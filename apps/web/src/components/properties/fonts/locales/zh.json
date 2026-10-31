@@ -1,0 +1,39 @@
+{
+  "title": "字体",
+  "search": "搜索字体",
+  "searchPrefix": "搜索",
+  "recent": "最近使用",
+  "empty": "没有匹配的字体",
+  "categories": "字体类别",
+  "all": "全部",
+  "installed": "已安装",
+  "import": "导入字体",
+  "loading": "正在加载字体…",
+  "installing": "正在添加字体…",
+  "sample": "{{brandName}} · Aa Bb · 0123",
+  "sampleLoading": "正在加载预览…",
+  "sampleUnavailable": "预览不可用",
+  "rendering": "正在渲染{{font}}…",
+  "renderUnavailable": "无法预览{{font}}",
+  "loadFailed": "无法加载字体库。请重试。",
+  "installFailed": "无法添加此字体。请重试。",
+  "importFailed": "无法导入此字体。请选择有效的TTF或OTF文件。",
+  "tooLarge": "请选择小于32MB的字体。",
+  "importHint": "TTF或OTF · 保存到字体库",
+  "localUnavailable": "系统字体不可用。你可以导入字体文件。",
+  "unavailable": "字体不可用",
+  "filter": {
+    "sans": "无衬线",
+    "serif": "衬线",
+    "mono": "等宽",
+    "display": "装饰",
+    "handwriting": "手写"
+  },
+  "category": {
+    "sans": "无衬线",
+    "serif": "衬线",
+    "mono": "等宽",
+    "display": "装饰",
+    "handwriting": "手写"
+  }
+}

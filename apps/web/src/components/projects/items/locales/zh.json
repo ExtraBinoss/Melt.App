@@ -1,0 +1,19 @@
+{
+  "options": "项目选项",
+  "open": "在{{brandName}}中打开",
+  "preview": "预览{{name}}",
+  "openNamed": "打开{{name}}",
+  "favorite": "添加到收藏",
+  "unfavorite": "从收藏中移除",
+  "favorites": "收藏",
+  "author": "创建者",
+  "me": "你",
+  "empty": "你的收藏将显示在这里。",
+  "failed": "无法加载此预览。",
+  "saveFailed": "无法保存收藏。",
+  "readFailed": "无法加载收藏。",
+  "retry": "重试",
+  "hint": "双击卡片可直接打开。",
+  "project": "项目",
+  "template": "模板"
+}

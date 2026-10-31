@@ -1,0 +1,19 @@
+{
+  "options": "Itemopties",
+  "open": "Openen in {{brandName}}",
+  "preview": "Voorbeeld van {{name}}",
+  "openNamed": "{{name}} openen",
+  "favorite": "Toevoegen aan favorieten",
+  "unfavorite": "Verwijderen uit favorieten",
+  "favorites": "Favorieten",
+  "author": "Gemaakt door",
+  "me": "Jij",
+  "empty": "Je favorieten verschijnen hier.",
+  "failed": "Dit voorbeeld kon niet worden geladen.",
+  "saveFailed": "Favorieten konden niet worden opgeslagen.",
+  "readFailed": "Favorieten konden niet worden geladen.",
+  "retry": "Opnieuw proberen",
+  "hint": "Dubbelklik op een kaart om deze direct te openen.",
+  "project": "Project",
+  "template": "Sjabloon"
+}

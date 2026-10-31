@@ -1,0 +1,12 @@
+{
+  "activate": "Editar {{name}}",
+  "options": "Opciones de mesa de trabajo: {{name}}",
+  "optionsHint": "Opciones de mesa de trabajo",
+  "rename": "Cambiar nombre",
+  "export": "Exportar composición…",
+  "remove": "Eliminar",
+  "name": "Nombre de la mesa de trabajo",
+  "preparing": "Preparando vista previa",
+  "unavailable": "Vista previa no disponible · haz clic para editar",
+  "retry": "Reintentar vistas previas"
+}

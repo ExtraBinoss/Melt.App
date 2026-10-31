@@ -1,0 +1,12 @@
+{
+  "activate": "Edytuj {{name}}",
+  "options": "Opcje obszaru roboczego: {{name}}",
+  "optionsHint": "Opcje obszaru roboczego",
+  "rename": "Zmień nazwę",
+  "export": "Eksportuj kompozycję…",
+  "remove": "Usuń",
+  "name": "Nazwa obszaru roboczego",
+  "preparing": "Przygotowywanie podglądu",
+  "unavailable": "Podgląd niedostępny · kliknij, aby edytować",
+  "retry": "Ponów podglądy"
+}

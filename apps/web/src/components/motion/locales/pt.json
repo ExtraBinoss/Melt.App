@@ -1,0 +1,12 @@
+{
+  "mode": "Modo de composição",
+  "static": "Estático",
+  "motion": "Animação",
+  "enableTitle": "Animar esta composição?",
+  "enableDescription": "Serão adicionados {{count}} itens à linha de tempo durante toda a composição.",
+  "groupCount": "Os grupos e as suas camadas estão incluídos. O teu trabalho continua editável.",
+  "yes": "Sim, ativar animação",
+  "no": "Não, manter estático",
+  "changed": "A composição foi alterada. Tenta novamente.",
+  "failed": "Não foi possível aplicar esta alteração."
+}

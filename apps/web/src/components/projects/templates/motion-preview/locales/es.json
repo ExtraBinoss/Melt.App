@@ -1,0 +1,8 @@
+{
+  "hover": "Pasa el cursor para ver la vista previa",
+  "play": "Reproducir vista previa",
+  "pause": "Pausar vista previa",
+  "loading": "Preparando vista previa en directo…",
+  "failed": "Vista previa no disponible. Puedes abrir este proyecto igualmente.",
+  "playing": "Vista previa de animación en directo"
+}

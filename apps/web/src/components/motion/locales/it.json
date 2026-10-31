@@ -1,0 +1,12 @@
+{
+  "mode": "Modalità composizione",
+  "static": "Statico",
+  "motion": "Animazione",
+  "enableTitle": "Vuoi animare questa composizione?",
+  "enableDescription": "Verranno aggiunti {{count}} elementi alla timeline per l’intera durata della composizione.",
+  "groupCount": "Sono inclusi i gruppi e i relativi livelli. Il tuo lavoro resterà modificabile.",
+  "yes": "Sì, attiva animazione",
+  "no": "No, mantieni statico",
+  "changed": "La composizione è cambiata. Riprova.",
+  "failed": "Impossibile applicare questa modifica."
+}

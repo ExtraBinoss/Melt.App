@@ -7,6 +7,7 @@ import {
   Dialog,
   DialogContent,
   DialogTitle,
+  DialogTrigger,
   DialogDescription,
   DialogClose,
 } from "../../ui/dialog";
@@ -34,12 +35,7 @@ export function VectorProperties({
   if (!layer.vector) return null;
   return (
     <section className="inspector-section">
-      <h3>SVG</h3>
-      <Button variant="outline" disabled={layer.locked || authored} onClick={() => setOpen(true)}>
-        <Spline size={14} />
-        {t("edit")}
-      </Button>
-      {authored && <p className="muted-description">{t("morphHint")}</p>}
+      <h3>{t("section")}</h3>
       <Dialog
         open={open}
         onOpenChange={(value) => {
@@ -47,6 +43,13 @@ export function VectorProperties({
           setOpen(value);
         }}
       >
+        <DialogTrigger asChild>
+          <Button variant="outline" disabled={layer.locked || authored}>
+            <Spline size={14} />
+            {t("edit")}
+          </Button>
+        </DialogTrigger>
+        {authored && <p className="muted-description">{t("morphHint")}</p>}
         <DialogContent
           className="vector-editor-dialog"
           onEscapeKeyDown={(event) => {

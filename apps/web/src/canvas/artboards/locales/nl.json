@@ -1,0 +1,12 @@
+{
+  "activate": "{{name}} bewerken",
+  "options": "Tekengebiedopties: {{name}}",
+  "optionsHint": "Tekengebiedopties",
+  "rename": "Naam wijzigen",
+  "export": "Compositie exporteren…",
+  "remove": "Verwijderen",
+  "name": "Naam van tekengebied",
+  "preparing": "Voorbeeld voorbereiden",
+  "unavailable": "Voorbeeld niet beschikbaar · klik om te bewerken",
+  "retry": "Voorbeelden opnieuw laden"
+}

@@ -131,3 +131,8 @@
   display: grid;
   gap: 7px;
 }
+
+/* The shared close control remains physically right-aligned in both directions. */
+.vector-editor-dialog [data-slot="dialog-title"] {
+  padding-right: 24px;
+}

@@ -1,0 +1,10 @@
+{
+  "newText": "내 텍스트",
+  "selectImageFirst": "이미지를 클릭하여 마스크를 만드세요.",
+  "canvas": "컴포지션 캔버스",
+  "toolHint": "캔버스를 클릭하거나 그리세요",
+  "dropImages": "이미지를 놓으세요",
+  "composition": "컴포지션",
+  "fontFamily": "글꼴",
+  "close": "닫기"
+}

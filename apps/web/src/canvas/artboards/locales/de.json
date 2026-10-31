@@ -1,0 +1,12 @@
+{
+  "activate": "Bearbeite {{name}}",
+  "options": "Zeichenflächenoptionen: {{name}}",
+  "optionsHint": "Zeichenflächenoptionen",
+  "rename": "Umbenennen",
+  "export": "Komposition exportieren…",
+  "remove": "Löschen",
+  "name": "Name der Zeichenfläche",
+  "preparing": "Vorschau wird vorbereitet",
+  "unavailable": "Vorschau nicht verfügbar · zum Bearbeiten klicken",
+  "retry": "Vorschauen erneut laden"
+}

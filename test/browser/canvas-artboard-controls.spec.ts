@@ -185,3 +185,84 @@ test("canvas-side additions persist in all directions, avoid occupied space and 
     canvas: 0,
   });
 });
+
+test("Arabic canvas controls and vector dialog retain RTL text and usable native focus", async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    localStorage.setItem("musart.language", "ar");
+    localStorage.setItem("musart.onboarding.v1", JSON.stringify({ version: 1, completed: true }));
+  });
+  await page.goto("/editor?automation=1");
+  await page.waitForFunction(() => Boolean(window.musart));
+  await expect(page.locator("html")).toHaveAttribute("dir", "rtl");
+  await page.evaluate(
+    (project) => {
+      window.musart!.load(project);
+      window.musart!.select(["vector"]);
+    },
+    createProject({
+      id: "rtl-controls",
+      pages: [
+        createPage({
+          id: "rtl-page",
+          name: "لوحة",
+          width: 640,
+          height: 400,
+          layers: [
+            createLayer("vector", {
+              id: "vector",
+              x: 50,
+              y: 50,
+              width: 220,
+              height: 180,
+              fill: "#8b5cf6",
+              vector: { viewBox: "0 0 200 160", path: "M20 20L180 20L180 140L20 140Z" },
+            }),
+            createLayer("text", {
+              id: "rtl-text",
+              text: "Melt",
+              x: 300,
+              y: 80,
+              width: 220,
+              height: 100,
+              fontFamily: "Inter",
+            }),
+          ],
+        }),
+      ],
+    }),
+  );
+  await expect(page.getByTestId("artboard")).toHaveAttribute("data-artboard-id", "rtl-page");
+  await expect(page.getByTestId("artboard")).toHaveAttribute("data-view-moving", "false");
+  const bounds = (await page.getByTestId("artboard").boundingBox())!;
+  await page.mouse.move(bounds.x + bounds.width + 34, bounds.y + bounds.height / 2);
+  const add = page.getByRole("button", { name: "إضافة لوح رسم", exact: true });
+  await expect(add).toHaveAttribute("data-visible", "true");
+  await add.hover();
+  await expect(page.getByRole("tooltip", { name: "إضافة لوح رسم", exact: true })).toBeVisible();
+  await expect(page.getByRole("radio", { name: "ثابت", exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "تحرير النقاط", exact: true }).click();
+  const dialog = page.getByRole("dialog", { name: "تحرير نقاط SVG", exact: true });
+  await expect(dialog).toBeVisible();
+  await expect(dialog.locator(".vector-anchor")).toHaveCount(4);
+  await expect(dialog.getByText("تدوير الزاوية", { exact: true })).toBeVisible();
+  const box = (await dialog.boundingBox())!,
+    size = page.viewportSize()!;
+  expect(box.x).toBeGreaterThanOrEqual(0);
+  expect(box.x + box.width).toBeLessThanOrEqual(size.width);
+  await page.screenshot({ path: "artifacts/artboard-controls/arabic-vector.png" });
+  await dialog.getByRole("button", { name: "تم", exact: true }).click();
+  await expect(page.getByRole("button", { name: "تحرير النقاط", exact: true })).toBeFocused();
+  await page.evaluate(() => window.musart!.select(["rtl-text"]));
+  await page.getByRole("combobox", { name: "الخط", exact: true }).click();
+  const list = page.getByRole("listbox", { name: "الخطوط", exact: true });
+  await expect(list).toBeVisible();
+  const specimen = list
+    .getByRole("option", { name: "Inter", exact: true })
+    .locator('[data-font-preview-state="ready"]');
+  await expect(specimen).toHaveText("Melt · Aa Bb · 0123");
+  await page.screenshot({ path: "artifacts/artboard-controls/arabic-fonts.png" });
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("combobox", { name: "الخط", exact: true })).toBeFocused();
+});

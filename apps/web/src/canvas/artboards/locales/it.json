@@ -1,0 +1,12 @@
+{
+  "activate": "Modifica {{name}}",
+  "options": "Opzioni tavola da disegno: {{name}}",
+  "optionsHint": "Opzioni tavola da disegno",
+  "rename": "Rinomina",
+  "export": "Esporta composizione…",
+  "remove": "Elimina",
+  "name": "Nome della tavola da disegno",
+  "preparing": "Preparazione dell’anteprima",
+  "unavailable": "Anteprima non disponibile · fai clic per modificare",
+  "retry": "Riprova le anteprime"
+}

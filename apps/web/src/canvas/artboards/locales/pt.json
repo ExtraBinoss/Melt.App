@@ -1,0 +1,12 @@
+{
+  "activate": "Editar {{name}}",
+  "options": "Opções da prancheta: {{name}}",
+  "optionsHint": "Opções da prancheta",
+  "rename": "Mudar nome",
+  "export": "Exportar composição…",
+  "remove": "Eliminar",
+  "name": "Nome da prancheta",
+  "preparing": "A preparar pré-visualização",
+  "unavailable": "Pré-visualização indisponível · clica para editar",
+  "retry": "Tentar novamente as pré-visualizações"
+}

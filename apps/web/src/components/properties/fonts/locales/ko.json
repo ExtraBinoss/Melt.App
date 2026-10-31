@@ -1,0 +1,39 @@
+{
+  "title": "글꼴",
+  "search": "글꼴 검색",
+  "searchPrefix": "검색",
+  "recent": "최근",
+  "empty": "일치하는 글꼴 없음",
+  "categories": "글꼴 종류",
+  "all": "전체",
+  "installed": "설치됨",
+  "import": "글꼴 가져오기",
+  "loading": "글꼴 불러오는 중…",
+  "installing": "글꼴 추가 중…",
+  "sample": "{{brandName}} · Aa Bb · 0123",
+  "sampleLoading": "미리보기 불러오는 중…",
+  "sampleUnavailable": "미리보기를 사용할 수 없음",
+  "rendering": "{{font}} 렌더링 중…",
+  "renderUnavailable": "{{font}} 미리보기를 표시할 수 없습니다",
+  "loadFailed": "글꼴 라이브러리를 불러올 수 없습니다. 다시 시도하세요.",
+  "installFailed": "이 글꼴을 추가할 수 없습니다. 다시 시도하세요.",
+  "importFailed": "이 글꼴을 가져올 수 없습니다. 유효한 TTF 또는 OTF 파일을 선택하세요.",
+  "tooLarge": "32MB보다 작은 글꼴을 선택하세요.",
+  "importHint": "TTF 또는 OTF · 라이브러리에 저장됨",
+  "localUnavailable": "시스템 글꼴을 사용할 수 없습니다. 글꼴 파일을 가져올 수 있습니다.",
+  "unavailable": "글꼴을 사용할 수 없음",
+  "filter": {
+    "sans": "산세리프",
+    "serif": "세리프",
+    "mono": "고정폭",
+    "display": "장식",
+    "handwriting": "손글씨"
+  },
+  "category": {
+    "sans": "산세리프",
+    "serif": "세리프",
+    "mono": "고정폭",
+    "display": "장식",
+    "handwriting": "손글씨"
+  }
+}

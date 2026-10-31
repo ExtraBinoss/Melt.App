@@ -1,0 +1,19 @@
+{
+  "options": "Opções do item",
+  "open": "Abrir no {{brandName}}",
+  "preview": "Pré-visualização de {{name}}",
+  "openNamed": "Abrir {{name}}",
+  "favorite": "Adicionar aos favoritos",
+  "unfavorite": "Remover dos favoritos",
+  "favorites": "Favoritos",
+  "author": "Criado por",
+  "me": "Tu",
+  "empty": "Os teus favoritos aparecerão aqui.",
+  "failed": "Não foi possível carregar esta pré-visualização.",
+  "saveFailed": "Não foi possível guardar os favoritos.",
+  "readFailed": "Não foi possível carregar os favoritos.",
+  "retry": "Tentar novamente",
+  "hint": "Faz duplo clique num cartão para o abrir diretamente.",
+  "project": "Projeto",
+  "template": "Modelo"
+}

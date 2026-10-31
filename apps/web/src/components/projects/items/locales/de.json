@@ -1,0 +1,19 @@
+{
+  "options": "Elementoptionen",
+  "open": "In {{brandName}} öffnen",
+  "preview": "Vorschau von {{name}}",
+  "openNamed": "{{name}} öffnen",
+  "favorite": "Zu Favoriten hinzufügen",
+  "unfavorite": "Aus Favoriten entfernen",
+  "favorites": "Favoriten",
+  "author": "Erstellt von",
+  "me": "Du",
+  "empty": "Deine Favoriten werden hier angezeigt.",
+  "failed": "Diese Vorschau konnte nicht geladen werden.",
+  "saveFailed": "Favoriten konnten nicht gespeichert werden.",
+  "readFailed": "Favoriten konnten nicht geladen werden.",
+  "retry": "Erneut versuchen",
+  "hint": "Doppelklicke auf eine Karte, um sie direkt zu öffnen.",
+  "project": "Projekt",
+  "template": "Vorlage"
+}

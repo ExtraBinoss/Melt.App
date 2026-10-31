@@ -1,0 +1,19 @@
+{
+  "options": "Opzioni elemento",
+  "open": "Apri in {{brandName}}",
+  "preview": "Anteprima di {{name}}",
+  "openNamed": "Apri {{name}}",
+  "favorite": "Aggiungi ai preferiti",
+  "unfavorite": "Rimuovi dai preferiti",
+  "favorites": "Preferiti",
+  "author": "Creato da",
+  "me": "Tu",
+  "empty": "I tuoi preferiti appariranno qui.",
+  "failed": "Impossibile caricare questa anteprima.",
+  "saveFailed": "Impossibile salvare i preferiti.",
+  "readFailed": "Impossibile caricare i preferiti.",
+  "retry": "Riprova",
+  "hint": "Fai doppio clic su una scheda per aprirla direttamente.",
+  "project": "Progetto",
+  "template": "Modello"
+}

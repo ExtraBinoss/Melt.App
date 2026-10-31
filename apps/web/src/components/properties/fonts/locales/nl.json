@@ -1,0 +1,39 @@
+{
+  "title": "Lettertypen",
+  "search": "Lettertypen zoeken",
+  "searchPrefix": "Zoeken",
+  "recent": "Recent",
+  "empty": "Geen passende lettertypen",
+  "categories": "Lettertypecategorie",
+  "all": "Alle",
+  "installed": "Geïnstalleerd",
+  "import": "Lettertype importeren",
+  "loading": "Lettertypen laden…",
+  "installing": "Lettertype toevoegen…",
+  "sample": "Ideeën krijgen vorm.",
+  "sampleLoading": "Voorbeeld laden…",
+  "sampleUnavailable": "Voorbeeld niet beschikbaar",
+  "rendering": "{{font}} weergeven…",
+  "renderUnavailable": "{{font}} kon niet worden weergegeven",
+  "loadFailed": "De lettertypebibliotheek kon niet worden geladen. Probeer het opnieuw.",
+  "installFailed": "Dit lettertype kon niet worden toegevoegd. Probeer het opnieuw.",
+  "importFailed": "Dit lettertype kon niet worden geïmporteerd. Kies een geldig TTF- of OTF-bestand.",
+  "tooLarge": "Kies een lettertype kleiner dan 32 MB.",
+  "importHint": "TTF of OTF · opgeslagen in je bibliotheek",
+  "localUnavailable": "Systeemlettertypen zijn niet beschikbaar. Je kunt een lettertypebestand importeren.",
+  "unavailable": "Lettertype niet beschikbaar",
+  "filter": {
+    "sans": "Schreefloos",
+    "serif": "Met schreef",
+    "mono": "Mono",
+    "display": "Decoratief",
+    "handwriting": "Handschrift"
+  },
+  "category": {
+    "sans": "Schreefloos",
+    "serif": "Met schreef",
+    "mono": "Vaste breedte",
+    "display": "Decoratief",
+    "handwriting": "Handschrift"
+  }
+}

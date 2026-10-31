@@ -1,0 +1,12 @@
+{
+  "mode": "Compositiemodus",
+  "static": "Statisch",
+  "motion": "Animatie",
+  "enableTitle": "Deze compositie animeren?",
+  "enableDescription": "Er worden {{count}} items toegevoegd aan de tijdlijn voor de volledige duur van de compositie.",
+  "groupCount": "Groepen en hun onderliggende lagen zijn inbegrepen. Je werk blijft bewerkbaar.",
+  "yes": "Ja, animatie inschakelen",
+  "no": "Nee, statisch houden",
+  "changed": "De compositie is gewijzigd. Probeer het opnieuw.",
+  "failed": "Deze wijziging kon niet worden toegepast."
+}

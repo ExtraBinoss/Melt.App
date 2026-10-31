@@ -8,6 +8,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 - Move artboard mode controls inside each bottom-right corner with bounded zoom scaling. Replace heading plus buttons with one imperative canvas action on free sides, persist directional placement through validated atomic commands and one undo, and preserve the first screen pose before a reduced-motion-aware reframe.
 
+- Translate the edited SVG, font picker, artboard, studio loading, library card, template and preview interfaces into all twelve advertised languages, including composition-mode confirmations. Remove remaining local English/French fallbacks in the canvas changes and resolve shared copy through feature JSON, with interpolation and RTL regressions. Restore native SVG dialog opener focus and reserve RTL title space for its close control; keep font specimens honest for bundled Latin-only faces.
+
 - Add six prerendered local effect converters accepting images and videos for ASCII, Dither, Halftone, Cyanotype, CRT and Posterize, with real shared TSL effects, registry-driven basic/advanced controls, lazy renderer loading, bounded cancellable sessions and native downloads. Add unique guides, FAQs, canonical URLs, sitemap entries and footer links; retain shared mascot loading and development-only preparation timings.
 
 - Center the shared public navigation across landing and tools, animate active/hover underlines, remove the Try Melt border, add violet text selection and a responsive two-column FAQ with a sticky heading. Extend the footer with local-tool links and an accessible language selector.

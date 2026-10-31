@@ -1,0 +1,39 @@
+{
+  "title": "الخطوط",
+  "search": "البحث عن الخطوط",
+  "searchPrefix": "بحث",
+  "recent": "الأخيرة",
+  "empty": "لا توجد خطوط مطابقة",
+  "categories": "فئة الخط",
+  "all": "الكل",
+  "installed": "المثبّتة",
+  "import": "استيراد خط",
+  "loading": "جارٍ تحميل الخطوط…",
+  "installing": "جارٍ إضافة الخط…",
+  "sample": "{{brandName}} · Aa Bb · 0123",
+  "sampleLoading": "جارٍ تحميل المعاينة…",
+  "sampleUnavailable": "المعاينة غير متاحة",
+  "rendering": "جارٍ عرض {{font}}…",
+  "renderUnavailable": "تعذّرت معاينة {{font}}",
+  "loadFailed": "تعذّر تحميل مكتبة الخطوط. حاول مرة أخرى.",
+  "installFailed": "تعذّرت إضافة هذا الخط. حاول مرة أخرى.",
+  "importFailed": "تعذّر استيراد هذا الخط. اختر ملف TTF أو OTF صالحًا.",
+  "tooLarge": "اختر خطًا أصغر من 32 ميغابايت.",
+  "importHint": "TTF أو OTF · يُحفظ في مكتبتك",
+  "localUnavailable": "خطوط النظام غير متاحة. يمكنك استيراد ملف خط.",
+  "unavailable": "الخط غير متاح",
+  "filter": {
+    "sans": "بلا زوائد",
+    "serif": "بزوائد",
+    "mono": "ثابت العرض",
+    "display": "زخرفي",
+    "handwriting": "يدوي"
+  },
+  "category": {
+    "sans": "بلا زوائد",
+    "serif": "بزوائد",
+    "mono": "ثابت العرض",
+    "display": "زخرفي",
+    "handwriting": "يدوي"
+  }
+}

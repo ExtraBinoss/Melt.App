@@ -1,0 +1,12 @@
+{
+  "mode": "合成模式",
+  "static": "静态",
+  "motion": "动画",
+  "enableTitle": "将此合成设为动画？",
+  "enableDescription": "{{count}}个项目将添加到时间轴，覆盖整个合成时长。",
+  "groupCount": "包括编组及其子图层。你的作品仍可编辑。",
+  "yes": "是，启用动画",
+  "no": "否，保持静态",
+  "changed": "合成已更改，请重试。",
+  "failed": "无法应用此更改。"
+}

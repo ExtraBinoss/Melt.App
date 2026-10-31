@@ -1,0 +1,12 @@
+{
+  "mode": "Tryb kompozycji",
+  "static": "Statyczny",
+  "motion": "Animacja",
+  "enableTitle": "Włączyć animację tej kompozycji?",
+  "enableDescription": "Do osi czasu zostanie dodanych {{count}} elementów na cały czas trwania kompozycji.",
+  "groupCount": "Uwzględnione zostaną grupy i ich warstwy. Praca pozostanie edytowalna.",
+  "yes": "Tak, włącz animację",
+  "no": "Nie, pozostaw statyczną",
+  "changed": "Kompozycja uległa zmianie. Spróbuj ponownie.",
+  "failed": "Nie udało się zastosować tej zmiany."
+}

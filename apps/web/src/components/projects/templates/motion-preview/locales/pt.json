@@ -1,0 +1,8 @@
+{
+  "hover": "Passa o cursor para pré-visualizar",
+  "play": "Reproduzir pré-visualização",
+  "pause": "Pausar pré-visualização",
+  "loading": "A preparar a pré-visualização em tempo real…",
+  "failed": "Pré-visualização indisponível. Ainda podes abrir este projeto.",
+  "playing": "Pré-visualização de animação em tempo real"
+}

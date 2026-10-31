@@ -1,0 +1,39 @@
+{
+  "title": "Czcionki",
+  "search": "Szukaj czcionek",
+  "searchPrefix": "Szukaj",
+  "recent": "Ostatnie",
+  "empty": "Brak pasujących czcionek",
+  "categories": "Kategoria czcionki",
+  "all": "Wszystkie",
+  "installed": "Zainstalowane",
+  "import": "Importuj czcionkę",
+  "loading": "Ładowanie czcionek…",
+  "installing": "Dodawanie czcionki…",
+  "sample": "Pomysły nabierają kształtu.",
+  "sampleLoading": "Ładowanie podglądu…",
+  "sampleUnavailable": "Podgląd niedostępny",
+  "rendering": "Renderowanie {{font}}…",
+  "renderUnavailable": "Nie udało się wyświetlić podglądu {{font}}",
+  "loadFailed": "Nie udało się wczytać biblioteki czcionek. Spróbuj ponownie.",
+  "installFailed": "Nie udało się dodać tej czcionki. Spróbuj ponownie.",
+  "importFailed": "Nie udało się zaimportować tej czcionki. Wybierz prawidłowy plik TTF lub OTF.",
+  "tooLarge": "Wybierz czcionkę mniejszą niż 32 MB.",
+  "importHint": "TTF lub OTF · zapisywane w bibliotece",
+  "localUnavailable": "Czcionki systemowe są niedostępne. Możesz zaimportować plik czcionki.",
+  "unavailable": "Czcionka niedostępna",
+  "filter": {
+    "sans": "Bezszeryfowe",
+    "serif": "Szeryfowe",
+    "mono": "Mono",
+    "display": "Ozdobne",
+    "handwriting": "Odręczne"
+  },
+  "category": {
+    "sans": "Bezszeryfowa",
+    "serif": "Szeryfowa",
+    "mono": "O stałej szerokości",
+    "display": "Ozdobna",
+    "handwriting": "Odręczna"
+  }
+}

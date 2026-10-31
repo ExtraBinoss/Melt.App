@@ -1,0 +1,39 @@
+{
+  "title": "Caratteri",
+  "search": "Cerca caratteri",
+  "searchPrefix": "Cerca",
+  "recent": "Recenti",
+  "empty": "Nessun carattere corrispondente",
+  "categories": "Categoria del carattere",
+  "all": "Tutti",
+  "installed": "Installati",
+  "import": "Importa carattere",
+  "loading": "Caricamento dei caratteri…",
+  "installing": "Aggiunta del carattere…",
+  "sample": "Le idee prendono forma.",
+  "sampleLoading": "Caricamento dell’anteprima…",
+  "sampleUnavailable": "Anteprima non disponibile",
+  "rendering": "Rendering di {{font}}…",
+  "renderUnavailable": "Impossibile visualizzare l’anteprima di {{font}}",
+  "loadFailed": "Impossibile caricare la libreria dei caratteri. Riprova.",
+  "installFailed": "Impossibile aggiungere questo carattere. Riprova.",
+  "importFailed": "Impossibile importare questo carattere. Scegli un file TTF o OTF valido.",
+  "tooLarge": "Scegli un carattere inferiore a 32 MB.",
+  "importHint": "TTF o OTF · salvato nella libreria",
+  "localUnavailable": "I caratteri di sistema non sono disponibili. Puoi importare un file di carattere.",
+  "unavailable": "Carattere non disponibile",
+  "filter": {
+    "sans": "Senza grazie",
+    "serif": "Con grazie",
+    "mono": "Mono",
+    "display": "Decorativo",
+    "handwriting": "Manoscritto"
+  },
+  "category": {
+    "sans": "Senza grazie",
+    "serif": "Con grazie",
+    "mono": "Monospaziato",
+    "display": "Decorativo",
+    "handwriting": "Manoscritto"
+  }
+}

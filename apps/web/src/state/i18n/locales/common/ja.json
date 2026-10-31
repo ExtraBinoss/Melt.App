@@ -1,0 +1,10 @@
+{
+  "newText": "テキスト",
+  "selectImageFirst": "画像をクリックしてマスクを作成します。",
+  "canvas": "コンポジションのキャンバス",
+  "toolHint": "キャンバスをクリックするか描画してください",
+  "dropImages": "画像をドロップ",
+  "composition": "コンポジション",
+  "fontFamily": "フォント",
+  "close": "閉じる"
+}

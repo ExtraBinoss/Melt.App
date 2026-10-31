@@ -1,0 +1,39 @@
+{
+  "title": "Tipos de letra",
+  "search": "Pesquisar tipos de letra",
+  "searchPrefix": "Pesquisar",
+  "recent": "Recentes",
+  "empty": "Nenhum tipo de letra correspondente",
+  "categories": "Categoria do tipo de letra",
+  "all": "Todos",
+  "installed": "Instalados",
+  "import": "Importar tipo de letra",
+  "loading": "A carregar tipos de letra…",
+  "installing": "A adicionar tipo de letra…",
+  "sample": "As ideias ganham forma.",
+  "sampleLoading": "A carregar pré-visualização…",
+  "sampleUnavailable": "Pré-visualização indisponível",
+  "rendering": "A apresentar {{font}}…",
+  "renderUnavailable": "Não foi possível pré-visualizar {{font}}",
+  "loadFailed": "Não foi possível carregar a biblioteca de tipos de letra. Tenta novamente.",
+  "installFailed": "Não foi possível adicionar este tipo de letra. Tenta novamente.",
+  "importFailed": "Não foi possível importar este tipo de letra. Escolhe um ficheiro TTF ou OTF válido.",
+  "tooLarge": "Escolhe um tipo de letra com menos de 32 MB.",
+  "importHint": "TTF ou OTF · guardado na tua biblioteca",
+  "localUnavailable": "Os tipos de letra do sistema estão indisponíveis. Podes importar um ficheiro.",
+  "unavailable": "Tipo de letra indisponível",
+  "filter": {
+    "sans": "Sem serifa",
+    "serif": "Com serifa",
+    "mono": "Mono",
+    "display": "Decorativo",
+    "handwriting": "Manuscrito"
+  },
+  "category": {
+    "sans": "Sem serifa",
+    "serif": "Com serifa",
+    "mono": "Monoespaçado",
+    "display": "Decorativo",
+    "handwriting": "Manuscrito"
+  }
+}

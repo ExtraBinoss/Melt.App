@@ -1,0 +1,39 @@
+{
+  "title": "Schriftarten",
+  "search": "Schriftarten suchen",
+  "searchPrefix": "Suchen",
+  "recent": "Zuletzt verwendet",
+  "empty": "Keine passenden Schriftarten",
+  "categories": "Schriftkategorie",
+  "all": "Alle",
+  "installed": "Installiert",
+  "import": "Schrift importieren",
+  "loading": "Schriftarten werden geladen…",
+  "installing": "Schrift wird hinzugefügt…",
+  "sample": "Ideen nehmen Form an.",
+  "sampleLoading": "Vorschau wird geladen…",
+  "sampleUnavailable": "Vorschau nicht verfügbar",
+  "rendering": "{{font}} wird dargestellt…",
+  "renderUnavailable": "{{font}} konnte nicht angezeigt werden",
+  "loadFailed": "Die Schriftbibliothek konnte nicht geladen werden. Versuche es erneut.",
+  "installFailed": "Diese Schrift konnte nicht hinzugefügt werden. Versuche es erneut.",
+  "importFailed": "Diese Schrift konnte nicht importiert werden. Wähle eine gültige TTF- oder OTF-Datei.",
+  "tooLarge": "Wähle eine Schriftdatei unter 32 MB.",
+  "importHint": "TTF oder OTF · wird in deiner Bibliothek gespeichert",
+  "localUnavailable": "Systemschriften sind nicht verfügbar. Du kannst eine Schriftdatei importieren.",
+  "unavailable": "Schrift nicht verfügbar",
+  "filter": {
+    "sans": "Serifenlos",
+    "serif": "Serifen",
+    "mono": "Monospace",
+    "display": "Display",
+    "handwriting": "Handschrift"
+  },
+  "category": {
+    "sans": "Serifenlos",
+    "serif": "Mit Serifen",
+    "mono": "Nichtproportional",
+    "display": "Display",
+    "handwriting": "Handschrift"
+  }
+}

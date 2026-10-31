@@ -1,0 +1,19 @@
+{
+  "options": "項目のオプション",
+  "open": "{{brandName}}で開く",
+  "preview": "{{name}}をプレビュー",
+  "openNamed": "{{name}}を開く",
+  "favorite": "お気に入りに追加",
+  "unfavorite": "お気に入りから削除",
+  "favorites": "お気に入り",
+  "author": "作成者",
+  "me": "あなた",
+  "empty": "お気に入りがここに表示されます。",
+  "failed": "このプレビューを読み込めませんでした。",
+  "saveFailed": "お気に入りを保存できませんでした。",
+  "readFailed": "お気に入りを読み込めませんでした。",
+  "retry": "再試行",
+  "hint": "カードをダブルクリックすると直接開けます。",
+  "project": "プロジェクト",
+  "template": "テンプレート"
+}

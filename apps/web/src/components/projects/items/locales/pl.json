@@ -1,0 +1,19 @@
+{
+  "options": "Opcje elementu",
+  "open": "Otwórz w {{brandName}}",
+  "preview": "Podgląd {{name}}",
+  "openNamed": "Otwórz {{name}}",
+  "favorite": "Dodaj do ulubionych",
+  "unfavorite": "Usuń z ulubionych",
+  "favorites": "Ulubione",
+  "author": "Autor",
+  "me": "Ty",
+  "empty": "Tutaj pojawią się Twoje ulubione.",
+  "failed": "Nie udało się wczytać tego podglądu.",
+  "saveFailed": "Nie udało się zapisać ulubionych.",
+  "readFailed": "Nie udało się wczytać ulubionych.",
+  "retry": "Spróbuj ponownie",
+  "hint": "Kliknij dwukrotnie kartę, aby od razu ją otworzyć.",
+  "project": "Projekt",
+  "template": "Szablon"
+}

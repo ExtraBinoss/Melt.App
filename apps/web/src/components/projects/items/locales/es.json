@@ -1,0 +1,19 @@
+{
+  "options": "Opciones del elemento",
+  "open": "Abrir en {{brandName}}",
+  "preview": "Vista previa de {{name}}",
+  "openNamed": "Abrir {{name}}",
+  "favorite": "Añadir a favoritos",
+  "unfavorite": "Quitar de favoritos",
+  "favorites": "Favoritos",
+  "author": "Creado por",
+  "me": "Tú",
+  "empty": "Tus favoritos aparecerán aquí.",
+  "failed": "No se pudo cargar esta vista previa.",
+  "saveFailed": "No se pudieron guardar los favoritos.",
+  "readFailed": "No se pudieron cargar los favoritos.",
+  "retry": "Reintentar",
+  "hint": "Haz doble clic en una tarjeta para abrirla directamente.",
+  "project": "Proyecto",
+  "template": "Plantilla"
+}

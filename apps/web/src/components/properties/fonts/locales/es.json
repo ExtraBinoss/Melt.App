@@ -1,0 +1,39 @@
+{
+  "title": "Fuentes",
+  "search": "Buscar fuentes",
+  "searchPrefix": "Buscar",
+  "recent": "Recientes",
+  "empty": "No hay fuentes coincidentes",
+  "categories": "Categoría de fuente",
+  "all": "Todas",
+  "installed": "Instaladas",
+  "import": "Importar fuente",
+  "loading": "Cargando fuentes…",
+  "installing": "Añadiendo fuente…",
+  "sample": "Las ideas toman forma.",
+  "sampleLoading": "Cargando vista previa…",
+  "sampleUnavailable": "Vista previa no disponible",
+  "rendering": "Renderizando {{font}}…",
+  "renderUnavailable": "No se ha podido previsualizar {{font}}",
+  "loadFailed": "No se ha podido cargar la biblioteca de fuentes. Inténtalo de nuevo.",
+  "installFailed": "No se ha podido añadir esta fuente. Inténtalo de nuevo.",
+  "importFailed": "No se ha podido importar esta fuente. Elige un archivo TTF u OTF válido.",
+  "tooLarge": "Elige una fuente de menos de 32 MB.",
+  "importHint": "TTF u OTF · se guarda en tu biblioteca",
+  "localUnavailable": "Las fuentes del sistema no están disponibles. Puedes importar un archivo de fuente.",
+  "unavailable": "Fuente no disponible",
+  "filter": {
+    "sans": "Sin serifa",
+    "serif": "Con serifa",
+    "mono": "Mono",
+    "display": "Decorativa",
+    "handwriting": "Manuscrita"
+  },
+  "category": {
+    "sans": "Sin serifa",
+    "serif": "Con serifa",
+    "mono": "Monoespaciada",
+    "display": "Decorativa",
+    "handwriting": "Manuscrita"
+  }
+}

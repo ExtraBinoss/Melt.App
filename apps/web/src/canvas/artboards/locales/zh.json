@@ -1,0 +1,12 @@
+{
+  "activate": "编辑{{name}}",
+  "options": "画板选项：{{name}}",
+  "optionsHint": "画板选项",
+  "rename": "重命名",
+  "export": "导出合成…",
+  "remove": "删除",
+  "name": "画板名称",
+  "preparing": "正在准备预览",
+  "unavailable": "预览不可用 · 点击编辑",
+  "retry": "重试预览"
+}

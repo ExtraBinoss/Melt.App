@@ -1,0 +1,12 @@
+{
+  "mode": "Kompositionsmodus",
+  "static": "Statisch",
+  "motion": "Bewegung",
+  "enableTitle": "Diese Komposition animieren?",
+  "enableDescription": "{{count}} Elemente werden für die gesamte Kompositionsdauer zur Zeitleiste hinzugefügt.",
+  "groupCount": "Gruppen und ihre untergeordneten Ebenen sind enthalten. Dein Werk bleibt bearbeitbar.",
+  "yes": "Ja, Bewegung aktivieren",
+  "no": "Nein, statisch lassen",
+  "changed": "Die Komposition hat sich geändert. Bitte versuche es erneut.",
+  "failed": "Diese Änderung konnte nicht angewendet werden."
+}
