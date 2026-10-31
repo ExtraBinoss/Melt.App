@@ -1,205 +1,33 @@
-import { AnimationContextMenu } from "./AnimationContextMenu";
-import { useVirtualList } from "../../shared/scroll/use-virtual-list";
-import type { RefObject } from "react";
-import { SimpleAudioRows } from "./SimpleAudioRows";
-import { useRef, useState, type CSSProperties, type PointerEvent } from "react";
-import { Plus, Sparkles } from "lucide-react";
+import { useMemo, type CSSProperties, type RefObject } from "react";
+import { useReducedMotion } from "motion/react";
+import { Sparkles } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import {
   createLayerGeometryIndex,
   motionTimeToSeconds,
-  type EnginePort,
   type Composition,
+  type EnginePort,
   type MotionAnimation,
   type MotionLayerTrack,
-  type SessionSnapshot,
 } from "@musart/core";
-import { Button } from "../../ui/button";
+import { useVirtualList } from "../../shared/scroll/use-virtual-list";
+import { TimelineRowView } from "../rows/TimelineRowView";
+import { useTimelineRowHover } from "../rows/use-row-hover";
+import { TrackClips } from "../occurrences/TrackClips";
 import { MotionPopover } from "./MotionPopover";
+import { AnimationBlock } from "./AnimationBlock";
+import { SimpleAudioRows } from "./SimpleAudioRows";
 import { animationPresentation, useAnimationPresentation } from "./presentation";
-import type { TimelineTransport } from "../model";
+import type { TimelineRow } from "../tree";
+import type { TimelineGestures } from "../gestures";
+import type { TimelineLayerDrag } from "../layer-drag/use-timeline-layer-drag";
+import type { TimelineTransport, TimelineUnit } from "../model";
 import "./animations.css";
 
-interface Draft {
-  pointer: number;
-  x: number;
-  start: number;
-  duration: number;
-  nextStart: number;
-  nextDuration: number;
-  edge: string | undefined;
-  snapshot: SessionSnapshot;
-  node: HTMLButtonElement;
-}
-function AnimationBlock({
-  engine,
-  animation,
-  layerId,
-  scale,
-  selected,
-  disabled,
-  transport,
-  page,
-  trackId,
-}: {
-  engine: EnginePort;
-  animation: MotionAnimation;
-  layerId: string;
-  scale: number;
-  selected: boolean;
-  disabled: boolean;
-  transport: TimelineTransport;
-  page: Composition;
-  trackId: string;
-}) {
-  const draft = useRef<Draft | null>(null);
-  const [error, setError] = useState(false);
-  const { t } = useTranslation("animations");
-  const start = motionTimeToSeconds(animation.start),
-    duration = motionTimeToSeconds(animation.duration);
-  function paint(node: HTMLButtonElement, from: number, span: number) {
-    node.style.left = `${from * scale}px`;
-    node.style.width = `${Math.max(5, span * scale)}px`;
-  }
-  function finish(event: PointerEvent<HTMLButtonElement>, cancel: boolean) {
-    const active = draft.current;
-    if (!active || active.pointer !== event.pointerId) return;
-    draft.current = null;
-    paint(active.node, start, duration);
-    if (active.node.hasPointerCapture(active.pointer))
-      active.node.releasePointerCapture(active.pointer);
-    if (
-      cancel ||
-      engine.getSnapshot().project !== active.snapshot.project ||
-      engine.getSnapshot().revision !== active.snapshot.revision
-    )
-      return;
-    if (
-      Math.abs(active.nextStart - start) < 1e-6 &&
-      Math.abs(active.nextDuration - duration) < 1e-6
-    )
-      return;
-    try {
-      engine.execute({
-        type: "updateMotionAnimation",
-        animationId: animation.id,
-        patch: {
-          start: { value: Math.round(active.nextStart * 1000000), rate: 1000000 },
-          duration: {
-            value: Math.max(1, Math.round(active.nextDuration * 1000000)),
-            rate: 1000000,
-          },
-        },
-      });
-      setError(false);
-    } catch {
-      setError(true);
-    }
-  }
-  return (
-    <AnimationContextMenu
-      engine={engine}
-      page={page}
-      layerId={layerId}
-      trackId={trackId}
-      animation={animation}
-      transport={transport}
-      disabled={disabled}
-    >
-      <button
-        className="motion-animation-block"
-        type="button"
-        data-animation-id={animation.id}
-        data-selected={selected}
-        data-disabled={!animation.enabled}
-        aria-label={`${animation.preset.name}, ${Math.round(duration * 1000)} ms`}
-        disabled={disabled}
-        style={{ left: start * scale, width: Math.max(5, duration * scale) }}
-        onPointerDown={(event) => {
-          if (event.button !== 0 || disabled) return;
-          event.stopPropagation();
-          transport.pause();
-          engine.select([layerId]);
-          animationPresentation(engine).set({ selected: animation.id });
-          event.currentTarget.setPointerCapture(event.pointerId);
-          draft.current = {
-            pointer: event.pointerId,
-            x: event.clientX,
-            start,
-            duration,
-            nextStart: start,
-            nextDuration: duration,
-            edge: (event.target as HTMLElement).dataset.edge,
-            snapshot: engine.getSnapshot(),
-            node: event.currentTarget,
-          };
-        }}
-        onPointerMove={(event) => {
-          const active = draft.current;
-          if (!active || active.pointer !== event.pointerId) return;
-          const delta = Math.round(((event.clientX - active.x) / scale) * 1000) / 1000;
-          if (active.edge === "end") active.nextDuration = Math.max(0.001, active.duration + delta);
-          else if (active.edge === "start") {
-            active.nextStart = Math.max(
-              0,
-              Math.min(active.start + active.duration - 0.001, active.start + delta),
-            );
-            active.nextDuration = active.start + active.duration - active.nextStart;
-          } else active.nextStart = Math.max(0, active.start + delta);
-          paint(active.node, active.nextStart, active.nextDuration);
-        }}
-        onPointerUp={(event) => finish(event, false)}
-        onPointerCancel={(event) => finish(event, true)}
-        onLostPointerCapture={(event) => finish(event, true)}
-        onKeyDown={(event) => {
-          if (event.key === "Delete" || event.key === "Backspace") {
-            event.preventDefault();
-            event.stopPropagation();
-            try {
-              engine.execute({ type: "deleteMotionAnimation", animationId: animation.id });
-            } catch {
-              setError(true);
-            }
-            return;
-          }
-          if (event.key === "Escape" && draft.current) {
-            const active = draft.current;
-            draft.current = null;
-            paint(active.node, start, duration);
-            if (active.node.hasPointerCapture(active.pointer))
-              active.node.releasePointerCapture(active.pointer);
-            event.preventDefault();
-          }
-          if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
-            event.preventDefault();
-            event.stopPropagation();
-            const delta = (event.key === "ArrowLeft" ? -1 : 1) * (event.shiftKey ? 0.1 : 0.01);
-            try {
-              engine.execute({
-                type: "updateMotionAnimation",
-                animationId: animation.id,
-                patch: {
-                  start: { value: Math.max(0, Math.round((start + delta) * 1000)), rate: 1000 },
-                },
-              });
-            } catch {
-              setError(true);
-            }
-          }
-        }}
-        onClick={() => {
-          engine.select([layerId]);
-          animationPresentation(engine).set({ selected: animation.id });
-        }}
-      >
-        <span>{error ? t("applyFailed") : duration * scale > 80 ? animation.preset.name : ""}</span>
-        <span className="animation-block-edge" data-edge="start" />
-        <span className="animation-block-edge" data-edge="end" />
-      </button>
-    </AnimationContextMenu>
-  );
-}
+type LayerRow = Extract<TimelineRow, { kind: "layer" }>;
+type Row = { row: LayerRow; track?: MotionLayerTrack; animation?: MotionAnimation };
 
+/** Same canonical layer rows and interactions as Keyframes, with editable animation children. */
 export function SimpleTimelineRows({
   engine,
   page,
@@ -208,6 +36,15 @@ export function SimpleTimelineRows({
   gutter,
   interactive,
   viewport,
+  layerRows,
+  rowHeight,
+  selected,
+  onToggle,
+  onSelect,
+  gestures,
+  drag,
+  onError,
+  unit,
 }: {
   engine: EnginePort;
   page: Composition;
@@ -216,115 +53,162 @@ export function SimpleTimelineRows({
   gutter: number;
   interactive: boolean;
   viewport: RefObject<HTMLDivElement | null>;
+  layerRows: readonly TimelineRow[];
+  rowHeight: number;
+  selected: ReadonlySet<string>;
+  onToggle(this: void, id: string): void;
+  onSelect(this: void, id: string, additive: boolean): void;
+  gestures: TimelineGestures;
+  drag: TimelineLayerDrag;
+  onError(this: void, message: string): void;
+  unit: TimelineUnit;
 }) {
   const { t } = useTranslation("animations");
-  const presentation = useAnimationPresentation(engine);
-  const geometry = createLayerGeometryIndex(page);
-  const tracks = (page.motion?.tracks ?? []).filter(
-    (track) =>
-      track.animations?.length ||
-      track.properties.some((property) => property.keyframes.length) ||
-      track.end !== null ||
-      geometry.get(track.layerId).kind === "video",
+  const presentation = useAnimationPresentation(engine),
+    reduced = !!useReducedMotion();
+  const { showHover, clearHover } = useTimelineRowHover(engine, page.id);
+  const geometry = useMemo(() => createLayerGeometryIndex(page), [page]);
+  const rows = useMemo(
+    () =>
+      layerRows.flatMap<Row>((row) => {
+        if (row.kind !== "layer") return [];
+        return [
+          { row },
+          ...(row.expanded
+            ? (row.occurrences ?? []).flatMap((track) =>
+                (track.animations ?? []).map((animation) => ({ row, track, animation })),
+              )
+            : []),
+        ];
+      }),
+    [layerRows],
   );
-  const rows: { track: MotionLayerTrack; animation?: MotionAnimation }[] = tracks.flatMap((track) =>
-    track.animations?.length
-      ? track.animations.map((animation) => ({ track, animation }))
-      : [{ track }],
-  );
-  rows.sort((a, b) => {
-    const start =
-      motionTimeToSeconds(a.animation?.start ?? a.track.start) -
-      motionTimeToSeconds(b.animation?.start ?? b.track.start);
-    if (start) return start;
-    return (
-      motionTimeToSeconds(a.animation?.duration ?? page.motion!.duration) -
-      motionTimeToSeconds(b.animation?.duration ?? page.motion!.duration)
-    );
-  });
-  const { first, last } = useVirtualList(
-    rows.length + (page.motion?.audioTracks?.length ?? 0),
-    32,
-    viewport,
-    4,
-  );
+  const audioCount = page.motion?.audioTracks?.length ?? 0;
+  const { first, last } = useVirtualList(rows.length + audioCount, rowHeight, viewport, 4);
+  const duration = motionTimeToSeconds(page.motion!.duration);
   return (
     <div
-      className="motion-simple-rows"
+      className="motion-simple-rows motion-row-space"
       style={
         {
           "--motion-gutter": `${gutter}px`,
-          height: (rows.length + (page.motion?.audioTracks?.length ?? 0)) * 32,
+          "--motion-simple-row-height": `${rowHeight}px`,
+          height: Math.max(140, (rows.length + audioCount) * rowHeight),
         } as CSSProperties
       }
       aria-label={t("title")}
     >
-      {!rows.length && !page.motion?.audioTracks?.length && (
-        <p className="animation-picker-empty">{t("select")}</p>
-      )}
-      {rows.slice(first, last).map(({ track, animation }, offset) => {
-        const layer = geometry.get(track.layerId),
-          disabled = !interactive || geometry.isLocked(layer.id);
+      {rows.slice(first, last).map(({ row, animation, track }, offset) => {
+        const layer = row.layer,
+          locked = geometry.isLocked(layer.id),
+          top = (first + offset) * rowHeight;
+        const disabled = !interactive || locked;
+        if (!animation || !track)
+          return (
+            <TimelineRowView
+              key={row.key}
+              row={row}
+              top={top}
+              height={rowHeight}
+              reduced={reduced}
+              active={selected.has(layer.id)}
+              locked={locked}
+              page={page}
+              project={engine.getSnapshot().project}
+              pixelsPerSecond={scale}
+              duration={duration}
+              left={0}
+              width={duration * scale}
+              unit={unit}
+              transport={transport}
+              onToggle={onToggle}
+              onSelect={onSelect}
+              engine={engine}
+              compositionId={page.id}
+              interactive={interactive}
+              drag={drag}
+              gestures={gestures}
+              onError={onError}
+              showHover={showHover}
+              clearHover={clearHover}
+              labelsOnly
+              action={
+                <MotionPopover
+                  engine={engine}
+                  compositionId={page.id}
+                  layerId={layer.id}
+                  trackId={row.track?.id}
+                  transport={transport}
+                  disabled={disabled}
+                />
+              }
+              lane={
+                <TrackClips
+                  page={page}
+                  engine={engine}
+                  layerId={layer.id}
+                  name={layer.name}
+                  tracks={row.occurrences ?? []}
+                  chosenId={row.track?.id}
+                  duration={duration}
+                  scale={scale}
+                  disabled={disabled}
+                  unit={unit}
+                  gestures={gestures}
+                  drag={drag}
+                  transport={transport}
+                  onSelect={onSelect}
+                  onError={onError}
+                />
+              }
+            />
+          );
+        const key = animation.id;
         return (
           <div
-            className="motion-simple-row"
-            key={animation?.id ?? track.id}
-            style={{ position: "absolute", top: (first + offset) * 32, width: "100%" }}
+            key={key}
+            className={`motion-row is-property ${selected.has(layer.id) ? "is-selected" : ""}`}
+            style={{ top, height: rowHeight }}
+            data-layer-id={layer.id}
+            data-motion-hover-layer={layer.id}
+            data-motion-animation-row={animation.id}
+            onPointerEnter={(event) => showHover(key, layer.id, event.currentTarget)}
+            onPointerLeave={(event) => {
+              if (!event.currentTarget.contains(document.activeElement)) clearHover(key);
+            }}
+            onFocus={(event) => showHover(key, layer.id, event.currentTarget)}
+            onBlur={(event) => {
+              if (!event.currentTarget.contains(event.relatedTarget as Node | null))
+                clearHover(key);
+            }}
           >
-            <div className="motion-simple-label">
-              <Sparkles size={11} />
+            <div className="motion-row-label" style={{ paddingLeft: 24 + (row.depth + 1) * 14 }}>
+              <Sparkles size={11} aria-hidden />
               <button
-                className="animation-instance-name"
-                onClick={() => {
-                  engine.select([layer.id]);
-                  if (animation) animationPresentation(engine).set({ selected: animation.id });
+                type="button"
+                className="motion-row-name"
+                disabled={!interactive}
+                title={animation.preset.name}
+                onClick={(event) => {
+                  onSelect(layer.id, event.shiftKey);
+                  animationPresentation(engine).set({ selected: animation.id });
                 }}
               >
-                {layer.name}
-                {animation ? ` · ${animation.preset.name}` : ""}
+                {animation.preset.name}
               </button>
-              <MotionPopover
-                engine={engine}
-                compositionId={page.id}
-                layerId={layer.id}
-                trackId={track.id}
-                transport={transport}
-                disabled={disabled}
-                trigger={
-                  <Button variant="ghost" size="icon-xs" aria-label={t("add")} disabled={disabled}>
-                    <Plus size={11} />
-                  </Button>
-                }
-              />
             </div>
-            <div className="motion-simple-lane">
-              {animation ? (
-                <AnimationBlock
-                  engine={engine}
-                  animation={animation}
-                  layerId={layer.id}
-                  scale={scale}
-                  selected={presentation.selected === animation.id}
-                  disabled={disabled}
-                  transport={transport}
-                  page={page}
-                  trackId={track.id}
-                />
-              ) : (
-                <div
-                  className="motion-animation-block"
-                  style={{
-                    left: motionTimeToSeconds(track.start) * scale,
-                    width: Math.max(
-                      5,
-                      motionTimeToSeconds(track.end ?? page.motion!.duration) * scale -
-                        motionTimeToSeconds(track.start) * scale,
-                    ),
-                  }}
-                >
-                  <span>{layer.name}</span>
-                </div>
-              )}
+            <div className="motion-row-time">
+              <AnimationBlock
+                engine={engine}
+                animation={animation}
+                layerId={layer.id}
+                scale={scale}
+                selected={presentation.selected === animation.id}
+                disabled={disabled}
+                transport={transport}
+                page={page}
+                trackId={track.id}
+              />
             </div>
           </div>
         );
@@ -332,7 +216,8 @@ export function SimpleTimelineRows({
       <SimpleAudioRows
         first={Math.max(0, first - rows.length)}
         last={Math.max(0, last - rows.length)}
-        top={rows.length * 32}
+        top={rows.length * rowHeight}
+        rowHeight={rowHeight}
         engine={engine}
         page={page}
         transport={transport}

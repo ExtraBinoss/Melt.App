@@ -1,10 +1,10 @@
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from "react";
+import { useMemo } from "react";
 import { useReducedMotion } from "motion/react";
 import { createLayerGeometryIndex, type EnginePort } from "@musart/core";
 import type { TimelineTransport, TimelineUnit } from "./model";
 import type { TimelineRow } from "./tree";
 import type { TimelineGestures } from "./gestures";
-import { createTimelineHoverSource } from "../../state/motion/hover";
+import { useTimelineRowHover } from "./rows/use-row-hover";
 import type { TimelineLayerDrag } from "./layer-drag/use-timeline-layer-drag";
 import { TimelineRowView } from "./rows/TimelineRowView";
 import "./row-hover.css";
@@ -54,40 +54,13 @@ export function TimelineRows({
   drag?: TimelineLayerDrag;
   labelsOnly?: boolean;
 }) {
-  const hover = useMemo(() => (engine ? createTimelineHoverSource(engine) : null), [engine]);
   const reduced = !!useReducedMotion();
   const dragPage = drag?.page;
   const geometry = useMemo(
     () => (dragPage ? createLayerGeometryIndex(dragPage) : null),
     [dragPage],
   );
-  const hovered = useRef<{ key: string; node: HTMLElement; clear(): void } | null>(null);
-  const clearHover = useCallback((key?: string) => {
-    const current = hovered.current;
-    if (!current || (key !== undefined && current.key !== key)) return;
-    hovered.current = null;
-    delete current.node.dataset.motionHovered;
-    current.clear();
-  }, []);
-  const showHover = useCallback(
-    (key: string, layerId: string, node: HTMLElement) => {
-      if (
-        hovered.current?.key === key &&
-        hovered.current.node === node &&
-        (!hover || hover.read()?.layerId === layerId)
-      )
-        return;
-      const clear = hover && compositionId ? hover.show(compositionId, layerId) : () => {};
-      clearHover();
-      node.dataset.motionHovered = "true";
-      hovered.current = { key, node, clear };
-    },
-    [hover, compositionId, clearHover],
-  );
-  useLayoutEffect(() => {
-    if (hovered.current && !hovered.current.node.isConnected) clearHover();
-  });
-  useEffect(() => () => clearHover(), [clearHover, hover, compositionId]);
+  const { showHover, clearHover } = useTimelineRowHover(engine, compositionId);
 
   const snapshot = engine?.getSnapshot();
   const page = dragPage ?? snapshot?.project.pages.find((item) => item.id === compositionId);

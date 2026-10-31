@@ -13,6 +13,7 @@ export function SimpleAudioRows({
   first,
   last,
   top,
+  rowHeight = 32,
 }: {
   engine: EnginePort;
   page: Composition;
@@ -22,11 +23,12 @@ export function SimpleAudioRows({
   first: number;
   last: number;
   top: number;
+  rowHeight?: number;
 }) {
   const [error, setError] = useState("");
   const tracks = page.motion?.audioTracks ?? [];
   return (
-    <div style={{ position: "absolute", top, width: "100%", height: tracks.length * 32 }}>
+    <div style={{ position: "absolute", top, width: "100%", height: tracks.length * rowHeight }}>
       <AudioRows
         engine={engine}
         tracks={tracks}
@@ -35,7 +37,7 @@ export function SimpleAudioRows({
         first={first}
         last={last}
         offset={0}
-        rowHeight={32}
+        rowHeight={rowHeight}
         scale={scale}
         duration={motionTimeToSeconds(page.motion!.duration)}
         left={0}

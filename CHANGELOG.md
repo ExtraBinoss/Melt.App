@@ -6,6 +6,7 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Preserve the canonical layer hierarchy and shared selection, canvas hover, rename and drag interactions in Animations. Nest editable animation blocks under their layers, retain collapse state across Keyframes switching, and reuse editable occurrence/audio rows.
 - Add development-only video playback diagnostics correlating decoded source timestamps with displayed Motion poses, readable speed ratios, real loop duration and decoder cursor restart reasons. Keep diagnostics bounded and disabled in production.
 - Allocate collision-free names for all new user projects, templates, imports and duplicates through one atomic persistence boundary: `Name`, `Name 1`, `Name 2`, using indexed key reads and the shared core naming rule. Publish the allocated name back into the editor without renaming ordinary saves.
 - Extend the on-demand composition profiler with actual per-pass Three.js GPU timestamps for video, effects, masks, composition and display. Sum captured passes instead of using only Three’s last internal frame, and reuse bounded sequential decoding during diagnostic sampling; see `docs/performance/gpu-passes.md` for measurements and limitations.

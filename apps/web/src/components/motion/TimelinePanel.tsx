@@ -1,3 +1,4 @@
+import { TimelineCollapseControl } from "./TimelineCollapseControl";
 import { SimpleTimelineRows } from "./animations/SimpleTimelineRows";
 import { AnimationViewToggle } from "./animations/AnimationViewToggle";
 import { useAnimationPresentation } from "./animations/presentation";
@@ -11,10 +12,9 @@ import {
   useState,
   type PointerEvent,
 } from "react";
-import { ChevronsDownUp, ChevronsUpDown, PanelBottom } from "lucide-react";
+import { PanelBottom } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { motionTimeToSeconds, type EnginePort, type SessionSnapshot } from "@musart/core";
-import { TimelineIconButton } from "./ControlButton";
 import { TooltipProvider } from "../ui/tooltip";
 import { useTimelinePlayhead } from "./use-timeline-playhead";
 import { TimelineZoom } from "./TimelineZoom";
@@ -41,7 +41,6 @@ import "./timeline.css";
 import "./timeline-compact.css";
 
 const ACTION_WIDTH = 252;
-
 export function TimelinePanel({
   engine,
   snapshot,
@@ -252,6 +251,7 @@ export function TimelinePanel({
     engine,
     page,
     chosenOccurrences,
+    details,
     collapsed,
     transport,
     gestures,
@@ -263,20 +263,13 @@ export function TimelinePanel({
   const audioTracks = page.motion?.audioTracks ?? [];
   const audioError = useCallback((error: unknown) => setInteractionError(formatUiError(error)), []);
   const toggleUnit = useCallback(() => setUnit((value) => (value === "s" ? "ms" : "s")), []);
-  // Vertical window changes do not rebuild the transport's Radix controls or ruler.
-  const collapseControl = useMemo(
-    () => (
-      <TimelineIconButton
-        disabled={!active}
-        label={t(collapsed.size ? "expandAll" : "collapseAll")}
-        onClick={() =>
-          setCollapsed(collapsed.size ? new Set() : new Set(page.layers.map((layer) => layer.id)))
-        }
-      >
-        {collapsed.size ? <ChevronsUpDown size={13} /> : <ChevronsDownUp size={13} />}
-      </TimelineIconButton>
-    ),
-    [active, collapsed, page.layers, t, setCollapsed],
+  const collapseControl = (
+    <TimelineCollapseControl
+      active={active}
+      collapsed={collapsed}
+      layers={page.layers}
+      onChange={setCollapsed}
+    />
   );
   useEffect(() => {
     const node = viewport.current;
@@ -530,6 +523,15 @@ export function TimelinePanel({
                   gutter={GUTTER}
                   interactive={active}
                   viewport={viewport}
+                  layerRows={rows}
+                  rowHeight={rowHeight}
+                  selected={selected}
+                  onToggle={toggleRow}
+                  onSelect={selectRow}
+                  gestures={gestures}
+                  drag={layerDrag}
+                  onError={setInteractionError}
+                  unit={unit}
                 />
               ) : (
                 <TimelineVirtualRows

@@ -27,6 +27,7 @@ export function projectTimelineRows(
   page: Composition,
   collapsed: ReadonlySet<string>,
   chosen?: ReadonlyMap<string, string>,
+  details = true,
 ): TimelineRow[] {
   const children = new Map<string | null, Layer[]>();
   for (const layer of page.layers) {
@@ -41,15 +42,16 @@ export function projectTimelineRows(
     const occurrences = listLayerMotionOccurrences(page, layer.id);
     const track = occurrences.find((item) => item.id === chosen?.get(layer.id)) ?? occurrences[0];
     const expanded = !collapsed.has(layer.id);
-    const animationProperties = track ? projectAnimationProperties(track) : [];
+    const animationProperties = details && track ? projectAnimationProperties(track) : [];
     const expandable =
       !!children.get(layer.id)?.length ||
-      !!track?.properties.length ||
-      !!animationProperties.length;
+      (details
+        ? !!track?.properties.length || !!animationProperties.length
+        : !!track?.animations?.length);
     const common = { layer, depth, occurrences, ...(track ? { track } : {}) };
     rows.push({ ...common, kind: "layer", key: layer.id, expandable, expanded });
     if (!expanded) continue;
-    for (const property of track?.properties ?? [])
+    for (const property of details ? (track?.properties ?? []) : [])
       rows.push({
         ...common,
         kind: "property",

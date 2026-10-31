@@ -1,5 +1,5 @@
 import { spatialPropertyLabel } from "../../spatial/presentation";
-import { memo } from "react";
+import { memo, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import {
   ChevronDown,
@@ -63,6 +63,8 @@ export interface TimelineRowViewProps {
   drag?: TimelineLayerDrag;
   /** The shared temporal canvas paints and picks all content outside the HTML gutter. */
   labelsOnly?: boolean;
+  lane?: ReactNode;
+  action?: ReactNode;
   /** Immutable gesture selection identity invalidates marker descendants after a key selection. */
   keySelection?: ReadonlySet<string>;
   showHover(this: void, key: string, layerId: string, node: HTMLElement): void;
@@ -234,98 +236,108 @@ export const TimelineRowView = memo(function TimelineRowView(props: TimelineRowV
             {name}
           </button>
         )}
-        {row.kind === "layer" && engine && compositionId && (
-          <MotionAction
-            engine={engine}
-            compositionId={compositionId}
-            layerId={row.layer.id}
-            trackId={row.track?.id}
-            transport={transport}
-            disabled={!interactive || !row.track}
-          />
-        )}
-      </div>
-      {!labelsOnly && (
-        <div
-          className="motion-row-time"
-          data-motion-property-id={row.kind === "property" ? row.property.id : undefined}
-        >
-          {row.kind === "property" &&
-            easingAvailable &&
-            projectEasingSegments(row.property.keyframes, left, width, pixelsPerSecond).map(
-              (segment) => (
-                <EasingPopover
-                  key={segment.destination.id}
-                  engine={engine!}
-                  compositionId={compositionId!}
-                  property={row.property}
-                  destination={segment.destination}
-                >
-                  <button
-                    type="button"
-                    className="motion-easing-segment"
-                    style={{ left: segment.left + 6, width: Math.max(1, segment.width - 12) }}
-                    aria-label={common("motionEasing:edit", {
-                      name: `${name} · ${formatTimelineTime(segment.destination.time, unit)} ${unit}`,
-                    })}
-                  >
-                    <Spline size={11} aria-hidden />
-                  </button>
-                </EasingPopover>
-              ),
-            )}
-          {row.kind === "layer" && (
-            <TrackClips
-              page={page}
+        {row.kind === "layer" &&
+          engine &&
+          compositionId &&
+          (props.action ?? (
+            <MotionAction
               engine={engine}
+              compositionId={compositionId}
               layerId={row.layer.id}
-              name={name}
-              tracks={row.occurrences ?? (row.track ? [row.track] : [])}
-              chosenId={row.track?.id}
-              duration={duration}
-              unit={unit}
-              scale={pixelsPerSecond}
-              disabled={!interactive || !!locked || row.layer.locked}
-              gestures={gestures}
-              drag={drag}
+              trackId={row.track?.id}
               transport={transport}
-              onSelect={onSelect}
-              onError={onError}
+              disabled={!interactive || !row.track}
             />
-          )}
-          {row.kind === "property" &&
-            projectKeyMarkers(row.property.keyframes, left, width, pixelsPerSecond).map((marker) =>
-              marker.count > 1 && interactive ? (
-                <KeyCluster
-                  key={marker.key.id}
-                  keys={row.property.keyframes}
-                  first={marker.firstKeyIndex}
-                  after={marker.afterKeyIndex}
-                  propertyId={row.property.id}
-                  name={name}
-                  x={marker.x}
-                  unit={unit}
-                  gestures={gestures}
-                  transport={transport}
-                  onSelectLayer={(additive) => onSelect(row.layer.id, additive)}
-                  onZoomRange={onZoomRange}
-                />
-              ) : (
-                <KeyframeMarker
-                  key={marker.key.id}
-                  marker={marker}
-                  name={name}
-                  propertyId={row.property.id}
-                  layerId={row.layer.id}
-                  unit={unit}
-                  transport={transport}
-                  gestures={gestures}
-                  onSelect={onSelect}
-                  interactive={interactive}
-                />
-              ),
-            )}
+          ))}
+      </div>
+      {props.lane !== undefined ? (
+        <div className="motion-row-time" style={{ pointerEvents: "auto" }}>
+          {props.lane}
         </div>
+      ) : (
+        !labelsOnly && (
+          <div
+            className="motion-row-time"
+            data-motion-property-id={row.kind === "property" ? row.property.id : undefined}
+          >
+            {row.kind === "property" &&
+              easingAvailable &&
+              projectEasingSegments(row.property.keyframes, left, width, pixelsPerSecond).map(
+                (segment) => (
+                  <EasingPopover
+                    key={segment.destination.id}
+                    engine={engine!}
+                    compositionId={compositionId!}
+                    property={row.property}
+                    destination={segment.destination}
+                  >
+                    <button
+                      type="button"
+                      className="motion-easing-segment"
+                      style={{ left: segment.left + 6, width: Math.max(1, segment.width - 12) }}
+                      aria-label={common("motionEasing:edit", {
+                        name: `${name} · ${formatTimelineTime(segment.destination.time, unit)} ${unit}`,
+                      })}
+                    >
+                      <Spline size={11} aria-hidden />
+                    </button>
+                  </EasingPopover>
+                ),
+              )}
+            {row.kind === "layer" && (
+              <TrackClips
+                page={page}
+                engine={engine}
+                layerId={row.layer.id}
+                name={name}
+                tracks={row.occurrences ?? (row.track ? [row.track] : [])}
+                chosenId={row.track?.id}
+                duration={duration}
+                unit={unit}
+                scale={pixelsPerSecond}
+                disabled={!interactive || !!locked || row.layer.locked}
+                gestures={gestures}
+                drag={drag}
+                transport={transport}
+                onSelect={onSelect}
+                onError={onError}
+              />
+            )}
+            {row.kind === "property" &&
+              projectKeyMarkers(row.property.keyframes, left, width, pixelsPerSecond).map(
+                (marker) =>
+                  marker.count > 1 && interactive ? (
+                    <KeyCluster
+                      key={marker.key.id}
+                      keys={row.property.keyframes}
+                      first={marker.firstKeyIndex}
+                      after={marker.afterKeyIndex}
+                      propertyId={row.property.id}
+                      name={name}
+                      x={marker.x}
+                      unit={unit}
+                      gestures={gestures}
+                      transport={transport}
+                      onSelectLayer={(additive) => onSelect(row.layer.id, additive)}
+                      onZoomRange={onZoomRange}
+                    />
+                  ) : (
+                    <KeyframeMarker
+                      key={marker.key.id}
+                      marker={marker}
+                      name={name}
+                      propertyId={row.property.id}
+                      layerId={row.layer.id}
+                      unit={unit}
+                      transport={transport}
+                      gestures={gestures}
+                      onSelect={onSelect}
+                      interactive={interactive}
+                    />
+                  ),
+              )}
+          </div>
+        )
       )}
     </TimelineLayerRow>
   );

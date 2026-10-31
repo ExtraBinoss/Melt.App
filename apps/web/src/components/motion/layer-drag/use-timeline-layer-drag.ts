@@ -19,6 +19,7 @@ export function useTimelineLayerDrag(options: {
   transport: TimelineTransport;
   gestures: TimelineGestures;
   active: boolean;
+  details?: boolean;
   onError: (message: string) => void;
   chosenOccurrences?: ReadonlyMap<string, string>;
 }) {
@@ -70,8 +71,8 @@ export function useTimelineLayerDrag(options: {
     }
   }, [active, pointer, cancelOwned]);
   const canonical = useMemo(
-    () => projectTimelineRows(page, collapsed, options.chosenOccurrences),
-    [page, collapsed, options.chosenOccurrences],
+    () => projectTimelineRows(page, collapsed, options.chosenOccurrences, options.details),
+    [page, collapsed, options.chosenOccurrences, options.details],
   );
   const moving = native.dragging !== null && native.pageId === page.id;
   const rows = canonical;

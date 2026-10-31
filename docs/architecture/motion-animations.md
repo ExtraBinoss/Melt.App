@@ -90,7 +90,6 @@ requests retain their plan-clock invalidation, and video without a plan remains
 ineligible. This avoids recomposition, source uploads and contour preparation on
 warm composition switches without admitting stale video frames.
 
-
 ### Manual navigation validation
 
 The production cohort on 2026-10-31 used Headless Chromium 156 on Linux,
@@ -114,3 +113,14 @@ Focused checks also verify unchanged peek layout, animated pinned panels,
 retained Motion controls and Morph-aware marquee/pointer selection. An existing
 collapsed-group drag-over unit regression fails identically with the baseline
 LayersPanel implementation; it is separate from composition activation.
+
+## Shared timeline hierarchy
+
+Animations and Keyframes project the same canonical foreground-first layer tree,
+with the same collapsed layer IDs, selection, hover ownership, icons, editable
+layer labels and layer drag controller. Animations keeps an editable occurrence
+lane for each layer and nests each animation block beneath its owner. Its
+projection omits property/keyframe expansion work. Keyframes exposes those
+property rows when requested. Animation blocks and ordinary occurrence clips
+retain their validated drag/trim/keyboard/context-menu handlers and undo behavior.
+Both modes share row heights and the audio row presentation.
