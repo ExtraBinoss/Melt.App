@@ -6,6 +6,8 @@ import {
   AnimationMixer,
   Color,
   DirectionalLight,
+  DoubleSide,
+  FrontSide,
   Group,
   HalfFloatType,
   MathUtils,
@@ -154,6 +156,9 @@ export class SpatialResource implements GpuResource {
     this.material.color.set(layer.fill === "transparent" ? "#000000" : layer.fill);
     const m = spatial.material;
     const previous = this.shaderKey();
+    this.material.side = ["shape", "circle", "ring", "plane"].includes(spatial.source)
+      ? DoubleSide
+      : FrontSide;
     for (const property of [
       "metalness",
       "roughness",
@@ -198,6 +203,7 @@ export class SpatialResource implements GpuResource {
   }
   private shaderKey() {
     return [
+      this.material.side,
       this.material.transmission > 0,
       this.material.clearcoat > 0,
       this.material.sheen > 0,

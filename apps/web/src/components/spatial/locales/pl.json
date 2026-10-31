@@ -82,7 +82,22 @@
     "capsule": "Kapsuła",
     "cone": "Stożek",
     "cylinder": "Walec",
-    "text": "Tekst 3D"
+    "text": "Tekst 3D",
+    "circle": "Koło",
+    "plane": "Płaszczyzna",
+    "ring": "Pierścień",
+    "dodecahedron": "Dwunastościan",
+    "icosahedron": "Dwudziestościan",
+    "octahedron": "Ośmiościan",
+    "tetrahedron": "Czworościan",
+    "torusKnot": "Węzeł torusa",
+    "lathe": "Bryła obrotowa",
+    "tube": "Rurka",
+    "polyhedron": "Wielościan",
+    "edges": "Krawędzie",
+    "wireframe": "Model krawędziowy",
+    "shape": "Kształt",
+    "extrude": "Wytłoczenie"
   },
   "lightTypes": {
     "directional": "Kierunkowe",
@@ -152,5 +167,28 @@
     "extrude": "3D · Wytłaczanie"
   },
   "filledOutlines": "Wytłaczanie 3D obsługuje do 256 wypełnionych ścieżek SVG.",
-  "textLimit": "Tekst 3D obsługuje do 4096 znaków."
+  "textLimit": "Tekst 3D obsługuje do 4096 znaków.",
+  "modelNames": {
+    "hexFrame": "Sześciokątna rama",
+    "hexArc": "Sześciokątny łuk",
+    "ringFrame": "Pusty pierścień",
+    "ringArc": "Łuk kołowy",
+    "rim": "Rowkowany pierścień",
+    "halfDisc": "Półkrążek",
+    "halfHex": "Pół sześciokąta",
+    "prism": "Graniastosłup",
+    "wedge": "Klin",
+    "roundedBlock": "Zaokrąglony blok",
+    "puck": "Krążek",
+    "halfBlock": "Pół bloku",
+    "rockA": "Skała A",
+    "rockB": "Skała B",
+    "rockC": "Skała C",
+    "rockE": "Skała E"
+  },
+  "library": "Biblioteka 3D",
+  "shapes": "Kształty",
+  "models": "Modele GLB",
+  "add": "Dodaj",
+  "preview": "Podgląd 3D"
 }

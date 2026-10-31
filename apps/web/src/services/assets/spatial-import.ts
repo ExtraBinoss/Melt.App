@@ -8,6 +8,8 @@ import {
   type SpatialSource,
 } from "@musart/core";
 import { readDataUrl } from "./imports";
+import { spatialLibraryLayer } from "./spatial-layer";
+import { brand } from "../../ui/brand/config";
 import { canvasNativeRenderer } from "../../canvas/render/plane-resources";
 function assertCurrent(engine: EnginePort, origin: SessionSnapshot, signal?: AbortSignal) {
   signal?.throwIfAborted();
@@ -34,17 +36,9 @@ export function insertSpatialObject(
   const snapshot = engine.getSnapshot(),
     page = snapshot.project.pages.find((item) => item.id === snapshot.pageId)!;
   const size = Math.min(page.width, page.height) * 0.55;
-  const layer = createLayer(source === "text" ? "text" : "rectangle", {
-    id: crypto.randomUUID(),
-    name,
-    x: (page.width - size) / 2,
-    y: (page.height - size) / 2,
-    width: size,
-    height: size,
-    fill: "#8B5CF6",
-    ...(source === "text" ? { text: "Melt", fontSize: size * 0.3 } : {}),
-    spatial: createSpatialLayer(source === "text" ? "extrude" : source),
-  });
+  const layer = spatialLibraryLayer(source, size, name, crypto.randomUUID());
+  layer.x = (page.width - layer.width) / 2;
+  layer.y = (page.height - layer.height) / 2;
   engine.transaction([
     { type: "addLayers", layers: [layer] },
     ...(!page.spatial ? [{ type: "updatePage" as const, patch: { spatial: freshScene() } }] : []),
@@ -52,7 +46,12 @@ export function insertSpatialObject(
   engine.select([layer.id]);
   return layer;
 }
-export async function importSpatialModel(engine: EnginePort, file: File, signal?: AbortSignal) {
+export async function importSpatialModel(
+  engine: EnginePort,
+  file: File,
+  signal?: AbortSignal,
+  presentation?: { name: string; useModelMaterials: boolean },
+) {
   assertSize(file);
   const origin = engine.getSnapshot(),
     page = origin.project.pages.find((item) => item.id === origin.pageId)!;
@@ -85,13 +84,17 @@ export async function importSpatialModel(engine: EnginePort, file: File, signal?
   const size = Math.min(page.width, page.height) * 0.55;
   const layer = createLayer("rectangle", {
     id: crypto.randomUUID(),
-    name: file.name.replace(/\.glb$/i, ""),
+    name: presentation?.name ?? file.name.replace(/\.glb$/i, ""),
+    fill: brand.colors.primary,
     assetId: asset.id,
     width: size,
     height: size,
     x: (page.width - size) / 2,
     y: (page.height - size) / 2,
-    spatial: createSpatialLayer("glb"),
+    spatial: {
+      ...createSpatialLayer("glb"),
+      useModelMaterials: presentation?.useModelMaterials ?? true,
+    },
   });
   engine.transaction([
     { type: "addLayers", layers: [layer], assets: [asset] },

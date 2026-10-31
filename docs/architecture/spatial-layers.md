@@ -60,6 +60,12 @@ bounded workers; uploaded environments are at most 1024 × 512. Geometry prepara
 also runs in a bounded worker. Targets, shadow allocations, environment scratch
 resources and caches participate in the existing GPU budget.
 
+The object library exposes all 21 Three geometry families and sixteen vendored
+CC0 GLBs. Its tiles use a native static atlas; one retained, bounded native preview
+spins the selected object without an editor document edit or React frame clock.
+Immutable originals are size/hash checked, lazy and bounded independently from
+GPU resources. See [the object library](../guides/spatial-library.md).
+
 The material picker uses a static atlas baked from thirty actual native renders.
 Opening it creates no preview renderer or continuous animation loop. The
 composition profiler exposes prepared mesh, vertex and triangle counts alongside

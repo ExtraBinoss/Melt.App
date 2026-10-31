@@ -82,7 +82,22 @@
     "capsule": "Capsula",
     "cone": "Cono",
     "cylinder": "Cilindro",
-    "text": "Testo 3D"
+    "text": "Testo 3D",
+    "circle": "Cerchio",
+    "plane": "Piano",
+    "ring": "Anello",
+    "dodecahedron": "Dodecaedro",
+    "icosahedron": "Icosaedro",
+    "octahedron": "Ottaedro",
+    "tetrahedron": "Tetraedro",
+    "torusKnot": "Nodo toroidale",
+    "lathe": "Solido di rotazione",
+    "tube": "Tubo",
+    "polyhedron": "Poliedro",
+    "edges": "Spigoli",
+    "wireframe": "Reticolo",
+    "shape": "Forma",
+    "extrude": "Estrusione"
   },
   "lightTypes": {
     "directional": "Direzionale",
@@ -152,5 +167,28 @@
     "extrude": "3D · Estrusione"
   },
   "filledOutlines": "L’estrusione 3D supporta fino a 256 tracciati SVG riempiti.",
-  "textLimit": "Il testo 3D supporta fino a 4096 caratteri."
+  "textLimit": "Il testo 3D supporta fino a 4096 caratteri.",
+  "modelNames": {
+    "hexFrame": "Cornice esagonale",
+    "hexArc": "Arco esagonale",
+    "ringFrame": "Anello cavo",
+    "ringArc": "Arco circolare",
+    "rim": "Anello scanalato",
+    "halfDisc": "Mezzo disco",
+    "halfHex": "Mezzo esagono",
+    "prism": "Prisma",
+    "wedge": "Cuneo",
+    "roundedBlock": "Blocco arrotondato",
+    "puck": "Disco",
+    "halfBlock": "Mezzo blocco",
+    "rockA": "Roccia A",
+    "rockB": "Roccia B",
+    "rockC": "Roccia C",
+    "rockE": "Roccia E"
+  },
+  "library": "Libreria 3D",
+  "shapes": "Forme",
+  "models": "Modelli GLB",
+  "add": "Aggiungi",
+  "preview": "Anteprima 3D"
 }

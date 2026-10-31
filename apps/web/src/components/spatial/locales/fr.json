@@ -82,7 +82,22 @@
     "capsule": "Capsule",
     "cone": "Cône",
     "cylinder": "Cylindre",
-    "text": "Texte 3D"
+    "text": "Texte 3D",
+    "circle": "Cercle",
+    "plane": "Plan",
+    "ring": "Anneau",
+    "dodecahedron": "Dodécaèdre",
+    "icosahedron": "Icosaèdre",
+    "octahedron": "Octaèdre",
+    "tetrahedron": "Tétraèdre",
+    "torusKnot": "Nœud torique",
+    "lathe": "Vase",
+    "tube": "Tube",
+    "polyhedron": "Polyèdre",
+    "edges": "Arêtes",
+    "wireframe": "Fil de fer",
+    "shape": "Forme",
+    "extrude": "Extrusion"
   },
   "lightTypes": {
     "directional": "Directionnelle",
@@ -152,5 +167,28 @@
     "extrude": "3D · Extrusion"
   },
   "filledOutlines": "L’extrusion 3D accepte jusqu’à 256 tracés SVG remplis.",
-  "textLimit": "Le texte 3D accepte jusqu’à 4 096 caractères."
+  "textLimit": "Le texte 3D accepte jusqu’à 4 096 caractères.",
+  "modelNames": {
+    "hexFrame": "Cadre hexagonal",
+    "hexArc": "Arc hexagonal",
+    "ringFrame": "Anneau creux",
+    "ringArc": "Arc circulaire",
+    "rim": "Bague rainurée",
+    "halfDisc": "Demi-disque",
+    "halfHex": "Demi-hexagone",
+    "prism": "Prisme",
+    "wedge": "Coin",
+    "roundedBlock": "Bloc arrondi",
+    "puck": "Palet",
+    "halfBlock": "Demi-bloc",
+    "rockA": "Roche A",
+    "rockB": "Roche B",
+    "rockC": "Roche C",
+    "rockE": "Roche E"
+  },
+  "library": "Bibliothèque 3D",
+  "shapes": "Formes",
+  "models": "Modèles GLB",
+  "add": "Ajouter",
+  "preview": "Aperçu 3D"
 }

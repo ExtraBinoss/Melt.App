@@ -82,7 +82,22 @@
     "capsule": "كبسولة",
     "cone": "مخروط",
     "cylinder": "أسطوانة",
-    "text": "نص ثلاثي الأبعاد"
+    "text": "نص ثلاثي الأبعاد",
+    "circle": "دائرة",
+    "plane": "مستوى",
+    "ring": "حلقة",
+    "dodecahedron": "اثنا عشري الوجوه",
+    "icosahedron": "عشروني الوجوه",
+    "octahedron": "ثماني الوجوه",
+    "tetrahedron": "رباعي الوجوه",
+    "torusKnot": "عقدة حلقية",
+    "lathe": "مجسم دوراني",
+    "tube": "أنبوب",
+    "polyhedron": "متعدد الوجوه",
+    "edges": "حواف",
+    "wireframe": "هيكل سلكي",
+    "shape": "شكل",
+    "extrude": "بثق"
   },
   "lightTypes": {
     "directional": "اتجاهي",
@@ -152,5 +167,28 @@
     "extrude": "3D · بثق"
   },
   "filledOutlines": "يدعم البثق ثلاثي الأبعاد حتى 256 مسار SVG ممتلئًا.",
-  "textLimit": "يدعم النص ثلاثي الأبعاد حتى 4096 حرفًا."
+  "textLimit": "يدعم النص ثلاثي الأبعاد حتى 4096 حرفًا.",
+  "modelNames": {
+    "hexFrame": "إطار سداسي",
+    "hexArc": "قوس سداسي",
+    "ringFrame": "حلقة مجوفة",
+    "ringArc": "قوس دائري",
+    "rim": "حلقة محززة",
+    "halfDisc": "نصف قرص",
+    "halfHex": "نصف سداسي",
+    "prism": "منشور",
+    "wedge": "إسفين",
+    "roundedBlock": "كتلة مستديرة",
+    "puck": "قرص",
+    "halfBlock": "نصف كتلة",
+    "rockA": "صخرة A",
+    "rockB": "صخرة B",
+    "rockC": "صخرة C",
+    "rockE": "صخرة E"
+  },
+  "library": "مكتبة ثلاثية الأبعاد",
+  "shapes": "أشكال",
+  "models": "نماذج GLB",
+  "add": "إضافة",
+  "preview": "معاينة ثلاثية الأبعاد"
 }

@@ -82,7 +82,22 @@
     "capsule": "胶囊",
     "cone": "圆锥",
     "cylinder": "圆柱",
-    "text": "3D 文本"
+    "text": "3D 文本",
+    "circle": "圆形",
+    "plane": "平面",
+    "ring": "圆环",
+    "dodecahedron": "正十二面体",
+    "icosahedron": "正二十面体",
+    "octahedron": "正八面体",
+    "tetrahedron": "正四面体",
+    "torusKnot": "环面结",
+    "lathe": "旋转体",
+    "tube": "管道",
+    "polyhedron": "多面体",
+    "edges": "边线",
+    "wireframe": "线框",
+    "shape": "形状",
+    "extrude": "挤出"
   },
   "lightTypes": {
     "directional": "平行光",
@@ -152,5 +167,28 @@
     "extrude": "3D · 挤出"
   },
   "filledOutlines": "3D 挤出最多支持 256 个填充的 SVG 路径。",
-  "textLimit": "3D 文本最多支持 4,096 个字符。"
+  "textLimit": "3D 文本最多支持 4,096 个字符。",
+  "modelNames": {
+    "hexFrame": "六角框",
+    "hexArc": "六角拱",
+    "ringFrame": "空心环",
+    "ringArc": "圆弧",
+    "rim": "凹槽环",
+    "halfDisc": "半圆盘",
+    "halfHex": "半六角形",
+    "prism": "棱柱",
+    "wedge": "楔形",
+    "roundedBlock": "圆角方块",
+    "puck": "圆盘",
+    "halfBlock": "半方块",
+    "rockA": "岩石 A",
+    "rockB": "岩石 B",
+    "rockC": "岩石 C",
+    "rockE": "岩石 E"
+  },
+  "library": "3D 素材库",
+  "shapes": "形状",
+  "models": "GLB 模型",
+  "add": "添加",
+  "preview": "3D 预览"
 }

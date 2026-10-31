@@ -82,7 +82,22 @@
     "capsule": "Capsule",
     "cone": "Cone",
     "cylinder": "Cylinder",
-    "text": "3D text"
+    "text": "3D text",
+    "circle": "Circle",
+    "plane": "Plane",
+    "ring": "Ring",
+    "dodecahedron": "Dodecahedron",
+    "icosahedron": "Icosahedron",
+    "octahedron": "Octahedron",
+    "tetrahedron": "Tetrahedron",
+    "torusKnot": "Torus knot",
+    "lathe": "Lathe",
+    "tube": "Tube",
+    "polyhedron": "Polyhedron",
+    "edges": "Edges",
+    "wireframe": "Wireframe",
+    "shape": "Shape",
+    "extrude": "Extrusion"
   },
   "lightTypes": {
     "directional": "Directional",
@@ -152,5 +167,28 @@
     "extrude": "3D · Extrude"
   },
   "filledOutlines": "3D extrusion supports up to 256 filled SVG parts.",
-  "textLimit": "3D text supports up to 4,096 characters."
+  "textLimit": "3D text supports up to 4,096 characters.",
+  "modelNames": {
+    "hexFrame": "Hex frame",
+    "hexArc": "Hex arc",
+    "ringFrame": "Ring frame",
+    "ringArc": "Ring arc",
+    "rim": "Grooved ring",
+    "halfDisc": "Half disc",
+    "halfHex": "Half hexagon",
+    "prism": "Prism",
+    "wedge": "Wedge",
+    "roundedBlock": "Rounded block",
+    "puck": "Puck",
+    "halfBlock": "Half block",
+    "rockA": "Rock A",
+    "rockB": "Rock B",
+    "rockC": "Rock C",
+    "rockE": "Rock E"
+  },
+  "library": "3D library",
+  "shapes": "Shapes",
+  "models": "GLB models",
+  "add": "Add",
+  "preview": "3D preview"
 }

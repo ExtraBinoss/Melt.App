@@ -44,14 +44,14 @@ function vectorKey(vector: Layer["vector"]) {
 }
 export function spatialGeometryKey(layer: Layer): string {
   const s = layer.spatial!;
-  const morph = s.source === "extrude" ? sourceMorph(layer) : undefined;
+  const morph = s.source === "extrude" || s.source === "shape" ? sourceMorph(layer) : undefined;
   return JSON.stringify([
     s.source,
     s.depth,
     s.bevel,
     s.bevelSegments,
     s.curveSegments,
-    ...(s.source === "extrude"
+    ...(s.source === "extrude" || s.source === "shape"
       ? [
           layer.kind,
           layer.width,
@@ -87,7 +87,7 @@ export function spatialGeometryJob(layer: Layer, font?: OutlineFont): SpatialGeo
     bevelSegments: s.bevelSegments,
     curveSegments: s.curveSegments,
   };
-  if (s.source !== "extrude") return job;
+  if (s.source !== "extrude" && s.source !== "shape") return job;
   const effect = sourceMorph(layer);
   if (effect && (layer.kind === "text" || effect.shapeMorph)) {
     const key = morphResourceKey(layer, effect);

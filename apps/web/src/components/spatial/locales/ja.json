@@ -82,7 +82,22 @@
     "capsule": "カプセル",
     "cone": "円錐",
     "cylinder": "円柱",
-    "text": "3Dテキスト"
+    "text": "3Dテキスト",
+    "circle": "円",
+    "plane": "平面",
+    "ring": "リング",
+    "dodecahedron": "正十二面体",
+    "icosahedron": "正二十面体",
+    "octahedron": "正八面体",
+    "tetrahedron": "正四面体",
+    "torusKnot": "トーラス結び目",
+    "lathe": "回転体",
+    "tube": "チューブ",
+    "polyhedron": "多面体",
+    "edges": "エッジ",
+    "wireframe": "ワイヤーフレーム",
+    "shape": "シェイプ",
+    "extrude": "押し出し"
   },
   "lightTypes": {
     "directional": "平行光源",
@@ -152,5 +167,28 @@
     "extrude": "3D · 押し出し"
   },
   "filledOutlines": "3D押し出しは最大256個の塗りつぶされたSVGパスに対応します。",
-  "textLimit": "3Dテキストは最大4,096文字に対応します。"
+  "textLimit": "3Dテキストは最大4,096文字に対応します。",
+  "modelNames": {
+    "hexFrame": "六角フレーム",
+    "hexArc": "六角アーチ",
+    "ringFrame": "中空リング",
+    "ringArc": "リングアーチ",
+    "rim": "溝付きリング",
+    "halfDisc": "半円盤",
+    "halfHex": "半六角形",
+    "prism": "プリズム",
+    "wedge": "くさび",
+    "roundedBlock": "角丸ブロック",
+    "puck": "円盤",
+    "halfBlock": "半ブロック",
+    "rockA": "岩 A",
+    "rockB": "岩 B",
+    "rockC": "岩 C",
+    "rockE": "岩 E"
+  },
+  "library": "3Dライブラリ",
+  "shapes": "シェイプ",
+  "models": "GLBモデル",
+  "add": "追加",
+  "preview": "3Dプレビュー"
 }

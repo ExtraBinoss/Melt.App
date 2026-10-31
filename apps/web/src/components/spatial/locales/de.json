@@ -82,7 +82,22 @@
     "capsule": "Kapsel",
     "cone": "Kegel",
     "cylinder": "Zylinder",
-    "text": "3D-Text"
+    "text": "3D-Text",
+    "circle": "Kreis",
+    "plane": "Fläche",
+    "ring": "Ring",
+    "dodecahedron": "Dodekaeder",
+    "icosahedron": "Ikosaeder",
+    "octahedron": "Oktaeder",
+    "tetrahedron": "Tetraeder",
+    "torusKnot": "Torusknoten",
+    "lathe": "Drehkörper",
+    "tube": "Rohr",
+    "polyhedron": "Polyeder",
+    "edges": "Kanten",
+    "wireframe": "Drahtgitter",
+    "shape": "Form",
+    "extrude": "Extrusion"
   },
   "lightTypes": {
     "directional": "Gerichtet",
@@ -152,5 +167,28 @@
     "extrude": "3D · Extrusion"
   },
   "filledOutlines": "3D-Extrusion unterstützt bis zu 256 gefüllte SVG-Pfade.",
-  "textLimit": "3D-Text unterstützt bis zu 4.096 Zeichen."
+  "textLimit": "3D-Text unterstützt bis zu 4.096 Zeichen.",
+  "modelNames": {
+    "hexFrame": "Sechseckrahmen",
+    "hexArc": "Sechseckbogen",
+    "ringFrame": "Ringrahmen",
+    "ringArc": "Ringbogen",
+    "rim": "Gerillter Ring",
+    "halfDisc": "Halbscheibe",
+    "halfHex": "Halbes Sechseck",
+    "prism": "Prisma",
+    "wedge": "Keil",
+    "roundedBlock": "Runder Block",
+    "puck": "Scheibe",
+    "halfBlock": "Halber Block",
+    "rockA": "Fels A",
+    "rockB": "Fels B",
+    "rockC": "Fels C",
+    "rockE": "Fels E"
+  },
+  "library": "3D-Bibliothek",
+  "shapes": "Formen",
+  "models": "GLB-Modelle",
+  "add": "Hinzufügen",
+  "preview": "3D-Vorschau"
 }

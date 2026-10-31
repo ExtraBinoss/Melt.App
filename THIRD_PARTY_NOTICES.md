@@ -51,3 +51,15 @@ The geometry worker uses [clipper-lib](https://github.com/junmer/clipper-lib)
 Its Boost Software License 1.0, original author notices and bundled Tom Wu JSBN
 license are retained in [the distributed notice](apps/web/public/licenses/clipper-LICENSE.txt)
 and [docs/legal/clipper](docs/legal/clipper/). No clipping work runs in React.
+
+## Bundled CC0 3D models
+
+Sixteen models by [Kenney](https://kenney.nl/) are taken from the
+[Prototype Kit](https://kenney.nl/assets/prototype-kit) and
+[Nature Kit](https://kenney.nl/assets/nature-kit), both CC0 1.0.
+The original notices ship in
+[Prototype Kit license](apps/web/public/spatial/models/Kenney-prototype-LICENSE.txt)
+and [Nature Kit license](apps/web/public/spatial/models/Kenney-nature-LICENSE.txt).
+The [source ledger](packages/assets/data/spatial/models.json) pins archive,
+original and distributed hashes and records texture embedding; no geometry or
+material content is changed. CC0 permits commercial use.

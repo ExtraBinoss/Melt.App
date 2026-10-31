@@ -75,3 +75,6 @@ export function assetSvg(asset: CatalogAsset): string {
     }/>`;
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${escape(asset.viewBox)}" role="img" aria-label="${escape(asset.name)}"><title>${escape(asset.name)}</title>${asset.attribution ? `<metadata>${escape(asset.attribution)}</metadata>` : ""}${geometry}</svg>`;
 }
+
+export { SPATIAL_MODEL_CATALOG } from "./spatial/catalog";
+export type { SpatialModelDefinition } from "./spatial/catalog";

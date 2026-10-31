@@ -6,6 +6,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Expand the native 3D library to all 21 Three geometry families and sixteen bundled CC0 Kenney GLBs, with real rendered thumbnails, a single retained rotating/orbitable preview, shared animated tabs and scroll shadows. Keep previews outside editor documents, bound original/GPU caches, verify bundled hashes and publish Add as one undoable transaction. Preserve provenance and commercial-use notices; translate controls and model names in twelve locales.
+
 - Replace Bloom Windows' sampled position curves with an exact hierarchy of two-keyframe interpolated rotations (26 keys total), register every effect window against the shared source, keep labels above all cards, and remove white shadow backings. Add native full-orbit coverage checks and sparse-preset interpolation regressions.
 - Publish playing compositions through a bounded front/back texture pair only after real GPU acknowledgement, retaining the last accepted image on cancellation. Keep same-size playback canvases and Fiber density stable instead of repeatedly clearing their drawing buffers. Reuse moving group crop allocations, include crop bounds in their cache signatures, and retain bounded mostly-visible group surfaces to avoid per-frame allocation churn.
 - Resolve self-intersecting and overlapping font/SVG contours with their actual nonzero or even-odd fill rule before native 3D triangulation. Restore the variable Inter M notch and SVG counters without replacing fonts; keep preparation in the bounded geometry worker.

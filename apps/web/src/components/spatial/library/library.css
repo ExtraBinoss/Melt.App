@@ -1,0 +1,126 @@
+.spatial-library {
+  width: min(350px, calc(100vw - 24px));
+  max-height: min(650px, var(--radix-popover-content-available-height));
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  overflow: hidden;
+}
+.spatial-library-preview {
+  position: relative;
+  flex: 0 0 160px;
+  height: 160px;
+  overflow: hidden;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--primary) 5%, var(--muted));
+  touch-action: none;
+  cursor: grab;
+  outline-offset: -2px;
+  contain: strict;
+}
+.spatial-library-preview[data-dragging="true"] {
+  cursor: grabbing;
+}
+.spatial-library-preview:focus-visible {
+  outline: 2px solid var(--ring);
+}
+.spatial-library-preview-poster,
+.spatial-library-live {
+  position: absolute;
+  width: 160px;
+  height: 160px;
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%);
+}
+.spatial-library-preview-poster,
+.spatial-object-poster {
+  display: block;
+  background-repeat: no-repeat;
+}
+.spatial-library-preview[data-ready="true"] .spatial-library-preview-poster {
+  visibility: hidden;
+}
+.spatial-library-preview:not([data-ready="true"]) .spatial-library-live {
+  visibility: hidden;
+}
+.spatial-live-canvas {
+  display: block;
+  width: 160px !important;
+  height: 160px !important;
+}
+.spatial-library-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 30px;
+  font-size: 12px;
+  font-weight: 500;
+}
+.spatial-library-heading > span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.spatial-library > .scroll-shadow {
+  min-height: 80px;
+  flex: 1 1 auto;
+}
+.spatial-library-list {
+  max-height: 252px;
+  min-height: 80px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.spatial-library .spatial-objects {
+  gap: 4px;
+  padding-block: 4px;
+}
+.spatial-library .spatial-object {
+  appearance: none;
+  border: 1px solid transparent;
+  height: 100px;
+  padding: 4px;
+  gap: 3px;
+  background: transparent;
+  color: var(--foreground);
+  cursor: pointer;
+}
+.spatial-library .spatial-object:hover {
+  background: var(--accent);
+}
+.spatial-library .spatial-object[aria-pressed="true"] {
+  border-color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 7%, transparent);
+}
+.spatial-library .spatial-object:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: -2px;
+}
+.spatial-object-poster {
+  width: 70px;
+  height: 70px;
+  flex: 0 0 70px;
+}
+.spatial-object > span:last-child {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.spatial-library .spatial-library-actions {
+  margin-top: 0;
+  flex: none;
+}
+@media (max-height: 600px) {
+  .spatial-library-preview {
+    flex-basis: 120px;
+    height: 120px;
+  }
+  .spatial-library-preview-poster,
+  .spatial-library-live {
+    top: -20px;
+  }
+}

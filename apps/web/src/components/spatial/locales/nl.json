@@ -82,7 +82,22 @@
     "capsule": "Capsule",
     "cone": "Kegel",
     "cylinder": "Cilinder",
-    "text": "3D-tekst"
+    "text": "3D-tekst",
+    "circle": "Cirkel",
+    "plane": "Vlak",
+    "ring": "Ring",
+    "dodecahedron": "Dodecaëder",
+    "icosahedron": "Icosaëder",
+    "octahedron": "Octaëder",
+    "tetrahedron": "Tetraëder",
+    "torusKnot": "Torusknoop",
+    "lathe": "Omwentelingslichaam",
+    "tube": "Buis",
+    "polyhedron": "Veelvlak",
+    "edges": "Randen",
+    "wireframe": "Draadmodel",
+    "shape": "Vorm",
+    "extrude": "Extrusie"
   },
   "lightTypes": {
     "directional": "Gericht",
@@ -152,5 +167,28 @@
     "extrude": "3D · Extrusie"
   },
   "filledOutlines": "3D-extrusie ondersteunt maximaal 256 gevulde SVG-paden.",
-  "textLimit": "3D-tekst ondersteunt maximaal 4096 tekens."
+  "textLimit": "3D-tekst ondersteunt maximaal 4096 tekens.",
+  "modelNames": {
+    "hexFrame": "Zeshoekig frame",
+    "hexArc": "Zeshoekige boog",
+    "ringFrame": "Holle ring",
+    "ringArc": "Cirkelboog",
+    "rim": "Gegroefde ring",
+    "halfDisc": "Halve schijf",
+    "halfHex": "Halve zeshoek",
+    "prism": "Prisma",
+    "wedge": "Wig",
+    "roundedBlock": "Afgerond blok",
+    "puck": "Schijf",
+    "halfBlock": "Half blok",
+    "rockA": "Rots A",
+    "rockB": "Rots B",
+    "rockC": "Rots C",
+    "rockE": "Rots E"
+  },
+  "library": "3D-bibliotheek",
+  "shapes": "Vormen",
+  "models": "GLB-modellen",
+  "add": "Toevoegen",
+  "preview": "3D-voorbeeld"
 }

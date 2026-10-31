@@ -269,6 +269,7 @@ export type { VectorCorner, VectorNodeEditing } from "./vector/model";
 export { arrangeArtboards, ARTBOARD_GAP } from "./pages/workspace";
 export type { ArtboardGeometry, ArtboardPlacement, ArtboardWorkspace } from "./pages/workspace";
 
+export { SPATIAL_PRIMITIVES } from "./spatial/model";
 export type {
   SpatialLayer,
   SpatialScene,

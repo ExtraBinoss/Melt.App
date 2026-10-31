@@ -9,7 +9,7 @@ import {
 import { ensure } from "../errors";
 import { SPATIAL_ENVIRONMENTS } from "./defaults";
 import { SPATIAL_MATERIALS } from "./materials";
-import type { SpatialLayer } from "./model";
+import { SPATIAL_PRIMITIVES, type SpatialLayer } from "./model";
 export const SPATIAL_NUMBERS = {
   x: [-1000, 1000],
   y: [-1000, 1000],
@@ -43,9 +43,7 @@ export function validateSpatialLayer(value: unknown): asserts value is SpatialLa
   assertRecord(value);
   assertBoolean(value.enabled);
   ensure(
-    ["box", "sphere", "torus", "capsule", "cone", "cylinder", "extrude", "glb"].includes(
-      String(value.source),
-    ),
+    [...SPATIAL_PRIMITIVES, "extrude", "glb"].includes(String(value.source)),
     "INVALID_DOCUMENT",
     "Unknown 3D source",
   );
@@ -145,7 +143,7 @@ export function validateSpatialSource(
       "INVALID_DOCUMENT",
       "Missing GLB original",
     );
-  if (settings.source !== "extrude" || !settings.enabled) return;
+  if ((settings.source !== "extrude" && settings.source !== "shape") || !settings.enabled) return;
   if (layer.kind === "text")
     ensure(
       typeof layer.text === "string" && layer.text.length <= 4096,

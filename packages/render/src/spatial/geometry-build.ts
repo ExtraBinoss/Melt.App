@@ -2,36 +2,18 @@ import { filledContourShapes } from "./filled-contours";
 import { spatialMorphPaths } from "./morph";
 import {
   BufferAttribute,
-  BoxGeometry,
-  CapsuleGeometry,
-  ConeGeometry,
-  CylinderGeometry,
   ExtrudeGeometry,
-  Shape,
+  ShapeGeometry,
   ShapePath,
-  SphereGeometry,
-  TorusGeometry,
+  type Shape,
   type BufferGeometry,
 } from "three";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
-import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
+import { spatialPrimitiveGeometry } from "./primitives";
 import type { GeometryPayload, SpatialGeometryJob } from "./geometry-model";
 export function buildSpatialGeometry(job: SpatialGeometryJob): BufferGeometry {
-  if (job.source === "box")
-    return job.bevel > 0
-      ? new RoundedBoxGeometry(
-          1.8,
-          1.8,
-          1.8,
-          Math.min(6, job.bevelSegments),
-          Math.min(0.8, job.bevel),
-        )
-      : new BoxGeometry(1.8, 1.8, 1.8);
-  if (job.source === "sphere") return new SphereGeometry(1, 48, 32);
-  if (job.source === "torus") return new TorusGeometry(0.72, 0.26, 24, 64);
-  if (job.source === "capsule") return new CapsuleGeometry(0.55, 0.9, 12, 32);
-  if (job.source === "cone") return new ConeGeometry(0.95, 1.9, 48);
-  if (job.source === "cylinder") return new CylinderGeometry(0.85, 0.85, 1.8, 48);
+  const primitive = spatialPrimitiveGeometry(job);
+  if (primitive) return primitive;
   const paths = spatialMorphPaths(job) ?? job.paths ?? [];
   const commands = paths.reduce((count, path) => count + path.length, 0);
   if (commands * (job.morph ? 1 : job.curveSegments) * (job.bevelSegments * 2 + 4) > 800_000)
@@ -57,17 +39,24 @@ export function buildSpatialGeometry(job: SpatialGeometryJob): BufferGeometry {
     let vertices = 0;
     for (const batch of batches) {
       if (!batch.shapes.length) continue;
-      const geometry = new ExtrudeGeometry(batch.shapes, {
-        depth: job.depth,
-        bevelEnabled: job.bevel > 0,
-        bevelSize: job.bevel,
-        bevelThickness: job.bevel,
-        bevelSegments: job.bevelSegments,
-        curveSegments: job.curveSegments,
-        steps: 1,
-      });
+      const geometry =
+        job.source === "shape"
+          ? new ShapeGeometry(batch.shapes, job.curveSegments)
+          : new ExtrudeGeometry(batch.shapes, {
+              depth: job.depth,
+              bevelEnabled: job.bevel > 0,
+              bevelSize: job.bevel,
+              bevelThickness: job.bevel,
+              bevelSegments: job.bevelSegments,
+              curveSegments: job.curveSegments,
+              steps: 1,
+            });
       built.push(geometry);
-      geometry.translate(0, 0, -job.depth / 2 + (job.pathParts ? batch.part * 0.0001 : 0));
+      geometry.translate(
+        0,
+        0,
+        (job.source === "shape" ? 0 : -job.depth / 2) + (job.pathParts ? batch.part * 0.0001 : 0),
+      );
       const count = geometry.getAttribute("position").count;
       vertices += count;
       if (vertices > 800_000) throw new RangeError("3D geometry exceeds the vertex budget");

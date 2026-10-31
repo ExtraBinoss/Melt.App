@@ -1,5 +1,27 @@
 /** Portable 3D source data. Three objects, geometry and textures are renderer-owned. */
-export type SpatialPrimitive = "box" | "sphere" | "torus" | "capsule" | "cone" | "cylinder";
+export const SPATIAL_PRIMITIVES = [
+  "box",
+  "sphere",
+  "torus",
+  "capsule",
+  "cone",
+  "cylinder",
+  "circle",
+  "plane",
+  "ring",
+  "dodecahedron",
+  "icosahedron",
+  "octahedron",
+  "tetrahedron",
+  "torusKnot",
+  "lathe",
+  "tube",
+  "polyhedron",
+  "edges",
+  "wireframe",
+  "shape",
+] as const;
+export type SpatialPrimitive = (typeof SPATIAL_PRIMITIVES)[number];
 export type SpatialSource = SpatialPrimitive | "extrude" | "glb";
 export interface SpatialMaterial {
   preset: string;

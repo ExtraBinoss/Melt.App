@@ -1,33 +1,108 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Box, Circle, Cylinder, Donut, Pyramid, Pill, Type, Upload } from "lucide-react";
+import { Box, Plus, Type, Upload } from "lucide-react";
 import type { EnginePort } from "@musart/core";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Button } from "../ui/button";
 import { IconButton } from "../shared/IconButton";
+import { ScrollShadow } from "../shared/scroll/ScrollShadow";
+import { SegmentedTabs } from "../shared/segmented/SegmentedTabs";
 import { importSpatialModel, insertSpatialObject } from "../../services/assets/spatial-import";
+import { SpatialLibraryModels } from "../../services/assets/spatial-library";
+import {
+  SPATIAL_LIBRARY_MODELS,
+  SPATIAL_LIBRARY_SHAPES,
+  spatialLibrarySwatch,
+  type SpatialLibraryEntry,
+} from "./library/catalog";
+import {
+  SpatialLibraryPreview,
+  type SpatialLibraryPreviewHandle,
+} from "./library/SpatialLibraryPreview";
 import "./messages";
 import "./spatial.css";
-const objects = [
-  ["box", Box],
-  ["sphere", Circle],
-  ["torus", Donut],
-  ["capsule", Pill],
-  ["cone", Pyramid],
-  ["cylinder", Cylinder],
-] as const;
+import "./library/library.css";
 export function SpatialLibrary({ engine }: { engine: EnginePort }) {
   const { t } = useTranslation("spatial");
   const [open, setOpen] = useState(false),
     [busy, setBusy] = useState(false),
     [error, setError] = useState("");
+  const [tab, setTab] = useState("shapes"),
+    [selected, setSelected] = useState<SpatialLibraryEntry>(SPATIAL_LIBRARY_SHAPES[0]!);
+  const store = useMemo(() => new SpatialLibraryModels(), []);
   const input = useRef<HTMLInputElement>(null),
+    preview = useRef<SpatialLibraryPreviewHandle>(null),
     pending = useRef<AbortController | null>(null);
-  useEffect(() => () => pending.current?.abort(), []);
+  useEffect(
+    () => () => {
+      pending.current?.abort();
+      store.clear();
+    },
+    [store],
+  );
+  const entries = tab === "models" ? SPATIAL_LIBRARY_MODELS : SPATIAL_LIBRARY_SHAPES;
+  async function add(entry: SpatialLibraryEntry | "text" | File) {
+    if (busy) return;
+    const controller = new AbortController();
+    pending.current?.abort();
+    pending.current = controller;
+    const origin = engine.getSnapshot();
+    setBusy(true);
+    setError("");
+    try {
+      await preview.current?.stop().catch(() => {});
+      controller.signal.throwIfAborted();
+      if (
+        engine.getSnapshot().project !== origin.project ||
+        engine.getSnapshot().pageId !== origin.pageId
+      ) {
+        setOpen(false);
+        return;
+      }
+      setOpen(false);
+      if (entry instanceof File) await importSpatialModel(engine, entry, controller.signal);
+      else if (entry === "text") insertSpatialObject(engine, "text", t("primitives.text"));
+      else if (entry.kind === "shape") insertSpatialObject(engine, entry.source, t(entry.nameKey));
+      else {
+        const asset = await store.load(entry.model, controller.signal),
+          blob = await (await fetch(asset.dataUrl, { signal: controller.signal })).blob();
+        controller.signal.throwIfAborted();
+        if (
+          engine.getSnapshot().project !== origin.project ||
+          engine.getSnapshot().pageId !== origin.pageId
+        )
+          return;
+        await importSpatialModel(
+          engine,
+          new File([blob], `${entry.id}.glb`, { type: "model/gltf-binary" }),
+          controller.signal,
+          { name: t(entry.nameKey), useModelMaterials: false },
+        );
+      }
+    } catch (cause) {
+      if (
+        !controller.signal.aborted &&
+        !(cause instanceof DOMException && cause.name === "AbortError")
+      ) {
+        setError(t("errors.import"));
+        setOpen(true);
+      }
+    } finally {
+      if (pending.current === controller) pending.current = null;
+      setBusy(false);
+    }
+  }
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover
+      open={open}
+      onOpenChange={(next) => {
+        if (!next) pending.current?.abort();
+        setOpen(next);
+      }}
+      modal={false}
+    >
       <PopoverTrigger asChild>
-        <IconButton label={t("title")}>
+        <IconButton label={t("title")} disabled={busy}>
           <Box strokeWidth={1.65} />
         </IconButton>
       </PopoverTrigger>
@@ -36,41 +111,94 @@ export function SpatialLibrary({ engine }: { engine: EnginePort }) {
         align="start"
         className="spatial-library"
         aria-label={t("objects")}
+        data-canvas-control
       >
-        <div className="spatial-objects">
-          {objects.map(([source, Icon]) => (
-            <Button
-              key={source}
-              variant="ghost"
-              onClick={() => {
-                insertSpatialObject(engine, source, t(`primitives.${source}`));
-                setOpen(false);
-              }}
-            >
-              <Icon size={25} strokeWidth={1.4} />
-              <span>{t(`primitives.${source}`)}</span>
-            </Button>
-          ))}
+        <SpatialLibraryPreview
+          ref={preview}
+          entry={selected}
+          store={store}
+          onError={() => setError(t("errors.render"))}
+        />
+        <div className="spatial-library-heading">
+          <span>{t(selected.nameKey)}</span>
+          <Button
+            size="sm"
+            disabled={busy}
+            onClick={() => {
+              void add(selected);
+            }}
+          >
+            <Plus size={14} />
+            {t("add")}
+          </Button>
         </div>
+        <SegmentedTabs
+          mode="choice"
+          size="compact"
+          label={t("library")}
+          value={tab}
+          disabled={busy}
+          items={[
+            { value: "shapes", label: t("shapes") },
+            { value: "models", label: t("models") },
+          ]}
+          onValueChange={(value) => {
+            setTab(value);
+            setSelected((value === "models" ? SPATIAL_LIBRARY_MODELS : SPATIAL_LIBRARY_SHAPES)[0]!);
+            setError("");
+          }}
+        />
+        <ScrollShadow fade="mask">
+          <div className="spatial-library-list">
+            <div className="spatial-objects">
+              {entries.map((entry) => (
+                <button
+                  type="button"
+                  key={entry.id}
+                  disabled={busy}
+                  className="spatial-object"
+                  aria-label={t(entry.nameKey)}
+                  aria-pressed={selected.id === entry.id}
+                  onPointerEnter={(event) => {
+                    if (event.pointerType !== "touch") {
+                      setSelected(entry);
+                      setError("");
+                    }
+                  }}
+                  onFocus={() => {
+                    setSelected(entry);
+                    setError("");
+                  }}
+                  onClick={() => {
+                    setSelected(entry);
+                    setError("");
+                  }}
+                >
+                  <span
+                    className="spatial-object-poster"
+                    aria-hidden
+                    style={spatialLibrarySwatch(entry.index)}
+                  />
+                  <span>{t(entry.nameKey)}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </ScrollShadow>
         <div className="spatial-library-actions">
           <Button
             variant="outline"
+            disabled={busy}
             onClick={() => {
-              insertSpatialObject(engine, "text", t("primitives.text"));
-              setOpen(false);
+              void add("text");
             }}
           >
             <Type size={14} />
             {t("primitives.text")}
           </Button>
-          <Button
-            variant="outline"
-            disabled={busy}
-            aria-busy={busy}
-            onClick={() => input.current?.click()}
-          >
+          <Button variant="outline" disabled={busy} onClick={() => input.current?.click()}>
             <Upload size={14} />
-            {t(busy ? "importing" : "importModel")}
+            {t("importModel")}
           </Button>
         </div>
         <input
@@ -81,26 +209,11 @@ export function SpatialLibrary({ engine }: { engine: EnginePort }) {
           onChange={(event) => {
             const file = event.target.files?.[0];
             event.target.value = "";
-            if (!file) return;
-            pending.current?.abort();
-            const request = new AbortController();
-            pending.current = request;
-            setBusy(true);
-            setError("");
-            void importSpatialModel(engine, file, request.signal)
-              .then(() => {
-                if (!request.signal.aborted) setOpen(false);
-              })
-              .catch(() => {
-                if (!request.signal.aborted) setError(t("errors.import"));
-              })
-              .finally(() => {
-                if (!request.signal.aborted) setBusy(false);
-              });
+            if (file) void add(file);
           }}
         />
         {error && (
-          <p role="status" className="spatial-import-error">
+          <p className="spatial-import-error" role="alert">
             {error}
           </p>
         )}

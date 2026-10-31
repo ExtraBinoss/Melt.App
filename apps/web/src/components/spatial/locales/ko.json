@@ -82,7 +82,22 @@
     "capsule": "캡슐",
     "cone": "원뿔",
     "cylinder": "원기둥",
-    "text": "3D 텍스트"
+    "text": "3D 텍스트",
+    "circle": "원",
+    "plane": "평면",
+    "ring": "고리",
+    "dodecahedron": "정십이면체",
+    "icosahedron": "정이십면체",
+    "octahedron": "정팔면체",
+    "tetrahedron": "정사면체",
+    "torusKnot": "토러스 매듭",
+    "lathe": "회전체",
+    "tube": "튜브",
+    "polyhedron": "다면체",
+    "edges": "모서리",
+    "wireframe": "와이어프레임",
+    "shape": "도형",
+    "extrude": "돌출"
   },
   "lightTypes": {
     "directional": "방향광",
@@ -152,5 +167,28 @@
     "extrude": "3D · 돌출"
   },
   "filledOutlines": "3D 돌출은 채워진 SVG 경로를 최대 256개 지원합니다.",
-  "textLimit": "3D 텍스트는 최대 4,096자를 지원합니다."
+  "textLimit": "3D 텍스트는 최대 4,096자를 지원합니다.",
+  "modelNames": {
+    "hexFrame": "육각 프레임",
+    "hexArc": "육각 아치",
+    "ringFrame": "속이 빈 고리",
+    "ringArc": "고리 아치",
+    "rim": "홈이 있는 고리",
+    "halfDisc": "반원판",
+    "halfHex": "반육각형",
+    "prism": "프리즘",
+    "wedge": "쐐기",
+    "roundedBlock": "둥근 블록",
+    "puck": "원판",
+    "halfBlock": "반블록",
+    "rockA": "바위 A",
+    "rockB": "바위 B",
+    "rockC": "바위 C",
+    "rockE": "바위 E"
+  },
+  "library": "3D 라이브러리",
+  "shapes": "도형",
+  "models": "GLB 모델",
+  "add": "추가",
+  "preview": "3D 미리보기"
 }
