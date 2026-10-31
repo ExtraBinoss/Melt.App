@@ -35,6 +35,8 @@ it("shows startup then mounts editor and closes resources", async () => {
   mocks.createRuntime.mockResolvedValue(result);
   const view = render(<Studio />);
   expect(screen.getByRole("status")).toHaveTextContent("Ouverture");
+  expect(screen.getByRole("status")).toHaveAttribute("data-variant", "shimmer");
+  expect(screen.getByRole("status")).toHaveAttribute("data-visible", "true");
   await screen.findByText("Atelier prêt");
   view.unmount();
   expect(result.dispose).toHaveBeenCalledOnce();

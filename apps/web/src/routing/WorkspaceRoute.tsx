@@ -4,7 +4,7 @@ import { lazy, Suspense, useEffect } from "react";
 import { useNavigate, useRouterState, useBlocker } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { readLanguage } from "../state/i18n";
-import { BrandStatus } from "../ui/brand/BrandStatus";
+import { StudioPreparation } from "../bootstrap/StudioPreparation";
 const Studio = lazy(() =>
   import("../bootstrap/Studio").then((module) => ({ default: module.Studio })),
 );
@@ -25,13 +25,7 @@ export function WorkspaceRoute() {
   const view = location.pathname.replace(/\/$/, "").endsWith("/dashboard") ? "dashboard" : "editor";
   const search = location.search as Record<string, unknown>;
   return (
-    <Suspense
-      fallback={
-        <div className="studio-loading" role="status">
-          <BrandStatus size={40} state="preparing" />
-        </div>
-      }
-    >
+    <Suspense fallback={<StudioPreparation />}>
       <Studio
         routing={{
           view,

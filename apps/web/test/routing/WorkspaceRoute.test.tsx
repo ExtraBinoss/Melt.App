@@ -8,6 +8,7 @@ const state = vi.hoisted(() => ({
 }));
 vi.mock("@tanstack/react-router", () => ({
   useNavigate: () => state.navigate,
+  useBlocker: vi.fn(),
   useRouterState: () => state.location,
 }));
 vi.mock("../../src/bootstrap/Studio", () => ({

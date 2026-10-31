@@ -1,5 +1,5 @@
 import { MeltLogo } from "../ui/brand/MeltLogo";
-import { BrandStatus } from "../ui/brand/BrandStatus";
+import { StudioPreparation } from "./StudioPreparation";
 import { useTranslation } from "react-i18next";
 import "./messages";
 import "./loading.css";
@@ -105,13 +105,7 @@ export function Studio({ routing }: { routing?: StudioRouting } = {}) {
           />
         </TooltipProvider>
       ) : runtime ? (
-        <Suspense
-          fallback={
-            <div className="studio-loading">
-              <BrandStatus size={52} state="preparing" />
-            </div>
-          }
-        >
+        <Suspense fallback={<StudioPreparation />}>
           <App
             engine={runtime.engine}
             services={runtime.services}
@@ -119,11 +113,12 @@ export function Studio({ routing }: { routing?: StudioRouting } = {}) {
             routing={routing}
           />
         </Suspense>
-      ) : (
-        <div className="studio-loading" role="status">
-          {error ? <MeltLogo size={52} /> : <BrandStatus size={52} state="preparing" />}
-          <span>{t("opening")}</span>
+      ) : error ? (
+        <div className="studio-loading">
+          <MeltLogo size={52} />
         </div>
+      ) : (
+        <StudioPreparation />
       )}
       {error && (
         <div className="runtime-error" role="alert">

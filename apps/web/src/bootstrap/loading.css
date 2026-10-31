@@ -12,3 +12,8 @@
 .studio-loading > :is(.melt-status, .melt-mascot) {
   justify-self: center;
 }
+.studio-loading > .ui-throbber {
+  display: grid;
+  justify-items: center;
+  gap: 1.15rem;
+}
