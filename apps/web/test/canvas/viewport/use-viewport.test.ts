@@ -1,4 +1,4 @@
-import { createElement, StrictMode, useRef } from "react";
+import { createElement, StrictMode, useRef, useSyncExternalStore } from "react";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, expect, it, vi } from "vitest";
 import { createPage, createProject, EditorEngine } from "@musart/core";
@@ -11,7 +11,7 @@ afterEach(() => {
   vi.unstubAllGlobals();
   vi.useRealTimers();
 });
-function fixture() {
+function fixture(pages = [createPage({ width: 200, height: 160 })]) {
   vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
   let time = 0,
     next = 1;
@@ -36,19 +36,19 @@ function fixture() {
     width: 1000,
     height: 800,
   } as DOMRect);
-  const page = createPage({ width: 200, height: 160 }),
-    engine = new EditorEngine(createProject({ pages: [page] })),
+  const engine = new EditorEngine(createProject({ pages })),
     controller = new SceneController(engine, EMPTY_PREVIEW_SOURCE);
   const workspace = createWorkspace(engine, controller);
   let current: ReturnType<typeof useViewport>,
     renders = 0;
   function Probe() {
     const viewport = useRef<HTMLDivElement>(null);
+    const snapshot = useSyncExternalStore(engine.subscribe, engine.getSnapshot, engine.getSnapshot);
     current = useViewport({
       engine,
       workspace,
       viewport,
-      layoutKey: page.id,
+      layoutKey: snapshot.project.pages.map((page) => page.id).join(","),
       projectId: engine.getSnapshot().project.id,
     });
     renders++;
@@ -69,6 +69,7 @@ function fixture() {
   return {
     Probe,
     engine,
+    workspace,
     media,
     changes,
     frames,
@@ -191,4 +192,39 @@ it("registers an origin bridge for explicit pin reservations while ordinary fit 
   view.unmount();
   expect(port.capture()).toBeUndefined();
   expect(d.frames.size).toBe(0);
+});
+
+it("keeps surviving artboards at the same screen coordinates and zoom when deletion shrinks the workspace", () => {
+  const pages = Array.from({ length: 4 }, (_, i) =>
+      createPage({ id: `p${i}`, width: 400, height: 300 }),
+    ),
+    d = fixture(pages),
+    mounted = render(createElement(d.Probe));
+  d.advance(0);
+  const screen = (id: string) => {
+    const layout = d.workspace.read(),
+      board = layout.boards.find((board) => board.id === id)!,
+      view = d.read().motion.read();
+    return {
+      x: view.x + (board.x - layout.width / 2) * view.zoom,
+      y: view.y + (board.y - layout.height / 2) * view.zoom,
+      zoom: view.zoom,
+    };
+  };
+  const first = screen("p0"),
+    second = screen("p1");
+  act(() => {
+    d.engine.setPage("p3");
+    d.engine.execute({ type: "deletePage", id: "p3" });
+  });
+  expect(screen("p0")).toEqual(first);
+  act(() => d.engine.execute({ type: "deletePage", id: "p2" }));
+  expect(screen("p0")).toEqual(first);
+  expect(screen("p1")).toEqual(second);
+  expect(d.read().motion.isMoving()).toBe(false);
+  d.advance(16);
+  d.advance(256);
+  expect(screen("p0")).toEqual(first);
+  expect(screen("p1")).toEqual(second);
+  mounted.unmount();
 });

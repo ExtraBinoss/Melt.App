@@ -264,3 +264,6 @@ export type { VectorNode, VectorPoint, VectorSubpath, VectorNodeMode } from "./v
 
 export { writeRoundedVectorPath } from "./vector/edit/rounding";
 export type { VectorCorner, VectorNodeEditing } from "./vector/model";
+
+export { arrangeArtboards, ARTBOARD_GAP } from "./pages/workspace";
+export type { ArtboardGeometry, ArtboardPlacement, ArtboardWorkspace } from "./pages/workspace";

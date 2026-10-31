@@ -67,6 +67,7 @@ import { useWand } from "./interaction/use-wand";
 import { PixelSelectionOverlay, PixelSelectionToolbar } from "./selection/PixelSelectionOverlay";
 import { attachmentSelection } from "../state/selection/attachments";
 import { useTransformSnapping } from "./interaction/snapping/use-transform-snapping";
+import { CanvasMarquee } from "./selection/CanvasMarquee";
 import { CanvasVectorEditing } from "./vector/CanvasVectorEditing";
 import { EffectGizmo } from "./effects/EffectGizmo";
 import "./canvas.css";
@@ -438,7 +439,6 @@ export function EditorCanvas({
       viewport.current?.releasePointerCapture(event.pointerId);
     }
   }
-
   function pointerCancel(event: ReactPointerEvent<HTMLDivElement>) {
     if (!gesture.current || gesture.current.pointerId === event.pointerId) cancelGesture();
   }
@@ -545,7 +545,6 @@ export function EditorCanvas({
               viewSource={motion}
             />
             <EffectGizmo {...gizmoProps} />
-            <div ref={marqueeElement} className="canvas-marquee" hidden />
           </div>
           <PixelSelectionOverlay
             port={services?.pixelSelection}
@@ -559,6 +558,12 @@ export function EditorCanvas({
             viewSource={pageViewSource}
             viewport={viewport}
             enabled={tool === "pointer" && !space}
+          />
+          <CanvasMarquee
+            board={activeBoard}
+            workspace={layout}
+            view={shown}
+            element={marqueeElement}
           />
           <ArtboardControls
             controller={controller}

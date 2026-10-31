@@ -24,23 +24,43 @@ export function wheelZoomFactor(delta: number, mode: number, viewport: number): 
     : 1;
 }
 
-/** Keep a useful part of the page in reach, with a small workspace gutter. */
+/** Travel freely while keeping a useful patch of at least one real artboard in reach. */
 export function constrainView(
   view: View,
-  size: { width: number; height: number },
+  size: {
+    width: number;
+    height: number;
+    boards?: readonly { x: number; y: number; width: number; height: number }[];
+  },
   viewport: { width: number; height: number },
 ): View {
-  const limit = (extent: number, available: number) =>
-    Math.max(0, (extent * view.zoom - available) / 2) + Math.min(240, available * 0.3);
-  const x = Math.max(
-    -limit(size.width, viewport.width),
-    Math.min(limit(size.width, viewport.width), view.x),
-  );
-  const y = Math.max(
-    -limit(size.height, viewport.height),
-    Math.min(limit(size.height, viewport.height), view.y),
-  );
-  return x === view.x && y === view.y ? view : { ...view, x, y };
+  if (viewport.width <= 0 || viewport.height <= 0) return view;
+  const boards = size.boards?.length
+    ? size.boards
+    : [{ x: 0, y: 0, width: size.width, height: size.height }];
+  let x = view.x,
+    y = view.y,
+    distance = Infinity;
+  for (const board of boards) {
+    const width = board.width * view.zoom,
+      height = board.height * view.zoom,
+      keepX = Math.min(96, viewport.width * 0.2, width / 2),
+      keepY = Math.min(96, viewport.height * 0.2, height / 2),
+      limitX = (viewport.width + width) / 2 - keepX,
+      limitY = (viewport.height + height) / 2 - keepY,
+      centerX = (board.x + board.width / 2 - size.width / 2) * view.zoom,
+      centerY = (board.y + board.height / 2 - size.height / 2) * view.zoom,
+      nextX = Math.max(-centerX - limitX, Math.min(-centerX + limitX, view.x)),
+      nextY = Math.max(-centerY - limitY, Math.min(-centerY + limitY, view.y)),
+      nextDistance = (nextX - view.x) ** 2 + (nextY - view.y) ** 2;
+    if (nextDistance === 0) return view;
+    if (nextDistance < distance) {
+      x = nextX;
+      y = nextY;
+      distance = nextDistance;
+    }
+  }
+  return { ...view, x, y };
 }
 
 export function zoomAt(view: View, factor: number, anchor: Point): View {

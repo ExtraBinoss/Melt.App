@@ -33,10 +33,10 @@
 .canvas-loading-feedback:has(.ui-throbber[data-visible="true"]) > .canvas-loading-orbit {
   opacity: 1;
 }
-.editor-gpu-scene:has(canvas[data-presentation-ready="true"]) > .canvas-loading {
+.editor-gpu-scene:has(canvas[data-display-initialized="true"]) > .canvas-loading {
   animation: canvas-loading-dismiss 240ms ease-out both;
 }
-.editor-gpu-scene:has(canvas[data-presentation-ready="true"]) .canvas-loading-orbit {
+.editor-gpu-scene:has(canvas[data-display-initialized="true"]) .canvas-loading-orbit {
   animation-play-state: paused;
 }
 @keyframes canvas-preparation-orbit {
@@ -54,11 +54,11 @@
   .canvas-loading-orbit {
     animation: none;
   }
-  .editor-gpu-scene:has(canvas[data-presentation-ready="true"]) > .canvas-loading {
+  .editor-gpu-scene:has(canvas[data-display-initialized="true"]) > .canvas-loading {
     animation: none;
     visibility: hidden;
   }
-  .editor-gpu-scene:has(canvas[data-presentation-ready="true"]) canvas {
+  .editor-gpu-scene:has(canvas[data-display-initialized="true"]) canvas {
     animation: none;
   }
 }

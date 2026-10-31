@@ -1,3 +1,4 @@
+import { arrangeArtboards } from "./workspace";
 import { ensure } from "../errors";
 import { createPage } from "../document/factories";
 import type { CommandHandler } from "../session/context";
@@ -43,6 +44,47 @@ export const deletePage: CommandHandler<"deletePage"> = ({ project, pageId }, co
     "NOT_FOUND",
     "Composition introuvable",
   );
-  project.pages = project.pages.filter((page) => page.id !== command.id);
-  return { pageId: command.id === pageId ? project.pages[0]!.id : pageId, selection: [] };
+  const layout = arrangeArtboards(project.pages),
+    byId = new Map(layout.boards.map((board) => [board.id, board])),
+    removed = byId.get(command.id)!,
+    removedIndex = project.pages.findIndex((page) => page.id === command.id),
+    origin = layout.origin ?? { x: 0, y: 0 };
+  const positions = new Map(
+    layout.boards.map((board) => [
+      board.id,
+      {
+        x: board.x + origin.x,
+        y: board.y + origin.y,
+      },
+    ]),
+  );
+  // Preserve legacy shelf positions within the portable coordinate range. An
+  // oversized legacy workspace must remain deletable even when migration cannot fit.
+  const portable = [...positions.values()].every(
+    (point) => Math.abs(point.x) <= 1_000_000 && Math.abs(point.y) <= 1_000_000,
+  );
+  project.pages = project.pages
+    .filter((page) => page.id !== command.id)
+    .map((page) =>
+      page.canvasPosition || !portable
+        ? page
+        : { ...page, canvasPosition: positions.get(page.id)! },
+    );
+  if (command.id !== pageId) return { pageId };
+  let nearest = project.pages[0]!,
+    distance = Infinity,
+    order = Infinity;
+  for (const [index, page] of project.pages.entries()) {
+    const board = byId.get(page.id)!,
+      dx = board.x + board.width / 2 - removed.x - removed.width / 2,
+      dy = board.y + board.height / 2 - removed.y - removed.height / 2,
+      nextDistance = dx * dx + dy * dy,
+      nextOrder = Math.abs((index >= removedIndex ? index + 1 : index) - removedIndex);
+    if (nextDistance < distance || (nextDistance === distance && nextOrder < order)) {
+      nearest = page;
+      distance = nextDistance;
+      order = nextOrder;
+    }
+  }
+  return { pageId: nearest.id, selection: [] };
 };

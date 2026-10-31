@@ -106,7 +106,7 @@ it("uses instant reduced motion, handles preference changes and bounds each pose
     constrainView(view, { width: 200, height: 160 }, { width: 1000, height: 800 });
   const d = fixture(true, undefined, bound);
   d.motion.animateTo({ x: 10000, y: -10000, zoom: 1 });
-  expect(d.motion.read()).toEqual({ x: 240, y: -240, zoom: 1 });
+  expect(d.motion.read()).toEqual({ x: 504, y: -400, zoom: 1 });
   expect(d.frames.size).toBe(0);
   d.preference.reduced = false;
   d.motion.zoomBy(2, { x: 1000, y: 1000 });
@@ -115,7 +115,7 @@ it("uses instant reduced motion, handles preference changes and bounds each pose
   d.advance(56);
   expect(d.frames.size).toBe(0);
   expect(d.motion.read().zoom).toBe(2);
-  expect(Math.abs(d.motion.read().x)).toBeLessThanOrEqual(240);
+  expect(Math.abs(d.motion.read().x)).toBeLessThanOrEqual(604);
   for (const factor of [0, -1, NaN, Infinity, 1]) d.motion.zoomBy(factor, { x: 0, y: 0 });
   expect(d.frames.size).toBe(0);
   const instant = fixture(false, 0);

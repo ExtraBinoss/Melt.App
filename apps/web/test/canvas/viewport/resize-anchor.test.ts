@@ -3,7 +3,7 @@ import { ViewMotion } from "../../../src/canvas/viewport/motion";
 import { createResizeAnchor } from "../../../src/canvas/viewport/resize-anchor";
 import { constrainView } from "../../../src/canvas/viewport/view";
 
-function fixture() {
+function fixture(initialY = 0) {
   let rectangle = { left: 20, top: 10, width: 1000, height: 1000 },
     reduced = false;
   let scope = {};
@@ -28,6 +28,7 @@ function fixture() {
     reduced: () => reduced,
     constrain: (view) => constrainView(view, size, rectangle),
   });
+  motion.jump({ x: 0, y: initialY, zoom: 1 });
   motion.subscribe(frame);
   motion.subscribeSettled(settled);
   const anchor = createResizeAnchor({
@@ -84,18 +85,18 @@ test("pin and unpin preserve exact screen coordinates and zoom without any docum
 });
 
 test("a constrained edge starts at the old screen pose then springs only position with no React-frame commits or geometry reads", async () => {
-  const d = fixture(),
+  const d = fixture(200),
     lease = d.anchor.capture()!;
   d.resize(350);
   lease.apply();
-  expect(d.motion.read()).toEqual({ x: 0, y: 325, zoom: 1 });
+  expect(d.motion.read()).toEqual({ x: 0, y: 525, zoom: 1 });
   expect(d.spring).toHaveBeenCalledOnce();
   expect(d.anchor.resizeHandled()).toBe(true);
   const reads = d.rect.mock.calls.length;
   for (const value of [0, 0.25, 0.5, 0.75, 1]) d.step(value);
   expect(d.rect).toHaveBeenCalledTimes(reads);
   expect(d.settled).not.toHaveBeenCalled();
-  expect(d.motion.read()).toEqual({ x: 0, y: 230, zoom: 1 });
+  expect(d.motion.read()).toEqual({ x: 0, y: 405, zoom: 1 });
   d.finish();
   await lease.finished;
   expect(d.settled).toHaveBeenCalledOnce();
@@ -104,7 +105,7 @@ test("a constrained edge starts at the old screen pose then springs only positio
 });
 
 test("rapid reentry, input cancellation and an unrelated resize reject stale frames", async () => {
-  const d = fixture(),
+  const d = fixture(200),
     first = d.anchor.capture()!;
   d.resize(350);
   first.apply();
@@ -135,13 +136,13 @@ test("rapid reentry, input cancellation and an unrelated resize reject stale fra
 });
 
 test("reduced motion settles immediately and retired captures cannot apply into a replacement", async () => {
-  const d = fixture();
+  const d = fixture(200);
   d.reduce();
   const first = d.anchor.capture()!;
   d.resize(350);
   first.apply();
   await first.finished;
-  expect(d.motion.read().y).toBe(230);
+  expect(d.motion.read().y).toBe(405);
   expect(d.spring).not.toHaveBeenCalled();
   const abandoned = d.anchor.capture()!;
   d.anchor.cancel();
@@ -153,7 +154,7 @@ test("reduced motion settles immediately and retired captures cannot apply into 
 });
 
 test("live reduced motion finishes the correction and a replaced scope rejects late samples", async () => {
-  const d = fixture(),
+  const d = fixture(200),
     first = d.anchor.capture()!;
   d.resize(350);
   first.apply();
@@ -161,8 +162,8 @@ test("live reduced motion finishes the correction and a replaced scope rejects l
   d.reduce();
   d.anchor.finish();
   await first.finished;
-  expect(d.motion.read().y).toBe(230);
-  const next = fixture(),
+  expect(d.motion.read().y).toBe(405);
+  const next = fixture(200),
     stale = next.anchor.capture()!;
   next.resize(350);
   stale.apply();
@@ -172,4 +173,15 @@ test("live reduced motion finishes the correction and a replaced scope rejects l
   await stale.finished;
   expect(next.motion.read()).toBe(current);
   expect(next.stopped).toHaveBeenCalledOnce();
+});
+
+test("composes viewport compensation with a structural world-origin rebase before the layout is applied", async () => {
+  const d = fixture(),
+    lease = d.anchor.capture()!;
+  d.motion.reframe({ x: 25, y: 30, zoom: 1 });
+  d.resize(700);
+  lease.apply();
+  await lease.finished;
+  expect(d.motion.read()).toEqual({ x: 25, y: 180, zoom: 1 });
+  expect(d.spring).not.toHaveBeenCalled();
 });

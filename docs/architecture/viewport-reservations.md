@@ -40,3 +40,19 @@ behavior. The framing bridge is requested only by explicit Pin/Unpin transitions
 The focused native witness records artwork/selection rectangles, zoom and editor
 commit counters on actual animation frames; final panel height alone does not
 establish visual continuity.
+
+## Static/Motion presence and page switches
+
+A persistent `DockViewportReservation` captures the old viewport during React's
+pre-mutation snapshot lifecycle when the composition scope or mode changes. It
+applies the lease after descendant layout effects have measured the final slot.
+This covers the 32-pixel peek, restored pinned heights and disappearance, without
+animating flex height or scaling the workspace. The body slides in independently;
+an outgoing inert dock leaves layout immediately and fades/slides over the app
+until Motion releases it. Reduced motion removes that visual transition.
+
+Applying a resize lease uses the currently rebased view, composing its viewport
+center delta with a structural artboard-origin change in the same commit. The
+registered adapter remains stable across layout keys; canonical scope checks and
+native input still retire stale corrections. Initial project opening keeps its
+normal Fit behavior.

@@ -1,3 +1,7 @@
+/* The app owns the outgoing overlay while the live workspace reserves its final size once. */
+.musart-app {
+  position: relative;
+}
 .motion-timeline-dock {
   --motion-panel-height: 260px;
   position: relative;
@@ -98,4 +102,14 @@
   .motion-timeline-dock .motion-resize .panel-divider-grip {
     transition: none;
   }
+}
+
+.motion-timeline-dock[data-motion-exiting="true"] {
+  position: absolute;
+  inset: auto 0 0;
+  pointer-events: none;
+}
+
+.motion-timeline-dock[data-motion-exiting="true"] .motion-timeline-surface {
+  pointer-events: none;
 }

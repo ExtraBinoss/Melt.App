@@ -10,6 +10,8 @@ type DraftFactories = {
 };
 /** Opt in only handlers whose mutation contract is safe on the declared shallow draft. */
 const factories: DraftFactories = Object.freeze({
+  addPage: (project) => ({ ...project, pages: [...project.pages] }),
+  deletePage: (project) => ({ ...project, pages: [...project.pages] }),
   updateMotionAudioTrack: (project, pageId, command) => ({
     ...project,
     pages: project.pages.map((page) =>

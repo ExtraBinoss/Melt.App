@@ -52,7 +52,6 @@ export function createResizeAnchor(options: Options) {
     const before = options.rect();
     if (!valid(before)) return;
     options.motion.stop(false);
-    const view = options.motion.read();
     const scope = options.scope?.();
     let target: View | undefined;
     let driver: Driver | undefined,
@@ -94,6 +93,7 @@ export function createResizeAnchor(options: Options) {
           return;
         }
         active.expected = after;
+        const view = options.motion.read();
         const from = {
           ...view,
           x: view.x + before.left + before.width / 2 - after.left - after.width / 2,

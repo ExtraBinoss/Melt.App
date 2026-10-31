@@ -6,6 +6,7 @@ import { MotionTimelineDock } from "../../../src/components/motion-shell/MotionT
 import { timelineOpenAtom } from "../../../src/state/motion/timeline-state";
 import { createMotionTransport } from "../../../src/services/motion/transport";
 import { setup } from "../../support/ui";
+import { createViewportResizeAnchor } from "../../../src/canvas/session/viewport-resize";
 import { animationPresentation } from "../../../src/components/motion/animations/presentation";
 
 let reduced = true;
@@ -218,4 +219,29 @@ test("reverses animated entry/exit without removing the interactive header", asy
   await waitFor(() => expect(dock()).not.toHaveAttribute("data-motion-animating"));
   expect(dock()).toHaveAttribute("data-motion-grip-ready", "true");
   view.unmount();
+});
+
+test("captures before a static/motion slot changes and applies after its final DOM reservation", () => {
+  const d = setup(),
+    phases: string[] = [],
+    capture = vi.fn(() => {
+      phases.push(
+        document.querySelector(".motion-timeline-dock") ? "before:motion" : "before:static",
+      );
+      return {
+        apply: () =>
+          phases.push(
+            document.querySelector(".motion-timeline-dock") ? "after:motion" : "after:static",
+          ),
+        cancel: vi.fn(),
+        finished: Promise.resolve(),
+      };
+    }),
+    stop = createViewportResizeAnchor(d.engine).register(capture),
+    view = d.mount(<MotionTimelineDock engine={d.engine} />);
+  act(() => d.engine.execute({ type: "setCompositionMode", mode: "motion" }));
+  act(() => d.engine.execute({ type: "setCompositionMode", mode: "static" }));
+  expect(phases).toEqual(["before:static", "after:motion", "before:motion", "after:static"]);
+  view.unmount();
+  stop();
 });

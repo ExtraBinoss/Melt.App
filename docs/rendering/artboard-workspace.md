@@ -2,13 +2,13 @@
 
 ## Workspace layout
 
-| Workspace feature              | Behavior                                                                                                                                                                                |
-| ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| World viewport                 | Project pages are displayed together as artboards on a single world viewport.                                                                                                           |
-| Placement                      | Legacy pages use the deterministic two-column shelves. Optional persisted `canvasPosition` metadata places added neighbors on any free side, with a 128-unit gap.                       |
-| Fit and panning                | Workspace bounds drive fit and bounded trackpad panning.                                                                                                                                |
-| Activation and project changes | Activating another page preserves the world pose. Structural layout changes preserve existing artboards’ first screen pose, then animate to fit; opening another project fits directly. |
-| View controls                  | The shared fit action remains available in command search, while the floating controls expose minus, exact 100% reset, plus and conditional recenter.                                   |
+| Workspace feature              | Behavior                                                                                                                                                                                                                                 |
+| ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| World viewport                 | Project pages are displayed together as artboards on a single world viewport.                                                                                                                                                            |
+| Placement                      | Legacy pages use the deterministic two-column shelves. Optional persisted `canvasPosition` metadata places added neighbors on any free side, with a 128-unit gap.                                                                        |
+| Fit and panning                | Workspace bounds drive fit. Panning permits free space until a useful part of every real artboard would leave the viewport.                                                                                                              |
+| Activation and project changes | Activating another page preserves the world pose. Add/resize preserves the first screen pose then fits. Deletion retains surviving positions and zoom; only an unreachable view glides back into reach. Opening a project fits directly. |
+| View controls                  | The shared fit action remains available in command search, with optional floating zoom controls in Editor preferences.                                                                                                                   |
 
 ### Active canvas and backdrops
 
@@ -144,3 +144,41 @@ restore them; the validated Jotai storage atom is device-local and independent o
 documents and undo. Wheel/trackpad, keyboard navigation, fit and recenter actions
 remain available. The compact SVG entry follows zoom between 60% and 85% of its
 small base size, without enlarging at overview zoom.
+
+## Deletion continuity and navigation limits
+
+The pure workspace placement geometry is shared with core page commands.
+Deleting a composition freezes legacy shelf positions into portable metadata in
+one undoable command, preserving original world coordinates and existing artwork
+references. Already-positioned pages keep their identity. A mixed legacy layout
+whose coordinates exceed the portable range remains deletable without an invalid
+placement migration. Deleting the active page activates its nearest surviving
+neighbor, with page-order distance breaking equal geometric distances. Deleting
+an inactive page preserves the active selection.
+
+The page-command draft copies the project header/page list, retaining original
+assets, layers and unrelated compositions. Certified GPU cache inputs ignore
+canvas position, name and ruler metadata, while real paint/dimension/layer changes
+still reject a retained hit. The same live GPU scene/context serves the deletion.
+The loading-mask dismissal follows the once-drawn `displayInitialized` marker;
+a pending destination's readiness cannot restart the initial reveal.
+
+A shrinking workspace rebases its center before paint and retains pan/zoom.
+If no remaining board is reachable, a position-only transition brings the nearest
+valid patch into view. Pan limits are the union of actual artboard visibility
+rectangles, rather than the entire workspace bounding box: at least one board
+keeps up to 96 CSS pixels per axis visible, capped by one fifth of the viewport
+and half of the artboard's projected size. Sparse gaps cannot satisfy the guard.
+
+`test/browser/composition-deletion.spec.ts` records real menu input, matching GPU
+presentation timestamps and RAF geometry/loader observations, validates warm
+retained frames and undo/redo, and pans natively to each corner. These are
+functional presentation opportunities, not physical display-latency percentiles.
+
+The selection marquee keeps its page-local geometry in a dedicated workspace
+plane above artboard headings and backdrops. Its transform follows the same
+imperative artboard presentation, while pointer events pass through. This prevents
+opaque heading bars from cutting its border/tint outside the active artboard.
+`canvas-transition-overlays.spec.ts` checks the actual decoded screenshot pixel
+at the heading crossing in a separate inspection page, with zero production
+pixel readbacks.

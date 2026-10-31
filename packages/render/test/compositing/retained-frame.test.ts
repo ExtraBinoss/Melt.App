@@ -49,3 +49,46 @@ it("reuses a certified frame through ruler bursts and history without reentering
   await graph.dispose();
   expect(graph.stats()).toMatchObject({ targets: 0, cacheBytes: 0 });
 });
+it("retains exact pixels through a composition deletion and canvas placement migration without GPU work", async () => {
+  const { renderer } = makeGpuRenderer(),
+    graph = new GpuCompositor(renderer),
+    engine = new EditorEngine(
+      createProject({
+        pages: Array.from({ length: 4 }, (_, i) =>
+          createPage({
+            id: `p${i}`,
+            width: 64,
+            height: 64,
+            layers: [createLayer("rectangle", { width: 20, height: 20 })],
+          }),
+        ),
+      }),
+    );
+  const before = engine.getSnapshot().project;
+  const retained = await Promise.all(before.pages.map((page) => graph.render(page, before.assets)));
+  const stats = graph.stats();
+  engine.setPage("p3");
+  engine.execute({ type: "deletePage", id: "p3" });
+  const after = engine.getSnapshot().project;
+  for (const [i, page] of after.pages.entries())
+    expect(graph.retainedFrame(page, after.assets, 1)).toBe(retained[i]);
+  expect(graph.stats()).toMatchObject({
+    frames: stats.frames,
+    passes: stats.passes,
+    cacheBytes: stats.cacheBytes,
+    uploads: stats.uploads,
+  });
+  const current = after.pages[0]!;
+  engine.setPage(current.id);
+  engine.execute({
+    type: "updatePage",
+    patch: { name: "Renamed", canvasPosition: { x: 100, y: 40 } },
+  });
+  const renamed = engine.getSnapshot().project;
+  expect(graph.retainedFrame(renamed.pages[0]!, renamed.assets, 1)).toBe(retained[0]);
+  engine.execute({ type: "updatePage", patch: { background: "#ff0000" } });
+  const changed = engine.getSnapshot().project;
+  expect(graph.retainedFrame(changed.pages[0]!, changed.assets, 1)).toBeNull();
+  await graph.dispose();
+  expect(graph.stats()).toMatchObject({ targets: 0, cacheBytes: 0 });
+});

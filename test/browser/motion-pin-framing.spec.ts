@@ -194,6 +194,11 @@ test("pin and unpin preserve artwork and selection pixels on every frame", async
   try {
     const revision = await ready(page);
     readyMs = Date.now() - started;
+    await page.mouse.move(600, 150);
+    await page.mouse.wheel(0, -600);
+    await expect
+      .poll(async () => Number(await page.getByTestId("artboard").getAttribute("data-pan-y")))
+      .toBeGreaterThan(250);
     await probe(page);
     await page.getByRole("button", { name: "Épingler la timeline", exact: true }).click();
     await page.waitForFunction(
@@ -251,6 +256,11 @@ test("a large pinned panel corrects pan limits smoothly without stretching artwo
     await page.waitForFunction(
       () => Number(document.querySelector(".motion-resize")?.getAttribute("aria-valuenow")) > 550,
     );
+    await page.mouse.move(600, 150);
+    await page.mouse.wheel(0, -600);
+    await expect
+      .poll(async () => Number(await page.getByTestId("artboard").getAttribute("data-pan-y")))
+      .toBeGreaterThan(250);
     await probe(page);
     await page.getByRole("button", { name: "Épingler la timeline", exact: true }).click();
     await page.waitForFunction(() => {
@@ -282,6 +292,12 @@ test("a large pinned panel corrects pan limits smoothly without stretching artwo
     }
     expect(differences).toEqual([]);
     quietRoots(frames, 1);
+    // The wider pan guard deliberately permits a partial page at the edge; bring the selected item back into the pinned viewport before clicking it.
+    await page.mouse.move(600, 150);
+    await page.mouse.wheel(0, 600);
+    await expect
+      .poll(async () => Number(await page.getByTestId("artboard").getAttribute("data-pan-y")))
+      .toBeLessThan(200);
     const card = (await page.locator('.canvas-selection[data-layer-id="pin-card"]').boundingBox())!;
     await page.mouse.click(card.x + card.width / 2, card.y + card.height / 2);
     const state = await finalState(page);

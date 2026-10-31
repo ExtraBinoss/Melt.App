@@ -109,21 +109,28 @@ export function useViewport({
     if (!rect) return;
     const shown = motion.read(),
       old = previous.layout;
-    motion.reframe(
-      {
-        ...shown,
-        x:
-          shown.x +
-          ((layout.origin?.x ?? 0) + layout.width / 2 - (old.origin?.x ?? 0) - old.width / 2) *
-            shown.zoom,
-        y:
-          shown.y +
-          ((layout.origin?.y ?? 0) + layout.height / 2 - (old.origin?.y ?? 0) - old.height / 2) *
-            shown.zoom,
-      },
-      false,
-    );
-    motion.animateTo(fitView(layout, rect), true);
+    const rebased = {
+      ...shown,
+      x:
+        shown.x +
+        ((layout.origin?.x ?? 0) + layout.width / 2 - (old.origin?.x ?? 0) - old.width / 2) *
+          shown.zoom,
+      y:
+        shown.y +
+        ((layout.origin?.y ?? 0) + layout.height / 2 - (old.origin?.y ?? 0) - old.height / 2) *
+          shown.zoom,
+    };
+    const removal =
+      layout.boards.length < old.boards.length &&
+      layout.boards.every((board) => old.boards.some((previous) => previous.id === board.id));
+    if (removal) {
+      const target = constrainView(rebased, layout, rect);
+      motion.reframe(rebased, target === rebased);
+      if (target !== rebased) motion.animateTo(target, true);
+    } else {
+      motion.reframe(rebased, false);
+      motion.animateTo(fitView(layout, rect), true);
+    }
   }, [motion, viewport, projectId, layoutKey, workspace]);
   useEffect(() => {
     motion.activate();
@@ -150,7 +157,7 @@ export function useViewport({
       unregister();
       resizeAnchor.cancel();
     };
-  }, [resizePort, resizeAnchor, projectId, layoutKey]);
+  }, [resizePort, resizeAnchor, projectId]);
   useEffect(() => {
     const frame = requestAnimationFrame(() => {
       const rect = viewport.current?.getBoundingClientRect();

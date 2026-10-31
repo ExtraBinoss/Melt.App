@@ -6,6 +6,12 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Preserve canvas framing when switching Static/Motion compositions or restoring pinned timelines: reserve final layout once, compose viewport/world-origin compensation, animate entry/exit without stretching artwork, and retire outgoing timeline input.
+
+- Paint live selection rectangles above artboard heading bars and backdrops so their borders and tint remain continuous across workspace overlays, without per-pointer React updates.
+
+- Keep composition deletion visually continuous: preserve surviving world positions and immutable artwork/assets, activate the nearest surviving composition, retain view zoom and warm GPU frames, and never replay the initial canvas loading mask. Expand pan travel while keeping a useful part of a real artboard visible, including sparse workspaces.
+
 - Let undo/redo pills expand to their action text within the canvas, using the project pill as a minimum width while retaining matched height, alignment, timed dismissal and hover/focus pauses.
 
 - Synchronize Cmd+K content reveals with the visible dialog entrance, sweep whole result rows from top to bottom with bounded blur staggering, preserve disabled contrast throughout the animation, and retain immediate focus, results and reduced-motion behavior. Add shared edge-hover scrolling and masked shadows to the category strip. Keep Cmd+K available while a previously closed dialog finishes its visual exit.
