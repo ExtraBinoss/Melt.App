@@ -22,7 +22,7 @@ export function HistoryNotice({ engine }: { engine: EnginePort }) {
     const paint = () => {
       const width = pill.offsetWidth,
         height = pill.offsetHeight;
-      element.style.width = `${width}px`;
+      element.style.setProperty("--history-min-width", `${width}px`);
       element.style.height = `${height}px`;
     };
     paint();

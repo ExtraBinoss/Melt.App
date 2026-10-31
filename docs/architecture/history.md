@@ -163,6 +163,7 @@ observer uses a generic edit label.
 A canvas-local leaf renders one animated two-second notice. Hover and keyboard
 focus independently pause its remaining timer; dismiss/load/unmount clear it.
 Its horizontal anchor is 50% of the actual canvas viewport. A local ResizeObserver
-matches the project pill's width/height; the same workspace/ruler spacing aligns
+matches the project pill's height and minimum width; the pill expands to its label
+within a 420-pixel/viewport bound so ordinary actions remain readable; the same workspace/ruler spacing aligns
 its top edge. Panel resizing, project renaming and ruler changes preserve these
 relationships without a page-wide mutation observer or gesture React updates.

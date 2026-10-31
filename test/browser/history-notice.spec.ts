@@ -54,6 +54,10 @@ test("undo/redo pills match the project pill and canvas center through panel/rul
   const notice = page.locator(".history-notice[role=status]:not([aria-hidden=true])");
   await expect(notice).toHaveAttribute("aria-label", "Undid · Color #8b5cf6");
   await notice.hover();
+  await expect(notice.locator("span")).toHaveJSProperty(
+    "scrollWidth",
+    await notice.locator("span").evaluate((node) => node.clientWidth),
+  );
   const aligned = async () => {
     await expect
       .poll(async () =>
@@ -64,7 +68,7 @@ test("undo/redo pills match the project pill and canvas center through panel/rul
           return Math.max(
             Math.abs(n.x + n.width / 2 - c.x - c.width / 2),
             Math.abs(n.y - p.y),
-            Math.abs(n.width - p.width),
+            Math.max(0, p.width - n.width),
             Math.abs(n.height - p.height),
           );
         }),
