@@ -118,3 +118,28 @@ frozen production build or recorded device-adapter identity. It establishes the
 observed cohort and the removed scheduling dependency, not a universal 60 fps
 claim, physical panel latency or a production benchmark. Raw events and the
 baseline scheduling override are in `artifacts/bloom-trace-205453/scheduling.*`.
+
+## Development video playback diagnostics
+
+Development canvas playback now prints bounded `[Melt video]` diagnostics using
+the existing User Timing lineage. Upload/reuse marks carry the source name,
+duration and decoded PTS. They are matched to the corresponding Three display
+pose before calculating progress; this is the renderer's display callback, not a
+physical panel timestamp. Synchronized copies are deduplicated. The observer
+retains at most 64 pending source records and 32 cycle records, installs no timer
+or RAF, and disconnects on HMR disposal. Production never creates the observer.
+
+The console reports playback start, decoded progress versus wall time at most
+once per two seconds per observed source, source loop/backward seek, and decoder
+cursor opening/restarting with its reason. The readable log heading includes the
+speed ratio and real loop duration so copying a collapsed console row remains
+useful. Pause/static presentation resets the cycle. Missing or unmatched decoded
+PTS is not counted as successful presentation.
+
+The supplied user logs show 4.247 seconds requested versus 4.233 seconds decoded,
+then a cursor restart near the end of the twelve-second source. These are useful
+lineage observations, not proof that the file's duration alone establishes its
+perceived visual speed. The bundled source contains six seconds forward followed
+by the reverse; the original footage is a blooming timelapse. Use the new loop
+wall duration and decoded speed fields to distinguish source content from an
+actual playback-rate defect.

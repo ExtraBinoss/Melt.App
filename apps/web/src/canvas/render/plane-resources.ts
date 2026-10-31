@@ -454,7 +454,7 @@ export class PlaneResources {
     ) {
       this.buffering.presented();
       this.profile.presented(this.preparedRequest.page.id, this.preparedRevision);
-      traceCanvasFrame(this.preparedRequest.motionFrame, this.sample.value.uuid);
+      traceCanvasFrame(this.preparedRequest, this.sample.value.uuid);
       this.presentedRevision = this.preparedRevision;
       element.dataset.rendererReady = String(this.preparedRevision === this.revision);
       element.dataset.presentationReady = "true";

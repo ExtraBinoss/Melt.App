@@ -1,7 +1,7 @@
 /** Optional trace events, with no retained history, pixel reads or console traffic. */
 export function traceRenderFrame(
   enabled: boolean | undefined,
-  phase: "video" | "gpu-ready" | "display",
+  phase: "video" | "video-cursor" | "gpu-ready" | "display",
   detail: Record<string, unknown>,
 ): void {
   if (!enabled || typeof performance.mark !== "function") return;

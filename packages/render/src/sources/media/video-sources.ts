@@ -291,6 +291,9 @@ export class MediaVideoSources {
           traceRenderFrame(true, "video", {
             compositionId: options.motionFrame?.compositionId,
             layerId: layer.id,
+            assetId: asset.id,
+            sourceName: asset.name,
+            sourceDuration: asset.duration,
             action: "reuse",
             time: options.motionFrame?.time,
             sourceTime: time,
@@ -308,6 +311,7 @@ export class MediaVideoSources {
         const cursorKey = `${pageId}:${layer.id}`;
         let entry = this.playback.get(cursorKey);
         const previous = entry?.cursor.readTime();
+        let reason = "initial";
         if (
           entry &&
           (entry.identity !== identity ||
@@ -316,11 +320,28 @@ export class MediaVideoSources {
                 compareMotionTime(subtractMotionTime(sampleTime, previous), { value: 1, rate: 1 }) >
                   0)))
         ) {
+          reason =
+            entry.identity !== identity
+              ? "source-change"
+              : previous && compareMotionTime(sampleTime, previous) < 0
+                ? "loop-or-backward-seek"
+                : "forward-seek";
           this.playback.delete(cursorKey);
           await entry.cursor.dispose();
           entry = undefined;
         }
         if (!entry) {
+          traceRenderFrame(options.traceFrames, "video-cursor", {
+            compositionId: pageId,
+            layerId: layer.id,
+            sourceName: asset.name,
+            sourceTime: time,
+            previousTime: previous,
+            action: reason === "initial" ? "opened" : "restarted",
+            reason,
+            playing: options.mediaMode === "playback",
+            proxy: !!proxy,
+          });
           entry = {
             identity,
             cursor: new VideoPlaybackCursor({
@@ -377,6 +398,9 @@ export class MediaVideoSources {
           traceRenderFrame(true, "video", {
             compositionId: options.motionFrame?.compositionId,
             layerId: layer.id,
+            assetId: asset.id,
+            sourceName: asset.name,
+            sourceDuration: asset.duration,
             action: lease ? "upload" : "gap",
             time: options.motionFrame?.time,
             sourceTime: time,
