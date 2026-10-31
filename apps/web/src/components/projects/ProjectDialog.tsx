@@ -1,3 +1,9 @@
+import { readLibraryPreview } from "./items/links";
+import {
+  dashboardHref,
+  isPlainPrimaryClick,
+  dialogLinkKeyDown,
+} from "../../ui/navigation/activation";
 import { atom, useStore } from "jotai";
 import { PreferencesHost } from "./preferences/PreferencesHost";
 import { LibraryBrowser } from "./items/LibraryBrowser";
@@ -70,11 +76,18 @@ function ProjectDashboard({
   const { t } = useTranslation();
   const mobile = useMobileLayout();
   const headingId = useId();
+  const [linkedPreview] = useState(readLibraryPreview);
   const [landing, setLanding] = useState(
     Boolean(showLanding && welcome && initialView !== "newProject"),
   );
   const [view, setView] = useState<"projects" | "templates">(
-    initialView === "templates" ? "templates" : "projects",
+    linkedPreview
+      ? linkedPreview.kind === "template"
+        ? "templates"
+        : "projects"
+      : initialView === "templates"
+        ? "templates"
+        : "projects",
   );
   const [queries, setQueries] = useState({ projects: "", templates: "" });
   const [libraryMode, setLibraryMode] = useLibraryMode();
@@ -82,6 +95,7 @@ function ProjectDashboard({
   const [creating, setCreating] = useState(initialView === "newProject");
   const [busy, setBusy] = useState(false);
   const [templateLoading, setTemplateLoading] = useState(false);
+  const BrandTrigger = busy ? "button" : "a";
   const [preferences] = useState(() => atom(false));
   const preferenceStore = useStore();
   const fileRef = useRef<HTMLInputElement>(null);
@@ -208,7 +222,23 @@ function ProjectDashboard({
       />
     );
   return (
-    <LibraryBrowser services={services} busy={busy}>
+    <LibraryBrowser
+      services={services}
+      busy={busy}
+      linkedPreview={linkedPreview}
+      onOpenLinked={(item) => {
+        if (item.kind === "template") chooseTemplate(item.id);
+        else
+          complete(async () => {
+            await Promise.all([onPrepareEditor?.(), services.openProject(item.id)]);
+          });
+      }}
+      onLinkedError={(error) => {
+        void onTask(() => {
+          throw error;
+        });
+      }}
+    >
       <Dialog
         open
         onOpenChange={(open) => {
@@ -236,10 +266,27 @@ function ProjectDashboard({
               className="dashboard-brand"
               aria-label={t("dashboard:home")}
               disabled={busy}
-              onClick={home}
+              asChild
             >
-              <MeltLogo size={32} interactive />
-              <span>{brand.name}</span>
+              <BrandTrigger
+                type={busy ? "button" : undefined}
+                href={busy ? undefined : dashboardHref}
+                role="button"
+                onKeyDown={dialogLinkKeyDown}
+                aria-disabled={busy || undefined}
+                onClick={(event) => {
+                  if (busy) {
+                    event.preventDefault();
+                    return;
+                  }
+                  if (!isPlainPrimaryClick(event)) return;
+                  event.preventDefault();
+                  home();
+                }}
+              >
+                <MeltLogo size={32} interactive />
+                <span>{brand.name}</span>
+              </BrandTrigger>
             </Button>
             <LibrarySidebar
               services={services}

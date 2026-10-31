@@ -1,3 +1,4 @@
+import { dashboardHref, isPlainPrimaryClick, dialogLinkKeyDown } from "./ui/navigation/activation";
 import { ExportLeaveGuard } from "./components/export/ExportLeaveGuard";
 import { guardExportNavigation, ExportLeaveCancelled } from "./services/export/leave";
 import { useCallback, useMemo, useRef, useState } from "react";
@@ -195,9 +196,20 @@ export function App({ engine, services, welcome = false, routing }: AppProps) {
                           variant="ghost"
                           className="brand-button floating-panel"
                           aria-label={t("projectMenu")}
-                          onClick={() => showProjectMenu("projects")}
+                          asChild
                         >
-                          <MeltLogo interactive />
+                          <a
+                            href={dashboardHref}
+                            role="button"
+                            onKeyDown={dialogLinkKeyDown}
+                            onClick={(event) => {
+                              if (!isPlainPrimaryClick(event)) return;
+                              event.preventDefault();
+                              showProjectMenu("projects");
+                            }}
+                          >
+                            <MeltLogo interactive />
+                          </a>
                         </Button>
                         <ProjectPill
                           key={projectId}

@@ -131,8 +131,9 @@ test("controlled query and mode filter list-only presentation without a duplicat
   );
   expect(screen.queryByRole("searchbox")).toBeNull();
   expect(screen.queryByRole("radiogroup")).toBeNull();
-  expect(document.querySelectorAll(".library-card")).toHaveLength(1);
+  expect(document.querySelectorAll(".library-card")).toHaveLength(2);
   expect(screen.getByRole("button", { name: /In Bloom/ })).toBeInTheDocument();
+  expect(screen.getByRole("button", { name: /Bloom Windows/ })).toBeInTheDocument();
   view.rerender(<TemplateGallery onChoose={vi.fn()} query="Techno" mode="static" hideToolbar />);
   expect(document.querySelectorAll(".library-card")).toHaveLength(1);
   expect(screen.getByRole("button", { name: /AFTERHOURS/ })).toBeInTheDocument();

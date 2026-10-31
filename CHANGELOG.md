@@ -6,6 +6,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Support native middle-click and modified-click navigation on editor/dashboard mascots and project/template cards. Open durable item preview URLs in a new tab without editing or installing a document, retain ordinary single/double-click and Space/Enter activation, and resolve linked project metadata with a bounded one-ID read. Keep landing navigation usable when visibility observation is unavailable.
+
 - Add an original Cornell Box Motion template with a procedural red/green 3D room, native shadows, silver sphere and editable brand-violet chrome text. Use two minimal A/B/A Motion actions at 60 fps with matching loop endpoints, a real rendered cover and twelve localized gallery descriptions.
 
 - Expand the native 3D library to all 21 Three geometry families and sixteen bundled CC0 Kenney GLBs, with real rendered thumbnails, a single retained rotating/orbitable preview, shared animated tabs and scroll shadows. Keep previews outside editor documents, bound original/GPU caches, verify bundled hashes and publish Add as one undoable transaction. Preserve provenance and commercial-use notices; translate controls and model names in twelve locales.

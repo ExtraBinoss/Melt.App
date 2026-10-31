@@ -1,3 +1,5 @@
+import { useLinkedPreview } from "./use-linked-preview";
+import type { LibraryPreviewRequest } from "./links";
 import { useCallback, useMemo, useState, type ReactNode } from "react";
 import { atom, useSetAtom } from "jotai";
 import { ItemDialog, type LibrarySelection } from "./ItemDialog";
@@ -42,7 +44,13 @@ export function LibraryBrowser({
   children,
   services,
   busy,
+  linkedPreview,
+  onOpenLinked,
+  onLinkedError,
 }: {
+  linkedPreview?: LibraryPreviewRequest | null;
+  onOpenLinked?: (item: LibraryItem) => void;
+  onLinkedError?: (error: unknown) => void;
   children: ReactNode;
   services: EditorServices;
   busy: boolean;
@@ -61,6 +69,7 @@ export function LibraryBrowser({
     },
     [select],
   );
+  useLinkedPreview(linkedPreview, services, inspect, onOpenLinked, onLinkedError);
   const context = useMemo(() => ({ inspect }), [inspect]);
   return (
     <FavoritesOutletContext.Provider value={favorites}>

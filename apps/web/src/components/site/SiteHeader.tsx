@@ -21,7 +21,7 @@ export function SiteHeader({
   const { t } = useTranslation("site");
   const [section, setSection] = useState(landing ? "" : "tools");
   useEffect(() => {
-    if (!landing) return;
+    if (!landing || typeof IntersectionObserver === "undefined") return;
     const sections = ["features", "faq"]
       .map((id) => document.getElementById(id))
       .filter((node): node is HTMLElement => node !== null);

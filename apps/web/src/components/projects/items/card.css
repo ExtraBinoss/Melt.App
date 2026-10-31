@@ -57,6 +57,12 @@
 
 .library-card-actions,
 .library-card-caption button,
+.library-card-caption a,
 .library-card-caption input {
   pointer-events: auto;
+}
+
+.library-card a {
+  color: inherit;
+  text-decoration: none;
 }

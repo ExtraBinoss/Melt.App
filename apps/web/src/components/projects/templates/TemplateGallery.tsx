@@ -1,3 +1,4 @@
+import { dialogLinkKeyDown } from "../../../ui/navigation/activation";
 import { BrandStatus } from "../../../ui/brand/BrandStatus";
 import { useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
@@ -109,6 +110,7 @@ export function TemplateGallery({
       <div className="template-grid">
         {templates.map((template, index) => {
           const name = t(template.nameKey);
+          const Trigger = busy ? "button" : "a";
           return (
             <LibraryItemActions
               key={template.id}
@@ -167,10 +169,14 @@ export function TemplateGallery({
                       />
                     }
                     preview={
-                      <button
-                        type="button"
-                        className="project-preview-open"
+                      <Trigger
+                        type={busy ? "button" : undefined}
                         disabled={busy}
+                        href={activation.href}
+                        role="button"
+                        onKeyDown={dialogLinkKeyDown}
+                        className="project-preview-open"
+                        aria-disabled={busy || undefined}
                         aria-label={
                           activation.inspectable
                             ? t("libraryItem:preview", { name })
@@ -225,7 +231,7 @@ export function TemplateGallery({
                             </div>
                           )}
                         </div>
-                      </button>
+                      </Trigger>
                     }
                   />
                   {activation.inspectable && (

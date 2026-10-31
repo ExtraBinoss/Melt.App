@@ -1,3 +1,5 @@
+import { isPlainPrimaryClick } from "../../../ui/navigation/activation";
+import { libraryPreviewHref } from "./links";
 import {
   createContext,
   useContext,
@@ -26,6 +28,7 @@ export function useLibraryItemActivation(item: LibraryItem, open: () => void, di
   useEffect(() => () => clearTimeout(timer.current), [item.id, item.kind, disabled]);
   return {
     cancel,
+    href: disabled ? undefined : libraryPreviewHref(item),
     preview(this: void) {
       cancel();
       if (!disabled) {
@@ -35,9 +38,14 @@ export function useLibraryItemActivation(item: LibraryItem, open: () => void, di
     },
     inspectable: !!browser,
     click(this: void, event: MouseEvent) {
-      if (disabled) return;
-      if (!browser) return open();
       cancel();
+      if (disabled) {
+        event.preventDefault();
+        return;
+      }
+      if (!isPlainPrimaryClick(event)) return;
+      event.preventDefault();
+      if (!browser) return open();
       if (event.detail > 1) return;
       const inspect = () => {
         const now = latest.current;
@@ -46,8 +54,9 @@ export function useLibraryItemActivation(item: LibraryItem, open: () => void, di
       if (event.detail === 0) inspect();
       else timer.current = setTimeout(inspect, 280);
     },
-    double(this: void) {
+    double(this: void, event?: MouseEvent) {
       cancel();
+      if (event && !isPlainPrimaryClick(event)) return;
       if (!disabled) open();
     },
     direct(this: void) {

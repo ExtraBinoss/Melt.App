@@ -1,3 +1,4 @@
+import { dialogLinkKeyDown } from "../../../ui/navigation/activation";
 import { useLibraryItemActivation } from "../items/context";
 import { LibraryOpenButton } from "../items/LibraryBrowser";
 import "../items/messages";
@@ -91,6 +92,7 @@ export function ProjectCard({
     event.preventDefault();
     input.focus({ preventScroll: true });
   }
+  const NameTrigger = disabled ? "button" : "a";
   return (
     <ContextMenu
       onOpenChange={(open) => {
@@ -110,6 +112,7 @@ export function ProjectCard({
           preview={
             <ProjectPreview
               project={project}
+              href={activation.href}
               services={services}
               onOpen={(event) => (event ? activation.click(event) : onOpen())}
               onDoubleClick={activation.double}
@@ -139,6 +142,7 @@ export function ProjectCard({
                   void rename(event.currentTarget.value);
                 }}
                 onKeyDown={(event) => {
+                  dialogLinkKeyDown(event);
                   if (event.key === "Enter") void rename(event.currentTarget.value);
                   if (event.key === "Escape") {
                     cancelled.current = true;
@@ -147,13 +151,17 @@ export function ProjectCard({
                 }}
               />
             ) : (
-              <button
-                type="button"
-                className="project-card-name"
+              <NameTrigger
+                type={disabled ? "button" : undefined}
                 disabled={disabled}
+                href={activation.href}
+                role="button"
+                className="project-card-name"
+                aria-disabled={disabled || undefined}
                 onClick={activation.click}
                 onDoubleClick={activation.double}
                 onKeyDown={(event) => {
+                  dialogLinkKeyDown(event);
                   if (event.key === "F2") {
                     event.preventDefault();
                     begin();
@@ -169,7 +177,7 @@ export function ProjectCard({
                   />
                 )}
                 <span>{project.name}</span>
-              </button>
+              </NameTrigger>
             )
           }
           menu={

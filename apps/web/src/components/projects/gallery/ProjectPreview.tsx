@@ -1,3 +1,4 @@
+import { dialogLinkKeyDown } from "../../../ui/navigation/activation";
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { useTranslation } from "react-i18next";
@@ -19,13 +20,15 @@ export function ProjectPreview({
   services,
   onOpen,
   onDoubleClick,
+  href,
   previewLabel,
   children,
   disabled = false,
 }: {
   project: ProjectSummary;
   services: EditorServices;
-  onOpen: (event?: import("react").MouseEvent<HTMLButtonElement>) => void;
+  onOpen: (event?: import("react").MouseEvent) => void;
+  href?: string;
   onDoubleClick?: () => void;
   previewLabel?: string;
   children?: ReactNode;
@@ -140,6 +143,7 @@ export function ProjectPreview({
   useEffect(() => {
     ready.current = Boolean(image && prefetched);
   }, [image, prefetched]);
+  const Trigger = href ? "a" : "button";
   return (
     <div
       ref={element}
@@ -160,8 +164,12 @@ export function ProjectPreview({
         if (!event.currentTarget.contains(event.relatedTarget)) setFocused(false);
       }}
     >
-      <button
-        type="button"
+      <Trigger
+        type={href ? undefined : "button"}
+        href={disabled ? undefined : href}
+        role={href ? "button" : undefined}
+        onKeyDown={href ? dialogLinkKeyDown : undefined}
+        aria-disabled={disabled || undefined}
         className="project-preview-open"
         aria-label={previewLabel ?? t("openNamedProject", { name: project.name })}
         disabled={disabled}
@@ -221,7 +229,7 @@ export function ProjectPreview({
             {prefetched && <img src={prefetched} alt="" draggable={false} />}
           </div>
         </motion.div>
-      </button>
+      </Trigger>
       {resource?.failed && resource.key === key && (
         <IconButton
           className="preview-retry"

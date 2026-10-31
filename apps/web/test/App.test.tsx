@@ -279,7 +279,7 @@ test("welcome preview can reopen the already restored project without replacing 
     expect(screen.queryByTestId("canvas")).toBeNull();
     fireEvent.click(screen.getAllByRole("button", { name: "Commencer à créer" })[0]!);
     fireEvent.click(await screen.findByRole("button", { name: "Atelier" }));
-    const preview = await screen.findByRole("dialog", { name: "Ouvrir dans Melt" });
+    const preview = await screen.findByRole("dialog", { name: d.project.name });
     fireEvent.click(within(preview).getByRole("button", { name: "Ouvrir dans Melt" }));
     await screen.findByTestId("canvas");
     expect(d.services.openProject).toHaveBeenCalledExactlyOnceWith(d.project.id);
