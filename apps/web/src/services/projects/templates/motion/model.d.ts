@@ -5,6 +5,7 @@ export type MotionTemplateId =
   | Extract<(typeof DESIGNED_TEMPLATES)[number], { mode: "motion" }>["id"]
   | "morphing-type"
   | "in-bloom"
+  | "bloom-windows"
   | "motion-stress-lab"
   | "sound-playground"
   | "share-your-work";

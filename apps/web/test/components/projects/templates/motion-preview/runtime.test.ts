@@ -25,6 +25,7 @@ function fixture() {
   let sequence = 0;
   const times: number[] = [];
   const rendered: Composition[] = [];
+  const modes: (string | undefined)[] = [];
   const host = document.createElement("span"),
     canvas = document.createElement("canvas");
   let gate: ReturnType<typeof deferred> | null = null;
@@ -32,6 +33,7 @@ function fixture() {
   const session: Awaited<ReturnType<PreviewDependencies["createSession"]>> = {
     withCanvasFrame: async (page, _assets, consume, options) => {
       rendered.push(page);
+      modes.push(options?.mediaMode);
       times.push(
         options?.motionFrame ? options.motionFrame.time.value / options.motionFrame.time.rate : -1,
       );
@@ -72,6 +74,7 @@ function fixture() {
     canvas,
     times,
     rendered,
+    modes,
     callbacks,
     dependencies,
     dispose,
@@ -89,7 +92,7 @@ function fixture() {
   };
 }
 
-test("presents the actual retained GPU canvas, pauses the clock until ready and resolves exact originals", async () => {
+test("presents the actual retained GPU canvas, pauses the clock until ready and uses continuous video playback after the first frame", async () => {
   const f = fixture(),
     gate = f.hold(),
     owner = f.start();
@@ -102,6 +105,7 @@ test("presents the actual retained GPU canvas, pauses the clock until ready and 
   expect(f.host.firstChild).toBe(f.canvas);
   expect(f.status).toHaveBeenLastCalledWith("playing");
   expect(f.times).toEqual([0]);
+  expect(f.modes).toEqual(["playback"]);
   const options = vi.mocked(f.dependencies.createSession).mock.calls[0]![0];
   expect(options.maxBytes).toBe(128 * 1024 * 1024);
   const video = Object.values(f.project.assets).find((asset) => asset.kind === "video")!;
@@ -113,6 +117,7 @@ test("presents the actual retained GPU canvas, pauses the clock until ready and 
   f.tick(1333);
   await flush();
   expect(f.times.at(-1)).toBe(0.3);
+  expect(f.modes.at(-1)).toBe("playback");
   await owner.release();
   expect(f.host.children).toHaveLength(0);
   expect(f.callbacks.size).toBe(0);
@@ -134,6 +139,19 @@ test("coalesces queued samples to the latest time and loops the genuine five-sec
   await flush();
   expect(f.times).toEqual([0, 0.1, 0.3]);
   f.tick(6100);
+  await flush();
+  expect(f.times.at(-1)).toBe(0.1);
+  await owner.release();
+});
+
+test("a stale RAF timestamp after bootstrap never presents a negative video clock", async () => {
+  const f = fixture(),
+    owner = f.start();
+  await flush();
+  f.tick(900);
+  await flush();
+  expect(f.times).toEqual([0]);
+  f.tick(1100);
   await flush();
   expect(f.times.at(-1)).toBe(0.1);
   await owner.release();

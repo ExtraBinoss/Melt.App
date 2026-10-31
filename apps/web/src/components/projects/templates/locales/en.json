@@ -1,4 +1,6 @@
 {
+  "bloomWindows": "Bloom Windows",
+  "bloomWindowsDescription": "12 s · Seamless 1080p bloom with moving dither, ASCII and cyanotype windows",
   "morphingType": "Melt Mascot",
   "morphingTypeDescription": "6 s · Curious mascot and full-height MELT letter morphing",
   "shareYourWork": "Too Hot to Haunt",

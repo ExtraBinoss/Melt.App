@@ -6,6 +6,7 @@ media imports. Editing a template never changes its bundled source document.
 
 | Template          | Mode         | Demonstrated capabilities                                                                                                        |
 | ----------------- | ------------ | -------------------------------------------------------------------------------------------------------------------------------- |
+| Bloom Windows     | Motion, 12 s | Seamless 1080p flower timelapse, aligned moving dither/ASCII/cyanotype windows, labels and soft shadows                          |
 | In Bloom          | Motion, 5 s  | Original flower video, photo collage, nested groups, text, animated effects, springs and three original sound effects            |
 | Sound Playground  | Motion, 6 s  | Nine audio cues sharing three original WAVs, grouped instruments, animated shapes, GPU transitions and editable audio processing |
 | Motion Stress Lab | Motion       | Fifty photo layers, one hundred effects, three video clips, masks, easing families and timed sound effects                       |

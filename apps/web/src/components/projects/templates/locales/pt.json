@@ -1,4 +1,6 @@
 {
+  "bloomWindows": "Bloom Windows",
+  "bloomWindowsDescription": "12 s · Floração em loop a 1080p com janelas móveis de dither, ASCII e cianotipia",
   "morphingType": "Mascote {{brandName}}",
   "morphingTypeDescription": "6 s · Mascote curiosa e transformação das letras {{brandNameUpper}} a toda a altura",
   "shareYourWork": "Quente demais para assombrar",

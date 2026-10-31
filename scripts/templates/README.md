@@ -6,6 +6,12 @@ Generate both editable projects without a browser or editor UI:
 bun scripts/templates/generate.ts
 ```
 
+Generate the separate 1080p **Bloom Windows** flower loop template with
+`bun scripts/templates/bloom-windows.ts`. Its pinned Pexels source, local loop
+preparation and native rendering workflow are documented in
+[Bloom Windows](../../docs/guides/bloom-windows.md). It shares one video original
+between an unprocessed background and three small editable effect windows.
+
 The generator verifies the checked-in CC0 media hashes, probes the **video stream** with FFprobe, and uses real public core commands. `TemplateAuthor` only orchestrates those commands; it does not inject timeline documents or simulate rendered results. Fixed IDs, timestamps and effect seeds make repeated generation byte-for-byte reproducible.
 
 Install FFmpeg, including its `ffprobe` executable, before running the generator or its source-backed tests. On Ubuntu, use `sudo apt-get install ffmpeg`; the Quality workflow installs this dependency explicitly before verification.

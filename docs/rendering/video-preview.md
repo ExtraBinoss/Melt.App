@@ -16,6 +16,42 @@ At most eight active original identities/playback streams/upload rings are admit
 
 This is bounded resource admission, not a guarantee that eight arbitrary 4K clips can play concurrently. Until preparation finishes, previews use originals; codec support, duration, source complexity and available memory still matter. Proxies are rebuilt per session and are not a persistent disk cache.
 
+## Shared frames and sequential export
+
+Copies that request the same immutable original, orientation, dimensions and exact
+source timestamp borrow one GPU texture pinned for the current render. Their
+masks/effects remain independent. The per-render sharing map is discarded before
+the next frame; changed trims, source metadata, proxy revisions and genuine gaps
+cannot inherit a different sample. Removing an owner retires its cursor/upload
+ring through the existing acknowledgement path. This reduces synchronized copies
+to one decode/upload without creating a second video processing pipeline.
+
+Hover previews use sequential playback and can use a separately validated raw
+video derivative bundled with a template. Full and preview manifests occupy
+separate bounded cache keys; normal project installation always resolves the full
+original. These derivatives contain no baked effects or rendered composition.
+
+A forward request more than one second beyond a cursor's previous request recreates
+that cursor near the requested time, as do reverse/loop seeks. This bounds stale
+stream catch-up after delayed input without choosing a future frame or hiding
+real VFR gaps. Ordinary small forward steps retain the decoder.
+
+Motion video export sets `RenderOptions.mediaSequential` while keeping
+`mediaMode: "exact"`. It reuses the bounded forward cursor over original bytes,
+retains exact timestamp selection and still awaits GPU upload fences before
+encoding. Interactive playback presents through the same ordered Three.js GPU
+queue without a per-frame upload wait; upload rings keep native leases until
+actual acknowledgement and remain bounded during cancellation/disposal.
+
 ## Mediabunny references
 
 The implementation follows the pinned 1.62.1 API and its official [conversion guide](https://mediabunny.dev/guide/converting-media-files), [conversion video options](https://mediabunny.dev/api/ConversionVideoOptions), [media sinks](https://mediabunny.dev/guide/media-sinks) and [VideoSampleSink API](https://mediabunny.dev/api/VideoSampleSink). Playback already used sequential `samples(start)` with latency optimization; the new work keeps that path and reduces the resolution entering it. See [the five-video measurements](../performance/video-preview.md) for native verification and limitations.
+
+## Infinite-canvas buffering
+
+The canvas adapter acquires a transport buffering lease when submitting a playing
+frame and releases it only after Three draws the corresponding display scene.
+Coalesced requests share one lease. Up to 33.3 ms of preparation counts toward
+normal playback; longer decode/compilation waits do not accumulate catch-up time.
+Paused seeks, errors and disposal release the lease as well. This is presentation
+backpressure, not a change to the portable document, source speed or exact export.

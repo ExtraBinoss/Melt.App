@@ -1,4 +1,6 @@
 {
+  "bloomWindows": "Bloom Windows",
+  "bloomWindowsDescription": "12 s · Płynna pętla kwitnienia w 1080p z ruchomymi oknami ditheringu, ASCII i cyjanotypii",
   "morphingType": "Maskotka {{brandName}}",
   "morphingTypeDescription": "6 s · Ciekawska maskotka i morfing liter {{brandNameUpper}} na pełną wysokość",
   "shareYourWork": "Zbyt gorące, by straszyć",

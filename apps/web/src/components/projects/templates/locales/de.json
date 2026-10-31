@@ -1,4 +1,6 @@
 {
+  "bloomWindows": "Bloom Windows",
+  "bloomWindowsDescription": "12 s · Nahtlose Blüte in 1080p mit bewegten Dither-, ASCII- und Cyanotypie-Fenstern",
   "morphingType": "{{brandName}}-Maskottchen",
   "morphingTypeDescription": "6 s · Neugieriges Maskottchen und bildhohes {{brandNameUpper}}-Buchstabenmorphing",
   "shareYourWork": "Zu heiß zum Spuken",

@@ -1,0 +1,25 @@
+{
+  "source": "https://www.pexels.com/video/video-of-flower-blooming-855183/",
+  "download": "https://videos.pexels.com/video-files/855183/855183-hd_1920_1080_25fps.mp4",
+  "creator": "Pixabay / Pexels",
+  "license": "Pexels License",
+  "licenseSource": "https://www.pexels.com/license/",
+  "sourceSha256": "07cc06256dd5b7bb396b845e63e1656d18c40bde2bc030c1c7d8980b0fe3b28a",
+  "sourceBytes": 7561009,
+  "file": "bloom-windows-loop.mp4",
+  "sha256": "34dae23137fe94de10d341fd7e3b25e20c9f39375834143fac77dd6de9bb01a1",
+  "bytes": 6009400,
+  "width": 1920,
+  "height": 1080,
+  "duration": 12,
+  "frames": 360,
+  "preparation": "First 6 s of the original at its natural speed, resampled to 30 fps, then the exact reverse. Silent 12-second AVC/OpenH264 loop at 4 Mb/s, GOP 30. The final six samples reuse the initial AVC key packet for identical source endpoints. All visual effects remain editable Melt effects.",
+  "preview": {
+    "file": "bloom-windows-hover.mp4",
+    "sha256": "4e7f1abf49519ad02af4fa46d28d4660709bf3ea6460edc3293ba50dedd8bd13",
+    "bytes": 782108,
+    "width": 480,
+    "height": 270,
+    "preparation": "Native FFmpeg scale=480:270, OpenH264 500 kb/s, GOP 30, no audio or visual treatments; the final six samples reuse the initial AVC key packet."
+  }
+}

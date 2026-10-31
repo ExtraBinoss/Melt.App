@@ -19,6 +19,16 @@ export interface ProjectTemplate {
 }
 export const TEMPLATE_CATALOG: readonly ProjectTemplate[] = Object.freeze([
   Object.freeze({
+    id: "bloom-windows",
+    nameKey: "templates:bloomWindows",
+    descriptionKey: "templates:bloomWindowsDescription",
+    width: 1920,
+    height: 1080,
+    mode: "motion",
+    category: "video",
+    preview: `${import.meta.env.BASE_URL}templates/motion/bloom-windows.webp?v=5`,
+  }),
+  Object.freeze({
     id: "morphing-type",
     previewBackground: "#ffffff",
     nameKey: "templates:morphingType",
@@ -113,6 +123,7 @@ async function openProjectTemplate(
   if (
     templateId === "morphing-type" ||
     templateId === "in-bloom" ||
+    templateId === "bloom-windows" ||
     templateId === "motion-stress-lab" ||
     templateId === "sound-playground" ||
     templateId === "share-your-work"

@@ -15,7 +15,7 @@ const ports = () => ({
   ),
 });
 test("publishes exact canonical canvas formats and the editable artwork template", async () => {
-  expect(new Set(TEMPLATE_CATALOG.map((item) => item.id)).size).toBe(PRESETS.length + 10);
+  expect(new Set(TEMPLATE_CATALOG.map((item) => item.id)).size).toBe(PRESETS.length + 11);
   expect(Object.isFrozen(TEMPLATE_CATALOG)).toBe(true);
   const services = ports();
   for (const preset of PRESETS) {
@@ -47,6 +47,7 @@ test("routes Motion bundles to the binary-capable installation service and keeps
   for (const id of [
     "morphing-type",
     "in-bloom",
+    "bloom-windows",
     "motion-stress-lab",
     "sound-playground",
     "share-your-work",

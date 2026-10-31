@@ -25,9 +25,10 @@ export class PreviewSourceCache {
     id: MotionTemplateId,
     signal: AbortSignal,
     prepare: () => Promise<PreparedMotionTemplate>,
+    variant = "full",
   ): Promise<PreparedMotionTemplate> {
     signal.throwIfAborted();
-    const key = `template:${id}`,
+    const key = `template:${id}:${variant}`,
       cached = this.touch(key);
     if (cached) return cached.source;
     const generation = this.generation;

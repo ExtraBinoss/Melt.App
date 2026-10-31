@@ -1,4 +1,6 @@
 {
+  "bloomWindows": "Bloom Windows",
+  "bloomWindowsDescription": "12 s · Fioritura in loop a 1080p con finestre mobili dither, ASCII e cianotipia",
   "morphingType": "Mascotte {{brandName}}",
   "morphingTypeDescription": "6 s · Mascotte curiosa e morphing delle lettere {{brandNameUpper}} a tutta altezza",
   "shareYourWork": "Troppo bollente per fare paura",

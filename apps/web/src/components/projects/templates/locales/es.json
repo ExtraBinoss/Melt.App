@@ -1,4 +1,6 @@
 {
+  "bloomWindows": "Bloom Windows",
+  "bloomWindowsDescription": "12 s · Floración en bucle a 1080p con ventanas móviles de dithering, ASCII y cianotipia",
   "morphingType": "Mascota de {{brandName}}",
   "morphingTypeDescription": "6 s · Mascota curiosa y transformación de letras {{brandNameUpper}} a toda altura",
   "shareYourWork": "Demasiado ardiente para asustar",

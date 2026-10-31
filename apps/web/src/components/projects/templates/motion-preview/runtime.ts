@@ -43,7 +43,7 @@ const sessions = new PreviewSessionPool(
   () => sources.clear(),
 );
 const native: PreviewDependencies = {
-  prepare: (id, signal) => prepareMotionTemplate(id, { signal }),
+  prepare: (id, signal) => prepareMotionTemplate(id, { signal, preview: true }),
   createSession: (options) => sessions.acquire(options),
   now: () => performance.now(),
   requestFrame: (callback) => requestAnimationFrame(callback),
@@ -185,7 +185,7 @@ export function startMotionPreview(
         maxBytes: 128 * 1024 * 1024,
         fontResolver: prepared.fontResolver,
         mediaResolver,
-        mediaMode: "exact",
+        mediaMode: "playback",
         signal: abort.signal,
       });
       abort.signal.throwIfAborted();
@@ -208,7 +208,7 @@ export function startMotionPreview(
               scale,
               motionFrame: plan,
               mediaResolver,
-              mediaMode: "exact",
+              mediaMode: "playback",
               signal: abort.signal,
               canRender: () => alive() && !paused && generation === renderGeneration,
             },
@@ -246,6 +246,8 @@ export function startMotionPreview(
       }
       function tick(now: number) {
         if (!alive() || paused) return;
+        // A RAF timestamp can predate a long bootstrap task in the same frame.
+        now = Math.max(now, dependencies.now());
         if (presentation?.busy()) {
           presentationHeldAt ??= now;
           frame = dependencies.requestFrame(tick);
@@ -255,7 +257,7 @@ export function startMotionPreview(
           began += now - presentationHeldAt;
           presentationHeldAt = null;
         }
-        const sample = Math.floor((((now - began) / 1000) % duration) * 30 + 1e-7);
+        const sample = Math.floor(((Math.max(0, now - began) / 1000) % duration) * 30 + 1e-7);
         if (sample !== lastSample) {
           lastSample = sample;
           requested = sample / 30;

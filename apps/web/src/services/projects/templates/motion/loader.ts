@@ -1,4 +1,7 @@
-import { MOTION_TEMPLATE_ASSET_REVISIONS } from "./asset-revisions";
+import {
+  MOTION_TEMPLATE_ASSET_REVISIONS,
+  MOTION_TEMPLATE_PREVIEW_REVISIONS,
+} from "./asset-revisions";
 import { motionTemplateSources } from "./source-cache";
 import type { ProjectTiming } from "../../../performance/project-timing";
 import { isDesignedTemplateId } from "../designed/catalog";
@@ -30,6 +33,8 @@ export interface TemplateLoadOptions {
 }
 
 export type TemplateFetcher = (url: string, init?: RequestInit) => Promise<Response>;
+
+type PreparationOptions = Pick<TemplateLoadOptions, "signal" | "timing"> & { preview?: boolean };
 
 async function download(
   url: string,
@@ -160,7 +165,7 @@ export interface PreparedMotionTemplate {
 /** Bounded original-only preparation shared by hover previews and durable installation. */
 async function prepareUncachedMotionTemplate(
   templateId: MotionTemplateId,
-  options: Pick<TemplateLoadOptions, "signal" | "timing"> = {},
+  options: PreparationOptions = {},
   fetcher: TemplateFetcher = fetch,
 ): Promise<PreparedMotionTemplate> {
   options.signal?.throwIfAborted();
@@ -176,9 +181,10 @@ async function prepareUncachedMotionTemplate(
   }
   const base = `${import.meta.env.BASE_URL}templates/motion/`;
   options.timing?.stage("Download template manifest");
-  const revision = MOTION_TEMPLATE_ASSET_REVISIONS[templateId];
+  const preview = options.preview ? MOTION_TEMPLATE_PREVIEW_REVISIONS[templateId] : undefined;
+  const revision = preview ?? MOTION_TEMPLATE_ASSET_REVISIONS[templateId];
   const response = await download(
-    `${base}${templateId}.json${revision ? `?v=${revision}` : ""}`,
+    `${base}${templateId}${preview ? ".preview" : ""}.json${revision ? `?v=${revision}` : ""}`,
     fetcher,
     options.signal,
   );
@@ -215,15 +221,18 @@ async function prepareUncachedMotionTemplate(
 /** Verified build assets can be reused by a later open, without caching failures or aborts. */
 export async function prepareMotionTemplate(
   templateId: MotionTemplateId,
-  options: Pick<TemplateLoadOptions, "signal" | "timing"> = {},
+  options: PreparationOptions = {},
   fetcher: TemplateFetcher = fetch,
 ): Promise<PreparedMotionTemplate> {
   options.signal?.throwIfAborted();
   if (fetcher !== fetch) return prepareUncachedMotionTemplate(templateId, options, fetcher);
   options.timing?.stage("Acquire validated template source (reuse when cached)");
   const signal = options.signal ?? new AbortController().signal;
-  return motionTemplateSources.template(templateId, signal, () =>
-    prepareUncachedMotionTemplate(templateId, options, fetcher),
+  return motionTemplateSources.template(
+    templateId,
+    signal,
+    () => prepareUncachedMotionTemplate(templateId, options, fetcher),
+    options.preview && MOTION_TEMPLATE_PREVIEW_REVISIONS[templateId] ? "preview" : "full",
   );
 }
 

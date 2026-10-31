@@ -23,6 +23,7 @@ test("carousel motion releases GPU work and rejects hover until the rail settles
   );
   const button = screen.getByRole("button"),
     rail = button.parentElement!;
+  expect(view.container.querySelector(".motion-preview-hint")).toBeNull();
   fireEvent.pointerEnter(button);
   expect(start).toHaveBeenCalledOnce();
   rail.dataset.carouselMoving = "true";

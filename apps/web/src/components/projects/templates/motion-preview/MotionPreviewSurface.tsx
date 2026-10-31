@@ -184,12 +184,6 @@ export function MotionPreviewSurface({
       <span className="motion-template-preview-loading-mark">
         <BrandStatus size={24} state="preparing" activity={loading} />
       </span>
-      {!autoplay && (
-        <span className="motion-preview-hint" aria-hidden>
-          <Play size={12} fill="currentColor" />
-          {t("hover")}
-        </span>
-      )}
       {controlHost &&
         createPortal(
           <button

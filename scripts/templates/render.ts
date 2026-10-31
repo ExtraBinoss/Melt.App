@@ -47,6 +47,7 @@ export function validateCoverOptions(options: CoverOptions): void {
     options.ids.some(
       (id) =>
         id !== "in-bloom" &&
+        id !== "bloom-windows" &&
         id !== "motion-stress-lab" &&
         id !== "sound-playground" &&
         id !== "morphing-type" &&

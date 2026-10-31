@@ -1,4 +1,6 @@
 {
+  "bloomWindows": "Bloom Windows",
+  "bloomWindowsDescription": "12 s · Naadloze bloei in 1080p met bewegende dither-, ASCII- en cyanotypievensters",
   "morphingType": "{{brandName}}-mascotte",
   "morphingTypeDescription": "6 s · Nieuwsgierige mascotte en vervormende {{brandNameUpper}}-letters over de volledige hoogte",
   "shareYourWork": "Te heet om te spoken",

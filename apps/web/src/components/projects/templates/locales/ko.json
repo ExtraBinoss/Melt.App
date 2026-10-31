@@ -1,4 +1,6 @@
 {
+  "bloomWindows": "Bloom Windows",
+  "bloomWindowsDescription": "12초 · 움직이는 디더·ASCII·시아노타입 창으로 보는 1080p 개화 루프",
   "morphingType": "{{brandName}} 마스코트",
   "morphingTypeDescription": "6초 · 호기심 많은 마스코트와 화면 높이를 채우는 {{brandNameUpper}} 글자 모핑",
   "shareYourWork": "너무 뜨거워 유령도 못 해",

@@ -75,31 +75,6 @@
   .motion-template-preview-canvas {
   opacity: 1;
 }
-.motion-preview-hint {
-  position: absolute;
-  left: 50%;
-  top: auto;
-  bottom: 4px;
-  transform: translateX(-50%);
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 8px;
-  border-radius: 20px;
-  background: #17151ccf;
-  color: #fff;
-  font-size: 10px;
-  line-height: 1.4;
-  white-space: nowrap;
-  pointer-events: none;
-  transition:
-    opacity 160ms ease,
-    transform 160ms ease;
-}
-.motion-template-preview:not([data-preview-status="idle"]) .motion-preview-hint {
-  opacity: 0;
-  transform: translate(-50%, 3px);
-}
 .motion-preview-control {
   position: absolute;
   top: 10px;
@@ -133,11 +108,6 @@
 }
 .motion-template-preview[data-preview-status="loading"] > .motion-template-preview-loading-mark {
   display: grid;
-}
-@media (hover: none), (prefers-reduced-motion: reduce) {
-  .motion-preview-hint {
-    display: none;
-  }
 }
 @media (prefers-reduced-motion: reduce) {
   .motion-template-preview *,

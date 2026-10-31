@@ -1,4 +1,6 @@
 {
+  "bloomWindows": "Bloom Windows",
+  "bloomWindowsDescription": "12秒 · 1080pの開花ループと動くディザ・ASCII・サイアノタイプのウィンドウ",
   "morphingType": "{{brandName}}マスコット",
   "morphingTypeDescription": "6秒 · 好奇心旺盛なマスコットと画面いっぱいの{{brandNameUpper}}文字モーフィング",
   "shareYourWork": "熱すぎて化けられない",

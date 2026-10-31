@@ -3,6 +3,25 @@ import { createProject } from "@musart/core";
 import { PreviewSourceCache } from "../../../../../src/services/projects/templates/motion/source-cache";
 
 const signal = () => new AbortController().signal;
+test("preview derivatives cannot replace full originals in the template cache", async () => {
+  const cache = new PreviewSourceCache();
+  const full = { project: createProject({ name: "Full original" }), originals: [] };
+  const preview = { project: createProject({ name: "Light source" }), originals: [] };
+  expect(await cache.template("bloom-windows", signal(), async () => preview, "preview")).toBe(
+    preview,
+  );
+  expect(await cache.template("bloom-windows", signal(), async () => full)).toBe(full);
+  expect(
+    await cache.template(
+      "bloom-windows",
+      signal(),
+      async () => {
+        throw Error("Unexpected fetch");
+      },
+      "preview",
+    ),
+  ).toBe(preview);
+});
 test("templates retain validated geometry and originals without repeated preparation", async () => {
   const cache = new PreviewSourceCache(),
     source = { project: createProject(), originals: [] };
