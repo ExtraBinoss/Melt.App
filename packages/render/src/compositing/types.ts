@@ -20,6 +20,8 @@ export interface RenderOptions {
   signal?: AbortSignal;
   /** Explicit diagnostics opt-in. Runtime marker/sample buffers stay disabled by default. */
   profileVideo?: boolean;
+  /** Optional User Timing lineage; no sample arrays or GPU pixel reads. Disabled by default. */
+  traceFrames?: boolean;
   /** Interactive canvas only. Exports omit this activity-owned proxy preparation gate. */
   videoProxy?: import("../sources/video/proxy/model").VideoProxyActivity;
 }

@@ -1,4 +1,5 @@
 import { VideoSourceError } from "../video/errors";
+import { traceRenderFrame } from "../../diagnostics/frame-trace";
 import { VideoDecodedBudget, VIDEO_MAX_STREAMS } from "../video/budgets";
 import type { VideoProxy } from "../video/proxy/model";
 import { VideoProxyCache } from "../video/proxy/cache";
@@ -286,6 +287,18 @@ export class MediaVideoSources {
         };
         this.prepared.set(layer.id, prepared);
         sharedFrames.set(sampleKey, prepared);
+        if (options.traceFrames)
+          traceRenderFrame(true, "video", {
+            compositionId: options.motionFrame?.compositionId,
+            layerId: layer.id,
+            action: "reuse",
+            time: options.motionFrame?.time,
+            sourceTime: time,
+            pts: cached.start,
+            end: cached.end,
+            proxy: !!proxy,
+            textureId: prepared.texture.uuid,
+          });
         continue;
       }
       const decodeStarted = performance.now();
@@ -360,6 +373,19 @@ export class MediaVideoSources {
         this.rasterizer ??= new VideoRasterizer(this.renderer, {
           reserveBytes: (bytes) => this.cache.reserveExternal("video-upload-textures", bytes),
         });
+        if (options.traceFrames)
+          traceRenderFrame(true, "video", {
+            compositionId: options.motionFrame?.compositionId,
+            layerId: layer.id,
+            action: lease ? "upload" : "gap",
+            time: options.motionFrame?.time,
+            sourceTime: time,
+            pts: lease?.timestamp ?? null,
+            duration: lease?.duration ?? null,
+            nativeFormat: lease?.frame?.format ?? null,
+            proxy: !!proxy,
+            textureId: output.texture.uuid,
+          });
         if (lease) {
           const uploadStarted = performance.now();
           transferred = true;

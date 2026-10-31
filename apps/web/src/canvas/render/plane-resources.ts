@@ -24,6 +24,7 @@ import {
 } from "three/webgpu";
 import { texture, uv } from "three/tsl";
 import { CanvasPlaybackBuffering } from "./playback-buffering";
+import { traceCanvasFrame } from "./frame-trace";
 import { SceneProfileSource } from "./scene-profile-source";
 import { previewScale } from "./preview-quality";
 import { CanvasVideoProxyActivity } from "./video-proxy-activity";
@@ -360,6 +361,7 @@ export class PlaneResources {
         mediaResolver: request.mediaResolver,
         motionFrame: request.motionFrame,
         mediaMode: request.playback ? "playback" : "preview",
+        ...(import.meta.env.DEV && request.motionFrame ? { traceFrames: true } : {}),
         ...(this.videoProxyActivity ? { videoProxy: this.videoProxyActivity } : {}),
         ...(this.profileVideo || this.profile.active ? { profileVideo: true } : {}),
         signal: abort.signal,
@@ -447,6 +449,7 @@ export class PlaneResources {
     ) {
       this.buffering.presented();
       this.profile.presented(this.preparedRequest.page.id, this.preparedRevision);
+      traceCanvasFrame(this.preparedRequest.motionFrame, this.sample.value.uuid);
       this.presentedRevision = this.preparedRevision;
       element.dataset.rendererReady = String(this.preparedRevision === this.revision);
       element.dataset.presentationReady = "true";

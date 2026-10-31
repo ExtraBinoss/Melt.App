@@ -1,5 +1,11 @@
 import { afterEach, beforeEach, expect, test, vi } from "vitest";
-import { createPage, type Composition } from "@musart/core";
+import {
+  compileMotion,
+  createPage,
+  createProject,
+  evaluateMotion,
+  type Composition,
+} from "@musart/core";
 import type { MediaSourceResolver } from "@musart/render";
 import { OrthographicCamera, Scene, Texture, type WebGPURenderer } from "three/webgpu";
 import { PlaneResources } from "../../../src/canvas/render/plane-resources";
@@ -55,7 +61,31 @@ beforeEach(() => {
 afterEach(() => {
   vi.useRealTimers();
   vi.unstubAllGlobals();
+  vi.unstubAllEnvs();
 });
+
+test.each([true, false])(
+  "frame lineage follows DEV=%s without buffered video profiling",
+  async (dev) => {
+    vi.stubEnv("DEV", dev);
+    const d = fixture();
+    const page = createPage(),
+      project = createProject({ pages: [page] });
+    const plan = evaluateMotion(compileMotion(project, { compositionId: page.id }), {
+      value: 0,
+      rate: 1,
+    });
+    try {
+      d.resources.submit(page, project.assets, presentation, plan, true);
+      await frame();
+      expect(gpu.render.mock.calls[0]![2].traceFrames).toBe(dev ? true : undefined);
+      expect(gpu.render.mock.calls[0]![2]).not.toHaveProperty("profileVideo");
+    } finally {
+      d.release();
+      await d.resources.dispose();
+    }
+  },
+);
 
 test("slow playback finishes useful frames while bounding the queue to the latest time", async () => {
   const d = fixture(),

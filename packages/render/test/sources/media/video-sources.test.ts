@@ -127,6 +127,36 @@ it("lazily resolves one original, shares its decoder and reuses GPU copies for i
   await sources.dispose();
   cache.clear();
 });
+it("traces real upload, reuse and gap decisions only when requested, without retaining marks", async () => {
+  const mark = vi.fn(),
+    clearMarks = vi.fn();
+  vi.stubGlobal("performance", { now: () => 1, mark, clearMarks });
+  const { renderer } = makeGpuRenderer(),
+    cache = new GpuResourceCache();
+  const sources = new MediaVideoSources(renderer, cache, 64);
+  const options = { mediaResolver: { resolveOriginal: async () => new Blob(["v"]) } };
+  try {
+    await sources.prepare("page", [layer], { video: asset }, options);
+    expect(mark).not.toHaveBeenCalled();
+    cache.clear();
+    await sources.prepare("page", [layer], { video: asset }, { ...options, traceFrames: true });
+    const textureId = sources.image(layer.id).uuid;
+    await sources.prepare("page", [layer], { video: asset }, { ...options, traceFrames: true });
+    cache.clear();
+    fake.reads.mockResolvedValueOnce(null);
+    await sources.prepare("page", [layer], { video: asset }, { ...options, traceFrames: true });
+    const events = mark.mock.calls.map(([, options]) => options.detail);
+    expect(events.map((event) => event.action)).toEqual(["upload", "reuse", "gap"]);
+    expect(events[0]).toMatchObject({ textureId, pts: { value: 0, rate: 1 } });
+    expect(events[1]).toMatchObject({ textureId, end: { value: 1, rate: 1 } });
+    expect(events[2]).toMatchObject({ pts: null, duration: null });
+    expect(clearMarks.mock.calls).toEqual(mark.mock.calls.map(([name]) => [name]));
+  } finally {
+    await sources.dispose();
+    cache.clear();
+    vi.unstubAllGlobals();
+  }
+});
 it("shares synchronized copies during playback with one cursor and one pinned GPU upload", async () => {
   const { renderer } = makeGpuRenderer(),
     cache = new GpuResourceCache();

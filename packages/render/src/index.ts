@@ -32,6 +32,7 @@ export type { MotionAudioPlan, MotionAudioSource, MotionPcmChunk } from "./expor
 
 export { estimatePreviewCost } from "./compositing/preview-cost";
 export { gpuTextureLimit } from "./cache/texture-limits";
+export { traceRenderFrame } from "./diagnostics/frame-trace";
 
 export { encodeManagedImage } from "./export/print/encode";
 export { printComposition, DEFAULT_PRINT } from "./export/print/layout";

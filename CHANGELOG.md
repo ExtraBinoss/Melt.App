@@ -6,6 +6,7 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Add development-only Motion frame lineage to Chrome traces: decoded source PTS, GPU reuse/upload/gap decisions, completed composition textures and display submissions. Keep production disabled and runtime marks unretained; document the supplied remaining Bloom flashes and reproduction limits without claiming a verified fix.
 - Support native middle-click and modified-click navigation on editor/dashboard mascots and project/template cards. Open durable item preview URLs in a new tab without editing or installing a document, retain ordinary single/double-click and Space/Enter activation, and resolve linked project metadata with a bounded one-ID read. Keep landing navigation usable when visibility observation is unavailable.
 
 - Add an original Cornell Box Motion template with a procedural red/green 3D room, native shadows, silver sphere and editable brand-violet chrome text. Use two minimal A/B/A Motion actions at 60 fps with matching loop endpoints, a real rendered cover and twelve localized gallery descriptions.
