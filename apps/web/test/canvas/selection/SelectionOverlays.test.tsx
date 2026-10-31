@@ -9,7 +9,8 @@ import { motionPoseFixture } from "../../support/motion-pose";
 vi.mock("react-i18next", () => ({
   useTranslation: () => ({
     t: (key: string, options?: { defaultValue?: string; count?: number }) =>
-      options?.defaultValue ?? `${key}:${options?.count ?? ""}`,
+      options?.defaultValue ??
+      (key === "layerControls:lockedState" ? "Locked" : `${key}:${options?.count ?? ""}`),
   }),
 }));
 function source(count: number) {

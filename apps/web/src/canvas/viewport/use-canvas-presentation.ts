@@ -30,7 +30,8 @@ function createPresentation({ controller, workspace, motion, viewport, beforePai
       artboard.dataset.zoom = String(view.zoom);
       artboard.dataset.panX = String(view.x);
       artboard.dataset.panY = String(view.y);
-      artboard.dataset.viewMoving = String(motion.isMoving());
+      const moving = String(motion.isMoving());
+      if (artboard.dataset.viewMoving !== moving) artboard.dataset.viewMoving = moving;
     }
     const label = root.querySelector(".canvas-zoom");
     const zoomLabel = `${Math.round(view.zoom * 100)}%`;

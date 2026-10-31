@@ -1,3 +1,12 @@
+.canvas-selection-plane {
+  contain: layout style;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform-origin: 50% 50%;
+  pointer-events: none;
+  z-index: 9;
+}
 .canvas-selection,
 .canvas-timeline-hover {
   transition: opacity 160ms ease-out;
@@ -83,5 +92,17 @@
   .canvas-selection,
   .canvas-timeline-hover {
     transition: none;
+  }
+}
+/* During camera motion, a fixed high-contrast handle avoids five moving backdrop
+   filters. Restore the adaptive contrast once the camera settles. */
+@media (forced-colors: none) {
+  .canvas-artboard-editor[data-view-moving="true"]
+    ~ .canvas-selection-plane
+    .canvas-selection-overlays
+    .canvas-handle {
+    background: #fff;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
   }
 }

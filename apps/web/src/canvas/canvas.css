@@ -19,6 +19,7 @@
   --workspace-dot: oklch(0.29 0.008 260);
 }
 .canvas-stage {
+  contain: layout style;
   position: absolute;
   inset: 0;
   overflow: hidden;

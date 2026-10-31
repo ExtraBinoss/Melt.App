@@ -90,12 +90,12 @@ it("keeps animation frames imperative, retargets through the real wheel listener
     clientX: 600,
     clientY: 450,
   });
-  d.advance(40);
-  d.advance(80);
-  d.advance(120);
+  d.advance(16);
+  d.advance(32);
+  d.advance(48);
   expect(d.read().motion.read().zoom).toBeGreaterThan(1);
   expect(d.renders()).toBe(initialRenders);
-  d.advance(160);
+  d.advance(80);
   expect(d.renders()).toBe(initialRenders + 1);
   expect(d.read().view.zoom).toBeCloseTo(Math.exp(0.08));
   expect(d.engine.getSnapshot()).toBe(baseline);
@@ -227,4 +227,23 @@ it("keeps surviving artboards at the same screen coordinates and zoom when delet
   expect(screen("p0")).toEqual(first);
   expect(screen("p1")).toEqual(second);
   mounted.unmount();
+});
+it("does not reread viewport layout on animated zoom frames", () => {
+  const d = fixture();
+  render(createElement(d.Probe));
+  d.advance(0);
+  const reads = vi.mocked(HTMLElement.prototype.getBoundingClientRect);
+  reads.mockClear();
+  fireEvent.wheel(screen.getByTestId("viewport"), {
+    deltaY: -40,
+    ctrlKey: true,
+    clientX: 500,
+    clientY: 400,
+  });
+  expect(reads).toHaveBeenCalledTimes(1);
+  d.advance(16);
+  d.advance(32);
+  d.advance(80);
+  d.advance(160);
+  expect(reads).toHaveBeenCalledTimes(1);
 });

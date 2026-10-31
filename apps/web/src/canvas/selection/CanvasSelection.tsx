@@ -7,6 +7,7 @@ import type { SceneController } from "../session/scene-controller";
 import type { ViewSource } from "../viewport/motion";
 import { GuideOverlay } from "../guides/GuideOverlay";
 import { SelectionOverlays } from "./SelectionOverlays";
+import { SelectionPlane } from "./SelectionPlane";
 import { createTimelineHoverSource } from "../../state/motion/hover";
 
 /** Only selection decorations subscribe to selected IDs; the retained canvas stays untouched. */
@@ -50,23 +51,25 @@ export const CanvasSelection = memo(function CanvasSelection({
         viewSource={viewSource}
         viewport={viewport}
       />
-      {showHandles &&
-        !(
-          selected.length === 1 &&
-          editing?.layerId === selected[0]!.id &&
-          editing.pageId === page.id &&
-          editing.projectId === engine.getSnapshot().project.id
-        ) && (
-          <SelectionOverlays
-            page={page}
-            selected={selected}
-            zoom={view.zoom}
-            controller={controller}
-            viewSource={viewSource}
-            onHandle={onHandle}
-          />
-        )}
-      <TimelineHoverOutline engine={engine} controller={controller} viewSource={viewSource} />
+      <SelectionPlane controller={controller} viewSource={viewSource}>
+        {showHandles &&
+          !(
+            selected.length === 1 &&
+            editing?.layerId === selected[0]!.id &&
+            editing.pageId === page.id &&
+            editing.projectId === engine.getSnapshot().project.id
+          ) && (
+            <SelectionOverlays
+              page={page}
+              selected={selected}
+              zoom={view.zoom}
+              controller={controller}
+              viewSource={viewSource}
+              onHandle={onHandle}
+            />
+          )}
+        <TimelineHoverOutline engine={engine} controller={controller} viewSource={viewSource} />
+      </SelectionPlane>
     </>
   );
 });

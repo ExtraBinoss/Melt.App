@@ -24,7 +24,16 @@ function fixture(reduced = false, duration?: number, constrain = (view: View) =>
     frames.clear();
     for (const callback of pending) callback(time);
   };
-  return { motion, frames, clock, preference, advance };
+  return {
+    motion,
+    frames,
+    clock,
+    preference,
+    advance,
+    elapse: (to: number) => {
+      time = to;
+    },
+  };
 }
 it("animates monotonically without overshoot, preserves the zoom anchor and publishes React only once", () => {
   const d = fixture(),
@@ -192,4 +201,30 @@ it("smoothly leaves a rebased out-of-bounds origin instead of clamping its first
   d.advance(300);
   expect(d.motion.read().y).toBe(10);
   expect(settled).toHaveBeenCalledOnce();
+});
+
+it("coalesces wheel retargets between frames without publishing unpresented intermediate poses", () => {
+  const d = fixture(),
+    paint = vi.fn();
+  d.motion.subscribe(paint);
+  d.motion.zoomBy(1.1, { x: 50, y: 20 });
+  expect(paint).toHaveBeenCalledTimes(1);
+  d.advance(16);
+  const shown = d.motion.read(),
+    publications = paint.mock.calls.length;
+  for (let i = 0; i < 8; i++) d.motion.zoomBy(1.01, { x: 50, y: 20 });
+  expect(paint).toHaveBeenCalledTimes(publications);
+  expect(d.motion.read()).toBe(shown);
+  expect(d.frames.size).toBe(1);
+  d.advance(32);
+  expect(d.motion.read().zoom).toBeGreaterThan(shown.zoom);
+});
+
+it("does not restart zoom easing for packets that arrive before a presentation frame", () => {
+  const d = fixture();
+  d.motion.zoomBy(2, { x: 0, y: 0 });
+  d.elapse(100);
+  d.motion.zoomBy(1.01, { x: 0, y: 0 });
+  d.advance(110);
+  expect(d.motion.read().zoom).toBeGreaterThan(1.9);
 });

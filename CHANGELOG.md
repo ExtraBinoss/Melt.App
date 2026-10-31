@@ -6,6 +6,7 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Keep editing handles above composition controls and isolate canvas layout; make infinite-canvas wheel zoom follow one bounded nearby target without queued catch-up, repeated constraint layout reads or per-frame moving-handle backdrop filters.
 - Match direct SVG multisample coverage between the editor, Motion preview and encoded video, while preserving authored effect/mask references; verify decoded MP4 vector edges and native analytical text.
 - Add an on-demand Performance popover below each artboard, sharing the mode control's height and zoom scale. Sample twelve nearby frames with real renderer counters, CPU host timing and supported GPU timestamps; compare independent budget bars against common or custom frame-rate targets. Restore playback safely, cancel on editor interaction, distinguish shared cache memory and unmeasured audio processing, and expose extensible domain metrics in twelve locales.
 

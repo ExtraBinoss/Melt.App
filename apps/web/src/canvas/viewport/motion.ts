@@ -10,6 +10,8 @@ export interface MotionClock {
   cancel: (handle: number) => void;
 }
 interface Transition {
+  kind?: "wheel";
+  wheelAge?: number;
   from: View;
   to: View;
   start: number;
@@ -17,6 +19,9 @@ interface Transition {
   waitingForFrame?: boolean;
   duration: number;
 }
+const WHEEL_LOOKAHEAD = 1.18;
+const WHEEL_RESPONSE_MS = 64;
+const WHEEL_FRAME_MAX_MS = 32;
 const equal = (a: View, b: View) => a.x === b.x && a.y === b.y && a.zoom === b.zoom;
 
 /** A shared interpolation fraction preserves the document point under a zoom anchor. */
@@ -74,6 +79,19 @@ export class ViewMotion implements ViewSource {
   }
   private sample() {
     if (!this.transition || this.transition.waitingForFrame) return;
+    if (this.transition.kind === "wheel") {
+      const current = this.transition,
+        now = this.options.clock.now();
+      const elapsed = Math.min(WHEEL_FRAME_MAX_MS, Math.max(0, now - current.start));
+      current.start = now;
+      current.wheelAge = (current.wheelAge ?? 0) + elapsed;
+      this.publish(
+        this.options.constrain(
+          interpolateView(this.current, current.to, elapsed / WHEEL_RESPONSE_MS),
+        ),
+      );
+      return;
+    }
     const duration = this.transition.duration;
     const progress =
       duration <= 0 ? 1 : (this.options.clock.now() - this.transition.start) / duration;
@@ -92,6 +110,14 @@ export class ViewMotion implements ViewSource {
       return;
     }
     const transition = this.transition;
+    if (transition.kind === "wheel") {
+      this.sample();
+      if (this.transition === transition && (transition.wheelAge ?? 0) >= WHEEL_RESPONSE_MS)
+        this.finish();
+      else if (!this.closed && this.transition === transition)
+        this.frame = this.options.clock.request(this.step);
+      return;
+    }
     // Structural reframing starts with the first visible frame, not a busy commit's clock.
     if (transition.waitingForFrame) {
       transition.start = this.options.clock.now();
@@ -126,12 +152,13 @@ export class ViewMotion implements ViewSource {
   }
   animateTo(next: View, preserveOrigin = false): void {
     if (this.closed) return;
-    this.sample();
+    if (this.transition?.kind !== "wheel") this.sample();
     this.begin(next, preserveOrigin);
   }
   private begin(next: View, preserveOrigin = false): void {
     if (this.closed) return;
     this.clearFrame();
+    const wasMoving = this.isMoving();
     const target = this.options.constrain(next);
     const duration = this.options.duration ?? (preserveOrigin ? 240 : 160);
     if (this.options.reduced() || equal(this.current, target) || duration <= 0) {
@@ -146,21 +173,54 @@ export class ViewMotion implements ViewSource {
       waitingForFrame: preserveOrigin,
       duration,
     };
-    this.publish(this.current, true);
+    if (!wasMoving) this.publish(this.current, true);
     this.frame = this.options.clock.request(this.step);
   }
   zoomBy(factor: number, anchor: Point): void {
     if (this.closed || !Number.isFinite(factor) || factor <= 0 || factor === 1) return;
-    this.sample();
+    // Retarget from the last presented pose. Sampling here would mutate styles in
+    // the input handler, immediately before viewport constraint reads.
     const direction = Math.sign(Math.log(factor)),
       previous = Math.sign((this.transition?.to.zoom ?? this.current.zoom) - this.current.zoom);
     const base =
       direction === previous ? (this.transition?.to.zoom ?? this.current.zoom) : this.current.zoom;
+    const pendingStart = this.transition?.from === this.current ? this.transition.start : undefined;
     this.begin(zoomAt(this.current, (base * factor) / this.current.zoom, anchor));
+    // Several wheel packets before the next RAF share one easing origin.
+    if (pendingStart !== undefined && this.transition) this.transition.start = pendingStart;
+  }
+  /** Continuous input follows one nearby target; stalled packets cannot build a distant zoom backlog. */
+  zoomWheel(factor: number, anchor: Point): void {
+    if (this.closed || !Number.isFinite(factor) || factor <= 0 || factor === 1) return;
+    if (this.options.reduced()) {
+      this.jump(zoomAt(this.current, factor, anchor));
+      return;
+    }
+    const pending = this.transition?.kind === "wheel" ? this.transition : null;
+    const sameDirection =
+      Math.sign(Math.log(factor)) ===
+      Math.sign((pending?.to.zoom ?? this.current.zoom) - this.current.zoom);
+    const base = sameDirection ? (pending?.to.zoom ?? this.current.zoom) : this.current.zoom;
+    const desired = Math.max(
+      this.current.zoom / WHEEL_LOOKAHEAD,
+      Math.min(this.current.zoom * WHEEL_LOOKAHEAD, base * factor),
+    );
+    const target = zoomAt(this.current, desired / this.current.zoom, anchor);
+    if (pending && equal(this.options.constrain(target), pending.to)) {
+      pending.wheelAge = 0;
+      return;
+    }
+    const start = pending?.start ?? this.options.clock.now();
+    this.begin(target);
+    if (this.transition) {
+      this.transition.kind = "wheel";
+      this.transition.wheelAge = 0;
+      this.transition.start = start;
+    }
   }
   stop(commit = true): void {
     const moving = this.isMoving();
-    this.sample();
+    if (this.transition?.kind !== "wheel") this.sample();
     this.clearFrame();
     this.transition = null;
     if (moving) this.publish(this.current, true);

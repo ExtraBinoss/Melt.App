@@ -12,6 +12,7 @@ import { createViewportActions } from "../session/viewport-actions";
 import { createViewportResizeAnchor } from "../session/viewport-resize";
 import { animatePresentationProgress } from "../../components/shared/motion/presentation-spring";
 import { createResizeAnchor } from "./resize-anchor";
+import { createViewportMetrics } from "./viewport-metrics";
 import { ViewMotion } from "./motion";
 import type { ArtboardWorkspace } from "../artboards/layout";
 import {
@@ -34,7 +35,7 @@ function clearPanIdle(idle: PanIdle) {
 
 function createMotion(
   workspace: WorkspaceSource,
-  viewport: RefObject<HTMLDivElement | null>,
+  metrics: ReturnType<typeof createViewportMetrics>,
   media: MediaQueryList,
 ) {
   return new ViewMotion({
@@ -45,8 +46,7 @@ function createMotion(
     },
     reduced: () => media.matches,
     constrain: (next) => {
-      const rect = viewport.current?.getBoundingClientRect();
-      return rect ? constrainView(next, workspace.read(), rect) : next;
+      return constrainView(next, workspace.read(), metrics.read());
     },
   });
 }
@@ -54,13 +54,13 @@ function createMotion(
 function createReservation(
   engine: EnginePort,
   workspace: WorkspaceSource,
-  viewport: RefObject<HTMLDivElement | null>,
+  metrics: ReturnType<typeof createViewportMetrics>,
   media: MediaQueryList,
   motion: ViewMotion,
 ) {
   return createResizeAnchor({
     motion,
-    rect: () => viewport.current?.getBoundingClientRect() ?? null,
+    rect: metrics.measure,
     workspace: () => workspace.read(),
     reduced: () => media.matches,
     spring: animatePresentationProgress,
@@ -82,9 +82,10 @@ export function useViewport({
   projectId: string;
 }) {
   const media = useMemo(() => matchMedia("(prefers-reduced-motion: reduce)"), []);
+  const metrics = useMemo(() => createViewportMetrics(viewport), [viewport]);
   const motion = useMemo(
-    () => createMotion(workspace, viewport, media),
-    [workspace, viewport, media],
+    () => createMotion(workspace, metrics, media),
+    [workspace, metrics, media],
   );
   const view = useSyncExternalStore(
     motion.subscribeSettled,
@@ -95,8 +96,8 @@ export function useViewport({
   const actions = useMemo(() => createViewportActions(engine), [engine]);
   const resizePort = useMemo(() => createViewportResizeAnchor(engine), [engine]);
   const resizeAnchor = useMemo(
-    () => createReservation(engine, workspace, viewport, media, motion),
-    [motion, viewport, workspace, media, engine],
+    () => createReservation(engine, workspace, metrics, media, motion),
+    [motion, metrics, workspace, media, engine],
   );
   const panIdle = useMemo<PanIdle>(() => ({ timer: undefined }), []);
   const previousLayout = useRef<{ projectId: string; layout: ArtboardWorkspace } | null>(null);
@@ -105,7 +106,7 @@ export function useViewport({
       previous = previousLayout.current;
     previousLayout.current = { projectId, layout };
     if (!previous || previous.projectId !== projectId || previous.layout === layout) return;
-    const rect = viewport.current?.getBoundingClientRect();
+    const rect = metrics.measure();
     if (!rect) return;
     const shown = motion.read(),
       old = previous.layout;
@@ -131,7 +132,7 @@ export function useViewport({
       motion.reframe(rebased, false);
       motion.animateTo(fitView(layout, rect), true);
     }
-  }, [motion, viewport, projectId, layoutKey, workspace]);
+  }, [motion, metrics, projectId, layoutKey, workspace]);
   useEffect(() => {
     motion.activate();
     viewRef.current = motion.read();
@@ -160,11 +161,11 @@ export function useViewport({
   }, [resizePort, resizeAnchor, projectId]);
   useEffect(() => {
     const frame = requestAnimationFrame(() => {
-      const rect = viewport.current?.getBoundingClientRect();
+      const rect = metrics.measure();
       if (rect) motion.jump(fitView(workspace.read(), rect));
     });
     return () => cancelAnimationFrame(frame);
-  }, [motion, viewport, projectId, workspace]);
+  }, [motion, metrics, projectId, workspace]);
   useEffect(
     () =>
       actions.subscribe((action) => {
@@ -172,7 +173,7 @@ export function useViewport({
         resizeAnchor.cancel();
         const handlers = {
           fit: () => {
-            const rect = viewport.current?.getBoundingClientRect();
+            const rect = metrics.measure();
             if (rect) motion.animateTo(fitView(workspace.read(), rect));
           },
           reset: () => motion.animateTo(INITIAL_VIEW),
@@ -182,7 +183,7 @@ export function useViewport({
         };
         handlers[action]();
       }),
-    [actions, workspace, motion, viewport, panIdle, resizeAnchor],
+    [actions, workspace, motion, metrics, panIdle, resizeAnchor],
   );
   useEffect(() => {
     const element = viewport.current;
@@ -191,9 +192,10 @@ export function useViewport({
       event.preventDefault();
       resizeAnchor.cancel();
       clearPanIdle(panIdle);
-      const rect = element.getBoundingClientRect();
+      const rect = metrics.measure();
+      if (!rect) return;
       if (event.ctrlKey || event.metaKey)
-        motion.zoomBy(wheelZoomFactor(event.deltaY, event.deltaMode, rect.height), {
+        motion.zoomWheel(wheelZoomFactor(event.deltaY, event.deltaMode, rect.height), {
           x: event.clientX - rect.left - rect.width / 2,
           y: event.clientY - rect.top - rect.height / 2,
         });
@@ -216,6 +218,7 @@ export function useViewport({
       }
     };
     const observer = new ResizeObserver(() => {
+      metrics.measure();
       if (!resizeAnchor.resizeHandled()) motion.jump(motion.read());
     });
     const interrupt = () => {
@@ -232,6 +235,6 @@ export function useViewport({
       element.removeEventListener("pointerdown", interrupt, true);
       clearPanIdle(panIdle);
     };
-  }, [motion, viewport, panIdle, resizeAnchor]);
+  }, [motion, viewport, metrics, panIdle, resizeAnchor]);
   return { view, viewRef, motion, actions };
 }
