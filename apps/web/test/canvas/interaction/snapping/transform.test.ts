@@ -132,6 +132,37 @@ it("preserves aspect ratio under parent/layer rotations and only publishes achie
   expect(fixed.y).toBeCloseTo(anchor.y);
   for (const cue of result.cues) expect(corner(next, changed)[cue.axis]).toBeCloseTo(cue.position);
 });
+it.each(["e", "w", "n", "s"] as const)(
+  "snaps the %s midpoint while shrinking only the active axis",
+  (handle) => {
+    const layer = createLayer("rectangle", { id: "side", x: 100, y: 100, width: 100, height: 80 });
+    const horizontal = handle === "e" || handle === "w";
+    const axis = horizontal ? ("x" as const) : ("y" as const);
+    const position = handle === "e" ? 180 : handle === "w" ? 120 : handle === "n" ? 116 : 164;
+    const page = createPage({
+      width: 1000,
+      height: 800,
+      layers: [layer],
+      guides: [{ id: "side-guide", axis, position }],
+    });
+    const from = {
+      x: handle === "w" ? 100 : handle === "e" ? 200 : 150,
+      y: handle === "n" ? 100 : handle === "s" ? 180 : 140,
+    };
+    const to = horizontal
+      ? { x: position + (handle === "w" ? -3 : 3), y: from.y + 4 }
+      : { x: from.x + 3, y: position + (handle === "n" ? -3 : 3) };
+    for (const aspect of [false, true]) {
+      const result = new TransformSnapping(page, [layer]).resize(handle, from, to, aspect, true, 6);
+      const changed = applyPreview(page, result.patches).layers[0]!;
+      expect(changed.width).toBeCloseTo(horizontal || aspect ? 80 : 100);
+      expect(changed.height).toBeCloseTo(!horizontal || aspect ? 64 : 80);
+      expect(result.cues.some((cue) => cue.targetId === "side-guide" && cue.axis === axis)).toBe(
+        true,
+      );
+    }
+  },
+);
 it("returns raw transforms for disabled/rotation gestures, clamped shapes and missing selection", () => {
   const layer = createLayer("rectangle", { id: "moving", x: 100, y: 100, width: 20, height: 10 }),
     page = createPage({ layers: [layer] });

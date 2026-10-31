@@ -37,7 +37,7 @@ test("the real Melt mascot keeps transform handles until double click, then expo
   }, project);
   await ready(page);
   const frame = page.locator('.canvas-selection[data-layer-id="melt-mascot-body"]');
-  await expect(frame.locator(".canvas-handle")).toHaveCount(5);
+  await expect(frame.locator(".canvas-handle")).toHaveCount(9);
   await expect(page.locator(".vector-canvas-entry button")).toBeVisible();
   const box = (await frame.boundingBox())!;
   const entry = (await page.locator(".vector-canvas-entry button").boundingBox())!,
@@ -123,7 +123,7 @@ test("the real Melt mascot keeps transform handles until double click, then expo
     window.musart!.select(["melt-mascot-body"]);
   });
   await expect(editor).toHaveCount(0);
-  await expect(frame.locator(".canvas-handle")).toHaveCount(5);
+  await expect(frame.locator(".canvas-handle")).toHaveCount(9);
   await page.evaluate(() => window.musart!.select(["melt-wordmark"]));
   await expect(page.locator(".vector-canvas-entry")).toHaveCount(0);
   expect(await page.evaluate(() => window.__musartVideoReadbacks)).toMatchObject({

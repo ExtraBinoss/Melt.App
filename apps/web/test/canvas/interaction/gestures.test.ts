@@ -102,6 +102,57 @@ describe("transient canvas gestures", () => {
     expect(clamped.width).toBe(1);
     expect(clamped.height).toBe(1);
   });
+  it.each(["n", "s", "e", "w"] as const)(
+    "shrinks from side %s with a fixed opposite midpoint under mirrored parent transforms",
+    (handle) => {
+      const group = createLayer("group", {
+        x: 100,
+        y: 50,
+        width: 300,
+        height: 200,
+        rotation: -20,
+        scaleX: 0.7,
+      });
+      const layer = createLayer("rectangle", {
+        parentId: group.id,
+        x: 30,
+        y: 40,
+        width: 100,
+        height: 80,
+        rotation: 35,
+        scaleX: -1.2,
+        scaleY: 1.6,
+      });
+      const page = createPage({ layers: [group, layer] });
+      const horizontal = handle === "e" || handle === "w";
+      const moving = {
+        x: handle === "w" ? 0 : handle === "e" ? 100 : 50,
+        y: handle === "n" ? 0 : handle === "s" ? 80 : 40,
+      };
+      const matrix = getWorldMatrix(page, layer.id);
+      const from = transformPoint(matrix, moving);
+      const to = transformPoint(matrix, {
+        x: moving.x + (handle === "w" ? 20 : handle === "e" ? -20 : 13),
+        y: moving.y + (handle === "n" ? 16 : handle === "s" ? -16 : 13),
+      });
+      for (const aspect of [false, true]) {
+        const next = { ...layer, ...resizePatch(page, layer, handle, from, to, aspect).patch };
+        expect(next.width).toBeCloseTo(horizontal || aspect ? 80 : 100);
+        expect(next.height).toBeCloseTo(!horizontal || aspect ? 64 : 80);
+        const anchor = { x: 1 - moving.x / layer.width, y: 1 - moving.y / layer.height };
+        const before = transformPoint(matrix, {
+          x: layer.width * anchor.x,
+          y: layer.height * anchor.y,
+        });
+        const after = transformPoint(getWorldMatrix({ ...page, layers: [group, next] }, layer.id), {
+          x: next.width * anchor.x,
+          y: next.height * anchor.y,
+        });
+        expect(after.x).toBeCloseTo(before.x, 8);
+        expect(after.y).toBeCloseTo(before.y, 8);
+      }
+    },
+  );
   it("rotates about the world-space center and supports 15-degree snapping", () => {
     const layer = createLayer("rectangle", { x: 0, y: 0, width: 100, height: 100 });
     const page = createPage({ layers: [layer] });

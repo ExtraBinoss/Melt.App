@@ -10,6 +10,7 @@ import { GuideOverlay } from "../guides/GuideOverlay";
 import { SelectionOverlays } from "./SelectionOverlays";
 import { SelectionPlane } from "./SelectionPlane";
 import { createTimelineHoverSource } from "../../state/motion/hover";
+import { paintSelectionHandleInk } from "./handle-color";
 
 /** Only selection decorations subscribe to selected IDs; the retained canvas stays untouched. */
 export const CanvasSelection = memo(function CanvasSelection({
@@ -141,6 +142,7 @@ function TimelineHoverOutline({
       node.dataset.layerId = layer.id;
       node.dataset.layerKind = layer.kind;
       node.dataset.playback = String(Boolean(frame.playback));
+      paintSelectionHandleInk(node, layer, frame.page);
       Object.assign(node.style, {
         width: `${layer.width}px`,
         height: `${layer.height}px`,

@@ -32,9 +32,10 @@
   width: 8px;
   height: 8px;
   padding: 0;
-  border: 1px solid #fff;
-  background: #fff;
-  box-shadow: 0 0 0 1px #000;
+  border: 1px solid var(--canvas-handle-color, #ffffff);
+  background: var(--canvas-handle-color, #ffffff);
+  border-radius: calc(var(--radius-sm, 4px) / 2);
+  box-shadow: 0 0 0 1px var(--canvas-handle-outline, #000000);
 }
 .canvas-handle:focus-visible {
   outline: 2px solid var(--canvas-selection-accent, var(--media-image));
@@ -46,23 +47,6 @@
 }
 .canvas-timeline-hover-handle {
   pointer-events: none;
-}
-/* Contrast is computed by the compositor from the actual painted canvas. Bound
-   backdrop work to one selected frame and one hover frame, never all 320 thumbs. */
-@media (forced-colors: none) {
-  @supports ((backdrop-filter: invert(1)) or (-webkit-backdrop-filter: invert(1))) {
-    .canvas-selection-overlays[data-selection-count="1"][data-playback="false"] .canvas-handle,
-    .canvas-selection-overlays:is(
-        [data-selection-count="0"],
-        [data-selection-count="1"]
-      )[data-playback="false"]
-      ~ .canvas-timeline-hover[data-playback="false"]:not([data-selected="true"])
-      .canvas-timeline-hover-handle {
-      background: transparent;
-      -webkit-backdrop-filter: blur(2px) grayscale(1) contrast(1000) invert(1);
-      backdrop-filter: blur(2px) grayscale(1) contrast(1000) invert(1);
-    }
-  }
 }
 @media (forced-colors: active) {
   .canvas-handle,
@@ -92,17 +76,5 @@
   .canvas-selection,
   .canvas-timeline-hover {
     transition: none;
-  }
-}
-/* During camera motion, a fixed high-contrast handle avoids five moving backdrop
-   filters. Restore the adaptive contrast once the camera settles. */
-@media (forced-colors: none) {
-  .canvas-artboard-editor[data-view-moving="true"]
-    ~ .canvas-selection-plane
-    .canvas-selection-overlays
-    .canvas-handle {
-    background: #fff;
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
   }
 }

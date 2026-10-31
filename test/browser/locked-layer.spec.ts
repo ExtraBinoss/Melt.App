@@ -122,7 +122,7 @@ test("locked artwork remains selectable and every property panel unlocks only it
   expect((await read()).project).toEqual(locked.project);
   expect((await read()).canUndo).toBe(false);
   await page.getByRole("button", { name: i18n.t("redo"), exact: true }).click();
-  await expect(frame.locator("[data-handle]")).toHaveCount(5);
+  await expect(frame.locator("[data-handle]")).toHaveCount(9);
   await page.evaluate((project) => {
     window.musart!.load(project);
     window.musart!.select(["child"]);

@@ -137,6 +137,26 @@
   bottom: -4px;
   cursor: nwse-resize;
 }
+.canvas-handle-n {
+  left: calc(50% - 4px);
+  top: -4px;
+  cursor: ns-resize;
+}
+.canvas-handle-s {
+  left: calc(50% - 4px);
+  bottom: -4px;
+  cursor: ns-resize;
+}
+.canvas-handle-w {
+  left: -4px;
+  top: calc(50% - 4px);
+  cursor: ew-resize;
+}
+.canvas-handle-e {
+  right: -4px;
+  top: calc(50% - 4px);
+  cursor: ew-resize;
+}
 .canvas-handle-rotate {
   left: calc(50% - 4px);
   top: -23px;

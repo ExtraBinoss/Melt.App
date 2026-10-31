@@ -2,6 +2,7 @@ import {
   createLayerGeometryIndex,
   SnapIndex,
   invertMatrix,
+  layerTransform,
   transformPoint,
   type Command,
   type Composition,
@@ -19,7 +20,7 @@ export type Tool =
   | "text"
   | "wand"
   | "segment";
-export type Handle = "nw" | "ne" | "sw" | "se" | "rotate";
+export type Handle = "nw" | "n" | "ne" | "w" | "e" | "sw" | "s" | "se" | "rotate";
 export interface LayerPatch {
   layerId: string;
   patch: Partial<Layer>;
@@ -123,33 +124,39 @@ export function resizePatch(
   const b = transformPoint(inverse, to);
   const west = handle.includes("w");
   const north = handle.includes("n");
+  const horizontal = west || handle.includes("e"),
+    vertical = north || handle.includes("s");
   const dx = b.x - a.x;
   const dy = b.y - a.y;
-  let width = Math.max(1, layer.width + (west ? -dx : dx));
-  let height = Math.max(1, layer.height + (north ? -dy : dy));
+  let width = horizontal ? Math.max(1, layer.width + (west ? -dx : dx)) : layer.width;
+  let height = vertical ? Math.max(1, layer.height + (north ? -dy : dy)) : layer.height;
   if (keepAspect) {
-    const ratio = Math.max(width / layer.width, height / layer.height);
+    const xRatio = width / layer.width,
+      yRatio = height / layer.height;
+    const driven = !horizontal
+      ? yRatio
+      : !vertical
+        ? xRatio
+        : Math.abs(xRatio - 1) > Math.abs(yRatio - 1)
+          ? xRatio
+          : yRatio;
+    const ratio = Math.max(driven, 1 / layer.width, 1 / layer.height);
     width = layer.width * ratio;
     height = layer.height * ratio;
   }
-  // Keep the opposite corner fixed under the layer's existing rotation.
-  const theta = (layer.rotation * Math.PI) / 180;
-  const localX = west ? layer.width - width : 0;
-  const localY = north ? layer.height - height : 0;
-  const centerOffsetX = (width - layer.width) / 2;
-  const centerOffsetY = (height - layer.height) / 2;
-  const x =
-    layer.x +
-    layer.width / 2 +
-    Math.cos(theta) * (localX + centerOffsetX) -
-    Math.sin(theta) * (localY + centerOffsetY) -
-    width / 2;
-  const y =
-    layer.y +
-    layer.height / 2 +
-    Math.sin(theta) * (localX + centerOffsetX) +
-    Math.cos(theta) * (localY + centerOffsetY) -
-    height / 2;
+  // Keep the opposite corner or edge midpoint fixed, including mirrored/nonuniform scales.
+  const anchorX = west ? 1 : horizontal ? 0 : 0.5;
+  const anchorY = north ? 1 : vertical ? 0 : 0.5;
+  const before = transformPoint(layerTransform(layer), {
+    x: layer.width * anchorX,
+    y: layer.height * anchorY,
+  });
+  const after = transformPoint(layerTransform({ ...layer, x: 0, y: 0, width, height }), {
+    x: width * anchorX,
+    y: height * anchorY,
+  });
+  const x = before.x - after.x,
+    y = before.y - after.y;
   return { layerId: layer.id, patch: { x, y, width, height } };
 }
 

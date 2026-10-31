@@ -42,8 +42,12 @@ async function nativeEnvironment(page: Page) {
 
 async function ready(page: Page, count = 1) {
   await installReadbackProbe(page);
-  await page.addInitScript(() => localStorage.setItem("musart.theme", "dark"));
-  await page.goto("/?automation=1", { waitUntil: "domcontentloaded" });
+  await page.addInitScript(() => {
+    localStorage.setItem("musart.theme", "dark");
+    localStorage.setItem("musart.language", "fr");
+    localStorage.setItem("musart.onboarding.v1", JSON.stringify({ version: 1, completed: true }));
+  });
+  await page.goto("/editor?automation=1", { waitUntil: "domcontentloaded" });
   await page.waitForFunction(() => Boolean(window.musart));
   const target = createLayer("rectangle", {
     id: "contrast-target",
@@ -121,7 +125,7 @@ async function ready(page: Page, count = 1) {
   await page.waitForFunction(
     () =>
       Boolean(document.querySelector('.canvas-artboard canvas[data-renderer-ready="true"]')) &&
-      document.querySelectorAll(".canvas-handle").length === 5,
+      document.querySelectorAll(".canvas-handle").length === 9,
   );
   await page.getByRole("button", { name: "Épingler la timeline", exact: true }).click();
   await page.getByRole("button", { name: "Keyframes", exact: true }).click();
@@ -155,7 +159,7 @@ async function capture(page: Page, name: string, selector: string): Promise<Shot
     selector,
   );
   expect(data.handles.length).toBeGreaterThan(0);
-  for (const handle of data.handles) expect(handle.filter).toContain("contrast(1000)");
+  for (const handle of data.handles) expect(handle.filter).toBe("none");
   await mkdir("artifacts/motion/ui", { recursive: true });
   const png = await page.screenshot({ path: `artifacts/motion/ui/handles-${name}.png` });
   return { name, ...data, url: `data:image/png;base64,${png.toString("base64")}` };
@@ -204,7 +208,7 @@ async function inspect(page: Page, shots: Shot[]) {
   }
 }
 
-test("paused selection and hover handles adapt to real canvas pixels in both themes without production readbacks", async ({
+test("paused selection and hover handles use uniform binary ink across the frame in both themes", async ({
   page,
 }) => {
   await ready(page);
@@ -235,10 +239,7 @@ test("paused selection and hover handles adapt to real canvas pixels in both the
     for (const handle of shot.handles) {
       const brightness = handle.mean.reduce((sum, value) => sum + value, 0) / 3;
       expect(Math.max(...handle.mean) - Math.min(...handle.mean)).toBeLessThan(12);
-      if (handle.kind === "nw" || handle.kind === "sw") expect(brightness).toBeLessThan(40);
-      else if (handle.kind === "ne" || handle.kind === "se")
-        expect(brightness).toBeGreaterThan(215);
-      else expect(Math.min(brightness, 255 - brightness)).toBeLessThan(40);
+      expect(brightness).toBeLessThan(40);
     }
   await writeFile(
     "artifacts/motion/ui/handle-contrast-optical.json",
@@ -250,7 +251,7 @@ test("paused selection and hover handles adapt to real canvas pixels in both the
   );
 });
 
-test("64 selected layers and playback retain two-tone handles without per-handle filters", async ({
+test("64 selected layers and playback retain uniform per-frame ink without per-handle filters", async ({
   page,
 }) => {
   const ids = await ready(page, 64);
@@ -267,12 +268,12 @@ test("64 selected layers and playback retain two-tone handles without per-handle
         ...document.querySelectorAll<HTMLElement>(".canvas-handle,.canvas-timeline-hover-handle"),
       ].filter((node) => getComputedStyle(node).backdropFilter !== "none").length,
   );
-  expect(pausedFilterCount).toBe(9);
+  expect(pausedFilterCount).toBe(0);
   await page.evaluate((ids) => window.musart!.select(ids), ids);
   await page.waitForFunction(
     () =>
       document.querySelector(".canvas-selection-overlays")?.getAttribute("data-selection-count") ===
-        "64" && document.querySelectorAll(".canvas-handle").length === 320,
+        "64" && document.querySelectorAll(".canvas-handle").length === 576,
   );
   const bulk = await page.evaluate(() =>
     [...document.querySelectorAll<HTMLElement>(".canvas-handle")].map((node) => {
@@ -286,9 +287,9 @@ test("64 selected layers and playback retain two-tone handles without per-handle
     }),
   );
   expect(new Set(bulk.map((handle) => handle.filter))).toEqual(new Set(["none"]));
-  expect(new Set(bulk.map((handle) => handle.background))).toEqual(new Set(["rgb(255, 255, 255)"]));
-  expect(new Set(bulk.map((handle) => handle.border))).toEqual(new Set(["rgb(255, 255, 255)"]));
-  expect(bulk.every((handle) => handle.shadow.includes("rgb(0, 0, 0)"))).toBe(true);
+  expect(new Set(bulk.map((handle) => handle.background))).toEqual(new Set(["rgb(0, 0, 0)"]));
+  expect(new Set(bulk.map((handle) => handle.border))).toEqual(new Set(["rgb(0, 0, 0)"]));
+  expect(bulk.every((handle) => handle.shadow.includes("rgb(255, 255, 255)"))).toBe(true);
   const bulkFilterCount = await page.evaluate(
     () =>
       [
@@ -313,7 +314,7 @@ test("64 selected layers and playback retain two-tone handles without per-handle
     )!.style.opacity,
     readbacks: window.__musartVideoReadbacks,
   }));
-  expect(playback.handles).toHaveLength(5);
+  expect(playback.handles).toHaveLength(9);
   expect(playback.handles.every((handle) => handle.filter === "none" && handle.disabled)).toBe(
     true,
   );

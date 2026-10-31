@@ -48,9 +48,10 @@ direction, and interruption retains the last visible pose. Fit and discrete zoom
 controls keep their own animation. Reduced motion remains direct. One settled
 React publication follows a completed wheel gesture.
 
-Canvas/selection layout and style are contained locally. During camera movement,
-handles keep fixed white/black contrast and suspend their moving backdrop filters;
-adaptive contrast returns after settling. Editing decorations live in a separate,
+Canvas/selection layout and style are contained locally. All handles on one frame use the same black or white ink, estimated from authored
+fill, alpha, gradient or a bounded vector palette. Their rounded shape uses the
+shared radius token. This applies while idle and during camera movement, with no
+per-handle backdrop filters or production pixel reads. Editing decorations live in a separate,
 noninteractive camera-aligned plane above composition chrome. Only handles accept
 pointer input; body-portalled menus remain above the plane. Camera updates remain
 imperative, and owned subscriptions/RAF work are released on disposal.
@@ -64,3 +65,12 @@ case records real wheel input and rejects per-frame zoom changes above 19%; its
 observed maximum ratio is approximately 1.156. A separate native case places real
 resize handles over the composition heading/menu and mode switch, performs resize
 and undo, and checks that empty overlay space and menus remain usable.
+
+## Side resizing
+
+All four edges expose handles and reuse the existing transform gesture, preview,
+snapping and single-commit undo path. A side changes only its own axis; Shift uses
+that axis for proportional shrinking or growing. Opposite edge midpoints and corner
+anchors are solved using the layer transform, including mirrored/nonuniform scales
+and transformed parents. Dense or unusually large vector palettes use the declared
+paint fallback rather than parsing unbounded paths for decoration contrast.

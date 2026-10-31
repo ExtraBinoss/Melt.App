@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, type PointerEvent } from "react";
+import { useLayoutEffect, useRef, type CSSProperties, type PointerEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { createLayerGeometryIndex, type Composition, type Layer } from "@musart/core";
 import { LockKeyhole } from "lucide-react";
@@ -7,6 +7,7 @@ import type { ViewSource } from "../viewport/motion";
 import "./selection-presentation.css";
 import "../../components/layers/messages";
 import { selectionSizeLabel } from "./size-label";
+import { selectionHandleInk } from "./handle-color";
 
 interface Props {
   page: Composition;
@@ -149,6 +150,7 @@ export function SelectionOverlays({
           const layer = index.byId.get(selectedLayer.id);
           if (!layer || presented.id !== page.id) return null;
           const locked = selectedLayer.locked || index.isLocked(layer.id);
+          const ink = selectionHandleInk(layer, presented);
           return (
             <div
               key={layer.id}
@@ -156,13 +158,17 @@ export function SelectionOverlays({
               data-layer-id={layer.id}
               data-layer-kind={layer.kind}
               data-locked={locked || undefined}
-              style={{
-                display: index.isVisible(layer.id) && !layer.maskSource ? undefined : "none",
-                width: layer.width,
-                height: layer.height,
-                transform: `matrix(${index.worldMatrix(layer.id).join(",")})`,
-                borderWidth: 1 / zoom,
-              }}
+              style={
+                {
+                  "--canvas-handle-color": ink,
+                  "--canvas-handle-outline": ink === "#ffffff" ? "#000000" : "#ffffff",
+                  display: index.isVisible(layer.id) && !layer.maskSource ? undefined : "none",
+                  width: layer.width,
+                  height: layer.height,
+                  transform: `matrix(${index.worldMatrix(layer.id).join(",")})`,
+                  borderWidth: 1 / zoom,
+                } as CSSProperties
+              }
             >
               {locked && (
                 <span
@@ -175,7 +181,7 @@ export function SelectionOverlays({
                 </span>
               )}
               {!locked &&
-                (["nw", "ne", "sw", "se", "rotate"] as const).map((handle) => (
+                (["nw", "n", "ne", "w", "e", "sw", "s", "se", "rotate"] as const).map((handle) => (
                   <button
                     type="button"
                     key={handle}

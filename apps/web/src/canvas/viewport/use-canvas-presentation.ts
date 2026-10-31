@@ -5,6 +5,7 @@ import type { WorkspaceSource } from "../artboards/workspace";
 import { paintArtboards } from "../artboards/presentation";
 import type { ViewMotion } from "./motion";
 import { selectionSizeLabel } from "../selection/size-label";
+import { paintSelectionHandleInk } from "../selection/handle-color";
 
 interface Options {
   controller: SceneController;
@@ -54,6 +55,7 @@ function createPresentation({ controller, workspace, motion, viewport, beforePai
       overlay.style.opacity = frame.playback ? ".2" : "1";
       overlay.inert = Boolean(frame.playback || !visible || (layer && index.isLocked(layer.id)));
       if (!layer) continue;
+      paintSelectionHandleInk(overlay, layer, page);
       Object.assign(overlay.style, {
         width: `${layer.width}px`,
         height: `${layer.height}px`,

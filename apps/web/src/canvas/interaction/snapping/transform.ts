@@ -62,11 +62,13 @@ export class TransformSnapping {
     const parent = layer.parentId ? geometry.worldMatrix(layer.parentId) : IDENTITY;
     const west = handle.includes("w"),
       north = handle.includes("n");
+    const fractionX = west ? 0 : handle.includes("e") ? 1 : 0.5;
+    const fractionY = north ? 0 : handle.includes("s") ? 1 : 0.5;
     const corner = (patch: LayerPatch): Point => {
       const next = { ...layer, ...patch.patch };
       return transformPoint(multiplyMatrices(parent, layerTransform(next)), {
-        x: west ? 0 : next.width,
-        y: north ? 0 : next.height,
+        x: fractionX * next.width,
+        y: fractionY * next.height,
       });
     };
     const point = corner(raw),
@@ -77,12 +79,12 @@ export class TransformSnapping {
     if (aspect) {
       const matrix = geometry.worldMatrix(layer.id);
       const anchor = transformPoint(matrix, {
-        x: west ? layer.width : 0,
-        y: north ? layer.height : 0,
+        x: (1 - fractionX) * layer.width,
+        y: (1 - fractionY) * layer.height,
       });
       const original = transformPoint(matrix, {
-        x: west ? 0 : layer.width,
-        y: north ? 0 : layer.height,
+        x: fractionX * layer.width,
+        y: fractionY * layer.height,
       });
       const vector = { x: original.x - anchor.x, y: original.y - anchor.y };
       let distance = Infinity;

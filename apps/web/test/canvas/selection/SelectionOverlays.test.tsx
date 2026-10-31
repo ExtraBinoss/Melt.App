@@ -58,7 +58,7 @@ it("keeps ordinary per-layer handles and locks while exposing the real size", ()
     <SelectionOverlays {...d} selected={selected} zoom={2} onHandle={onHandle} />,
   );
   expect(screen.getByText("8 × 8")).toBeInTheDocument();
-  expect(screen.getAllByRole("button")).toHaveLength(5);
+  expect(screen.getAllByRole("button")).toHaveLength(9);
   expect(container.querySelector(".canvas-selection-overlays")).toHaveAttribute(
     "data-selection-count",
     "1",
@@ -73,7 +73,7 @@ it("keeps ordinary per-layer handles and locks while exposing the real size", ()
       onHandle={onHandle}
     />,
   );
-  expect(screen.getAllByRole("button")).toHaveLength(5);
+  expect(screen.getAllByRole("button")).toHaveLength(9);
   expect(container.querySelector(".canvas-selection-overlays")).toHaveAttribute(
     "data-selection-count",
     "2",
