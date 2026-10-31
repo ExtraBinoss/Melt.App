@@ -9,6 +9,7 @@ const project = JSON.parse(
 test("performance footer samples the actual Motion canvas, restores its pose and stops on outside dismissal", async ({
   page,
 }) => {
+  await page.context().grantPermissions(["clipboard-read", "clipboard-write"]);
   await installReadbackProbe(page);
   await page.addInitScript(() => {
     localStorage.setItem("musart.language", "en");
@@ -62,21 +63,35 @@ test("performance footer samples the actual Motion canvas, restores its pose and
   await expect(popup).toBeVisible();
   await expect(popup.getByText("12 samples", { exact: true })).toBeVisible({ timeout: 12000 });
   await expect(popup.getByRole("meter", { name: "CPU host elapsed", exact: true })).toBeVisible();
-  await popup.getByRole("button", { name: "120 fps", exact: true }).click();
+  await popup.getByRole("combobox", { name: "Target frame rate" }).click();
+  await page.getByRole("option", { name: "120 fps", exact: true }).click();
   await expect(popup.getByRole("meter", { name: "CPU host elapsed" })).toHaveAttribute(
     "aria-valuemax",
     String(1000 / 120),
   );
-  await popup.getByRole("spinbutton", { name: "Target frame rate" }).fill("144");
+  await popup.getByRole("combobox", { name: "Target frame rate" }).click();
+  await page.getByRole("option", { name: "144 fps", exact: true }).click();
   await expect(popup.getByRole("meter", { name: "CPU host elapsed" })).toHaveAttribute(
     "aria-valuemax",
     String(1000 / 144),
   );
   await page.screenshot({ path: "artifacts/composition-performance-popover.png" });
-  await popup.getByRole("button", { name: /^GPU/ }).click();
+  await popup
+    .locator(".composition-performance-domains")
+    .getByRole("button", { name: /^GPU/ })
+    .click();
   const drawCommands = popup.getByRole("term").filter({ hasText: "Draw commands" });
   await drawCommands.scrollIntoViewIfNeeded();
   await expect(drawCommands).toBeVisible();
+  expect(
+    await popup
+      .locator(".composition-performance-viewport")
+      .evaluate((node) => node.scrollWidth <= node.clientWidth),
+  ).toBe(true);
+  await popup.getByRole("button", { name: "Copy report", exact: true }).click();
+  await expect(popup.getByRole("button", { name: "Copied", exact: true })).toBeVisible();
+  const copied = await page.evaluate(() => navigator.clipboard.readText());
+  expect(JSON.parse(copied)).toMatchObject({ sampleCount: 12, targetFps: 144 });
   await expect(canvas).toHaveAttribute("data-composition-profiling", "false");
   await expect(canvas).toHaveAttribute("data-motion-time", initialTime!);
   expect(await page.evaluate(() => window.musart!.snapshot().revision)).toBe(revision);
@@ -86,8 +101,18 @@ test("performance footer samples the actual Motion canvas, restores its pose and
   expect(reads.every((label) => label.startsWith("buffer_timestamp_result_"))).toBe(true);
   if (await popup.getByRole("meter", { name: "GPU timestamp duration" }).count()) {
     expect(reads.length).toBeGreaterThan(0);
-    await expect(popup.getByRole("term").filter({ hasText: "GPU display" })).toBeVisible();
-    await expect(popup.getByRole("term").filter({ hasText: "GPU morph" })).toBeVisible();
+    await expect(
+      popup
+        .locator(".composition-performance-domains")
+        .getByRole("term")
+        .filter({ hasText: "GPU display" }),
+    ).toBeVisible();
+    await expect(
+      popup
+        .locator(".composition-performance-domains")
+        .getByRole("term")
+        .filter({ hasText: "GPU morph" }),
+    ).toBeVisible();
   }
   expect(await page.evaluate(() => window.__musartVideoReadbacks)).toMatchObject({
     webgl: 0,

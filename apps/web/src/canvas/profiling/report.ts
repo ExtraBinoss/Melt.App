@@ -1,3 +1,4 @@
+import { frameContributions } from "./contributions";
 import type { Composition } from "@musart/core";
 import type { SceneFrameSample } from "../render/scene-profile-source";
 import type {
@@ -209,6 +210,9 @@ export function compositionReport(input: PerformanceReportInput): CompositionPer
   const { samples } = input;
   const intervals = samples.slice(1).map((sample, i) => sample.at - samples[i]!.at);
   return {
+    contributions: frameContributions(samples, (sample, index) =>
+      sample.hostMs === null ? null : hostWork(sample, input.animationIntervals[index]),
+    ),
     compositionId: input.page.id,
     measuredAt: Date.now(),
     budgetMs: 1000 / 60,

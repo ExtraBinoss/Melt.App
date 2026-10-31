@@ -81,7 +81,8 @@
     "spatialLayers": "Calques 3D",
     "spatialMeshes": "Maillages 3D",
     "spatialVertices": "Sommets 3D",
-    "spatialTriangles": "Triangles 3D"
+    "spatialTriangles": "Triangles 3D",
+    "otherCpu": "Autres tâches hôte"
   },
   "warmthNote": "Reflète l’état actuel du cache. Le temps côté CPU hôte peut inclure des attentes asynchrones ; ce n’est pas une mesure d’utilisation du CPU.",
   "sharedNote": "La mémoire des textures et les compteurs de cache concernent le cache partagé du moteur de rendu. Les commandes de dessin et passes de rendu concernent cet échantillon.",
@@ -101,5 +102,8 @@
     "effects": "GPU effet",
     "display": "GPU affichage",
     "other": "GPU autre"
-  }
+  },
+  "contributions": "Contributions",
+  "overBudget": "Budget dépassé de {{value}}",
+  "copyReport": "Copier le rapport"
 }

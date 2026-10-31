@@ -81,7 +81,8 @@
     "spatialLayers": "3D-Ebenen",
     "spatialMeshes": "3D-Netze",
     "spatialVertices": "3D-Eckpunkte",
-    "spatialTriangles": "3D-Dreiecke"
+    "spatialTriangles": "3D-Dreiecke",
+    "otherCpu": "Sonstige Host-Arbeit"
   },
   "warmthNote": "Zeigt den aktuellen Cache-Zustand. Die CPU-Host-Zeit kann asynchrone Wartezeiten enthalten und misst keine CPU-Auslastung.",
   "sharedNote": "Texturspeicher und Cache-Zähler gelten für den gemeinsamen Renderer-Cache. Zeichenbefehle und Renderdurchläufe gelten für diese Stichprobe.",
@@ -101,5 +102,8 @@
     "effects": "GPU Effekt",
     "display": "GPU Anzeige",
     "other": "GPU Sonstiges"
-  }
+  },
+  "contributions": "Beiträge",
+  "overBudget": "Budget um {{value}} überschritten",
+  "copyReport": "Bericht kopieren"
 }

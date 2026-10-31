@@ -26,6 +26,7 @@ export interface CompositionPerformanceSnapshot {
   /** Only measured GPU timestamps qualify as measured GPU time. */
   gpu: CompositionPerformanceValue;
   metrics: readonly CompositionPerformanceMetric[];
+  contributions?: Readonly<Record<"cpu" | "gpu", readonly { id: string; value: number }[]>>;
 }
 export type CompositionProfiler = (
   compositionId: string,
@@ -99,6 +100,31 @@ function capture(value: CompositionPerformanceSnapshot, id: string) {
       value.metrics.length
   )
     throw new CompositionPerformanceError("invalid");
+  if (
+    value.contributions &&
+    (["cpu", "gpu"] as const).some((domain) => {
+      const parts = value.contributions![domain];
+      return (
+        !Array.isArray(parts) ||
+        parts.length > 64 ||
+        parts.some(
+          (part) =>
+            !part ||
+            typeof part.id !== "string" ||
+            !part.id ||
+            part.id.length > 128 ||
+            !Number.isFinite(part.value) ||
+            part.value < 0,
+        ) ||
+        new Set(parts.map((part) => part.id)).size !== parts.length ||
+        (parts.length > 0 &&
+          (value[domain].value === null ||
+            Math.abs(parts.reduce((sum, part) => sum + part.value, 0) - value[domain].value!) >
+              0.001))
+      );
+    })
+  )
+    throw new CompositionPerformanceError("invalid");
   const measured = (item: CompositionPerformanceValue) =>
     Object.freeze({
       value: item.value,
@@ -114,6 +140,20 @@ function capture(value: CompositionPerformanceSnapshot, id: string) {
     frame: measured(value.frame),
     cpu: measured(value.cpu),
     gpu: measured(value.gpu),
+    ...(value.contributions
+      ? {
+          contributions: Object.freeze(
+            Object.fromEntries(
+              (["cpu", "gpu"] as const).map((domain) => [
+                domain,
+                Object.freeze(
+                  value.contributions![domain].map((part) => Object.freeze({ ...part })),
+                ),
+              ]),
+            ),
+          ) as NonNullable<CompositionPerformanceSnapshot["contributions"]>,
+        }
+      : {}),
     metrics: Object.freeze(
       value.metrics.map((metric) =>
         Object.freeze({

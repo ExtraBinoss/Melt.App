@@ -81,7 +81,8 @@
     "spatialLayers": "Warstwy 3D",
     "spatialMeshes": "Siatki 3D",
     "spatialVertices": "Wierzchołki 3D",
-    "spatialTriangles": "Trójkąty 3D"
+    "spatialTriangles": "Trójkąty 3D",
+    "otherCpu": "Inna praca hosta"
   },
   "warmthNote": "Odzwierciedla bieżący stan pamięci podręcznej. Czas hosta CPU może obejmować oczekiwanie asynchroniczne; nie mierzy wykorzystania CPU.",
   "sharedNote": "Pamięć tekstur i liczniki dotyczą wspólnej pamięci podręcznej renderera. Polecenia rysowania i przebiegi renderowania dotyczą tej próbki.",
@@ -101,5 +102,8 @@
     "effects": "GPU efekt",
     "display": "GPU wyświetlanie",
     "other": "GPU inne"
-  }
+  },
+  "contributions": "Składowe",
+  "overBudget": "Budżet przekroczony o {{value}}",
+  "copyReport": "Kopiuj raport"
 }

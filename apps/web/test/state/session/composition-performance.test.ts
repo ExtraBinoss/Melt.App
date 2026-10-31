@@ -133,6 +133,34 @@ test("bounds retained snapshots to the most recent 32 compositions", async () =>
   expect(port.read("page-34")).not.toBeNull();
 });
 
+test("captures additive contributions immutably and rejects inconsistent or duplicate costs", async () => {
+  const { port, id } = fixture();
+  const source = {
+    ...performanceSnapshot(id),
+    cpu: { value: 12, availability: "measured" as const },
+    contributions: { cpu: [{ id: "composition", value: 12 }], gpu: [] },
+  };
+  port.registerProfiler(async () => source);
+  const captured = await port.request(id, new AbortController().signal);
+  source.contributions.cpu[0]!.value = 20;
+  expect(captured.contributions?.cpu).toEqual([{ id: "composition", value: 12 }]);
+  expect(Object.isFrozen(captured.contributions?.cpu[0])).toBe(true);
+  for (const cpu of [
+    [{ id: "composition", value: 11 }],
+    [{ id: "composition", value: -1 }],
+    [{ id: "composition", value: Number.NaN }],
+    [
+      { id: "composition", value: 6 },
+      { id: "composition", value: 6 },
+    ],
+  ]) {
+    port.registerProfiler(async () => ({ ...source, contributions: { cpu, gpu: [] } }));
+    await expect(port.request(id, new AbortController().signal)).rejects.toMatchObject({
+      code: "invalid",
+    });
+  }
+});
+
 test("bounds request lifetime and cancels the provider's resources on timeout", async () => {
   vi.useFakeTimers();
   try {

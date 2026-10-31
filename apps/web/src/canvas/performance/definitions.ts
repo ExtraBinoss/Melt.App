@@ -60,3 +60,17 @@ export function budgetFraction(value: number | null, budgetMs: number): number {
     return 0;
   return Math.min(1, value / budgetMs);
 }
+
+export function performanceMetricLabel(
+  id: string,
+  t: (key: string, options?: Record<string, string>) => string,
+): string {
+  if (id === "cpu") return t("timings.cpu");
+  if (id === "otherCpu") return t("metrics.otherCpu");
+  if (id.startsWith("gpuPass:")) {
+    const [kind, ...stage] = id.slice(8).split("/");
+    const label = t(`gpuStages.${kind}`, { defaultValue: t("gpuStages.other") });
+    return stage.length ? `${label} · ${stage.join("/")}` : label;
+  }
+  return performanceMetrics.has(id) ? t(`metrics.${id}`) : t("additionalMetric", { id });
+}

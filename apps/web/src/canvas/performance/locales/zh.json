@@ -81,7 +81,8 @@
     "spatialLayers": "3D 图层",
     "spatialMeshes": "3D 网格",
     "spatialVertices": "3D 顶点",
-    "spatialTriangles": "3D 三角形"
+    "spatialTriangles": "3D 三角形",
+    "otherCpu": "其他主机工作"
   },
   "warmthNote": "反映当前缓存状态。CPU主机耗时可能包含异步等待，并非CPU利用率测量。",
   "sharedNote": "纹理内存和缓存计数器覆盖渲染器的共享缓存。绘制命令和渲染通道仅覆盖此样本。",
@@ -101,5 +102,8 @@
     "effects": "GPU 效果",
     "display": "GPU 显示",
     "other": "GPU 其他"
-  }
+  },
+  "contributions": "耗时分布",
+  "overBudget": "超出预算 {{value}}",
+  "copyReport": "复制报告"
 }

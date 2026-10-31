@@ -81,7 +81,8 @@
     "spatialLayers": "3D layers",
     "spatialMeshes": "3D meshes",
     "spatialVertices": "3D vertices",
-    "spatialTriangles": "3D triangles"
+    "spatialTriangles": "3D triangles",
+    "otherCpu": "Other host work"
   },
   "warmthNote": "Reflects the current cache state. CPU host timing can include async waiting; it does not measure CPU utilization.",
   "sharedNote": "Texture memory and cache counters cover the shared renderer cache. Draw commands and render passes cover this sample.",
@@ -101,5 +102,8 @@
     "effects": "GPU effect",
     "display": "GPU display",
     "other": "GPU other"
-  }
+  },
+  "contributions": "Contributions",
+  "overBudget": "Over budget by {{value}}",
+  "copyReport": "Copy report"
 }

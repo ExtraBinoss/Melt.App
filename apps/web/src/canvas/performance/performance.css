@@ -48,30 +48,6 @@
   letter-spacing: -0.5px;
   font-variant-numeric: tabular-nums;
 }
-.composition-performance-targets {
-  grid-column: 1 / -1;
-  display: flex;
-  border: 1px solid var(--border);
-  border-radius: 7px;
-  padding: 2px;
-  gap: 2px;
-}
-.composition-performance-targets button {
-  flex: 1;
-  padding: 4px 6px;
-  border-radius: 4px;
-  color: var(--muted-foreground);
-  cursor: pointer;
-  font-size: 11px;
-}
-.composition-performance-targets button[aria-pressed="true"] {
-  background: var(--accent);
-  color: var(--accent-foreground);
-}
-.composition-performance-targets button:focus-visible {
-  outline: 2px solid var(--ring);
-  outline-offset: 2px;
-}
 .composition-performance-scroll {
   min-height: 0;
 }
@@ -188,10 +164,58 @@
   }
 }
 
-.composition-performance-custom-target[data-slot="input"] {
-  width: 66px;
-  height: 26px;
-  padding: 0 5px;
-  font-size: 10px;
-  text-align: center;
+.composition-performance-popover,
+.composition-performance-scroll,
+.composition-performance-viewport {
+  min-width: 0;
+  max-width: 100%;
+}
+.composition-performance-viewport {
+  overflow-x: hidden;
+  scrollbar-gutter: stable;
+  padding-inline-end: 4px;
+}
+.composition-performance-row dt {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.composition-performance-row dd {
+  flex-shrink: 0;
+}
+.composition-performance-heading,
+.composition-performance-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.artboard-performance-button {
+  width: 26px;
+  padding: 3px;
+}
+.artboard-performance-button svg {
+  width: 18px;
+  height: 18px;
+}
+.composition-performance-target-select {
+  grid-column: 1 / -1;
+  width: 100%;
+}
+.composition-performance-target-options {
+  min-width: 0;
+  width: var(--radix-select-trigger-width);
+}
+.performance-budget-breakdown {
+  margin-top: 10px;
+}
+.performance-budget-breakdown .storage-chart {
+  gap: 6px;
+}
+.performance-budget-breakdown .storage-row {
+  min-height: 22px;
+  font-size: 11px;
+}
+.performance-budget-overflow {
+  margin: 6px 0 0;
+  color: var(--destructive);
+  font-size: 11px;
 }

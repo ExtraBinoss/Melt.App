@@ -6,6 +6,7 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Redesign the on-demand Performance popover with an icon-only translated trigger, standard FPS select, shared linked budget contribution chart and copyable JSON report. Hide zero/unavailable metrics and empty domains, keep accordion scrolling vertical, and attribute CPU/GPU budgets independently using a single p95-ranked pose.
 - Preserve the canonical layer hierarchy and shared selection, canvas hover, rename and drag interactions in Animations. Nest editable animation blocks under their layers, retain collapse state across Keyframes switching, and reuse editable occurrence/audio rows.
 - Add development-only video playback diagnostics correlating decoded source timestamps with displayed Motion poses, readable speed ratios, real loop duration and decoder cursor restart reasons. Keep diagnostics bounded and disabled in production.
 - Allocate collision-free names for all new user projects, templates, imports and duplicates through one atomic persistence boundary: `Name`, `Name 1`, `Name 2`, using indexed key reads and the shared core naming rule. Publish the allocated name back into the editor without renaming ordinary saves.

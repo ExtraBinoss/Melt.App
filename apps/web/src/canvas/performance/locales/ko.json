@@ -81,7 +81,8 @@
     "spatialLayers": "3D 레이어",
     "spatialMeshes": "3D 메시",
     "spatialVertices": "3D 정점",
-    "spatialTriangles": "3D 삼각형"
+    "spatialTriangles": "3D 삼각형",
+    "otherCpu": "기타 호스트 작업"
   },
   "warmthNote": "현재 캐시 상태를 반영합니다. CPU 호스트 시간에는 비동기 대기가 포함될 수 있으며 CPU 사용률을 측정하지 않습니다.",
   "sharedNote": "텍스처 메모리와 캐시 카운터는 렌더러의 공유 캐시를 나타냅니다. 그리기 명령과 렌더링 패스는 이 샘플을 나타냅니다.",
@@ -101,5 +102,8 @@
     "effects": "GPU 효과",
     "display": "GPU 표시",
     "other": "GPU 기타"
-  }
+  },
+  "contributions": "기여도",
+  "overBudget": "예산 {{value}} 초과",
+  "copyReport": "보고서 복사"
 }

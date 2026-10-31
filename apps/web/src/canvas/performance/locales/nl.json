@@ -81,7 +81,8 @@
     "spatialLayers": "3D-lagen",
     "spatialMeshes": "3D-mazen",
     "spatialVertices": "3D-hoekpunten",
-    "spatialTriangles": "3D-driehoeken"
+    "spatialTriangles": "3D-driehoeken",
+    "otherCpu": "Overig hostwerk"
   },
   "warmthNote": "Toont de huidige cachestatus. De CPU-hosttijd kan asynchrone wachttijd bevatten en meet geen CPU-gebruik.",
   "sharedNote": "Textuurgeheugen en cachetellers gelden voor de gedeelde renderercache. Tekenopdrachten en renderpassen gelden voor deze meting.",
@@ -101,5 +102,8 @@
     "effects": "GPU effect",
     "display": "GPU weergave",
     "other": "GPU overig"
-  }
+  },
+  "contributions": "Bijdragen",
+  "overBudget": "Budget met {{value}} overschreden",
+  "copyReport": "Rapport kopiëren"
 }

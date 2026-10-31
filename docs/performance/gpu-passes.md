@@ -62,3 +62,26 @@ WebGPU witness passed in Chrome 156.0.8078.79 with one CPU core and a 1400 MiB
 memory cap, and recorded zero pixel/frame readbacks. No adapter identity was
 recorded for that functional witness. A full healthy-machine cohort remains
 necessary before claiming a Bloom frame-rate improvement.
+
+## Budget presentation and copying
+
+The Performance icon starts a fresh measurement when its popover opens. The
+normal FPS select changes only the comparison budget, not the sampled document or
+another profiling job. The shared CopyButton copies a JSON snapshot with the
+selected FPS and budget. Cached results stay hidden while a fresh request is
+pending, and closing still cancels pending work.
+
+The popover omits zero/unavailable metrics and empty domains. It uses the same
+linked contribution chart/legend as Project storage, now a unit-independent shared
+component. CPU and GPU keep independent budgets. Their breakdowns use a single
+p95-ranked pose for that clock, so each breakdown adds to its displayed total;
+independent per-stage p95 rows are never added together. CPU host elapsed includes
+awaited work and scheduling inside its measured boundary. Unknown/overlapping
+stages fall back to one host-elapsed contribution. A budget marker, over-budget
+amount and highlighted individually excessive contributions expose the dominant
+cost without attributing GPU time to CPU utilization.
+
+The focused native UI check uses a small real-rendered rectangle Motion scene to
+verify selection, clipboard output, fresh reopening and horizontal bounds. It is
+separate from the heavier Morph/Bloom diagnostic workloads and does not claim
+those workloads meet their frame budget.
