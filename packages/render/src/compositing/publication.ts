@@ -9,7 +9,22 @@ export async function completeGpuFrame(
   target: RenderTarget,
   options: RenderOptions,
 ): Promise<FrameTexture> {
-  if (options.mediaMode === "playback") await acknowledgeGpuWork(renderer);
+  if (options.mediaMode === "playback") {
+    const start = options.profileVideo ? performance.now() : 0;
+    await acknowledgeGpuWork(renderer);
+    if (options.profileVideo && typeof performance.measure === "function") {
+      const name = "Melt frame: gpu-wait";
+      performance.measure(name, {
+        start,
+        end: performance.now(),
+        detail: {
+          compositionId: options.motionFrame?.compositionId,
+          time: options.motionFrame?.time,
+        },
+      });
+      performance.clearMeasures(name);
+    }
+  }
   options.signal?.throwIfAborted();
   if (options.canRender && !options.canRender())
     throw new DOMException("Rendering deferred.", "AbortError");

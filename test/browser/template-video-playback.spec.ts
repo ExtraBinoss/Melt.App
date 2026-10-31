@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 import { mkdir, writeFile } from "node:fs/promises";
 import { installReadbackProbe } from "./support/readback-probe";
 
-test("template hover keeps continuous animation and ordered video PTS through a native loop", async ({
+test("development hover lineage keeps continuous animation and ordered video PTS through a native loop", async ({
   page,
 }) => {
   await installReadbackProbe(page);
@@ -15,6 +15,10 @@ test("template hover keeps continuous animation and ordered video PTS through a 
     });
   });
   await page.goto("/dashboard");
+  test.skip(
+    (await page.locator('script[src*="/@vite/client"]').count()) === 0,
+    "Frame lineage is intentionally disabled in production.",
+  );
   const card = page.getByRole("button", { name: "Preview Bloom Windows", exact: true });
   await card.waitFor();
   await page.evaluate(() => {

@@ -47,10 +47,7 @@ function fixture(backend = {}) {
   return { renderer, resources, camera, scene, invalidate, error };
 }
 async function ticks() {
-  await Promise.resolve();
-  await Promise.resolve();
-  await Promise.resolve();
-  await Promise.resolve();
+  for (let tick = 0; tick < 4; tick++) await Promise.resolve();
 }
 async function frame() {
   await vi.runOnlyPendingTimersAsync();
@@ -299,6 +296,7 @@ describe("direct GPU preview ownership and scheduling", () => {
         mediaResolver: undefined,
         motionFrame: undefined,
         mediaMode: "preview",
+        profileVideo: true,
         vectorAntialias: true,
         signal: expect.any(AbortSignal),
         videoProxy: proxyActivity,
@@ -319,6 +317,7 @@ describe("direct GPU preview ownership and scheduling", () => {
         mediaResolver: undefined,
         motionFrame: undefined,
         mediaMode: "preview",
+        profileVideo: true,
         vectorAntialias: true,
         signal: expect.any(AbortSignal),
         videoProxy: proxyActivity,
@@ -354,6 +353,7 @@ describe("direct GPU preview ownership and scheduling", () => {
         mediaResolver: undefined,
         motionFrame: undefined,
         mediaMode: "preview",
+        profileVideo: true,
         vectorAntialias: true,
         signal: expect.any(AbortSignal),
         videoProxy: proxyActivity,
@@ -373,6 +373,7 @@ describe("direct GPU preview ownership and scheduling", () => {
       -150, 150, 100, -100,
     ]);
     expect(d.renderer.compileAsync).toHaveBeenCalledOnce();
+    await vi.advanceTimersByTimeAsync(250);
     expect(JSON.parse(d.renderer.domElement.dataset.gpuStats!)).toMatchObject({
       readbacks: 0,
       submitted: 2,

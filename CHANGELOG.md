@@ -6,6 +6,7 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Add development-only canvas/library pipeline summaries for preparation phases, GPU queue waits, source formats, upload reuse and decoded memory. Bound diagnostic DOM serialization to four updates per second, retain the latest/final accounting, and dispose observers and pending publications explicitly.
 - Keep eight independent native 1080p playback streams within the existing decoded-memory budget by shrinking retained history only above four streams. Count synchronized source-time aliases once, retire redundant upload rings, and add a reproducible CC0 four-to-eight-video effects/motion workload with native cleanup and readback checks.
 - Share continuous playback phase and half-open loop sampling between the editor and library previews instead of imposing a separate 30 fps preview grid. Fit bounded preview output to the visible host, reuse native video frames between animation poses, and emit development-only preview lineage for decoded PTS and GPU submissions.
 

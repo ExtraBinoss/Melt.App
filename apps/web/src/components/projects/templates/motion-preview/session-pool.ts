@@ -1,9 +1,9 @@
-import type { createRenderSession, RenderOptions } from "@musart/render";
+import type { createRenderSession, RenderOptions, GpuStats } from "@musart/render";
 
 export type PreviewSession = Pick<
   ReturnType<typeof createRenderSession>,
   "withCanvasFrame" | "dispose"
->;
+> & { stats?: () => GpuStats | null };
 type Options = RenderOptions & { maxBytes: number };
 interface Entry {
   session: PreviewSession;
@@ -53,6 +53,7 @@ export class PreviewSessionPool {
       entry.leased = true;
       let released = false;
       return {
+        stats: () => entry.session.stats?.() ?? null,
         withCanvasFrame: async (...args) => {
           if (released) throw Error("The preview lease is closed.");
           try {

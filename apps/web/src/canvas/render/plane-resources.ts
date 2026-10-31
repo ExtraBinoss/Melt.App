@@ -23,7 +23,10 @@ import {
   type WebGPURenderer,
 } from "three/webgpu";
 import { texture, uv } from "three/tsl";
+import { CanvasGpuDiagnostics, rendererMemoryDiagnostics } from "./gpu-diagnostics";
 import { CanvasPlaybackBuffering } from "./playback-buffering";
+import { createPlaybackPipelineDiagnostics } from "../../services/performance/playback-pipeline";
+import type { PresentationInput, PreviewRequest } from "./frame-request";
 import { CanvasFrameScheduler } from "./frame-scheduler";
 import { traceCanvasFrame } from "./frame-trace";
 import { SceneProfileSource } from "./scene-profile-source";
@@ -33,39 +36,32 @@ import { syncArtboardBackdrops } from "../artboards/backdrop-presentation";
 import { formatUiError } from "../../state/i18n/errors/format";
 import { errorDiagnostics } from "../../components/notifications/diagnostics";
 import type {
-  CanonicalOrigin,
   PresentationPublisher,
   PresentationTicket,
 } from "../../state/session/canonical-presentation";
-import type {
-  FontPresentationPublisher,
-  FontRenderTicket,
-} from "../../state/session/font-presentation";
+import type { FontPresentationPublisher } from "../../state/session/font-presentation";
 
-interface PresentationInput {
-  origin: CanonicalOrigin;
-  canonical: boolean;
-}
-
-interface PreviewRequest {
-  page: Composition;
-  assets: Record<string, Asset>;
-  revision: number;
-  scale: number;
-  ticket?: PresentationTicket;
-  motionFrame?: MotionFramePlan;
-  origin?: CanonicalOrigin;
-  mediaResolver?: MediaSourceResolver;
-  playback: boolean;
-  fontTicket?: FontRenderTicket;
-}
 const canvasOwners = new WeakMap<HTMLCanvasElement, PlaneResources>();
 /** Owns one display plane and a latest-only queue. GPU allocation begins at activation. */
 export class PlaneResources {
   readonly profile: SceneProfileSource;
   private readonly buffering: CanvasPlaybackBuffering;
   private videoProxyActivity: CanvasVideoProxyActivity | null = null;
-  private readonly profileVideo = new URLSearchParams(location.search).get("profileVideo") === "1";
+  private readonly profileVideo =
+    import.meta.env.DEV || new URLSearchParams(location.search).get("profileVideo") === "1";
+  private readonly useVideoProxy =
+    !import.meta.env.DEV || new URLSearchParams(location.search).get("videoProxy") !== "0";
+  private readonly diagnostics = createPlaybackPipelineDiagnostics(
+    "Canvas",
+    () => this.compositor?.stats() ?? null,
+  );
+  private readonly gpuDiagnostics = new CanvasGpuDiagnostics(
+    () => this.diagnosticSnapshot(),
+    (json) => {
+      this.renderer.domElement.dataset.gpuStats = json;
+    },
+    () => canvasOwners.get(this.renderer.domElement) === this,
+  );
   readonly placeholder = new DataTexture(new Uint8Array(4), 1, 1, RGBAFormat);
   readonly sample: TextureNode<"vec4">;
   readonly material = new MeshBasicNodeMaterial({
@@ -354,6 +350,8 @@ export class PlaneResources {
     });
   }
   private async render(request: PreviewRequest): Promise<void> {
+    const started = this.diagnostics ? performance.now() : 0;
+    if (!request.playback) this.diagnostics?.pause();
     this.profile.begin(request.revision);
     const abort = new AbortController();
     this.activeAbort = abort;
@@ -366,7 +364,9 @@ export class PlaneResources {
         motionFrame: request.motionFrame,
         mediaMode: request.playback ? "playback" : "preview",
         ...(import.meta.env.DEV && request.motionFrame ? { traceFrames: true } : {}),
-        ...(this.videoProxyActivity ? { videoProxy: this.videoProxyActivity } : {}),
+        ...(this.videoProxyActivity && this.useVideoProxy
+          ? { videoProxy: this.videoProxyActivity }
+          : {}),
         ...(this.profileVideo || this.profile.active ? { profileVideo: true } : {}),
         ...(this.profile.active ? { mediaSequential: true } : {}),
         signal: abort.signal,
@@ -381,6 +381,11 @@ export class PlaneResources {
       }
       if (!this.canPresent(request)) return;
       this.preparedFrame(request, result);
+      if (request.playback)
+        this.diagnostics?.record(request.motionFrame, started, {
+          projectId: request.origin?.projectId,
+          name: request.page.name,
+        });
     } catch (error) {
       if (this.canPresent(request) && !abort.signal.aborted) {
         if (request.fontTicket) this.fontPresenter?.fail(request.fontTicket, error);
@@ -481,25 +486,19 @@ export class PlaneResources {
     this.schedule();
   }
   private publish() {
-    if (canvasOwners.get(this.renderer.domElement) !== this) return;
-    const memory = this.renderer.info?.memory;
-    this.renderer.domElement.dataset.gpuStats = JSON.stringify({
+    this.gpuDiagnostics.request();
+  }
+  private diagnosticSnapshot() {
+    return {
       ...this.compositor?.stats(),
-      ...(memory
-        ? {
-            uniformBuffers: memory.uniformBuffers,
-            uniformBytes: memory.uniformBuffersSize,
-            nodePrograms: memory.programs,
-            rendererTargets: memory.renderTargets,
-          }
-        : {}),
+      ...rendererMemoryDiagnostics(this.renderer),
       submitted: this.revision,
       completed: this.completed,
       coalesced: this.coalesced,
       displayFrames: this.frames,
       pending: Number(Boolean(this.latest)),
       active: Number(Boolean(this.active)),
-    });
+    };
   }
   private report(error: unknown) {
     const message = error instanceof Error ? error.message : String(error);
@@ -540,6 +539,7 @@ export class PlaneResources {
     this.disposed = true;
     this.buffering.presented();
     this.profile.dispose();
+    this.diagnostics?.dispose();
     this.videoProxyActivity?.dispose();
     this.videoProxyActivity = null;
     this.activeAbort?.abort();
@@ -566,6 +566,7 @@ export class PlaneResources {
         this.geometry.dispose();
         this.placeholder.dispose();
         this.mesh.visible = false;
+        this.gpuDiagnostics.dispose();
         if (canvasOwners.get(this.renderer.domElement) === this) {
           canvasOwners.delete(this.renderer.domElement);
           this.renderer.domElement.style.visibility = "hidden";

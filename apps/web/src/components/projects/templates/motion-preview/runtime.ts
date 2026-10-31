@@ -4,6 +4,7 @@ import {
 } from "../../../../state/session/ui-presentation";
 import { waitForPresentation } from "../../../../state/session/wait-for-presentation";
 import { beginProjectTiming } from "../../../../services/performance/project-timing";
+import { createPlaybackPipelineDiagnostics } from "../../../../services/performance/playback-pipeline";
 import {
   applyMotionFrame,
   compileMotion,
@@ -17,22 +18,17 @@ import {
   PLAYBACK_FRAME_CREDIT_MS,
   samplePlaybackPhase,
 } from "@musart/render/playback";
-import type {
-  createRenderSession,
-  FontResolver,
-  MediaSourceResolver,
-  RenderOptions,
-} from "@musart/render";
+import type { FontResolver, MediaSourceResolver, RenderOptions } from "@musart/render";
 import {
   prepareMotionTemplate,
   type PreparedMotionTemplate,
 } from "../../../../services/projects/templates/motion/loader";
 import type { MotionTemplateId } from "../../../../services/projects/templates/motion/model";
-import { PreviewSessionPool } from "./session-pool";
+import { PreviewSessionPool, type PreviewSession } from "./session-pool";
 import { motionTemplateSources as sources } from "../../../../services/projects/templates/motion/source-cache";
 
 export type PreviewStatus = "idle" | "loading" | "playing" | "paused" | "failed";
-type Session = Pick<ReturnType<typeof createRenderSession>, "withCanvasFrame" | "dispose">;
+type Session = PreviewSession;
 export interface PreviewDependencies {
   presentation?: UiPresentationPort;
   prepare: (id: MotionTemplateId, signal: AbortSignal) => Promise<PreparedMotionTemplate>;
@@ -105,6 +101,10 @@ export function startMotionPreview(
   const abort = new AbortController();
   let stopped = false;
   let session: Session | null = null;
+  const diagnostics = createPlaybackPipelineDiagnostics(
+    options.label ?? "Library",
+    () => session?.stats?.() ?? null,
+  );
   let frame: number | null = null;
   let requested: MotionTime | null = null;
   let draining: Promise<void> | null = null;
@@ -125,6 +125,7 @@ export function startMotionPreview(
     timing?.finish("cancelled");
     stopped = true;
     clock.stop();
+    diagnostics?.dispose();
     stopPresentation?.();
     abort.abort();
     if (frame !== null) dependencies.cancelFrame(frame);
@@ -206,6 +207,7 @@ export function startMotionPreview(
           : Infinity;
       const scale = Math.min(1, 480 / Math.max(page.width, page.height), displayScale);
       async function render(time: MotionTime) {
+        const started = diagnostics ? performance.now() : 0;
         const generation = renderGeneration;
         if (presentation?.busy()) await waitForPresentation(presentation, abort.signal);
         if (!alive() || paused || generation !== renderGeneration) return;
@@ -221,7 +223,12 @@ export function startMotionPreview(
               options.host.dataset.previewTime = String(motionTimeToSeconds(plan.time));
               if (import.meta.env.DEV && typeof performance.mark === "function") {
                 performance.mark("Melt frame: preview-submit", {
-                  detail: { compositionId: program.compositionId, time: plan.time },
+                  detail: {
+                    compositionId: program.compositionId,
+                    projectId: prepared.project.id,
+                    playing: true,
+                    time: plan.time,
+                  },
                 });
                 performance.clearMarks("Melt frame: preview-submit");
               }
@@ -232,10 +239,16 @@ export function startMotionPreview(
               mediaResolver,
               mediaMode: "playback",
               traceFrames: import.meta.env.DEV,
+              profileVideo: import.meta.env.DEV,
               signal: abort.signal,
               canRender: () => alive() && !paused && generation === renderGeneration,
             },
           );
+          if (alive() && !paused && generation === renderGeneration)
+            diagnostics?.record(plan, started, {
+              projectId: prepared.project.id,
+              name: prepared.project.name,
+            });
         } catch (error) {
           // A queued/in-flight frame rejected by pause is expected admission cancellation.
           // Never hide actual preparation, decoding or GPU failures.
@@ -291,6 +304,7 @@ export function startMotionPreview(
         if (!alive() || paused === next) return;
         paused = next;
         if (next) {
+          diagnostics?.pause();
           clock.stop();
           presentationRelease = null;
           renderGeneration++;

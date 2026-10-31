@@ -48,7 +48,7 @@ export class VideoPlaybackDiagnostics {
       if (this.sources.size > 64) this.sources.delete(this.sources.keys().next().value!);
       return;
     }
-    if (name !== "Melt frame: display") return;
+    if (name !== "Melt frame: display" && name !== "Melt frame: preview-submit") return;
     const owner = `${detail.projectId}:${detail.compositionId}`;
     if (this.owner !== owner || !detail.playing) {
       this.cycles.clear();
