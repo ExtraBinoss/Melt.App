@@ -6,5 +6,10 @@
   "dropImages": "画像をドロップ",
   "composition": "コンポジション",
   "fontFamily": "フォント",
-  "close": "閉じる"
+  "close": "閉じる",
+  "rotate": "回転",
+  "resize": "サイズ変更",
+  "zoomOut": "縮小",
+  "zoomIn": "拡大",
+  "resetView": "100%で中央に表示"
 }

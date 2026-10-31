@@ -57,7 +57,7 @@ test("canvas-side additions persist in all directions, avoid occupied space and 
     const board = (await active.boundingBox())!,
       mode = (await footer.boundingBox())!;
     expect(mode.x + mode.width).toBeLessThanOrEqual(board.x + board.width);
-    expect(mode.y + mode.height).toBeLessThanOrEqual(board.y + board.height);
+    expect(mode.y).toBeGreaterThan(board.y + board.height);
     const counters = () =>
       page.evaluate(() =>
         [".musart-app", ".inspector", ".canvas-area", ".editor-canvas", ".editor-gpu-scene"].map(
@@ -141,9 +141,7 @@ test("canvas-side additions persist in all directions, avoid occupied space and 
       expect(dimensions!.x + dimensions!.width).toBeLessThanOrEqual(
         activeBounds.x + activeBounds.width,
       );
-      expect(dimensions!.y + dimensions!.height).toBeLessThanOrEqual(
-        activeBounds.y + activeBounds.height,
-      );
+      expect(dimensions!.y).toBeGreaterThan(activeBounds.y + activeBounds.height);
       const collisions = await page.evaluate(() => {
         const f = document
           .querySelector('.artboard-mode-footer[data-active="true"]')!
@@ -186,7 +184,7 @@ test("canvas-side additions persist in all directions, avoid occupied space and 
   });
 });
 
-test("Arabic canvas controls and vector dialog retain RTL text and usable native focus", async ({
+test("Arabic canvas controls and inline SVG settings retain RTL text and usable native focus", async ({
   page,
 }) => {
   await page.addInitScript(() => {
@@ -242,18 +240,21 @@ test("Arabic canvas controls and vector dialog retain RTL text and usable native
   await add.hover();
   await expect(page.getByRole("tooltip", { name: "إضافة لوح رسم", exact: true })).toBeVisible();
   await expect(page.getByRole("radio", { name: "ثابت", exact: true })).toBeVisible();
-  await page.getByRole("button", { name: "تحرير النقاط", exact: true }).click();
-  const dialog = page.getByRole("dialog", { name: "تحرير نقاط SVG", exact: true });
-  await expect(dialog).toBeVisible();
-  await expect(dialog.locator(".vector-anchor")).toHaveCount(4);
-  await expect(dialog.getByText("تدوير الزاوية", { exact: true })).toBeVisible();
-  const box = (await dialog.boundingBox())!,
-    size = page.viewportSize()!;
-  expect(box.x).toBeGreaterThanOrEqual(0);
-  expect(box.x + box.width).toBeLessThanOrEqual(size.width);
+  await page
+    .locator(".vector-canvas-entry")
+    .getByRole("button", { name: "تحرير النقاط", exact: true })
+    .click();
+  const editor = page.locator(".vector-editor-inline");
+  await expect(editor).toBeVisible();
+  await expect(editor.locator(".vector-anchor")).toHaveCount(4);
+  await editor.getByRole("button", { name: "تحرير نقاط SVG", exact: true }).click();
+  await expect(
+    page.locator(".vector-canvas-settings").getByText("تدوير الزاوية", { exact: true }),
+  ).toBeVisible();
   await page.screenshot({ path: "artifacts/artboard-controls/arabic-vector.png" });
-  await dialog.getByRole("button", { name: "تم", exact: true }).click();
-  await expect(page.getByRole("button", { name: "تحرير النقاط", exact: true })).toBeFocused();
+  await page.keyboard.press("Escape");
+  await editor.getByRole("button", { name: "تم", exact: true }).click();
+  await expect(page.getByTestId("editor-canvas")).toBeFocused();
   await page.evaluate(() => window.musart!.select(["rtl-text"]));
   await page.getByRole("combobox", { name: "الخط", exact: true }).click();
   const list = page.getByRole("listbox", { name: "الخطوط", exact: true });

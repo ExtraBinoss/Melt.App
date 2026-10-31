@@ -1,3 +1,5 @@
+import { useAtomValue } from "jotai";
+import { vectorEditingAtom } from "../../state/session/vector-editing";
 import { memo, useLayoutEffect, useMemo, useRef, type PointerEvent, type RefObject } from "react";
 import { createLayerGeometryIndex, type EnginePort } from "@musart/core";
 import { useEngineValue } from "../../state/session/editor";
@@ -23,6 +25,7 @@ export const CanvasSelection = memo(function CanvasSelection({
   showHandles: boolean;
   onHandle: (event: PointerEvent<HTMLButtonElement>) => void;
 }) {
+  const editing = useAtomValue(vectorEditingAtom(engine));
   const page = useEngineValue(
     engine,
     (snapshot) =>
@@ -47,16 +50,22 @@ export const CanvasSelection = memo(function CanvasSelection({
         viewSource={viewSource}
         viewport={viewport}
       />
-      {showHandles && (
-        <SelectionOverlays
-          page={page}
-          selected={selected}
-          zoom={view.zoom}
-          controller={controller}
-          viewSource={viewSource}
-          onHandle={onHandle}
-        />
-      )}
+      {showHandles &&
+        !(
+          selected.length === 1 &&
+          editing?.layerId === selected[0]!.id &&
+          editing.pageId === page.id &&
+          editing.projectId === engine.getSnapshot().project.id
+        ) && (
+          <SelectionOverlays
+            page={page}
+            selected={selected}
+            zoom={view.zoom}
+            controller={controller}
+            viewSource={viewSource}
+            onHandle={onHandle}
+          />
+        )}
       <TimelineHoverOutline engine={engine} controller={controller} viewSource={viewSource} />
     </>
   );

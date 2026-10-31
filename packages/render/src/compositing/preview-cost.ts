@@ -32,6 +32,7 @@ export function estimatePreviewCost(
   page: Composition,
   scale: number,
   assets: Record<string, Asset> = {},
+  vectorAntialias = false,
 ): PreviewCost {
   if (!Number.isFinite(scale) || scale <= 0) throw new RangeError("Invalid preview density.");
   const geometry = createLayerGeometryIndex(page),
@@ -44,9 +45,9 @@ export function estimatePreviewCost(
     primitiveCount = 0,
     scratch = 0,
     backdrop = 0;
-  function target(width: number, height: number, fixed: boolean, mip = false) {
+  function target(width: number, height: number, fixed: boolean, mip = false, samples = 0) {
     maxDimension = Math.max(maxDimension, width, height);
-    let pixels = width * height;
+    let pixels = width * height * (samples > 1 ? samples + 1 : 1);
     while (mip && (width > 1 || height > 1)) {
       width = Math.max(1, Math.floor(width / 2));
       height = Math.max(1, Math.floor(height / 2));
@@ -86,13 +87,14 @@ export function estimatePreviewCost(
       fixed = true;
     }
     const window = l.kind === "group" && !reference ? groupViewport(l, density, parent) : null;
-    const key = `${l.id}:${density}:${window?.key ?? "full"}`;
+    const key = `${l.id}:${density}:${window?.key ?? "full"}:${vectorAntialias && !fixed}`;
     if (seen.has(key)) return;
     seen.add(key);
     let w = rasterExtent(l.width, density),
       h = rasterExtent(l.height, density);
     if (l.kind === "group") children(l.id, l.width, l.height, density, fixed, window);
-    else if (l.kind !== "image" && l.kind !== "video") target(w, h, fixed);
+    else if (l.kind !== "image" && l.kind !== "video")
+      target(w, h, fixed, false, vectorAntialias && !fixed && l.kind === "vector" ? 4 : 0);
     else {
       const asset = l.assetId ? assets[l.assetId] : undefined;
       const sourceKey = l.kind === "video" ? `video:${l.id}` : `image:${asset?.id}`;

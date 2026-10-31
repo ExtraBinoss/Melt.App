@@ -6,6 +6,8 @@ export interface RenderOptions {
   scale?: number;
   /** Display applies the document ICC proof. Source is reserved for native CMYK encoding. */
   colorOutput?: "display" | "source";
+  /** Interactive SVG source coverage only; fixed effect/mask references and exports keep authored pixels. */
+  vectorAntialias?: boolean;
   forceWebGL?: boolean;
   canRender?: () => boolean;
   fontResolver?: FontResolver;

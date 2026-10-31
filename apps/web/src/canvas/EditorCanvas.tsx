@@ -67,6 +67,7 @@ import { useWand } from "./interaction/use-wand";
 import { PixelSelectionOverlay, PixelSelectionToolbar } from "./selection/PixelSelectionOverlay";
 import { attachmentSelection } from "../state/selection/attachments";
 import { useTransformSnapping } from "./interaction/snapping/use-transform-snapping";
+import { CanvasVectorEditing } from "./vector/CanvasVectorEditing";
 import { EffectGizmo } from "./effects/EffectGizmo";
 import "./canvas.css";
 export type { Tool } from "./interaction/gestures";
@@ -551,6 +552,13 @@ export function EditorCanvas({
             controller={controller}
             viewSource={pageViewSource}
             viewport={viewport}
+          />
+          <CanvasVectorEditing
+            engine={engine}
+            controller={controller}
+            viewSource={pageViewSource}
+            viewport={viewport}
+            enabled={tool === "pointer" && !space}
           />
           <ArtboardControls
             controller={controller}

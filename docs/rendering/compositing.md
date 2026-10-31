@@ -172,6 +172,27 @@ the pixel witness.
 | CSS geometry         | CSS size, viewport coordinates and the authored orthographic camera remain unchanged.                                                                                                                                                                          |
 | Per-axis correctness | This works independently on both axes and is reapplied after Fiber resize; presentation never adds an avoidable one-pixel downsample before CSS reconstruction.                                                                                                |
 
+### Interactive SVG edge coverage
+
+The infinite canvas requests `vectorAntialias` for scalable SVG source targets.
+Three's public `RenderTarget.samples = 4` supplies hardware coverage on both
+WebGPU and its WebGL fallback. This does not multiply the whole canvas backing
+size, reparse paths on zoom or read pixels into JavaScript. Existing geometry,
+paint uniforms, render-on-demand scheduling and disposal remain shared.
+
+The estimate and hard GPU admission both include the resolved RGBA8 texture plus
+four coverage samples before allocation. The same 192 MiB preview-target cap,
+reserved headroom, device bounds and 384 MiB hard cache apply. Quality is part of
+root/layer retained keys; preview and exact frames cannot alias. Enabled effect
+or mask boundaries, including their descendants, keep their existing fixed
+reference sampling. Exports and project dialogs retain their existing policy.
+
+`test/browser/vector-preview-quality.spec.ts` decodes native PNGs from the actual
+editor canvas in a separate inspection page, compares alpha error against an
+8× reference on both Three backends, checks repeatable exact exports and probes
+zero production pixel readbacks. This is an image-quality check, not a physical
+input-latency benchmark.
+
 ## Color and output
 
 Document modes are sRGB, Display-P3, ICC-managed CMYK and the legacy generic CMYK proof. Imported sRGB photos and branded SVG paints are converted into a Display-P3 working document; the current display/export path converts the document back to sRGB. This path does not claim native wide-gamut canvas output.

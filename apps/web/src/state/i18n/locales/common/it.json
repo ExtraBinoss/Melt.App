@@ -6,5 +6,10 @@
   "dropImages": "Trascina qui le immagini",
   "composition": "Composizione",
   "fontFamily": "Carattere",
-  "close": "Chiudi"
+  "close": "Chiudi",
+  "rotate": "Ruota",
+  "resize": "Ridimensiona",
+  "zoomOut": "Riduci zoom",
+  "zoomIn": "Aumenta zoom",
+  "resetView": "100% e centra"
 }

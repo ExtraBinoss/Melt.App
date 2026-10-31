@@ -38,6 +38,7 @@ import {
 interface RenderFrame {
   readonly page: Composition;
   readonly scale: number;
+  readonly vectorAntialias: boolean;
   readonly keyFor: (layer: Layer) => string;
   readonly referenceKeyFor: (layer: Layer) => string;
   readonly geometry: ReturnType<typeof createLayerGeometryIndex>;
@@ -100,9 +101,10 @@ export class GpuCompositor {
     scale: number,
     motionFrame?: MotionFramePlan,
     colorOutput: RenderOptions["colorOutput"] = "display",
+    vectorAntialias = false,
   ): FrameTexture | null {
     if (this.disposed || !isPublishedComposition(page) || !isPublishedAssets(assets)) return null;
-    const key = `page:${page.id}:${scale}${colorOutput === "source" ? ":source" : ""}`,
+    const key = `page:${page.id}:${scale}${colorOutput === "source" ? ":source" : ""}${vectorAntialias ? ":vector-aa" : ""}`,
       entry = this.cache.get<LayerTargets>(key);
     const input = entry && this.retainedInputs.get(entry);
     if (
@@ -215,6 +217,7 @@ export class GpuCompositor {
       const frame: RenderFrame = {
         page,
         scale,
+        vectorAntialias: !!options.vectorAntialias,
         keyFor: createSourceKeys(page, assets, scale, {
           geometry,
           videoStamp: (id) => this.sources.videoStamp(id),
@@ -226,7 +229,7 @@ export class GpuCompositor {
         geometry,
       };
       const { keyFor } = frame;
-      const rootKey = `page:${page.id}:${scale}${options.colorOutput === "source" ? ":source" : ""}`;
+      const rootKey = `page:${page.id}:${scale}${options.colorOutput === "source" ? ":source" : ""}${frame.vectorAntialias ? ":vector-aa" : ""}`;
       const entry = this.entry(rootKey);
       const roots = geometry.children(null);
       const signature = JSON.stringify([
@@ -319,9 +322,10 @@ export class GpuCompositor {
     width: number,
     height: number,
     mipmapped = false,
+    samples = 0,
   ): RenderTarget {
-    this.cache.ensureCapacity(key, entry.projectedBytes(role, width, height, mipmapped));
-    const target = entry.target(role, width, height, mipmapped);
+    this.cache.ensureCapacity(key, entry.projectedBytes(role, width, height, mipmapped, samples));
+    const target = entry.target(role, width, height, mipmapped, samples);
     this.cache.synchronize(key);
     return target;
   }
@@ -329,12 +333,12 @@ export class GpuCompositor {
     const reference = layer.effects.some((effect) => effect.enabled) || !!layer.mask?.enabled;
     // Effects and masks consume the same authored reference pixels in every
     // caller. Output density changes sampling of this plane, never its content.
-    if (reference && frame.scale !== 1)
-      frame = { ...frame, scale: 1, keyFor: frame.referenceKeyFor };
-    const { page, scale, keyFor, geometry } = frame;
+    if (reference && (frame.scale !== 1 || frame.vectorAntialias))
+      frame = { ...frame, scale: 1, vectorAntialias: false, keyFor: frame.referenceKeyFor };
+    const { page, scale, keyFor, geometry, vectorAntialias } = frame;
     const viewport =
       layer.kind === "group" && !reference ? groupViewport(layer, scale, parentViewport) : null;
-    const key = `layer:${page.id}:${layer.id}:${scale}${viewport ? `:window:${viewport.key}` : ""}`;
+    const key = `layer:${page.id}:${layer.id}:${scale}${viewport ? `:window:${viewport.key}` : ""}${vectorAntialias ? ":vector-aa" : ""}`;
     const entry = this.entry(key);
     const signature = keyFor(layer);
     if (entry.signature === signature && entry.output) {
@@ -374,7 +378,15 @@ export class GpuCompositor {
         premultiplied: true,
       };
     } else if (layer.kind === "vector") {
-      const target = this.target(entry, key, "vector", width, height);
+      const target = this.target(
+        entry,
+        key,
+        "vector",
+        width,
+        height,
+        false,
+        vectorAntialias ? 4 : 0,
+      );
       this.passes!.clear(target);
       this.vectors!.render(layer, target, page.colorSpace === "display-p3");
       source = { texture: target.texture, width, height, premultiplied: true };

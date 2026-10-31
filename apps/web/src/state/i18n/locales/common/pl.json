@@ -6,5 +6,10 @@
   "dropImages": "Upuść obrazy",
   "composition": "Kompozycja",
   "fontFamily": "Krój pisma",
-  "close": "Zamknij"
+  "close": "Zamknij",
+  "rotate": "Obróć",
+  "resize": "Zmień rozmiar",
+  "zoomOut": "Oddal",
+  "zoomIn": "Przybliż",
+  "resetView": "100% i wyśrodkuj"
 }

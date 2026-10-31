@@ -1,6 +1,7 @@
 import { useEffect, useId, useRef } from "react";
 import type { SceneController } from "../session/scene-controller";
 import type { ViewSource } from "../viewport/motion";
+import { drawRotationGuide } from "./rotation-guide";
 import type { SnapFeedback } from "../interaction/snapping/source";
 
 const namespace = "http://www.w3.org/2000/svg";
@@ -60,7 +61,7 @@ export function Measurements({
       if (
         !origin ||
         !presentation ||
-        !state.cues.length ||
+        (!state.cues.length && !state.rotation) ||
         frame.playback ||
         origin.pageId !== frame.page.id ||
         origin.project.id !== presentation.origin.projectId ||
@@ -84,6 +85,7 @@ export function Measurements({
       );
       defs.append(marker);
       element.append(defs);
+      if (state.rotation) drawRotationGuide(element, state.rotation, currentZoom, node);
       for (const cue of state.cues) {
         element.append(
           node("line", {

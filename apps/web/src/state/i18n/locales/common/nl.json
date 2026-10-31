@@ -6,5 +6,10 @@
   "dropImages": "Sleep je afbeeldingen hierheen",
   "composition": "Compositie",
   "fontFamily": "Lettertype",
-  "close": "Sluiten"
+  "close": "Sluiten",
+  "rotate": "Draaien",
+  "resize": "Formaat wijzigen",
+  "zoomOut": "Uitzoomen",
+  "zoomIn": "Inzoomen",
+  "resetView": "100% en centreren"
 }

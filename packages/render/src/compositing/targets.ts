@@ -11,10 +11,10 @@ import type { GpuResource } from "../cache/GpuResourceCache";
 import type { FrameTexture } from "./types";
 import { assertTextureSize } from "../cache/texture-limits";
 
-function bytes(width: number, height: number, mipmapped = false): number {
+function bytes(width: number, height: number, mipmapped = false, samples = 0): number {
   if (!Number.isInteger(width) || !Number.isInteger(height) || width < 1 || height < 1)
     throw new RangeError("Invalid GPU target dimensions.");
-  let pixels = width * height;
+  let pixels = width * height * (samples > 1 ? samples + 1 : 1);
   while (mipmapped && (width > 1 || height > 1)) {
     width = Math.max(1, Math.floor(width / 2));
     height = Math.max(1, Math.floor(height / 2));
@@ -31,22 +31,39 @@ export class LayerTargets implements GpuResource {
   private source: Texture | null = null;
   sourceSignature = "";
   sourceBytes = 0;
-  projectedBytes(role: string, width: number, height: number, mipmapped = false): number {
+  projectedBytes(
+    role: string,
+    width: number,
+    height: number,
+    mipmapped = false,
+    samples = 0,
+  ): number {
     assertTextureSize(width, height, this.maxDimension);
     const target = this.buffers.get(role);
     return (
       this.bytes -
-      (target ? bytes(target.width, target.height, target.texture.generateMipmaps) : 0) +
-      bytes(width, height, mipmapped)
+      (target
+        ? bytes(target.width, target.height, target.texture.generateMipmaps, target.samples)
+        : 0) +
+      bytes(width, height, mipmapped, samples)
     );
   }
-  target(role: string, width: number, height: number, mipmapped = false): RenderTarget {
+  target(
+    role: string,
+    width: number,
+    height: number,
+    mipmapped = false,
+    samples = 0,
+  ): RenderTarget {
     assertTextureSize(width, height, this.maxDimension);
     let target = this.buffers.get(role);
     if (target && target.texture.generateMipmaps !== mipmapped)
       throw new Error("A GPU target role cannot change its filtering policy.");
+    if (target && target.samples !== samples)
+      throw new Error("A GPU target role cannot change its sampling policy.");
     if (!target) {
       target = new RenderTarget(width, height, {
+        samples,
         depthBuffer: false,
         stencilBuffer: false,
         type: UnsignedByteType,
@@ -72,7 +89,8 @@ export class LayerTargets implements GpuResource {
     return (
       this.sourceBytes +
       [...this.buffers.values()].reduce(
-        (sum, target) => sum + bytes(target.width, target.height, target.texture.generateMipmaps),
+        (sum, target) =>
+          sum + bytes(target.width, target.height, target.texture.generateMipmaps, target.samples),
         0,
       )
     );

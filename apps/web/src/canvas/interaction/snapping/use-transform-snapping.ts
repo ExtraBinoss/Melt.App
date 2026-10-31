@@ -6,6 +6,7 @@ import { isTransformAuthoringCurrent, type TransformAuthoring } from "../transfo
 import type { Handle, LayerPatch } from "../gestures";
 import { snappingPreferences } from "../../../state/snapping/preferences";
 import { SnapFeedback } from "./source";
+import { rotationGuide } from "./rotation";
 import { TransformSnapping } from "./transform";
 export interface TransformGesture extends TransformAuthoring {
   presentation?: Composition;
@@ -47,7 +48,13 @@ export function useTransformSnapping({
           : session.move(active.from, point, enabled, threshold);
       active.modifiers = { alt, shift };
       patchesRef.current = result.patches;
-      feedback.set(active.origin, result.cues);
+      const layer = active.layers[0],
+        rotation = result.patches[0]?.patch.rotation;
+      const guide =
+        active.handle === "rotate" && shift && layer && typeof rotation === "number"
+          ? rotationGuide(page, layer, rotation, view.read().zoom)
+          : undefined;
+      feedback.set(active.origin, result.cues, guide);
       controller.setGesture(result.patches);
     },
     [controller, feedback, view, patchesRef],

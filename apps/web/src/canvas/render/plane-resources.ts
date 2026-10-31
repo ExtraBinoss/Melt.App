@@ -261,7 +261,7 @@ export class PlaneResources {
     const retained =
       this.users > 0 &&
       this.compiled &&
-      this.compositor?.retainedFrame(page, assets, this.latest.scale, motionFrame);
+      this.compositor?.retainedFrame(page, assets, this.latest.scale, motionFrame, "display", true);
     if (retained) {
       this.activeAbort?.abort();
       const request = this.latest;
@@ -328,6 +328,7 @@ export class PlaneResources {
     try {
       const result = await this.compositor!.render(request.page, request.assets, {
         scale: request.scale,
+        vectorAntialias: true,
         mediaResolver: request.mediaResolver,
         motionFrame: request.motionFrame,
         mediaMode: request.playback ? "playback" : "preview",

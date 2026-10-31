@@ -1,6 +1,36 @@
 import { expect, it } from "vitest";
 import { createEffect, createLayer, createPage } from "@musart/core";
 import { estimatePreviewCost } from "../../src/compositing/preview-cost";
+it("budgets SVG coverage samples only for scalable preview sources, including transformed groups and mask references", () => {
+  const vector = createLayer("vector", { id: "svg", x: 0, y: 0, width: 40, height: 30 }),
+    page = createPage({ width: 64, height: 64, layers: [vector] });
+  expect(estimatePreviewCost(page, 2, {}, true).bytes - estimatePreviewCost(page, 2).bytes).toBe(
+    80 * 60 * 4 * 4,
+  );
+  const group = createLayer("group", { id: "group", x: 0, y: 0, width: 64, height: 64 }),
+    grouped = { ...page, layers: [group, { ...vector, parentId: group.id }] };
+  expect(
+    estimatePreviewCost(grouped, 2, {}, true).bytes - estimatePreviewCost(grouped, 2).bytes,
+  ).toBe(80 * 60 * 4 * 4);
+  for (const layers of [
+    [{ ...vector, effects: [createEffect("blur")] }],
+    [
+      { ...group, effects: [createEffect("blur")] },
+      { ...vector, parentId: group.id },
+    ],
+    [
+      { ...vector, maskSource: true },
+      createLayer("rectangle", {
+        width: 64,
+        height: 64,
+        mask: { enabled: true, inverted: false, layerId: vector.id },
+      }),
+    ],
+  ]) {
+    const fixed = { ...page, layers };
+    expect(estimatePreviewCost(fixed, 2, {}, true)).toEqual(estimatePreviewCost(fixed, 2));
+  }
+});
 it("counts real primitive batches instead of allocating each shape rectangle", () => {
   const page = createPage({
     width: 64,

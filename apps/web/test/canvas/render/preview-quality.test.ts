@@ -3,6 +3,18 @@ import { createEffect, createLayer, createPage } from "@musart/core";
 import { estimatePreviewCost } from "@musart/render";
 import { previewScale, PREVIEW_MEMORY_BYTES } from "../../../src/canvas/render/preview-quality";
 import { createTechnoArtboard } from "../../../src/services/projects/templates/techno";
+it("keeps SVG coverage samples inside the same preview memory budget", () => {
+  const page = createPage({
+      width: 1600,
+      height: 1000,
+      layers: Array.from({ length: 12 }, () => createLayer("vector", { width: 800, height: 600 })),
+    }),
+    scale = previewScale(page, 4),
+    cost = estimatePreviewCost(page, scale, {}, true);
+  expect(scale).toBeLessThan(4);
+  expect(cost.targetBytes + 16 * 1024 * 1024).toBeLessThanOrEqual(PREVIEW_MEMORY_BYTES);
+  expect(cost.bytes + 16 * 1024 * 1024).toBeLessThanOrEqual(384 * 1024 * 1024);
+});
 it("uses stable quarters above1x without promoting floating noise into a new allocation tier", () => {
   const page = createPage({
     width: 192,

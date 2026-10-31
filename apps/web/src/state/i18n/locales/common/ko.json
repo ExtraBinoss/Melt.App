@@ -6,5 +6,10 @@
   "dropImages": "이미지를 놓으세요",
   "composition": "컴포지션",
   "fontFamily": "글꼴",
-  "close": "닫기"
+  "close": "닫기",
+  "rotate": "회전",
+  "resize": "크기 조절",
+  "zoomOut": "축소",
+  "zoomIn": "확대",
+  "resetView": "100% 및 가운데 맞춤"
 }

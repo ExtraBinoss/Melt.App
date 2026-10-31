@@ -1,6 +1,24 @@
 import { describe, expect, it, vi } from "vitest";
 import { Texture, LinearMipmapLinearFilter, NearestFilter } from "three/webgpu";
 import { LayerTargets } from "../../src/compositing/targets";
+it("admits the resolved texture and four coverage samples before allocating, then reuses and disposes them", () => {
+  const layer = new LayerTargets(16384);
+  expect(layer.projectedBytes("vector", 20, 10, false, 4)).toBe(4000);
+  const target = layer.target("vector", 20, 10, false, 4),
+    dispose = vi.spyOn(target, "dispose");
+  expect(target.samples).toBe(4);
+  expect(target.depthBuffer).toBe(false);
+  expect(layer.bytes).toBe(4000);
+  expect(layer.target("vector", 20, 10, false, 4)).toBe(target);
+  expect(dispose).not.toHaveBeenCalled();
+  expect(layer.projectedBytes("vector", 30, 10, false, 4)).toBe(6000);
+  expect(layer.target("vector", 30, 10, false, 4)).toBe(target);
+  expect(layer.bytes).toBe(6000);
+  expect(() => layer.target("vector", 30, 10)).toThrow("sampling policy");
+  layer.dispose();
+  expect(dispose).toHaveBeenCalledTimes(2);
+  expect(layer.bytes).toBe(0);
+});
 it("rejects oversized thin allocations and resizes before changing a retained role", () => {
   const layer = new LayerTargets(64),
     target = layer.target("reference", 32, 1, true),

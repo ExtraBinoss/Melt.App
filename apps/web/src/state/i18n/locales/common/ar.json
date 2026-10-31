@@ -6,5 +6,10 @@
   "dropImages": "أفلت صورك",
   "composition": "تكوين",
   "fontFamily": "الخط",
-  "close": "إغلاق"
+  "close": "إغلاق",
+  "rotate": "تدوير",
+  "resize": "تغيير الحجم",
+  "zoomOut": "تصغير",
+  "zoomIn": "تكبير",
+  "resetView": "100٪ وتوسيط"
 }

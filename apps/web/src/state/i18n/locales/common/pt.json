@@ -6,5 +6,10 @@
   "dropImages": "Larga as tuas imagens",
   "composition": "Composição",
   "fontFamily": "Tipo de letra",
-  "close": "Fechar"
+  "close": "Fechar",
+  "rotate": "Rodar",
+  "resize": "Redimensionar",
+  "zoomOut": "Diminuir zoom",
+  "zoomIn": "Aumentar zoom",
+  "resetView": "100% e centrar"
 }

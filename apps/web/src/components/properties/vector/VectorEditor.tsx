@@ -1,10 +1,13 @@
 import {
   useMemo,
+  useCallback,
   useRef,
   useState,
   useReducer,
   useEffect,
   useImperativeHandle,
+  useLayoutEffect,
+  type CSSProperties,
   type Ref,
   type PointerEvent as ReactPointerEvent,
 } from "react";
@@ -21,27 +24,35 @@ import {
   type VectorSubpath,
   type VectorCorner,
   type VectorNodeMode,
+  type Matrix,
+  invertMatrix,
+  transformPoint,
 } from "@musart/core";
 import { useTranslation } from "react-i18next";
-import { Trash2, Scissors } from "lucide-react";
 import { Button } from "../../ui/button";
-import { Label } from "../../ui/label";
-import { Switch } from "../../ui/switch";
-import { VectorSelect } from "./VectorSelect";
-import { VectorZoom } from "./VectorZoom";
-import { NumberInput } from "../../shared/NumberInput";
-import { ScrollShadow } from "../../shared/scroll/ScrollShadow";
+import type { VectorControls } from "./VectorSettings";
+import { VectorCanvasToolbar } from "./VectorCanvasToolbar";
+import type { VectorSurface } from "./surface";
+import { vectorScreenMatrix } from "../../../canvas/vector/geometry";
+import { vectorContrast } from "../../../canvas/vector/contrast";
+import {
+  captureGestureOrigin,
+  isGestureOriginCurrent,
+  type GestureOrigin,
+} from "../../../canvas/interaction/gesture-origin";
 import "./messages";
 import { VectorDraft } from "./draft";
+import { paintVector } from "./presentation";
 export interface VectorEditorHandle {
   cancelGesture: () => boolean;
 }
 interface Props {
   ref?: Ref<VectorEditorHandle>;
+  surface: VectorSurface;
+  onDone: () => void;
   vector: VectorDefinition;
   fill: string;
   stroke: string;
-  strokeWidth: number;
   onPreview: (v: VectorDefinition) => void;
   onCommit: (v: VectorDefinition) => void;
   onCancel: () => void;
@@ -54,7 +65,9 @@ interface Gesture {
   anchor?: { x: number; y: number };
   client?: { x: number; y: number };
   moved?: boolean;
-  matrix?: DOMMatrix;
+  matrix?: Matrix;
+  rect?: { left: number; top: number };
+  origin: GestureOrigin;
   contour: number;
   node: number;
   handle?: "incoming" | "outgoing";
@@ -62,10 +75,11 @@ interface Gesture {
 }
 export default function VectorEditor({
   ref,
+  surface,
+  onDone,
   vector,
   fill,
   stroke,
-  strokeWidth,
   onPreview,
   onCommit,
   onCancel,
@@ -74,8 +88,6 @@ export default function VectorEditor({
   const [partIndex, setPartIndex] = useState(0),
     [contour, setContour] = useState(0),
     [selected, setSelected] = useState(0),
-    [zoom, setZoom] = useState(1),
-    [focus, setFocus] = useState<{ x: number; y: number } | null>(null),
     [error, setError] = useState("");
   const [, refresh] = useReducer((n) => n + 1, 0);
   const svg = useRef<SVGSVGElement>(null),
@@ -95,22 +107,22 @@ export default function VectorEditor({
       .trim()
       .split(/[\s,]+/)
       .map(Number),
-    [bx = 0, by = 0, bw = 100, bh = 100] = box;
-  const displayBox = [
-    (focus?.x ?? bx + bw / 2) - (bw * 0.6) / zoom,
-    (focus?.y ?? by + bh / 2) - (bh * 0.6) / zoom,
-    (bw * 1.2) / zoom,
-    (bh * 1.2) / zoom,
-  ];
+    [, , bw = 100, bh = 100] = box;
+  const matrix = useRef<Matrix>([1, 0, 0, 1, 0, 0]);
+  const contrast = useMemo(() => vectorContrast(vector, fill, stroke), [vector, fill, stroke]);
   const pending = useRef<number | null>(null);
-  function stopFrame() {
+  const stopFrame = useCallback(() => {
     if (pending.current !== null) cancelAnimationFrame(pending.current);
     pending.current = null;
-  }
+  }, []);
   function present() {
     if (pending.current === null)
       pending.current = requestAnimationFrame(() => {
         pending.current = null;
+        if (held.current && !isGestureOriginCurrent(surface.engine, held.current.origin)) {
+          cancel();
+          return;
+        }
         paint();
         onPreview(draft());
       });
@@ -126,44 +138,16 @@ export default function VectorEditor({
     delete next.path;
     return next;
   }
-  function paint(nodes = true) {
-    const root = svg.current;
-    if (!root) return;
-    const d = model.outline();
-    root.querySelector<SVGPathElement>("[data-edit-path]")?.setAttribute("d", d);
-    root.querySelector<SVGPathElement>(".vector-edit-outline")?.setAttribute("d", d);
-    if (!nodes) return;
-    root
-      .querySelectorAll<SVGCircleElement>(
-        `circle[data-node="${held.current?.node ?? ni}"][data-contour="${held.current?.contour ?? ci}"]`,
-      )
-      .forEach((circle) => {
-        const item =
-          model.paths[Number(circle.dataset.contour)]?.nodes[Number(circle.dataset.node)];
-        if (!item) return;
-        const p = circle.dataset.handle
-          ? item[circle.dataset.handle as "incoming" | "outgoing"]
-          : item;
-        if (p) {
-          circle.setAttribute("cx", String(p.x));
-          circle.setAttribute("cy", String(p.y));
-        }
-      });
-    root
-      .querySelectorAll<SVGLineElement>(
-        `[data-handle-line][data-node="${held.current?.node ?? ni}"][data-contour="${held.current?.contour ?? ci}"]`,
-      )
-      .forEach((line) => {
-        const item = model.paths[Number(line.dataset.contour)]?.nodes[Number(line.dataset.node)],
-          p = item?.[line.dataset.handleLine as "incoming" | "outgoing"];
-        if (item && p)
-          for (const [key, value] of Object.entries({ x1: item.x, y1: item.y, x2: p.x, y2: p.y }))
-            line.setAttribute(key, String(value));
-      });
-  }
+  const paint = useCallback(
+    (nodes = true) => {
+      if (svg.current) paintVector(svg.current, model, matrix.current, nodes);
+    },
+    [model],
+  );
   function begin() {
     if (!held.current && node)
       held.current = {
+        origin: captureGestureOrigin(surface.engine),
         paths: structuredClone(model.paths),
         corners: structuredClone(model.corners),
         contour: ci,
@@ -171,7 +155,7 @@ export default function VectorEditor({
         mode: vectorNodeMode(node),
       };
   }
-  function cancel() {
+  const cancel = useCallback(() => {
     stopFrame();
     const gesture = held.current;
     if (gesture) {
@@ -181,14 +165,14 @@ export default function VectorEditor({
       refresh();
     }
     onCancel();
-  }
+  }, [model, paint, stopFrame, onCancel]);
   useEffect(
     () => () => {
       stopFrame();
       held.current = null;
       onCancel();
     },
-    [onCancel, model],
+    [onCancel, model, stopFrame],
   );
   useImperativeHandle(ref, () => ({
     cancelGesture() {
@@ -200,6 +184,10 @@ export default function VectorEditor({
   function commit(style: Partial<VectorPart> = {}) {
     stopFrame();
     const origin = held.current;
+    if (origin && !isGestureOriginCurrent(surface.engine, origin.origin)) {
+      cancel();
+      return;
+    }
     if (
       origin &&
       !Object.keys(style).length &&
@@ -208,11 +196,13 @@ export default function VectorEditor({
     )
       return cancel();
     try {
-      onCommit(draft(style));
+      const next = draft(style);
       held.current = null;
+      onCommit(next);
       setError("");
       refresh();
     } catch {
+      held.current = origin;
       cancel();
       setError("failed");
     }
@@ -237,21 +227,30 @@ export default function VectorEditor({
     if (event.button !== 0) return;
     event.preventDefault();
     event.stopPropagation();
-    const matrix = svg.current?.getScreenCTM()?.inverse();
-    if (!matrix || !path) return;
+    const rect = surface.viewport.current?.getBoundingClientRect();
+    if (!rect || !path) return;
+    let inverse: Matrix;
+    try {
+      inverse = invertMatrix(matrix.current);
+    } catch {
+      setError("failed");
+      return;
+    }
     setSelected(at);
     const item = path.nodes[at]!;
     held.current = {
+      origin: captureGestureOrigin(surface.engine),
       paths: structuredClone(model.paths),
       corners: structuredClone(model.corners),
       pointerId: event.pointerId,
-      start: new DOMPoint(event.clientX, event.clientY).matrixTransform(matrix),
+      start: transformPoint(inverse, { x: event.clientX - rect.left, y: event.clientY - rect.top }),
+      rect,
       client: { x: event.clientX, y: event.clientY },
       anchor: {
         x: (handle ? item[handle] : item)?.x ?? item.x,
         y: (handle ? item[handle] : item)?.y ?? item.y,
       },
-      matrix,
+      matrix: inverse,
       contour: ci,
       node: at,
       handle,
@@ -268,7 +267,14 @@ export default function VectorEditor({
     )
       return;
     gesture.moved = true;
-    const mapped = new DOMPoint(event.clientX, event.clientY).matrixTransform(gesture.matrix);
+    if (!isGestureOriginCurrent(surface.engine, gesture.origin)) {
+      cancel();
+      return;
+    }
+    const mapped = transformPoint(gesture.matrix, {
+      x: event.clientX - gesture.rect!.left,
+      y: event.clientY - gesture.rect!.top,
+    });
     const point = {
       x: gesture.anchor!.x + mapped.x - gesture.start!.x,
       y: gesture.anchor!.y + mapped.y - gesture.start!.y,
@@ -289,16 +295,160 @@ export default function VectorEditor({
     if (preview) onPreview(draft());
     else commit();
   }
-  const radius = Math.max(bw, bh) / 110 / zoom;
-  if (model.error) return <p role="alert">{t(model.error)}</p>;
+  useLayoutEffect(() => {
+    const root = svg.current,
+      viewport = surface.viewport.current;
+    if (!root || !viewport) return;
+    let previousView = surface.view.read();
+    let size = { width: viewport.clientWidth, height: viewport.clientHeight };
+    function reproject() {
+      const frame = surface.controller.read(),
+        layer = frame.page.layers.find((l) => l.id === surface.layerId);
+      if (!layer?.vector || frame.playback) {
+        cancel();
+        onDone();
+        return;
+      }
+      const view = surface.view.read();
+      if (
+        held.current &&
+        (view.x !== previousView.x ||
+          view.y !== previousView.y ||
+          view.zoom !== previousView.zoom ||
+          !isGestureOriginCurrent(surface.engine, held.current.origin))
+      )
+        cancel();
+      previousView = view;
+      const { width, height } = size;
+      const nextMatrix = vectorScreenMatrix(frame.page, layer, view, { width, height });
+      if (
+        held.current &&
+        nextMatrix.some((value, index) => Math.abs(value - matrix.current[index]!) > 1e-8)
+      )
+        cancel();
+      matrix.current = nextMatrix;
+      const box = `0 0 ${Math.max(1, width)} ${Math.max(1, height)}`,
+        transform = `matrix(${matrix.current.join(" ")})`;
+      if (root!.getAttribute("viewBox") !== box) root!.setAttribute("viewBox", box);
+      const outlines = root!.querySelector("[data-vector-outlines]");
+      if (outlines?.getAttribute("transform") !== transform)
+        outlines?.setAttribute("transform", transform);
+      paint();
+    }
+    reproject();
+    const resize = new ResizeObserver((entries) => {
+      const bounds = entries[0]?.contentRect;
+      if (bounds && (bounds.width !== size.width || bounds.height !== size.height)) {
+        if (held.current) cancel();
+        size = { width: bounds.width, height: bounds.height };
+      }
+      reproject();
+    });
+    window.addEventListener("blur", cancel);
+    resize.observe(viewport);
+    const stops = [
+      surface.controller.subscribe(reproject),
+      surface.view.subscribe(reproject),
+      surface.engine.subscribe(() => {
+        if (held.current && !isGestureOriginCurrent(surface.engine, held.current.origin)) cancel();
+      }),
+    ];
+    return () => {
+      resize.disconnect();
+      window.removeEventListener("blur", cancel);
+      for (const stop of stops) stop();
+    };
+  }, [surface, model, cancel, onDone, paint]);
+  useLayoutEffect(() => paint());
+  const controls: VectorControls = {
+    index,
+    parts: parts.length,
+    contour: ci,
+    contours: model.paths.length,
+    part,
+    maxRadius: Math.max(bw, bh),
+    point:
+      node && path
+        ? {
+            index: ni,
+            x: node.x,
+            y: node.y,
+            mode: vectorNodeMode(node),
+            radius: model.radius(ci, ni),
+            canRound: canRoundVectorNode(path, ni),
+            canRemove: path.nodes.length > (path.closed ? 3 : 2),
+            canSplit: path.closed || ni < path.nodes.length - 1,
+            closed: path.closed,
+          }
+        : undefined,
+    selectPart(value) {
+      cancel();
+      setPartIndex(value);
+      setContour(0);
+      setSelected(0);
+    },
+    selectContour(value) {
+      cancel();
+      setContour(value);
+      setSelected(0);
+    },
+    coordinate,
+    round(value, preview = false) {
+      begin();
+      if (!held.current) return;
+      model.restore(held.current.paths, held.current.corners);
+      model.round(ci, ni, value);
+      paint(false);
+      if (preview) onPreview(draft());
+      else commit();
+    },
+    split: () => path && change(() => setSelected(splitVectorSegment(path, ni))),
+    remove: () =>
+      path &&
+      change(() => {
+        removeVectorNode(path, ni);
+        setSelected(Math.max(0, ni - 1));
+      }),
+    close: (closed) => path && change(() => model.close(ci, closed)),
+    style: commit,
+    cancel,
+  };
+  const radius = 4.5;
+  if (model.error)
+    return (
+      <aside className="vector-canvas-toolbar floating-panel" data-canvas-control>
+        <p role="alert">{t(model.error)}</p>
+        <Button onClick={onDone}>{t("close")}</Button>
+      </aside>
+    );
   return (
     <div
-      className="vector-editor"
+      className="vector-editor vector-editor-inline"
+      data-keybinding-capture
+      data-document-shortcuts
+      onPointerDown={(event) => event.stopPropagation()}
+      onPointerMove={(event) => event.stopPropagation()}
+      onPointerUp={(event) => event.stopPropagation()}
+      onPointerCancel={(event) => event.stopPropagation()}
+      onKeyDown={(event) => {
+        if (!event.ctrlKey && !event.metaKey) event.stopPropagation();
+      }}
+      style={{ "--vector-ink": contrast.ink, "--vector-halo": contrast.halo } as CSSProperties}
       onKeyDownCapture={(event) => {
-        if (event.key === "Escape" && held.current) {
-          event.preventDefault();
-          event.stopPropagation();
-          cancel();
+        if (event.key === "Escape") {
+          if (held.current) {
+            event.preventDefault();
+            event.stopPropagation();
+            cancel();
+          } else if (
+            !(event.target as Element).closest(
+              '[data-slot="popover-content"],[role="listbox"],[role="menu"]',
+            )
+          ) {
+            event.preventDefault();
+            event.stopPropagation();
+            onDone();
+          }
         }
       }}
     >
@@ -307,7 +457,9 @@ export default function VectorEditor({
           ref={svg}
           role="group"
           aria-label={t("title")}
-          viewBox={displayBox.join(" ")}
+          data-canvas-control
+          data-vector-stage
+          onPointerDown={(event) => event.stopPropagation()}
           onPointerMove={move}
           onPointerUp={(event) => {
             if (held.current?.pointerId === event.pointerId) {
@@ -320,39 +472,10 @@ export default function VectorEditor({
             if (held.current?.pointerId !== undefined) cancel();
           }}
         >
-          {parts.map((p, i) => (
-            <path
-              key={i}
-              data-edit-path={i === index ? "" : undefined}
-              d={i === index ? model.outline() : p.path}
-              transform={i === index || !p.matrix ? undefined : `matrix(${p.matrix.join(" ")})`}
-              fill={
-                vector.strokeOnly || p.fill === "none"
-                  ? "none"
-                  : vector.preserveColors && p.fill && p.fill !== "currentColor"
-                    ? p.fill
-                    : fill
-              }
-              stroke={
-                p.stroke === "none"
-                  ? "none"
-                  : vector.preserveColors && p.stroke && p.stroke !== "currentColor"
-                    ? p.stroke
-                    : stroke
-              }
-              strokeWidth={
-                vector.preserveColors
-                  ? (p.strokeWidth ?? strokeWidth)
-                  : strokeWidth || p.strokeWidth || (vector.strokeOnly || p.stroke ? 2 : 0)
-              }
-              strokeLinecap={p.linecap ?? "round"}
-              strokeLinejoin={p.linejoin ?? "round"}
-              fillRule={p.fillRule}
-              opacity={p.opacity ?? 1}
-              className={i !== index ? "vector-other-path" : undefined}
-            />
-          ))}
-          <path d={model.outline()} className="vector-edit-outline" />
+          <g data-vector-outlines>
+            <path d={model.outline()} className="vector-edit-outline vector-outline-halo" />
+            <path d={model.outline()} className="vector-edit-outline" />
+          </g>
           {path?.nodes.map((item, i) => (
             <g key={i}>
               {i === ni &&
@@ -361,21 +484,31 @@ export default function VectorEditor({
                     item[key] && (
                       <g key={key}>
                         <line
+                          className="vector-handle-halo"
                           data-contour={ci}
                           data-node={i}
                           data-handle-line={key}
-                          x1={item.x}
-                          y1={item.y}
-                          x2={item[key].x}
-                          y2={item[key].y}
+                          x1={0}
+                          y1={0}
+                          x2={0}
+                          y2={0}
+                        />
+                        <line
+                          data-contour={ci}
+                          data-node={i}
+                          data-handle-line={key}
+                          x1={0}
+                          y1={0}
+                          x2={0}
+                          y2={0}
                         />
                         <circle
                           className="vector-control-handle"
                           data-contour={ci}
                           data-node={i}
                           data-handle={key}
-                          cx={item[key].x}
-                          cy={item[key].y}
+                          cx={0}
+                          cy={0}
                           r={radius * 0.75}
                           aria-label={t(key)}
                           onPointerDown={(event) => start(event, i, key)}
@@ -388,9 +521,9 @@ export default function VectorEditor({
                 data-selected={i === ni || undefined}
                 data-contour={ci}
                 data-node={i}
-                cx={item.x}
-                cy={item.y}
-                r={radius}
+                cx={0}
+                cy={0}
+                r={i === ni ? radius : 3}
                 role="button"
                 tabIndex={0}
                 aria-label={t("point", { index: i + 1 })}
@@ -399,6 +532,7 @@ export default function VectorEditor({
                 onKeyDown={(event) => {
                   if (event.key === "Delete" || event.key === "Backspace") {
                     event.preventDefault();
+                    event.stopPropagation();
                     change(() => removeVectorNode(path, i));
                     return;
                   }
@@ -411,6 +545,7 @@ export default function VectorEditor({
                     }[event.key];
                   if (delta) {
                     event.preventDefault();
+                    event.stopPropagation();
                     setSelected(i);
                     change(() =>
                       moveVectorNode(item, { x: item.x + delta[0]!, y: item.y + delta[1]! }),
@@ -421,161 +556,17 @@ export default function VectorEditor({
             </g>
           ))}
         </svg>
-        <VectorZoom
-          onOut={() => {
-            if (zoom / 1.25 <= 1) setFocus(null);
-            setZoom((v) => Math.max(0.25, v / 1.25));
-          }}
-          onFit={() => {
-            setFocus(null);
-            setZoom(1);
-          }}
-          onIn={() => {
-            if (node) setFocus({ x: node.x, y: node.y });
-            setZoom((v) => Math.min(8, v * 1.25));
-          }}
-        />
       </div>
-      <ScrollShadow className="vector-editor-settings-shadow">
-        <div className="vector-editor-settings">
-          <VectorSelect
-            label={t("part")}
-            value={String(index)}
-            options={parts.map((_, i) => ({ value: String(i), label: `${t("part")} ${i + 1}` }))}
-            onValueChange={(value) => {
-              cancel();
-              setPartIndex(Number(value));
-              setContour(0);
-              setSelected(0);
-            }}
-          />
-          {model.paths.length > 1 && (
-            <VectorSelect
-              label={t("contour")}
-              value={String(ci)}
-              options={model.paths.map((_, i) => ({
-                value: String(i),
-                label: `${t("contour")} ${i + 1}`,
-              }))}
-              onValueChange={(value) => {
-                setContour(Number(value));
-                setSelected(0);
-              }}
-            />
-          )}
-          {node && path && (
-            <>
-              <strong>{t("point", { index: ni + 1 })}</strong>
-              <div className="vector-point-fields">
-                {(["x", "y"] as const).map((axis) => (
-                  <NumberInput
-                    key={`${ci}:${ni}:${axis}`}
-                    label={axis.toUpperCase()}
-                    value={node[axis]}
-                    min={-100000}
-                    max={100000}
-                    onPreview={(value) => coordinate(axis, value, true)}
-                    onCommit={(value) => coordinate(axis, value)}
-                    onCancel={cancel}
-                  />
-                ))}
-              </div>
-              <VectorSelect
-                label={t("mode")}
-                value={vectorNodeMode(node)}
-                options={(["corner", "smooth", "symmetric"] as const).map((value) => ({
-                  value,
-                  label: t(value),
-                }))}
-                onValueChange={(value) =>
-                  change(() => setVectorNodeMode(path, ni, value as VectorNodeMode))
-                }
-              />
-              <NumberInput
-                key={`${ci}:${ni}:round`}
-                label={t("round")}
-                value={model.radius(ci, ni)}
-                min={0}
-                max={Math.max(bw, bh)}
-                disabled={!canRoundVectorNode(path, ni)}
-                onPreview={(value) => {
-                  begin();
-                  model.restore(held.current!.paths, held.current!.corners);
-                  model.round(ci, ni, value);
-                  paint(false);
-                  onPreview(draft());
-                }}
-                onCommit={(value) => {
-                  begin();
-                  model.restore(held.current!.paths, held.current!.corners);
-                  model.round(ci, ni, value);
-                  commit();
-                }}
-                onCancel={cancel}
-              />
-              {!canRoundVectorNode(path, ni) && (
-                <p className="muted-description">{t("roundHint")}</p>
-              )}
-              <div className="vector-node-actions">
-                <Button
-                  variant="outline"
-                  disabled={!path.closed && ni === path.nodes.length - 1}
-                  onClick={() => change(() => setSelected(splitVectorSegment(path, ni)))}
-                >
-                  <Scissors size={14} />
-                  {t("add")}
-                </Button>
-                <Button
-                  variant="outline"
-                  disabled={path.nodes.length <= (path.closed ? 3 : 2)}
-                  onClick={() =>
-                    change(() => {
-                      removeVectorNode(path, ni);
-                      setSelected(Math.max(0, ni - 1));
-                    })
-                  }
-                >
-                  <Trash2 size={14} />
-                  {t("remove")}
-                </Button>
-              </div>
-              <label className="switch-row">
-                <Label>{t("closed")}</Label>
-                <Switch
-                  aria-label={t("closed")}
-                  checked={path.closed}
-                  disabled={path.nodes.length < 3}
-                  onCheckedChange={(closed) =>
-                    change(() => {
-                      model.close(ci, closed);
-                    })
-                  }
-                />
-              </label>
-            </>
-          )}
-          <VectorSelect
-            label={t("cap")}
-            value={part.linecap ?? "round"}
-            options={["butt", "round", "square"].map((value) => ({
-              value,
-              label: t(value === "round" ? "roundStyle" : value),
-            }))}
-            onValueChange={(linecap) => commit({ linecap: linecap as VectorPart["linecap"] })}
-          />
-          <VectorSelect
-            label={t("join")}
-            value={part.linejoin ?? "round"}
-            options={["miter", "round", "bevel"].map((value) => ({
-              value,
-              label: t(value === "round" ? "roundStyle" : value),
-            }))}
-            onValueChange={(linejoin) => commit({ linejoin: linejoin as VectorPart["linejoin"] })}
-          />
-          <p className="muted-description">{t("hint")}</p>
-          {error && <p role="alert">{t(error)}</p>}
-        </div>
-      </ScrollShadow>
+      <VectorCanvasToolbar
+        controls={controls}
+        onMode={(value) => path && change(() => setVectorNodeMode(path, ni, value))}
+        onDone={onDone}
+      />
+      {error && (
+        <p className="vector-canvas-error" role="alert">
+          {t(error)}
+        </p>
+      )}
     </div>
   );
 }

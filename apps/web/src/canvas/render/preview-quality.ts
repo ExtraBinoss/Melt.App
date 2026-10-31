@@ -23,7 +23,7 @@ export function previewScale(
       : Math.ceil((desired - 1e-6) * 4) / 4;
   const upper = Math.max(minimum, Math.min(requested, limit));
   const fits = (scale: number) => {
-    const cost = estimatePreviewCost(page, scale, assets);
+    const cost = estimatePreviewCost(page, scale, assets, true);
     return (
       cost.targetBytes + HEADROOM_BYTES <= PREVIEW_MEMORY_BYTES &&
       cost.bytes + HEADROOM_BYTES <= 384 * 1024 * 1024 &&

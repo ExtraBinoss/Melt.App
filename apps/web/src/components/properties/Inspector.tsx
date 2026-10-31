@@ -405,12 +405,7 @@ export const Inspector = memo(
                       <AlignmentPanel engine={engine} selected={selected} run={runCurrent} />
                     </fieldset>
                     {layer.kind === "vector" && (
-                      <VectorProperties
-                        layer={displayLayer!}
-                        patch={patch}
-                        preview={preview}
-                        cancel={cancel}
-                      />
+                      <VectorProperties layer={displayLayer!} engine={engine} />
                     )}
                     {layer.kind === "text" && (
                       <TextProperties

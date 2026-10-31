@@ -58,10 +58,14 @@ test("native SVG nodes preview imperatively, commit once, cancel cleanly and ret
   const original = await page.evaluate(
     () => window.musart!.snapshot().project.pages[0]!.layers[0]!.vector,
   );
-  await page.getByRole("button", { name: "Edit points", exact: true }).click();
-  const dialog = page.getByRole("dialog", { name: "Edit SVG points", exact: true });
-  await expect(dialog).toBeVisible();
-  const root = dialog.locator(".vector-editor-stage svg");
+  await page
+    .locator(".vector-canvas-entry")
+    .getByRole("button", { name: "Edit points", exact: true })
+    .click();
+  const editor = page.locator(".vector-editor-inline");
+  await expect(page.locator('[data-slot="dialog-content"]')).toHaveCount(0);
+  await expect(editor).toBeVisible();
+  const root = editor.locator(".vector-editor-stage svg");
   await expect(root.locator(".vector-anchor")).toHaveCount(4);
   const baseline = await page.evaluate(() => ({
     revision: window.musart!.snapshot().revision,
@@ -150,7 +154,7 @@ test("native SVG nodes preview imperatively, commit once, cancel cleanly and ret
   await page.mouse.move(cancelPoint.x - 25, cancelPoint.y + 20);
   await page.keyboard.press("Escape");
   await page.mouse.up();
-  await expect(dialog).toBeVisible();
+  await expect(editor).toBeVisible();
   expect(await page.evaluate(() => window.musart!.snapshot().revision)).toBe(baseline.revision + 1);
   expect(
     await page.evaluate(() => window.musart!.snapshot().project.pages[0]!.layers[0]!.vector),
@@ -169,12 +173,18 @@ test("native SVG nodes preview imperatively, commit once, cancel cleanly and ret
     await page.evaluate(() => window.musart!.snapshot().project.pages[0]!.layers[0]!.vector),
   ).toEqual(changed);
   await page.evaluate(() => window.musart!.undo());
-  await dialog.getByRole("combobox", { name: "Node type", exact: true }).click();
-  await page.getByRole("option", { name: "Symmetric", exact: true }).click();
+  await editor.getByRole("radio", { name: "Symmetric", exact: true }).click();
+  await editor.getByRole("button", { name: "Edit SVG points", exact: true }).click();
   await expect(root.locator(".vector-control-handle")).toHaveCount(2);
-  await dialog.getByRole("button", { name: "Split next segment", exact: true }).click();
+  await page
+    .locator(".vector-canvas-settings")
+    .getByRole("button", { name: "Split next segment", exact: true })
+    .click();
   await expect(root.locator(".vector-anchor")).toHaveCount(5);
-  await dialog.getByRole("combobox", { name: "Line ends", exact: true }).click();
+  await page
+    .locator(".vector-canvas-settings")
+    .getByRole("combobox", { name: "Line ends", exact: true })
+    .click();
   await page.getByRole("option", { name: "Square", exact: true }).click();
   expect(
     await page.evaluate(
@@ -184,7 +194,8 @@ test("native SVG nodes preview imperatively, commit once, cancel cleanly and ret
   await mkdir("artifacts/vector-editor", { recursive: true });
   await page.screenshot({ path: "artifacts/vector-editor/points-and-handles.png" });
   await page.keyboard.press("Escape");
-  await expect(dialog).toBeHidden();
+  await editor.getByRole("button", { name: "Done", exact: true }).click();
+  await expect(editor).toBeHidden();
   await page.evaluate(() => {
     window.musart!.undo();
     window.musart!.undo();
@@ -194,12 +205,18 @@ test("native SVG nodes preview imperatively, commit once, cancel cleanly and ret
   expect(
     await page.evaluate(() => window.musart!.snapshot().project.pages[0]!.layers[0]!.vector),
   ).toEqual(original);
-  await page.getByRole("button", { name: "Edit points", exact: true }).click();
-  await expect(dialog).toBeVisible();
+  await page
+    .locator(".vector-canvas-entry")
+    .getByRole("button", { name: "Edit points", exact: true })
+    .click();
+  await expect(editor).toBeVisible();
   const beforeSelect = await page.evaluate(() => window.musart!.snapshot().revision);
   await root.locator(".vector-anchor").nth(1).click();
   expect(await page.evaluate(() => window.musart!.snapshot().revision)).toBe(beforeSelect);
-  const rounding = dialog.getByRole("textbox", { name: "Round corner", exact: true });
+  await editor.getByRole("button", { name: "Edit SVG points", exact: true }).click();
+  const rounding = page
+    .locator(".vector-canvas-settings")
+    .getByRole("textbox", { name: "Round corner", exact: true });
   await rounding.fill("16");
   await rounding.press("Enter");
   expect(
@@ -209,11 +226,18 @@ test("native SVG nodes preview imperatively, commit once, cancel cleanly and ret
           ?.rounding[0]?.radius,
     ),
   ).toBe(16);
-  await dialog.getByRole("button", { name: "Done", exact: true }).click();
-  await expect(dialog).toBeHidden();
-  await page.getByRole("button", { name: "Edit points", exact: true }).click();
-  await expect(dialog).toBeVisible();
+  if (await page.locator(".vector-canvas-settings").isVisible())
+    await page.keyboard.press("Escape");
+  await editor.getByRole("button", { name: "Done", exact: true }).click();
+  await expect(editor).toBeHidden();
+  await page
+    .locator(".vector-canvas-entry")
+    .getByRole("button", { name: "Edit points", exact: true })
+    .click();
+  await expect(editor).toBeVisible();
   await root.locator(".vector-anchor").nth(1).click();
+  if (!(await page.locator(".vector-canvas-settings").isVisible()))
+    await editor.getByRole("button", { name: "Edit SVG points", exact: true }).click();
   await expect(rounding).toHaveValue("16");
   await rounding.fill("6");
   await rounding.press("Enter");
@@ -226,7 +250,9 @@ test("native SVG nodes preview imperatively, commit once, cancel cleanly and ret
   ).toBe(6);
   await page.evaluate(() => window.musart!.undo());
   await expect(rounding).toHaveValue("16");
-  await dialog.getByRole("button", { name: "Done", exact: true }).click();
+  if (await page.locator(".vector-canvas-settings").isVisible())
+    await page.keyboard.press("Escape");
+  await editor.getByRole("button", { name: "Done", exact: true }).click();
   await page.evaluate(() => window.musart!.save());
   const beforeReloadReads = await page.evaluate(() => window.__musartVideoReadbacks);
   expect(beforeReloadReads).toMatchObject({ gpu: 0, webgl: 0, canvas: 0 });

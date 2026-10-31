@@ -5,6 +5,8 @@ import { LockKeyhole } from "lucide-react";
 import type { SceneController } from "../session/scene-controller";
 import type { ViewSource } from "../viewport/motion";
 import "./selection-presentation.css";
+import "../../components/layers/messages";
+import { selectionSizeLabel } from "./size-label";
 
 interface Props {
   page: Composition;
@@ -166,7 +168,7 @@ export function SelectionOverlays({
                 <span
                   className="canvas-layer-lock"
                   role="img"
-                  aria-label={t("layerControls:lockedState", { defaultValue: "Locked" })}
+                  aria-label={t("layerControls:lockedState")}
                   style={{ transform: `translate(-50%, -50%) scale(${1 / zoom})` }}
                 >
                   <LockKeyhole size={16} aria-hidden="true" />
@@ -178,7 +180,7 @@ export function SelectionOverlays({
                     type="button"
                     key={handle}
                     className={`canvas-handle canvas-handle-${handle}`}
-                    aria-label={`${handle === "rotate" ? t("rotate", { defaultValue: "Tourner" }) : t("resize", { defaultValue: "Redimensionner" })} ${layer.name} ${handle}`}
+                    aria-label={`${handle === "rotate" ? t("rotate") : t("resize")} ${layer.name} ${handle}`}
                     style={{ transform: `scale(${1 / zoom})` }}
                     data-layer-id={layer.id}
                     data-handle={handle}
@@ -190,10 +192,7 @@ export function SelectionOverlays({
               {selected.length === 1 && (
                 <span
                   className="canvas-selection-size"
-                  style={{
-                    transform: `translateX(-50%) scale(${1 / zoom})`,
-                    transformOrigin: "top center",
-                  }}
+                  style={selectionSizeLabel(layer, index.worldMatrix(layer.id), zoom)}
                 >
                   {Math.round(layer.width)} × {Math.round(layer.height)}
                 </span>

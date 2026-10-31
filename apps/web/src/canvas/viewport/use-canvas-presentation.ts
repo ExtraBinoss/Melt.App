@@ -4,6 +4,7 @@ import type { SceneController } from "../session/scene-controller";
 import type { WorkspaceSource } from "../artboards/workspace";
 import { paintArtboards } from "../artboards/presentation";
 import type { ViewMotion } from "./motion";
+import { selectionSizeLabel } from "../selection/size-label";
 
 interface Options {
   controller: SceneController;
@@ -61,7 +62,10 @@ function createPresentation({ controller, workspace, motion, viewport, beforePai
       const size = overlay.querySelector<HTMLElement>(".canvas-selection-size");
       if (size) {
         size.textContent = `${Math.round(layer.width)} × ${Math.round(layer.height)}`;
-        size.style.transform = `translateX(-50%) scale(${1 / view.zoom})`;
+        Object.assign(
+          size.style,
+          selectionSizeLabel(layer, index.worldMatrix(layer.id), view.zoom),
+        );
       }
       for (const handle of overlay.querySelectorAll<HTMLButtonElement>(".canvas-handle")) {
         handle.style.transform = `scale(${1 / view.zoom})`;

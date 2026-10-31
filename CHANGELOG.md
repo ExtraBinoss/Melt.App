@@ -6,6 +6,12 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Antialias scalable SVG sources on the infinite canvas with four GPU coverage samples, separate preview/exact retained keys and full resolved/sample memory accounting inside the existing preview and GPU cache limits. Preserve authored effect/mask references and export pixels.
+
+- Edit SVG nodes directly on the canvas through an object-anchored, animated floating action or double click while preserving ordinary transform handles on selection. Reuse the existing node/rounding model with screen-space controls, adaptive black/white contrast, overview anchor spacing and a nonmodal settings popover; isolate portaled input, cancel stale previews and retain one undo per gesture and saved radii.
+
+- Keep selection dimensions horizontal beneath rotated/nested artwork and move scaled Static/Motion controls below each artboard. Show the constrained axis and angle while Shift is held during rotation.
+
 - Use one persistent shared segmented wipe for canvas modes and library filters, with local offset measurement, RTL support, cancellable animations and live reduced-motion preferences.
 
 - Add one shared accessible preview player for local tools, Motion export and Timelapse, with a stable elapsed/duration clock, seek gestures and a volume popover. Enable initially muted, independently adjustable audio monitoring through the existing bounded mixer; retain seek/pause/disposal synchronization and selection scope. Shorten clip controls and repair inherited offsets that displaced the Export split button.

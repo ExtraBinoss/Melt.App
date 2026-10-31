@@ -6,5 +6,10 @@
   "dropImages": "Suelta tus imágenes",
   "composition": "Composición",
   "fontFamily": "Fuente",
-  "close": "Cerrar"
+  "close": "Cerrar",
+  "rotate": "Girar",
+  "resize": "Cambiar tamaño",
+  "zoomOut": "Alejar",
+  "zoomIn": "Acercar",
+  "resetView": "100 % y centrar"
 }
