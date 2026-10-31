@@ -180,7 +180,7 @@ it("audio buffering parks the local clock without changing Play or scheduling id
   expect(scheduler.callbacks.size).toBe(0);
 });
 
-it("parks GPU work during caller UI entrances, catches up the clock and releases the gate", async () => {
+it("parks GPU work and the shared clock during caller UI entrances without catching up", async () => {
   const scheduler = clock();
   let busy = true;
   let listener: () => void = () => {};
@@ -210,9 +210,44 @@ it("parks GPU work during caller UI entrances, catches up the clock and releases
   busy = false;
   listener();
   await scheduler.step(600);
-  expect(preview.read().time.value / preview.read().time.rate).toBeCloseTo(0.6);
+  expect(preview.read().time.value / preview.read().time.rate).toBeCloseTo(0.1);
   await preview.dispose();
   expect(stop).toHaveBeenCalledOnce();
   listener();
   expect(scheduler.callbacks.size).toBe(0);
+});
+
+it("excludes a delayed GPU frame from elapsed playback and rejects stale audio holds after seek", async () => {
+  const scheduler = clock();
+  const preview = createMotionPreview(motionProject(), {
+    compositionId: "composition",
+    scheduler,
+    onFrame: vi.fn(),
+  });
+  await scheduler.step(0);
+  let release!: () => void;
+  state.render.mockImplementationOnce(async (_page, _assets, consume) => {
+    await new Promise<void>((done) => {
+      release = done;
+    });
+    consume({} as HTMLCanvasElement);
+  });
+  await scheduler.step(100);
+  await scheduler.step(2100);
+  expect(scheduler.callbacks.size).toBe(0);
+  release();
+  await scheduler.step(2100);
+  await scheduler.step(2134);
+  expect(preview.read().time.value / preview.read().time.rate).toBeCloseTo(1 / 6, 5);
+  const stale = preview.holdPlayback();
+  preview.seek({ value: 1, rate: 2 });
+  const current = preview.holdPlayback();
+  stale();
+  await scheduler.step(2500);
+  expect(preview.read().time).toEqual({ value: 1, rate: 2 });
+  expect(scheduler.callbacks.size).toBe(0);
+  current();
+  await scheduler.step(2600);
+  expect(preview.read().time.value / preview.read().time.rate).toBeCloseTo(0.6);
+  await preview.dispose();
 });

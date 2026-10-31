@@ -14,6 +14,7 @@ import {
   type MotionProgram,
 } from "@musart/core";
 import { rulerChange } from "./ruler-change";
+import { BufferedPlaybackClock } from "@musart/render/playback";
 import {
   classifyAudioMixChange,
   rebaseAudioMixFrame,
@@ -62,9 +63,7 @@ export class MotionTransport {
   private readonly listeners = new Set<() => void>();
   private stopEngine: (() => void) | null = null;
   private tickId: number | null = null;
-  private anchorTime = 0;
-  private anchorClock = 0;
-  private readonly clockHolds = new Set<symbol>();
+  private readonly clock: BufferedPlaybackClock;
   private disposed = false;
   private draft: MotionProgram | null = null;
   private stopDraft: (() => void) | null = null;
@@ -76,6 +75,7 @@ export class MotionTransport {
     private readonly engine: EnginePort,
     private readonly scheduler = browserScheduler,
   ) {
+    this.clock = new BufferedPlaybackClock(() => this.scheduler.now());
     this.sync();
   }
 
@@ -132,7 +132,7 @@ export class MotionTransport {
         playbackMode: this.state.playbackMode,
       });
     this.stopTick();
-    this.clockHolds.clear();
+    this.clock.stop();
     if (this.project?.id !== snapshot.project.id) this.retained.clear();
     this.project = snapshot.project;
     const page = snapshot.project.pages.find((item) => item.id === snapshot.pageId)!;
@@ -290,7 +290,7 @@ export class MotionTransport {
         this.stopEngine?.();
         this.stopEngine = null;
         this.stopTick();
-        this.clockHolds.clear();
+        this.clock.stop();
         if (this.state.playing) this.state = Object.freeze({ ...this.state, playing: false });
         this.present();
       }
@@ -308,7 +308,7 @@ export class MotionTransport {
       return;
     }
     this.stopTick();
-    this.clockHolds.clear();
+    this.clock.stop();
     const time =
       requested.value < 0
         ? ZERO
@@ -338,45 +338,27 @@ export class MotionTransport {
     const start =
       compareMotionTime(this.state.time, this.state.duration) >= 0 ? ZERO : this.state.time;
     this.state = Object.freeze({ ...this.state, time: start, playing: true });
-    this.anchorTime = motionTimeToSeconds(start);
-    this.anchorClock = this.scheduler.now();
+    this.clock.start(motionTimeToSeconds(start));
     this.present();
     this.emit();
-    if (!this.disposed && this.state.playing && !this.clockHolds.size && this.tickId === null)
+    if (!this.disposed && this.state.playing && !this.clock.blocked && this.tickId === null)
       this.tickId = this.scheduler.request(this.tick);
   };
 
   /** Buffering parks the presentation clock, without changing Play or the authored document. */
   holdPlayback = (frameBudgetMs = 0): ((delayMs?: number) => void) => {
-    if (!Number.isFinite(frameBudgetMs) || frameBudgetMs < 0 || frameBudgetMs > 100)
-      throw new RangeError("Invalid playback frame budget.");
-    const heldAt = this.scheduler.now();
+    const release = this.clock.hold(frameBudgetMs);
     if (this.disposed || !this.state.playing) return () => {};
-    if (!this.clockHolds.size) {
-      this.stopTick();
-      const time = motionTimeToSeconds(this.state.time),
-        duration = motionTimeToSeconds(this.state.duration),
-        elapsed = this.anchorTime + Math.max(0, this.scheduler.now() - this.anchorClock) / 1000;
-      this.anchorTime =
-        this.state.playbackMode === "pingPong" && elapsed % (2 * duration) > duration
-          ? 2 * duration - time
-          : time;
-    }
-    const token = Symbol("playback-buffering");
-    this.clockHolds.add(token);
+    this.stopTick();
     return (delayMs = 0) => {
-      if (!Number.isFinite(delayMs) || delayMs < 0)
-        throw new RangeError("Invalid playback clock delay.");
-      if (!this.clockHolds.delete(token) || this.clockHolds.size || !this.state.playing) return;
-      const now = this.scheduler.now();
-      this.anchorClock = now + delayMs - Math.min(frameBudgetMs, Math.max(0, now - heldAt));
-      if (this.tickId === null) this.tickId = this.scheduler.request(this.tick);
+      if (release(delayMs) && !this.disposed && this.state.playing && this.tickId === null)
+        this.tickId = this.scheduler.request(this.tick);
     };
   };
 
   pause = (): void => {
     this.stopTick();
-    this.clockHolds.clear();
+    this.clock.stop();
     if (!this.state.playing) return;
     this.state = Object.freeze({ ...this.state, playing: false });
     this.emit();
@@ -390,9 +372,9 @@ export class MotionTransport {
       if (this.state !== previous) this.emit();
       return;
     }
-    if (this.clockHolds.size) return;
+    if (this.clock.blocked) return;
     const duration = motionTimeToSeconds(this.state.duration);
-    const elapsed = this.anchorTime + Math.max(0, this.scheduler.now() - this.anchorClock) / 1000;
+    const elapsed = this.clock.read();
     let seconds = elapsed;
     let playing = true;
     if (this.state.playbackMode === "once") {
@@ -409,9 +391,10 @@ export class MotionTransport {
         ? this.state.duration
         : rounded;
     this.state = Object.freeze({ ...this.state, time, playing });
+    if (!playing) this.clock.stop(duration);
     this.present();
     this.emit();
-    if (!this.disposed && this.state.playing && !this.clockHolds.size && this.tickId === null)
+    if (!this.disposed && this.state.playing && !this.clock.blocked && this.tickId === null)
       this.tickId = this.scheduler.request(this.tick);
   };
 
@@ -422,7 +405,7 @@ export class MotionTransport {
     this.stopDraft?.();
     this.state = Object.freeze({ ...this.state, playing: false });
     this.stopTick();
-    this.clockHolds.clear();
+    this.clock.stop();
     this.stopEngine?.();
     this.stopEngine = null;
     this.listeners.clear();

@@ -11,8 +11,9 @@ import {
 import { createRenderSession } from "../standalone";
 import { MotionExportError } from "./errors";
 import type { MotionPreviewOptions, MotionPreviewState } from "./preview-model";
+import { BufferedPlaybackClock, PLAYBACK_FRAME_CREDIT_MS } from "../../playback";
 
-/** A local wall clock and one acknowledged GPU job; no editor, history or transport dependency. */
+/** The shared buffered clock and one acknowledged GPU job; no editor/history dependency. */
 export function createMotionPreview(project: Project, options: MotionPreviewOptions) {
   const assets = structuredClone(project.assets);
   const program = compileMotion({ ...project, assets }, { compositionId: options.compositionId });
@@ -47,8 +48,13 @@ export function createMotionPreview(project: Project, options: MotionPreviewOpti
     maxBytes: options.maxGpuBytes ?? 256 * 1024 * 1024,
   });
   const abort = new AbortController(),
-    listeners = new Set<() => void>(),
-    clockHolds = new Set<symbol>();
+    listeners = new Set<() => void>();
+  const clock = new BufferedPlaybackClock(() => scheduler.now());
+  clock.start(0);
+  let bootstrapRelease: (() => boolean) | null = clock.hold();
+  let presentationRelease: (() => boolean) | null = options.presentation?.busy()
+    ? clock.hold()
+    : null;
   let state: MotionPreviewState = {
     playing: true,
     time: { value: 0, rate: 1 },
@@ -58,8 +64,7 @@ export function createMotionPreview(project: Project, options: MotionPreviewOpti
   };
   let frame: number | null = null,
     pending: Promise<void> | null = null;
-  let anchor: number | null = null,
-    generation = 0,
+  let generation = 0,
     dirty = true,
     closed = false;
   let disposal: Promise<void> | null = null;
@@ -67,10 +72,6 @@ export function createMotionPreview(project: Project, options: MotionPreviewOpti
     state = { ...state, ...next };
     for (const listener of listeners) listener();
   };
-  const clock = () =>
-    anchor === null
-      ? motionTimeToSeconds(state.time)
-      : Math.max(0, (scheduler.now() - anchor) / 1000) % duration;
   const sample = (seconds: number) =>
     normalizeMotionTime({ value: Math.round(seconds * 1_000_000), rate: 1_000_000 });
   const schedule = () => {
@@ -80,7 +81,7 @@ export function createMotionPreview(project: Project, options: MotionPreviewOpti
       !options.presentation?.busy() &&
       frame === null &&
       !pending &&
-      ((state.playing && !clockHolds.size) || dirty)
+      ((state.playing && !clock.blocked) || dirty)
     )
       frame = scheduler.request(() => {
         frame = null;
@@ -90,8 +91,8 @@ export function createMotionPreview(project: Project, options: MotionPreviewOpti
   const paint = () => {
     if (closed || pending || state.error || options.presentation?.busy()) return;
     const seconds =
-      state.playing && !clockHolds.size
-        ? Math.floor(clock() * frameRate) / frameRate
+      state.playing && !clock.blocked
+        ? Math.floor((clock.read() % duration) * frameRate + 1e-7) / frameRate
         : motionTimeToSeconds(state.time);
     const owner = generation,
       time = sample(seconds);
@@ -100,6 +101,7 @@ export function createMotionPreview(project: Project, options: MotionPreviewOpti
       return;
     }
     const plan = evaluateMotion(program, time);
+    const releaseFrame = clock.hold(bootstrapRelease ? 0 : PLAYBACK_FRAME_CREDIT_MS);
     dirty = false;
     publish({ busy: true });
     const job = session.withCanvasFrame(
@@ -121,15 +123,19 @@ export function createMotionPreview(project: Project, options: MotionPreviewOpti
       .then(
         () => {
           if (closed || owner !== generation) return;
-          if (state.playing && !clockHolds.size && anchor === null)
-            anchor = scheduler.now() - motionTimeToSeconds(time) * 1000;
           publish({ time, busy: false });
+          bootstrapRelease?.();
+          bootstrapRelease = null;
         },
         (error: unknown) => {
-          if (!closed && owner === generation) publish({ playing: false, busy: false, error });
+          if (!closed && owner === generation) {
+            clock.stop();
+            publish({ playing: false, busy: false, error });
+          }
         },
       )
       .finally(() => {
+        releaseFrame();
         pending = null;
         if (state.error && !closed) {
           disposal ??= session.dispose();
@@ -146,11 +152,16 @@ export function createMotionPreview(project: Project, options: MotionPreviewOpti
   const stopPresentation = options.presentation?.subscribe(() => {
     if (closed) return;
     if (options.presentation?.busy()) {
+      presentationRelease ??= clock.hold();
       generation++;
       dirty = true;
       if (frame !== null) scheduler.cancel(frame);
       frame = null;
-    } else schedule();
+    } else {
+      presentationRelease?.();
+      presentationRelease = null;
+      schedule();
+    }
   });
   schedule();
   return {
@@ -163,32 +174,25 @@ export function createMotionPreview(project: Project, options: MotionPreviewOpti
     },
     holdPlayback() {
       if (closed || !state.playing) return () => {};
-      if (!clockHolds.size) {
-        state = { ...state, time: sample(clock()) };
-        anchor = null;
-      }
-      const owner = Symbol("preview-audio");
-      clockHolds.add(owner);
+      const release = clock.hold();
       return (delayMs = 0) => {
-        if (!Number.isFinite(delayMs) || delayMs < 0) throw new RangeError("Invalid clock delay.");
-        if (!clockHolds.delete(owner) || clockHolds.size || closed || !state.playing) return;
-        anchor = scheduler.now() + delayMs - motionTimeToSeconds(state.time) * 1000;
-        schedule();
+        if (release(delayMs)) schedule();
       };
     },
     play() {
       if (closed || state.error || state.playing) return;
-      anchor = scheduler.now() - motionTimeToSeconds(state.time) * 1000;
+      clock.start(motionTimeToSeconds(state.time));
+      presentationRelease = options.presentation?.busy() ? clock.hold() : null;
       publish({ playing: true });
       schedule();
     },
     pause() {
       if (closed || !state.playing) return;
-      const time = sample(clock());
-      anchor = null;
+      clock.stop(motionTimeToSeconds(state.time));
+      bootstrapRelease = presentationRelease = null;
       generation++;
       dirty = true;
-      publish({ playing: false, time });
+      publish({ playing: false });
       schedule();
     },
     seek(time: MotionTime) {
@@ -198,7 +202,12 @@ export function createMotionPreview(project: Project, options: MotionPreviewOpti
         Math.min(duration, motionTimeToSeconds(normalizeMotionTime(time))),
       );
       generation++;
-      anchor = state.playing ? scheduler.now() - seconds * 1000 : null;
+      clock.stop(seconds);
+      bootstrapRelease = presentationRelease = null;
+      if (state.playing) {
+        clock.start(seconds);
+        presentationRelease = options.presentation?.busy() ? clock.hold() : null;
+      }
       dirty = true;
       publish({ time: sample(seconds) });
       schedule();
@@ -207,7 +216,7 @@ export function createMotionPreview(project: Project, options: MotionPreviewOpti
       if (!closed) {
         closed = true;
         stopPresentation?.();
-        clockHolds.clear();
+        clock.stop();
         generation++;
         abort.abort();
         if (frame !== null) scheduler.cancel(frame);

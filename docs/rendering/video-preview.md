@@ -47,14 +47,33 @@ actual acknowledgement and remain bounded during cancellation/disposal.
 
 The implementation follows the pinned 1.62.1 API and its official [conversion guide](https://mediabunny.dev/guide/converting-media-files), [conversion video options](https://mediabunny.dev/api/ConversionVideoOptions), [media sinks](https://mediabunny.dev/guide/media-sinks) and [VideoSampleSink API](https://mediabunny.dev/api/VideoSampleSink). Playback already used sequential `samples(start)` with latency optimization; the new work keeps that path and reduces the resolution entering it. See [the five-video measurements](../performance/video-preview.md) for native verification and limitations.
 
-## Infinite-canvas buffering
+## Shared interactive playback clock
 
-The canvas adapter acquires a transport buffering lease when submitting a playing
-frame and releases it only after Three draws the corresponding display scene.
-Coalesced requests share one lease. Up to 33.3 ms of preparation counts toward
-normal playback; longer decode/compilation waits do not accumulate catch-up time.
-Paused seeks, errors and disposal release the lease as well. This is presentation
-backpressure, not a change to the portable document, source speed or exact export.
+`BufferedPlaybackClock` in `@musart/render/playback` owns an unwrapped, sampled
+presentation phase without installing timers or depending on editor state. The
+canvas transport, saved/template hover previews and export preview all use it.
+Source selection, animation values and effect time still come from the same
+issued Motion plan; this does not change authored speed or exact offline export.
+
+A frame acquires a buffering lease and releases it after its actual canvas draw.
+Coalesced canvas requests share one lease. Up to 33.3 ms of preparation counts
+toward normal playback; longer decode/compilation waits do not accumulate
+catch-up time. Initial preview preparation has no credit. UI presentation gates
+and audio startup use zero-credit nested leases; native audio can specify its
+start delay. Only the last current lease resumes scheduling, and pause, seek,
+replacement and disposal invalidate older leases. The editor keeps the unwrapped
+phase while holding, including the reverse half of ping-pong playback.
+
+Hover previews park their RAF while a GPU frame is pending or a UI gate is held,
+and resume from completion/subscription callbacks. No catch-up queue or idle gate
+polling is needed. Preview pause keeps the accepted frame; resume excludes paused
+time. Exact export continues evaluating explicit timestamps independently.
+
+Mediabunny's sequential `samples(start)` already pre-decodes ahead. Its pinned
+four-sample queue is covered by the existing decoder reservation, in addition to
+borrowed/cached frames. This change preserves that anticipatory decoder and its
+memory accounting; it does not add a second decoder or an unbounded application
+prefetch queue. A loop/reverse still creates a cursor near the requested time.
 
 ## Opaque packed RGB frames
 

@@ -22,7 +22,8 @@ function fixture() {
   const media = templateMedia(),
     { project } = createBloomTemplate(media);
   const callbacks = new Map<number, FrameRequestCallback>();
-  let sequence = 0;
+  let sequence = 0,
+    now = 1000;
   const times: number[] = [];
   const rendered: Composition[] = [];
   const modes: (string | undefined)[] = [];
@@ -58,7 +59,7 @@ function fixture() {
       ],
     })),
     createSession: vi.fn(async () => session),
-    now: () => 1000,
+    now: () => now,
     requestFrame: (callback) => {
       const id = ++sequence;
       callbacks.set(id, callback);
@@ -82,7 +83,11 @@ function fixture() {
     project,
     status,
     hold: () => (gate = deferred()),
+    advance: (time: number) => {
+      now = time;
+    },
     tick: (time: number) => {
+      now = Math.max(now, time);
       const [id, callback] = [...callbacks.entries()][0]!;
       callbacks.delete(id);
       callback(time);
@@ -124,23 +129,26 @@ test("presents the actual retained GPU canvas, pauses the clock until ready and 
   expect(f.dispose).toHaveBeenCalledOnce();
 });
 
-test("coalesces queued samples to the latest time and loops the genuine five-second composition", async () => {
+test("bounds pending work and excludes a long GPU stall from the shared clock", async () => {
   const f = fixture(),
     owner = f.start();
   await flush();
   const gate = f.hold();
   f.tick(1100);
   await flush();
-  f.tick(1200);
-  f.tick(1300);
-  await flush();
+  expect(f.callbacks.size).toBe(0);
+  f.advance(3100);
   expect(f.times).toEqual([0, 0.1]);
   gate.resolve();
   await flush();
-  expect(f.times).toEqual([0, 0.1, 0.3]);
-  f.tick(6100);
+  expect(f.times).toEqual([0, 0.1]);
+  f.tick(3134);
   await flush();
-  expect(f.times.at(-1)).toBe(0.1);
+  expect(f.times.at(-1)).toBeCloseTo(1 / 6);
+  // Source/effect time stays the same, including when crossing the exclusive loop end.
+  f.tick(7968);
+  await flush();
+  expect(f.times.at(-1)).toBe(0);
   await owner.release();
 });
 
@@ -270,12 +278,10 @@ test("saved projects and authored templates share one GPU owner and evaluate the
 
 test("pause retains the GPU frame and resumes the same clock without counting paused time", async () => {
   const f = fixture();
-  let now = 1000;
-  f.dependencies.now = () => now;
+
   const owner = f.start();
   await flush();
-  now = 1300;
-  f.tick(now);
+  f.tick(1300);
   await flush();
   expect(f.times.at(-1)).toBe(0.3);
   owner.setPaused!(true);
@@ -283,7 +289,7 @@ test("pause retains the GPU frame and resumes the same clock without counting pa
   expect(f.host.firstChild).toBe(f.canvas);
   expect(f.status).toHaveBeenLastCalledWith("paused");
   const count = f.times.length;
-  now = 8300;
+  f.advance(8300);
   owner.setPaused!(false);
   expect(f.status).toHaveBeenLastCalledWith("playing");
   expect(f.callbacks.size).toBe(1);
@@ -355,13 +361,16 @@ test("optional preview preparation and frame admission yield to overlay transiti
   await flush();
   expect(f.dependencies.prepare).toHaveBeenCalledOnce();
   expect(f.times).toEqual([0]);
-  expect(listeners.size).toBe(0);
+  expect(listeners.size).toBe(1);
+  f.advance(1067);
   busy = true;
-  f.tick(1067);
+  listeners.forEach((listener) => listener());
   await flush();
   expect(f.times).toEqual([0]);
+  f.advance(1167);
   busy = false;
-  f.tick(1167);
+  listeners.forEach((listener) => listener());
+  f.tick(1234);
   await flush();
   expect(f.times.at(-1)).toBeCloseTo(2 / 30);
   await owner.release();

@@ -1,3 +1,4 @@
+import { PLAYBACK_FRAME_CREDIT_MS } from "@musart/render/playback";
 import type { MotionFramePlan, Asset, Composition, EnginePort, Layer, Project } from "@musart/core";
 import type { PreviewSource, PreviewValue } from "../../state/session/preview-source";
 import { createPlaybackSource, type PlaybackSource, type PlaybackFrame } from "./playback-source";
@@ -74,7 +75,7 @@ export class SceneController {
     this.playback = createPlaybackSource(engine);
     this.motion = createMotionTransport(engine);
   }
-  holdPlayback = () => this.motion.holdPlayback(1000 / 30);
+  holdPlayback = () => this.motion.holdPlayback(PLAYBACK_FRAME_CREDIT_MS);
 
   read = (): SceneFrame => {
     const playback = this.playback.read();

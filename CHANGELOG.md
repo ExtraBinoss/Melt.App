@@ -6,6 +6,7 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Share a bounded presentation clock across the canvas, library previews and export preview. Slow frame preparation and UI transitions no longer accumulate playback catch-up; hover previews park scheduling while a frame is pending.
 - Add a translated Center selected layer export switch and information tooltip only for a single selected layer. Preserve authored artboard dimensions, shift the isolated layer once without editing the document, and share identical framing across image, print, Motion and Timelapse previews and exports. Keep animated movement, masks, stale preview rejection and crop-cache identities intact.
 
 - Start canvas playback preparation without a redundant animation-frame wait, retaining RAF coalescing for still edits and one prepared playing pose until real display. Cancel retired microtasks on navigation/device loss/disposal and prevent superseded poses from blocking newer frames; preserve authored timing and buffering credits.

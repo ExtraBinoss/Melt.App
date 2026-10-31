@@ -11,6 +11,7 @@ import {
   motionTimeToSeconds,
   type Project,
 } from "@musart/core";
+import { BufferedPlaybackClock, PLAYBACK_FRAME_CREDIT_MS } from "@musart/render/playback";
 import type {
   createRenderSession,
   FontResolver,
@@ -103,8 +104,9 @@ export function startMotionPreview(
   let requested: number | null = null;
   let draining: Promise<void> | null = null;
   let disposal: Promise<void> | null = null;
-  let began = 0;
-  let presentationHeldAt: number | null = null;
+  const clock = new BufferedPlaybackClock(dependencies.now);
+  let stopPresentation: (() => void) | undefined;
+  let presentationRelease: (() => boolean) | null = null;
   let paused = false;
   let renderGeneration = 0;
   let changePaused: ((next: boolean) => void) | null = null;
@@ -117,6 +119,8 @@ export function startMotionPreview(
     if (disposal) return disposal;
     timing?.finish("cancelled");
     stopped = true;
+    clock.stop();
+    stopPresentation?.();
     abort.abort();
     if (frame !== null) dependencies.cancelFrame(frame);
     frame = null;
@@ -195,6 +199,7 @@ export function startMotionPreview(
         if (presentation?.busy()) await waitForPresentation(presentation, abort.signal);
         if (!alive() || paused || generation !== renderGeneration) return;
         const plan = evaluateMotion(program, { value: Math.floor(seconds * 30 + 1e-7), rate: 30 });
+        const releaseFrame = clock.hold(PLAYBACK_FRAME_CREDIT_MS);
         try {
           await session!.withCanvasFrame(
             applyMotionFrame(program, plan),
@@ -223,6 +228,8 @@ export function startMotionPreview(
           )
             return;
           throw error;
+        } finally {
+          releaseFrame();
         }
       }
       function failure(error: unknown) {
@@ -242,59 +249,65 @@ export function startMotionPreview(
           .catch(failure)
           .finally(() => {
             draining = null;
+            schedule();
           });
       }
-      function tick(now: number) {
-        if (!alive() || paused) return;
-        // A RAF timestamp can predate a long bootstrap task in the same frame.
-        now = Math.max(now, dependencies.now());
-        if (presentation?.busy()) {
-          presentationHeldAt ??= now;
+      function schedule() {
+        if (alive() && !paused && !draining && !clock.blocked && frame === null)
           frame = dependencies.requestFrame(tick);
-          return;
-        }
-        if (presentationHeldAt !== null) {
-          began += now - presentationHeldAt;
-          presentationHeldAt = null;
-        }
-        const sample = Math.floor(((Math.max(0, now - began) / 1000) % duration) * 30 + 1e-7);
+      }
+      function tick() {
+        frame = null;
+        if (!alive() || paused || clock.blocked) return;
+        const sample = Math.floor((clock.read() % duration) * 30 + 1e-7);
         if (sample !== lastSample) {
           lastSample = sample;
           requested = sample / 30;
           drain();
-        }
-        frame = dependencies.requestFrame(tick);
+        } else schedule();
       }
       timing?.stage("First frame: fonts, geometry + GPU render");
       await render(0);
       if (!alive()) return;
-      let pausedAt = 0;
       changePaused = (next) => {
         if (!alive() || paused === next) return;
         paused = next;
         if (next) {
-          if (presentationHeldAt !== null) {
-            began += dependencies.now() - presentationHeldAt;
-            presentationHeldAt = null;
-          }
+          clock.stop();
+          presentationRelease = null;
           renderGeneration++;
-          pausedAt = dependencies.now();
           if (frame !== null) dependencies.cancelFrame(frame);
           frame = null;
           requested = null;
           options.onStatus("paused");
         } else {
-          began += dependencies.now() - pausedAt;
+          clock.start(clock.read());
+          if (presentation?.busy()) presentationRelease = clock.hold();
           lastSample = -1;
           options.onStatus("playing");
-          frame = dependencies.requestFrame(tick);
+          schedule();
         }
       };
+      clock.start(0);
+      stopPresentation = presentation?.subscribe(() => {
+        if (!alive() || paused) return;
+        if (presentation.busy()) {
+          presentationRelease ??= clock.hold();
+          renderGeneration++;
+          lastSample = -1;
+          if (frame !== null) dependencies.cancelFrame(frame);
+          frame = null;
+        } else {
+          presentationRelease?.();
+          presentationRelease = null;
+          schedule();
+        }
+      });
+      if (presentation?.busy()) presentationRelease = clock.hold();
       options.onStatus("playing");
       timing?.finish("ready");
-      began = dependencies.now();
       lastSample = 0;
-      frame = dependencies.requestFrame(tick);
+      schedule();
     } catch (error) {
       if (alive()) {
         timing?.finish("failed", error);

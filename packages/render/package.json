@@ -7,6 +7,7 @@
     ".": "./src/index.ts",
     "./spatial": "./src/spatial/public.ts",
     "./audio": "./src/audio.ts",
+    "./playback": "./src/playback/index.ts",
     "./preview-cost": "./src/compositing/preview-cost.ts"
   },
   "dependencies": {
