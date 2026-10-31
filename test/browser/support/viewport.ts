@@ -42,6 +42,9 @@ export async function zoomViewport(page: Page, target: number) {
       await expect
         .poll(() => page.evaluate(() => (window as ZoomDriverWindow).__musartZoomDriver?.count))
         .toBe(++packets);
+      // Wheel lookahead is intentionally bounded by the presented pose. Let
+      // each setup packet settle so later packets cannot be clipped by that bound.
+      await expect(artboard).toHaveAttribute("data-view-moving", "false");
       remaining -= delta;
     }
   } finally {

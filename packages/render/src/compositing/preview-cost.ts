@@ -142,6 +142,8 @@ export function estimatePreviewCost(
   }
   children(null, page.width, page.height, scale, false);
   target(rasterExtent(page.width, scale), rasterExtent(page.height, scale), false);
+  // A front/back pair keeps the visible texture intact until its successor is ready.
+  target(rasterExtent(page.width, scale), rasterExtent(page.height, scale), false);
   if (primitiveCount)
     fixedBytes +=
       BASE_GEOMETRY_BYTES +

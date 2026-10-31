@@ -39,7 +39,7 @@ it("counts real primitive batches instead of allocating each shape rectangle", (
   });
   const result = estimatePreviewCost(page, 1);
   expect(result.maxDimension).toBe(64);
-  expect(result.scaledBytes).toBe(64 * 64 * 4 * 2);
+  expect(result.scaledBytes).toBe(64 * 64 * 4 * 3);
   expect(result.fixedBytes).toBeLessThan(1024);
 });
 it("clips transport groups using the same indexed viewport while preserving reference effects at1x", () => {

@@ -1,6 +1,6 @@
 import { expect, it, vi } from "vitest";
 import type { WebGPURenderer } from "three/webgpu";
-import { settleVideoUpload } from "../../../src/sources/video/settle";
+import { acknowledgeGpuWork as settleVideoUpload } from "../../src/cache/acknowledgement";
 it("awaits the native WebGPU submission acknowledgement without mapping any buffer", async () => {
   let finish!: () => void;
   const done = new Promise<void>((resolve) => {

@@ -22,7 +22,12 @@ const edge = (value: number, round: (value: number) => number) => {
 };
 
 /** Only transport containers use this window. Treatments/mask sources keep their full domain. */
-export function groupViewport(layer: Layer, scale: number, parent?: Bounds): GroupViewport | null {
+export function groupViewport(
+  layer: Layer,
+  scale: number,
+  parent?: Bounds,
+  maxDimension = 16384,
+): GroupViewport | null {
   if (!parent) return null;
   const inverse = invertMatrix(layerTransform(layer));
   const corners = [
@@ -46,6 +51,16 @@ export function groupViewport(layer: Layer, scale: number, parent?: Bounds): Gro
     bottom = empty
       ? 1
       : Math.min(fullHeight, edge((maxY / layer.height) * fullHeight, Math.ceil) + 1);
+  // Keep a bounded, mostly visible surface stable while its parent rotates.
+  // Reallocating a slightly different crop every frame is costlier than this <=2x overdraw.
+  if (
+    !empty &&
+    fullWidth <= Math.min(2048, maxDimension) &&
+    fullHeight <= Math.min(2048, maxDimension) &&
+    fullWidth * fullHeight <= 4 * 1024 * 1024 &&
+    (right - left) * (bottom - top) >= (fullWidth * fullHeight) / 2
+  )
+    return null;
   if (!empty && left === 0 && top === 0 && right === fullWidth && bottom === fullHeight)
     return null;
   return {

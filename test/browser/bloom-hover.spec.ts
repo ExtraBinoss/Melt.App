@@ -1,3 +1,4 @@
+import { checkBloomBackdrop } from "./support/bloom-presentation";
 import { expect, test } from "@playwright/test";
 import { mkdir, writeFile } from "node:fs/promises";
 
@@ -32,6 +33,17 @@ test("real Bloom Windows card presents continuous motion, pauses and releases on
     .evaluate(async (host) => {
       const times: number[] = [],
         clocks: number[] = [];
+      let resizeWrites = 0;
+      const resize = new MutationObserver((records) => {
+        resizeWrites += records.filter(
+          (record) => (record.target as Element).tagName === "CANVAS",
+        ).length;
+      });
+      resize.observe(host, {
+        subtree: true,
+        attributes: true,
+        attributeFilter: ["width", "height"],
+      });
       const observer = new MutationObserver(() => {
         times.push(performance.now());
         clocks.push(Number((host as HTMLElement).dataset.previewTime));
@@ -39,10 +51,12 @@ test("real Bloom Windows card presents continuous motion, pauses and releases on
       observer.observe(host, { attributes: true, attributeFilter: ["data-preview-time"] });
       await new Promise((resolve) => setTimeout(resolve, 3200));
       observer.disconnect();
+      resize.disconnect();
       const gaps = times.slice(1).map((time, index) => time - times[index]!);
       const sorted = [...gaps].sort((a, b) => a - b);
       return {
         frames: times.length,
+        resizeWrites,
         gapP95: sorted[Math.floor(sorted.length * 0.95)] ?? null,
         gapMax: Math.max(0, ...gaps),
         times,
@@ -56,6 +70,7 @@ test("real Bloom Windows card presents continuous motion, pauses and releases on
     await profiler.detach();
   }
   await writeFile("artifacts/bloom-windows/hover-cadence.json", JSON.stringify(cadence, null, 2));
+  expect(cadence.resizeWrites).toBe(0);
   expect(cadence.frames).toBeGreaterThan(40);
   expect(cadence.gapP95).not.toBeNull();
   expect(cadence.gapP95!).toBeLessThan(100);
@@ -65,6 +80,7 @@ test("real Bloom Windows card presents continuous motion, pauses and releases on
   expect(requests.some((url) => url.includes("bloom-windows.preview.json"))).toBe(true);
   expect(requests.some((url) => url.includes("bloom-windows-hover.mp4"))).toBe(true);
   expect(requests.some((url) => url.includes("bloom-windows-loop.mp4"))).toBe(false);
+  await checkBloomBackdrop(preview.locator("canvas"), "artifacts/bloom-flicker/hover-display");
   await page.locator(".dashboard-brand").hover();
   await expect(preview).toHaveAttribute("data-preview-status", "idle");
   await expect(preview.locator("canvas")).toHaveCount(0);

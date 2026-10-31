@@ -398,7 +398,7 @@ it("prepares custom font bytes through the injected resolver and retains their G
   await graph.dispose();
 });
 
-it("composes ten thousand plain primitives with two document targets and one bounded instanced draw", async () => {
+it("composes ten thousand plain primitives with a bounded front/back pair and one instanced draw", async () => {
   const { renderer, fake } = makeGpuRenderer(),
     graph = new GpuCompositor(renderer);
   const layers = Array.from({ length: 10_000 }, (_, index) =>
@@ -432,7 +432,7 @@ it("composes ten thousand plain primitives with two document targets and one bou
     {},
   );
   expect(graph.stats().passes - cold.passes).toBe(3);
-  expect(graph.stats().targets).toBe(3);
+  expect(graph.stats().targets).toBe(4);
   expect(graph.stats().primitiveBytes).toBe(cold.primitiveBytes);
   expect(fake.readRenderTargetPixelsAsync).not.toHaveBeenCalled();
   await graph.dispose();

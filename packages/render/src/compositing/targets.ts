@@ -76,6 +76,12 @@ export class LayerTargets implements GpuResource {
     } else target.setSize(width, height);
     return target;
   }
+  /** Never overwrite the texture currently borrowed by the display while preparing its successor. */
+  nextPresentationRole(): string {
+    return this.output?.texture === this.buffers.get("presentation-a")?.texture
+      ? "presentation-b"
+      : "presentation-a";
+  }
   get sourceTexture(): Texture | null {
     return this.source;
   }

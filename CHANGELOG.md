@@ -6,6 +6,7 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Publish playing compositions through a bounded front/back texture pair only after real GPU acknowledgement, retaining the last accepted image on cancellation. Keep same-size playback canvases and Fiber density stable instead of repeatedly clearing their drawing buffers. Reuse moving group crop allocations, include crop bounds in their cache signatures, and retain bounded mostly-visible group surfaces to avoid per-frame allocation churn.
 - Resolve self-intersecting and overlapping font/SVG contours with their actual nonzero or even-odd fill rule before native 3D triangulation. Restore the variable Inter M notch and SVG counters without replacing fonts; keep preparation in the bounded geometry worker.
 
 - Add native 3D sources to classic layers: editable shaped text/SVG extrusion, six primitives, self-contained animated GLB import, thirty rendered material presets, and composition lighting, environments and cameras. Keep normal effects, masks, ordering, keyframes, action recipes and exports; add an object-anchored 2D/3D switch, Three transform/orbit controls, snapped G/R/S gestures and owned one-transaction previews. Bound worker/GPU resources, decode HDR/EXR off-thread, retain transparent transmission reflections and SVG paints, expose measured 3D inventories, and translate controls in twelve locales. Await native wheel delivery before releasing Ctrl in browser zoom witnesses.

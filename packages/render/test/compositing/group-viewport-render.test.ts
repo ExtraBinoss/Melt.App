@@ -76,7 +76,8 @@ it("uses the complete current processing target for descendants beneath an effec
   );
   const apply = vi.spyOn(EffectResources.prototype, "apply");
   expect(await graph.render(scope, {}, { scale: 8 })).toMatchObject({ width: 8, height: 88 });
-  expect(apply.mock.calls[0]?.slice(1, 3)).toEqual([64, 64]);
+  // The 64 px authored domain includes 27 px of real blur coverage on each side.
+  expect(apply.mock.calls[0]?.slice(1, 3)).toEqual([118, 118]);
   const targets = fake.setRenderTarget.mock.calls.flatMap(([target]) => (target ? [target] : []));
   expect(targets.some((target) => target.width === 65 && target.height === 65)).toBe(true);
   expect(targets.every((target) => target.width <= 128 && target.height <= 128)).toBe(true);
@@ -131,5 +132,18 @@ it("skips an empty offscreen transport container without allocating its authored
   await graph.render(createPage({ width: 16, height: 16, layers: [group, tick()] }), {});
   expect(resize.mock.calls.every(([width, height]) => width <= 128 && height <= 128)).toBe(true);
   expect(graph.stats().primitiveDraws).toBe(0);
+  await graph.dispose();
+});
+
+it("reuses one cropped transport allocation while its visible window moves", async () => {
+  const { renderer } = makeGpuRenderer();
+  const graph = new GpuCompositor(renderer);
+  const group = { ...giant(), x: -60, y: -1400 };
+  const page = createPage({ width: 16, height: 16, layers: [group, tick()] });
+  await graph.render(page, {});
+  const entries = graph.stats().cacheEntries;
+  for (let step = 1; step <= 40; step++)
+    await graph.render({ ...page, layers: [{ ...group, x: group.x - step / 2 }, tick()] }, {});
+  expect(graph.stats().cacheEntries).toBe(entries);
   await graph.dispose();
 });

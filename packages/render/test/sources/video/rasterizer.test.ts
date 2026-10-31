@@ -1,11 +1,13 @@
 import { beforeEach, expect, it, vi } from "vitest";
 import { RenderTarget } from "three/webgpu";
 import { VideoRasterizer } from "../../../src/sources/video/rasterizer";
-import { settleVideoUpload } from "../../../src/sources/video/settle";
+import { acknowledgeGpuWork as settleVideoUpload } from "../../../src/cache/acknowledgement";
 import type { VideoFrameLease } from "../../../src/sources/video/model";
 import { makeGpuRenderer } from "../../gpu-fixture";
 import { deferred } from "./fixtures";
-vi.mock("../../../src/sources/video/settle", () => ({ settleVideoUpload: vi.fn(async () => {}) }));
+vi.mock("../../../src/cache/acknowledgement", () => ({
+  acknowledgeGpuWork: vi.fn(async () => {}),
+}));
 function lease() {
   return {
     frame: { codedWidth: 2, codedHeight: 2, displayWidth: 4, displayHeight: 2 },

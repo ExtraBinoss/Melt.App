@@ -1,3 +1,4 @@
+import { completeGpuFrame } from "./publication";
 import { drawLayerSource } from "./layer-source";
 import type { SpatialSources } from "../spatial/SpatialSources";
 import {
@@ -233,7 +234,7 @@ export class GpuCompositor {
       if (options.canRender && !options.canRender())
         throw new DOMException("Rendering deferred.", "AbortError");
       if (this.disposed) throw new Error("Le compositeur GPU est fermé.");
-      // No await below this point: R3F cannot observe intermediate targets or altered state.
+      // Compose synchronously and restore renderer state before yielding for publication.
       const frame: RenderFrame = {
         page,
         scale,
@@ -288,19 +289,20 @@ export class GpuCompositor {
         rootKey,
         frame,
       );
-      const target = this.target(entry, rootKey, "presentation", composed.width, composed.height);
+      const target = this.target(
+        entry,
+        rootKey,
+        entry.nextPresentationRole(),
+        composed.width,
+        composed.height,
+      );
       if (proof) {
         proof.render(composed, target);
         this.proofPasses++;
       } else if (page.colorSpace === "display-p3") this.color.render(composed, target, "to-srgb");
       else if (page.colorSpace === "cmyk-proof") this.color.render(composed, target, "cmyk-proof");
       else this.passes.copyTo(composed, target);
-      entry.output = {
-        texture: target.texture,
-        width: target.width,
-        height: target.height,
-        premultiplied: true,
-      };
+      entry.output = await completeGpuFrame(this.renderer, target, options);
       entry.signature = signature;
       this.retainedRoot = rootKey;
       this.rememberInput(entry, page, assets, options.motionFrame);
@@ -359,10 +361,12 @@ export class GpuCompositor {
       frame = { ...frame, scale: 1, vectorAntialias: false, keyFor: frame.referenceKeyFor };
     const { page, scale, keyFor, geometry, vectorAntialias } = frame;
     const viewport =
-      layer.kind === "group" && !reference ? groupViewport(layer, scale, parentViewport) : null;
-    const key = `layer:${page.id}:${layer.id}:${scale}${viewport ? `:window:${viewport.key}` : ""}${vectorAntialias ? ":vector-aa" : ""}`;
+      layer.kind === "group" && !reference
+        ? groupViewport(layer, scale, parentViewport, this.maxTextureDimension)
+        : null;
+    const key = `layer:${page.id}:${layer.id}:${scale}${viewport ? ":window" : ""}${vectorAntialias ? ":vector-aa" : ""}`;
     const entry = this.entry(key);
-    const signature = keyFor(layer);
+    const signature = viewport ? JSON.stringify([keyFor(layer), viewport.key]) : keyFor(layer);
     if (entry.signature === signature && entry.output) {
       this.cacheHits++;
       return entry.output;

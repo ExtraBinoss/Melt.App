@@ -1,3 +1,4 @@
+import { checkBloomBackdrop } from "./support/bloom-presentation";
 import { expect, test } from "@playwright/test";
 import { mkdir, writeFile } from "node:fs/promises";
 
@@ -51,6 +52,7 @@ test("1080p Bloom canvas shares synchronized video copies and keeps presenting a
       error: canvas.dataset.renderError ?? null,
     };
   });
+  await checkBloomBackdrop(canvas, "artifacts/bloom-flicker/canvas-display");
   await page.keyboard.press("Control+Space");
   await mkdir("artifacts/bloom-windows", { recursive: true });
   await writeFile("artifacts/bloom-windows/canvas-cadence.json", JSON.stringify(cohort, null, 2));

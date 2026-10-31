@@ -3,6 +3,7 @@ import type { WebGPURenderer } from "three/webgpu";
 /** Fiber retains the requested density; physical presentation retains exact frame texels. */
 export class DrawingDensity {
   readonly bounds: [number, number] = [1, 1];
+  private scale: number | null = null;
   private frame: { width: number; height: number } | null = null;
   apply(scale: number, setDpr: (value: number) => void, width: number, height: number): void {
     if (!Number.isFinite(scale) || scale <= 0) throw new Error("Invalid drawing density.");
@@ -11,7 +12,10 @@ export class DrawingDensity {
     this.frame = { width, height };
     this.bounds[0] = scale;
     this.bounds[1] = scale;
-    setDpr(scale);
+    if (this.scale !== scale) {
+      this.scale = scale;
+      setDpr(scale);
+    }
   }
   /** Before R3F's draw, repair Three's floor-rounded resize without changing CSS or camera. */
   prepare(renderer: Pick<WebGPURenderer, "domElement" | "setDrawingBufferSize">): void {

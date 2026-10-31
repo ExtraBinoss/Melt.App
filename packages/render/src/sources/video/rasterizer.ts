@@ -18,7 +18,7 @@ import { sRGBTransferOETF, texture, uniform, uv, vec3, vec4 } from "three/tsl";
 import type { VideoFrameLease } from "./model";
 import { VideoFrameTextureOwner } from "./texture";
 import { videoOrientationMatrix } from "./orientation";
-import { settleVideoUpload } from "./settle";
+import { acknowledgeGpuWork as settleVideoUpload } from "../../cache/acknowledgement";
 import { VIDEO_MAX_STREAMS } from "./budgets";
 interface Slot {
   readonly owner: VideoFrameTextureOwner;

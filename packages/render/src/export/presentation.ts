@@ -29,7 +29,9 @@ export class GpuPresentation {
   }
   render(frame: FrameTexture): void {
     this.source.value = frame.texture;
-    this.renderer.setSize(frame.width, frame.height, false);
+    const canvas = this.renderer.domElement;
+    if (canvas.width !== frame.width || canvas.height !== frame.height)
+      this.renderer.setSize(frame.width, frame.height, false);
     this.renderer.setRenderTarget(null);
     this.renderer.render(this.scene, this.camera);
   }

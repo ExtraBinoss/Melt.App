@@ -83,3 +83,26 @@ it("maps rotated parent targets and cropped source quads without mutating author
     expect(actual.y).toBeCloseTo(expected.y - 7, 10);
   }
 });
+
+it("retains compact mostly-visible rotating surfaces without changing giant or tiny-window cropping", () => {
+  for (const angle of [0, 15, 30, 45, 60, 90, 135]) {
+    const group = createLayer("group", {
+      width: 1920,
+      height: 1920,
+      x: 0,
+      y: -420,
+      rotation: angle,
+    });
+    expect(groupViewport(group, 0.5, { x: 0, y: 0, width: 1920, height: 1080 })).toBeNull();
+  }
+  const group = createLayer("group", { width: 1920, height: 1920 });
+  expect(groupViewport(group, 0.5, { x: 50, y: 50, width: 10, height: 10 })).not.toBeNull();
+  expect(groupViewport(group, 8, { x: 0, y: 0, width: 1920, height: 1080 })).not.toBeNull();
+});
+
+it("keeps cropping when a stable full surface would exceed the actual device side limit", () => {
+  const group = createLayer("group", { width: 200, height: 10, x: 0, y: 0 });
+  const window = groupViewport(group, 1, { x: 0, y: 0, width: 110, height: 10 }, 128);
+  expect(window).not.toBeNull();
+  expect(window!.pixelWidth).toBeLessThanOrEqual(128);
+});

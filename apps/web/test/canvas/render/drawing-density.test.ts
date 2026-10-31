@@ -57,3 +57,10 @@ it("presents exact non-square frame dimensions and repairs Fiber resizes without
   expect(density.bounds).toEqual([0.20435, 0.20435]);
   expect(setDpr).toHaveBeenCalledTimes(1);
 });
+
+it("does not invalidate Fiber or resize its drawing buffer for unchanged playback density", () => {
+  const density = new DrawingDensity(),
+    setDpr = vi.fn();
+  for (let frame = 0; frame < 90; frame++) density.apply(0.5, setDpr, 960, 540);
+  expect(setDpr).toHaveBeenCalledTimes(1);
+});
