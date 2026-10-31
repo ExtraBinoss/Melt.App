@@ -12,7 +12,7 @@
   "up": "Monter {{name}}",
   "down": "Descendre {{name}}",
   "hint": "Glissez les raccourcis pour les déplacer. Au clavier, utilisez les flèches ici.",
-  "limit": "Épinglez jusqu’à {{count}} raccourcis.",
+  "limit": "jusqu’à {{count}} raccourcis",
   "empty": "Aucune commande correspondante",
   "reordered": "Ordre des raccourcis modifié"
 }

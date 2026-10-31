@@ -12,7 +12,7 @@
   "up": "Move {{name}} up",
   "down": "Move {{name}} down",
   "hint": "Drag shortcuts to reorder. Use the arrow buttons here with a keyboard.",
-  "limit": "Pin up to {{count}} shortcuts.",
+  "limit": "up to {{count}} shortcuts",
   "empty": "No matching commands",
   "reordered": "Shortcut order updated"
 }

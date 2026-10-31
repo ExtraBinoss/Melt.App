@@ -6,6 +6,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Move the dock shortcut limit into a compact parenthetical beside the customizer title and remove its footer line.
+
 - Make canvas zoom controls opt-in through device-local Editor preferences. Add a two-second undo/redo pill centered on the canvas, matched to the project pill's size and vertical alignment through panel/ruler/name changes, with contextual action labels, pause on hover/focus, explicit dismissal and twelve-locale resources. Classify edits from bounded, payload-free command field metadata rather than recomputing SVG/effect contents.
 
 - Antialias scalable SVG sources on the infinite canvas with four GPU coverage samples, separate preview/exact retained keys and full resolved/sample memory accounting inside the existing preview and GPU cache limits. Preserve authored effect/mask references and export pixels.

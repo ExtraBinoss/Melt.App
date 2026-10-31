@@ -31,7 +31,12 @@ export function DockCustomizer({
         </IconButton>
       </PopoverTrigger>
       <PopoverContent side="right" align="end" className="floating-panel dock-customizer">
-        <h2>{t("dock:title")}</h2>
+        <h2>
+          {t("dock:title")}{" "}
+          <span className="dock-customizer-limit">
+            ({t("dock:limit", { count: MAX_DOCK_COMMANDS })})
+          </span>
+        </h2>
         <p className="dock-customizer-hint">{t("dock:hint")}</p>
         {pinnedCount > 0 && (
           <>
@@ -81,7 +86,6 @@ export function DockCustomizer({
         )}
         <h3>{t("dock:available")}</h3>
         <CommandCatalog ids={ids} commands={commands} onChange={onChange} />
-        <p className="dock-customizer-limit">{t("dock:limit", { count: MAX_DOCK_COMMANDS })}</p>
       </PopoverContent>
     </Popover>
   );
