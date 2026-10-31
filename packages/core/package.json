@@ -6,5 +6,8 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "svg-pathdata": "9.0.0"
   }
 }

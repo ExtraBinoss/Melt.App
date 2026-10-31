@@ -1,3 +1,7 @@
+import { editVectorPath } from "./edit/path";
+import { writeRoundedVectorPath } from "./edit/rounding";
+import { canRoundVectorNode } from "./edit/nodes";
+import type { VectorCorner } from "./model";
 import { ensure } from "../errors";
 import {
   assertRecord,
@@ -8,7 +12,7 @@ import {
   assertList,
 } from "../document/guards";
 const pathPattern = /^[MmZzLlHhVvCcSsQqTtAa\dEe+.,\s-]+$/;
-function path(value: unknown): void {
+function path(value: unknown): asserts value is string {
   assertText(value, 2_000_000);
   ensure(
     /^[Mm]/.test(value.trim()) && pathPattern.test(value),
@@ -43,6 +47,44 @@ export function validateVector(value: unknown): void {
     for (const part of value.parts) {
       assertRecord(part);
       path(part.path);
+      if (part.nodeEditing !== undefined) {
+        const editing = part.nodeEditing;
+        assertRecord(editing);
+        ensure(
+          editing.version === 1 && part.matrix === undefined,
+          "INVALID_DOCUMENT",
+          "Invalid SVG node parameters",
+        );
+        path(editing.path);
+        assertList(editing.rounding, 4096);
+        const paths = editVectorPath({ path: editing.path }),
+          rounding: VectorCorner[] = [],
+          seen = new Set<string>();
+        for (const corner of editing.rounding) {
+          assertRecord(corner);
+          assertNumber(corner.contour, 0, 4095);
+          assertNumber(corner.node, 0, 4095);
+          assertNumber(corner.radius, 0, 1000000);
+          const key = `${corner.contour}:${corner.node}`,
+            subpath = paths[corner.contour];
+          ensure(
+            Number.isInteger(corner.contour) &&
+              Number.isInteger(corner.node) &&
+              !!subpath?.nodes[corner.node] &&
+              !seen.has(key) &&
+              canRoundVectorNode(subpath, corner.node),
+            "INVALID_DOCUMENT",
+            "Invalid SVG corner parameters",
+          );
+          seen.add(key);
+          rounding.push({ contour: corner.contour, node: corner.node, radius: corner.radius });
+        }
+        ensure(
+          writeRoundedVectorPath(paths, rounding) === part.path,
+          "INVALID_DOCUMENT",
+          "SVG outline does not match its node parameters",
+        );
+      }
       if (part.fill !== undefined) paint(part.fill);
       if (part.stroke !== undefined) paint(part.stroke);
       if (part.strokeWidth !== undefined) assertNumber(part.strokeWidth, 0, 32768);

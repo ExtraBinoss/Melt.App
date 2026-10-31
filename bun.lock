@@ -80,6 +80,9 @@
     "packages/core": {
       "name": "@musart/core",
       "version": "0.2.0",
+      "dependencies": {
+        "svg-pathdata": "9.0.0",
+      },
     },
     "packages/render": {
       "name": "@musart/render",
@@ -1342,6 +1345,8 @@
     "strip-indent": ["strip-indent@3.0.0", "", { "dependencies": { "min-indent": "^1.0.0" } }, "sha512-laJTa3Jb+VQpaC6DseHhF7dXVqHTfJPCRDaEbid/drOhgitgYku/letMUqOXFoWV0zIIUbjpdH2t+tYj4bQMRQ=="],
 
     "suspend-react": ["suspend-react@0.1.3", "", { "peerDependencies": { "react": ">=17.0" } }, "sha512-aqldKgX9aZqpoDp3e8/BZ8Dm7x1pJl+qI3ZKxDN0i/IQTWUwBx/ManmlVJ3wowqbno6c2bmiIfs+Um6LbsjJyQ=="],
+
+    "svg-pathdata": ["svg-pathdata@9.0.0", "", {}, "sha512-h9FuqmNsgDKq2hQBqTMOWjZwqdZOnWijZmcg6FL4iSmH6VvRnobhHrBQSdOiP0W9nwgv0qiW5vQ3//Arrmp19g=="],
 
     "systeminformation": ["systeminformation@5.33.16", "", { "os": "!aix", "bin": { "systeminformation": "lib/cli.js" } }, "sha512-R+Lh69IJXfJj6bfyH1In5cIR9FTr4hBS39YvlZHZjsK1p9cuELPq7hplZZIb56ZESMMb+DzdKqqE6Iomi01Mvg=="],
 

@@ -1,5 +1,16 @@
+export interface VectorCorner {
+  contour: number;
+  node: number;
+  radius: number;
+}
+export interface VectorNodeEditing {
+  version: 1;
+  path: string;
+  rounding: VectorCorner[];
+}
 export interface VectorPart {
   path: string;
+  nodeEditing?: VectorNodeEditing;
   fill?: string;
   stroke?: string;
   strokeWidth?: number;

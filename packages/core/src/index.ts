@@ -246,3 +246,19 @@ export {
   animationPropertyId,
   animationPointId,
 } from "./motion/animations/keyframes";
+
+export { editVectorPath, writeVectorPath } from "./vector/edit/path";
+export {
+  moveVectorNode,
+  moveVectorHandle,
+  vectorNodeMode,
+  setVectorNodeMode,
+  splitVectorSegment,
+  removeVectorNode,
+  canRoundVectorNode,
+  roundVectorNode,
+} from "./vector/edit/nodes";
+export type { VectorNode, VectorPoint, VectorSubpath, VectorNodeMode } from "./vector/edit/model";
+
+export { writeRoundedVectorPath } from "./vector/edit/rounding";
+export type { VectorCorner, VectorNodeEditing } from "./vector/model";

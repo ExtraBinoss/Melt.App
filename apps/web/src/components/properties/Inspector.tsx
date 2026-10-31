@@ -1,4 +1,5 @@
 import "../export/messages";
+import { VectorProperties } from "./vector/VectorProperties";
 import { LayerAnimations } from "../motion/animations/LayerAnimations";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 import {
@@ -403,6 +404,14 @@ export const Inspector = memo(
                     <fieldset className="locked-layer-controls" disabled={locked}>
                       <AlignmentPanel engine={engine} selected={selected} run={runCurrent} />
                     </fieldset>
+                    {layer.kind === "vector" && (
+                      <VectorProperties
+                        layer={displayLayer!}
+                        patch={patch}
+                        preview={preview}
+                        cancel={cancel}
+                      />
+                    )}
                     {layer.kind === "text" && (
                       <TextProperties
                         engine={engine}

@@ -6,6 +6,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Add a lazy SVG point editor with anchor/Bézier handles, corner/smooth/symmetric nodes, exact segment splitting, persistent corner radii, per-path ends/joins and zoom controls. Keep GPU gesture previews imperative, commit once per gesture, cancel stale edits safely and preserve undo/save compatibility.
+
 - Isolate Preferences and library-detail visibility in small Jotai leaves so opening/closing no longer rerenders their card grids. Preserve genuine Radix exit presence and opener focus, use shared opacity-only glass-dialog fades, and reserve settings blur reveals for tab changes. Defer optional Motion preparation and frames during real overlay transitions with cancellation and clock preservation; record bounded native timing diagnostics.
 
 - Reveal settings categories with a short blur/fade entrance and reduced-motion support. Place the compact Try snapping action beside its distance label, retaining the real sandbox. Add shared content-mask scroll fades for translucent panels, preserving their existing background/blur and scrollbar gutters instead of painting opaque edge bands.
