@@ -39,8 +39,8 @@ The durable `share-your-work` template ID now presents **Too Hot to Haunt**.
 Its 1.2-second photo cycle uses ten editable action blocks over eight images.
 Occurrences crossing the loop boundary are split and their channel curves are
 clipped at the same phase; opacity and blur return continuously rather than
-popping a card or resetting a drift. Preview sampling floors the 30 fps index,
-so the last subframe cannot round into the exclusive composition end.
+popping a card or resetting a drift. Preview playback shares the editor's
+continuous phase and keeps loop samples below the exclusive composition end.
 
 The durable `morphing-type` ID now presents **Melt Mascot** on white. A fixed,
 mouthless mascot sits to the left; only its separate eyes move and blink. The

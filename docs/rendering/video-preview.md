@@ -69,6 +69,17 @@ and resume from completion/subscription callbacks. No catch-up queue or idle gat
 polling is needed. Preview pause keeps the accepted frame; resume excludes paused
 time. Exact export continues evaluating explicit timestamps independently.
 
+The editor transport and library previews also share `samplePlaybackPhase`:
+continuous microsecond animation/effect time, loop wrapping and terminal rules.
+Library playback must not introduce its own 30 fps animation grid. The video
+cursor independently selects the source sample covering that same timestamp;
+two animation poses inside one video frame reuse its uploaded GPU texture.
+Loop samples stay below the exclusive end even when microsecond rounding would
+reach it. Preview output fits its measured host density, bounded to a 480 px edge.
+Development previews emit decoded PTS, GPU-ready and `preview-submit` lineage
+marks without retaining runtime arrays; production emits none. Submission marks
+describe canvas submission, not physical display timing.
+
 Mediabunny's sequential `samples(start)` already pre-decodes ahead. Its pinned
 four-sample queue is covered by the existing decoder reservation, in addition to
 borrowed/cached frames. This change preserves that anticipatory decoder and its

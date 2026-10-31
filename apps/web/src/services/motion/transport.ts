@@ -14,7 +14,7 @@ import {
   type MotionProgram,
 } from "@musart/core";
 import { rulerChange } from "./ruler-change";
-import { BufferedPlaybackClock } from "@musart/render/playback";
+import { BufferedPlaybackClock, samplePlaybackPhase } from "@musart/render/playback";
 import {
   classifyAudioMixChange,
   rebaseAudioMixFrame,
@@ -374,22 +374,11 @@ export class MotionTransport {
     }
     if (this.clock.blocked) return;
     const duration = motionTimeToSeconds(this.state.duration);
-    const elapsed = this.clock.read();
-    let seconds = elapsed;
-    let playing = true;
-    if (this.state.playbackMode === "once") {
-      seconds = Math.min(elapsed, duration);
-      playing = elapsed < duration;
-    } else if (this.state.playbackMode === "loop") seconds = elapsed % duration;
-    else {
-      const phase = elapsed % (duration * 2);
-      seconds = phase > duration ? duration * 2 - phase : phase;
-    }
-    const rounded = Object.freeze({ value: Math.round(seconds * 1_000_000), rate: 1_000_000 });
-    const time =
-      !playing || compareMotionTime(rounded, this.state.duration) >= 0
-        ? this.state.duration
-        : rounded;
+    const { time, playing } = samplePlaybackPhase(
+      this.clock.read(),
+      this.state.duration,
+      this.state.playbackMode,
+    );
     this.state = Object.freeze({ ...this.state, time, playing });
     if (!playing) this.clock.stop(duration);
     this.present();

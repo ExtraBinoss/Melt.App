@@ -9,9 +9,14 @@ import {
   compileMotion,
   evaluateMotion,
   motionTimeToSeconds,
+  type MotionTime,
   type Project,
 } from "@musart/core";
-import { BufferedPlaybackClock, PLAYBACK_FRAME_CREDIT_MS } from "@musart/render/playback";
+import {
+  BufferedPlaybackClock,
+  PLAYBACK_FRAME_CREDIT_MS,
+  samplePlaybackPhase,
+} from "@musart/render/playback";
 import type {
   createRenderSession,
   FontResolver,
@@ -101,7 +106,7 @@ export function startMotionPreview(
   let stopped = false;
   let session: Session | null = null;
   let frame: number | null = null;
-  let requested: number | null = null;
+  let requested: MotionTime | null = null;
   let draining: Promise<void> | null = null;
   let disposal: Promise<void> | null = null;
   const clock = new BufferedPlaybackClock(dependencies.now);
@@ -169,7 +174,7 @@ export function startMotionPreview(
           : compileMotion(prepared.project, { compositionId: page.id });
       if (program.mode !== "motion" || !program.duration)
         throw new Error("The preview does not contain a Motion composition.");
-      const duration = motionTimeToSeconds(program.duration);
+      const duration = program.duration;
       const mediaResolver: MediaSourceResolver = prepared.mediaResolver ?? {
         resolveOriginal: async (asset, request) => {
           abort.signal.throwIfAborted();
@@ -193,12 +198,18 @@ export function startMotionPreview(
         signal: abort.signal,
       });
       abort.signal.throwIfAborted();
-      const scale = Math.min(1, 480 / Math.max(page.width, page.height));
-      async function render(seconds: number) {
+      const bounds = options.host.getBoundingClientRect();
+      const displayScale =
+        bounds.width > 0 && bounds.height > 0
+          ? Math.min(bounds.width / page.width, bounds.height / page.height) *
+            Math.min(2, globalThis.devicePixelRatio || 1)
+          : Infinity;
+      const scale = Math.min(1, 480 / Math.max(page.width, page.height), displayScale);
+      async function render(time: MotionTime) {
         const generation = renderGeneration;
         if (presentation?.busy()) await waitForPresentation(presentation, abort.signal);
         if (!alive() || paused || generation !== renderGeneration) return;
-        const plan = evaluateMotion(program, { value: Math.floor(seconds * 30 + 1e-7), rate: 30 });
+        const plan = evaluateMotion(program, time);
         const releaseFrame = clock.hold(PLAYBACK_FRAME_CREDIT_MS);
         try {
           await session!.withCanvasFrame(
@@ -207,13 +218,20 @@ export function startMotionPreview(
             (canvas) => {
               if (!alive() || paused || generation !== renderGeneration) return;
               if (canvas.parentElement !== options.host) options.host.replaceChildren(canvas);
-              options.host.dataset.previewTime = String(seconds);
+              options.host.dataset.previewTime = String(motionTimeToSeconds(plan.time));
+              if (import.meta.env.DEV && typeof performance.mark === "function") {
+                performance.mark("Melt frame: preview-submit", {
+                  detail: { compositionId: program.compositionId, time: plan.time },
+                });
+                performance.clearMarks("Melt frame: preview-submit");
+              }
             },
             {
               scale,
               motionFrame: plan,
               mediaResolver,
               mediaMode: "playback",
+              traceFrames: import.meta.env.DEV,
               signal: abort.signal,
               canRender: () => alive() && !paused && generation === renderGeneration,
             },
@@ -241,9 +259,9 @@ export function startMotionPreview(
         if (draining || !alive() || paused) return;
         draining = (async () => {
           while (requested !== null && alive() && !paused) {
-            const seconds = requested;
+            const sample = requested;
             requested = null;
-            await render(seconds);
+            await render(sample);
           }
         })()
           .catch(failure)
@@ -259,15 +277,15 @@ export function startMotionPreview(
       function tick() {
         frame = null;
         if (!alive() || paused || clock.blocked) return;
-        const sample = Math.floor((clock.read() % duration) * 30 + 1e-7);
-        if (sample !== lastSample) {
-          lastSample = sample;
-          requested = sample / 30;
+        const { time } = samplePlaybackPhase(clock.read(), duration);
+        if (time.value !== lastSample) {
+          lastSample = time.value;
+          requested = time;
           drain();
         } else schedule();
       }
       timing?.stage("First frame: fonts, geometry + GPU render");
-      await render(0);
+      await render({ value: 0, rate: 1 });
       if (!alive()) return;
       changePaused = (next) => {
         if (!alive() || paused === next) return;

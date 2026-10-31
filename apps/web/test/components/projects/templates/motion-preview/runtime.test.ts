@@ -27,6 +27,7 @@ function fixture() {
   const times: number[] = [];
   const rendered: Composition[] = [];
   const modes: (string | undefined)[] = [];
+  const scales: (number | undefined)[] = [];
   const host = document.createElement("span"),
     canvas = document.createElement("canvas");
   let gate: ReturnType<typeof deferred> | null = null;
@@ -35,6 +36,7 @@ function fixture() {
     withCanvasFrame: async (page, _assets, consume, options) => {
       rendered.push(page);
       modes.push(options?.mediaMode);
+      scales.push(options?.scale);
       times.push(
         options?.motionFrame ? options.motionFrame.time.value / options.motionFrame.time.rate : -1,
       );
@@ -76,6 +78,7 @@ function fixture() {
     times,
     rendered,
     modes,
+    scales,
     callbacks,
     dependencies,
     dispose,
@@ -121,7 +124,7 @@ test("presents the actual retained GPU canvas, pauses the clock until ready and 
   ).resolves.toBeInstanceOf(Blob);
   f.tick(1333);
   await flush();
-  expect(f.times.at(-1)).toBe(0.3);
+  expect(f.times.at(-1)).toBe(0.333);
   expect(f.modes.at(-1)).toBe("playback");
   await owner.release();
   expect(f.host.children).toHaveLength(0);
@@ -144,11 +147,11 @@ test("bounds pending work and excludes a long GPU stall from the shared clock", 
   expect(f.times).toEqual([0, 0.1]);
   f.tick(3134);
   await flush();
-  expect(f.times.at(-1)).toBeCloseTo(1 / 6);
+  expect(f.times.at(-1)).toBeCloseTo(0.167333, 6);
   // Source/effect time stays the same, including when crossing the exclusive loop end.
   f.tick(7968);
   await flush();
-  expect(f.times.at(-1)).toBe(0);
+  expect(f.times.at(-1)).toBeCloseTo(0.001333, 6);
   await owner.release();
 });
 
@@ -164,6 +167,52 @@ test("a stale RAF timestamp after bootstrap never presents a negative video cloc
   expect(f.times.at(-1)).toBe(0.1);
   await owner.release();
 });
+
+test("renders only the visible card's pixel size within the existing 480 px GPU bound", async () => {
+  const f = fixture();
+  vi.spyOn(f.host, "getBoundingClientRect").mockReturnValue({ width: 240, height: 200 } as DOMRect);
+  const owner = f.start();
+  await flush();
+  const page = f.project.pages[0]!;
+  expect(f.scales[0]).toBe(Math.min(1, 240 / page.width, 200 / page.height));
+  await owner.release();
+});
+
+test.each([
+  { numerator: 60, denominator: 1 },
+  { numerator: 240, denominator: 1 },
+  { numerator: 30000, denominator: 1001 },
+  { numerator: 24, denominator: 1 },
+])(
+  "uses the editor's continuous phase rather than quantizing to a separate preview cadence (%j)",
+  async (rate) => {
+    const f = fixture();
+    const prepare = f.dependencies.prepare;
+    f.dependencies.prepare = async (id, signal) => {
+      const source = await prepare(id, signal);
+      return {
+        ...source,
+        project: {
+          ...source.project,
+          pages: source.project.pages.map((page) => ({
+            ...page,
+            motion: { ...page.motion!, frameRate: rate },
+          })),
+        },
+      };
+    };
+    const owner = f.start();
+    await flush();
+    f.tick(1017);
+    await flush();
+    expect(f.times.at(-1)).toBe(0.017);
+    expect(Number(f.host.dataset.previewTime)).toBe(0.017);
+    f.tick(1034);
+    await flush();
+    expect(f.times.at(-1)).toBe(0.034);
+    await owner.release();
+  },
+);
 
 test("a second card waits for the previous GPU owner to finish disposal", async () => {
   const first = fixture(),
@@ -330,11 +379,11 @@ test("the final subframe stays below the exclusive duration instead of presentin
   await flush();
   f.tick(5999);
   await flush();
-  expect(f.times.at(-1)).toBeCloseTo(149 / 30, 8);
+  expect(f.times.at(-1)).toBe(4.999);
   expect(f.rendered.at(-1)!.layers.some((layer) => layer.visible)).toBe(true);
   f.tick(6001);
   await flush();
-  expect(f.times.at(-1)).toBe(0);
+  expect(f.times.at(-1)).toBe(0.001);
   await owner.release();
 });
 
@@ -372,7 +421,7 @@ test("optional preview preparation and frame admission yield to overlay transiti
   listeners.forEach((listener) => listener());
   f.tick(1234);
   await flush();
-  expect(f.times.at(-1)).toBeCloseTo(2 / 30);
+  expect(f.times.at(-1)).toBe(0.067);
   await owner.release();
   expect(listeners.size).toBe(0);
   expect(f.callbacks.size).toBe(0);
