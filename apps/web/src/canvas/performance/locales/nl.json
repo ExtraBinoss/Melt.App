@@ -1,0 +1,83 @@
+{
+  "title": "Prestaties",
+  "description": "Gemeten scèneanalyse op aanvraag.",
+  "refresh": "Opnieuw meten",
+  "frameBudget": "Tijdbudget per frame",
+  "target": "Doelframesnelheid",
+  "fps": "{{count}} fps",
+  "milliseconds": "{{value}} ms",
+  "loading": "Deze compositie wordt geanalyseerd…",
+  "timingNote": "CPU-tijd en GPU-tijdstempels zijn verschillende metingen. De balken zijn onafhankelijk; het frame-interval omvat ook planning en presentatie.",
+  "domainNotMeasured": "Voor dit domein zijn geen metingen beschikbaar.",
+  "onDemand": "Wordt alleen uitgevoerd zolang dit paneel open is.",
+  "measuredAt": "Gemeten om {{time}}",
+  "sampleCount": "{{count}} metingen",
+  "sampleCount_one": "{{count}} meting",
+  "sampleCount_other": "{{count}} metingen",
+  "metricCount": "{{count}} waarden",
+  "metricCount_one": "{{count}} waarde",
+  "metricCount_other": "{{count}} waarden",
+  "additionalDomain": "Domein · {{id}}",
+  "additionalMetric": "Meetwaarde · {{id}}",
+  "availability": {
+    "measured": "Gemeten",
+    "unavailable": "Niet beschikbaar",
+    "not-measured": "Niet gemeten"
+  },
+  "errors": {
+    "unavailable": "Prestatiemetingen zijn niet beschikbaar voor dit voorbeeld.",
+    "stale": "De compositie is gewijzigd. Meet opnieuw voor actuele resultaten.",
+    "invalid": "De profiler heeft ongeldige metingen geleverd.",
+    "timeout": "De meting duurde te lang. Probeer opnieuw wanneer het voorbeeld klaar is.",
+    "failed": "De compositie kon niet worden gemeten. Probeer opnieuw."
+  },
+  "timings": {
+    "frame": "Waargenomen frame-interval",
+    "cpu": "Verstreken CPU-hosttijd",
+    "gpu": "Duur via GPU-tijdstempels"
+  },
+  "kinds": {
+    "timing": "Gemeten duur",
+    "counter": "Teller",
+    "inventory": "Huidige inventaris"
+  },
+  "domains": {
+    "scene": "Scène",
+    "images": "Afbeeldingen",
+    "shapes": "Vormen",
+    "text": "Tekst",
+    "animation": "Animatie",
+    "audio": "Audio",
+    "gpu": "GPU",
+    "videos": "Video’s"
+  },
+  "metrics": {
+    "layers": "Lagen",
+    "visibleLayers": "Zichtbare lagen",
+    "images": "Afbeeldingen",
+    "shapes": "Vormen",
+    "textLayers": "Tekstlagen",
+    "groups": "Groepen",
+    "effects": "Ingeschakelde effecten",
+    "masks": "Ingeschakelde maskers",
+    "animationTracks": "Animatiesporen",
+    "audioTracks": "Audiosporen",
+    "drawCommands": "Tekenopdrachten",
+    "renderPasses": "Compositiepasses",
+    "allocations": "Renderdoelen (gedeeld)",
+    "uploads": "Uploads",
+    "textureBytes": "Gedeeld textuurcachegeheugen",
+    "cacheEntries": "Gedeelde cache-items",
+    "cacheHits": "Gedeelde cachetreffers",
+    "cacheMisses": "Gedeelde cachemissers",
+    "sourcePreparation": "Bronvoorbereiding",
+    "textPreparation": "Tekstvoorbereiding",
+    "composition": "Compositie",
+    "videos": "Video’s",
+    "animationChannels": "Animatiekanalen",
+    "audioProcessing": "Audioverwerkingstijd",
+    "animationUpdate": "Animatie-update op de host"
+  },
+  "warmthNote": "Toont de huidige cachestatus. De CPU-hosttijd kan asynchrone wachttijd bevatten en meet geen CPU-gebruik.",
+  "sharedNote": "Textuurgeheugen en cachetellers gelden voor de gedeelde renderercache. Tekenopdrachten en renderpassen gelden voor deze meting."
+}

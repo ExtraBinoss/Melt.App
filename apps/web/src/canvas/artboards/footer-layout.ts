@@ -17,3 +17,15 @@ export const artboardFooterScale = (view: View) =>
   Math.min(1, Math.max(0.45, Math.sqrt(view.zoom)));
 export const artboardFooterSmall = (board: ArtboardPlacement, view: View) =>
   board.width * view.zoom < 64 || board.height * view.zoom < 50;
+
+/** Match the mode footer's scale/gap at the opposite, outside bottom-left corner. */
+export function artboardPerformancePosition(
+  board: ArtboardPlacement,
+  workspace: ArtboardWorkspace,
+  view: View,
+) {
+  const scale = artboardFooterScale(view);
+  const x = view.x + (board.x - workspace.width / 2) * view.zoom + 6 * scale;
+  const y = view.y + (board.y + board.height - workspace.height / 2) * view.zoom + 10 * scale;
+  return `translate3d(${x}px, ${y}px, 0) scale(${scale})`;
+}

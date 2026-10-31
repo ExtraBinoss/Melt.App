@@ -1,0 +1,83 @@
+{
+  "title": "パフォーマンス",
+  "description": "必要なときにシーンの実測値を分析します。",
+  "refresh": "再計測",
+  "frameBudget": "フレーム予算",
+  "target": "目標フレームレート",
+  "fps": "{{count}} fps",
+  "milliseconds": "{{value}} ms",
+  "loading": "このコンポジションを分析中…",
+  "timingNote": "CPU経過時間とGPUタイムスタンプは異なる測定値です。各バーは独立しており、フレーム間隔にはスケジューリングと表示も含まれます。",
+  "domainNotMeasured": "このサンプルには、この分野の測定値がありません。",
+  "onDemand": "このパネルを開いている間だけ実行します。",
+  "measuredAt": "計測時刻 {{time}}",
+  "sampleCount": "{{count}} サンプル",
+  "sampleCount_one": "{{count}} サンプル",
+  "sampleCount_other": "{{count}} サンプル",
+  "metricCount": "{{count}} 項目",
+  "metricCount_one": "{{count}} 項目",
+  "metricCount_other": "{{count}} 項目",
+  "additionalDomain": "分野 · {{id}}",
+  "additionalMetric": "測定値 · {{id}}",
+  "availability": {
+    "measured": "計測済み",
+    "unavailable": "利用不可",
+    "not-measured": "未計測"
+  },
+  "errors": {
+    "unavailable": "このプレビューではパフォーマンスを計測できません。",
+    "stale": "コンポジションが変更されました。再計測してください。",
+    "invalid": "プロファイラーが無効な測定値を返しました。",
+    "timeout": "計測がタイムアウトしました。プレビューの準備ができてから再試行してください。",
+    "failed": "コンポジションを計測できませんでした。再試行してください。"
+  },
+  "timings": {
+    "frame": "観測されたフレーム間隔",
+    "cpu": "CPUホスト経過時間",
+    "gpu": "GPUタイムスタンプの所要時間"
+  },
+  "kinds": {
+    "timing": "計測時間",
+    "counter": "カウンター",
+    "inventory": "現在の構成"
+  },
+  "domains": {
+    "scene": "シーン",
+    "images": "画像",
+    "shapes": "図形",
+    "text": "テキスト",
+    "animation": "アニメーション",
+    "audio": "オーディオ",
+    "gpu": "GPU",
+    "videos": "動画"
+  },
+  "metrics": {
+    "layers": "レイヤー",
+    "visibleLayers": "表示レイヤー",
+    "images": "画像",
+    "shapes": "図形",
+    "textLayers": "テキストレイヤー",
+    "groups": "グループ",
+    "effects": "有効なエフェクト",
+    "masks": "有効なマスク",
+    "animationTracks": "アニメーショントラック",
+    "audioTracks": "オーディオトラック",
+    "drawCommands": "描画コマンド",
+    "renderPasses": "コンポジションのパス数",
+    "allocations": "レンダーターゲット（共有）",
+    "uploads": "アップロード",
+    "textureBytes": "共有キャッシュのテクスチャメモリ",
+    "cacheEntries": "共有キャッシュ項目",
+    "cacheHits": "共有キャッシュヒット",
+    "cacheMisses": "共有キャッシュミス",
+    "sourcePreparation": "ソース準備",
+    "textPreparation": "テキスト準備",
+    "composition": "合成",
+    "videos": "動画",
+    "animationChannels": "アニメーションチャンネル",
+    "audioProcessing": "オーディオ処理時間",
+    "animationUpdate": "ホスト側のアニメーション更新"
+  },
+  "warmthNote": "現在のキャッシュ状態を反映します。CPUホスト時間には非同期の待機が含まれる場合があり、CPU使用率の測定ではありません。",
+  "sharedNote": "テクスチャメモリとキャッシュカウンターはレンダラーの共有キャッシュ全体が対象です。描画コマンドとレンダリングパスはこのサンプルが対象です。"
+}

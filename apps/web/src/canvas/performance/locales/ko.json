@@ -1,0 +1,83 @@
+{
+  "title": "성능",
+  "description": "요청 시 장면의 실제 측정값을 분석합니다.",
+  "refresh": "다시 측정",
+  "frameBudget": "프레임 예산",
+  "target": "목표 프레임 속도",
+  "fps": "{{count}} fps",
+  "milliseconds": "{{value}} ms",
+  "loading": "이 컴포지션 분석 중…",
+  "timingNote": "CPU 경과 시간과 GPU 타임스탬프는 서로 다른 측정값입니다. 막대는 독립적이며 프레임 간격에는 예약과 표시 시간도 포함됩니다.",
+  "domainNotMeasured": "이 샘플에는 이 영역의 측정값이 없습니다.",
+  "onDemand": "이 패널이 열려 있을 때만 실행됩니다.",
+  "measuredAt": "측정 시각 {{time}}",
+  "sampleCount": "샘플 {{count}}개",
+  "sampleCount_one": "샘플 {{count}}개",
+  "sampleCount_other": "샘플 {{count}}개",
+  "metricCount": "지표 {{count}}개",
+  "metricCount_one": "지표 {{count}}개",
+  "metricCount_other": "지표 {{count}}개",
+  "additionalDomain": "영역 · {{id}}",
+  "additionalMetric": "지표 · {{id}}",
+  "availability": {
+    "measured": "측정됨",
+    "unavailable": "사용 불가",
+    "not-measured": "측정 안 됨"
+  },
+  "errors": {
+    "unavailable": "이 미리보기에서는 성능 측정을 사용할 수 없습니다.",
+    "stale": "컴포지션이 변경되었습니다. 다시 측정하세요.",
+    "invalid": "프로파일러가 잘못된 측정값을 반환했습니다.",
+    "timeout": "측정 시간이 초과되었습니다. 미리보기가 준비되면 다시 시도하세요.",
+    "failed": "컴포지션을 측정할 수 없습니다. 다시 시도하세요."
+  },
+  "timings": {
+    "frame": "관측된 프레임 간격",
+    "cpu": "CPU 호스트 경과 시간",
+    "gpu": "GPU 타임스탬프 소요 시간"
+  },
+  "kinds": {
+    "timing": "측정 시간",
+    "counter": "카운터",
+    "inventory": "현재 구성"
+  },
+  "domains": {
+    "scene": "장면",
+    "images": "이미지",
+    "shapes": "도형",
+    "text": "텍스트",
+    "animation": "애니메이션",
+    "audio": "오디오",
+    "gpu": "GPU",
+    "videos": "동영상"
+  },
+  "metrics": {
+    "layers": "레이어",
+    "visibleLayers": "표시 레이어",
+    "images": "이미지",
+    "shapes": "도형",
+    "textLayers": "텍스트 레이어",
+    "groups": "그룹",
+    "effects": "활성 효과",
+    "masks": "활성 마스크",
+    "animationTracks": "애니메이션 트랙",
+    "audioTracks": "오디오 트랙",
+    "drawCommands": "그리기 명령",
+    "renderPasses": "컴포지션 패스",
+    "allocations": "렌더 타깃 (공유)",
+    "uploads": "업로드",
+    "textureBytes": "공유 캐시 텍스처 메모리",
+    "cacheEntries": "공유 캐시 항목",
+    "cacheHits": "공유 캐시 적중",
+    "cacheMisses": "공유 캐시 실패",
+    "sourcePreparation": "소스 준비",
+    "textPreparation": "텍스트 준비",
+    "composition": "합성",
+    "videos": "동영상",
+    "animationChannels": "애니메이션 채널",
+    "audioProcessing": "오디오 처리 시간",
+    "animationUpdate": "호스트 애니메이션 업데이트"
+  },
+  "warmthNote": "현재 캐시 상태를 반영합니다. CPU 호스트 시간에는 비동기 대기가 포함될 수 있으며 CPU 사용률을 측정하지 않습니다.",
+  "sharedNote": "텍스처 메모리와 캐시 카운터는 렌더러의 공유 캐시를 나타냅니다. 그리기 명령과 렌더링 패스는 이 샘플을 나타냅니다."
+}

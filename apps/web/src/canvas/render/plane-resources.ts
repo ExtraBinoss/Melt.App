@@ -23,6 +23,7 @@ import {
   type WebGPURenderer,
 } from "three/webgpu";
 import { texture, uv } from "three/tsl";
+import { SceneProfileSource } from "./scene-profile-source";
 import { previewScale } from "./preview-quality";
 import { CanvasVideoProxyActivity } from "./video-proxy-activity";
 import { syncArtboardBackdrops } from "../artboards/backdrop-presentation";
@@ -58,6 +59,7 @@ interface PreviewRequest {
 const canvasOwners = new WeakMap<HTMLCanvasElement, PlaneResources>();
 /** Owns one display plane and a latest-only queue. GPU allocation begins at activation. */
 export class PlaneResources {
+  readonly profile: SceneProfileSource;
   private videoProxyActivity: CanvasVideoProxyActivity | null = null;
   private readonly profileVideo = new URLSearchParams(location.search).get("profileVideo") === "1";
   readonly placeholder = new DataTexture(new Uint8Array(4), 1, 1, RGBAFormat);
@@ -122,6 +124,7 @@ export class PlaneResources {
     this.maxTextureDimension = gpuTextureLimit(renderer);
     renderer.domElement.dataset.gpuTextureLimit = String(this.maxTextureDimension);
     this.placeholder.needsUpdate = true;
+    this.profile = new SceneProfileSource(renderer, () => this.compositor?.stats() ?? null);
     this.sample = texture(this.placeholder, uv().flipY());
     this.material.fragmentNode = this.sample;
     this.mesh.visible = false;
@@ -258,6 +261,7 @@ export class PlaneResources {
       this.mesh.visible = false;
       this.compositor?.releasePresentation();
     }
+    if (this.profile.active) this.profile.begin(this.revision);
     const retained =
       this.users > 0 &&
       this.compiled &&
@@ -276,6 +280,18 @@ export class PlaneResources {
     }
     this.publish();
     this.schedule();
+  }
+  requestProfileFrame() {
+    const current = this.current;
+    if (!current) return undefined;
+    this.submit(
+      current.page,
+      current.assets,
+      current.presentation,
+      current.motionFrame,
+      current.playback,
+    );
+    return this.revision;
   }
   /** Navigation changes the raster target density, never font outlines or image uploads. */
   setDensity(density: number): void {
@@ -322,6 +338,7 @@ export class PlaneResources {
     });
   }
   private async render(request: PreviewRequest): Promise<void> {
+    this.profile.begin(request.revision);
     const abort = new AbortController();
     this.activeAbort = abort;
     this.activeRequest = request;
@@ -333,7 +350,7 @@ export class PlaneResources {
         motionFrame: request.motionFrame,
         mediaMode: request.playback ? "playback" : "preview",
         ...(this.videoProxyActivity ? { videoProxy: this.videoProxyActivity } : {}),
-        ...(this.profileVideo ? { profileVideo: true } : {}),
+        ...(this.profileVideo || this.profile.active ? { profileVideo: true } : {}),
         signal: abort.signal,
         canRender: () => this.canPresent(request),
       });
@@ -384,6 +401,7 @@ export class PlaneResources {
     this.onScale?.(request.scale, result.width, result.height);
   }
   private preparedFrame(request: PreviewRequest, result: FrameTexture): void {
+    this.profile.prepared(request.revision);
     this.completed++;
     if (request.motionFrame)
       this.renderer.domElement.dataset.motionTime = JSON.stringify(request.motionFrame.time);
@@ -416,6 +434,7 @@ export class PlaneResources {
       this.canPresent(this.preparedRequest) &&
       this.presentedRevision !== this.preparedRevision
     ) {
+      this.profile.presented(this.preparedRequest.page.id, this.preparedRevision);
       this.presentedRevision = this.preparedRevision;
       element.dataset.rendererReady = String(this.preparedRevision === this.revision);
       element.dataset.presentationReady = "true";
@@ -498,6 +517,7 @@ export class PlaneResources {
   dispose(): Promise<void> {
     if (this.disposal) return this.disposal;
     this.disposed = true;
+    this.profile.dispose();
     this.videoProxyActivity?.dispose();
     this.videoProxyActivity = null;
     this.activeAbort?.abort();
@@ -537,4 +557,15 @@ export class PlaneResources {
     })();
     return this.disposal;
   }
+}
+
+/** A diagnostic request uses the existing display renderer; it never allocates a second engine. */
+export function canvasProfileSource(canvas: HTMLCanvasElement) {
+  const owner = canvasOwners.get(canvas);
+  return owner
+    ? {
+        source: owner.profile,
+        force: () => owner.requestProfileFrame(),
+      }
+    : null;
 }

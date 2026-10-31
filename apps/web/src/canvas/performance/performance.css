@@ -1,0 +1,197 @@
+.artboard-performance-button {
+  height: 26px;
+  min-height: 26px;
+  padding: 0 7px;
+  gap: 4px;
+  font-size: 10px;
+}
+.artboard-performance-button svg {
+  width: 15px;
+  height: 15px;
+}
+.composition-performance-popover {
+  width: min(352px, calc(100vw - 32px));
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px;
+  font-size: 12px;
+  contain: layout style;
+}
+.composition-performance-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.composition-performance-header h2 {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+}
+.composition-performance-header p,
+.composition-performance-note {
+  margin: 5px 0 0;
+  color: var(--muted-foreground);
+  font-size: 11px;
+  line-height: 1.5;
+}
+.composition-performance-budget {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 10px;
+}
+.composition-performance-budget strong {
+  font-size: 20px;
+  font-weight: 550;
+  letter-spacing: -0.5px;
+  font-variant-numeric: tabular-nums;
+}
+.composition-performance-targets {
+  grid-column: 1 / -1;
+  display: flex;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 2px;
+  gap: 2px;
+}
+.composition-performance-targets button {
+  flex: 1;
+  padding: 4px 6px;
+  border-radius: 4px;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  font-size: 11px;
+}
+.composition-performance-targets button[aria-pressed="true"] {
+  background: var(--accent);
+  color: var(--accent-foreground);
+}
+.composition-performance-targets button:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+.composition-performance-scroll {
+  min-height: 0;
+}
+.composition-performance-viewport {
+  max-height: min(420px, calc(var(--radix-popover-content-available-height, 85dvh) - 205px));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.composition-performance-timings {
+  display: grid;
+  gap: 13px;
+}
+.composition-performance-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  font-size: 11px;
+}
+.composition-performance-row strong,
+.composition-performance-row dd {
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+  text-align: end;
+  margin: 0;
+}
+.composition-performance-track {
+  height: 7px;
+  margin-top: 6px;
+  overflow: hidden;
+  border-radius: 4px;
+  background: var(--muted);
+}
+.composition-performance-track span {
+  display: block;
+  height: 100%;
+  width: 100%;
+  background: var(--primary);
+  transform-origin: left center;
+}
+[dir="rtl"] .composition-performance-track span {
+  transform-origin: right center;
+}
+.composition-performance-track[data-over-budget="true"] span {
+  background: var(--destructive);
+}
+.composition-performance-track[data-available="false"] {
+  opacity: 0.45;
+}
+.composition-performance-note {
+  margin: 12px 0;
+}
+.composition-performance-cadence {
+  margin-top: 12px;
+  color: var(--muted-foreground);
+}
+.composition-performance-domain-trigger {
+  gap: 8px;
+  padding: 10px 0;
+  font-size: 11px;
+}
+.composition-performance-domain-trigger > svg {
+  height: 12px;
+  width: 12px;
+}
+.composition-performance-domain-summary {
+  margin-inline-start: auto;
+  color: var(--muted-foreground);
+  font-size: 10px;
+  font-weight: 400;
+}
+.composition-performance-domain-content {
+  padding-bottom: 10px;
+}
+.composition-performance-domain-content dl {
+  margin: 0;
+  display: grid;
+  gap: 10px;
+}
+.composition-performance-domain-content small {
+  display: block;
+  font-size: 10px;
+  color: var(--muted-foreground);
+}
+.composition-performance-status,
+.composition-performance-error {
+  margin: 0 0 12px;
+  color: var(--muted-foreground);
+  line-height: 1.5;
+}
+.composition-performance-error {
+  color: var(--destructive);
+}
+.composition-performance-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+  color: var(--muted-foreground);
+  font-size: 10px;
+}
+.composition-performance-spinner {
+  animation: composition-performance-spin 1s linear infinite;
+}
+@keyframes composition-performance-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .composition-performance-spinner {
+    animation: none;
+  }
+}
+
+.composition-performance-custom-target[data-slot="input"] {
+  width: 66px;
+  height: 26px;
+  padding: 0 5px;
+  font-size: 10px;
+  text-align: center;
+}

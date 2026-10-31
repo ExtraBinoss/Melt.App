@@ -1,0 +1,83 @@
+{
+  "title": "Prestazioni",
+  "description": "Analisi misurata della scena, su richiesta.",
+  "refresh": "Misura di nuovo",
+  "frameBudget": "Budget per fotogramma",
+  "target": "Frequenza obiettivo",
+  "fps": "{{count}} fps",
+  "milliseconds": "{{value}} ms",
+  "loading": "Analisi della composizione…",
+  "timingNote": "Il tempo CPU trascorso e i timestamp GPU sono misure diverse. Le barre sono indipendenti; l’intervallo include anche pianificazione e presentazione.",
+  "domainNotMeasured": "Nessuna misurazione per questo ambito nel campione.",
+  "onDemand": "Si esegue solo mentre il pannello è aperto.",
+  "measuredAt": "Misurato alle {{time}}",
+  "sampleCount": "{{count}} campioni",
+  "sampleCount_one": "{{count}} campione",
+  "sampleCount_other": "{{count}} campioni",
+  "metricCount": "{{count}} metriche",
+  "metricCount_one": "{{count}} metrica",
+  "metricCount_other": "{{count}} metriche",
+  "additionalDomain": "Ambito · {{id}}",
+  "additionalMetric": "Metrica · {{id}}",
+  "availability": {
+    "measured": "Misurato",
+    "unavailable": "Non disponibile",
+    "not-measured": "Non misurato"
+  },
+  "errors": {
+    "unavailable": "La misurazione delle prestazioni non è disponibile per questa anteprima.",
+    "stale": "La composizione è cambiata. Ripeti la misurazione.",
+    "invalid": "Il profiler ha restituito misurazioni non valide.",
+    "timeout": "Tempo di misurazione scaduto. Riprova quando l’anteprima è pronta.",
+    "failed": "Impossibile misurare la composizione. Riprova."
+  },
+  "timings": {
+    "frame": "Intervallo osservato tra fotogrammi",
+    "cpu": "Tempo trascorso sul lato CPU host",
+    "gpu": "Durata da timestamp GPU"
+  },
+  "kinds": {
+    "timing": "Durata misurata",
+    "counter": "Contatore",
+    "inventory": "Inventario attuale"
+  },
+  "domains": {
+    "scene": "Scena",
+    "images": "Immagini",
+    "shapes": "Forme",
+    "text": "Testo",
+    "animation": "Animazione",
+    "audio": "Audio",
+    "gpu": "GPU",
+    "videos": "Video"
+  },
+  "metrics": {
+    "layers": "Livelli",
+    "visibleLayers": "Livelli visibili",
+    "images": "Immagini",
+    "shapes": "Forme",
+    "textLayers": "Livelli di testo",
+    "groups": "Gruppi",
+    "effects": "Effetti attivi",
+    "masks": "Maschere attive",
+    "animationTracks": "Tracce di animazione",
+    "audioTracks": "Tracce audio",
+    "drawCommands": "Comandi di disegno",
+    "renderPasses": "Passaggi di composizione",
+    "allocations": "Destinazioni di rendering (condivise)",
+    "uploads": "Caricamenti",
+    "textureBytes": "Memoria texture della cache condivisa",
+    "cacheEntries": "Voci della cache condivisa",
+    "cacheHits": "Accessi riusciti alla cache condivisa",
+    "cacheMisses": "Accessi mancati alla cache condivisa",
+    "sourcePreparation": "Preparazione delle sorgenti",
+    "textPreparation": "Preparazione del testo",
+    "composition": "Composizione",
+    "videos": "Video",
+    "animationChannels": "Canali di animazione",
+    "audioProcessing": "Tempo di elaborazione audio",
+    "animationUpdate": "Aggiornamento animazione sul sistema host"
+  },
+  "warmthNote": "Riflette lo stato attuale della cache. Il tempo CPU host può includere attese asincrone e non misura l’utilizzo della CPU.",
+  "sharedNote": "La memoria delle texture e i contatori riguardano la cache condivisa del renderer. I comandi di disegno e i passaggi di rendering riguardano questo campione."
+}

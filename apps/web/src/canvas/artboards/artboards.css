@@ -157,3 +157,38 @@
   color: var(--muted-foreground);
   font-variant-numeric: tabular-nums;
 }
+
+.artboard-performance-footer {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  width: max-content;
+  height: 32px;
+  transform-origin: top left;
+  z-index: 4;
+  border-radius: 9px;
+  padding: 0;
+}
+.artboard-performance-footer[data-small="true"] {
+  visibility: hidden;
+  pointer-events: none;
+}
+.artboard-performance-footer[data-compact="true"] .artboard-performance-button > span {
+  display: none;
+}
+
+/* Both artboard footers share one visual height at every canvas zoom. */
+.artboard-mode-footer {
+  height: 32px;
+  display: flex;
+  align-items: center;
+}
+.artboard-mode-footer .segmented-tabs[data-size="compact"][role="radiogroup"] {
+  height: 26px;
+  padding: 0;
+}
+.artboard-performance-footer {
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  z-index: 7;
+}

@@ -1,0 +1,83 @@
+{
+  "title": "Performance",
+  "description": "Measured scene analysis, on demand.",
+  "refresh": "Measure again",
+  "frameBudget": "Frame budget",
+  "target": "Target frame rate",
+  "fps": "{{count}} fps",
+  "milliseconds": "{{value}} ms",
+  "loading": "Analyzing this composition…",
+  "timingNote": "CPU elapsed and GPU timestamps are different measurements. Bars are independent; the frame interval also includes scheduling and presentation.",
+  "domainNotMeasured": "This domain has no measurements in this sample.",
+  "onDemand": "Runs only while this panel is open.",
+  "measuredAt": "Measured at {{time}}",
+  "sampleCount": "{{count}} samples",
+  "sampleCount_one": "{{count}} sample",
+  "sampleCount_other": "{{count}} samples",
+  "metricCount": "{{count}} metrics",
+  "metricCount_one": "{{count}} metric",
+  "metricCount_other": "{{count}} metrics",
+  "additionalDomain": "Domain · {{id}}",
+  "additionalMetric": "Metric · {{id}}",
+  "availability": {
+    "measured": "Measured",
+    "unavailable": "Unavailable",
+    "not-measured": "Not measured"
+  },
+  "errors": {
+    "unavailable": "Performance measurement is unavailable for this preview.",
+    "stale": "The composition changed. Measure again for current results.",
+    "invalid": "The profiler returned invalid measurements.",
+    "timeout": "Measurement timed out. Try again when the preview is ready.",
+    "failed": "The composition could not be measured. Try again."
+  },
+  "timings": {
+    "frame": "Observed frame interval",
+    "cpu": "CPU host elapsed",
+    "gpu": "GPU timestamp duration"
+  },
+  "kinds": {
+    "timing": "Measured duration",
+    "counter": "Counter",
+    "inventory": "Current inventory"
+  },
+  "domains": {
+    "scene": "Scene",
+    "images": "Images",
+    "shapes": "Shapes",
+    "text": "Text",
+    "animation": "Animation",
+    "audio": "Audio",
+    "gpu": "GPU",
+    "videos": "Videos"
+  },
+  "metrics": {
+    "layers": "Layers",
+    "visibleLayers": "Visible layers",
+    "images": "Images",
+    "shapes": "Shapes",
+    "textLayers": "Text layers",
+    "groups": "Groups",
+    "effects": "Enabled effects",
+    "masks": "Enabled masks",
+    "animationTracks": "Animation tracks",
+    "audioTracks": "Audio tracks",
+    "drawCommands": "Draw commands",
+    "renderPasses": "Composition passes",
+    "allocations": "Render targets (shared)",
+    "uploads": "Uploads",
+    "textureBytes": "Shared cached texture memory",
+    "cacheEntries": "Shared cache entries",
+    "cacheHits": "Shared cache hits",
+    "cacheMisses": "Shared cache misses",
+    "sourcePreparation": "Source preparation",
+    "textPreparation": "Text preparation",
+    "composition": "Composition",
+    "videos": "Videos",
+    "animationChannels": "Animation channels",
+    "audioProcessing": "Audio processing time",
+    "animationUpdate": "Animation host update"
+  },
+  "warmthNote": "Reflects the current cache state. CPU host timing can include async waiting; it does not measure CPU utilization.",
+  "sharedNote": "Texture memory and cache counters cover the shared renderer cache. Draw commands and render passes cover this sample."
+}

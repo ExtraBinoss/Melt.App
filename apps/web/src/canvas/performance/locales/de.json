@@ -1,0 +1,83 @@
+{
+  "title": "Leistung",
+  "description": "Gemessene Szenenanalyse auf Anfrage.",
+  "refresh": "Erneut messen",
+  "frameBudget": "Zeitbudget pro Bild",
+  "target": "Zielbildrate",
+  "fps": "{{count}} B/s",
+  "milliseconds": "{{value}} ms",
+  "loading": "Diese Komposition wird analysiert…",
+  "timingNote": "CPU-Dauer und GPU-Zeitstempel sind unterschiedliche Messungen. Die Balken sind unabhängig; das Bildintervall umfasst auch Planung und Darstellung.",
+  "domainNotMeasured": "Für diesen Bereich liegen keine Messungen vor.",
+  "onDemand": "Wird nur bei geöffnetem Fenster ausgeführt.",
+  "measuredAt": "Gemessen um {{time}}",
+  "sampleCount": "{{count}} Messungen",
+  "sampleCount_one": "{{count}} Messung",
+  "sampleCount_other": "{{count}} Messungen",
+  "metricCount": "{{count}} Werte",
+  "metricCount_one": "{{count}} Wert",
+  "metricCount_other": "{{count}} Werte",
+  "additionalDomain": "Bereich · {{id}}",
+  "additionalMetric": "Messwert · {{id}}",
+  "availability": {
+    "measured": "Gemessen",
+    "unavailable": "Nicht verfügbar",
+    "not-measured": "Nicht gemessen"
+  },
+  "errors": {
+    "unavailable": "Die Leistungsmessung ist für diese Vorschau nicht verfügbar.",
+    "stale": "Die Komposition wurde geändert. Bitte erneut messen.",
+    "invalid": "Der Profiler hat ungültige Messwerte geliefert.",
+    "timeout": "Zeitüberschreitung. Erneut versuchen, sobald die Vorschau bereit ist.",
+    "failed": "Die Komposition konnte nicht gemessen werden. Bitte erneut versuchen."
+  },
+  "timings": {
+    "frame": "Beobachtetes Bildintervall",
+    "cpu": "Verstrichene CPU-Host-Zeit",
+    "gpu": "GPU-Dauer per Zeitstempel"
+  },
+  "kinds": {
+    "timing": "Gemessene Dauer",
+    "counter": "Zähler",
+    "inventory": "Aktueller Bestand"
+  },
+  "domains": {
+    "scene": "Szene",
+    "images": "Bilder",
+    "shapes": "Formen",
+    "text": "Text",
+    "animation": "Animation",
+    "audio": "Audio",
+    "gpu": "GPU",
+    "videos": "Videos"
+  },
+  "metrics": {
+    "layers": "Ebenen",
+    "visibleLayers": "Sichtbare Ebenen",
+    "images": "Bilder",
+    "shapes": "Formen",
+    "textLayers": "Textebenen",
+    "groups": "Gruppen",
+    "effects": "Aktivierte Effekte",
+    "masks": "Aktivierte Masken",
+    "animationTracks": "Animationsspuren",
+    "audioTracks": "Audiospuren",
+    "drawCommands": "Zeichenbefehle",
+    "renderPasses": "Kompositionsdurchläufe",
+    "allocations": "Renderziele (gemeinsam)",
+    "uploads": "Uploads",
+    "textureBytes": "Gemeinsamer Textur-Cache-Speicher",
+    "cacheEntries": "Gemeinsame Cache-Einträge",
+    "cacheHits": "Gemeinsame Cache-Treffer",
+    "cacheMisses": "Gemeinsame Cache-Fehler",
+    "sourcePreparation": "Quellenvorbereitung",
+    "textPreparation": "Textvorbereitung",
+    "composition": "Komposition",
+    "videos": "Videos",
+    "animationChannels": "Animationskanäle",
+    "audioProcessing": "Audioverarbeitungszeit",
+    "animationUpdate": "Animationsaktualisierung auf dem Host"
+  },
+  "warmthNote": "Zeigt den aktuellen Cache-Zustand. Die CPU-Host-Zeit kann asynchrone Wartezeiten enthalten und misst keine CPU-Auslastung.",
+  "sharedNote": "Texturspeicher und Cache-Zähler gelten für den gemeinsamen Renderer-Cache. Zeichenbefehle und Renderdurchläufe gelten für diese Stichprobe."
+}

@@ -1,7 +1,11 @@
 import type { View } from "../viewport/view";
 import { viewForArtboard, type ArtboardPlacement, type ArtboardWorkspace } from "./layout";
 import { layoutArtboardHeadings } from "./heading-layout";
-import { artboardFooterPosition, artboardFooterSmall } from "./footer-layout";
+import {
+  artboardFooterPosition,
+  artboardFooterSmall,
+  artboardPerformancePosition,
+} from "./footer-layout";
 
 export function artboardStyle(board: ArtboardPlacement, workspace: ArtboardWorkspace, view: View) {
   const local = viewForArtboard(view, workspace, board);
@@ -22,6 +26,12 @@ export function paintArtboards(root: HTMLElement, workspace: ArtboardWorkspace, 
   for (const element of root.querySelectorAll<HTMLElement>("[data-artboard-id]")) {
     const board = workspace.boards.find((item) => item.id === element.dataset.artboardId);
     if (!board) continue;
+    if (element.classList.contains("artboard-performance-footer")) {
+      element.style.transform = artboardPerformancePosition(board, workspace, view);
+      element.dataset.small = String(artboardFooterSmall(board, view));
+      element.dataset.compact = String(board.width * view.zoom < 180);
+      continue;
+    }
     if (element.classList.contains("artboard-mode-footer")) {
       element.style.transform = artboardFooterPosition(board, workspace, view);
       element.dataset.compact = String(board.width * view.zoom < 180);

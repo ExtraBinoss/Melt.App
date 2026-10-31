@@ -1,0 +1,83 @@
+{
+  "title": "Wydajność",
+  "description": "Pomiar sceny na żądanie.",
+  "refresh": "Zmierz ponownie",
+  "frameBudget": "Budżet klatki",
+  "target": "Docelowa liczba klatek",
+  "fps": "{{count}} kl./s",
+  "milliseconds": "{{value}} ms",
+  "loading": "Analizowanie kompozycji…",
+  "timingNote": "Czas CPU i znaczniki czasu GPU to różne pomiary. Paski są niezależne; odstęp klatek obejmuje też planowanie i prezentację.",
+  "domainNotMeasured": "Brak pomiarów tej dziedziny w próbce.",
+  "onDemand": "Działa tylko przy otwartym panelu.",
+  "measuredAt": "Pomiar o {{time}}",
+  "sampleCount": "Liczba próbek: {{count}}",
+  "sampleCount_one": "Liczba próbek: {{count}}",
+  "sampleCount_other": "Liczba próbek: {{count}}",
+  "metricCount": "Liczba metryk: {{count}}",
+  "metricCount_one": "Liczba metryk: {{count}}",
+  "metricCount_other": "Liczba metryk: {{count}}",
+  "additionalDomain": "Dziedzina · {{id}}",
+  "additionalMetric": "Metryka · {{id}}",
+  "availability": {
+    "measured": "Zmierzono",
+    "unavailable": "Niedostępne",
+    "not-measured": "Nie zmierzono"
+  },
+  "errors": {
+    "unavailable": "Pomiar wydajności jest niedostępny dla tego podglądu.",
+    "stale": "Kompozycja się zmieniła. Zmierz ponownie.",
+    "invalid": "Profiler zwrócił nieprawidłowe pomiary.",
+    "timeout": "Przekroczono czas pomiaru. Spróbuj ponownie, gdy podgląd będzie gotowy.",
+    "failed": "Nie udało się zmierzyć kompozycji. Spróbuj ponownie."
+  },
+  "timings": {
+    "frame": "Obserwowany odstęp klatek",
+    "cpu": "Czas po stronie hosta CPU",
+    "gpu": "Czas ze znaczników GPU"
+  },
+  "kinds": {
+    "timing": "Zmierzony czas",
+    "counter": "Licznik",
+    "inventory": "Bieżący stan"
+  },
+  "domains": {
+    "scene": "Scena",
+    "images": "Obrazy",
+    "shapes": "Kształty",
+    "text": "Tekst",
+    "animation": "Animacja",
+    "audio": "Dźwięk",
+    "gpu": "GPU",
+    "videos": "Wideo"
+  },
+  "metrics": {
+    "layers": "Warstwy",
+    "visibleLayers": "Widoczne warstwy",
+    "images": "Obrazy",
+    "shapes": "Kształty",
+    "textLayers": "Warstwy tekstowe",
+    "groups": "Grupy",
+    "effects": "Włączone efekty",
+    "masks": "Włączone maski",
+    "animationTracks": "Ścieżki animacji",
+    "audioTracks": "Ścieżki audio",
+    "drawCommands": "Polecenia rysowania",
+    "renderPasses": "Przebiegi kompozycji",
+    "allocations": "Cele renderowania (współdzielone)",
+    "uploads": "Przesyłania",
+    "textureBytes": "Wspólna pamięć podręczna tekstur",
+    "cacheEntries": "Wpisy wspólnej pamięci podręcznej",
+    "cacheHits": "Trafienia wspólnej pamięci podręcznej",
+    "cacheMisses": "Chybienia wspólnej pamięci podręcznej",
+    "sourcePreparation": "Przygotowanie źródeł",
+    "textPreparation": "Przygotowanie tekstu",
+    "composition": "Kompozycja",
+    "videos": "Wideo",
+    "animationChannels": "Kanały animacji",
+    "audioProcessing": "Czas przetwarzania dźwięku",
+    "animationUpdate": "Aktualizacja animacji po stronie hosta"
+  },
+  "warmthNote": "Odzwierciedla bieżący stan pamięci podręcznej. Czas hosta CPU może obejmować oczekiwanie asynchroniczne; nie mierzy wykorzystania CPU.",
+  "sharedNote": "Pamięć tekstur i liczniki dotyczą wspólnej pamięci podręcznej renderera. Polecenia rysowania i przebiegi renderowania dotyczą tej próbki."
+}
