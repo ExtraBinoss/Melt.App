@@ -313,7 +313,6 @@ const ParameterField = memo(function ParameterField({
             <label className="effect-select-field">
               <span>{label}</span>
               <SelectField
-                matchTriggerWidth={!engine}
                 identity={effect}
                 label={label}
                 value={String(live)}

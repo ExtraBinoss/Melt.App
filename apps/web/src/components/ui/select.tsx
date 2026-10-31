@@ -6,11 +6,17 @@ import { DropdownChevron } from "../shared/DropdownChevron";
 import { Select as SelectPrimitive } from "radix-ui";
 import { ScrollShadow } from "../shared/scroll/ScrollShadow";
 import { bindSelectScroll } from "./select/scroll";
+import { SelectAnchor, bindSelectSizing } from "./select/sizing";
 import { menuPointerUpCapture } from "./menu/pointer";
 import "./select/scroll.css";
 
 function Select({ ...props }: React.ComponentProps<typeof SelectPrimitive.Root>) {
-  return <SelectPrimitive.Root data-slot="select" {...props} />;
+  const anchorRef = React.useRef<HTMLButtonElement | null>(null);
+  return (
+    <SelectAnchor.Provider value={anchorRef}>
+      <SelectPrimitive.Root data-slot="select" {...props} />
+    </SelectAnchor.Provider>
+  );
 }
 
 function SelectGroup({ ...props }: React.ComponentProps<typeof SelectPrimitive.Group>) {
@@ -24,13 +30,23 @@ function SelectValue({ ...props }: React.ComponentProps<typeof SelectPrimitive.V
 function SelectTrigger({
   className,
   size = "default",
+  ref,
   children,
   ...props
 }: React.ComponentProps<typeof SelectPrimitive.Trigger> & {
   size?: "sm" | "default";
 }) {
+  const anchorRef = React.useContext(SelectAnchor);
+  const triggerRef = React.useCallback(
+    (node: HTMLButtonElement | null) => {
+      if (anchorRef) anchorRef.current = node;
+    },
+    [anchorRef],
+  );
+  React.useImperativeHandle(ref, () => anchorRef!.current!, [anchorRef]);
   return (
     <SelectPrimitive.Trigger
+      ref={triggerRef}
       data-slot="select-trigger"
       data-size={size}
       className={cn(
@@ -55,19 +71,30 @@ function SelectContent({
   style,
   onPointerUpCapture,
   scrollButtons = true,
-  matchTriggerWidth = false,
   ...props
 }: React.ComponentProps<typeof SelectPrimitive.Content> & {
   scrollButtons?: boolean;
-  matchTriggerWidth?: boolean;
 }) {
+  const anchorRef = React.useContext(SelectAnchor);
   const cleanup = React.useRef<(() => void) | null>(null);
-  const viewportRef = React.useCallback((node: HTMLDivElement | null) => {
-    cleanup.current?.();
-    cleanup.current = null;
-    const content = node?.closest<HTMLElement>('[data-slot="select-content"]');
-    if (node && content) cleanup.current = bindSelectScroll(node, content);
-  }, []);
+  const viewportRef = React.useCallback(
+    (node: HTMLDivElement | null) => {
+      cleanup.current?.();
+      cleanup.current = null;
+      const content = node?.closest<HTMLElement>('[data-slot="select-content"]');
+      if (node && content) {
+        const scroll = bindSelectScroll(node, content);
+        const sizing = anchorRef?.current
+          ? bindSelectSizing(anchorRef.current, content, position)
+          : undefined;
+        cleanup.current = () => {
+          scroll();
+          sizing?.();
+        };
+      }
+    },
+    [anchorRef, position],
+  );
   return (
     <SelectPrimitive.Portal>
       <SelectPrimitive.Content
@@ -83,13 +110,10 @@ function SelectContent({
         align={align}
         style={{
           maxHeight: "var(--select-scroll-max-height)",
-          ...(matchTriggerWidth
-            ? {
-                width: "var(--radix-select-trigger-width)",
-                minWidth: "var(--radix-select-trigger-width)",
-              }
-            : {}),
           ...style,
+          width: "var(--select-trigger-width, var(--radix-select-trigger-width))",
+          minWidth: "var(--select-trigger-width, var(--radix-select-trigger-width))",
+          maxWidth: "calc(100dvw - 20px)",
         }}
         {...props}
       >
@@ -101,13 +125,7 @@ function SelectContent({
           <SelectPrimitive.Viewport
             ref={viewportRef}
             data-slot="select-viewport"
-            className={cn(
-              "p-1",
-              position === "popper" && "w-full scroll-my-1",
-              position === "popper" &&
-                !matchTriggerWidth &&
-                "min-w-[var(--radix-select-trigger-width)]",
-            )}
+            className="w-full min-w-0 p-1 scroll-my-1"
             onScroll={(event) => {
               // Radix item alignment otherwise expands the wrapper and rewrites scrollTop.
               // A scroll event cannot cancel native scrolling; this skips only that composed handler.
@@ -155,7 +173,7 @@ function SelectItem({
           <CheckIcon className="size-4" />
         </SelectPrimitive.ItemIndicator>
       </span>
-      <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
+      <SelectPrimitive.ItemText className="min-w-0 truncate">{children}</SelectPrimitive.ItemText>
     </SelectPrimitive.Item>
   );
 }

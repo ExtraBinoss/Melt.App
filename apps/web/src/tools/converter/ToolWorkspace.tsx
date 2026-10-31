@@ -111,7 +111,6 @@ function ToolControls({
           </Button>
           <div className="tool-output-controls">
             <SelectField
-              matchTriggerWidth
               label={t("resolution")}
               value={String(state.edge)}
               disabled={blocked}
@@ -194,7 +193,6 @@ function ToolControls({
           )}
           <div className="tool-download-controls">
             <SelectField
-              matchTriggerWidth
               label={t("format")}
               value={format}
               disabled={blocked}

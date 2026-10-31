@@ -106,6 +106,7 @@ test("Receipt selectors remain local, fit the viewport and preserve keyboard, ca
     });
     const samples = [];
     for (let index = 0; index < 3; index++) {
+      const field = (await mode.boundingBox())!;
       await observeOpening(page, "pointerdown", '[role="listbox"]');
       await mode.click();
       samples.push(await opening(page));
@@ -116,6 +117,12 @@ test("Receipt selectors remain local, fit the viewport and preserve keyboard, ca
       expect(
         await list.evaluate((node) => !!node.closest("[data-radix-popper-content-wrapper]")),
       ).toBe(false);
+      await expect
+        .poll(async () => Math.abs((await list.boundingBox())!.width - field.width))
+        .toBeLessThan(1);
+      await expect
+        .poll(async () => Math.abs((await list.boundingBox())!.x - field.x))
+        .toBeLessThan(1);
       const bounds = (await list.boundingBox())!;
       const viewport = page.viewportSize()!;
       expect(bounds.x).toBeGreaterThanOrEqual(0);

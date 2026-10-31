@@ -104,7 +104,12 @@ for (const reduced of [false, true])
     await curve.click();
     const menu = page.locator(".animation-curve-menu");
     const menuBox = await menu.boundingBox();
-    expect(menuBox!.width).toBeLessThanOrEqual(triggerBox!.width + 2);
+    await expect
+      .poll(async () => Math.abs((await menu.boundingBox())!.width - triggerBox!.width))
+      .toBeLessThan(1);
+    await expect
+      .poll(async () => Math.abs((await menu.boundingBox())!.x - triggerBox!.x))
+      .toBeLessThan(1);
     expect(menuBox!.height).toBeLessThan(140);
     await expect(menu.getByRole("option").first()).toHaveCSS("font-size", "11px");
     if (!reduced) await page.screenshot({ path: test.info().outputPath("compact-easing.png") });

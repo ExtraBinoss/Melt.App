@@ -23,7 +23,6 @@ export function SelectField({
   selectedLabel,
   identity,
   scrollButtons,
-  matchTriggerWidth = false,
 }: {
   label: string;
   value: string;
@@ -39,7 +38,6 @@ export function SelectField({
   selectedLabel?: ReactNode;
   identity?: SelectFieldIdentity;
   scrollButtons?: boolean;
-  matchTriggerWidth?: boolean;
 }) {
   const [owner, setOwner] = useState(() => ({ identity, token: {} }));
   const current = useRef<object | null>(owner.token);
@@ -148,9 +146,8 @@ export function SelectField({
       {mounted && (
         <SelectContent
           scrollButtons={scrollButtons}
-          position={side || matchTriggerWidth ? "popper" : "item-aligned"}
-          align={matchTriggerWidth ? "start" : "center"}
-          matchTriggerWidth={matchTriggerWidth}
+          position={side ? "popper" : "item-aligned"}
+          align="start"
           side={side}
           className={["property-select-menu", contentClassName].filter(Boolean).join(" ")}
           onCloseAutoFocus={(event) => {

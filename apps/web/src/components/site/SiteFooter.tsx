@@ -49,7 +49,6 @@ export function SiteFooter() {
           <div className="site-languages">
             <SelectField
               scrollButtons={false}
-              matchTriggerWidth
               disabled={!hydrated}
               label={t("language")}
               value={i18n.language.split("-")[0]!}

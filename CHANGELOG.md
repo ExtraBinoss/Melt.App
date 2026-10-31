@@ -6,6 +6,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Make every shared Select match its trigger width in both item-aligned and popper modes, including effect color modes. Remove per-screen sizing flags, retain editor positioning and keyboard focus, and track open-field resizing with local observers.
+
 - Hide language-menu scroll arrows while retaining scroll shadows, native wheel input and keyboard selection. Match standalone tool/language menus to their trigger width without adding floating ancestor tracking to item-aligned editor menus. Organize converter guides into numbered steps, compact output notes and spaced tips.
 
 - Extend the shared ASCII effect with editable character ramps, tonal/shadow controls, ink/background colors, density reversal and cell/glyph shaping. Add validated generic text parameters with hold animation and single-commit drafts. Reuse compiled passes with a bounded eight-atlas cache; preserve legacy pixels and verify fifty photographic images / one hundred effects on both Three backends with zero production readbacks.

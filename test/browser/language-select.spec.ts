@@ -50,16 +50,34 @@ test("tool menus match their field width and guides keep steps and output notes 
   await expect(page.getByRole("button", { name: "Download image", exact: true })).toBeEnabled({
     timeout: 30000,
   });
-  const trigger = page.getByRole("combobox", { name: "Download format", exact: true });
-  const field = (await trigger.boundingBox())!;
-  await trigger.click();
-  const menu = page.locator('[data-slot="select-content"]');
-  await expect
-    .poll(async () => Math.abs((await menu.boundingBox())!.width - field.width))
-    .toBeLessThan(1);
-  await expect.poll(async () => Math.abs((await menu.boundingBox())!.x - field.x)).toBeLessThan(1);
-  await page.keyboard.press("Escape");
-  await expect(trigger).toBeFocused();
+  // Exercise both short output choices and a longer selected effect label.
+  const color = page.getByRole("combobox", { name: "Color mode", exact: true });
+  await color.click();
+  await page.getByRole("option", { name: "Shaded ink", exact: true }).click();
+  for (const name of ["Color mode", "Maximum edge", "Download format"]) {
+    const trigger = page.getByRole("combobox", { name, exact: true, includeHidden: true });
+    const field = (await trigger.boundingBox())!;
+    await trigger.click();
+    const menu = page.locator('[data-slot="select-content"]');
+    await expect
+      .poll(async () => Math.abs((await menu.boundingBox())!.width - field.width))
+      .toBeLessThan(1);
+    await expect
+      .poll(async () => Math.abs((await menu.boundingBox())!.x - field.x))
+      .toBeLessThan(1);
+    // An open field can change width without rebuilding the menu.
+    await trigger.evaluate((node) => {
+      node.style.width = "180px";
+    });
+    await expect
+      .poll(async () => Math.abs((await menu.boundingBox())!.width - 180))
+      .toBeLessThan(1);
+    await trigger.evaluate((node) => {
+      node.style.removeProperty("width");
+    });
+    await page.keyboard.press("Escape");
+    await expect(trigger).toBeFocused();
+  }
   await page.locator(".tool-guide").scrollIntoViewIfNeeded();
   await expect(page.locator(".tool-steps li")).toHaveCount(3);
   await expect(page.locator(".tool-output-notes > div")).toHaveCount(2);

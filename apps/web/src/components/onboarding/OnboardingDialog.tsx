@@ -137,7 +137,6 @@ export function OnboardingDialog({ onComplete }: { onComplete: () => void }) {
             <SelectField
               className="onboarding-language"
               scrollButtons={false}
-              matchTriggerWidth
               label={t("translation:language")}
               value={i18n.language}
               options={supportedLocales.map(({ code, label }) => ({ value: code, label }))}
