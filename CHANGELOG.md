@@ -6,6 +6,7 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Match direct SVG multisample coverage between the editor, Motion preview and encoded video, while preserving authored effect/mask references; verify decoded MP4 vector edges and native analytical text.
 - Add an on-demand Performance popover below each artboard, sharing the mode control's height and zoom scale. Sample twelve nearby frames with real renderer counters, CPU host timing and supported GPU timestamps; compare independent budget bars against common or custom frame-rate targets. Restore playback safely, cancel on editor interaction, distinguish shared cache memory and unmeasured audio processing, and expose extensible domain metrics in twelve locales.
 
 - Keep the collapsed Motion timeline out of workspace layout, skip reservation geometry for unpinned navigation, animate pinned sidebar/toolbar repositioning locally, and start its native slide after the mounting commit. Retain its controls across Static switches, suspend the inactive ruler, and prevent resize observers from snapping active transitions. Let segmented indicators and virtual lists obtain initial geometry after layout.

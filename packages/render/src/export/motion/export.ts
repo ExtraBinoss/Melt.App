@@ -159,6 +159,7 @@ export async function exportMotionVideo(
           },
           {
             scale,
+            vectorAntialias: true,
             motionFrame: plan,
             mediaMode: "exact",
             mediaResolver: options.mediaResolver,

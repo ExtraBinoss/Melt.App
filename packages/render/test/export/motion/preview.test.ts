@@ -63,7 +63,11 @@ it("autoplays a frozen program with one acknowledged job and a bounded physical 
   project.pages[0]!.layers[0]!.x = 999;
   await scheduler.step(100);
   expect(state.render.mock.calls[1]![0].layers[0].x).toBeCloseTo(2);
-  expect(state.render.mock.calls[1]![3]).toMatchObject({ scale: 1, mediaMode: "playback" });
+  expect(state.render.mock.calls[1]![3]).toMatchObject({
+    scale: 1,
+    mediaMode: "playback",
+    vectorAntialias: true,
+  });
   expect(state.options).toHaveBeenCalledWith(
     expect.objectContaining({ maxBytes: 256 * 1024 * 1024 }),
   );

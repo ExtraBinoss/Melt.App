@@ -106,6 +106,7 @@ export function createMotionPreview(project: Project, options: MotionPreviewOpti
       },
       {
         scale: Math.min(1, edge / Math.max(selection.page.width, selection.page.height)),
+        vectorAntialias: true,
         motionFrame: plan,
         mediaMode: state.playing ? "playback" : "preview",
         signal: abort.signal,
