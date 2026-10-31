@@ -1,4 +1,6 @@
 .segmented-tabs:is([data-slot="tabs-list"], [role="radiogroup"]) {
+  position: relative;
+  isolation: isolate;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -15,7 +17,7 @@
   justify-content: center;
   flex: 1;
   position: relative;
-  isolation: isolate;
+  z-index: 1;
   min-width: 114px;
   height: 30px;
   border: 0;
@@ -48,10 +50,11 @@
 }
 .segmented-tab-indicator {
   position: absolute;
-  inset: 0;
-  z-index: -1;
+  left: 0;
+  top: 0;
+  z-index: 0;
   background: var(--card);
-  border-radius: inherit;
+  border-radius: 8px;
   box-shadow:
     0 1px 3px #00000012,
     inset 0 0 0 1px color-mix(in srgb, var(--foreground) 7%, transparent);
@@ -111,4 +114,16 @@
 .segmented-tabs[data-size="compact"] .segmented-tab-icon svg {
   width: 14px;
   height: 14px;
+}
+
+.segmented-tabs[data-size="compact"] > .segmented-tab-indicator {
+  border-radius: 6px;
+}
+.segmented-tabs .segmented-tab {
+  transition: color 140ms ease-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  .segmented-tabs .segmented-tab {
+    transition: none;
+  }
 }

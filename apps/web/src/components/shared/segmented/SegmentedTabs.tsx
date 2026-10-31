@@ -1,9 +1,11 @@
-import { useId, type ReactNode } from "react";
-import { LayoutGroup, motion, useReducedMotion } from "motion/react";
+import { useRef, type ReactNode } from "react";
+import { motion } from "motion/react";
 import { TabsList, TabsTrigger } from "../../ui/tabs";
+import { useTranslation } from "react-i18next";
 import { RadioGroup } from "radix-ui";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../../ui/tooltip";
 import "./segmented.css";
+import { useSegmentedIndicator } from "./use-indicator";
 
 export interface SegmentedTab {
   value: string;
@@ -40,8 +42,11 @@ export function SegmentedTabs({
   tooltips = false,
   onValueChange,
 }: Props) {
-  const id = useId(),
-    reduced = useReducedMotion();
+  const root = useRef<HTMLDivElement>(null);
+  const { i18n } = useTranslation(),
+    direction = i18n.dir();
+  const layoutKey = JSON.stringify([direction, items.map((item) => [item.value, item.label])]);
+  const indicator = useSegmentedIndicator(root, value, layoutKey);
   const Trigger = mode === "choice" ? RadioGroup.Item : TabsTrigger;
   const buttons = items.map((item) => {
     const button = (
@@ -50,19 +55,9 @@ export function SegmentedTabs({
         value={item.value}
         disabled={disabled}
         aria-label={item.label}
+        data-segmented-value={item.value}
         className={`segmented-tab ${itemClassName}`}
       >
-        {value === item.value && (
-          <motion.span
-            aria-hidden
-            className={`segmented-tab-indicator ${indicatorClassName}`}
-            layoutId="active-tab"
-            initial={false}
-            transition={
-              reduced ? { duration: 0 } : { type: "spring", stiffness: 460, damping: 38, mass: 0.7 }
-            }
-          />
-        )}
         {item.icon && (
           <span className="segmented-tab-icon" aria-hidden>
             {item.icon}
@@ -82,25 +77,41 @@ export function SegmentedTabs({
       button
     );
   });
-  return (
-    <LayoutGroup id={id}>
-      {mode === "choice" ? (
-        <RadioGroup.Root
-          value={value}
-          onValueChange={onValueChange}
-          orientation="horizontal"
-          disabled={disabled}
-          aria-label={label}
-          className={`segmented-tabs ${className}`}
-          data-size={size}
-        >
-          {buttons}
-        </RadioGroup.Root>
-      ) : (
-        <TabsList aria-label={label} className={`segmented-tabs ${className}`} data-size={size}>
-          {buttons}
-        </TabsList>
-      )}
-    </LayoutGroup>
+  const highlight = (
+    <motion.span
+      aria-hidden
+      className={`segmented-tab-indicator ${indicatorClassName}`}
+      style={indicator}
+      data-segmented-indicator
+    />
+  );
+  return mode === "choice" ? (
+    <RadioGroup.Root
+      ref={root}
+      data-animation="wipe"
+      dir={direction}
+      value={value}
+      onValueChange={onValueChange}
+      orientation="horizontal"
+      disabled={disabled}
+      aria-label={label}
+      className={`segmented-tabs ${className}`}
+      data-size={size}
+    >
+      {highlight}
+      {buttons}
+    </RadioGroup.Root>
+  ) : (
+    <TabsList
+      ref={root}
+      data-animation="wipe"
+      dir={direction}
+      aria-label={label}
+      className={`segmented-tabs ${className}`}
+      data-size={size}
+    >
+      {highlight}
+      {buttons}
+    </TabsList>
   );
 }

@@ -6,6 +6,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Use one persistent shared segmented wipe for canvas modes and library filters, with local offset measurement, RTL support, cancellable animations and live reduced-motion preferences.
+
 - Add one shared accessible preview player for local tools, Motion export and Timelapse, with a stable elapsed/duration clock, seek gestures and a volume popover. Enable initially muted, independently adjustable audio monitoring through the existing bounded mixer; retain seek/pause/disposal synchronization and selection scope. Shorten clip controls and repair inherited offsets that displaced the Export split button.
 
 - Interpolate playback markers and color-picker thumbs without smoothing authored values; preserve fractional picker coordinates, precise scrubbing and reduced-motion preferences. Slightly increase light glass-popover opacity and use content masks automatically inside floating surfaces to avoid white scroll-shadow bands.
