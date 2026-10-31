@@ -60,5 +60,37 @@ it. Marks are immediately removed from the runtime entry buffer after recording,
 with no retained frame arrays, polling, console logging or GPU pixel readbacks.
 They do not enable the more expensive buffered `profileVideo` sample arrays.
 
-The cause of the supplied remaining flashes is **not yet established**. These
-changes add attribution; they are not reported as a flash repair.
+## Follow-up trace and native RGB fix
+
+`Trace-20261031T205453.json` includes 893 frame-lineage events: 297 native BGRX
+uploads from a proxy, one retained source reuse, 297 accepted composites and 298
+display callbacks. There are no missing source samples and no publication/display
+texture-time mismatches. Every selected PTS is at or before the requested time,
+with a maximum 33.094 ms difference (one 30 fps sample).
+
+The opaque BGRX path was absent from the earlier I420 reproduction. The
+[WebCodecs format contract](https://w3c.github.io/webcodecs/#dom-videopixelformat-bgrx)
+defines its fourth component as padding, with fully opaque coverage. A native
+WebGPU witness reproduced the defect with arbitrary padding: bytes `[30, 80, 180,
+0]` produced red RGB with alpha zero; padding 127 instead unpremultiplied and
+brightened those same colors. This explains both missing artwork and brightness
+flashes without a decoder gap.
+
+For BGRX/RGBX only, video uploads now preserve stored RGB through Three's
+`premultiplyAlpha` copy setting, then TSL writes opaque output coverage. RGBA,
+BGRA and YUV paths retain their existing behavior. The same pooled texture and
+native frame lease remain in use; this adds no image conversion, decoded frame,
+GPU target, production pixel readback or extra render pass.
+
+The native regression alternates packed opaque and actual-alpha formats through
+one upload slot, testing padding 0, 1, 127 and 255 on both WebGPU and WebGL. All
+opaque samples retain their exact RGB and alpha 255, and actual alpha remains
+unchanged. Both backend checks and nine focused ownership/upload checks pass.
+
+In the supplied playing interval, display callbacks are separated by a median
+52.748 ms, p95 84.393 ms and maximum 277.134 ms. Source-selection-to-accepted-GPU
+publication has median 14.988 ms, p95 36.658 ms and maximum 241.636 ms; these are
+wall intervals including CPU work and queue waits, not GPU timer queries. The
+accepted authored time advances 14.473 seconds in 18.337 seconds of wall time
+including the loop, rather than running ahead. The remaining scheduling/performance
+work is distinct from the corrected pixel-format defect.

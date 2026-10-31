@@ -55,3 +55,14 @@ Coalesced requests share one lease. Up to 33.3 ms of preparation counts toward
 normal playback; longer decode/compilation waits do not accumulate catch-up time.
 Paused seeks, errors and disposal release the lease as well. This is presentation
 backpressure, not a change to the portable document, source speed or exact export.
+
+## Opaque packed RGB frames
+
+Hardware/proxy decoding may produce BGRX or RGBX instead of I420. Their X byte
+is padding, not alpha. Preserve the encoded RGB bytes with Three's premultiplied
+upload setting and write coverage 1 in the existing TSL raster pass for these two
+formats only. This avoids unpremultiplication against undefined padding as well
+as accidental transparent frames. Actual-alpha and YUV formats keep their own
+settings. Reusing a slot across format changes refreshes that setting every time;
+leases, upload rings, texture budgets and acknowledgements remain unchanged.
+Native backend regressions check arbitrary padding and retained real alpha.

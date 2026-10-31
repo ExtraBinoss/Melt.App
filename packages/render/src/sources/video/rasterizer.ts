@@ -14,9 +14,9 @@ import {
   type RenderTarget,
   type WebGPURenderer,
 } from "three/webgpu";
-import { sRGBTransferOETF, texture, uniform, uv, vec3, vec4 } from "three/tsl";
+import { mix, sRGBTransferOETF, texture, uniform, uv, vec3, vec4 } from "three/tsl";
 import type { VideoFrameLease } from "./model";
-import { VideoFrameTextureOwner } from "./texture";
+import { hasOpaqueRgbPadding, VideoFrameTextureOwner } from "./texture";
 import { videoOrientationMatrix } from "./orientation";
 import { acknowledgeGpuWork as settleVideoUpload } from "../../cache/acknowledgement";
 import { VIDEO_MAX_STREAMS } from "./budgets";
@@ -57,6 +57,7 @@ export class VideoRasterizer {
   private readonly maxDimension: number;
   private readonly placeholder = new VideoFrameTexture();
   private readonly matrix = uniform(new Matrix3());
+  private readonly opaqueRgb = uniform(0);
   private readonly textureNode = texture(this.placeholder, this.matrix.mul(vec3(uv(), 1)).xy);
   private readonly scene = new Scene();
   private readonly camera = new OrthographicCamera(-1, 1, 1, -1, 0, 1);
@@ -87,7 +88,7 @@ export class VideoRasterizer {
     this.maxDimension = gpuTextureLimit(renderer);
     this.material.fragmentNode = vec4(
       sRGBTransferOETF(this.textureNode.rgb) as Node<"vec3">,
-      this.textureNode.a,
+      mix(this.textureNode.a, 1, this.opaqueRgb),
     );
     this.scene.add(new Mesh(this.geometry, this.material));
   }
@@ -153,6 +154,7 @@ export class VideoRasterizer {
       });
       const operation = slot.owner.withFrame(lease, async (source) => {
         this.textureNode.value = source;
+        this.opaqueRgb.value = hasOpaqueRgbPadding(lease.frame) ? 1 : 0;
         this.matrix.value.copy(videoOrientationMatrix(lease.rotation, lease.flip));
         const previous = this.renderer.getRenderTarget(),
           auto = this.renderer.autoClear,

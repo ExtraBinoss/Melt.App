@@ -61,6 +61,20 @@ test("reuses textures of equal dimensions and releases rejected or failed consum
     (texture) => texture,
   );
   expect(second).toBe(first);
+  for (const [format, expected] of [
+    ["BGRX", true],
+    ["RGBA", false],
+    ["RGBX", true],
+    ["I420", false],
+    [null, false],
+  ] as const) {
+    const sample = decoded(frames);
+    Object.defineProperty(sample.frame, "format", { value: format });
+    await owner.withFrame(pool.adopt(sample, { value: 0, rate: 1 }, false), (texture) => {
+      expect(texture).toBe(first);
+      expect(texture.premultiplyAlpha).toBe(expected);
+    });
+  }
   const disposed = vi.fn();
   first.addEventListener("dispose", disposed);
   await expect(

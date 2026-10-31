@@ -2,6 +2,11 @@ import { SRGBColorSpace, VideoFrameTexture } from "three";
 import type { VideoFrameLease } from "./model";
 import { VideoSourceError } from "./errors";
 
+/** X is padding, never coverage. Some native RGB uploads still expose its arbitrary byte. */
+export function hasOpaqueRgbPadding(frame: VideoFrame): boolean {
+  return frame.format === "BGRX" || frame.format === "RGBX";
+}
+
 /** One consumer at a time. Its promise must cover actual upload/render/encode consumption. */
 export class VideoFrameTextureOwner {
   private texture: VideoFrameTexture | null = null;
@@ -35,6 +40,8 @@ export class VideoFrameTextureOwner {
         this.width = lease.frame.displayWidth;
         this.height = lease.frame.displayHeight;
       }
+      // Preserve packed RGB values: unpremultiplying by an undefined X byte corrupts brightness.
+      this.texture.premultiplyAlpha = hasOpaqueRgbPadding(lease.frame);
       this.texture.setFrame(lease.frame);
       return await consume(this.texture);
     } finally {
