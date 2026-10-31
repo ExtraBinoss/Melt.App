@@ -92,5 +92,8 @@
     "reveal": "Révélation",
     "stylize": "Style",
     "custom": "Personnalisé"
-  }
+  },
+  "animatedBy": "Animé par {{name}}",
+  "editKeyframes": "Modifier les images clés",
+  "turns": "Tours"
 }

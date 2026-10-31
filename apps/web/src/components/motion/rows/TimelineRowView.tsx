@@ -1,4 +1,4 @@
-import { spatialPropertyLabel } from "../../spatial/presentation";
+import { motionPropertyLabel } from "./property-label";
 import { memo, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import {
@@ -13,12 +13,10 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import {
-  getEffectDefinition,
   resolveLayerMotionProperty,
   type Composition,
   type EnginePort,
   type Layer,
-  type MotionPropertyTarget,
   type Project,
 } from "@musart/core";
 import type { TimelineTransport, TimelineUnit } from "../model";
@@ -70,12 +68,6 @@ export interface TimelineRowViewProps {
   showHover(this: void, key: string, layerId: string, node: HTMLElement): void;
   clearHover(this: void, key?: string): void;
 }
-const propertyLabels: Readonly<Record<string, string>> = {
-  x: "positionX",
-  y: "positionY",
-  "fillGradient.angle": "gradientAngle",
-  "fillGradient.kind": "gradientKind",
-};
 const layerIcons: Partial<Record<Layer["kind"], LucideIcon>> = {
   group: Folder,
   image: ImageIcon,
@@ -114,26 +106,11 @@ export const TimelineRowView = memo(function TimelineRowView(props: TimelineRowV
   } = props;
   const { t } = useTranslation("motion"),
     { t: common } = useTranslation();
-  function propertyName(target: MotionPropertyTarget, row: TimelineRow): string {
-    if (target.kind === "layer")
-      return target.property.startsWith("spatial.")
-        ? spatialPropertyLabel(target.property, t)
-        : t(propertyLabels[target.property] ?? target.property);
-    const effect = row.layer.effects.find((item) => item.id === target.effectId);
-    if (!effect) return target.property;
-    const definition = getEffectDefinition(effect.type);
-    const parameter = definition.parameters.find(
-      (item) =>
-        item.key === target.property &&
-        (item.scope === "settings") === (target.kind === "effectSetting"),
-    );
-    return `${common(definition.nameKey)} · ${parameter ? common(parameter.labelKey) : t(target.property)}`;
-  }
   const MotionAction = labelsOnly ? TimelineMotionAction : TransitionPopover;
   const Icon = row.kind === "property" ? Diamond : (layerIcons[row.layer.kind] ?? Layers);
   const name =
     row.kind === "property"
-      ? `${row.animation ? `${row.animation.preset.name} · ` : ""}${propertyName(row.property.target, row)}`
+      ? `${row.animation ? `${row.animation.preset.name} · ` : ""}${motionPropertyLabel(row.property.target, row.layer, t, common)}`
       : row.layer.name;
   const easingAvailable =
     !labelsOnly &&

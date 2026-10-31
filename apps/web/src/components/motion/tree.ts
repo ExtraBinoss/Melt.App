@@ -47,7 +47,11 @@ export function projectTimelineRows(
       !!children.get(layer.id)?.length ||
       (details
         ? !!track?.properties.length || !!animationProperties.length
-        : !!track?.animations?.length);
+        : occurrences.some(
+            (item) =>
+              item.animations?.length ||
+              item.properties.some((property) => property.keyframes.length),
+          ));
     const common = { layer, depth, occurrences, ...(track ? { track } : {}) };
     rows.push({ ...common, kind: "layer", key: layer.id, expandable, expanded });
     if (!expanded) continue;

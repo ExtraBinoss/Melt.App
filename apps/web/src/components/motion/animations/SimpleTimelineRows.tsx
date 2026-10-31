@@ -9,13 +9,17 @@ import {
   type EnginePort,
   type MotionAnimation,
   type MotionLayerTrack,
+  type MotionPropertyTrack,
 } from "@musart/core";
 import { useVirtualList } from "../../shared/scroll/use-virtual-list";
+import { useEngineValue } from "../../../state/session/editor";
 import { TimelineRowView } from "../rows/TimelineRowView";
+import { motionPropertyLabel } from "../rows/property-label";
 import { useTimelineRowHover } from "../rows/use-row-hover";
 import { TrackClips } from "../occurrences/TrackClips";
 import { MotionPopover } from "./MotionPopover";
 import { AnimationBlock } from "./AnimationBlock";
+import { MotionSummaryBlock } from "./MotionSummaryBlock";
 import { SimpleAudioRows } from "./SimpleAudioRows";
 import { animationPresentation, useAnimationPresentation } from "./presentation";
 import type { TimelineRow } from "../tree";
@@ -25,7 +29,12 @@ import type { TimelineTransport, TimelineUnit } from "../model";
 import "./animations.css";
 
 type LayerRow = Extract<TimelineRow, { kind: "layer" }>;
-type Row = { row: LayerRow; track?: MotionLayerTrack; animation?: MotionAnimation };
+type Row = {
+  row: LayerRow;
+  track?: MotionLayerTrack;
+  animation?: MotionAnimation;
+  property?: MotionPropertyTrack;
+};
 
 /** Same canonical layer rows and interactions as Keyframes, with editable animation children. */
 export function SimpleTimelineRows({
@@ -38,7 +47,6 @@ export function SimpleTimelineRows({
   viewport,
   layerRows,
   rowHeight,
-  selected,
   onToggle,
   onSelect,
   gestures,
@@ -55,7 +63,6 @@ export function SimpleTimelineRows({
   viewport: RefObject<HTMLDivElement | null>;
   layerRows: readonly TimelineRow[];
   rowHeight: number;
-  selected: ReadonlySet<string>;
   onToggle(this: void, id: string): void;
   onSelect(this: void, id: string, additive: boolean): void;
   gestures: TimelineGestures;
@@ -64,9 +71,13 @@ export function SimpleTimelineRows({
   unit: TimelineUnit;
 }) {
   const { t } = useTranslation("animations");
+  const { t: motionLabel } = useTranslation("motion"),
+    { t: common } = useTranslation();
   const presentation = useAnimationPresentation(engine),
     reduced = !!useReducedMotion();
   const { showHover, clearHover } = useTimelineRowHover(engine, page.id);
+  const selection = useEngineValue(engine, (snapshot) => snapshot.selection);
+  const selected = useMemo(() => new Set(selection), [selection]);
   const geometry = useMemo(() => createLayerGeometryIndex(page), [page]);
   const rows = useMemo(
     () =>
@@ -75,9 +86,12 @@ export function SimpleTimelineRows({
         return [
           { row },
           ...(row.expanded
-            ? (row.occurrences ?? []).flatMap((track) =>
-                (track.animations ?? []).map((animation) => ({ row, track, animation })),
-              )
+            ? (row.occurrences ?? []).flatMap((track) => [
+                ...(track.animations ?? []).map((animation) => ({ row, track, animation })),
+                ...track.properties
+                  .filter((property) => property.keyframes.length)
+                  .map((property) => ({ row, track, property })),
+              ])
             : []),
         ];
       }),
@@ -98,11 +112,66 @@ export function SimpleTimelineRows({
       }
       aria-label={t("title")}
     >
-      {rows.slice(first, last).map(({ row, animation, track }, offset) => {
+      {rows.slice(first, last).map(({ row, animation, track, property }, offset) => {
         const layer = row.layer,
           locked = geometry.isLocked(layer.id),
           top = (first + offset) * rowHeight;
         const disabled = !interactive || locked;
+        if (property && track) {
+          const propertyRow: TimelineRow = {
+            ...row,
+            kind: "property",
+            key: property.id,
+            property,
+            track,
+            depth: row.depth + 1,
+          };
+          return (
+            <TimelineRowView
+              key={property.id}
+              row={propertyRow}
+              top={top}
+              height={rowHeight}
+              reduced={reduced}
+              active={selected.has(layer.id)}
+              locked={locked}
+              page={page}
+              project={engine.getSnapshot().project}
+              pixelsPerSecond={scale}
+              duration={duration}
+              left={0}
+              width={duration * scale}
+              unit={unit}
+              transport={transport}
+              onToggle={onToggle}
+              onSelect={onSelect}
+              engine={engine}
+              compositionId={page.id}
+              interactive={interactive}
+              drag={drag}
+              gestures={gestures}
+              onError={onError}
+              showHover={showHover}
+              clearHover={clearHover}
+              labelsOnly
+              lane={
+                <MotionSummaryBlock
+                  engine={engine}
+                  layerId={layer.id}
+                  label={motionPropertyLabel(property.target, layer, motionLabel, common)}
+                  keys={property.keyframes}
+                  gestures={gestures}
+                  scale={scale}
+                  disabled={disabled}
+                  onSelect={() => animationPresentation(engine).set({ selected: null })}
+                  onDetails={() =>
+                    animationPresentation(engine).set({ details: true, selected: null })
+                  }
+                />
+              }
+            />
+          );
+        }
         if (!animation || !track)
           return (
             <TimelineRowView
@@ -170,6 +239,7 @@ export function SimpleTimelineRows({
             className={`motion-row is-property ${selected.has(layer.id) ? "is-selected" : ""}`}
             style={{ top, height: rowHeight }}
             data-layer-id={layer.id}
+            data-layer-kind={layer.kind}
             data-motion-hover-layer={layer.id}
             data-motion-animation-row={animation.id}
             onPointerEnter={(event) => showHover(key, layer.id, event.currentTarget)}
@@ -208,6 +278,7 @@ export function SimpleTimelineRows({
                 transport={transport}
                 page={page}
                 trackId={track.id}
+                gestures={gestures}
               />
             </div>
           </div>

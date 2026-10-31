@@ -119,6 +119,29 @@ for (const [id, name, values] of [
   ["swing", "Swing", [-30, 15, -8, 0]],
 ] as const)
   recipes.push(preset(`rotate-${id}`, name, "rotate", [channel("rotation", [...values])]));
+for (const [id, name, direction] of [
+  ["rotate-spin", "Spin clockwise", 1],
+  ["rotate-spin-reverse", "Spin counterclockwise", -1],
+] as const)
+  recipes.push(
+    preset(
+      id,
+      name,
+      "rotate",
+      [
+        {
+          target: { kind: "layer", property: "rotation" },
+          operation: "add",
+          points: [
+            { at: 0, value: 0, easing: { type: "linear" } },
+            { at: 1, value: direction * 360, easing: { type: "linear" } },
+          ],
+        },
+      ],
+      [],
+      1200,
+    ),
+  );
 recipes.push(
   preset("attention-pulse", "Pulse", "attention", [
     channel("scaleX", [1, 1.15, 1], "multiply"),

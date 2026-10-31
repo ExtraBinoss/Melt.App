@@ -47,7 +47,7 @@ test("authors a deterministic 1080p loop through replayable commands with one sh
   ).toBe(true);
 });
 
-test("uses two linear keys per rotating part and keeps every source registered throughout the orbit", () => {
+test("uses editable Spin presets with two linear points and keeps sources registered throughout the orbit", () => {
   const { project } = build();
   const program = compileMotion(project, { compositionId: project.pages[0]!.id });
   const at = (time: number) =>
@@ -59,17 +59,23 @@ test("uses two linear keys per rotating part and keeps every source registered t
         { terminalPreview: time === 12 },
       ),
     );
-  const tracks = project.pages[0]!.motion!.tracks.flatMap((track) => track.properties);
-  expect(tracks).toHaveLength(13);
+  expect(project.pages[0]!.motion!.tracks.flatMap((track) => track.properties)).toHaveLength(0);
+  const animations = project.pages[0]!.motion!.tracks.flatMap((track) => track.animations ?? []);
+  expect(animations).toHaveLength(13);
   expect(
-    tracks.every(
-      (track) =>
-        track.target.kind === "layer" &&
-        track.target.property === "rotation" &&
-        track.keyframes.length === 2,
+    animations.every(
+      (animation) =>
+        animation.preset.id.startsWith("rotate-spin") &&
+        animation.preset.channels.length === 1 &&
+        animation.preset.channels[0]!.target.kind === "layer" &&
+        animation.preset.channels[0]!.target.property === "rotation" &&
+        animation.preset.channels[0]!.points.length === 2 &&
+        animation.preset.channels[0]!.points.every((point) => point.easing?.type === "linear"),
     ),
   ).toBe(true);
-  expect(tracks.reduce((count, track) => count + track.keyframes.length, 0)).toBe(26);
+  expect(
+    animations.reduce((count, animation) => count + animation.preset.channels[0]!.points.length, 0),
+  ).toBe(26);
   const start = at(0);
   for (const time of Array.from({ length: 81 }, (_, index) => (index * 12) / 80)) {
     const page = at(time);

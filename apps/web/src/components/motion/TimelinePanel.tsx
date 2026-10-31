@@ -370,7 +370,7 @@ export function TimelinePanel({
         data-document-shortcuts
         onKeyDown={(event) => {
           if (!event.currentTarget.contains(event.target as Node)) return;
-          if (details) gestures.keyDown(event);
+          gestures.keyDown(event);
           if (
             event.defaultPrevented ||
             event.key !== " " ||
@@ -525,7 +525,6 @@ export function TimelinePanel({
                   viewport={viewport}
                   layerRows={rows}
                   rowHeight={rowHeight}
-                  selected={selected}
                   onToggle={toggleRow}
                   onSelect={selectRow}
                   gestures={gestures}

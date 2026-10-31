@@ -34,10 +34,21 @@ test("layer selection retains the simple timeline; advanced rows adopt canonical
     });
     expect(d.engine.getSnapshot().selection).toEqual([d.text.id]);
     expect(panel.dataset.reactRenders).toBe(before);
+    expect(panel.querySelector(`.motion-row[data-layer-id="${d.text.id}"]`)).toHaveClass(
+      "is-selected",
+    );
+    act(() => d.engine.select([d.rectangle.id]));
+    expect(panel.querySelector(`.motion-row[data-layer-id="${d.text.id}"]`)).not.toHaveClass(
+      "is-selected",
+    );
+    expect(panel.querySelector(`.motion-row[data-layer-id="${d.rectangle.id}"]`)).toHaveClass(
+      "is-selected",
+    );
+    expect(panel.dataset.reactRenders).toBe(before);
     act(() => animationPresentation(d.engine).set({ details: true }));
     const advanced = Number(panel.dataset.reactRenders);
     expect(advanced).toBeGreaterThan(Number(before));
-    act(() => d.engine.select([d.rectangle.id]));
+    act(() => d.engine.select([d.text.id]));
     expect(Number(panel.dataset.reactRenders)).toBeGreaterThan(advanced);
   } finally {
     view.unmount();

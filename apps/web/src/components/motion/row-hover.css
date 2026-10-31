@@ -12,8 +12,8 @@
 }
 .motion-row:not(.is-selected):is(:hover, :focus-within, [data-motion-hovered="true"])
   .motion-track {
-  border-color: color-mix(in srgb, var(--motion-track-color) 32%, var(--border));
-  background: color-mix(in srgb, var(--motion-track-color) 12%, var(--background));
+  border-color: color-mix(in srgb, var(--muted-foreground) 45%, transparent);
+  background: color-mix(in srgb, var(--muted-foreground) 32%, var(--background));
 }
 .motion-row:is(:hover, :focus-within, [data-motion-hovered="true"]) .motion-trim-handle::after,
 .motion-trim-handle:hover::after {

@@ -36,6 +36,13 @@ test("Animations preserves groups, hover, editing and collapsed state when switc
     createProject({ pages: [createPage({ width: 480, height: 360, layers: [group, child] })] }),
   );
   engine.execute({ type: "setCompositionMode", mode: "motion" });
+  for (const value of [0, 1])
+    engine.execute({
+      type: "upsertMotionKeyframe",
+      target: { kind: "layer", layerId: group.id, property: "rotation" },
+      time: { value: value * 2 + 1, rate: 2 },
+      value: value * 360,
+    });
   const track = engine
     .getSnapshot()
     .project.pages[0]!.motion!.tracks.find((track) => track.layerId === child.id)!;
@@ -55,12 +62,16 @@ test("Animations preserves groups, hover, editing and collapsed state when switc
   const label = timeline.getByRole("button", { name: "Select Animated child", exact: true });
   await label.click();
   expect(await page.evaluate(() => window.musart!.snapshot().selection)).toEqual([child.id]);
+  const childRow = label.locator("xpath=ancestor::*[@data-layer-id][1]");
+  await expect(childRow).toHaveClass(/is-selected/);
   await label.hover();
   await expect(label.locator("xpath=ancestor::*[@data-layer-id][1]")).toHaveAttribute(
     "data-motion-hovered",
     "true",
   );
-  const block = timeline.locator("button.motion-animation-block");
+  const block = timeline.locator("button[data-animation-id]");
+  const rawBlock = timeline.getByRole("button", { name: "Rotation, 1000 ms", exact: true });
+  await expect(rawBlock).toBeVisible();
   await block.focus();
   await page.keyboard.press("ArrowRight");
   await expect
@@ -73,6 +84,45 @@ test("Animations preserves groups, hover, editing and collapsed state when switc
       }, track.id),
     )
     .toBe(0.01);
+  const before = await page.evaluate(() => window.musart!.snapshot().project);
+  const bounds = (await block.boundingBox())!;
+  await page.mouse.move(bounds.x + bounds.width / 2, bounds.y + bounds.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(bounds.x + bounds.width / 2 + 24, bounds.y + bounds.height / 2, {
+    steps: 6,
+  });
+  expect(await page.evaluate(() => window.musart!.snapshot().project)).toEqual(before);
+  await page.mouse.up();
+  await expect
+    .poll(() =>
+      page.evaluate((id) => {
+        const value = window
+          .musart!.snapshot()
+          .project.pages[0]!.motion!.tracks.find((item) => item.id === id)!.animations![0]!.start;
+        return value.value / value.rate;
+      }, track.id),
+    )
+    .toBeGreaterThan(0.01);
+  await page.evaluate(() => window.musart!.undo());
+  expect(await page.evaluate(() => window.musart!.snapshot().project)).toEqual(before);
+  await block.click({ button: "right" });
+  await expect(page.getByRole("menu")).toBeVisible();
+  await page.keyboard.press("Escape");
+  const groupLabel = timeline.getByRole("button", { name: "Select Nested motion", exact: true });
+  await groupLabel.click();
+  await expect(childRow).not.toHaveClass(/is-selected/);
+  await expect(block).not.toHaveAttribute("data-selected", "true");
+  await expect(groupLabel.locator("xpath=ancestor::*[@data-layer-id][1]")).toHaveClass(
+    /is-selected/,
+  );
+  const rawBefore = await page.evaluate(() => window.musart!.snapshot().project);
+  const raw = (await rawBlock.boundingBox())!;
+  await page.mouse.move(raw.x + raw.width / 2, raw.y + raw.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(raw.x + raw.width / 2 + 20, raw.y + raw.height / 2, { steps: 4 });
+  await page.keyboard.press("Escape");
+  await page.mouse.up();
+  expect(await page.evaluate(() => window.musart!.snapshot().project)).toEqual(rawBefore);
   await timeline.getByRole("button", { name: "Collapse Nested motion", exact: true }).click();
   await expect(label).toHaveCount(0);
   await timeline.getByRole("button", { name: "Keyframes", exact: true }).click();
@@ -80,5 +130,14 @@ test("Animations preserves groups, hover, editing and collapsed state when switc
   await expect(expand).toHaveAttribute("aria-expanded", "false");
   await expand.click();
   await expect(label).toBeVisible();
+  const diamond = page.getByRole("button", { name: /(?:Add|Update) keyframe · Rotation/ });
+  await expect(diamond).not.toHaveAttribute("title");
+  await diamond.locator("..").hover();
+  await expect(page.getByRole("tooltip")).toContainText("Animated property");
+  await expect(
+    page.locator(
+      '[data-slot="tooltip-content"][data-state="delayed-open"], [data-slot="tooltip-content"][data-state="instant-open"]',
+    ),
+  ).toHaveAttribute("data-side", "top");
   await page.screenshot({ path: "artifacts/motion-hierarchy.png" });
 });

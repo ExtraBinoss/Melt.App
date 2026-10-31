@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState, type ComponentProps } from "react";
-import { Sparkles } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { TimelineIconButton } from "../ControlButton";
 import { TransitionPopover } from "../transitions/TransitionPopover";
@@ -55,7 +55,7 @@ export function TimelineMotionAction(props: Props) {
         );
       }}
     >
-      <Sparkles size={13} />
+      <Plus size={13} />
     </TimelineIconButton>
   );
   return origin ? (

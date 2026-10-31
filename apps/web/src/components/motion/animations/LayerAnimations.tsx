@@ -22,6 +22,8 @@ import { AnimationDetailsDisclosure } from "./AnimationDetails";
 import { Collapsible, CollapsibleTrigger } from "../../ui/collapsible";
 import { SavePreset } from "./SavePreset";
 import { animationPresentation, useAnimationPresentation } from "./presentation";
+import { AuthoredMotionSources, motionSources } from "./AuthoredMotionSources";
+import { RotationControls, rotationTurns } from "./RotationControls";
 import "./messages";
 import "./animations.css";
 
@@ -38,6 +40,7 @@ export function LayerAnimations({ engine, layerId }: { engine: EnginePort; layer
   if (!geometry.byId.has(layerId)) return null;
   const locked = geometry.isLocked(layerId);
   if (page.motion?.mode !== "motion") return null;
+  const sources = motionSources(page, layerId);
   function run(action: () => void) {
     if (locked || engine.getSnapshot().project !== project) return;
     try {
@@ -74,9 +77,10 @@ export function LayerAnimations({ engine, layerId }: { engine: EnginePort; layer
           }
         />
       </div>
-      {!tracks.some((track) => track.animations?.length) && (
-        <p className="muted-description">{t("empty")}</p>
-      )}
+      {!tracks.some((track) => track.animations?.length) &&
+        !sources.custom.length &&
+        !sources.inherited.length && <p className="muted-description">{t("empty")}</p>}
+      <AuthoredMotionSources engine={engine} page={page} layerId={layerId} sources={sources} />
       {tracks.flatMap((track) =>
         (track.animations ?? []).map((animation) => {
           const selected = presentation.selected === animation.id;
@@ -144,36 +148,45 @@ export function LayerAnimations({ engine, layerId }: { engine: EnginePort; layer
                         update(animation, { duration: { value: Math.round(value), rate: 1000 } })
                       }
                     />
-                    <NumberInput
-                      identity={animation}
-                      label={t("intensity")}
-                      value={(geometryEffect?.amount ?? animation.strength) * 100}
-                      min={0}
-                      max={geometryEffect ? 100 : 1000}
-                      unit="%"
-                      disabled={locked}
-                      onCommit={(value) =>
-                        geometryEffect
-                          ? run(() =>
-                              engine.execute({
-                                type: "updateLayerPatches",
-                                patches: [
-                                  {
-                                    id: subject.id,
-                                    patch: {
-                                      effects: subject.effects.map((effect) =>
-                                        effect.id === geometryEffect.id
-                                          ? { ...effect, amount: value / 100 }
-                                          : effect,
-                                      ),
+                    {rotationTurns(animation) !== null ? (
+                      <RotationControls
+                        engine={engine}
+                        animation={animation}
+                        disabled={locked}
+                        run={run}
+                      />
+                    ) : (
+                      <NumberInput
+                        identity={animation}
+                        label={t("intensity")}
+                        value={(geometryEffect?.amount ?? animation.strength) * 100}
+                        min={0}
+                        max={geometryEffect ? 100 : 1000}
+                        unit="%"
+                        disabled={locked}
+                        onCommit={(value) =>
+                          geometryEffect
+                            ? run(() =>
+                                engine.execute({
+                                  type: "updateLayerPatches",
+                                  patches: [
+                                    {
+                                      id: subject.id,
+                                      patch: {
+                                        effects: subject.effects.map((effect) =>
+                                          effect.id === geometryEffect.id
+                                            ? { ...effect, amount: value / 100 }
+                                            : effect,
+                                        ),
+                                      },
                                     },
-                                  },
-                                ],
-                              }),
-                            )
-                          : update(animation, { strength: value / 100 })
-                      }
-                    />
+                                  ],
+                                }),
+                              )
+                            : update(animation, { strength: value / 100 })
+                        }
+                      />
+                    )}
                   </div>
                   <TypographyControls
                     engine={engine}

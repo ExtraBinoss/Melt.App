@@ -1,4 +1,9 @@
-import { createEffect, planMotionInitialization, type Layer } from "@musart/core";
+import {
+  createEffect,
+  MOTION_ANIMATION_PRESETS,
+  planMotionInitialization,
+  type Layer,
+} from "@musart/core";
 import { TemplateAuthor, seconds } from "./author";
 import type { BuiltMotionTemplate, MotionTemplateMedia } from "./model";
 import {
@@ -174,13 +179,23 @@ export function createBloomWindows(media: MotionTemplateMedia): BuiltMotionTempl
             layer.id.endsWith("-label-anchor")
           ? -1
           : 0;
-    if (direction)
-      a.commit(
-        a.layerKeys(layer.id, "rotation", [
-          [0, 0, { type: "linear" }],
-          [BLOOM_WINDOWS_DURATION, turns * direction, { type: "linear" }],
-        ]),
+    if (direction) {
+      const preset = structuredClone(
+        MOTION_ANIMATION_PRESETS.find(
+          (item) => item.id === (direction > 0 ? "rotate-spin" : "rotate-spin-reverse"),
+        )!,
       );
+      preset.channels[0]!.points[1]!.value = turns * direction;
+      a.commit([
+        {
+          type: "addMotionAnimation",
+          trackId: a.track(layer.id),
+          preset,
+          start: seconds(0),
+          duration: seconds(BLOOM_WINDOWS_DURATION),
+        },
+      ]);
+    }
   }
   return a.finish();
 }

@@ -92,5 +92,8 @@
     "reveal": "Reveal",
     "stylize": "Stylize",
     "custom": "Custom"
-  }
+  },
+  "animatedBy": "Animated by {{name}}",
+  "editKeyframes": "Edit keyframes",
+  "turns": "Turns"
 }

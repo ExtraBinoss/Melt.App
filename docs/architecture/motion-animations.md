@@ -124,3 +124,27 @@ projection omits property/keyframe expansion work. Keyframes exposes those
 property rows when requested. Animation blocks and ordinary occurrence clips
 retain their validated drag/trim/keyboard/context-menu handlers and undo behavior.
 Both modes share row heights and the audio row presentation.
+
+### Direct channels and shared gestures
+
+Animations also projects each directly authored property as a named interval block,
+without persisting a synthetic preset or duplicating its keys. Preset blocks project
+existing channel point identities and use the same key gesture controller as Keyframes.
+Moving the body moves all points; endpoints select the corresponding boundary points.
+Snapping, live preview, stale-session rejection, cancellation and undo remain owned by
+that controller. Block geometry follows its imperative preview subscription.
+
+The simple row leaf reads canonical engine selection directly, retaining the dock's
+selection-independent document subscription. Animation focus is cleared when its owner
+is no longer selected. Both views use neutral hover and the track's media color only
+for selected intervals. Inspector source summaries distinguish authored channels from
+inherited ancestor motion and navigate to the actual owner.
+
+### Spin recipes
+
+The built-in clockwise/counterclockwise Spin presets use two linear additive
+rotation points. Their Turns field edits the authoritative channel, baking any
+strength into the two values once. Bloom Windows authors these presets through
+`addMotionAnimation` for its parent and counter rotations, with ten turns over
+its twelve-second composition. Direct custom channels remain available for manual
+authoring; generated intervals never become a second persisted timeline.

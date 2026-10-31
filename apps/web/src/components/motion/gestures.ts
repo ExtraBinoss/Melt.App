@@ -539,11 +539,17 @@ export function createTimelineGestures(options: {
         event.stopPropagation();
       }
     },
-    beginKey(event: ReactPointerEvent<HTMLElement>, layerId: string, key: MotionKeyframe) {
+    beginKey(
+      event: ReactPointerEvent<HTMLElement>,
+      layerId: string,
+      key: MotionKeyframe,
+      group?: readonly string[],
+    ) {
       if (event.button !== 0) return;
       cancel();
       const originalKeys = new Set(selected);
-      if (event.shiftKey || !selected.has(key.id)) selectKey(key.id, event.shiftKey);
+      if (group) setSelection(new Set(event.shiftKey ? [...selected, ...group] : group));
+      else if (event.shiftKey || !selected.has(key.id)) selectKey(key.id, event.shiftKey);
       if (!selected.has(key.id)) return;
       if (
         begin(toTimelinePointerInput(event), {

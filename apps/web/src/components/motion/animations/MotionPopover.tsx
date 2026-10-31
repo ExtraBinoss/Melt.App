@@ -1,7 +1,7 @@
 import { requestLayerTransition } from "../transitions/requests";
 import { useMobileLayout } from "../../workspace/mobile/use-mobile";
 import { useState, type ReactElement } from "react";
-import { Sparkles } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { motionTimeToSeconds, type EnginePort, type MotionAnimationPreset } from "@musart/core";
 import { Popover, PopoverAnchor, PopoverContent, PopoverTrigger } from "../../ui/popover";
@@ -129,7 +129,7 @@ export function MotionPopover({
         <PopoverTrigger asChild>
           {trigger ?? (
             <TimelineIconButton label={t("add")} disabled={disabled}>
-              <Sparkles size={13} />
+              <Plus size={13} />
             </TimelineIconButton>
           )}
         </PopoverTrigger>

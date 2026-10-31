@@ -6,6 +6,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Add constant-speed clockwise/counterclockwise Spin presets with a simple Turns control. Author Bloom Windows rotations through these editable presets rather than raw property tracks, preserving the 1080p twelve-second loop, counter-rotation registration and two-point interpolation; refresh its portable bundles and preview cache revision.
+- Unify Animations selection with the canonical engine selection, keep unselected hover neutral, and clear stale animation focus when its layer is deselected. Show directly authored property motion alongside presets and explain inherited group motion in the Inspector. Reuse Keyframes gestures for preset/property block movement and endpoint edits, preserving snapping, previews, cancellation and single-entry undo; replace Add motion sparkles with a plus.
 - Redesign the on-demand Performance popover with an icon-only translated trigger, standard FPS select, shared linked budget contribution chart and copyable JSON report. Hide zero/unavailable metrics and empty domains, keep accordion scrolling vertical, and attribute CPU/GPU budgets independently using a single p95-ranked pose.
 - Preserve the canonical layer hierarchy and shared selection, canvas hover, rename and drag interactions in Animations. Nest editable animation blocks under their layers, retain collapse state across Keyframes switching, and reuse editable occurrence/audio rows.
 - Add development-only video playback diagnostics correlating decoded source timestamps with displayed Motion poses, readable speed ratios, real loop duration and decoder cursor restart reasons. Keep diagnostics bounded and disabled in production.
