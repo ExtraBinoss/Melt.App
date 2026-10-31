@@ -1,7 +1,12 @@
 import { createEffect, planMotionInitialization, type Layer } from "@musart/core";
 import { TemplateAuthor, seconds } from "./author";
 import type { BuiltMotionTemplate, MotionTemplateMedia } from "./model";
-import { BLOOM_WINDOWS, BLOOM_WINDOWS_DURATION, bloomWindowMotion } from "./bloom-windows-motion";
+import {
+  BLOOM_WINDOWS,
+  BLOOM_WINDOWS_DURATION,
+  BLOOM_WINDOW_CYCLE,
+  bloomWindowPose,
+} from "./bloom-windows-motion";
 
 export { BLOOM_WINDOWS_DURATION } from "./bloom-windows-motion";
 const W = 1920;
@@ -51,28 +56,39 @@ function treatment(id: (typeof BLOOM_WINDOWS)[number]["id"]) {
   });
 }
 
-/** One shared source, three direct cropped effect surfaces: no nested transport/mask targets. */
+/** A two-keyframe orbit rig keeps each card and its sampled video registered together. */
 export function createBloomWindows(media: MotionTemplateMedia): BuiltMotionTemplate {
   if (media.video.duration.value / media.video.duration.rate < BLOOM_WINDOWS_DURATION)
     throw Error("Bloom Windows requires a twelve-second video loop.");
   const a = new TemplateAuthor("bloom-windows", "Bloom Windows", W, H);
+  const orbitId = "bw-orbit";
   const layers: Layer[] = [
     a.layer("video", "bw-original", "Bloom / original", {
       width: W,
       height: H,
       assetId: media.video.id,
     }),
+    a.layer("group", orbitId, "Windows / orbit", { x: 0, y: (H - W) / 2, width: W, height: W }),
   ];
   for (const [index, window] of BLOOM_WINDOWS.entries()) {
     const prefix = `bw-${window.id}`,
-      pose = bloomWindowMotion(index)[0]!;
-    const x = pose.x,
-      y = pose.y;
-    const box = { x, y, width: window.size, height: window.size };
+      pose = bloomWindowPose(index),
+      pad = 80,
+      outer = window.size + pad * 2,
+      sourceSize = Math.ceil(window.size * Math.SQRT2) + 4;
+    const box = { x: pad, y: pad, width: window.size, height: window.size };
     layers.push(
+      a.layer("group", `${prefix}-card`, `${window.label} / upright card`, {
+        parentId: orbitId,
+        x: pose.centerX - outer / 2,
+        y: pose.centerY + (W - H) / 2 - outer / 2,
+        width: outer,
+        height: outer,
+      }),
       a.layer("rectangle", `${prefix}-shadow`, `${window.label} / soft shadow`, {
+        parentId: `${prefix}-card`,
         ...box,
-        fill: "#ffffff",
+        fill: "#14201c",
         effects: [
           createEffect("shadow", {
             id: `${prefix}-shadow-fx`,
@@ -82,20 +98,36 @@ export function createBloomWindows(media: MotionTemplateMedia): BuiltMotionTempl
         ],
       }),
       a.layer("group", `${prefix}-window`, `${window.label} / effect window`, {
+        parentId: `${prefix}-card`,
         ...box,
         effects: [treatment(window.id)],
       }),
-      a.layer("video", `${prefix}-video`, `${window.label} / source sample`, {
+      a.layer("group", `${prefix}-source-orbit`, `${window.label} / source registration`, {
         parentId: `${prefix}-window`,
+        x: (window.size - sourceSize) / 2,
+        y: (window.size - sourceSize) / 2,
+        width: sourceSize,
+        height: sourceSize,
+      }),
+      a.layer("video", `${prefix}-video`, `${window.label} / source sample`, {
+        parentId: `${prefix}-source-orbit`,
         width: W,
         height: H,
         assetId: media.video.id,
-        x: pose.videoX,
-        y: pose.videoY,
+        x: sourceSize / 2 - pose.offsetX - W / 2,
+        y: sourceSize / 2 - pose.offsetY - H / 2,
+      }),
+      a.layer("group", `${prefix}-label-anchor`, `${window.label} / upright label`, {
+        parentId: orbitId,
+        x: pose.centerX - outer / 2,
+        y: pose.centerY + (W - H) / 2 - outer / 2,
+        width: outer,
+        height: outer,
       }),
       a.layer("text", `${prefix}-label`, `${window.label} / label`, {
-        x: x + 12,
-        y: y - 44,
+        parentId: `${prefix}-label-anchor`,
+        x: pad + 12,
+        y: pad - 44,
         width: 180,
         height: 30,
         text: window.label,
@@ -109,8 +141,12 @@ export function createBloomWindows(media: MotionTemplateMedia): BuiltMotionTempl
   }
   a.add(
     [
-      ...layers.filter((layer) => layer.kind !== "text"),
-      ...layers.filter((layer) => layer.kind === "text"),
+      ...layers.filter(
+        (layer) => !layer.id.endsWith("-label") && !layer.id.endsWith("-label-anchor"),
+      ),
+      ...layers.filter(
+        (layer) => layer.id.endsWith("-label-anchor") || layer.id.endsWith("-label"),
+      ),
     ],
     { ...media, photos: [], sounds: [] },
   );
@@ -128,36 +164,23 @@ export function createBloomWindows(media: MotionTemplateMedia): BuiltMotionTempl
         patch: { mute: true, volume: 0, sourceIn: seconds(0) },
       },
     ]);
-  for (const [index, window] of BLOOM_WINDOWS.entries()) {
-    const prefix = `bw-${window.id}`,
-      frames = bloomWindowMotion(index);
-    for (const property of ["x", "y"] as const) {
-      const easing = (pose: (typeof frames)[number]) =>
-        property === "x" ? pose.easingX : pose.easingY;
-      for (const suffix of ["window", "shadow", "label"])
-        a.commit(
-          a.layerKeys(
-            `${prefix}-${suffix}`,
-            property,
-            frames.map((pose) => [
-              pose.time,
-              pose[property] + (suffix === "label" ? (property === "x" ? 12 : -44) : 0),
-              easing(pose),
-            ]),
-          ),
-        );
+  const turns = (BLOOM_WINDOWS_DURATION / BLOOM_WINDOW_CYCLE) * 360;
+  for (const layer of layers) {
+    const direction =
+      layer.id === orbitId || layer.id.endsWith("-source-orbit")
+        ? 1
+        : layer.id.endsWith("-card") ||
+            layer.id.endsWith("-video") ||
+            layer.id.endsWith("-label-anchor")
+          ? -1
+          : 0;
+    if (direction)
       a.commit(
-        a.layerKeys(
-          `${prefix}-video`,
-          property,
-          frames.map((pose) => [
-            pose.time,
-            property === "x" ? pose.videoX : pose.videoY,
-            easing(pose),
-          ]),
-        ),
+        a.layerKeys(layer.id, "rotation", [
+          [0, 0, { type: "linear" }],
+          [BLOOM_WINDOWS_DURATION, turns * direction, { type: "linear" }],
+        ]),
       );
-    }
   }
   return a.finish();
 }

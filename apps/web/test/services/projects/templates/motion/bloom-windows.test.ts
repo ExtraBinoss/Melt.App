@@ -8,8 +8,7 @@ import {
   parseProject,
   serializeProject,
   validateProject,
-  layerTransform,
-  multiplyMatrices,
+  getWorldMatrix,
   transformPoint,
 } from "@musart/core";
 import { createBloomWindows } from "../../../../../src/services/projects/templates/motion/bloom-windows";
@@ -48,7 +47,7 @@ test("authors a deterministic 1080p loop through replayable commands with one sh
   ).toBe(true);
 });
 
-test("moves crop windows without moving the image underneath; closes every geometry/label path", () => {
+test("uses two linear keys per rotating part and keeps every source registered throughout the orbit", () => {
   const { project } = build();
   const program = compileMotion(project, { compositionId: project.pages[0]!.id });
   const at = (time: number) =>
@@ -60,50 +59,47 @@ test("moves crop windows without moving the image underneath; closes every geome
         { terminalPreview: time === 12 },
       ),
     );
+  const tracks = project.pages[0]!.motion!.tracks.flatMap((track) => track.properties);
+  expect(tracks).toHaveLength(13);
+  expect(
+    tracks.every(
+      (track) =>
+        track.target.kind === "layer" &&
+        track.target.property === "rotation" &&
+        track.keyframes.length === 2,
+    ),
+  ).toBe(true);
+  expect(tracks.reduce((count, track) => count + track.keyframes.length, 0)).toBe(26);
   const start = at(0);
-  expect(at(12).layers).toEqual(start.layers);
-  const middle = at(3.125);
-  expect(middle.layers).not.toEqual(start.layers);
-  for (const time of [0, 1 / 60, 1.313, 3.125, 6.77, 719 / 60, 12]) {
+  for (const time of Array.from({ length: 81 }, (_, index) => (index * 12) / 80)) {
     const page = at(time);
     for (const id of ["dither", "ascii", "cyanotype"]) {
       const get = (suffix: string) =>
         page.layers.find((layer) => layer.id === `bw-${id}-${suffix}`)!;
-      const window = get("window"),
-        video = get("video");
-      const world = multiplyMatrices(layerTransform(window), layerTransform(video));
+      const matrix = getWorldMatrix(page, get("video").id);
       for (const point of [
         { x: 0, y: 0 },
         { x: 1920, y: 1080 },
       ]) {
-        const aligned = transformPoint(world, point);
-        expect(Math.abs(aligned.x - point.x)).toBeLessThan(1);
-        expect(Math.abs(aligned.y - point.y)).toBeLessThan(1);
+        const aligned = transformPoint(matrix, point);
+        expect(Math.abs(aligned.x - point.x)).toBeLessThan(1e-6);
+        expect(Math.abs(aligned.y - point.y)).toBeLessThan(1e-6);
       }
-      expect(window.mask).toBeNull();
+      const window = get("window");
       expect(window.effects[0]!.type).toBe(id);
       expect(window.width).toBeLessThanOrEqual(400);
-      expect(get("label").x - window.x).toBeCloseTo(12, 8);
-      expect(get("label").y - window.y).toBeCloseTo(-44, 8);
-      expect(get("shadow").effects[0]).toMatchObject({
-        type: "shadow",
-        settings: { offsetY: 14, radius: 20 },
-      });
+      expect(get("label").parentId).toBe(get("label-anchor").id);
+      expect(get("shadow").parentId).toBe(get("card").id);
+      expect(get("shadow").fill).toBe("#14201c");
+      const m = getWorldMatrix(page, window.id);
+      expect(m[0]).toBeCloseTo(1, 8);
+      expect(m[1]).toBeCloseTo(0, 8);
+      if (time === 12 || time === 1.2) {
+        const origin = getWorldMatrix(start, window.id);
+        m.forEach((v, index) => expect(v).toBeCloseTo(origin[index]!, 8));
+      }
     }
   }
-  expect(at(1.2).layers).toEqual(start.layers);
-  expect(start.layers.every((layer) => layer.opacity === 1)).toBe(true);
-  expect(
-    start.layers.some(
-      (layer) => layer.name.includes("flash") || layer.name.includes("label backing"),
-    ),
-  ).toBe(false);
-  const before = at(12 - 1 / 600).layers.find((layer) => layer.id === "bw-dither-window")!;
-  const after = at(1 / 600).layers.find((layer) => layer.id === "bw-dither-window")!;
-  const origin = start.layers.find((layer) => layer.id === before.id)!;
-  expect(Math.abs(origin.y - before.y - (after.y - origin.y))).toBeLessThan(0.1);
-  at(0);
-  expect(at(3.125)).toEqual(middle);
 });
 
 test("ships a normal validated gallery bundle and command journal with one pinned local video", async () => {

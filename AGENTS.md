@@ -8,6 +8,7 @@ Direct user instructions take precedence. Read the relevant architecture contrac
 - `packages/core` is pure TypeScript: documents, validation, commands, geometry, history and replay. No DOM, React, state-library, storage or GPU dependencies.
 - `packages/render` owns Three.js resources, source preparation, composition, effects, caches and export. Portable documents contain no GPU resources.
 - `apps/web` owns UI, presentation state, R3F integration and platform adapters. Document edits use validated engine commands.
+- Author presets and generated motion with sparse meaningful control points and interpolation. Use curves, loops or parent transforms instead of baking one keyframe per sampled frame. Playback evaluation must not create document keys; preserve intentional user-authored detail.
 - Use a typed command registry and domain handlers. Each effect owns its directory; registries contain definitions rather than large implementation switches.
 
 ## Stack and interaction

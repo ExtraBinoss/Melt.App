@@ -1,28 +1,30 @@
 # Bloom Windows
 
-A 1920 × 1080, twelve-second Motion template with a real rose timelapse and three
-moving treatment windows. Its 60 fps composition animates the windows over one
-30 fps original. Dither, ASCII and cyanotype are ordinary editable GPU effects;
-bare labels and drop shadows are ordinary document layers.
+A 1920 × 1080, twelve-second Motion template with a natural-speed rose timelapse
+and a fast 1.2-second orbit of editable dither, ASCII and cyanotype windows.
 
-## Editing
+## Editing and interpolation
 
-Open **Templates → Bloom Windows**. Each effect belongs to its named window
-group. Its full-size video child counter-translates against the window so the
-underlying petals remain aligned with the unprocessed background. The effect
-only processes the group's 400 × 400 or 340 × 340 surface. This avoids retaining
-three full-HD effect/mask/reference stacks. The 13-layer document uses direct
-group bounds for cropping, without extra transport groups, mask layers or outlines.
-All four video layers share one
-immutable original, and every video track is silent.
+Open **Templates → Bloom Windows**. Ordinary parent/counter rotations keep each
+card upright and its source image aligned with the unprocessed background. The
+rig contains 26 keyframes in total: two linear rotation endpoints for each moving
+part, including the separate label anchors. There are no sampled x/y trajectories
+or generated points per video frame. Labels render above all cards; soft shadows
+use dark backings rather than opaque white rectangles.
 
-The cropped group, shadow and bare label follow a continuous 1.2-second carousel.
-The source video plays at its original speed, independently of that faster cycle.
-There are no white flash layers or opacity/enable toggles. The final
-geometry matches the first exactly. The source footage opens and closes with
-natural-speed opening and mirrored frame order. Its final six samples reuse
-the first AVC key packet, producing identical decoded source endpoints. This is authored motion around
-the flower, not automatic object recognition or a new tracking subsystem.
+Each treatment processes only its 400 × 400 or 340 × 340 local surface. All four
+video layers share one immutable original and one synchronized decode/upload.
+Source-registration groups are oversized enough to cover their window throughout
+the complete rotation. The source footage advances independently at its original
+speed; geometry closes after ten complete turns. Source samples open and close
+with mirrored frame order and identical decoded endpoints. This is authored
+motion, not automatic object recognition.
+
+Built-in Move, Focus/Blur, Grow and simple rotation presets already use two
+control points per channel. Their evaluator interpolates arbitrary timestamps
+without adding document keyframes. Multi-stage shakes, bounces and custom actions
+can retain meaningful intermediate points. A regression checks bounded built-in
+recipes and confirms that 240 evaluations never mutate their stored points.
 
 ## Source and reproducibility
 
@@ -64,33 +66,54 @@ source cache keep preview/full variants separate; opening and saving always use
 the full 1080p original. Decoder and GPU uploads share one immutable same-PTS
 frame across synchronized copies. Different trims/proxies retain separate frames.
 
-## Verification
+## Rendering and verification
 
-Focused tests cover command replay, deterministic generation, normal gallery
-installation routing, shared source identity, counter-translation, label/window
-alignment, silent tracks and closed geometry paths. The native browser witness
-renders both backends, compares source-only pixels outside the effect windows,
-checks first/last/terminal loop frames, and decodes an actual twelve-second MP4.
-Production pixel-read APIs are instrumented separately from inspection images.
-Evidence stays in ignored `artifacts/bloom-windows/`.
+Hover uses a separately validated 480 × 270 derivative of the raw footage. It
+retains live native effects; normal project installation resolves the full 1080p
+original. Saved projects retain their authored document, so the new rig is applied
+by reopening the template rather than overwriting a user's existing composition.
 
-The infinite-canvas transport holds its presentation clock while a frame is pending.
-Normal preparation receives up to one 30 fps frame of elapsed-time credit; longer
-cold decode/shader waits do not accumulate unseen animation time. Presentation,
-seek, failure and disposal release their leases. Audio buffering retains its
-existing independent lease. This can slow preview on overloaded devices rather
-than skipping ahead to recover real time; it does not change authored timestamps
-or offline export cadence.
+Playing compositions use a bounded front/back pair. The displayed texture stays
+untouched while its successor is composed; publication waits for real GPU queue
+acknowledgement and rejects cancellation before swapping the accepted output.
+This fence reads no GPU pixels.
 
-The final production browser cohort (Linux 7.2.8, Playwright Chromium, WebGPU,
-1600 × 1000 viewport, one browser worker capped at two logical CPU cores and
-2400 MiB) observed 62 actual canvas presentation updates in 3.2 seconds
-(p95 gap 52.2 ms), with one decoder/upload stream and no production pixel
-readbacks. The largest presented clock increment was 50.1 ms. Hover presented
-97 updates in 3.2 seconds (p95 gap 42.3 ms), using only the raw 480p derivative.
-These are bounded host measurements, not a guarantee of 60 fps on every device.
-A separate cold development run retained a 2.2-second preparation pause; buffering
-kept that pause out of the animation clock. The matching production canvas gate
-passed. Native WebGPU/WebGL output, source registration, exact loop endpoints and
-a decoded twelve-second MP4 passed independently. A native display screencast of
-142 frames showed no return to a white canvas after the composition appeared.
+Playback no longer resizes the browser framebuffer or republishes Fiber's DPR
+when dimensions/density are unchanged. Moving transport groups reuse one cropped
+allocation per layer/density, with crop bounds included in the content signature.
+Surfaces no larger than four million pixels keep their full target when at least
+half is visible; this trades bounded overdraw for stable allocations during motion.
+Tiny windows inside large containers still use their original cropped texel grid.
+
+The infinite-canvas clock holds during pending frame preparation and releases at
+actual display presentation. Normal preparation receives up to 33.3 ms of elapsed
+time credit, while long decode/compile stalls do not accumulate catch-up time.
+This does not change authored timestamps or offline export cadence.
+
+The native opacity witness freezes the source image and inspects all three window
+interiors at 25 phases over one full orbit, independently on WebGPU and WebGL. It
+requires fully opaque coverage, catching local holes even when the rest of the
+canvas remains visible. Separate native checks compare source registration,
+first/last/terminal loop poses and a decoded twelve-second MP4. Inspection image
+reads stay outside production pixel-read accounting. Evidence stays in ignored
+`artifacts/bloom-flicker/`.
+
+The final production cohort passed all six focused browser checks: infinite-canvas
+playback, gallery hover, both backend coverage witnesses, and both backend loop
+witnesses including an encoded MP4. The displayed source strip stayed visible in
+all eight post-cadence captures per UI surface. Hover presented 97 updates in
+3.2 seconds (p95 38.5 ms) with zero drawing-buffer resize writes. The cold canvas
+interval presented 41 updates with p95 433 ms; the largest authored-clock step
+was 49.9 ms. These two-core measurements do not establish universal 60 fps.
+
+The wider 50-image production workload verified initial effect pixels, gestures,
+transparent/canonical encoding, IndexedDB recovery frames and original integrity
+checks. Its final recovered-PNG stage timed out and the process was stopped
+when its isolated browser group exceeded its
+2500 MiB MemoryHigh threshold (3000 MiB hard limit), rather than continuing under
+heavy memory reclaim. Its complete gate is not counted as passing. Earlier dev
+runs were unsuitable because the isolated Vite server also hit MemoryHigh and
+stalled module requests. Production verification used a frozen application and a
+bundle of the same native SDK, avoiding dev transformation overhead. The native
+wheel setup helper now settles each bounded packet, preserving its exact zoom
+assertion without violating the editor's bounded lookahead policy.

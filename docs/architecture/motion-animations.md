@@ -6,6 +6,13 @@ Motion opens with a block timeline. Each selected layer has an Animations sectio
 
 `MotionLayerTrack.animations` contains declarative `MotionAnimation` instances. Each instance owns its preset channels, exact start/duration, enabled state, intensity, and resolved effect slots. A channel contains normalized local points, easing, a registry-validated target, and an explicit add/multiply/replace operation. There is no second generated set of authoritative keyframes.
 
+Presets and generated templates use sparse semantic control points. A simple move,
+blur, scale or rotation normally needs two endpoints; intermediate points represent
+actual stages, reversals or overshoots. Springs and Bézier curves are evaluated at
+the requested timestamp without writing sampled frames back into the document.
+Repeated geometry can use a parent/counter-transform rig instead of a long sampled
+trajectory. This authoring policy does not discard a user's intentional detail.
+
 Ordinary authored keyframes evaluate first, then enabled action channels compose in array order. Add and multiply are explicit; replacement intentionally takes precedence. Endpoints hold outside the local interval. Layer occurrence presence still determines visibility and which occurrence contributes. Numeric contributions clamp to the registered property range after composition. Relative width/height distances rebase on the target's current canonical dimensions.
 
 Presets instantiate independent effects with document IDs. Core commands validate application, edits and deletion atomically through normal engine transactions. Undo/redo, serialization, duplication, occurrence movement and clipboard identity remapping retain animation data. Deleting a referenced effect prunes the dependent action. Applying or changing a saved preset never changes existing instances in other projects.

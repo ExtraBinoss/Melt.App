@@ -26,7 +26,7 @@ export const TEMPLATE_CATALOG: readonly ProjectTemplate[] = Object.freeze([
     height: 1080,
     mode: "motion",
     category: "video",
-    preview: `${import.meta.env.BASE_URL}templates/motion/bloom-windows.webp?v=5`,
+    preview: `${import.meta.env.BASE_URL}templates/motion/bloom-windows.webp?v=7`,
   }),
   Object.freeze({
     id: "morphing-type",
