@@ -22,6 +22,7 @@ const fake = vi.hoisted(() => ({
   factory: vi.fn(),
   cursorFactory: vi.fn(),
   proxyRead: vi.fn(),
+  readTime: vi.fn(() => null as { value: number; rate: number } | null),
   retire: vi.fn(async () => {}),
 }));
 vi.mock("../../../src/sources/video/source", () => ({
@@ -64,7 +65,7 @@ vi.mock("../../../src/sources/video/playback", () => ({
     metadata = fake.metadata;
     requestFrame = fake.reads;
     dispose = fake.dispose;
-    readTime = () => null;
+    readTime = fake.readTime;
     stats = () => ({});
   },
 }));
@@ -96,6 +97,7 @@ const lease = () =>
 beforeEach(() => {
   vi.clearAllMocks();
   fake.proxyRead.mockReset();
+  fake.readTime.mockReset().mockReturnValue(null);
   fake.metadata.mockResolvedValue({ width: 2, height: 2 });
   fake.dispose.mockResolvedValue(undefined);
   fake.reads.mockImplementation(async () => lease());
@@ -110,20 +112,169 @@ it("lazily resolves one original, shares its decoder and reuses GPU copies for i
   await sources.prepare("page", layers, assets, { mediaResolver: resolver });
   expect(resolver.resolveOriginal).toHaveBeenCalledTimes(1);
   expect(fake.factory).toHaveBeenCalledTimes(1);
-  expect(fake.reads).toHaveBeenCalledTimes(2);
-  expect(fake.rasterize).toHaveBeenCalledTimes(2);
+  expect(fake.reads).toHaveBeenCalledTimes(1);
+  expect(fake.rasterize).toHaveBeenCalledTimes(1);
   const original = sources.image(layer.id),
     stamp = sources.stamp(layer.id);
+  expect(sources.image("copy")).toBe(original);
   await sources.prepare("page", layers, assets, { mediaResolver: resolver });
   expect(sources.image(layer.id)).toBe(original);
   expect(sources.stamp(layer.id)).toBe(stamp);
-  expect(fake.reads).toHaveBeenCalledTimes(2);
-  expect(cache.stats().cacheBytes).toBe(32);
+  expect(fake.reads).toHaveBeenCalledTimes(1);
+  expect(cache.stats().cacheBytes).toBe(16);
   await sources.prepare("page", [], assets, { mediaResolver: resolver });
   expect(fake.dispose).toHaveBeenCalledTimes(1);
   await sources.dispose();
   cache.clear();
 });
+it("shares synchronized copies during playback with one cursor and one pinned GPU upload", async () => {
+  const { renderer } = makeGpuRenderer(),
+    cache = new GpuResourceCache();
+  const sources = new MediaVideoSources(renderer, cache, 64);
+  const resolver = { resolveOriginal: async () => new Blob(["v"]) };
+  const layers = Array.from({ length: 4 }, (_, index) => ({
+    ...layer,
+    id: `copy-${index}`,
+    x: index * 100,
+  }));
+  await sources.prepare(
+    "page",
+    layers,
+    { video: asset },
+    { mediaResolver: resolver, mediaMode: "playback" },
+  );
+  expect(fake.cursorFactory).toHaveBeenCalledOnce();
+  expect(fake.reads).toHaveBeenCalledOnce();
+  expect(fake.rasterize).toHaveBeenCalledOnce();
+  expect(new Set(layers.map((item) => sources.image(item.id))).size).toBe(1);
+  expect(cache.stats().cacheBytes).toBe(16);
+  await sources.prepare(
+    "page",
+    layers.slice(1),
+    { video: asset },
+    { mediaResolver: resolver, mediaMode: "playback" },
+  );
+  expect(fake.cursorFactory).toHaveBeenCalledTimes(2); // The removed owner cannot donate a stale cursor.
+  expect(new Set(layers.slice(1).map((item) => sources.image(item.id))).size).toBe(1);
+  await sources.dispose();
+  cache.clear();
+});
+
+it("keeps different source in-points independent even when their original bytes match", async () => {
+  const { renderer } = makeGpuRenderer(),
+    cache = new GpuResourceCache();
+  const sources = new MediaVideoSources(renderer, cache, 64);
+  const layers = [layer, { ...layer, id: "trimmed" }];
+  const page = createPage({
+    id: "page",
+    layers,
+    motion: {
+      version: 1,
+      initialized: true,
+      mode: "motion",
+      duration: { value: 1, rate: 1 },
+      frameRate: { numerator: 30, denominator: 1 },
+      tracks: layers.map((item, index) => ({
+        id: `track-${index}`,
+        layerId: item.id,
+        start: { value: 0, rate: 1 },
+        end: { value: 1, rate: 1 },
+        properties: [],
+        media: { sourceIn: { value: index, rate: 2 }, mute: true, volume: 1 },
+      })),
+    },
+  });
+  const program = compileMotion(createProject({ pages: [page], assets: { video: asset } }), {
+    compositionId: "page",
+  });
+  await sources.prepare(
+    "page",
+    layers,
+    { video: asset },
+    {
+      mediaResolver: { resolveOriginal: async () => new Blob(["v"]) },
+      mediaMode: "playback",
+      motionFrame: evaluateMotion(program, { value: 0, rate: 1 }),
+    },
+  );
+  expect(fake.cursorFactory).toHaveBeenCalledTimes(2);
+  expect(fake.rasterize).toHaveBeenCalledTimes(2);
+  expect(sources.image(layer.id)).not.toBe(sources.image("trimmed"));
+  await sources.dispose();
+  cache.clear();
+});
+
+it("seeks a lagging forward cursor directly instead of replaying an unbounded backlog", async () => {
+  const { renderer } = makeGpuRenderer(),
+    cache = new GpuResourceCache();
+  const sources = new MediaVideoSources(renderer, cache, 64);
+  const page = createPage({
+    id: "page",
+    layers: [layer],
+    motion: {
+      version: 1,
+      initialized: true,
+      mode: "motion",
+      duration: { value: 2, rate: 1 },
+      frameRate: { numerator: 30, denominator: 1 },
+      tracks: [
+        {
+          id: "track",
+          layerId: layer.id,
+          start: { value: 0, rate: 1 },
+          end: { value: 2, rate: 1 },
+          properties: [],
+          media: { sourceIn: { value: 0, rate: 1 }, mute: true, volume: 1 },
+        },
+      ],
+    },
+  });
+  const program = compileMotion(createProject({ pages: [page], assets: { video: asset } }), {
+    compositionId: "page",
+  });
+  const resolver = { resolveOriginal: async () => new Blob(["v"]) };
+  const prepare = (value: number) =>
+    sources.prepare(
+      "page",
+      [layer],
+      { video: asset },
+      {
+        mediaResolver: resolver,
+        mediaMode: "playback",
+        motionFrame: evaluateMotion(program, { value, rate: 1000 }),
+      },
+    );
+  await prepare(0);
+  fake.readTime.mockReturnValue({ value: 0, rate: 1 });
+  await prepare(1500);
+  expect(fake.cursorFactory).toHaveBeenCalledTimes(2);
+  expect(fake.dispose).toHaveBeenCalledOnce();
+  expect(fake.reads).toHaveBeenLastCalledWith({ value: 3, rate: 2 }, expect.any(Object));
+  await sources.dispose();
+  cache.clear();
+});
+
+it("can read exact exports sequentially without admitting a presentation proxy", async () => {
+  const { renderer } = makeGpuRenderer(),
+    cache = new GpuResourceCache();
+  const sources = new MediaVideoSources(renderer, cache, 64);
+  await sources.prepare(
+    "page",
+    [layer],
+    { video: asset },
+    {
+      mediaResolver: { resolveOriginal: async () => new Blob(["v"]) },
+      mediaMode: "exact",
+      mediaSequential: true,
+    },
+  );
+  expect(fake.cursorFactory).toHaveBeenCalledOnce();
+  expect(fake.factory).not.toHaveBeenCalled();
+  expect(fake.proxyRead).not.toHaveBeenCalled();
+  await sources.dispose();
+  cache.clear();
+});
+
 it("rejects absent resolvers/stale native frames and represents real source gaps transparently", async () => {
   const { renderer } = makeGpuRenderer(),
     cache = new GpuResourceCache(),

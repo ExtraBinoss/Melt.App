@@ -160,6 +160,7 @@ export async function exportMotionVideo(
           {
             scale,
             vectorAntialias: true,
+            mediaSequential: true,
             motionFrame: plan,
             mediaMode: "exact",
             mediaResolver: options.mediaResolver,

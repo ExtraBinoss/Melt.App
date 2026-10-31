@@ -15,6 +15,8 @@ export interface RenderOptions {
   motionFrame?: MotionFramePlan;
   /** Dedicated export jobs always request exact samples from original files. */
   mediaMode?: "preview" | "playback" | "exact";
+  /** Reuse a bounded forward decoder cursor while preserving exact original/frame selection. */
+  mediaSequential?: boolean;
   signal?: AbortSignal;
   /** Explicit diagnostics opt-in. Runtime marker/sample buffers stay disabled by default. */
   profileVideo?: boolean;

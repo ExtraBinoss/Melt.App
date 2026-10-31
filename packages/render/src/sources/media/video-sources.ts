@@ -7,6 +7,7 @@ import {
   assetOriginalIdentity,
   compareMotionTime,
   isVideoAsset,
+  normalizeMotionTime,
   subtractMotionTime,
   type Asset,
   type Layer,
@@ -181,8 +182,9 @@ export class MediaVideoSources {
         layers.filter((layer) => layer.kind === "video").map((layer) => `${pageId}:${layer.id}`),
       ),
     );
+    const sequential = options.mediaMode === "playback" || options.mediaSequential === true;
     const playing = new Set(
-      options.mediaMode === "playback"
+      sequential
         ? layers.filter((layer) => layer.kind === "video").map((layer) => `${pageId}:${layer.id}`)
         : [],
     );
@@ -198,7 +200,7 @@ export class MediaVideoSources {
       this.sources.delete(identity);
       await entry.source?.dispose();
     }
-    if (options.mediaMode === "playback")
+    if (sequential)
       for (const entry of this.sources.values()) {
         await entry.source?.dispose();
         entry.source = null;
@@ -209,6 +211,9 @@ export class MediaVideoSources {
     const requests = new Map(
       options.motionFrame?.mediaRequests.map((request) => [request.layerId, request]),
     );
+    // Same original/PTS copies borrow one pinned texture for this frame only.
+    // A fresh map per prepare prevents aliasing changed trims, proxies or originals.
+    const sharedFrames = new Map<string, { texture: Texture; stamp: string }>();
     for (const layer of layers) {
       if (layer.kind !== "video") continue;
       this.current(options);
@@ -239,6 +244,31 @@ export class MediaVideoSources {
         ? subtractMotionTime(asset.firstTimestamp, selected.firstTimestamp)
         : { value: 0, rate: 1 };
       const sampleTime = subtractMotionTime(time, shift);
+      const sampleKey = JSON.stringify([
+        identity,
+        selected.width,
+        selected.height,
+        selected.orientation,
+        selected.timeResolution,
+        selected.duration,
+        selected.firstTimestamp,
+        asset.firstTimestamp,
+        normalizeMotionTime(time),
+      ]);
+      const shared = sharedFrames.get(sampleKey);
+      if (shared) {
+        const cursorKey = `${pageId}:${layer.id}`;
+        const redundant = this.playback.get(cursorKey);
+        if (redundant) {
+          this.playback.delete(cursorKey);
+          await redundant.cursor.dispose();
+          await this.rasterizer?.retireStream(cursorKey);
+        }
+        this.current(options);
+        this.prepared.set(layer.id, shared);
+        this.timings.gpuReuses++;
+        continue;
+      }
       let target = this.cache.get<LayerTargets>(key);
       const cached = target && this.frames.get(target);
       if (cached && cached.identity !== identity)
@@ -250,23 +280,28 @@ export class MediaVideoSources {
         compareMotionTime(time, cached.end) < 0
       ) {
         this.timings.gpuReuses++;
-        this.prepared.set(layer.id, {
+        const prepared = {
           texture: target!.target("source", selected.width, selected.height).texture,
           stamp: cached.stamp,
-        });
+        };
+        this.prepared.set(layer.id, prepared);
+        sharedFrames.set(sampleKey, prepared);
         continue;
       }
       const decodeStarted = performance.now();
       this.timings.requests++;
       let lease: VideoFrameLease | null;
-      if (options.mediaMode === "playback") {
+      if (sequential) {
         const cursorKey = `${pageId}:${layer.id}`;
         let entry = this.playback.get(cursorKey);
+        const previous = entry?.cursor.readTime();
         if (
           entry &&
           (entry.identity !== identity ||
-            (entry.cursor.readTime() &&
-              compareMotionTime(sampleTime, entry.cursor.readTime()!) < 0))
+            (previous &&
+              (compareMotionTime(sampleTime, previous) < 0 ||
+                compareMotionTime(subtractMotionTime(sampleTime, previous), { value: 1, rate: 1 }) >
+                  0)))
         ) {
           this.playback.delete(cursorKey);
           await entry.cursor.dispose();
@@ -297,7 +332,7 @@ export class MediaVideoSources {
       } else {
         const source = await this.source(selected, original, entry, options);
         lease = await source.requestFrame(sampleTime, {
-          mode: options.mediaMode ?? "preview",
+          mode: options.mediaMode === "exact" ? "exact" : "preview",
           signal: options.signal,
         });
       }
@@ -357,7 +392,9 @@ export class MediaVideoSources {
             stamp,
           });
         else this.frames.delete(target);
-        this.prepared.set(layer.id, { texture: output.texture, stamp });
+        const prepared = { texture: output.texture, stamp };
+        this.prepared.set(layer.id, prepared);
+        sharedFrames.set(sampleKey, prepared);
       } catch (error) {
         if (!transferred) lease?.release();
         this.frames.delete(target);

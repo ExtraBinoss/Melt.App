@@ -171,7 +171,7 @@ it("exports half-open rational frames and a shortened final sample from one froz
     },
   });
   for (const call of state.render.mock.calls)
-    expect(call[3]).toMatchObject({ vectorAntialias: true });
+    expect(call[3]).toMatchObject({ vectorAntialias: true, mediaSequential: true });
   expect(state.frames.map((frame) => frame.time)).toEqual([
     { value: 0, rate: 1 },
     { value: 1, rate: 30 },

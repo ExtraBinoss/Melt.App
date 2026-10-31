@@ -64,12 +64,16 @@ export class StandaloneRenderer {
       if (options.canRender && !options.canRender())
         throw new DOMException("Rendering deferred.", "AbortError");
       await this.init();
+      const mediaMode = options.mediaMode ?? this.mediaDefaults.mediaMode ?? "exact";
       const frame = await this.compositor!.render(page, assets, {
         mediaMode: "exact",
         ...this.mediaDefaults,
         ...options,
       });
-      if (page.layers.some((layer) => layer.kind === "video")) await this.compositor!.settleMedia();
+      // Playback presents on the same ordered GPU queue; upload rings retain
+      // native frames until acknowledgement. Exact exports keep the explicit fence.
+      if (mediaMode !== "playback" && page.layers.some((layer) => layer.kind === "video"))
+        await this.compositor!.settleMedia();
       this.presentation!.render(frame);
       return consume(this.renderer!.domElement);
     });

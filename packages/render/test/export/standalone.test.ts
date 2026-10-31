@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { createPage } from "@musart/core";
+import { createPage, createLayer } from "@musart/core";
 import { Texture } from "three/webgpu";
 import {
   createRenderSession,
@@ -15,6 +15,7 @@ const gpu = vi.hoisted(() => ({
   present: vi.fn(),
   presentationDispose: vi.fn(),
   compositorConstructors: vi.fn(),
+  settle: vi.fn(async () => {}),
 }));
 vi.mock("three/webgpu", async (importOriginal) => {
   const actual = await importOriginal<typeof import("three/webgpu")>();
@@ -40,6 +41,7 @@ vi.mock("../../src/compositing/GpuCompositor", () => ({
       gpu.compositorConstructors(options);
     }
     render = gpu.render;
+    settleMedia = gpu.settle;
     dispose = gpu.compositorDispose;
     stats = () => ({ readbacks: 0, frames: 2 });
   },
@@ -69,6 +71,7 @@ beforeEach(async () => {
   gpu.compositorDispose.mockReset().mockResolvedValue(undefined);
   gpu.present.mockClear();
   gpu.presentationDispose.mockClear();
+  gpu.settle.mockClear();
   transfer = vi.fn();
   close = vi.fn();
   vi.stubGlobal("createImageBitmap", vi.fn().mockResolvedValue({ close }));
@@ -82,6 +85,16 @@ afterEach(async () => {
   vi.unstubAllGlobals();
 });
 describe("GPU-backed durable export snapshots", () => {
+  it("keeps exact video export fences while letting playback present on the ordered GPU queue", async () => {
+    const page = createPage({ layers: [createLayer("video", { assetId: "v" })] });
+    const session = createRenderSession();
+    await session.withCanvasFrame(page, {}, () => {}, { mediaMode: "playback" });
+    expect(gpu.present).toHaveBeenCalledOnce();
+    expect(gpu.settle).not.toHaveBeenCalled();
+    await session.withCanvasFrame(page, {}, () => {}, { mediaMode: "exact" });
+    expect(gpu.settle).toHaveBeenCalledOnce();
+    await session.dispose();
+  });
   it("copies GPU pixels through ImageBitmap and bitmaprenderer without CPU arrays", async () => {
     const canvas = await snapshotComposition(createPage(), {}, {});
     expect([canvas.width, canvas.height]).toEqual([16, 12]);
