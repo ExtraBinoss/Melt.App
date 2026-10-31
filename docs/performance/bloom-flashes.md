@@ -94,3 +94,27 @@ wall intervals including CPU work and queue waits, not GPU timer queries. The
 accepted authored time advances 14.473 seconds in 18.337 seconds of wall time
 including the loop, rather than running ahead. The remaining scheduling/performance
 work is distinct from the corrected pixel-format defect.
+
+## Avoiding a redundant playback scheduling hop
+
+Canvas playback preparation previously waited for another RAF after the transport
+already issued its frame from RAF. Playing preparation now uses one cancellable
+microtask; still edits retain RAF coalescing. The latest-only queue waits until a
+prepared playing pose is actually displayed before starting its next coalesced
+pose, while superseded document/asset/project revisions remain cancellable.
+
+A serial live-development diagnostic on Chrome 156/WebGPU, DPR 1.25, 1600 × 1000,
+two CPU cores and 1800/2400 MiB soft/hard process limits compared the scheduler
+with the extra RAF forced on and off. Both used the same new publication guard,
+1080p original-backed I420 decoding and a warmup beyond 0.3 seconds. In four-second
+windows, callbacks increased from 40 to 47; median display spacing changed from
+100.000 to 84.150 ms and p95 from 133.800 to 116.600 ms. Both retained 65,654,796
+GPU-cache bytes, zero production readbacks and no publication/time mismatches.
+The maximum authored clock step remained 50.033/50.000 ms respectively, and neither
+clock ran ahead of its wall interval.
+
+This is a small development diagnostic, with capture/CPU limits and without a
+frozen production build or recorded device-adapter identity. It establishes the
+observed cohort and the removed scheduling dependency, not a universal 60 fps
+claim, physical panel latency or a production benchmark. Raw events and the
+baseline scheduling override are in `artifacts/bloom-trace-205453/scheduling.*`.

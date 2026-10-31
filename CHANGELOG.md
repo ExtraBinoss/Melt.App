@@ -6,6 +6,7 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Start canvas playback preparation without a redundant animation-frame wait, retaining RAF coalescing for still edits and one prepared playing pose until real display. Cancel retired microtasks on navigation/device loss/disposal and prevent superseded poses from blocking newer frames; preserve authored timing and buffering credits.
 - Fix video flashes from native BGRX/RGBX proxy frames: preserve packed RGB during the Three.js upload and force opaque coverage in the existing TSL pass instead of interpreting padding as alpha. Retain actual-alpha/YUV behavior, pooled textures and native lease ownership; add real WebGPU/WebGL padding and color regressions.
 - Add development-only Motion frame lineage to Chrome traces: decoded source PTS, GPU reuse/upload/gap decisions, completed composition textures and display submissions. Keep production disabled and runtime marks unretained; document the supplied remaining Bloom flashes and reproduction limits without claiming a verified fix.
 - Support native middle-click and modified-click navigation on editor/dashboard mascots and project/template cards. Open durable item preview URLs in a new tab without editing or installing a document, retain ordinary single/double-click and Space/Enter activation, and resolve linked project metadata with a bounded one-ID read. Keep landing navigation usable when visibility observation is unavailable.

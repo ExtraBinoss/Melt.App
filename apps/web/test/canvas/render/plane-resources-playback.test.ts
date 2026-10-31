@@ -39,8 +39,11 @@ function fixture(
       getRenderTarget: () => null,
     } as unknown as WebGPURenderer);
   const resources = new PlaneResources(target, undefined, undefined, resolverFor, hold);
-  const release = resources.activate(new Scene(), new OrthographicCamera(), vi.fn());
-  return { renderer: target, resources, release };
+  const preparedTextures: Texture[] = [];
+  const release = resources.activate(new Scene(), new OrthographicCamera(), () => {
+    preparedTextures.push(resources.sample.value);
+  });
+  return { renderer: target, resources, release, preparedTextures };
 }
 async function ticks() {
   for (let index = 0; index < 8; index++) await Promise.resolve();
@@ -107,6 +110,7 @@ test("slow playback finishes useful frames while bounding the queue to the lates
   expect(options.canRender()).toBe(true);
   complete(result());
   await ticks();
+  expect(gpu.render).toHaveBeenCalledTimes(1); // A prepared playing frame must actually display first.
   d.resources.present();
   expect(d.renderer.domElement.style.visibility).toBe("visible");
   expect(d.renderer.domElement.dataset.presentationReady).toBe("true");
@@ -160,13 +164,39 @@ test.each(["paused seek", "document edit", "project switch", "asset replacement"
     );
     expect(options.signal.aborted).toBe(true);
     expect(options.canRender()).toBe(false);
-    complete(result());
+    const stale = result();
+    complete(stale);
     await ticks();
+    expect(d.preparedTextures).not.toContain(stale.texture);
     d.resources.present();
-    expect(d.renderer.domElement.dataset.presentationReady).not.toBe("true");
+    if (d.renderer.domElement.dataset.presentationReady === "true")
+      expect(d.renderer.domElement.dataset.renderedRevision).toBe("2");
     await frame();
     d.resources.present();
     expect(d.renderer.domElement.dataset.rendererReady).toBe("true");
+    d.release();
+    await d.resources.dispose();
+  },
+);
+
+test.each(["paused preview", "superseded revision"])(
+  "%s cannot block a newer playing frame before the old pose displays",
+  async (kind) => {
+    const d = fixture(),
+      base = createPage({ id: "page" }),
+      assets = {};
+    d.resources.submit(base, assets, presentation, undefined, kind !== "paused preview");
+    await frame();
+    expect(d.renderer.domElement.dataset.presentationReady).not.toBe("true");
+    const next =
+      kind === "superseded revision"
+        ? { ...presentation, origin: { ...origin, revision: origin.revision + 1 } }
+        : presentation;
+    d.resources.submit(base, assets, next, undefined, true);
+    await ticks();
+    expect(gpu.render).toHaveBeenCalledTimes(2);
+    d.resources.present();
+    expect(d.renderer.domElement.dataset.renderedRevision).toBe("2");
     d.release();
     await d.resources.dispose();
   },

@@ -66,3 +66,11 @@ as accidental transparent frames. Actual-alpha and YUV formats keep their own
 settings. Reusing a slot across format changes refreshes that setting every time;
 leases, upload rings, texture budgets and acknowledgements remain unchanged.
 Native backend regressions check arbitrary padding and retained real alpha.
+
+Playing canvas requests already originate from the transport's animation-frame
+clock. Queue their serialized preparation in a cancellable microtask instead of
+waiting for a second RAF before beginning. Paused edits retain RAF coalescing. A
+prepared playing frame must pass through the actual display callback before another
+coalesced playing request starts; superseded poses cannot block a newer revision.
+Cancellation, navigation, device loss and disposal retire either kind of scheduled
+work. This changes neither source timestamps nor buffering credits.

@@ -24,6 +24,7 @@ import {
 } from "three/webgpu";
 import { texture, uv } from "three/tsl";
 import { CanvasPlaybackBuffering } from "./playback-buffering";
+import { CanvasFrameScheduler } from "./frame-scheduler";
 import { traceCanvasFrame } from "./frame-trace";
 import { SceneProfileSource } from "./scene-profile-source";
 import { previewScale } from "./preview-quality";
@@ -83,7 +84,7 @@ export class PlaneResources {
   private activeAbort: AbortController | null = null;
   private activeRequest: PreviewRequest | null = null;
   private preparedRequest: PreviewRequest | null = null;
-  private scheduled = 0;
+  private readonly frameScheduler = new CanvasFrameScheduler();
   private revision = 0;
   private disposed = false;
   private disposal: Promise<void> | null = null;
@@ -199,10 +200,7 @@ export class PlaneResources {
       this.users--;
       if (this.users === 0) {
         this.activeAbort?.abort();
-        if (this.scheduled) {
-          cancelAnimationFrame(this.scheduled);
-          this.scheduled = 0;
-        }
+        this.frameScheduler.clear();
         queueMicrotask(() => {
           if (this.users === 0) void this.dispose().catch((error) => this.report(error));
         });
@@ -276,8 +274,7 @@ export class PlaneResources {
       this.activeAbort?.abort();
       const request = this.latest;
       this.latest = null;
-      if (this.scheduled) cancelAnimationFrame(this.scheduled);
-      this.scheduled = 0;
+      this.frameScheduler.clear();
       this.bindFrame(request, retained);
       if (!this.users || this.disposed || this.deviceLost || request.revision !== this.revision)
         return;
@@ -329,15 +326,22 @@ export class PlaneResources {
   private schedule() {
     if (
       !this.users ||
-      this.scheduled ||
+      this.frameScheduler.pending ||
       this.active ||
       !this.latest ||
       this.disposed ||
       this.deviceLost
     )
       return;
-    this.scheduled = requestAnimationFrame(() => {
-      this.scheduled = 0;
+    if (
+      this.latest.playback &&
+      this.prepared &&
+      this.preparedRequest &&
+      this.preparedRevision !== this.presentedRevision &&
+      this.canPresent(this.preparedRequest)
+    )
+      return;
+    this.frameScheduler.schedule(this.latest.playback, () => {
       const request = this.latest;
       if (!request || !this.users || this.disposed || this.deviceLost) return;
       this.latest = null;
@@ -473,6 +477,7 @@ export class PlaneResources {
       }
       this.publish();
     }
+    this.schedule();
   }
   private publish() {
     if (canvasOwners.get(this.renderer.domElement) !== this) return;
@@ -514,8 +519,7 @@ export class PlaneResources {
           this.fontPresenter?.unavailable();
           this.activeAbort?.abort();
           this.latest = null;
-          if (this.scheduled) cancelAnimationFrame(this.scheduled);
-          this.scheduled = 0;
+          this.frameScheduler.clear();
           this.renderer.domElement.dataset.rendererReady = "false";
           this.renderer.domElement.dataset.deviceLost = "true";
           const message = `${info.api} device lost: ${info.message}`;
@@ -548,10 +552,7 @@ export class PlaneResources {
     this.preparedTicket = undefined;
     this.latest = null;
     this.current = null;
-    if (this.scheduled) {
-      cancelAnimationFrame(this.scheduled);
-      this.scheduled = 0;
-    }
+    this.frameScheduler.clear();
     this.disposal = (async () => {
       try {
         const closing = this.compositor?.dispose();
