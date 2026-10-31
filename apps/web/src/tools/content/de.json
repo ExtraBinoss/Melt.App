@@ -51,7 +51,7 @@
   "tips": "Einige Möglichkeiten, das Ergebnis zu gestalten",
   "how": "{{media}} umwandeln",
   "steps": [
-    "Wählen Sie eine lokale Datei oder ziehen Sie sie in die Vorschau. Der Renderer wird nur geladen, wenn Sie ihn benötigen.",
+    "Wähle ein Bild oder Video aus oder ziehe die Datei in die Vorschau. Sie bleibt auf deinem Gerät.",
     "Passen Sie den Effekt an und vergleichen Sie ihn mit dem Original. Die grundlegenden Einstellungen sind direkt zugänglich; erweiterte Optionen öffnen Sie bei Bedarf.",
     "Wählen Sie Ihre Ausgabeeinstellungen und laden Sie das Ergebnis herunter. Die Verarbeitung und Kodierung erfolgt in Ihrem Browser."
   ],

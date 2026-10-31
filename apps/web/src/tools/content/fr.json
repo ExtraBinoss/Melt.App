@@ -51,7 +51,7 @@
   "tips": "Quelques pistes pour façonner le résultat",
   "how": "Comment convertir votre {{media}}",
   "steps": [
-    "Choisissez un fichier local ou déposez-le dans l’aperçu. Le moteur n’est chargé que lorsque vous en avez besoin.",
+    "Choisissez une image ou une vidéo, ou glissez votre fichier dans l’aperçu. Il reste sur votre appareil.",
     "Ajustez l’effet et comparez-le à l’original. Les réglages simples restent accessibles ; les détails sont facultatifs.",
     "Choisissez les options de sortie et téléchargez le résultat. Le traitement et l’encodage se font dans votre navigateur."
   ],

@@ -51,7 +51,7 @@
   "tips": "Algunas formas de darle forma al resultado",
   "how": "Cómo convertir tu {{media}}",
   "steps": [
-    "Elige un archivo local o arrástralo a la vista previa. El motor de renderizado solo se carga cuando lo necesitas.",
+    "Elige una imagen o un vídeo, o arrastra el archivo a la vista previa. El archivo permanece en tu dispositivo.",
     "Ajusta el efecto y compáralo con el original. Los controles básicos están a mano; los ajustes avanzados son opcionales.",
     "Elige los ajustes de salida y descarga el resultado. El procesamiento y la codificación se realizan en tu navegador."
   ],

@@ -251,7 +251,7 @@
   grid-template-columns: minmax(0, 1fr);
   column-gap: 0;
 }
-.tool-controls .effect-select-field > [data-slot="select-trigger"] {
+.tool-controls [data-slot="select-trigger"] {
   width: 100%;
 }
 .tool-controls .number-field {
@@ -340,29 +340,96 @@
 }
 .tool-guide {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 64px;
-  padding: 80px 0 40px;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+  gap: 72px;
+  align-items: start;
+  padding: 80px 0 48px;
 }
 .tool-guide h2,
 .tool-tips h2,
 .tool-related > h2 {
-  font: 550 28px/1.2 var(--font-brand-display);
+  margin: 0 0 22px;
+  font: 550 28px/1.25 var(--font-brand-display);
   letter-spacing: 0.01em;
+  text-wrap: balance;
 }
 .tool-guide p,
 .tool-guide li,
-.tool-tips li {
+.tool-tips li,
+.tool-output-notes dd {
   color: var(--muted-foreground);
   font-size: 14px;
-  line-height: 1.9;
+  line-height: 1.85;
 }
-.tool-guide ol,
+.tool-steps ol {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  counter-reset: tool-step;
+  display: grid;
+  gap: 22px;
+}
+.tool-steps li {
+  counter-increment: tool-step;
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr);
+  align-items: start;
+  gap: 14px;
+}
+.tool-steps li::before {
+  content: counter(tool-step, decimal-leading-zero);
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  color: var(--foreground);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+.tool-about > p {
+  margin: 0;
+}
+.tool-output-notes {
+  display: grid;
+  gap: 18px;
+  margin: 24px 0 0;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+}
+.tool-output-notes > div {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr);
+  gap: 16px;
+}
+.tool-output-notes dt {
+  padding-top: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--foreground);
+}
+.tool-output-notes dd {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.8;
+}
+.tool-tips {
+  padding: 30px 0 0;
+  border-top: 1px solid var(--border);
+}
 .tool-tips ul {
-  padding-left: 20px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
-.tool-guide li + li {
-  margin-top: 16px;
+.tool-tips li {
+  padding-inline-start: 16px;
+  border-inline-start: 2px solid color-mix(in srgb, var(--action) 30%, var(--border));
+  font-size: 13px;
 }
 .tool-related {
   margin-top: 80px;
@@ -411,6 +478,10 @@
   }
   .tool-control-viewport {
     max-height: none;
+  }
+  .tool-tips ul {
+    grid-template-columns: 1fr;
+    gap: 18px;
   }
 }
 @media (max-width: 600px) {

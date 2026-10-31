@@ -51,7 +51,7 @@
   "tips": "Alcuni modi per modellare il risultato",
   "how": "Come convertire il tuo {{media}}",
   "steps": [
-    "Scegli un file locale o trascinalo nell'anteprima. Il renderer viene caricato solo quando ne hai bisogno.",
+    "Scegli un’immagine o un video oppure trascina il file nell’anteprima. Il file resta sul tuo dispositivo.",
     "Regola l’effetto e confrontalo con l’originale. I controlli di base sono a portata di mano; le impostazioni avanzate sono facoltative.",
     "Scegli le impostazioni di output e scarica il risultato. L'elaborazione e la codifica avvengono nel tuo browser."
   ],

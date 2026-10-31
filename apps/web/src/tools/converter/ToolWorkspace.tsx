@@ -97,20 +97,21 @@ function ToolControls({
                 onCancel={controller.cancelPreview}
                 disabled={blocked}
               />
-              <Button
-                className="tool-advanced"
-                variant="ghost"
-                size="sm"
-                aria-expanded={advanced}
-                onClick={() => setAdvanced(!advanced)}
-              >
-                {t(advanced ? "basic" : "advanced")}
-                <ChevronDown size={13} />
-              </Button>
             </div>
           </ScrollShadow>
+          <Button
+            className="tool-advanced"
+            variant="ghost"
+            size="sm"
+            aria-expanded={advanced}
+            onClick={() => setAdvanced(!advanced)}
+          >
+            {t(advanced ? "basic" : "advanced")}
+            <ChevronDown size={13} />
+          </Button>
           <div className="tool-output-controls">
             <SelectField
+              matchTriggerWidth
               label={t("resolution")}
               value={String(state.edge)}
               disabled={blocked}
@@ -193,6 +194,7 @@ function ToolControls({
           )}
           <div className="tool-download-controls">
             <SelectField
+              matchTriggerWidth
               label={t("format")}
               value={format}
               disabled={blocked}

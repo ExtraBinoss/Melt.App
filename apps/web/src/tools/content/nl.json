@@ -51,7 +51,7 @@
   "tips": "Een paar manieren om het resultaat vorm te geven",
   "how": "Hoe u uw {{media}} kunt converteren",
   "steps": [
-    "Kies een lokaal bestand of sleep het naar het voorbeeld. De renderer wordt alleen geladen wanneer u deze nodig heeft.",
+    "Kies een afbeelding of video, of sleep het bestand naar de voorvertoning. Je bestand blijft op je apparaat.",
     "Pas het effect aan en vergelijk het met het origineel. De basisinstellingen zijn direct toegankelijk; geavanceerde instellingen zijn optioneel.",
     "Kies uw uitvoerinstellingen en download het resultaat. Verwerking en codering gebeuren in uw browser."
   ],

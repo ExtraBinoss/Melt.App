@@ -48,6 +48,8 @@ export function SiteFooter() {
           <a href={`${repository}/blob/main/LICENSE`}>{t("license")}</a>
           <div className="site-languages">
             <SelectField
+              scrollButtons={false}
+              matchTriggerWidth
               disabled={!hydrated}
               label={t("language")}
               value={i18n.language.split("-")[0]!}

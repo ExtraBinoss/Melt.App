@@ -54,8 +54,13 @@ function SelectContent({
   align = "center",
   style,
   onPointerUpCapture,
+  scrollButtons = true,
+  matchTriggerWidth = false,
   ...props
-}: React.ComponentProps<typeof SelectPrimitive.Content>) {
+}: React.ComponentProps<typeof SelectPrimitive.Content> & {
+  scrollButtons?: boolean;
+  matchTriggerWidth?: boolean;
+}) {
   const cleanup = React.useRef<(() => void) | null>(null);
   const viewportRef = React.useCallback((node: HTMLDivElement | null) => {
     cleanup.current?.();
@@ -76,10 +81,19 @@ function SelectContent({
         )}
         position={position}
         align={align}
-        style={{ maxHeight: "var(--select-scroll-max-height)", ...style }}
+        style={{
+          maxHeight: "var(--select-scroll-max-height)",
+          ...(matchTriggerWidth
+            ? {
+                width: "var(--radix-select-trigger-width)",
+                minWidth: "var(--radix-select-trigger-width)",
+              }
+            : {}),
+          ...style,
+        }}
         {...props}
       >
-        <SelectScrollUpButton />
+        {scrollButtons && <SelectScrollUpButton />}
         <ScrollShadow
           className="select-scroll-shadow"
           viewportSelector="[data-radix-select-viewport]"
@@ -89,8 +103,10 @@ function SelectContent({
             data-slot="select-viewport"
             className={cn(
               "p-1",
+              position === "popper" && "w-full scroll-my-1",
               position === "popper" &&
-                "w-full min-w-[var(--radix-select-trigger-width)] scroll-my-1",
+                !matchTriggerWidth &&
+                "min-w-[var(--radix-select-trigger-width)]",
             )}
             onScroll={(event) => {
               // Radix item alignment otherwise expands the wrapper and rewrites scrollTop.
@@ -101,7 +117,7 @@ function SelectContent({
             {children}
           </SelectPrimitive.Viewport>
         </ScrollShadow>
-        <SelectScrollDownButton />
+        {scrollButtons && <SelectScrollDownButton />}
       </SelectPrimitive.Content>
     </SelectPrimitive.Portal>
   );

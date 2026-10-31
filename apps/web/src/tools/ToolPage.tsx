@@ -33,7 +33,7 @@ export function ToolPage({ tool }: { tool: ToolDefinition }) {
       </header>
       <Converter key={tool.slug} tool={tool} />
       <section className="tool-guide">
-        <div>
+        <div className="tool-steps">
           <h2>{t("how", { media: t("file").toLocaleLowerCase() })}</h2>
           <ol>
             {(t("steps", { returnObjects: true }) as string[]).map((step) => (
@@ -41,11 +41,19 @@ export function ToolPage({ tool }: { tool: ToolDefinition }) {
             ))}
           </ol>
         </div>
-        <div>
+        <div className="tool-about">
           <h2>{t("about", { style: name })}</h2>
           <p>{t(`styles.${tool.style}.about`)}</p>
-          <p>{t("imageIntro")}</p>
-          <p>{t("videoIntro")}</p>
+          <dl className="tool-output-notes">
+            <div>
+              <dt>{t("image")}</dt>
+              <dd>{t("imageIntro")}</dd>
+            </div>
+            <div>
+              <dt>{t("video")}</dt>
+              <dd>{t("videoIntro")}</dd>
+            </div>
+          </dl>
         </div>
       </section>
       <section className="tool-tips">

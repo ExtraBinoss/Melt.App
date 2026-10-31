@@ -51,7 +51,7 @@
   "tips": "Algumas maneiras de moldar o resultado",
   "how": "Como converter seu {{media}}",
   "steps": [
-    "Escolha um arquivo local ou arraste-o para a visualização. O renderizador é carregado somente quando você precisa dele.",
+    "Escolha uma imagem ou um vídeo, ou arraste o ficheiro para a pré-visualização. O ficheiro fica no seu dispositivo.",
     "Ajuste o efeito e compare com o original. Os controles básicos ficam à mão; as configurações avançadas são opcionais.",
     "Escolha suas configurações de saída e baixe o resultado. O processamento e a codificação acontecem no seu navegador."
   ],

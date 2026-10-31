@@ -51,7 +51,7 @@
   "tips": "Kilka sposobów na kształtowanie wyniku",
   "how": "Jak przekonwertować {{media}}",
   "steps": [
-    "Wybierz plik lokalny lub przeciągnij go do podglądu. Moduł renderujący jest ładowany tylko wtedy, gdy jest potrzebny.",
+    "Wybierz obraz lub film albo przeciągnij plik do podglądu. Plik pozostaje na Twoim urządzeniu.",
     "Dostosuj efekt i porównaj go z oryginałem. Podstawowe ustawienia są pod ręką, a zaawansowane opcje możesz otworzyć w razie potrzeby.",
     "Wybierz ustawienia wyjściowe i pobierz wynik. Przetwarzanie i kodowanie odbywa się w przeglądarce."
   ],

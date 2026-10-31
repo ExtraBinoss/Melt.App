@@ -51,7 +51,7 @@
   "tips": "A few ways to shape the result",
   "how": "How to convert your {{media}}",
   "steps": [
-    "Choose a local file or drag it into the preview. The renderer is loaded only when you need it.",
+    "Choose an image or video, or drag the file into the preview. Your file stays on your device.",
     "Adjust the effect and compare it with the original. Basic controls stay close; advanced settings are optional.",
     "Choose your output settings and download the result. Processing and encoding happen in your browser."
   ],

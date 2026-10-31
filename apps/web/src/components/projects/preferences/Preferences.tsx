@@ -100,6 +100,8 @@ export function Preferences({
               </div>
               <SelectField
                 id="preferences-language"
+                scrollButtons={false}
+                matchTriggerWidth
                 label={t("language")}
                 value={i18n.language}
                 options={supportedLocales.map(({ code, label }) => ({ value: code, label }))}
