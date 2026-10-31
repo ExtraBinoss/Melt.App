@@ -64,14 +64,14 @@ export function MotionField({
       onPointerDownCapture={(event) => {
         if (
           !event.currentTarget.disabled &&
-          !(event.target as Element).closest("[data-motion-diamond]")
+          !(event.target as Element).closest("[data-motion-diamond],.motion-property-diamond-slot")
         )
           (editor?.start ?? editor?.begin)?.(captureTarget ? (targets ?? target) : undefined);
       }}
       onFocusCapture={(event) => {
         if (
           !event.currentTarget.disabled &&
-          !(event.target as Element).closest("[data-motion-diamond]")
+          !(event.target as Element).closest("[data-motion-diamond],.motion-property-diamond-slot")
         )
           (editor?.start ?? editor?.begin)?.(captureTarget ? (targets ?? target) : undefined);
       }}

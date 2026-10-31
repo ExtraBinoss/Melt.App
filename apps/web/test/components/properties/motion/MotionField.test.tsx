@@ -2,6 +2,7 @@ import { act, fireEvent, screen } from "@testing-library/react";
 import { expect, test, vi } from "vitest";
 import { planMotionInitialization } from "@musart/core";
 import { MotionField } from "../../../../src/components/properties/motion/MotionField";
+import { animationPresentation } from "../../../../src/components/motion/animations/presentation";
 import { MotionFieldProvider } from "../../../../src/components/properties/motion/context";
 import { setup } from "../../../support/ui";
 import { createMotionTransport } from "../../../../src/services/motion/transport";
@@ -13,6 +14,7 @@ test("captures the intended field before pointer/focus input but never treats a 
     mode: "motion",
     plan: planMotionInitialization(d.engine.getSnapshot()),
   });
+  animationPresentation(d.engine).set({ details: true });
   const target = { kind: "layer" as const, layerId: d.rectangle.id, property: "x" as const };
   const view = d.mount(
     <MotionFieldProvider editor={{ begin }}>

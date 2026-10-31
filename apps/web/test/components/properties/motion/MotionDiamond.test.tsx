@@ -5,6 +5,7 @@ import { createEffect, planMotionInitialization } from "@musart/core";
 import { MotionDiamond } from "../../../../src/components/properties/motion/MotionDiamond";
 import { createMotionTransport } from "../../../../src/services/motion/transport";
 import { setup as baseSetup } from "../../../support/ui";
+import userEvent from "@testing-library/user-event";
 test("adds the first real key and imperatively reflects playhead, mode and lock changes", () => {
   const d = setup();
   d.engine.execute({
@@ -42,7 +43,7 @@ test("adds the first real key and imperatively reflects playhead, mode and lock 
   act(() => d.engine.execute({ type: "setCompositionMode", mode: "static" }));
   expect(button).not.toBeVisible();
 });
-test("advertises preset macros honestly instead of keying an inert preset selector", () => {
+test("advertises preset macros in the shared tooltip instead of a native title", async () => {
   const d = setup(),
     effect = createEffect("gradient");
   d.engine.execute({ type: "updateLayers", ids: [d.rectangle.id], patch: { effects: [effect] } });
@@ -65,7 +66,9 @@ test("advertises preset macros honestly instead of keying an inert preset select
   );
   const button = screen.getByRole("button", { name: "Ajouter une image clé · Preset" });
   expect(button).toBeDisabled();
-  expect(button.title).toContain("plusieurs paramètres");
+  expect(button).not.toHaveAttribute("title");
+  await userEvent.setup().hover(button.parentElement!);
+  expect(await screen.findByRole("tooltip")).toHaveTextContent("plusieurs paramètres");
 });
 
 test("uses sorted key lookup and avoids identical attribute mutations during continuous non-key seeks", async () => {
@@ -108,7 +111,7 @@ test("uses sorted key lookup and avoids identical attribute mutations during con
   view.unmount();
 });
 
-test("switches occurrence arming at clip boundaries and disables the diamond in a gap without React renders", () => {
+test("switches occurrence arming at clip boundaries and disables the diamond in a gap without React renders", async () => {
   const d = setup();
   d.engine.execute({ type: "setCompositionMode", mode: "motion" });
   const id = d.engine.getSnapshot().project.pages[0]!.motion!.tracks[0]!.id;
@@ -138,7 +141,9 @@ test("switches occurrence arming at clip boundaries and disables the diamond in 
   expect(node).toHaveAttribute("data-animated", "false");
   act(() => transport.seek({ value: 5, rate: 2 }));
   expect(node).toBeDisabled();
-  expect(node.title).toContain("dans un clip");
+  expect(node).not.toHaveAttribute("title");
+  await userEvent.setup().hover(node.parentElement!);
+  expect(await screen.findByRole("tooltip")).toHaveTextContent("dans un clip");
   expect(renders).toBe(before);
 });
 

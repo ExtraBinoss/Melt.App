@@ -1,5 +1,5 @@
 import { animationPresentation } from "../../motion/animations/presentation";
-import { useLayoutEffect, useRef } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { Diamond } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import {
@@ -15,6 +15,7 @@ import {
 import { createMotionTransport } from "../../../services/motion/transport";
 import { addMotionPropertyKeys, motionPropertyTrack } from "../../../state/session/motion-edit";
 import { Button } from "../../ui/button";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../../ui/tooltip";
 import "./messages";
 import "./motion-properties.css";
 
@@ -47,6 +48,10 @@ export function MotionDiamond({
 }) {
   const { t } = useTranslation("motionProperties");
   const button = useRef<HTMLButtonElement>(null);
+  const wrapper = useRef<HTMLSpanElement>(null);
+  const help = useRef("");
+  const open = useRef(false);
+  const [tooltip, setTooltip] = useState("");
   useLayoutEffect(() => {
     const transport = createMotionTransport(engine);
     const owner = engine.getSnapshot();
@@ -94,16 +99,21 @@ export function MotionDiamond({
       if (presentation === lastPresentation) return;
       lastPresentation = presentation;
       node.hidden = hidden;
+      if (wrapper.current) {
+        wrapper.current.hidden = hidden;
+        wrapper.current.tabIndex = blocked ? 0 : -1;
+      }
       node.disabled = blocked;
       node.dataset.animated = String(animated);
       node.dataset.current = String(current);
       node.setAttribute("aria-label", t(current ? "update" : "add", { property: label }));
       node.setAttribute("aria-pressed", String(current));
-      node.title = unavailable
+      help.current = unavailable
         ? t("macro")
         : absent
           ? t("inactive")
           : t(animated ? "armed" : "add", { property: label });
+      if (open.current) setTooltip(help.current);
     };
     const stop = transport.subscribe(update);
     const stopPresentation = animationPresentation(engine).subscribe(update);
@@ -114,19 +124,31 @@ export function MotionDiamond({
     };
   }, [engine, target, targets, label, disabled, t]);
   return (
-    <Button
-      ref={button}
-      type="button"
-      variant="ghost"
-      size="icon-xs"
-      className="motion-property-diamond"
-      data-motion-diamond
-      hidden
-      aria-label={t("add", { property: label })}
-      onPointerDown={(event) => event.preventDefault()}
-      onClick={() => addMotionPropertyKeys(engine, targets ?? [target])}
+    <Tooltip
+      onOpenChange={(value) => {
+        open.current = value;
+        if (value) setTooltip(help.current);
+      }}
     >
-      <Diamond size={11} aria-hidden />
-    </Button>
+      <TooltipTrigger asChild>
+        <span ref={wrapper} className="motion-property-diamond-slot" hidden>
+          <Button
+            ref={button}
+            type="button"
+            variant="ghost"
+            size="icon-xs"
+            className="motion-property-diamond"
+            data-motion-diamond
+            hidden
+            aria-label={t("add", { property: label })}
+            onPointerDown={(event) => event.preventDefault()}
+            onClick={() => addMotionPropertyKeys(engine, targets ?? [target])}
+          >
+            <Diamond size={11} aria-hidden />
+          </Button>
+        </span>
+      </TooltipTrigger>
+      <TooltipContent side="top">{tooltip}</TooltipContent>
+    </Tooltip>
   );
 }
