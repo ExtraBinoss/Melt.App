@@ -2,6 +2,7 @@ import { compileGpuScene } from "./compile";
 import { isInstancedPrimitive } from "./primitives/eligibility";
 import type { Bounds, Layer } from "@musart/core";
 import { sourcePlacement } from "./group-viewport";
+import { placementMatrix } from "./placement-matrix";
 import {
   DoubleSide,
   Mesh,
@@ -87,9 +88,16 @@ export class NormalBatch {
       item.controls.flipY.value = textureFlip(source.texture);
       item.controls.opacity.value = layer.opacity;
       item.controls.premultiplied.value = source.premultiplied ? 1 : 0;
-      item.mesh.position.set(placed.x + placed.width / 2, placed.y + placed.height / 2, 0);
-      item.mesh.scale.set(placed.width, -placed.height, 1);
-      item.mesh.rotation.z = (placed.rotation * Math.PI) / 180;
+      item.mesh.matrixAutoUpdate = !placed.affine;
+      item.mesh.frustumCulled = !placed.affine;
+      if (placed.affine) {
+        placementMatrix(item.mesh.matrix, placed);
+        item.mesh.matrixWorldNeedsUpdate = true;
+      } else {
+        item.mesh.position.set(placed.x + placed.width / 2, placed.y + placed.height / 2, 0);
+        item.mesh.scale.set(placed.width, -placed.height, 1);
+        item.mesh.rotation.z = (placed.rotation * Math.PI) / 180;
+      }
       item.mesh.renderOrder = index;
       this.scene.add(item.mesh);
     }

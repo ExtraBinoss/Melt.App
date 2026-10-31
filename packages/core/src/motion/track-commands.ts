@@ -1,3 +1,4 @@
+import { captureSceneMotionKeyMove } from "./scene/keyframes";
 import { captureAnimationPointMove, removeAnimationPoints } from "./animations/keyframes";
 import { ensure } from "../errors";
 import { assertEditable, getLayer } from "../layers/access";
@@ -76,7 +77,13 @@ export const moveMotionKeyframes: CommandHandler<"moveMotionKeyframes"> = (
       track.animations = track.animations.map(
         (animation) => animations.get(animation.id) ?? animation,
       );
-  let found = animationMove.found.size;
+  const sceneMove = captureSceneMotionKeyMove(page, ids);
+  const sceneProperties = sceneMove.sample(command.delta);
+  if (page.motion.sceneProperties)
+    page.motion.sceneProperties = page.motion.sceneProperties.map(
+      (property) => sceneProperties.get(property.id) ?? property,
+    );
+  let found = animationMove.found.size + sceneMove.found.size;
   for (const track of page.motion.tracks)
     for (const property of track.properties) {
       let changed = false;
@@ -126,6 +133,12 @@ export const deleteMotionKeyframes: CommandHandler<"deleteMotionKeyframes"> = (
   for (const { track } of animationSelection.entries)
     assertEditable(page, getLayer(page, track.layerId));
   let found = removeAnimationPoints(page, ids);
+  if (page.motion.sceneProperties)
+    page.motion.sceneProperties = page.motion.sceneProperties.map((property) => {
+      const keyframes = property.keyframes.filter((key) => !ids.has(key.id));
+      found += property.keyframes.length - keyframes.length;
+      return keyframes.length === property.keyframes.length ? property : { ...property, keyframes };
+    });
   for (const track of page.motion.tracks)
     for (const property of track.properties) {
       const kept = property.keyframes.filter((key) => !ids.has(key.id));

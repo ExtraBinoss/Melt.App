@@ -151,6 +151,7 @@ export class LayerGeometryIndex {
     if (
       layer.parentId === null &&
       layer.rotation === 0 &&
+      !layer.affine &&
       (layer.scaleX ?? 1) === 1 &&
       (layer.scaleY ?? 1) === 1
     ) {
@@ -194,6 +195,7 @@ export class LayerGeometryIndex {
         !layer.spatial?.enabled &&
         layer.parentId === null &&
         layer.rotation === 0 &&
+        !layer.affine &&
         (layer.scaleX ?? 1) === 1 &&
         (layer.scaleY ?? 1) === 1
           ? layer
@@ -254,24 +256,29 @@ export class LayerGeometryIndex {
         stack.push({ children, at: children.length - 1, point: frame.point, fallback: layer });
         continue;
       }
-      if (layer.rotation === 0 && (layer.scaleX ?? 1) === 1 && (layer.scaleY ?? 1) === 1) {
+      if (
+        !layer.affine &&
+        layer.rotation === 0 &&
+        (layer.scaleX ?? 1) === 1 &&
+        (layer.scaleY ?? 1) === 1
+      ) {
         const x = frame.point.x - layer.x,
           y = frame.point.y - layer.y;
         if (x < 0 || y < 0 || x > layer.width || y > layer.height) continue;
         local = { x, y };
       } else {
-        // A conservative square contains every rotation of the local rectangle.
-        const radius =
-          (layer.width * Math.abs(layer.scaleX ?? 1) + layer.height * Math.abs(layer.scaleY ?? 1)) /
-          2;
+        const matrix = layerTransform(layer);
+        const radiusX =
+            (layer.width * Math.abs(matrix[0]) + layer.height * Math.abs(matrix[2])) / 2,
+          radiusY = (layer.width * Math.abs(matrix[1]) + layer.height * Math.abs(matrix[3])) / 2;
         if (
-          Math.abs(frame.point.x - layer.x - layer.width / 2) > radius ||
-          Math.abs(frame.point.y - layer.y - layer.height / 2) > radius
+          Math.abs(frame.point.x - layer.x - layer.width / 2) > radiusX ||
+          Math.abs(frame.point.y - layer.y - layer.height / 2) > radiusY
         )
           continue;
         let inverse = this.localInverses.get(layer.id);
         if (!inverse) {
-          inverse = invertMatrix(layerTransform(layer));
+          inverse = invertMatrix(matrix);
           this.localInverses.set(layer.id, inverse);
         }
         local = transformPoint(inverse, frame.point);

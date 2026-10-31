@@ -17,6 +17,7 @@ export function applyCommand(
   command: Command,
   nextId: (prefix: string) => string,
   revision = 0,
+  validationScope: "full" | "local" = "full",
 ): CommandResult {
   ensure(Object.hasOwn(COMMAND_HANDLERS, command.type), "INVALID_COMMAND", "Commande inconnue");
   const handler = COMMAND_HANDLERS[command.type] as (
@@ -37,7 +38,11 @@ export function applyCommand(
   const result = handler({ project, pageId, page, nextId, revision }, command);
   // Reconcile only structural operations; parameter previews retain their shallow draft path.
   if (previousLayerIds) reconcileMotionLayers(page, nextId, previousLayerIds, project.assets);
-  if (page.motion && (command.type === "updateLayers" || command.type === "updateLayerPatches"))
+  if (
+    validationScope === "full" &&
+    page.motion &&
+    (command.type === "updateLayers" || command.type === "updateLayerPatches")
+  )
     pruneMotionProperties(page);
   return result;
 }

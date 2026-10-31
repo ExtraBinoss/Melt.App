@@ -1,6 +1,6 @@
 import { ensure } from "../errors";
 import { compileMotionEasing, type MotionEasing } from "./easing";
-import type { MotionPropertyDescriptor, MotionValue } from "./properties/model";
+import type { MotionPropertySchema, MotionValue } from "./properties/model";
 import { validateMotionValue } from "./properties/validation";
 
 function channels(color: string): readonly number[] {
@@ -20,7 +20,7 @@ function clamp(value: number, min: number, max: number): number {
 
 /** Registry values/curve are checked once; returned samplers never resolve document properties. */
 export function compileMotionInterpolator(
-  descriptor: MotionPropertyDescriptor,
+  descriptor: MotionPropertySchema,
   before: MotionValue,
   after: MotionValue,
   easing: MotionEasing = { type: "linear" },

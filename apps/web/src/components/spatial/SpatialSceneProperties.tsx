@@ -1,3 +1,5 @@
+import { SceneMotionValue } from "./SceneMotionValue";
+import { SceneMotionField } from "./SceneMotionField";
 import { InfoTooltip } from "../shared/InfoTooltip";
 import { useTranslation } from "react-i18next";
 import { Plus, Sun, Trash2, Upload } from "lucide-react";
@@ -9,13 +11,16 @@ import {
   type EnginePort,
   type SpatialLight,
   type SpatialScene,
+  type LightMotionProperty,
+  type SceneMotionPropertyTarget,
+  CAMERA_MOTION_SCHEMAS,
 } from "@musart/core";
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../ui/accordion";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Button } from "../ui/button";
 import { Switch } from "../ui/switch";
-import { NumberInput } from "../shared/NumberInput";
+import { SceneNumberInput as NumberInput } from "./SceneNumberInput";
 import { IconButton } from "../shared/IconButton";
 import { SelectField } from "../shared/SelectField";
 import { SpatialLightEditor } from "./SpatialLightEditor";
@@ -34,44 +39,75 @@ export function SpatialSceneProperties({
   run: (task: () => void) => void;
 }) {
   const { t } = useTranslation("spatial");
-  const settings = page.spatial ?? createSpatialScene();
-  const edit = useScenePreview(engine, page, run);
+  const settings = useMemo(() => page.spatial ?? createSpatialScene(), [page]);
+  const edit = useScenePreview(engine, page, run, settings);
   const input = useRef<HTMLInputElement>(null);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const environment = settings.environment,
     camera = settings.camera;
   const changeEnvironment = (patch: Partial<SpatialScene["environment"]>, commit: boolean) =>
-    (commit ? edit.commit : edit.preview)({
-      ...settings,
-      environment: { ...environment, ...patch },
-    });
+    (commit ? edit.commit : edit.preview)(
+      {
+        ...settings,
+        environment: { ...environment, ...patch },
+      },
+      Object.keys(patch).length === 1 && ("intensity" in patch || "rotation" in patch)
+        ? {
+            kind: "environment",
+            compositionId: page.id,
+            property: "intensity" in patch ? "intensity" : "rotation",
+          }
+        : undefined,
+    );
   const changeCamera = (patch: Partial<SpatialScene["camera"]>, commit: boolean) =>
-    (commit ? edit.commit : edit.preview)({ ...settings, camera: { ...camera, ...patch } });
-  const changeLight = (value: SpatialLight, commit: boolean) =>
-    (commit ? edit.commit : edit.preview)({
-      ...settings,
-      lights: settings.lights.map((light) => (light.id === value.id ? value : light)),
-    });
+    (commit ? edit.commit : edit.preview)(
+      { ...settings, camera: { ...camera, ...patch } },
+      Object.keys(patch).length === 1
+        ? ({
+            kind: "camera",
+            compositionId: page.id,
+            property: Object.keys(patch)[0],
+          } as SceneMotionPropertyTarget)
+        : undefined,
+    );
+  const changeLight = (value: SpatialLight, commit: boolean, property?: LightMotionProperty) =>
+    (commit ? edit.commit : edit.preview)(
+      {
+        ...settings,
+        lights: settings.lights.map((light) => (light.id === value.id ? value : light)),
+      },
+      property ? { kind: "light", compositionId: page.id, lightId: value.id, property } : undefined,
+    );
   function cameraField(
     key: "fov" | "yaw" | "pitch" | "distance",
     min: number,
     max: number,
     step = 1,
   ) {
+    const descriptor = CAMERA_MOTION_SCHEMAS[key];
     return (
-      <NumberInput
+      <SceneMotionField
+        engine={engine}
+        target={{ kind: "camera", compositionId: page.id, property: key }}
         label={t(key)}
-        identity={page}
-        value={camera[key]}
-        min={min}
-        max={max}
-        step={step}
-        unit={key === "distance" ? undefined : "°"}
-        onPreview={(value) => changeCamera({ [key]: value }, false)}
-        onCommit={(value) => changeCamera({ [key]: value }, true)}
-        onCancel={edit.cancel}
-      />
+      >
+        <NumberInput
+          engine={engine}
+          target={{ kind: "camera", compositionId: page.id, property: key }}
+          onStart={edit.begin}
+          label={t(key)}
+          identity={page}
+          value={camera[key]}
+          min={descriptor.kind === "number" ? descriptor.min : min}
+          max={descriptor.kind === "number" ? descriptor.max : max}
+          step={step}
+          unit={key === "distance" ? undefined : "°"}
+          onPreview={(value) => changeCamera({ [key]: value }, false)}
+          onCommit={(value) => changeCamera({ [key]: value }, true)}
+          onCancel={edit.cancel}
+        />
+      </SceneMotionField>
     );
   }
   return (
@@ -139,29 +175,47 @@ export function SpatialSceneProperties({
         }}
       />
       <div className="fields-grid">
-        <NumberInput
+        <SceneMotionField
+          engine={engine}
+          target={{ kind: "environment", compositionId: page.id, property: "intensity" }}
           label={t("intensity")}
-          identity={page}
-          value={environment.intensity}
-          min={0}
-          max={10}
-          step={0.1}
-          onPreview={(intensity) => changeEnvironment({ intensity }, false)}
-          onCommit={(intensity) => changeEnvironment({ intensity }, true)}
-          onCancel={edit.cancel}
-        />
-        <NumberInput
+        >
+          <NumberInput
+            engine={engine}
+            target={{ kind: "environment", compositionId: page.id, property: "intensity" }}
+            onStart={edit.begin}
+            label={t("intensity")}
+            identity={page}
+            value={environment.intensity}
+            min={0}
+            max={10}
+            step={0.1}
+            onPreview={(intensity) => changeEnvironment({ intensity }, false)}
+            onCommit={(intensity) => changeEnvironment({ intensity }, true)}
+            onCancel={edit.cancel}
+          />
+        </SceneMotionField>
+        <SceneMotionField
+          engine={engine}
+          target={{ kind: "environment", compositionId: page.id, property: "rotation" }}
           label={t("rotation")}
-          identity={page}
-          value={environment.rotation}
-          min={-360}
-          max={360}
-          step={1}
-          unit="°"
-          onPreview={(rotation) => changeEnvironment({ rotation }, false)}
-          onCommit={(rotation) => changeEnvironment({ rotation }, true)}
-          onCancel={edit.cancel}
-        />
+        >
+          <NumberInput
+            engine={engine}
+            target={{ kind: "environment", compositionId: page.id, property: "rotation" }}
+            onStart={edit.begin}
+            label={t("rotation")}
+            identity={page}
+            value={environment.rotation}
+            min={-360}
+            max={360}
+            step={1}
+            unit="°"
+            onPreview={(rotation) => changeEnvironment({ rotation }, false)}
+            onCommit={(rotation) => changeEnvironment({ rotation }, true)}
+            onCancel={edit.cancel}
+          />
+        </SceneMotionField>
       </div>
       <div className="spatial-title">
         <span>{t("reflections")}</span>
@@ -258,16 +312,19 @@ export function SpatialSceneProperties({
             <PopoverContent side="left" align="start">
               <SpatialLightEditor
                 light={light}
-                onPreview={(value) => changeLight(value, false)}
-                onCommit={(value) => changeLight(value, true)}
+                engine={engine}
+                compositionId={page.id}
+                onPreview={(value, property) => changeLight(value, false, property)}
+                onCommit={(value, property) => changeLight(value, true, property)}
                 onCancel={edit.cancel}
+                onStart={edit.begin}
               />
             </PopoverContent>
           </Popover>
           <Switch
             aria-label={t("enabled")}
             checked={light.enabled}
-            onCheckedChange={(enabled) => changeLight({ ...light, enabled }, true)}
+            onCheckedChange={(enabled) => changeLight({ ...light, enabled }, true, "enabled")}
           />
           <IconButton
             label={t("remove")}
@@ -295,21 +352,35 @@ export function SpatialSceneProperties({
           <AccordionTrigger>{t("camera")}</AccordionTrigger>
           <AccordionContent>
             <div className="spatial-accordion-body">
-              <SelectField
+              <SceneMotionField
+                engine={engine}
+                target={{ kind: "camera", compositionId: page.id, property: "projection" }}
                 label={t("camera")}
-                identity={page}
-                value={camera.projection}
-                options={["perspective", "orthographic"].map((value) => ({
-                  value,
-                  label: t(value),
-                }))}
-                onValueChange={(projection) =>
-                  changeCamera(
-                    { projection: projection as SpatialScene["camera"]["projection"] },
-                    true,
-                  )
-                }
-              />
+              >
+                <SceneMotionValue
+                  engine={engine}
+                  target={{ kind: "camera", compositionId: page.id, property: "projection" }}
+                  fallback={camera.projection}
+                >
+                  {(value) => (
+                    <SelectField
+                      label={t("camera")}
+                      identity={page}
+                      value={value as string}
+                      options={["perspective", "orthographic"].map((value) => ({
+                        value,
+                        label: t(value),
+                      }))}
+                      onValueChange={(projection) =>
+                        changeCamera(
+                          { projection: projection as SpatialScene["camera"]["projection"] },
+                          true,
+                        )
+                      }
+                    />
+                  )}
+                </SceneMotionValue>
+              </SceneMotionField>
               <div className="fields-grid">
                 {cameraField("yaw", -360000, 360000)}
                 {cameraField("pitch", -89.9, 89.9)}

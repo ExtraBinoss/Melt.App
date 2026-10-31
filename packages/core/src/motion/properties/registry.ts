@@ -1,3 +1,4 @@
+import { propertyDependencies } from "../../spatial/properties";
 import type { Composition, Layer } from "../../document/model";
 import { ensure } from "../../errors";
 import {
@@ -33,7 +34,13 @@ export function resolveLayerMotionProperty(
       ? readLayerMotionValue(layer, target.property)
       : readEffectMotionValue(effect!, target.property, target.kind === "effectSetting");
   if (!isValidMotionValue(schema, value)) return null;
-  return { ...schema, target: { ...target }, value } as MotionPropertyDescriptor;
+  return {
+    ...schema,
+    target: { ...target },
+    value,
+    animatable: true,
+    dependencies: propertyDependencies(target.kind, target.property, effect?.type),
+  } as MotionPropertyDescriptor;
 }
 
 export function resolveMotionProperty(

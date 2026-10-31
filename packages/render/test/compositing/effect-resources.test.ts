@@ -25,7 +25,7 @@ describe("shared effect allocations inside the hard cache budget", () => {
     expect(effects.projectedBytes(2, 2, ascii)).toBe(16 + 16384);
     effects.apply(source, 2, 2, ascii, output);
     expect(effects.bytes).toBe(16 + 16384);
-    expect(effects.projectedBytes(3, 2, stack)).toBe(24 + 16384);
+    expect(effects.projectedBytes(3, 2, stack)).toBe(16 + 24 + 16384);
     expect(effects.stats().passes).toBe(3);
     expect(effects.projectedBytes(2, 2, [createEffect("ascii", { enabled: false })])).toBe(
       effects.bytes,

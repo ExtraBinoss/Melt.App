@@ -52,7 +52,11 @@ export function validateEffect(value: unknown, ids: Set<string>): void {
   validateEffectExtensions(value);
 }
 
-function validateLayer(value: unknown, ids: Set<string>, assets: Record<string, unknown>): void {
+export function validateLayer(
+  value: unknown,
+  ids: Set<string>,
+  assets: Record<string, unknown>,
+): void {
   assertRecord(value);
   assertUniqueId(value.id, ids);
   assertText(value.name);
@@ -73,6 +77,20 @@ function validateLayer(value: unknown, ids: Set<string>, assets: Record<string, 
   assertNumber(value.rotation, -360000, 360000);
   for (const key of ["scaleX", "scaleY"] as const)
     if (value[key] !== undefined) assertNumber(value[key], 0.001, 100);
+  if (value.affine !== undefined) {
+    assertList(value.affine, 4);
+    ensure(value.affine.length === 4, "INVALID_DOCUMENT", "Invalid 2D affine basis");
+    for (const coefficient of value.affine) assertNumber(coefficient, -1_000_000, 1_000_000);
+    const [a, b, c, d] = value.affine as number[];
+    const determinant = a! * d! - b! * c!;
+    const authoredScale =
+      ((value.scaleX as number | undefined) ?? 1) * ((value.scaleY as number | undefined) ?? 1);
+    ensure(
+      Math.abs(determinant) > 1e-12 && Math.abs(determinant * authoredScale) > 1e-12,
+      "INVALID_DOCUMENT",
+      "Singular 2D affine basis",
+    );
+  }
   assertNumber(value.opacity, 0, 1);
   assertNumber(value.strokeWidth, 0, 1024);
   assertNumber(value.radius, 0, 32768);
@@ -169,6 +187,25 @@ function validateHierarchy(layers: unknown[]): void {
   }
 }
 
+/** Shared by full import validation and certified local command validation. */
+export function validateProjectMetadata(value: Record<string, unknown>): void {
+  assertText(value.name);
+  assertText(value.createdAt, 64);
+  assertText(value.updatedAt, 64);
+  ensure(
+    Number.isFinite(Date.parse(value.createdAt)) && Number.isFinite(Date.parse(value.updatedAt)),
+    "INVALID_DOCUMENT",
+    "Dates invalides",
+  );
+}
+export function validatePageMetadata(page: Record<string, unknown>): void {
+  assertText(page.name);
+  assertNumber(page.width, 1, 16384);
+  assertNumber(page.height, 1, 16384);
+  assertColor(page.background);
+  validatePageLayout(page);
+}
+
 export function validateProject(value: unknown): asserts value is Project {
   assertRecord(value);
   ensure(
@@ -178,14 +215,7 @@ export function validateProject(value: unknown): asserts value is Project {
   );
   const ids = new Set<string>();
   assertUniqueId(value.id, ids);
-  assertText(value.name);
-  assertText(value.createdAt, 64);
-  assertText(value.updatedAt, 64);
-  ensure(
-    Number.isFinite(Date.parse(value.createdAt)) && Number.isFinite(Date.parse(value.updatedAt)),
-    "INVALID_DOCUMENT",
-    "Dates invalides",
-  );
+  validateProjectMetadata(value);
   assertRecord(value.assets);
   const assetEntries = Object.entries(value.assets);
   ensure(assetEntries.length <= 5000, "INVALID_DOCUMENT", "Trop de ressources");
@@ -200,16 +230,12 @@ export function validateProject(value: unknown): asserts value is Project {
   for (const page of value.pages) {
     assertRecord(page);
     assertUniqueId(page.id, ids);
-    assertText(page.name);
-    assertNumber(page.width, 1, 16384);
-    assertNumber(page.height, 1, 16384);
-    assertColor(page.background);
+    validatePageMetadata(page);
     assertList(page.layers, 10000);
     assertList(page.guides, 1000);
     for (const layer of page.layers) validateLayer(layer, ids, value.assets);
     validateHierarchy(page.layers);
     validateMaskGraph(page.layers);
-    validatePageLayout(page);
     if (page.spatial !== undefined) validateSpatialScene(page.spatial, ids, value.assets);
     validateCompositionMotion(
       page as unknown as Composition,

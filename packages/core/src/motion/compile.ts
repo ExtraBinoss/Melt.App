@@ -1,3 +1,5 @@
+import { compileSceneMotion } from "./scene/compile";
+import type { CompiledSceneMotionProperty } from "./scene/compile";
 import type { CompiledAnimationChannel } from "./animations/compile";
 import type { Composition, Project } from "../document/model";
 import { cloneValue, freezeValue } from "../document/immutable";
@@ -48,6 +50,7 @@ export interface MotionProgram {
   readonly duration: MotionTime | null;
   readonly layers: readonly CompiledMotionLayer[];
   readonly audio: readonly CompiledMotionAudio[];
+  readonly sceneProperties?: readonly CompiledSceneMotionProperty[];
 }
 
 export interface CompiledMotionAudio {
@@ -121,6 +124,7 @@ export function compileMotion(
     duration,
     layers,
     audio,
+    sceneProperties: mode === "motion" ? compileSceneMotion(page) : [],
   });
   if (trusted) {
     let retained = programs.get(project);

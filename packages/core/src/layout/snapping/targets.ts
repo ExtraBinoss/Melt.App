@@ -62,7 +62,14 @@ export function collectSnapTargets(
       if (movingIds.has(layer.id) || layer.maskSource || !layer.visible || layer.opacity <= 0)
         continue;
       const bounds =
-        layer.parentId === null && layer.rotation === 0 ? layer : geometry.worldBounds(layer.id);
+        !layer.spatial?.enabled &&
+        !layer.affine &&
+        layer.parentId === null &&
+        layer.rotation === 0 &&
+        (layer.scaleX ?? 1) === 1 &&
+        (layer.scaleY ?? 1) === 1
+          ? layer
+          : geometry.worldBounds(layer.id);
       appendBox(targets, bounds, layer.id, "layer");
       if (layer.kind === "group") pending.push(layer.id);
       if (layer.guides?.length) {

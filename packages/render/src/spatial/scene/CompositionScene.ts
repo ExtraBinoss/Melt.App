@@ -18,19 +18,21 @@ import {
   PCFShadowMap,
   RenderTarget,
   type Camera,
-  type Material,
   type Texture,
   type WebGPURenderer,
 } from "three/webgpu";
 import type { GpuResource } from "../../cache/GpuResourceCache";
 import { SourceIdentities } from "../../cache/source-identities";
+import { createSpatialDependencySignatures } from "../../cache/spatial-signatures";
 import { compileGpuScene } from "../../compositing/compile";
 import { assertTextureSize, gpuTextureLimit } from "../../cache/texture-limits";
 import { updateCompositionCamera } from "../camera";
 import { SpatialResource, type SpatialNativeLight } from "../SpatialResource";
 import type { ReflectionSource } from "../reflections/model";
 import { DepthBindings } from "./DepthBindings";
+import { DepthScopes } from "./DepthScopes";
 import { SharedShadows } from "./SharedShadows";
+import { registerSampledLights } from "./SampledLights";
 import { projectedTransport, transportProjection } from "./projection";
 
 /** One world, camera and light rig per composition. Sources keep independent effect surfaces. */
@@ -53,6 +55,14 @@ export class CompositionScene implements GpuResource {
   private compiledDepth = "";
   private compiledColor = "";
   private depthReady = false;
+  private shadowsReady = false;
+  private depthSignature = "";
+  private shadowSignature = "";
+  private readonly sourceStamps = new Map<string, string>();
+  private readonly sourceMeshes = new Map<string, Mesh[]>();
+  private depthScope: string | null = null;
+  private scopes: DepthScopes | null = null;
+  private readonly meshSources = new Map<Mesh, string>();
   stamp = "";
   closed = false;
   constructor(
@@ -60,6 +70,7 @@ export class CompositionScene implements GpuResource {
     settings: SpatialScene,
   ) {
     this.settings = settings;
+    registerSampledLights(renderer);
     this.owner = new SpatialResource(new Group(), [], settings);
     this.owner.scene.name = "melt:composition-3d";
     this.depth = new DepthBindings(renderer, this.depthTarget.depthTexture!);
@@ -73,6 +84,7 @@ export class CompositionScene implements GpuResource {
   get bytes() {
     return (
       this.identities.stats().bytes +
+      this.signatureBytes +
       this.owner.bytes +
       this.depthTarget.width * this.depthTarget.height * 8 +
       this.depth.bytes
@@ -81,8 +93,23 @@ export class CompositionScene implements GpuResource {
   get targets() {
     return this.owner.targets + 1;
   }
+  private get signatureBytes() {
+    return (
+      (this.depthSignature.length +
+        this.shadowSignature.length +
+        this.stamp.length +
+        [...this.sourceStamps.values()].reduce((size, stamp) => size + stamp.length, 0)) *
+      2
+    );
+  }
   projectedBytes(width: number, height: number, count: number) {
-    return this.identities.stats().bytes + this.owner.bytes + width * height * 8 + count * 8192;
+    return (
+      this.identities.stats().bytes +
+      this.signatureBytes +
+      this.owner.bytes +
+      width * height * 8 +
+      count * 8192
+    );
   }
   sync(
     page: Composition,
@@ -92,6 +119,13 @@ export class CompositionScene implements GpuResource {
     scale: number,
   ) {
     this.settings = settings;
+    this.scopes = new DepthScopes(
+      page,
+      sources.map(({ layer }) => layer.id),
+    );
+    this.depth.restore();
+    this.meshSources.clear();
+    this.sourceMeshes.clear();
     for (const anchor of this.anchors.values()) anchor.clear();
     const active = new Set(sources.map((s) => s.layer.id));
     for (const [id, anchor] of this.anchors)
@@ -131,6 +165,14 @@ export class CompositionScene implements GpuResource {
       if (index.isVisible(layer.id)) this.visibleSources.add(layer.id);
       resource.root.visible = !mask && this.visibleSources.has(layer.id);
       this.sources.set(layer.id, source);
+      const meshes: Mesh[] = [];
+      resource.root.traverse((node) => {
+        if (node instanceof Mesh) {
+          this.meshSources.set(node, layer.id);
+          meshes.push(node);
+        }
+      });
+      this.sourceMeshes.set(layer.id, meshes);
     }
     this.scene.updateMatrixWorld(true);
     const density = Math.max(
@@ -143,6 +185,8 @@ export class CompositionScene implements GpuResource {
       depthHeight = Math.max(1, Math.ceil(page.height * density));
     const limit = gpuTextureLimit(this.renderer);
     assertTextureSize(depthWidth, depthHeight, limit);
+    if (this.depthTarget.width !== depthWidth || this.depthTarget.height !== depthHeight)
+      this.depthReady = false;
     this.depthTarget.setSize(depthWidth, depthHeight);
     this.depth.viewProjection.value
       .copy(this.camera.projectionMatrix)
@@ -168,26 +212,37 @@ export class CompositionScene implements GpuResource {
       resource.camera.projectionMatrix.copy(crop);
       resource.camera.projectionMatrixInverse.copy(crop).invert();
     }
-    this.depthReady = false;
-    this.stamp = `${this.scene.uuid}:${this.identities.intern(
-      JSON.stringify([
-        page.width,
-        page.height,
-        settings,
-        sources.map(({ layer, resource }) => [
-          layer.id,
-          resource.content.uuid,
-          geometry.worldMatrix(layer.id),
-          layer.opacity,
-          index.isVisible(layer.id),
-          index.ancestors(layer.id).map((parent) => parent.opacity),
-          layer.fill,
-          layer.fillGradient,
-          layer.spatial,
-          layer.vector?.parts?.map((p) => [p.fill, p.opacity]),
-        ]),
-      ]),
-    )}`;
+    const signatures = createSpatialDependencySignatures(
+      page,
+      settings,
+      sources.map(({ layer, resource }) => ({
+        layer,
+        contentIdentity: resource.content.uuid,
+        worldMatrix: geometry.worldMatrix(layer.id),
+        visible: index.isVisible(layer.id),
+        inheritedOpacity: index.ancestors(layer.id).map((parent) => parent.opacity),
+      })),
+      environment?.uuid ?? null,
+      (signature) => this.identities.intern(signature),
+    );
+    if (this.depthSignature !== signatures.depth) this.depthReady = false;
+    if (this.shadowSignature !== signatures.shadows) this.shadowsReady = false;
+    this.depthSignature = signatures.depth;
+    this.shadowSignature = signatures.shadows;
+    if (!this.depthReady) this.depthScope = null;
+    this.sourceStamps.clear();
+    for (const { layer } of sources)
+      this.sourceStamps.set(
+        layer.id,
+        `${this.scene.uuid}:${this.identities.intern(signatures.source(layer.id)!)}`,
+      );
+    this.stamp = `${this.scene.uuid}:${this.identities.intern(signatures.composite)}`;
+  }
+  sourceStamp(id: string) {
+    return this.sourceStamps.get(id);
+  }
+  bindingStats() {
+    return this.depth.stats();
   }
   bounds(id: string) {
     return this.transports.get(id);
@@ -197,6 +252,17 @@ export class CompositionScene implements GpuResource {
     this.depth.restore();
     for (const anchor of this.anchors.values()) anchor.clear();
     this.sources.clear();
+    this.meshSources.clear();
+    this.sourceMeshes.clear();
+    this.sourceStamps.clear();
+    this.identities.clear();
+    this.stamp = "";
+    this.scopes = null;
+    this.depthReady = false;
+    this.shadowsReady = false;
+    this.depthSignature = "";
+    this.shadowSignature = "";
+    this.depthScope = null;
     this.depth.prune(new Set());
     this.compiledDepth = "";
     this.compiledColor = "";
@@ -205,16 +271,10 @@ export class CompositionScene implements GpuResource {
     const source = this.sources.values().next().value as ReflectionSource | undefined;
     if (!source) return;
     const state = this.renderer.shadowMap.enabled;
-    const materials = new Set<Material>();
-    this.scene.traverse((node) => {
-      if (node instanceof Mesh)
-        for (const m of Array.isArray(node.material) ? node.material : [node.material])
-          materials.add(m);
-    });
-    this.depth.prune(materials);
+    this.depth.sync(this.meshSources.keys());
     try {
       this.renderer.shadowMap.enabled = this.settings.shadows;
-      this.depth.apply(this.scene, "depth");
+      this.depth.bind(this.meshSources.keys(), "depth");
       const depthKey = this.shaderKey("depth");
       if (depthKey !== this.compiledDepth) {
         const pending = compileGpuScene(
@@ -231,7 +291,7 @@ export class CompositionScene implements GpuResource {
       this.depth.restore();
       this.renderer.shadowMap.enabled = this.settings.shadows;
       for (const source of this.sources.values()) source.resource.root.visible = true;
-      this.depth.apply(this.scene, "color");
+      this.depth.bind(this.meshSources.keys(), "color");
       const key = this.shaderKey("color");
       if (key !== this.compiledColor) {
         const pending = compileGpuScene(
@@ -280,27 +340,38 @@ export class CompositionScene implements GpuResource {
       renderer.shadowMap.type = PCFShadowMap;
       renderer.autoClear = true;
       renderer.setClearColor(0, 0);
-      if (!this.depthReady) {
-        this.shadows.begin();
+      const scope = this.scopes!.scope(layer.id);
+      if (!this.depthReady || this.depthScope !== scope || !this.shadowsReady) {
+        if (!this.shadowsReady) this.shadows.begin();
         for (const anchor of this.anchors.values()) anchor.visible = true;
         this.scene.traverse((node) => {
           const light = node as SpatialNativeLight;
-          if (light.shadow) light.shadow.autoUpdate = true;
+          if (light.shadow) light.shadow.autoUpdate = !this.shadowsReady;
         });
-        this.depth.apply(this.scene, "depth");
+        this.depth.bind(this.meshSources.keys(), "depth", (mesh) =>
+          this.scopes!.writes(this.meshSources.get(mesh)!, scope),
+        );
+        // A failed or interrupted prepass must never leave the previous scope marked usable.
+        this.depthReady = false;
+        this.depthScope = null;
         renderer.setRenderTarget(this.depthTarget);
-        renderer.render(this.scene, this.camera);
+        try {
+          renderer.render(this.scene, this.camera);
+        } finally {
+          this.scene.traverse((node) => {
+            const light = node as SpatialNativeLight;
+            if (light.shadow) light.shadow.autoUpdate = false;
+          });
+        }
         this.depth.restore();
-        this.scene.traverse((node) => {
-          const light = node as SpatialNativeLight;
-          if (light.shadow) light.shadow.autoUpdate = false;
-        });
         this.depthReady = true;
+        this.shadowsReady = true;
+        this.depthScope = scope;
       }
       for (const [id, anchor] of this.anchors) anchor.visible = id === layer.id;
       resource.root.visible = true;
       this.depth.occlusion.value = this.maskSources.has(layer.id) ? 0 : 1;
-      this.depth.apply(this.scene, "color");
+      this.depth.bind(this.sourceMeshes.get(layer.id)!, "color");
       this.camera.projectionMatrix.copy(this.projection.get(layer.id)!);
       this.camera.projectionMatrixInverse.copy(this.camera.projectionMatrix).invert();
       renderer.setRenderTarget(resource.target);

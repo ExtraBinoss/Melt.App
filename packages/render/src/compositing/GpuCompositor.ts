@@ -267,6 +267,7 @@ export class GpuCompositor {
           layer.rotation,
           layer.scaleX ?? 1,
           layer.scaleY ?? 1,
+          layer.affine ?? null,
           layer.opacity,
           layer.visible,
           layer.blendMode,

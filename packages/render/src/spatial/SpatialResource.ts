@@ -1,4 +1,5 @@
 import { preserveTransmissionCoverage } from "./material-output";
+import { createSampledLight, registerSampledLights } from "./scene/SampledLights";
 import { spatialVectorPaint } from "./vector-paint";
 import { spatialTextPaint } from "./text-paint";
 import type { Layer, SpatialScene } from "@musart/core";
@@ -217,7 +218,7 @@ export class SpatialResource implements GpuResource {
       if (!present.has(id)) {
         this.scene.remove(light);
         if (!(light instanceof PointLight)) this.scene.remove(light.target);
-        light.shadow.dispose();
+        light.dispose();
         this.lights.delete(id);
       }
     this.shadowBytes = 0;
@@ -232,12 +233,12 @@ export class SpatialResource implements GpuResource {
       if (light && !(light instanceof type)) {
         this.scene.remove(light);
         if (!(light instanceof PointLight)) this.scene.remove(light.target);
-        light.shadow.dispose();
+        light.dispose();
         this.lights.delete(config.id);
         light = undefined;
       }
       if (!light) {
-        light = new type();
+        light = createSampledLight(config.type);
         this.lights.set(config.id, light);
         this.scene.add(light);
       }
@@ -266,6 +267,7 @@ export class SpatialResource implements GpuResource {
     }
   }
   async prepare(renderer: WebGPURenderer, settings: SpatialScene, canContinue: () => boolean) {
+    registerSampledLights(renderer);
     const key = JSON.stringify([
       this.camera.type,
       this.modelMaterials,
@@ -287,6 +289,7 @@ export class SpatialResource implements GpuResource {
     this.compiledKey = key;
   }
   render(renderer: WebGPURenderer, settings: SpatialScene) {
+    registerSampledLights(renderer);
     const target = renderer.getRenderTarget(),
       auto = renderer.autoClear,
       shadow = renderer.shadowMap.enabled,
@@ -318,7 +321,7 @@ export class SpatialResource implements GpuResource {
     disposeModel(this.content);
     this.material.dispose();
     this.target.dispose();
-    for (const light of this.lights.values()) light.shadow.dispose();
+    for (const light of this.lights.values()) light.dispose();
     this.lights.clear();
     this.originalMaterials.clear();
     this.scene.clear();

@@ -7,9 +7,7 @@ import {
   MeshBasicNodeMaterial,
   NormalBlending,
   OrthographicCamera,
-  Quaternion,
   Scene,
-  Vector3,
   type InstancedBufferAttribute,
   type PlaneGeometry,
   type RenderTarget,
@@ -25,6 +23,7 @@ import {
 } from "./attributes";
 import { primitiveNode } from "./node";
 import { PrimitivePaintCache } from "./paint-cache";
+import { placementMatrix } from "../placement-matrix";
 /** One bounded retained buffer is reused across contiguous ordered runs and isolated groups. */
 export class PrimitiveBatch implements GpuResource {
   readonly targets = 0;
@@ -45,10 +44,6 @@ export class PrimitiveBatch implements GpuResource {
   private capacity = 0;
   private closed = false;
   private readonly matrix = new Matrix4();
-  private readonly position = new Vector3();
-  private readonly scale = new Vector3();
-  private readonly rotation = new Quaternion();
-  private readonly axis = new Vector3(0, 0, 1);
   private readonly colors = new PrimitivePaintCache();
   constructor(private readonly renderer: WebGPURenderer) {
     this.camera.position.z = 1;
@@ -95,8 +90,6 @@ export class PrimitiveBatch implements GpuResource {
     this.camera.bottom = height;
     this.camera.updateProjectionMatrix();
     const attributes = mesh.geometry.attributes as Record<string, InstancedBufferAttribute>;
-    const offsetX = origin?.x ?? 0,
-      offsetY = origin?.y ?? 0;
     const before = this.renderer.getRenderTarget(),
       autoClear = this.renderer.autoClear;
     try {
@@ -106,14 +99,7 @@ export class PrimitiveBatch implements GpuResource {
         const count = Math.min(this.capacity, layers.length - start);
         for (let index = 0; index < count; index++) {
           const layer = layers[start + index]!;
-          this.position.set(
-            layer.x + layer.width / 2 - offsetX,
-            layer.y + layer.height / 2 - offsetY,
-            0,
-          );
-          this.scale.set(layer.width * (layer.scaleX ?? 1), -layer.height * (layer.scaleY ?? 1), 1);
-          this.rotation.setFromAxisAngle(this.axis, (layer.rotation * Math.PI) / 180);
-          mesh.setMatrixAt(index, this.matrix.compose(this.position, this.rotation, this.scale));
+          mesh.setMatrixAt(index, placementMatrix(this.matrix, layer, origin));
           const fill = this.colors.read(layer.fill),
             stroke = this.colors.read(layer.stroke);
           attributes.primitiveFill!.setXYZW(index, fill.x, fill.y, fill.z, fill.w);

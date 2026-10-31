@@ -70,9 +70,11 @@ export class SceneReflections {
       this.releaseCurrent();
       return;
     }
+    // Capture admission bounds draw cost, never eligibility to receive a probe.
+    const receivers = items.filter((item) => item.reflectivity > 0.05);
     const { admitted, triangles, omitted } = admitMeshes(items, budget),
-      choices = chooseProbes(admitted, budget.probes);
-    if (!choices.length || admitted.length < 2) {
+      choices = chooseProbes(receivers, budget.probes);
+    if (!choices.length) {
       this.releaseCurrent();
       return;
     }
@@ -87,7 +89,7 @@ export class SceneReflections {
       this.current.bindings.dispose();
     }
     this.current = resource;
-    this.cache.ensureCapacity(key, resource.projectedBytes(admitted));
+    this.cache.ensureCapacity(key, resource.projectedBytes(admitted, receivers));
     resource.stats = {
       ...resource.stats,
       captures: 0,
@@ -102,25 +104,30 @@ export class SceneReflections {
       sources,
       [environment?.uuid, settings.environment],
       settings.lights,
+      choices,
     );
     const changed = signature !== resource.signature;
     const blocked = options.mediaMode === "preview" && this.activity && !this.activity.read();
     const cadence =
       options.mediaMode === "playback" &&
       performance.now() - resource.lastCapture < 1000 / budget.fps;
-    if (changed && !blocked && !cadence) {
-      resource.capture.sync(admitted, scene, settings, environment);
-      await resource.capture.prepare(this.renderer, canContinue);
-      await resource.update(this.environments, choices, signature, canContinue);
-      this.pending = false;
-    } else if (changed) {
-      resource.stats.deferred = true;
-      this.pending = !!blocked;
+    try {
+      if (changed && !blocked && !cadence) {
+        resource.capture.sync(admitted, scene, settings, environment);
+        await resource.capture.prepare(this.renderer, canContinue);
+        await resource.update(this.environments, choices, signature, canContinue);
+        this.pending = false;
+      } else if (changed) {
+        resource.stats.deferred = true;
+        this.pending = !!blocked;
+      }
+      resource.bindings.bind(this.renderer, receivers, resource.textures(), resource.revision);
+      resource.stats.probes = resource.probes.filter((probe) => probe.target).length;
+      resource.stats.receivers = resource.bindings.count;
+    } finally {
+      // A superseded capture can still own completed targets and private proxies.
+      this.cache.synchronize(key);
     }
-    resource.bindings.bind(this.renderer, admitted, resource.textures(), resource.revision);
-    resource.stats.probes = resource.probes.filter((probe) => probe.target).length;
-    resource.stats.receivers = resource.bindings.count;
-    this.cache.synchronize(key);
   }
   stamp(layerId: string) {
     return this.current?.bindings.stamp(layerId) ?? null;

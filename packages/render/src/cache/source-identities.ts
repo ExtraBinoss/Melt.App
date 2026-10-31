@@ -34,6 +34,11 @@ export class SourceIdentities {
     }
     return id;
   }
+  /** Drop retained signature payloads without recycling identities held by external caches. */
+  clear() {
+    this.entries.clear();
+    this.bytes = 0;
+  }
   stats() {
     return { entries: this.entries.size, bytes: this.bytes };
   }

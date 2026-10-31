@@ -14,26 +14,39 @@ export function createId(prefix = "node"): string {
   return id;
 }
 
-/** Reserve the complete validated graph, including IDs not produced by this allocator. */
-export function reserveProjectIds(project: Project): void {
-  reserved.add(project.id);
-  for (const asset of Object.values(project.assets)) reserved.add(asset.id);
+/** Collect only durable schema identities, including scene channels and spatial lights. */
+export function collectProjectIds(project: Project): Set<string> {
+  const ids = new Set<string>([project.id]);
+  for (const asset of Object.values(project.assets)) ids.add(asset.id);
   for (const page of project.pages) {
-    reserved.add(page.id);
-    for (const track of page.motion?.audioTracks ?? []) reserved.add(track.id);
+    ids.add(page.id);
+    for (const light of page.spatial?.lights ?? []) ids.add(light.id);
+    for (const track of page.motion?.audioTracks ?? []) ids.add(track.id);
+    for (const property of page.motion?.sceneProperties ?? []) {
+      ids.add(property.id);
+      for (const key of property.keyframes) ids.add(key.id);
+    }
     for (const track of page.motion?.tracks ?? []) {
-      reserved.add(track.id);
-      for (const animation of track.animations ?? []) reserved.add(animation.id);
+      ids.add(track.id);
+      for (const animation of track.animations ?? []) ids.add(animation.id);
       for (const property of track.properties) {
-        reserved.add(property.id);
-        for (const key of property.keyframes) reserved.add(key.id);
+        ids.add(property.id);
+        for (const key of property.keyframes) ids.add(key.id);
       }
     }
-    for (const guide of page.guides) reserved.add(guide.id);
+    for (const guide of page.guides) ids.add(guide.id);
     for (const layer of page.layers) {
-      reserved.add(layer.id);
-      for (const effect of layer.effects) reserved.add(effect.id);
-      for (const guide of layer.guides ?? []) reserved.add(guide.id);
+      ids.add(layer.id);
+      for (const effect of layer.effects) ids.add(effect.id);
+      for (const guide of layer.guides ?? []) ids.add(guide.id);
     }
   }
+  return ids;
+}
+/** Reserve the complete validated graph, optionally reusing the engine's identity index. */
+export function reserveProjectIds(
+  project: Project,
+  ids: ReadonlySet<string> = collectProjectIds(project),
+): void {
+  for (const id of ids) reserved.add(id);
 }

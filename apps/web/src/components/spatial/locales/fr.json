@@ -200,5 +200,6 @@
     "balanced": "Équilibrée",
     "high": "Élevée"
   },
-  "reflectionsHint": "Reflète les objets 3D voisins. Les mises à jour attendent la fin des manipulations. Les effets 2D et les masques sont appliqués ensuite."
+  "reflectionsHint": "Reflète les objets 3D voisins. Les mises à jour attendent la fin des manipulations. Les effets 2D et les masques sont appliqués ensuite.",
+  "removeKeyframe": "Supprimer l’image clé · {{property}}"
 }

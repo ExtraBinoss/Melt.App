@@ -1,3 +1,4 @@
+import { applySceneMotionValues } from "./scene/properties";
 import type { Composition } from "../document/model";
 import { markMotionComposition } from "../document/published";
 import { freezeValue } from "../document/immutable";
@@ -32,8 +33,9 @@ export function applyMotionFrame(program: MotionProgram, plan: MotionFramePlan):
     if (layer !== original) changed = true;
     return layer;
   });
-  if (!changed) return base;
-  const frame = freezeValue({ ...base, layers });
+  const scene = applySceneMotionValues(base, plan.sceneValues ?? []);
+  if (!changed && scene === base) return base;
+  const frame = freezeValue({ ...scene, layers });
   markMotionComposition(base, frame);
   return frame;
 }

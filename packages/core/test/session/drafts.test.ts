@@ -4,7 +4,7 @@ import { freezeValue } from "../../src/document/immutable";
 import { createCommandDraft } from "../../src/session/drafts";
 import { EditorEngine } from "../../src/session/engine";
 import type { Command } from "../../src/document/model";
-test("uses domain opt-ins only for one validated mutation domain on an immutable session", () => {
+test("uses domain opt-ins for supported immutable scalar batches", () => {
   const input = createProject({
     pages: [createPage({ layers: [createLayer("rectangle", { id: "r" })] })],
   });
@@ -16,12 +16,9 @@ test("uses domain opt-ins only for one validated mutation domain on an immutable
   expect(
     createCommandDraft(project, pageId, [{ type: "updateLayerPatches", patches: [] }]).assets,
   ).toBe(project.assets);
-  for (const commands of [
-    [],
-    [command, command],
-    [{ type: "renameProject" as const, name: "New" }],
-  ])
-    expect(createCommandDraft(project, pageId, commands).assets).not.toBe(project.assets);
+  for (const commands of [[command, command], [{ type: "renameProject" as const, name: "New" }]])
+    expect(createCommandDraft(project, pageId, commands).assets).toBe(project.assets);
+  expect(createCommandDraft(project, pageId, []).assets).not.toBe(project.assets);
 });
 
 test("copies only patch targets and preserves immutable neighbors through commit and undo", () => {

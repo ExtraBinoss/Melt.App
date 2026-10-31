@@ -1,3 +1,5 @@
+import { captureSceneMotionKeyMove } from "./scene/keyframes";
+import { compileSceneMotion } from "./scene/compile";
 import { captureAnimationPointMove } from "./animations/keyframes";
 import { compileAnimations } from "./animations/compile";
 import { ensure } from "../errors";
@@ -26,7 +28,8 @@ export function createMotionKeyframePreview(
   const animationMove = captureAnimationPointMove(program.composition, ids);
   for (const { track } of animationMove.entries)
     assertEditable(program.composition, getLayer(program.composition, track.layerId));
-  const found = new Set<string>(animationMove.found);
+  const sceneMove = captureSceneMotionKeyMove(program.composition, ids);
+  const found = new Set<string>([...animationMove.found, ...sceneMove.found]);
   const tracks = new Map(program.composition.motion?.tracks.map((track) => [track.id, track]));
   const affected = new Map(
     program.layers.flatMap((layer, layerIndex) => {
@@ -54,6 +57,7 @@ export function createMotionKeyframePreview(
     try {
       validateMotionTime(delta);
       animationMove.sample(delta);
+      sceneMove.sample(delta);
       for (const { moving, fixed } of constraints) {
         if (
           program.composition.motion!.version !== 2 &&
@@ -82,6 +86,7 @@ export function createMotionKeyframePreview(
     validateMotionTime(delta);
     if (delta.value === 0) return program;
     const animationDrafts = animationMove.sample(delta);
+    const sceneDrafts = sceneMove.sample(delta);
     const authored = new Map<string, MotionPropertyTrack>();
     const layers = program.layers.map((layer, layerIndex) => {
       const entries = affected.get(layerIndex);
@@ -136,6 +141,13 @@ export function createMotionKeyframePreview(
       ...program.composition,
       motion: {
         ...motion,
+        ...(motion.sceneProperties
+          ? {
+              sceneProperties: motion.sceneProperties.map(
+                (property) => sceneDrafts.get(property.id) ?? property,
+              ),
+            }
+          : {}),
         tracks: motion.tracks.map((track) =>
           track.properties.some((property) => authored.has(property.id)) ||
           track.animations?.some((animation) => animationDrafts.has(animation.id))
@@ -164,6 +176,7 @@ export function createMotionKeyframePreview(
     return Object.freeze({
       ...program,
       composition,
+      ...(sceneDrafts.size ? { sceneProperties: compileSceneMotion(composition) } : {}),
       layers: Object.freeze(
         layers.map((layer) => {
           const draft = layer.trackId && compiled.get(layer.trackId);

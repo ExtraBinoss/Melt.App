@@ -200,5 +200,6 @@
     "balanced": "Bilanciata",
     "high": "Alta"
   },
-  "reflectionsHint": "Riflette gli oggetti 3D vicini. Gli aggiornamenti si interrompono durante le modifiche. Effetti 2D e maschere vengono applicati dopo."
+  "reflectionsHint": "Riflette gli oggetti 3D vicini. Gli aggiornamenti si interrompono durante le modifiche. Effetti 2D e maschere vengono applicati dopo.",
+  "removeKeyframe": "Rimuovi fotogramma chiave · {{property}}"
 }

@@ -39,6 +39,43 @@ async function waitForRender(page: Page, previous?: number) {
     renders: Number(await canvas.getAttribute("data-render-count")),
   } as Record<string, number>;
 }
+/** Renderer readiness is published at presentation, while GPU diagnostics are
+ * throttled. Start idle measurement only after the counters describe that same
+ * completed presentation and the existing render queue has drained.
+ */
+async function waitForSettledRender(page: Page): Promise<Record<string, number>> {
+  const ready = await page.waitForFunction(
+    () => {
+      const data = document.querySelector<HTMLCanvasElement>(".canvas-artboard canvas")?.dataset;
+      if (
+        !data ||
+        data.rendererReady !== "true" ||
+        data.presentationReady !== "true" ||
+        !data.renderedRevision ||
+        data.renderedRevision !== data.sceneRevision
+      )
+        return null;
+      const stats = JSON.parse(data.gpuStats ?? "{}") as Record<string, number>;
+      const renders = Number(data.renderCount);
+      if (
+        stats.pending !== 0 ||
+        stats.active !== 0 ||
+        stats.submitted !== Number(data.sceneRevision) ||
+        stats.completed !== renders ||
+        stats.displayFrames !== Number(data.renderFrames)
+      )
+        return null;
+      return { ...stats, renders };
+    },
+    undefined,
+    { timeout: 120000 },
+  );
+  try {
+    return (await ready.jsonValue()) as Record<string, number>;
+  } finally {
+    await ready.dispose();
+  }
+}
 async function measureCommand(page: Page, command: Command) {
   return page.evaluate(async (command) => {
     const canvas = document.querySelector<HTMLCanvasElement>(".canvas-artboard canvas")!;
@@ -261,7 +298,7 @@ test("50 image layers and 100 effects: GPU-only composition, bounded updates, id
       canvas.dataset.rendererReady === "true"
     );
   });
-  const settledView = await waitForRender(page);
+  const settledView = await waitForSettledRender(page);
   expect(settledView.renders).toBe(beforeView.renders + 1);
   expect(settledView.uploads).toBe(beforeView.uploads);
   // A bounded observation window is intentional: no frame is expected while the document is idle.

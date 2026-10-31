@@ -1,3 +1,4 @@
+import type { SceneMotionPropertyTarget, SceneMotionPropertyTrack } from "./scene/model";
 import type { MotionAnimation, MotionAnimationCommand } from "./animations/model";
 import type { MotionTime, MotionFrameRate } from "./time";
 import type { MotionEasing } from "./easing";
@@ -40,6 +41,8 @@ export interface CompositionMotion {
   duration: MotionTime;
   frameRate: MotionFrameRate;
   tracks: MotionLayerTrack[];
+  /** Composition-owned channels; absent in legacy portable documents. */
+  sceneProperties?: SceneMotionPropertyTrack[];
   /** Independent sound clips do not create visual layers or GPU resources. */
   audioTracks?: MotionAudioTrack[];
 }
@@ -76,7 +79,7 @@ export type MotionCommand =
       type: "upsertMotionKeyframe";
       /** Required to edit a chosen repeated occurrence; omitted legacy calls resolve at time. */
       trackId?: string;
-      target: MotionPropertyTarget;
+      target: MotionPropertyTarget | SceneMotionPropertyTarget;
       time: MotionTime;
       value: MotionValue;
       easing?: MotionEasing;

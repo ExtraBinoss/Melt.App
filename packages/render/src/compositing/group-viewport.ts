@@ -91,15 +91,16 @@ export function sourcePlacement(
     x: region.x + region.width / 2,
     y: region.y + region.height / 2,
   });
-  const width = region.width * (layer.scaleX ?? 1),
-    height = region.height * (layer.scaleY ?? 1);
+  // A residual basis mixes the source axes; retain its complete linear transform.
+  const width = region.width * (layer.affine ? 1 : (layer.scaleX ?? 1)),
+    height = region.height * (layer.affine ? 1 : (layer.scaleY ?? 1));
   return {
     ...layer,
     x: center.x - width / 2 - x,
     y: center.y - height / 2 - y,
     width,
     height,
-    scaleX: 1,
-    scaleY: 1,
+    scaleX: layer.affine ? (layer.scaleX ?? 1) : 1,
+    scaleY: layer.affine ? (layer.scaleY ?? 1) : 1,
   };
 }

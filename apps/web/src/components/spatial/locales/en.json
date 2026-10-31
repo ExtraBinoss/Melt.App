@@ -200,5 +200,6 @@
     "balanced": "Balanced",
     "high": "High"
   },
-  "reflectionsHint": "Reflects nearby 3D objects. Updates pause during editing. 2D effects and masks are applied afterward."
+  "reflectionsHint": "Reflects nearby 3D objects. Updates pause during editing. 2D effects and masks are applied afterward.",
+  "removeKeyframe": "Remove keyframe · {{property}}"
 }

@@ -200,5 +200,6 @@
     "balanced": "均衡",
     "high": "高"
   },
-  "reflectionsHint": "反射附近的3D对象。编辑时暂停更新。二维效果和蒙版在之后应用。"
+  "reflectionsHint": "反射附近的3D对象。编辑时暂停更新。二维效果和蒙版在之后应用。",
+  "removeKeyframe": "移除关键帧 · {{property}}"
 }

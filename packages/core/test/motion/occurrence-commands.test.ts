@@ -185,7 +185,7 @@ test("promotion materializes legacy implicit layers once and undo restores the v
   engine.undo();
   expect(engine.getSnapshot().project).toBe(before.project);
 });
-test("a v2 group occurrence move preserves child placement and rejects locked visual edits", () => {
+test("a v2 group occurrence move shifts descendants while keeping sibling-parent timing and respecting locks", () => {
   const engine = new EditorEngine(
     createProject({
       pages: [
@@ -200,12 +200,33 @@ test("a v2 group occurrence move preserves child placement and rejects locked vi
   );
   engine.execute({ type: "setCompositionMode", mode: "motion" });
   const page = () => engine.getSnapshot().project.pages[0]!;
+  engine.execute({
+    type: "upsertMotionKeyframe",
+    target: { kind: "layer", layerId: "child", property: "x" },
+    time: t(1, 2),
+    value: 10,
+  });
   const group = page().motion!.tracks[0]!;
   engine.execute({ type: "duplicateMotionOccurrence", trackId: group.id, start: t(3) });
   const copy = listLayerMotionOccurrences(page(), "parent")[1]!;
+  const originalParent = structuredClone(listLayerMotionOccurrences(page(), "parent")[0]!);
   const child = structuredClone(listLayerMotionOccurrences(page(), "child")[0]!);
   engine.execute({ type: "moveMotionTrack", trackId: copy.id, delta: t(1) });
-  expect(listLayerMotionOccurrences(page(), "child")[0]).toEqual(child);
+  expect(listLayerMotionOccurrences(page(), "parent")[0]).toEqual(originalParent);
+  expect(listLayerMotionOccurrences(page(), "parent")[1]).toMatchObject({
+    id: copy.id,
+    start: t(4),
+    end: t(6),
+  });
+  expect(listLayerMotionOccurrences(page(), "child")[0]).toEqual({
+    ...child,
+    start: t(1),
+    end: t(6),
+    properties: child.properties.map((property) => ({
+      ...property,
+      keyframes: property.keyframes.map((key) => ({ ...key, time: t(3, 2) })),
+    })),
+  });
   engine.execute({ type: "updateLayers", ids: ["parent"], patch: { locked: true } });
   const before = engine.getSnapshot();
   expect(() => engine.execute({ type: "deleteMotionOccurrence", trackId: copy.id })).toThrow();

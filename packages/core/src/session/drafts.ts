@@ -1,6 +1,7 @@
 import type { Command, Project } from "../document/model";
 import { cloneValue } from "../document/immutable";
 import { createLayerPatchDraft } from "../layers/draft";
+import { commandMutationScope, type CommandMutationScope } from "./scopes";
 type DraftFactories = {
   [K in Command["type"]]?: (
     project: Project,
@@ -58,7 +59,30 @@ export function createCommandDraft(
   project: Project,
   pageId: string,
   commands: readonly Command[],
+  scope: CommandMutationScope = commandMutationScope(project, pageId, commands),
 ): Project {
+  if (scope.kind === "local") {
+    return {
+      ...project,
+      pages: scope.pages.size
+        ? project.pages.map((page) => {
+            const touched = scope.pages.get(page.id);
+            return touched
+              ? {
+                  ...page,
+                  ...(touched.layers.size
+                    ? {
+                        layers: page.layers.map((layer) =>
+                          touched.layers.has(layer.id) ? { ...layer } : layer,
+                        ),
+                      }
+                    : {}),
+                }
+              : page;
+          })
+        : project.pages,
+    };
+  }
   const command = commands.length === 1 ? commands[0] : undefined;
   // Dispatch retains the command/factory correlation checked by DraftFactories.
   const factory = (

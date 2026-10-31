@@ -97,6 +97,9 @@ export interface Layer {
   /** Presentation scale around the layer center; omitted means one. */
   scaleX?: number;
   scaleY?: number;
+  /** Residual column-major 2D linear basis; centered local matrix is R * S * affine.
+   * Omitted means identity. Preserves shear/reflection across hierarchy changes. */
+  affine?: readonly [number, number, number, number];
   opacity: number;
   visible: boolean;
   locked: boolean;

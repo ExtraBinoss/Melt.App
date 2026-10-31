@@ -42,7 +42,7 @@ export function invertMatrix(matrix: Matrix): Matrix {
   ];
 }
 export function layerTransform(
-  layer: Pick<Layer, "x" | "y" | "width" | "height" | "rotation" | "scaleX" | "scaleY">,
+  layer: Pick<Layer, "x" | "y" | "width" | "height" | "rotation" | "scaleX" | "scaleY" | "affine">,
 ): Matrix {
   const radians = (layer.rotation * Math.PI) / 180;
   const cosine = Math.cos(radians);
@@ -51,14 +51,12 @@ export function layerTransform(
   const cy = layer.height / 2;
   const sx = layer.scaleX ?? 1,
     sy = layer.scaleY ?? 1;
-  return [
-    cosine * sx,
-    sine * sx,
-    -sine * sy,
-    cosine * sy,
-    layer.x + cx - cosine * sx * cx + sine * sy * cy,
-    layer.y + cy - sine * sx * cx - cosine * sy * cy,
-  ];
+  const basis = layer.affine ?? [1, 0, 0, 1];
+  const a = cosine * sx * basis[0]! - sine * sy * basis[1]!,
+    b = sine * sx * basis[0]! + cosine * sy * basis[1]!,
+    c = cosine * sx * basis[2]! - sine * sy * basis[3]!,
+    d = sine * sx * basis[2]! + cosine * sy * basis[3]!;
+  return [a, b, c, d, layer.x + cx - a * cx - c * cy, layer.y + cy - b * cx - d * cy];
 }
 export function getAncestors(page: Composition, layerId: string): Layer[] {
   const byId = new Map(page.layers.map((layer) => [layer.id, layer]));

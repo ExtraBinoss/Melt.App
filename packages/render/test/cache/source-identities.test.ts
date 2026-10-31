@@ -32,3 +32,18 @@ test("bounds signature payloads by bytes and declines individually oversized val
   ])
     expect(() => new SourceIdentities(args[0], args[1])).toThrow("budget");
 });
+
+test("clearing releases signature payloads without recycling identities retained by source caches", () => {
+  const identities = new SourceIdentities(16, 1024);
+  const a = identities.intern("large-old-signature"),
+    b = identities.intern("another-signature");
+  expect(identities.stats().bytes).toBeGreaterThan(0);
+  identities.clear();
+  expect(identities.stats()).toEqual({ entries: 0, bytes: 0 });
+  const renewed = identities.intern("large-old-signature");
+  expect(renewed).not.toBe(a);
+  expect(renewed).not.toBe(b);
+  expect(identities.intern("large-old-signature")).toBe(renewed);
+  identities.clear();
+  expect(identities.stats()).toEqual({ entries: 0, bytes: 0 });
+});

@@ -6,6 +6,15 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Make certified scalar and compatible 3D pose/material transactions validate only touched domains, preserve unchanged page/resource identities across batches, and reuse complete durable ID indexes while retaining atomic validation, history and conservative structural fallbacks.
+- Preserve complete centered 2D affine transforms, including nonuniform scale, shear and reflection, through ungrouping and reparenting; keep native rendering, masks, picking, snapping, portable documents and undo aligned.
+- Scope native opaque depth to layer and group opacity so fractional layers reveal rear objects while faded groups preserve internal occlusion, selection holdouts and shared shadows.
+- Keep reflective GLB, text and shape meshes eligible for shared probes when capture budgets omit their geometry, with bounded captures, honest omission diagnostics and receiver resource accounting.
+- Prepare native material variants once per sample and bind only active source meshes; intern shared dependency signatures once, compact morph payloads, and reuse unaffected source, depth and shadow work.
+- Reuse bounded, exact-size GPU effect scratch and backdrop surfaces across alternating layer dimensions, with charged retained allocations, deterministic eviction and preserved multi-stage alpha and output ownership.
+- Add durable camera, light and environment Motion channels with validated keyframe authoring, Auto-key, undo and portable serialization; share typed property capabilities and render dependencies across authoring and native frame sampling.
+- Refresh native light colors, intensities and point/spot parameters for every exact render and reflection capture, including multiple export samples in one animation frame; dispose owned light nodes through the native lifecycle.
+
 - Record native video upload experiments and Chromium Linux readback fallbacks; reject the ImageBitmap upload workaround and retain the native VideoFrame path while documenting the remaining WebGPU-specific flash reproduction.
 - Add development-only canvas/library pipeline summaries for preparation phases, GPU queue waits, source formats, upload reuse and decoded memory. Bound diagnostic DOM serialization to four updates per second, retain the latest/final accounting, and dispose observers and pending publications explicitly.
 - Keep eight independent native 1080p playback streams within the existing decoded-memory budget by shrinking retained history only above four streams. Count synchronized source-time aliases once, retire redundant upload rings, and add a reproducible CC0 four-to-eight-video effects/motion workload with native cleanup and readback checks.

@@ -200,5 +200,6 @@
     "balanced": "Zrównoważona",
     "high": "Wysoka"
   },
-  "reflectionsHint": "Odbija pobliskie obiekty 3D. Aktualizacje są wstrzymywane podczas edycji. Efekty 2D i maski są nakładane później."
+  "reflectionsHint": "Odbija pobliskie obiekty 3D. Aktualizacje są wstrzymywane podczas edycji. Efekty 2D i maski są nakładane później.",
+  "removeKeyframe": "Usuń klatkę kluczową · {{property}}"
 }

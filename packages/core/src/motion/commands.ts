@@ -1,3 +1,4 @@
+import { upsertSceneMotionKeyframe } from "./scene/commands";
 import { ensure } from "../errors";
 import type { CommandHandler } from "../session/context";
 import type { CompositionMotion, MotionPropertyTrack } from "./model";
@@ -23,8 +24,16 @@ function sameTarget(a: MotionPropertyTarget, b: MotionPropertyTarget): boolean {
   );
 }
 
-function findKey(page: Composition, id: string): { property: MotionPropertyTrack; index: number } {
-  for (const track of editableMotion(page).tracks) {
+function findKey(
+  page: Composition,
+  id: string,
+): { property: Pick<MotionPropertyTrack, "keyframes">; index: number } {
+  const motion = editableMotion(page);
+  for (const property of motion.sceneProperties ?? []) {
+    const index = property.keyframes.findIndex((key) => key.id === id);
+    if (index >= 0) return { property, index };
+  }
+  for (const track of motion.tracks) {
     for (const property of track.properties) {
       const index = property.keyframes.findIndex((key) => key.id === id);
       if (index >= 0) {
@@ -144,7 +153,14 @@ export const upsertMotionKeyframe: CommandHandler<"upsertMotionKeyframe"> = (
   command,
 ) => {
   const motion = editableMotion(page);
-  const descriptor = resolveMotionProperty(page, command.target);
+  if (
+    command.target.kind === "camera" ||
+    command.target.kind === "environment" ||
+    command.target.kind === "light"
+  )
+    return upsertSceneMotionKeyframe(page, command, nextId, pageId);
+  const target = command.target;
+  const descriptor = resolveMotionProperty(page, target);
   ensure(descriptor, "INVALID_COMMAND", "Unknown Motion property");
   validateMotionValue(descriptor, command.value);
   validateMotionTime(command.time);
@@ -153,16 +169,11 @@ export const upsertMotionKeyframe: CommandHandler<"upsertMotionKeyframe"> = (
     "INVALID_COMMAND",
     "Negative keyframe time",
   );
-  assertEditable(page, getLayer(page, command.target.layerId));
-  const track = resolveMotionOccurrence(
-    page,
-    command.target.layerId,
-    command.trackId,
-    command.time,
-  );
-  let property = track.properties.find((item) => sameTarget(item.target, command.target));
+  assertEditable(page, getLayer(page, target.layerId));
+  const track = resolveMotionOccurrence(page, target.layerId, command.trackId, command.time);
+  let property = track.properties.find((item) => sameTarget(item.target, target));
   if (!property) {
-    property = { id: nextId("property"), target: command.target, keyframes: [] };
+    property = { id: nextId("property"), target, keyframes: [] };
     track.properties.push(property);
   }
   const existing = property.keyframes.find(

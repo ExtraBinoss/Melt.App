@@ -32,7 +32,17 @@ fallback. No production GPU pixel readbacks are introduced.
 
 Separate native objects share opaque depth and cast shadows onto one another.
 Classic paint, blending, post-effects and masks retain their document ordering.
-Transparent contributions retain that ordering; this is raster rendering, not
+Fractional layer opacity does not write an opaque shared-depth holdout. A faded
+ancestor group introduces a depth scope: its opaque children still occlude one
+another before the group surface receives alpha, but do not hold out sources
+outside that group. Nested faded groups introduce nested scopes. One reusable
+GPU depth target switches scopes without retaining a depth texture per group;
+the common native shadow maps update once for each composition sample. Material
+alpha and transmission retain their native material rules independently of
+layer/group alpha. Masks and effects remain post-composite treatments and do not
+change native depth eligibility. Selection-export neighbours retain their native
+depth, shadow and reflection roles while the compositor excludes their paint.
+Transparent contributions retain document ordering; this is raster rendering, not
 order-independent transparency or path-traced global illumination.
 
 Scene reflections use a bounded set of native PMREM probes capturing actual
@@ -76,6 +86,30 @@ the standard property registry. Escape, pointer cancellation, owner/time changes
 and unmount discard the owned draft. Ordinary animation recipes still operate on
 the classic layer; additional recipes address native rotations, scales and depth.
 Imported animation clips sample explicit `clipTime`, never a wall clock.
+
+Composition Motion stores optional `sceneProperties` separately from layer
+occurrences. Camera projection/orbit, environment intensity/rotation and durable
+light properties use typed targets and the same validated keyframe commands,
+interpolation, undo and frame sampling as preview and video export. Inspector
+diamonds and Auto-key author scene channels; numeric playback presentation is
+imperative, and discrete controls subscribe at their leaves. Deleting a light
+prunes its channels atomically; composition duplication remaps all scene/light/key
+identities. Scene channels do not yet have dedicated rows in the layer timeline;
+environment asset/preset changes remain structural, without keyframe support.
+
+Engine-owned analytic lights use Three's renderer-local light-node extension
+API to refresh color, intensity and point/spot parameters per render. Exact
+samples and reflection captures can share one browser animation frame without
+retaining an earlier sample's lighting. Owned lights dispose through the native
+light lifecycle; borrowed source lights remain untouched.
+
+Pure property descriptors declare geometry, appearance, world, projection,
+depth, shadow, probe and compositing dependencies. The renderer interns shared
+scene inputs once and uses compact per-source stamps. An opaque appearance edit
+with environment reflections can reuse unrelated source/depth surfaces; scene
+reflections retain neighbour dependencies. Material variants synchronize once per
+sample and source passes bind only their own meshes. A scope switch may still
+redraw shared depth; these bounds do not imply constant rendering cost.
 
 ## Assets and limits
 
@@ -124,7 +158,10 @@ The implementation was checked on Linux with Chrome 156.0.8078.79, a
 1600 × 1000 viewport and one bounded browser worker. These are rendering and
 interaction correctness checks, not physical display-latency benchmarks.
 
-The 50-image effect stress run produced its initial native-density round trip
-and active/neutral full-resolution PNG captures, then was stopped when its
-3,000 MiB memory high watermark caused reclaim pressure. Its complete
-preview/export/recovery scenario is not counted as passing in this cohort.
+The subsequent optimization batch completed the full 50-image / 100-effect
+preview, edit, strict-idle, 2400×1500 PNG export, save/recovery and persisted
+768×480 thumbnail scenario. All production readback counters and browser errors
+remained zero; charged cache bytes stayed below 384 MiB. This supersedes the
+earlier partial stress run stopped on memory pressure. See
+[the optimization validation report](../optimization_binoss/validation-results.md)
+for scope, environment, actual evidence and remaining limits.

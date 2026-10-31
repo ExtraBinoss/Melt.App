@@ -14,6 +14,7 @@ import type { CommandHandler } from "../session/context";
 import { applyLayerPatches } from "./patches";
 import { duplicateMotionTracks } from "../motion/structure";
 import { assertMotionHierarchyChange } from "../motion/hierarchy";
+import { setLayerTransform } from "./affine";
 export const addLayers: CommandHandler<"addLayers"> = ({ project, page, pageId }, command) => {
   for (const asset of command.assets ?? []) {
     ensure(!Object.hasOwn(project.assets, asset.id), "INVALID_COMMAND", "Ressource déjà présente");
@@ -89,13 +90,9 @@ export const reorderLayer: CommandHandler<"reorderLayer"> = ({ page, pageId }, c
     "INVALID_COMMAND",
     "Position de calque invalide",
   );
-  if (command.parentId !== undefined) {
+  if (command.parentId !== undefined && command.parentId !== layer.parentId) {
     const restoreSpatial = captureSpatialReparent(page, [layer.id]);
-    if (command.parentId !== layer.parentId)
-      assertMotionHierarchyChange(page, [
-        layer.id,
-        ...(command.parentId ? [command.parentId] : []),
-      ]);
+    assertMotionHierarchyChange(page, [layer.id, ...(command.parentId ? [command.parentId] : [])]);
     if (command.parentId !== null) {
       const parent = getLayer(page, command.parentId);
       ensure(parent.kind === "group", "INVALID_HIERARCHY", "Parent non groupé");
@@ -108,13 +105,8 @@ export const reorderLayer: CommandHandler<"reorderLayer"> = ({ page, pageId }, c
     );
     const world = getWorldMatrix(page, layer.id),
       parentWorld = command.parentId === null ? IDENTITY : getWorldMatrix(page, command.parentId);
-    const local = multiplyMatrices(invertMatrix(parentWorld), world),
-      rotation = Math.atan2(local[1], local[0]),
-      cx = layer.width / 2,
-      cy = layer.height / 2;
-    layer.x = local[4] - cx + Math.cos(rotation) * cx - Math.sin(rotation) * cy;
-    layer.y = local[5] - cy + Math.sin(rotation) * cx + Math.cos(rotation) * cy;
-    layer.rotation = (rotation * 180) / Math.PI;
+    const local = multiplyMatrices(invertMatrix(parentWorld), world);
+    setLayerTransform(layer, local, (Math.atan2(local[1], local[0]) * 180) / Math.PI);
     layer.parentId = command.parentId;
     restoreSpatial();
   }

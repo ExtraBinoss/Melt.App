@@ -310,3 +310,24 @@ export { canUngroupSpatial } from "./spatial/grouping";
 export { reframeSpatialScene } from "./spatial/framing";
 
 export { SPATIAL_GEOMETRY_DEFINITIONS, SPATIAL_MODEL_EXTENT } from "./spatial/bounds/definitions";
+
+export { propertyDependencies, spatialLayerDependencies } from "./spatial/properties";
+export type { PropertyDependency, PropertyCapabilities } from "./spatial/properties";
+export {
+  resolveSceneMotionProperty,
+  listSceneMotionProperties,
+  sceneMotionAddress,
+  applySceneMotionValues,
+  CAMERA_MOTION_SCHEMAS,
+  ENVIRONMENT_MOTION_SCHEMAS,
+  LIGHT_MOTION_SCHEMAS,
+} from "./motion/scene/properties";
+export type {
+  SceneMotionPropertyTarget,
+  SceneMotionPropertyDescriptor,
+  SceneMotionPropertyTrack,
+  SceneMotionFrameValue,
+  CameraMotionProperty,
+  EnvironmentMotionProperty,
+  LightMotionProperty,
+} from "./motion/scene/model";

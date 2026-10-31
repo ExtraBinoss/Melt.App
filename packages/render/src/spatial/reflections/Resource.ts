@@ -1,4 +1,4 @@
-import { Vector3, type RenderTarget, type Texture } from "three/webgpu";
+import { InstancedMesh, Vector3, type RenderTarget, type Texture } from "three/webgpu";
 import type { GpuResource } from "../../cache/GpuResourceCache";
 import type { EnvironmentSources } from "../EnvironmentSources";
 import type { ReflectionBudget, ReflectionStats } from "./model";
@@ -24,20 +24,27 @@ export class ReflectionResource implements GpuResource {
     deferred: false,
   };
   constructor(readonly budget: ReflectionBudget) {}
-  projectedBytes(items: CaptureMesh[]) {
+  projectedBytes(contributors: CaptureMesh[], receivers: CaptureMesh[] = contributors) {
     // PMREM scene targets include half-float radiance and depth; shared scratch is reserved by EnvironmentSources.
     const targets =
       this.budget.probes * Math.max(3 * this.budget.size, 336) * 4 * this.budget.size * 12;
+    const materials = (item: CaptureMesh) =>
+      Array.isArray(item.original.material) ? item.original.material.length : 1;
+    const captureBytes = contributors.reduce(
+      (bytes, item) =>
+        bytes +
+        materials(item) * 1024 +
+        (item.original instanceof InstancedMesh
+          ? item.original.instanceMatrix.array.byteLength +
+            (item.original.instanceColor?.array.byteLength ?? 0)
+          : 0),
+      12,
+    );
+    // Receiver materials are private even when their geometry is excluded from capture.
+    // Keep room for old bindings until bind() has released the previous material set.
+    const receiverBytes = receivers.reduce((bytes, item) => bytes + materials(item) * 1024, 0);
     return (
-      targets +
-      items.reduce(
-        (bytes, item) =>
-          bytes +
-          ((item.original as import("three").InstancedMesh).instanceMatrix?.array.byteLength ?? 0),
-        0,
-      ) +
-      items.length * 4096 +
-      12
+      targets + Math.max(this.capture.bytes, captureBytes) + this.bindings.bytes + receiverBytes
     );
   }
   get bytes() {

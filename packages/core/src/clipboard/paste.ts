@@ -11,6 +11,10 @@ function reservedIds(project: Project): Set<string> {
     result.add(page.id);
     for (const light of page.spatial?.lights ?? []) result.add(light.id);
     for (const guide of page.guides) result.add(guide.id);
+    for (const property of page.motion?.sceneProperties ?? []) {
+      result.add(property.id);
+      for (const key of property.keyframes) result.add(key.id);
+    }
     for (const track of page.motion?.audioTracks ?? []) result.add(track.id);
     for (const track of page.motion?.tracks ?? []) {
       result.add(track.id);
@@ -75,6 +79,10 @@ export function pasteContent(
     for (const effect of layer.effects) ids.set(effect.id, allocate());
     for (const guide of layer.guides ?? []) ids.set(guide.id, allocate());
   }
+  for (const property of page.motion?.sceneProperties ?? []) {
+    ids.set(property.id, allocate());
+    for (const key of property.keyframes) ids.set(key.id, allocate());
+  }
   for (const track of page.motion?.audioTracks ?? []) ids.set(track.id, allocate());
   for (const track of page.motion?.tracks ?? []) {
     ids.set(track.id, allocate());
@@ -112,6 +120,22 @@ export function pasteContent(
       ? {
           motion: {
             ...page.motion,
+            ...(page.motion.sceneProperties
+              ? {
+                  sceneProperties: page.motion.sceneProperties.map((property) => ({
+                    ...property,
+                    id: ids.get(property.id)!,
+                    target: {
+                      ...property.target,
+                      compositionId: ids.get(page.id)!,
+                      ...(property.target.kind === "light"
+                        ? { lightId: ids.get(property.target.lightId)! }
+                        : {}),
+                    },
+                    keyframes: property.keyframes.map((key) => ({ ...key, id: ids.get(key.id)! })),
+                  })),
+                }
+              : {}),
             ...(page.motion.audioTracks
               ? {
                   audioTracks: page.motion.audioTracks.map((track) => ({

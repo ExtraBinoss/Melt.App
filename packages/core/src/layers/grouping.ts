@@ -7,6 +7,8 @@ import { SpatialGeometry } from "../spatial/geometry";
 import { invertSpatial, transformSpatial } from "../spatial/matrix";
 import { captureSpatialReparent } from "../spatial/reparent";
 import { canUngroupSpatial } from "../spatial/grouping";
+import { layerTransform, multiplyMatrices } from "./geometry";
+import { setLayerTransform } from "./affine";
 export function groupLayers(
   page: Composition,
   ids: string[],
@@ -64,11 +66,7 @@ export function ungroupLayers(page: Composition, ids: string[]): string[] {
   for (const group of selected) {
     ensure(group.kind === "group", "INVALID_COMMAND", "Le calque n’est pas un groupe");
     assertEditable(page, group);
-    const radians = (group.rotation * Math.PI) / 180;
-    const cosine = Math.cos(radians);
-    const sine = Math.sin(radians);
-    const cx = group.width / 2;
-    const cy = group.height / 2;
+    const groupTransform = layerTransform(group);
     const children = page.layers.filter((layer) => layer.parentId === group.id);
     const spatial = group.spatial?.enabled && group.spatial.source === "group";
     const restoreSpatial = captureSpatialReparent(
@@ -84,6 +82,7 @@ export function ungroupLayers(page: Composition, ids: string[]): string[] {
     ensure(
       group.effects.length === 0 &&
         group.mask === null &&
+        !group.maskSource &&
         group.opacity === 1 &&
         group.blendMode === "normal",
       "INVALID_COMMAND",
@@ -91,11 +90,11 @@ export function ungroupLayers(page: Composition, ids: string[]): string[] {
     );
     for (const layer of children) {
       assertEditable(page, layer);
-      const centerX = layer.x + layer.width / 2 - cx;
-      const centerY = layer.y + layer.height / 2 - cy;
-      layer.x = group.x + cx + cosine * centerX - sine * centerY - layer.width / 2;
-      layer.y = group.y + cy + sine * centerX + cosine * centerY - layer.height / 2;
-      layer.rotation += group.rotation;
+      setLayerTransform(
+        layer,
+        multiplyMatrices(groupTransform, layerTransform(layer)),
+        layer.rotation + group.rotation,
+      );
       layer.visible = layer.visible && group.visible;
       layer.parentId = group.parentId;
       nextSelection.push(layer.id);

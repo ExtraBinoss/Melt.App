@@ -1,3 +1,4 @@
+import type { SceneMotionFrameValue } from "./scene/model";
 import { evaluateAnimations } from "./animations/compile";
 import type { MotionProgram, CompiledMotionProperty, CompiledMotionLayer } from "./compile";
 import type { MotionPropertyTarget, MotionValue } from "./properties/model";
@@ -31,6 +32,7 @@ export interface MotionFramePlan {
   /** Preview-only left-limit presence at the duration boundary; properties still sample exact time. */
   readonly terminalPreview: boolean;
   readonly values: readonly MotionFrameValue[];
+  readonly sceneValues?: readonly SceneMotionFrameValue[];
   /** Temporal presence only. Ordinary visibility and mask-source paint rules remain in the renderer. */
   readonly activeLayerIds: readonly string[];
   readonly mediaRequests: readonly MotionFrameMediaRequest[];
@@ -57,7 +59,10 @@ function activeAt(
   return terminal ? start > 0 && end <= 0 : start >= 0 && end < 0;
 }
 
-function propertyValue(property: CompiledMotionProperty, time: MotionTime): MotionValue {
+function propertyValue(
+  property: Pick<CompiledMotionProperty, "keys" | "segments">,
+  time: MotionTime,
+): MotionValue {
   const keys = property.keys;
   let low = 0;
   let high = keys.length;
@@ -185,6 +190,11 @@ export function evaluateMotion(
     time: Object.freeze(sampledTime),
     terminalPreview,
     values: Object.freeze(values),
+    sceneValues: Object.freeze(
+      (program.sceneProperties ?? []).map((property) =>
+        Object.freeze({ target: property.target, value: propertyValue(property, sampledTime) }),
+      ),
+    ),
     activeLayerIds: Object.freeze(activeLayerIds),
     mediaRequests: Object.freeze(mediaRequests),
   });

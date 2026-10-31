@@ -74,7 +74,7 @@ export function enumerateMeshes(
   });
   return items;
 }
-/** Prefer large nearby geometry; rejected meshes consume neither clone buffers nor draw calls. */
+/** Budget capture contributors only; rejected meshes can still receive shared probes. */
 export function admitMeshes(items: CaptureMesh[], budget: ReflectionBudget) {
   let triangles = 0;
   const admitted: CaptureMesh[] = [];

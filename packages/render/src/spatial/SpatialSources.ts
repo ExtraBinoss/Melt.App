@@ -214,7 +214,7 @@ export class SpatialSources {
     };
   }
   reflectionStamp(layerId: string) {
-    return `${this.stage?.stamp ?? ""}:${this.reflections.stamp(layerId) ?? ""}`;
+    return `${this.stage?.sourceStamp(layerId) ?? ""}:${this.reflections.stamp(layerId) ?? ""}`;
   }
   bounds(layerId: string) {
     return this.stage?.bounds(layerId);

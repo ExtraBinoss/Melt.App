@@ -1,6 +1,7 @@
 import { compileGpuScene } from "../compositing/compile";
 import {
   ASCII_DEFAULT_CHARACTERS,
+  createEffect,
   getEffectDefinition,
   resolveEffectSettings,
   resolveGradientSettings,
@@ -9,14 +10,11 @@ import {
 import {
   Mesh,
   MeshBasicNodeMaterial,
-  NearestFilter,
   NoBlending,
-  NoColorSpace,
   OrthographicCamera,
   PlaneGeometry,
   RenderTarget,
   Scene,
-  UnsignedByteType,
   type Texture,
   type TextureNode,
   type WebGPURenderer,
@@ -29,6 +27,11 @@ import { effectStages, type EffectStage } from "./pipeline";
 import { compositeEffect } from "./shared/compositing/node";
 import { sampleEffect, type EffectDimensions } from "./shared/context";
 import { createEffectUniforms, updateEffectUniforms, type EffectUniforms } from "./shared/uniforms";
+import { EffectTargetPool } from "./shared/target-pool";
+
+// The shared copy graph has no effect-specific parameters. Keep its uniform
+// schema independent of whichever effect first requests a backdrop copy.
+const COPY_EFFECT = createEffect("brightness");
 
 function effectPassKey(effect: Effect, stage: EffectStage): string {
   const advanced =
@@ -60,8 +63,7 @@ export class GpuEffects {
   private readonly compiled = new WeakSet<EffectPass>();
   private mesh: Mesh<PlaneGeometry, MeshBasicNodeMaterial> | null = null;
   private readonly atlases = new GlyphAtlasCache();
-  private scratch: RenderTarget | null = null;
-  private backdrop: RenderTarget | null = null;
+  private readonly surfaces = new EffectTargetPool();
   private renderedPasses = 0;
   private disposed = false;
 
@@ -93,11 +95,12 @@ export class GpuEffects {
       stage.final &&
       Boolean(effect.composite || (effect.blendMode && effect.blendMode !== "normal"));
     const passKey = effectPassKey(effect, stage);
+    const uniformEffect = stage.key === "copy" ? COPY_EFFECT : effect;
     let pass = this.passes.get(passKey);
     if (!pass) {
       const source = texture(input),
         backdrop = texture(original);
-      const controls = createEffectUniforms(effect, width, height, logical);
+      const controls = createEffectUniforms(uniformEffect, width, height, logical);
       const glyph: EffectPass["glyph"] = { characters: this.characters(effect), binding: null };
       const node = stage.builder({
         source,
@@ -132,7 +135,7 @@ export class GpuEffects {
     pass.backdrop.value = original;
     pass.controls.sourceFlipY.value = input.isRenderTargetTexture ? 1 : 0;
     pass.controls.backdropFlipY.value = original.isRenderTargetTexture ? 1 : 0;
-    updateEffectUniforms(pass.controls, effect, width, height, logical);
+    updateEffectUniforms(pass.controls, uniformEffect, width, height, logical);
     pass.glyph.characters = this.characters(effect);
     if (pass.glyph.binding) {
       pass.glyph.binding.texture.value = this.glyphTexture(pass.glyph.characters);
@@ -151,8 +154,22 @@ export class GpuEffects {
     height: number,
     canContinue?: () => boolean,
   ): Promise<void> {
-    for (const effect of effects) {
-      const stages = effectStages(effect);
+    if (this.disposed) throw new Error("L’opérateur d’effets a été fermé.");
+    const blocks = effects.map((effect) => ({ effect, stages: effectStages(effect) }));
+    // Warmup attachments can be 1×1 while width/height describe logical uniforms.
+    // Only distinct multi-stage sampler identities need a pooled texture here.
+    const needsBackdrop = blocks.some(
+      ({ effect, stages }) =>
+        stages.length > 1 &&
+        stages.some((stage) => {
+          const pass = this.passes.get(effectPassKey(effect, stage));
+          return !pass || !this.compiled.has(pass);
+        }),
+    );
+    if (needsBackdrop)
+      assertTextureSize(target.width, target.height, gpuTextureLimit(this.renderer));
+    const surfaces = needsBackdrop ? this.surfaces.acquire(target.width, target.height, 1) : [];
+    for (const { effect, stages } of blocks) {
       for (const stage of stages) {
         const existing = this.passes.get(effectPassKey(effect, stage));
         if (existing && this.compiled.has(existing)) continue;
@@ -160,9 +177,9 @@ export class GpuEffects {
           effect,
           stage,
           target.texture,
-          stage.final && effectStages(effect).length > 1
-            ? this.getBackdrop(width, height).texture
-            : target.texture,
+          // Three deduplicates sampled bindings by texture UUID at compilation.
+          // Multi-stage finishes need distinct source/backdrop bindings at warmup.
+          stage.final && stages.length > 1 ? surfaces[0]!.texture : target.texture,
           width,
           height,
           {
@@ -176,11 +193,14 @@ export class GpuEffects {
           this.scene.add(this.mesh);
         } else this.mesh.material = pass.material;
         await compileGpuScene(this.renderer, this.scene, this.camera, target, canContinue);
+        if (this.disposed) throw new Error("L’opérateur d’effets a été fermé.");
         this.compiled.add(pass);
       }
     }
   }
   private draw(pass: EffectPass, target: RenderTarget): void {
+    if (pass.source.value === target.texture || pass.backdrop.value === target.texture)
+      throw new Error("Effect pass cannot sample its output target.");
     if (!this.mesh) {
       this.mesh = new Mesh(this.geometry, pass.material);
       this.scene.add(this.mesh);
@@ -189,24 +209,16 @@ export class GpuEffects {
     this.renderer.render(this.scene, this.camera);
     this.renderedPasses++;
   }
-  /** Allocation high-water mark remains accounted for until explicit disposal. */
+  /** Retained surfaces and allocation peaks stay charged to the shared hard GPU budget. */
   projectedBytes(width: number, height: number, effects: readonly Effect[]): number {
     const enabled = effects.filter(
       (effect) => effect.enabled && getEffectDefinition(effect.type).source !== "geometry",
     );
-    const stages = enabled.reduce((sum, effect) => sum + effectStages(effect).length, 0);
-    if (stages) assertTextureSize(width, height, gpuTextureLimit(this.renderer));
-    const scratch =
-      stages > 1
-        ? width * height * 4
-        : this.scratch
-          ? this.scratch.width * this.scratch.height * 4
-          : 0;
-    const backdrop = enabled.some((effect) => effectStages(effect).length > 1)
-      ? width * height * 4
-      : this.backdrop
-        ? this.backdrop.width * this.backdrop.height * 4
-        : 0;
+    const stages = enabled.map((effect) => effectStages(effect));
+    const total = stages.reduce((sum, block) => sum + block.length, 0);
+    if (total) assertTextureSize(width, height, gpuTextureLimit(this.renderer));
+    const count =
+      Number(total > 1) + Number(stages.some((block, index) => index > 0 && block.length > 1));
     const glyphs = enabled
       .filter(
         (effect) =>
@@ -215,31 +227,7 @@ export class GpuEffects {
             resolveGradientSettings(effect.settings).treatment === "ascii"),
       )
       .map((effect) => this.characters(effect));
-    return scratch + backdrop + this.atlases.projectedBytes(glyphs);
-  }
-  private getBackdrop(width: number, height: number): RenderTarget {
-    this.backdrop ??= new RenderTarget(width, height, {
-      depthBuffer: false,
-      type: UnsignedByteType,
-      minFilter: NearestFilter,
-      magFilter: NearestFilter,
-    });
-    this.backdrop.texture.colorSpace = NoColorSpace;
-    this.backdrop.setSize(width, height);
-    return this.backdrop;
-  }
-  private getScratch(width: number, height: number): RenderTarget {
-    if (!this.scratch) {
-      this.scratch = new RenderTarget(width, height, {
-        depthBuffer: false,
-        type: UnsignedByteType,
-        minFilter: NearestFilter,
-        magFilter: NearestFilter,
-      });
-      this.scratch.texture.colorSpace = NoColorSpace;
-    }
-    this.scratch.setSize(width, height);
-    return this.scratch;
+    return this.surfaces.projectedBytes(width, height, count) + this.atlases.projectedBytes(glyphs);
   }
 
   /**
@@ -275,7 +263,14 @@ export class GpuEffects {
     output.setSize(width, height);
     const blocks = enabled.map((effect) => ({ effect, stages: effectStages(effect) }));
     const total = blocks.reduce((sum, block) => sum + block.stages.length, 0);
-    const scratch = total > 1 ? this.getScratch(width, height) : null;
+    const needsBackdrop = blocks.some((block, index) => index > 0 && block.stages.length > 1);
+    const surfaces = this.surfaces.acquire(
+      width,
+      height,
+      Number(total > 1) + Number(needsBackdrop),
+    );
+    const scratch = surfaces[0];
+    const backdrop = surfaces[1];
     const previous = this.renderer.getRenderTarget();
     let input = source,
       index = 0;
@@ -283,7 +278,6 @@ export class GpuEffects {
       for (const block of blocks) {
         let original = input;
         if (block.stages.length > 1 && input !== source) {
-          const backdrop = this.getBackdrop(width, height);
           const copy: EffectStage = {
             key: "copy",
             builder: ({ source, controls }) => sampleEffect(source, controls, uv()),
@@ -291,9 +285,9 @@ export class GpuEffects {
           };
           this.draw(
             this.getPass(block.effect, copy, input, input, width, height, logical),
-            backdrop,
+            backdrop!,
           );
-          original = backdrop.texture;
+          original = backdrop!.texture;
         }
         for (const stage of block.stages) {
           const target = (total - index++) % 2 === 1 ? output : scratch!;
@@ -313,21 +307,15 @@ export class GpuEffects {
   stats(): GpuEffectStats {
     return {
       passes: this.renderedPasses,
-      targets: Number(Boolean(this.scratch)) + Number(Boolean(this.backdrop)),
-      bytes:
-        (this.scratch ? this.scratch.width * this.scratch.height * 4 : 0) +
-        this.atlases.bytes() +
-        (this.backdrop ? this.backdrop.width * this.backdrop.height * 4 : 0),
+      targets: this.surfaces.targets,
+      bytes: this.surfaces.bytes + this.atlases.bytes(),
       materials: this.passes.size,
     };
   }
   dispose(): void {
     if (this.disposed) return;
     this.disposed = true;
-    this.backdrop?.dispose();
-    this.backdrop = null;
-    this.scratch?.dispose();
-    this.scratch = null;
+    this.surfaces.dispose();
     this.atlases.dispose();
     for (const pass of this.passes.values()) pass.material.dispose();
     this.passes.clear();

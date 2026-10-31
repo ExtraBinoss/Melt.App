@@ -1,3 +1,4 @@
+import { pruneSceneMotionProperties } from "../motion/scene/structure";
 import { arrangeArtboards } from "./workspace";
 import { ensure } from "../errors";
 import { createPage } from "../document/factories";
@@ -32,6 +33,7 @@ export const updatePage: CommandHandler<"updatePage"> = ({ project, page, pageId
     command.targetId === undefined ? page : project.pages.find((p) => p.id === command.targetId);
   ensure(target, "NOT_FOUND", "NOT_FOUND");
   Object.assign(target, command.patch);
+  if (Object.hasOwn(command.patch, "spatial")) pruneSceneMotionProperties(target);
   return { pageId };
 };
 export const deletePage: CommandHandler<"deletePage"> = ({ project, pageId }, command) => {

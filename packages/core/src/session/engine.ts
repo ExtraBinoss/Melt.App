@@ -2,7 +2,7 @@ import { committedLayerFields } from "./commit-info";
 import { applyCommand, currentPage } from "./commands";
 import { EngineError, ensure } from "../errors";
 import { createProject } from "../document/factories";
-import { reserveProjectIds } from "../document/identity";
+import { collectProjectIds, reserveProjectIds } from "../document/identity";
 import type { Command, EnginePort, Project, SessionSnapshot } from "../document/model";
 import { validateProject } from "../document/validation";
 import { cloneValue as clone, freezeValue as freeze } from "../document/immutable";
@@ -10,6 +10,8 @@ import { markPublishedProject } from "../document/published";
 import type { CommandCommit, CommandCommitInfo } from "../animation/model";
 import { createLayerGeometryIndex } from "../layers/geometry-index";
 import { createCommandDraft } from "./drafts";
+import { commandMutationScope } from "./scopes";
+import { validateLocalProject } from "../document/local-validation";
 import type { PreparedEngineTransaction } from "./reservation";
 
 function collectExplicitIds(value: unknown, occupied: Set<string>): void {
@@ -51,6 +53,7 @@ export class EditorEngine implements EnginePort {
   private historyLimit: number;
   private now: (() => string) | undefined;
   private reservation: symbol | null = null;
+  private readonly identityIndexes = new WeakMap<Project, ReadonlySet<string>>();
 
   private assertUnlocked(): void {
     ensure(this.reservation === null, "BUSY", "Document is busy committing a prepared change.");
@@ -105,7 +108,9 @@ export class EditorEngine implements EnginePort {
       "Historique limité entre 1 et 100",
     );
     this.now = options.now;
-    reserveProjectIds(copy);
+    const ids = collectProjectIds(copy);
+    this.identityIndexes.set(copy, ids);
+    reserveProjectIds(copy, ids);
     this.snapshot = freeze({
       project: copy,
       pageId: copy.pages[0]!.id,
@@ -258,26 +263,12 @@ export class EditorEngine implements EnginePort {
     let selectionChanged = false;
     let sequence = this.sequence;
     let detailedCommands: readonly Command[] | undefined;
-    const occupied = new Set<string>([before.project.id, ...Object.keys(before.project.assets)]);
-    for (const page of before.project.pages) {
-      occupied.add(page.id);
-      for (const track of page.motion?.audioTracks ?? []) occupied.add(track.id);
-      for (const track of page.motion?.tracks ?? []) {
-        occupied.add(track.id);
-        for (const animation of track.animations ?? []) occupied.add(animation.id);
-        for (const property of track.properties) {
-          occupied.add(property.id);
-          for (const key of property.keyframes) occupied.add(key.id);
-        }
-      }
-      for (const layer of page.layers) {
-        occupied.add(layer.id);
-        for (const effect of layer.effects) occupied.add(effect.id);
-        for (const guide of layer.guides ?? []) occupied.add(guide.id);
-      }
-      for (const guide of page.guides) occupied.add(guide.id);
-    }
+    let committedCommands: readonly Command[] = commands;
+    let occupied: Set<string> | undefined;
+    let identities: ReadonlySet<string> | undefined;
+    let local = false;
     const nextId = (prefix: string): string => {
+      ensure(occupied, "INVALID_COMMAND", "Local commands cannot allocate identities");
       let id: string;
       do {
         sequence += 1;
@@ -287,12 +278,21 @@ export class EditorEngine implements EnginePort {
       return id;
     };
     try {
-      project = createCommandDraft(before.project, before.pageId, commands);
-      // Reserve explicit IDs from the entire batch before generating any IDs.
-      collectExplicitIds(commands, occupied);
+      // Own the command data before deriving a validation scope. Caller getters/mutations
+      // cannot change a certified scalar plan into an unvalidated structural mutation.
       if (captureCommands) detailedCommands = freeze(clone(commands));
-      for (const command of clone(commands)) {
-        const result = applyCommand(project, pageId, command, nextId, before.revision);
+      const ownedCommands = clone(commands);
+      committedCommands = ownedCommands;
+      const scope = commandMutationScope(before.project, before.pageId, ownedCommands);
+      local = scope.kind === "local";
+      project = createCommandDraft(before.project, before.pageId, ownedCommands, scope);
+      if (!local) {
+        occupied = new Set(this.identityIndexes.get(before.project)!);
+        // Reserve explicit IDs from the entire batch before generating any IDs.
+        collectExplicitIds(ownedCommands, occupied);
+      }
+      for (const command of ownedCommands) {
+        const result = applyCommand(project, pageId, command, nextId, before.revision, scope.kind);
         pageId = result.pageId;
         if (result.selection) {
           selection = result.selection;
@@ -300,7 +300,13 @@ export class EditorEngine implements EnginePort {
         }
       }
       if (this.now) project.updatedAt = this.now();
-      validateProject(project);
+      if (scope.kind === "local") {
+        validateLocalProject(before.project, project, scope);
+        identities = this.identityIndexes.get(before.project)!;
+      } else {
+        validateProject(project);
+        identities = collectProjectIds(project);
+      }
     } catch (error) {
       if (error instanceof EngineError) throw error;
       throw new EngineError(
@@ -309,9 +315,9 @@ export class EditorEngine implements EnginePort {
       );
     }
     const page = currentPage(project, pageId);
-    const remainingIds = new Set(page.layers.map((layer) => layer.id));
+    const remainingIds = local ? undefined : new Set(page.layers.map((layer) => layer.id));
     // Preserve presentation identity unless a command actually removed a selected layer.
-    if (selection.some((id) => !remainingIds.has(id)))
+    if (remainingIds && selection.some((id) => !remainingIds.has(id)))
       selection = selection.filter((id) => remainingIds.has(id));
     return this.prepared(
       before,
@@ -321,10 +327,12 @@ export class EditorEngine implements EnginePort {
         if (this.past.length > this.historyLimit) this.past.shift();
         this.future = [];
         this.sequence = sequence;
-        reserveProjectIds(project);
+        this.identityIndexes.set(project, identities!);
+        // Scalar transactions preserve the complete durable identity index.
+        if (!local) reserveProjectIds(project, identities!);
         // Reservations permit selection changes; an explicit handler result still takes priority.
         let committedSelection = selectionChanged ? selection : this.snapshot.selection;
-        if (committedSelection.some((id) => !remainingIds.has(id)))
+        if (remainingIds && committedSelection.some((id) => !remainingIds.has(id)))
           committedSelection = committedSelection.filter((id) => remainingIds.has(id));
         this.publish(
           {
@@ -336,7 +344,7 @@ export class EditorEngine implements EnginePort {
             canRedo: false,
           },
           "commit",
-          detailedCommands ?? commands,
+          detailedCommands ?? committedCommands,
           this.commandListeners.size ? detailedCommands : undefined,
         );
       },
@@ -377,7 +385,9 @@ export class EditorEngine implements EnginePort {
     this.assertUnlocked();
     const copy = clone(project);
     validateProject(copy);
-    reserveProjectIds(copy);
+    const ids = collectProjectIds(copy);
+    this.identityIndexes.set(copy, ids);
+    reserveProjectIds(copy, ids);
     this.past = [];
     this.future = [];
     this.sequence = 0;

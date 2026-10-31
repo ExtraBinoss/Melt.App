@@ -7,6 +7,7 @@ export function reflectionSignature(
   sources: ReflectionSource[],
   environment: unknown,
   lights: unknown,
+  probes: CaptureMesh[] = [],
 ) {
   const rounded = (values: number[]) => values.map((value) => Math.round(value * 1e8) / 1e8);
   const appearance = (material: Material) => {
@@ -34,6 +35,8 @@ export function reflectionSignature(
   return JSON.stringify([
     environment,
     lights,
+    // An omitted receiver can still place a probe; moving it changes capture inputs.
+    probes.map((probe) => [probe.key, rounded(probe.center.toArray())]),
     sources.map(({ layer }) => [
       layer.id,
       layer.fill,

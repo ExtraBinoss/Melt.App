@@ -1,6 +1,7 @@
 import { expect, it } from "vitest";
 import { createLayer, createPage } from "../../../src/document/factories";
 import { collectSnapTargets } from "../../../src/layout/snapping/targets";
+import { getWorldBounds } from "../../../src/layers/geometry";
 it("indexes artboard/margin/manual anchors and visible locked layers, excluding moving or hidden subtrees", () => {
   const group = createLayer("group", { id: "moving" }),
     child = createLayer("rectangle", { id: "moving-child", parentId: group.id });
@@ -77,4 +78,30 @@ it("uses transformed groups and layer guides in world coordinates without treati
   expect(
     targets.filter((t) => t.id === "child" && t.axis === "x").map((t) => Math.round(t.value)),
   ).toEqual([140, 160, 180]);
+});
+
+it("uses scaled and affine root bounds for snapping after a hierarchy change", () => {
+  for (const patch of [{ scaleX: 2, scaleY: 0.5 }, { affine: [-2, 0, 0.5, 1] as const }]) {
+    const layer = createLayer("rectangle", {
+      id: "root",
+      x: 100,
+      y: 80,
+      width: 100,
+      height: 80,
+      ...patch,
+    });
+    const page = createPage({ layers: [layer] }),
+      bounds = getWorldBounds(page, layer.id);
+    const targets = collectSnapTargets(page, new Set()).filter((target) => target.id === layer.id);
+    expect(targets.filter((target) => target.axis === "x").map((target) => target.value)).toEqual([
+      bounds.x,
+      bounds.x + bounds.width / 2,
+      bounds.x + bounds.width,
+    ]);
+    expect(targets.filter((target) => target.axis === "y").map((target) => target.value)).toEqual([
+      bounds.y,
+      bounds.y + bounds.height / 2,
+      bounds.y + bounds.height,
+    ]);
+  }
 });

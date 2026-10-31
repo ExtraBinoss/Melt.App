@@ -19,6 +19,7 @@ import type { SpatialScene } from "@musart/core";
 import { compileGpuScene } from "../../compositing/compile";
 import type { CaptureMesh } from "./meshes";
 import { copySpatialMaterial } from "../material-copy";
+import { createSampledLight, registerSampledLights } from "../scene/SampledLights";
 interface Proxy {
   source: Mesh;
   mesh: Mesh;
@@ -124,12 +125,19 @@ export class CaptureScene {
         light instanceof SpotLight ||
         light instanceof PointLight
       )
-        light.shadow.dispose();
+        light.dispose();
     }
     this.lights = [];
     for (const node of original.children)
       if (node instanceof Light) {
-        const light = node.clone();
+        const light =
+          node instanceof DirectionalLight
+            ? createSampledLight("directional").copy(node)
+            : node instanceof PointLight
+              ? createSampledLight("point").copy(node)
+              : node instanceof SpotLight
+                ? createSampledLight("spot").copy(node)
+                : node.clone();
         light.castShadow = false;
         this.scene.add(light);
         this.lights.push(light);
@@ -139,6 +147,7 @@ export class CaptureScene {
     this.lightKey = key;
   }
   async prepare(renderer: WebGPURenderer, canContinue: () => boolean) {
+    registerSampledLights(renderer);
     const key = JSON.stringify([
       Boolean(this.scene.environment),
       this.lights.map((light) => light.type),
@@ -190,7 +199,7 @@ export class CaptureScene {
         light instanceof SpotLight ||
         light instanceof PointLight
       )
-        light.shadow.dispose();
+        light.dispose();
     this.proxies.clear();
     this.lights = [];
     this.lightKey = "";

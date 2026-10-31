@@ -1,5 +1,5 @@
 import { ensure } from "../../errors";
-import type { MotionPropertyDescriptor, MotionPropertySchema, MotionValue } from "./model";
+import type { MotionPropertySchema, MotionValue } from "./model";
 
 const paintColor = /^(?:#[\da-f]{3,4}|#[\da-f]{6}|#[\da-f]{8}|transparent)$/i;
 const effectColor = /^#[\da-f]{6}$/i;
@@ -38,7 +38,7 @@ export function isValidMotionValue(
 }
 
 export function validateMotionValue(
-  descriptor: MotionPropertyDescriptor,
+  descriptor: MotionPropertySchema,
   value: unknown,
 ): asserts value is MotionValue {
   ensure(isValidMotionValue(descriptor, value), "INVALID_COMMAND", "Invalid animation value.");

@@ -1,3 +1,4 @@
+import type { PropertyCapabilities } from "../../spatial/properties";
 import type { SpatialMotionProperty } from "../../spatial/motion";
 /** Serializable animation values; structural document edits are not keyframe values. */
 export type MotionValue = number | string | boolean;
@@ -57,7 +58,7 @@ export type MotionPropertyTarget =
     };
 
 /** Metadata only: no closures, clocks, browser handles or mutable document references. */
-interface MotionPropertyBase {
+interface MotionPropertyBase extends PropertyCapabilities {
   readonly target: MotionPropertyTarget;
   readonly interpolation: "continuous" | "hold";
 }
@@ -86,7 +87,9 @@ export type MotionPropertyDescriptor = MotionPropertyBase &
       }
   );
 
-type WithoutCurrentValue<T> = T extends unknown ? Omit<T, "value" | "target"> : never;
+type WithoutCurrentValue<T> = T extends unknown
+  ? Omit<T, "value" | "target" | "animatable" | "dependencies">
+  : never;
 export type MotionPropertySchema = WithoutCurrentValue<MotionPropertyDescriptor>;
 
 export interface EffectMotionCapability {
