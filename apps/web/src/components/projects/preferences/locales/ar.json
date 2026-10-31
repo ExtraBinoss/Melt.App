@@ -1,4 +1,9 @@
 {
   "showCanvasZoom": "إظهار عناصر تكبير اللوحة",
-  "showCanvasZoomDescription": "عرض أزرار التكبير ونسبته على اللوحة."
+  "showCanvasZoomDescription": "عرض أزرار التكبير ونسبته على اللوحة.",
+  "marqueeContain": "اشتراط إحاطة الطبقات بالكامل",
+  "marqueeContainDescription": "افتراضياً، يكفي أن يلامس مستطيل التحديد الطبقة لتحديدها. فعّل هذا الخيار لتحديد الطبقات الموجودة بالكامل داخل المستطيل فقط.",
+  "marqueeExample": "أمثلة على مستطيل التحديد",
+  "marqueeTouch": "الملامسة تكفي",
+  "marqueeEnclose": "الموجودة بالكامل فقط"
 }

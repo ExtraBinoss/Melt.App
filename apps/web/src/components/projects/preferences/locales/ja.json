@@ -1,4 +1,9 @@
 {
   "showCanvasZoom": "キャンバスのズーム操作を表示",
-  "showCanvasZoomDescription": "キャンバスにズームボタンと倍率を表示します。"
+  "showCanvasZoomDescription": "キャンバスにズームボタンと倍率を表示します。",
+  "marqueeContain": "レイヤー全体を囲んで選択",
+  "marqueeContainDescription": "通常はレイヤーに触れるだけで選択できます。有効にすると、選択範囲に完全に含まれるレイヤーのみ選択します。",
+  "marqueeExample": "選択範囲の例",
+  "marqueeTouch": "触れるだけで選択",
+  "marqueeEnclose": "全体が範囲内のみ"
 }

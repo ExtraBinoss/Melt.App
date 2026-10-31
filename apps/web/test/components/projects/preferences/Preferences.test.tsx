@@ -100,3 +100,25 @@ test("canvas zoom UI is opt-in and persists without changing the document", () =
   expect(d.engine.getSnapshot()).toBe(before);
   fireEvent.click(control);
 });
+
+test("full enclosure is opt-in, persisted locally, and illustrated beside touching selection", () => {
+  const d = setup(),
+    before = d.engine.getSnapshot();
+  d.mount(<Preferences initialSection="editor" />);
+  const control = screen.getByRole("switch", { name: "Englober entièrement les calques" });
+  expect(control).not.toBeChecked();
+  expect(screen.getByRole("group", { name: "Exemples de rectangle de sélection" })).toBeVisible();
+  expect(screen.getByText("Toucher suffit").closest("figure")).toHaveAttribute(
+    "data-active",
+    "true",
+  );
+  fireEvent.click(control);
+  expect(control).toBeChecked();
+  expect(localStorage.getItem("musart.marquee-contain.v1")).toBe("true");
+  expect(screen.getByText("Entièrement à l’intérieur").closest("figure")).toHaveAttribute(
+    "data-active",
+    "true",
+  );
+  expect(d.engine.getSnapshot()).toBe(before);
+  fireEvent.click(control);
+});

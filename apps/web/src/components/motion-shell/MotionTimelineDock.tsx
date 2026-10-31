@@ -1,18 +1,19 @@
 import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useAtom, useStore } from "jotai";
-import { AnimatePresence, motion, useIsPresent, animate, useReducedMotion } from "motion/react";
+import { animate as animateFallback, useReducedMotion } from "motion/react";
+import { animate } from "motion/mini";
+import { spring } from "motion";
 import type { EnginePort, SessionSnapshot } from "@musart/core";
 import { timelineOpenAtom } from "../../state/motion/timeline-state";
 import { useDocumentSnapshot } from "../../state/session/use-document-snapshot";
 import { createMotionTransport } from "../../services/motion/transport";
 import { TimelinePanel } from "../motion/TimelinePanel";
 import type { TimelineTransport } from "../motion/model";
+import { captureDockLayout } from "./layout-reservation";
+import { useDockPresence } from "./use-dock-presence";
 import { DockViewportReservation } from "./DockViewportReservation";
 import { observeDockInteraction } from "./dock-interaction";
-import {
-  createViewportResizeAnchor,
-  type ViewportResizeLease,
-} from "../../canvas/session/viewport-resize";
+import { type ViewportResizeLease } from "../../canvas/session/viewport-resize";
 import { presentationSpring } from "../shared/motion/presentation-spring";
 import { useAnimationPresentation } from "../motion/animations/presentation";
 import "./motion-shell.css";
@@ -35,7 +36,6 @@ export const MotionTimelineDock = memo(function MotionTimelineDock({
   engine: EnginePort;
 }) {
   const { details } = useAnimationPresentation(engine);
-  const reduced = Boolean(useReducedMotion());
   const snapshot = useDocumentSnapshot(engine, details);
   const transport = useMemo(() => createMotionTransport(engine), [engine]);
   const [choices, setChoices] = useState<ReadonlyMap<string, boolean>>(() => new Map());
@@ -54,14 +54,23 @@ export const MotionTimelineDock = memo(function MotionTimelineDock({
   useEffect(() => {
     if (mode !== "motion") transport.pause();
   }, [mode, transport]);
+  // Retain the last Motion surface while Static is active: its controls need not remount.
+  const [retained, setRetained] = useState<SessionSnapshot | null>(null);
+  const reusable =
+    retained?.project === snapshot.project &&
+    snapshot.project.pages.some((page) => page.id === retained.pageId);
+  const shown = mode === "motion" ? snapshot : reusable ? retained : null;
+  if (mode === "motion" && retained !== snapshot) setRetained(snapshot);
+  else if (retained && !reusable) setRetained(null);
   const content =
-    mode === "motion" ? (
+    shown?.project.id === snapshot.project.id ? (
       <DockSurface
-        key={scope}
-        scope={scope}
+        key={JSON.stringify([shown.project.id, shown.pageId])}
+        scope={JSON.stringify([shown.project.id, shown.pageId])}
         engine={engine}
-        snapshot={snapshot}
+        snapshot={shown}
         transport={transport}
+        visible={mode === "motion"}
         initialPinned={choices.get(scope) ?? false}
         pinRequest={observed.scope === scope ? observed.pin : 0}
         remember={remember}
@@ -72,8 +81,9 @@ export const MotionTimelineDock = memo(function MotionTimelineDock({
       engine={engine}
       projectId={snapshot.project.id}
       layoutKey={JSON.stringify([scope, mode])}
+      reserved={mode === "motion" && (choices.get(scope) ?? false)}
     >
-      {reduced ? content : <AnimatePresence initial={false}>{content}</AnimatePresence>}
+      {content}
     </DockViewportReservation>
   );
 });
@@ -84,6 +94,7 @@ function DockSurface({
   transport,
   scope,
   initialPinned,
+  visible,
   pinRequest,
   remember,
 }: {
@@ -92,11 +103,11 @@ function DockSurface({
   transport: TimelineTransport;
   scope: string;
   initialPinned: boolean;
+  visible: boolean;
   pinRequest: number;
   remember: (scope: string, pinned: boolean) => void;
 }) {
   const [open, setOpen] = useAtom(timelineOpenAtom);
-  const resizeAnchor = useMemo(() => createViewportResizeAnchor(engine), [engine]);
   const store = useStore();
   const [pinned, setPinned] = useState(initialPinned || pinRequest > 0);
   const [seenPinRequest, setSeenPinRequest] = useState(pinRequest);
@@ -104,19 +115,34 @@ function DockSurface({
     setSeenPinRequest(pinRequest);
     if (pinRequest > seenPinRequest) setPinned(true);
   }
-  const present = useIsPresent();
+  const present = visible;
   const [initialExpansion] = useState(initialPinned || pinRequest > 0);
-  const expanded = pinned || open;
+  const expanded = visible && (pinned || open);
   const reduced = Boolean(useReducedMotion());
-  const surface = useRef<HTMLDivElement>(null),
-    slot = useRef<HTMLDivElement>(null);
+  const surface = useRef<HTMLDivElement>(null);
+  const slot = useRef<HTMLDivElement>(null);
+  const presenceRef = useDockPresence(present, reduced);
+  const attach = useCallback(
+    (node: HTMLDivElement | null) => {
+      slot.current = node;
+      presenceRef(node);
+    },
+    [presenceRef],
+  );
+  const captureResize = useCallback(
+    () => captureDockLayout(engine, slot.current?.closest(".musart-app") ?? null),
+    [engine, slot],
+  );
   const interaction = useRef<ReturnType<typeof observeDockInteraction> | null>(null);
   const latest = useRef({ expanded, pinned });
   const beforeLayout = useRef<{ anchor: ViewportResizeLease; pinned: boolean } | null>(null);
   const idleFrame = useRef<number | null>(null);
+  const measuredHeight = useRef(0);
+  const heightAnchor = useRef<ViewportResizeLease | null>(null);
   useEffect(
     () => () => {
       beforeLayout.current?.anchor.cancel();
+      heightAnchor.current?.cancel();
     },
     [],
   );
@@ -137,8 +163,8 @@ function DockSurface({
     };
   }, []);
   useLayoutEffect(() => {
-    latest.current = { expanded, pinned };
-  }, [expanded, pinned]);
+    latest.current = { expanded, pinned: visible && pinned };
+  }, [expanded, pinned, visible]);
   // This publishes presentation intent to the external store, without a React state cascade.
   useLayoutEffect(() => {
     setOpen(initialExpansion);
@@ -148,11 +174,20 @@ function DockSurface({
     const panel = surface.current?.querySelector<HTMLElement>(".motion-timeline");
     if (panel && slot.current) {
       const height = panel.getBoundingClientRect().height;
-      slot.current.style.setProperty("--motion-panel-height", `${height}px`);
-      if (!latest.current.expanded && surface.current)
+      if (height !== measuredHeight.current) {
+        const anchor = initialized.current && latest.current.pinned ? captureResize() : null;
+        measuredHeight.current = height;
+        slot.current.style.setProperty("--motion-panel-height", `${height}px`);
+        if (anchor) {
+          heightAnchor.current?.cancel();
+          heightAnchor.current = anchor;
+          anchor.apply();
+        }
+      }
+      if (!transitions.current && !latest.current.expanded && surface.current)
         surface.current.style.transform = `translateY(${Math.max(0, height - 32)}px)`;
     }
-  }, []);
+  }, [captureResize]);
   useLayoutEffect(() => {
     const root = slot.current,
       panel = surface.current?.querySelector<HTMLElement>(".motion-timeline");
@@ -204,18 +239,23 @@ function DockSurface({
     const finishTransition = beginTransition();
     // Hide the grip before revealing the moving body, including interrupted reentries.
     root.dataset.motionBodyHidden = String(first && !expanded);
-    const animation = animate(
-      node,
-      { transform: target, opacity: expanded ? 1 : 0.98 },
-      presentationSpring,
-    );
-    void animation.then(() => {
-      finishTransition();
-      if (!cancelled && !expanded) root.dataset.motionBodyHidden = "true";
+    let stop = () => {};
+    const frame = requestAnimationFrame(() => {
+      const values = { transform: target, opacity: expanded ? 1 : 0.98 };
+      const animation =
+        typeof node.animate === "function"
+          ? animate(node, values, { ...presentationSpring, type: spring })
+          : animateFallback(node, values, presentationSpring);
+      stop = () => animation.stop();
+      void animation.then(() => {
+        finishTransition();
+        if (!cancelled && !expanded) root.dataset.motionBodyHidden = "true";
+      });
     });
     return () => {
       cancelled = true;
-      animation.stop();
+      cancelAnimationFrame(frame);
+      stop();
       finishTransition();
     };
   }, [beginTransition, expanded, reduced]);
@@ -236,10 +276,10 @@ function DockSurface({
     (nextPinned: boolean) => {
       measure();
       beforeLayout.current?.anchor.cancel();
-      const anchor = resizeAnchor.capture();
+      const anchor = captureResize();
       beforeLayout.current = anchor ? { anchor, pinned: nextPinned } : null;
     },
-    [measure, resizeAnchor],
+    [measure, captureResize],
   );
   const pin = useCallback(() => {
     const nextPinned = !latest.current.pinned;
@@ -268,15 +308,13 @@ function DockSurface({
     [close, store],
   );
   return (
-    <motion.div
-      ref={slot}
+    <div
+      ref={attach}
       className="motion-timeline-dock"
       data-motion-exiting={String(!present)}
       inert={!present || undefined}
-      initial={false}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: 32 }}
-      transition={{ duration: reduced ? 0 : 0.16 }}
+      style={{ opacity: 0, transform: "translateY(32px)" }}
+      aria-hidden={!present || undefined}
       data-motion-presence={expanded ? "present" : "peek"}
       data-motion-expanded={String(expanded)}
       data-motion-pinned={String(pinned)}
@@ -303,6 +341,6 @@ function DockSurface({
           />
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }

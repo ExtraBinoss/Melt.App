@@ -10,6 +10,7 @@ import { zoomControlsAtom } from "../../../state/viewport/preferences";
 import { clipboardAtom } from "../../../state/clipboard/preferences";
 import { SegmentedTabs } from "../../shared/segmented/SegmentedTabs";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "../../ui/tabs";
+import { MarqueePreference } from "./MarqueePreference";
 import { Switch } from "../../ui/switch";
 import { SelectField } from "../../shared/SelectField";
 import { NumberInput } from "../../shared/NumberInput";
@@ -144,6 +145,7 @@ export function Preferences({
           <ShortcutSettings />
         </Panel>
         <Panel section="editor">
+          <MarqueePreference />
           <div className="preferences-card">
             <label className="preferences-setting-row">
               <span>

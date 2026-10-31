@@ -1,0 +1,49 @@
+.marquee-examples {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding: 0 14px 14px;
+}
+.marquee-examples figure {
+  margin: 0;
+  padding: 6px 10px 9px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--background);
+}
+.marquee-examples figure[data-active="true"] {
+  border-color: color-mix(in srgb, var(--primary) 55%, var(--border));
+  background: color-mix(in srgb, var(--primary) 4%, var(--background));
+}
+.marquee-examples svg {
+  display: block;
+  width: 100%;
+  height: 78px;
+}
+.marquee-examples figcaption {
+  font-size: 11px;
+  text-align: center;
+  color: var(--muted-foreground);
+}
+.marquee-examples figure[data-active="true"] figcaption {
+  color: var(--foreground);
+}
+.marquee-example-region {
+  fill: color-mix(in srgb, var(--primary) 8%, transparent);
+}
+.marquee-example-outline {
+  fill: none;
+  stroke: var(--primary);
+  stroke-width: 1.5;
+  stroke-dasharray: 3 3;
+}
+.marquee-example-layer {
+  fill: var(--muted);
+  stroke: var(--muted-foreground);
+  stroke-width: 1;
+}
+.marquee-example-layer[data-selected="true"] {
+  fill: color-mix(in srgb, var(--primary) 24%, var(--background));
+  stroke: var(--primary);
+  stroke-width: 1.5;
+}

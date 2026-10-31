@@ -21,3 +21,8 @@ export function isPublishedComposition(page: Composition): boolean {
 export function isPublishedAssets(collection: Project["assets"]): boolean {
   return assets.has(collection);
 }
+
+/** Internal: validated Motion value application preserves an engine page's immutable contract. */
+export function markMotionComposition(base: Composition, frame: Composition): void {
+  if (compositions.has(base)) compositions.add(frame);
+}

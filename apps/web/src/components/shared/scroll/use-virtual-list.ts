@@ -56,7 +56,7 @@ export function useVirtualList(
           observer.disconnect();
         },
       };
-      measure();
+      // Initial observer delivery supplies the real size after the browser lays out.
     },
     [publish, synchronousScroll],
   );

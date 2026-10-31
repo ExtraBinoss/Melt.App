@@ -1,4 +1,5 @@
 import type { Composition } from "../document/model";
+import { markMotionComposition } from "../document/published";
 import { freezeValue } from "../document/immutable";
 import { ensure } from "../errors";
 import type { MotionProgram } from "./compile";
@@ -31,5 +32,8 @@ export function applyMotionFrame(program: MotionProgram, plan: MotionFramePlan):
     if (layer !== original) changed = true;
     return layer;
   });
-  return changed ? freezeValue({ ...base, layers }) : base;
+  if (!changed) return base;
+  const frame = freezeValue({ ...base, layers });
+  markMotionComposition(base, frame);
+  return frame;
 }

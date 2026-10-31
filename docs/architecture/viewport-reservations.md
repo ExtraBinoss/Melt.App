@@ -46,13 +46,32 @@ establish visual continuity.
 A persistent `DockViewportReservation` captures the old viewport during React's
 pre-mutation snapshot lifecycle when the composition scope or mode changes. It
 applies the lease after descendant layout effects have measured the final slot.
-This covers the 32-pixel peek, restored pinned heights and disappearance, without
-animating flex height or scaling the workspace. The body slides in independently;
-an outgoing inert dock leaves layout immediately and fades/slides over the app
-until Motion releases it. Reduced motion removes that visual transition.
+The 32-pixel peek overlays the workspace and reserves no height, so it cannot
+resize the canvas, toolbar or sidebar. Switching between unpinned compositions
+also skips viewport/panel reservation geometry reads entirely. Restored pinned heights and disappearance
+reserve their final layout once, without animating flex height or scaling artwork. The body slides in independently;
+the most recent Motion dock leaves layout immediately, becomes inert and
+aria-hidden, and fades/slides over the app. Its controls remain mounted while a
+Static composition is active, so returning to that Motion composition reuses
+them. Only one composition scope is retained; switching to another Motion scope
+or project releases its observers and gesture state. Reduced motion removes the
+visual transition.
 
 Applying a resize lease uses the currently rebased view, composing its viewport
 center delta with a structural artboard-origin change in the same commit. The
 registered adapter remains stable across layout keys; canonical scope checks and
 native input still retire stale corrections. Initial project opening keeps its
 normal Fit behavior.
+
+The panel ResizeObserver does not write a peek transform while a slide owns that
+transform. It publishes a height only when the measured value changes; later
+pinned-height changes capture/apply their own viewport lease. Hidden ruler
+subscriptions are suspended. Shared segmented indicators and virtual lists use
+initial ResizeObserver delivery rather than synchronously forcing layout during
+mount, keeping geometry reads out of repeated control layout effects.
+
+For pinned reservations, sidebar panels, their separator and the toolbar retain
+their old screen positions through a local native translation animation. Geometry
+reads precede animation writes; interruption and unmount cancel the owned lease.
+The timeline starts its native body slide after the mounting commit, keeping a
+long mount from consuming its entrance before the first paint opportunity.

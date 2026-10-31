@@ -1,3 +1,6 @@
+import { EditorEngine } from "../../src/session/engine";
+import { isPublishedComposition } from "../../src/document/published";
+import { applyMotionFrame } from "../../src/motion/frame";
 import { expect, test, vi } from "vitest";
 import { createLayer, createPage, createProject } from "../../src/document/factories";
 import { compileMotion } from "../../src/motion/compile";
@@ -88,4 +91,34 @@ test("does not reread or clone caller-owned project state during sampling", () =
   Object.defineProperty(project, "pages", { get: read });
   for (let index = 0; index < 100; index++) evaluateMotion(program, { value: index, rate: 100 });
   expect(read).not.toHaveBeenCalled();
+});
+
+test("certified navigation reuses compilation and immutable source geometry; document edits invalidate it", () => {
+  const engine = new EditorEngine(fixture());
+  const project = engine.getSnapshot().project;
+  const program = compileMotion(project, { compositionId: "cover" });
+  expect(program.composition).toBe(project.pages[0]);
+  expect(compileMotion(project, { compositionId: "cover" })).toBe(program);
+  const frame = applyMotionFrame(program, evaluateMotion(program, { value: 1, rate: 2 }));
+  expect(isPublishedComposition(frame)).toBe(true);
+  expect(Object.isFrozen(frame.layers)).toBe(true);
+  engine.execute({ type: "updatePage", patch: { background: "#ff0000" } });
+  const replacement = compileMotion(engine.getSnapshot().project, { compositionId: "cover" });
+  expect(replacement).not.toBe(program);
+  expect(replacement.composition.background).toBe("#ff0000");
+  expect(program.composition.background).toBe(project.pages[0]!.background);
+});
+
+test("trusted compilation retention is bounded and an untrusted frozen object gains no certificate", () => {
+  const engine = new EditorEngine(
+    createProject({ pages: Array.from({ length: 9 }, (_, i) => createPage({ id: `page-${i}` })) }),
+  );
+  const project = engine.getSnapshot().project;
+  const first = compileMotion(project, { compositionId: "page-0" });
+  for (let i = 1; i < 9; i++) compileMotion(project, { compositionId: `page-${i}` });
+  expect(compileMotion(project, { compositionId: "page-0" })).not.toBe(first);
+  const external = Object.freeze(fixture());
+  const untrusted = compileMotion(external, { compositionId: "cover" });
+  expect(untrusted.composition).not.toBe(external.pages[0]);
+  expect(isPublishedComposition(untrusted.composition)).toBe(false);
 });

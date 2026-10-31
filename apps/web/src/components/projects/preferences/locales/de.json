@@ -1,4 +1,9 @@
 {
   "showCanvasZoom": "Zoomsteuerung anzeigen",
-  "showCanvasZoomDescription": "Zoomtasten und Zoomfaktor auf der Zeichenfläche anzeigen."
+  "showCanvasZoomDescription": "Zoomtasten und Zoomfaktor auf der Zeichenfläche anzeigen.",
+  "marqueeContain": "Ebenen vollständig einschließen",
+  "marqueeContainDescription": "Standardmäßig genügt eine Berührung zum Auswählen. Aktivieren, um nur Ebenen vollständig innerhalb des Auswahlrechtecks auszuwählen.",
+  "marqueeExample": "Beispiele für das Auswahlrechteck",
+  "marqueeTouch": "Berührung genügt",
+  "marqueeEnclose": "Nur vollständig enthalten"
 }

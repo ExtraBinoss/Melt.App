@@ -62,3 +62,48 @@ serialized with a one-core CPU quota, bounded memory and no swap.
 ## Detailed timeline
 
 Keyframes mode projects animation channels into property rows alongside ordinary authored tracks. Derived presentation IDs identify the animation, channel and point in the captured revision; they are never serialized as a second set of tracks. Dragging interior points updates normalized channel times. Dragging an endpoint changes the block interval while preserving intermediate absolute times; selecting every point moves the block. Crossings and negative intervals are rejected atomically. Endpoints remain required, so deletion removes intermediate points or complete channels while retaining at least one channel. Easing edits update the original preset channel. Live previews recompile only affected animation samplers, retain canonical documents, and commit once per completed gesture.
+
+## Navigation compilation and presentation retention
+
+`compileMotion` reuses at most eight programs per certified immutable engine
+project, held in a WeakMap. Certified pages share their already validated/frozen
+source graph; external documents still validate and receive a private frozen
+copy on every compilation. Edits create a new project identity, so old programs
+cannot mask changed tracks, originals or document data.
+
+The editor transport retains at most eight sampled poses from that unchanged
+project. Returning to the same composition and rational time reuses the page and
+issued plan; edits, replacement and disposal clear the pose cache. Applying
+validated Motion values to a certified page preserves its internal immutable
+composition certificate. Untrusted external programs do not gain a certificate.
+
+The GPU cache can reuse that exact certified pose through a new media-free plan;
+materialized layer/effect values already contain every visual change. Media
+requests retain their plan-clock invalidation, and video without a plan remains
+ineligible. This avoids recomposition, source uploads and contour preparation on
+warm composition switches without admitting stale video frames.
+
+
+### Manual navigation validation
+
+The production cohort on 2026-10-31 used Headless Chromium 156 on Linux,
+WebGPU with an Intel Xe-LPG adapter, DPR 1, a 1600 × 1000 viewport and a
+one-core CPU quota. The frozen build and source maps are retained under
+`artifacts/switch-selection-cohort`, based on `09da4b0` plus the owned source
+snapshot in `artifacts/composition-performance-source.diff`.
+
+Native input clicks blank artboard paper through canvas picking and artboard
+rows in Layers. Warm returns add no composition passes or uploads. In this
+single cohort, input dispatch to the first observed ready-canvas RAF was
+133.4 ms for paper and 34.2 ms for Layers; these are individual presentation
+opportunities, not INP, physical display latency or a refresh-rate guarantee.
+First-visit preparation is separate. A later 276.6 ms main-thread frame gap
+remained in the warm paper observation window, so this does not establish that
+all background/UI stutter has disappeared. Raw clocks, frames and environment
+are retained under `artifacts/motion-melt-continuity` and
+`artifacts/composition-final-latency.json`.
+
+Focused checks also verify unchanged peek layout, animated pinned panels,
+retained Motion controls and Morph-aware marquee/pointer selection. An existing
+collapsed-group drag-over unit regression fails identically with the baseline
+LayersPanel implementation; it is separate from composition activation.

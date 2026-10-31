@@ -1,4 +1,9 @@
 {
   "showCanvasZoom": "캔버스 확대/축소 컨트롤 표시",
-  "showCanvasZoomDescription": "캔버스에 확대/축소 버튼과 배율을 표시합니다."
+  "showCanvasZoomDescription": "캔버스에 확대/축소 버튼과 배율을 표시합니다.",
+  "marqueeContain": "레이어 전체를 감싸야 선택",
+  "marqueeContainDescription": "기본적으로 레이어에 닿기만 해도 선택됩니다. 켜면 선택 사각형 안에 완전히 들어온 레이어만 선택합니다.",
+  "marqueeExample": "선택 사각형 예시",
+  "marqueeTouch": "닿으면 선택",
+  "marqueeEnclose": "완전히 안에 있어야 선택"
 }

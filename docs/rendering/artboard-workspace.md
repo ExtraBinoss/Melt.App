@@ -182,3 +182,24 @@ opaque heading bars from cutting its border/tint outside the active artboard.
 `canvas-transition-overlays.spec.ts` checks the actual decoded screenshot pixel
 at the heading crossing in a separate inspection page, with zero production
 pixel readbacks.
+
+### Morph source picking
+
+Marquee and pointer selection use authored Morph placement bounds, evaluated with
+the renderer's easing, stagger order and effect amount. Empty text-frame padding
+can start a marquee; enclosing the visible word does not require enclosing its
+full editable frame. The resize frame remains the document's width and height.
+Immutable layer identities cache these source bounds without GPU readbacks.
+Text whose content/font no longer matches an authored source keeps the ordinary
+frame fallback until its generated source geometry has a picking contract.
+
+Live marquee queries the scene controller's displayed composition, retaining its
+canonical gesture-origin checks. Parent transforms and mirrored/nonuniform scales
+apply to ink bounds and pointer picking. Containment, intersection, additive
+selection, locked/hidden ancestors and cancellation keep their existing rules.
+
+Marquee selection touches layers by default. The device-local **Require full
+enclosure** Editor preference is off by default and includes a side-by-side
+illustration of touching versus enclosing. Primary and secondary selection
+rectangles honor it; secondary-click/context-menu ownership is independent of
+that geometric mode. The setting does not change the project or undo history.

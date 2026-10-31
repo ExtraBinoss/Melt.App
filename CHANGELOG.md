@@ -6,6 +6,12 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Keep the collapsed Motion timeline out of workspace layout, skip reservation geometry for unpinned navigation, animate pinned sidebar/toolbar repositioning locally, and start its native slide after the mounting commit. Retain its controls across Static switches, suspend the inactive ruler, and prevent resize observers from snapping active transitions. Let segmented indicators and virtual lists obtain initial geometry after layout.
+
+- Reuse bounded Motion compilations and sampled poses for unchanged certified documents. Share validated immutable source geometry and retain matching GPU frames across navigation, while invalidating on edits, replacement and media-clock changes.
+
+- Select authored Morph lettering using its displayed placement instead of its oversized text frame, and fix pointer picking for mirrored/nonuniformly scaled layers. Default marquee selection to touching layers; add an opt-in full-enclosure Editor preference with comparison illustrations and twelve-locale resources.
+
 - Reduce Shortcuts tab presentation work by reading scroll geometry before shadow writes, confining tab reveals to the viewport and windowing variable-height shortcut rows while preserving keyboard focus; show Canvas navigation before shortcut editing controls.
 - Align the Free Tools video player with its trim fields, hide Keep audio for silent sources, place smoothly expanding Advanced controls after the basic parameters, and add a localized Dither source-color switch shared by previews and image/video exports while preserving existing black-and-white defaults.
 - Paint the Export dialog before admitting GPU preparation, reuse the canvas mascot/shimmer loader across image, Motion and Timelapse previews, and crossfade only after decoded or rendered pixels are ready. Preserve cancellation, stale ownership, errors and reduced-motion behavior. Remove black preview gutters, align the playhead with exact rail endpoints, add editable playback time, shorten volume-menu entrances and explain unavailable audio in twelve locales. Simplify dialog copy, move background help into one info tooltip, reserve footer geometry for progress, hide prior completed jobs on reopening and show approximate video sizes in MB. Preserve playback on untouched time-field focus, remove the hidden clock, yield preview GPU work to UI entrances and maintain Select field widths throughout parent/menu animations.

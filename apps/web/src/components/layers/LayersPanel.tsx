@@ -84,7 +84,7 @@ export const LayersPanel = memo(function LayersPanel({
         {headerActions}
       </PanelHeaderActions>
       <LayerCompositing
-        key={`${project.id}:${page.id}`}
+        key={project.id}
         engine={engine}
         page={page}
         selection={attachment || !selection.length ? EMPTY_SELECTION : selection}

@@ -1,4 +1,9 @@
 {
   "showCanvasZoom": "Mostra controlli di zoom",
-  "showCanvasZoomDescription": "Mostra i pulsanti e la percentuale di zoom sulla tela."
+  "showCanvasZoomDescription": "Mostra i pulsanti e la percentuale di zoom sulla tela.",
+  "marqueeContain": "Racchiudere interamente i livelli",
+  "marqueeContainDescription": "Per impostazione predefinita basta toccare un livello per selezionarlo. Attiva per selezionare solo i livelli interamente nel rettangolo.",
+  "marqueeExample": "Esempi del rettangolo di selezione",
+  "marqueeTouch": "Basta toccare",
+  "marqueeEnclose": "Solo interamente dentro"
 }

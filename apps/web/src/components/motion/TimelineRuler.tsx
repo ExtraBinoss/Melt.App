@@ -62,12 +62,13 @@ export const TimelineRuler = memo(function TimelineRuler({
     [transport],
   );
   useLayoutEffect(() => {
+    if (!active) return;
+    let scrollVersion = 0;
     let lastPaint: { seconds: number; scroll: number } | null = null;
     const sync = () => {
       const state = transport.read();
       const seconds = motionTimeToSeconds(state.time);
-      const scroll =
-        ruler.current?.closest<HTMLElement>(".motion-timeline-scroll")?.scrollLeft ?? 0;
+      const scroll = scrollVersion;
       if (playhead.current)
         playhead.current.dataset.interpolate = String(
           state.playing &&
@@ -93,6 +94,7 @@ export const TimelineRuler = memo(function TimelineRuler({
     const node = ruler.current;
     const viewport = node?.closest(".motion-timeline-scroll");
     const invalidateBounds = () => {
+      scrollVersion++;
       if (playhead.current) playhead.current.dataset.interpolate = "false";
       if (gesture.current) gesture.current.bounds = null;
     };

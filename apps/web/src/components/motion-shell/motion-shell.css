@@ -5,9 +5,9 @@
 .motion-timeline-dock {
   --motion-panel-height: 260px;
   position: relative;
-  flex: 0 0 32px;
-  height: 32px;
-  min-height: 32px;
+  flex: 0 0 0;
+  height: 0;
+  min-height: 0;
   min-width: 0;
   width: 100%;
   z-index: 40;

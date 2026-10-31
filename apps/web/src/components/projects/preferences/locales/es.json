@@ -1,4 +1,9 @@
 {
   "showCanvasZoom": "Mostrar controles de zoom",
-  "showCanvasZoomDescription": "Mostrar los botones y el porcentaje de zoom en el lienzo."
+  "showCanvasZoomDescription": "Mostrar los botones y el porcentaje de zoom en el lienzo.",
+  "marqueeContain": "Incluir las capas por completo",
+  "marqueeContainDescription": "Por defecto, basta con tocar una capa para seleccionarla. Activa esta opción para seleccionar solo las capas completamente dentro del rectángulo.",
+  "marqueeExample": "Ejemplos del rectángulo de selección",
+  "marqueeTouch": "Basta con tocar",
+  "marqueeEnclose": "Solo dentro por completo"
 }

@@ -195,7 +195,13 @@ export class LayerGeometryIndex {
       : null;
   }
   /** Parent-local traversal rejects cheap bounds before allocating any world geometry. */
-  hitTest(point: Point, options: { includeLocked?: boolean } = {}): Layer | null {
+  hitTest(
+    point: Point,
+    options: {
+      includeLocked?: boolean;
+      contentBounds?: (layer: Layer) => Readonly<Bounds> | null;
+    } = {},
+  ): Layer | null {
     const roots = this.children(null);
     const stack: { children: readonly Layer[]; at: number; point: Point; fallback?: Layer }[] = [
       { children: roots, at: roots.length - 1, point },
@@ -216,14 +222,16 @@ export class LayerGeometryIndex {
       )
         continue;
       let local: Point;
-      if (layer.rotation === 0) {
+      if (layer.rotation === 0 && (layer.scaleX ?? 1) === 1 && (layer.scaleY ?? 1) === 1) {
         const x = frame.point.x - layer.x,
           y = frame.point.y - layer.y;
         if (x < 0 || y < 0 || x > layer.width || y > layer.height) continue;
         local = { x, y };
       } else {
         // A conservative square contains every rotation of the local rectangle.
-        const radius = (layer.width + layer.height) / 2;
+        const radius =
+          (layer.width * Math.abs(layer.scaleX ?? 1) + layer.height * Math.abs(layer.scaleY ?? 1)) /
+          2;
         if (
           Math.abs(frame.point.x - layer.x - layer.width / 2) > radius ||
           Math.abs(frame.point.y - layer.y - layer.height / 2) > radius
@@ -237,6 +245,15 @@ export class LayerGeometryIndex {
         local = transformPoint(inverse, frame.point);
         if (local.x < 0 || local.y < 0 || local.x > layer.width || local.y > layer.height) continue;
       }
+      const ink = options.contentBounds?.(layer);
+      if (
+        ink &&
+        (local.x < ink.x ||
+          local.y < ink.y ||
+          local.x > ink.x + ink.width ||
+          local.y > ink.y + ink.height)
+      )
+        continue;
       if (
         layer.kind === "ellipse" &&
         ((local.x - layer.width / 2) / (layer.width / 2)) ** 2 +

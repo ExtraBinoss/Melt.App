@@ -1,6 +1,7 @@
 import type { CompiledAnimationChannel } from "./animations/compile";
 import type { Composition, Project } from "../document/model";
 import { cloneValue, freezeValue } from "../document/immutable";
+import { isPublishedProject } from "../document/published";
 import { validateProject } from "../document/validation";
 import { ensure } from "../errors";
 import { compileMotionLayers } from "./compile-layers";
@@ -41,7 +42,7 @@ export interface CompiledMotionLayer {
 
 export interface MotionProgram {
   readonly compositionId: string;
-  /** A private deep-frozen copy of the authored composition, never a caller-owned reference. */
+  /** Certified engine pages are shared; external authored compositions are privately copied. */
   readonly composition: Composition;
   readonly mode: "static" | "motion";
   readonly duration: MotionTime | null;
@@ -75,15 +76,20 @@ function compileProperty(page: Composition, property: MotionPropertyTrack): Comp
   };
 }
 
+const programs = new WeakMap<Project, Map<string, MotionProgram>>();
+
 /** Cold compilation owns validation/copying. Frame evaluation never visits project validation. */
 export function compileMotion(
   project: Project,
   options: { readonly compositionId: string },
 ): MotionProgram {
-  validateProject(project);
+  const trusted = isPublishedProject(project);
+  const cached = trusted ? programs.get(project)?.get(options.compositionId) : undefined;
+  if (cached) return cached;
+  if (!trusted) validateProject(project);
   const authored = project.pages.find((page) => page.id === options.compositionId);
   ensure(authored, "NOT_FOUND", "Motion composition not found.");
-  const page = cloneValue(authored);
+  const page = trusted ? authored : cloneValue(authored);
   const mode = page.motion?.mode ?? "static";
   const duration = page.motion?.duration ?? null;
   const layers = compileMotionLayers(page, project.assets, compileProperty);
@@ -108,5 +114,19 @@ export function compileMotion(
           };
         })
       : [];
-  return freezeValue({ compositionId: page.id, composition: page, mode, duration, layers, audio });
+  const program = freezeValue({
+    compositionId: page.id,
+    composition: page,
+    mode,
+    duration,
+    layers,
+    audio,
+  });
+  if (trusted) {
+    let retained = programs.get(project);
+    if (!retained) programs.set(project, (retained = new Map()));
+    retained.set(page.id, program);
+    if (retained.size > 8) retained.delete(retained.keys().next().value!);
+  }
+  return program;
 }

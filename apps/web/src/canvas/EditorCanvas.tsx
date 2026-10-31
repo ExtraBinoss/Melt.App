@@ -7,7 +7,8 @@ import {
   useSyncExternalStore,
   type PointerEvent as ReactPointerEvent,
 } from "react";
-import { useStore } from "jotai";
+import { useStore, useAtomValue } from "jotai";
+import { marqueeContainAtom } from "../state/selection/preferences";
 import type { EditorCanvasProps } from "./session/canvas-contracts";
 export type { EditorCanvasProps } from "./session/canvas-contracts";
 import { shapeChoiceAtom } from "../components/assets/selection";
@@ -58,7 +59,7 @@ import { CanvasSelection } from "./selection/CanvasSelection";
 import { canvasHit } from "./selection/hit";
 import { editablePresentedLayer, pickMotionPlayback } from "./selection/presented-pick";
 import { useMarquee } from "./selection/use-marquee";
-import { createLiveMarquee } from "./selection/live-marquee";
+import { useLiveMarquee } from "./selection/use-live-marquee";
 import * as marqueeScope from "./selection/marquee-scope";
 import { useCanvasPresentation } from "./viewport/use-canvas-presentation";
 import { CanvasRulers } from "./guides/CanvasRulers";
@@ -121,15 +122,8 @@ export function EditorCanvas({
   });
   const marqueeElement = useRef<HTMLDivElement>(null);
   const marquee = useMarquee(marqueeElement);
-  const liveMarquee = useMemo(
-    () =>
-      createLiveMarquee(engine, {
-        request: (callback) => requestAnimationFrame(callback),
-        cancel: (handle) => cancelAnimationFrame(handle),
-      }),
-    [engine],
-  );
-  useEffect(() => () => liveMarquee.cancel(), [liveMarquee]);
+  const liveMarquee = useLiveMarquee(engine, controller);
+  const containMarquee = useAtomValue(marqueeContainAtom);
   const [space, setSpace] = useState(false);
   const [dragOver, setDragOver] = useState(false);
   const wand = useWand({ port: services?.pixelSelection, store, tool, onError });
@@ -248,7 +242,12 @@ export function EditorCanvas({
       gesture.current = {
         ...base,
         mode: "box",
-        boxSelection: marqueeScope.intersectingMarquee(engine, additive, targetBoard?.id),
+        boxSelection: marqueeScope.intersectingMarquee(
+          engine,
+          additive,
+          targetBoard?.id,
+          !containMarquee,
+        ),
       };
       return;
     }
@@ -314,7 +313,7 @@ export function EditorCanvas({
       gesture.current = {
         ...base,
         mode: "box",
-        boxSelection: { initial, additive, intersect: false },
+        boxSelection: { initial, additive, intersect: !containMarquee },
       };
       marquee.show(point, point);
       return;
@@ -404,7 +403,7 @@ export function EditorCanvas({
     if (active.mode === "box") {
       const box = active.boxSelection!;
       if (
-        !box.intersect ||
+        !box.secondary ||
         active.boxStarted ||
         Math.hypot(event.clientX - active.client.x, event.clientY - active.client.y) > 3
       )
@@ -484,14 +483,14 @@ export function EditorCanvas({
           if (event.key === "Escape") {
             const pendingBox = gesture.current?.boxSelection;
             const pixelSelection = Boolean(services?.pixelSelection?.read());
-            if (pixelSelection || pendingBox?.intersect) {
+            if (pixelSelection || pendingBox?.secondary) {
               event.preventDefault();
               event.stopPropagation();
             }
             wand.escape();
-            if (!pendingBox?.intersect) liveMarquee.discard();
+            if (!pendingBox?.secondary) liveMarquee.discard();
             cancelGesture();
-            if (!pixelSelection && !pendingBox?.intersect) engine.select([]);
+            if (!pixelSelection && !pendingBox?.secondary) engine.select([]);
           }
         }}
         onKeyUp={(event) => {

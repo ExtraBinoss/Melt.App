@@ -2,7 +2,9 @@ import { TooltipProvider } from "../../src/components/ui/tooltip";
 import type { ReactNode } from "react";
 import type { RenderOptions } from "@testing-library/react";
 import { useEffect, useRef } from "react";
-import { createStore } from "jotai";
+import { createStore, getDefaultStore } from "jotai";
+import { i18n } from "../../src/state/i18n";
+import { zoomControlsAtom } from "../../src/state/viewport/preferences";
 import { createPreviewSource } from "../../src/state/session/preview-source";
 import { previewAtom } from "../../src/state/session/editor";
 import type { SceneController } from "../../src/canvas/session/scene-controller";
@@ -56,12 +58,6 @@ vi.mock("../../src/canvas/render/EditorScene", () => ({
     );
   },
 }));
-vi.mock("react-i18next", async (original) => ({
-  ...(await original<typeof import("react-i18next")>()),
-  useTranslation: () => ({
-    t: (key: string, options?: { defaultValue?: string }) => options?.defaultValue ?? key,
-  }),
-}));
 
 const rectangle = () => createLayer("rectangle", { x: 20, y: 20, width: 60, height: 50 });
 function setup(layers: Layer[] = [rectangle()]) {
@@ -108,6 +104,8 @@ it("releases the transient frame before publishing a canonical move and keeps on
 beforeEach(() => {
   renderer.render.mockReset();
   renderer.controller = null;
+  void i18n.changeLanguage("fr");
+  getDefaultStore().set(zoomControlsAtom, true);
   vi.spyOn(window, "matchMedia").mockImplementation((query) => ({
     matches: query.includes("prefers-reduced-motion"),
     media: query,
@@ -227,12 +225,12 @@ describe("canvas input and renderer integration", () => {
     fireEvent.wheel(canvas(), { deltaX: 240, deltaY: 200 });
     expect(artboard()).toHaveAttribute("data-zoom", "1");
     expect(artboard()).toHaveAttribute("data-pan-x", "-120");
-    fireEvent.click(await screen.findByRole("button", { name: "100 % et recentrer" }));
+    fireEvent.click(await screen.findByRole("button", { name: i18n.t("resetView") }));
     expect(artboard()).toHaveAttribute("data-pan-y", "0");
     fireEvent.wheel(canvas(), { deltaY: -30, ctrlKey: true, clientX: 500, clientY: 400 });
     expect(Number(artboard().dataset.zoom)).toBeGreaterThan(1);
     fireEvent.wheel(canvas(), { deltaY: 50, metaKey: true, clientX: 500, clientY: 400 });
-    fireEvent.click(screen.getByRole("button", { name: "100 % et recentrer" }));
+    fireEvent.click(screen.getByRole("button", { name: i18n.t("resetView") }));
     expect(artboard()).toHaveAttribute("data-zoom", "1");
     fireEvent.click(screen.getByRole("button", { name: "Zoomer" }));
     expect(artboard()).toHaveAttribute("data-zoom", "1.2");
@@ -252,17 +250,17 @@ describe("canvas input and renderer integration", () => {
     const { unmount } = render(<EditorCanvas engine={engine} tool="hand" />);
     await ready();
     fireEvent.wheel(canvas(), { deltaX: 10000, deltaY: -10000 });
-    expect(artboard()).toHaveAttribute("data-pan-x", "-240");
-    expect(artboard()).toHaveAttribute("data-pan-y", "240");
-    const reset = await screen.findByRole("button", { name: "100 % et recentrer" });
+    expect(artboard()).toHaveAttribute("data-pan-x", "-504");
+    expect(artboard()).toHaveAttribute("data-pan-y", "400");
+    const reset = await screen.findByRole("button", { name: i18n.t("resetView") });
     expect(reset.closest(".canvas-controls")).toHaveClass("floating-panel");
     act(() => {
       actions.run("recenter");
     });
     expect(artboard()).toHaveAttribute("data-pan-x", "0");
     pointerDrag(canvas(), point(0, 0), point(10000, -10000));
-    expect(artboard()).toHaveAttribute("data-pan-x", "240");
-    expect(artboard()).toHaveAttribute("data-pan-y", "-240");
+    expect(artboard()).toHaveAttribute("data-pan-x", "504");
+    expect(artboard()).toHaveAttribute("data-pan-y", "-400");
     act(() => {
       actions.run("zoomIn");
     });
@@ -488,10 +486,10 @@ describe("canvas input and renderer integration", () => {
     expect(screen.queryByRole("button", { name: /Redimensionner/ })).not.toBeInTheDocument();
     const file = new File(["one"], "one.png", { type: "image/png" });
     fireEvent.dragOver(canvas(), { dataTransfer: { types: ["Files"], files: [] } });
-    expect(screen.getByText("Déposez vos images ici")).toBeInTheDocument();
+    expect(screen.getByText(i18n.t("dropImages"))).toBeInTheDocument();
     const internalLeave = fileDragEvent("dragleave", { relatedTarget: canvas() });
     fireEvent(canvas(), internalLeave);
-    expect(screen.getByText("Déposez vos images ici")).toBeInTheDocument();
+    expect(screen.getByText(i18n.t("dropImages"))).toBeInTheDocument();
     const externalLeave = fileDragEvent("dragleave", { relatedTarget: document.body });
     fireEvent(canvas(), externalLeave);
     expect(screen.queryByText("Déposez vos images ici")).not.toBeInTheDocument();

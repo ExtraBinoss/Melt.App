@@ -473,3 +473,20 @@ function openLayerActions() {
     ctrlKey: false,
   });
 }
+
+test("composition switches retain compositing controls while their values follow the current selection", () => {
+  const d = renderLayers();
+  const controls = document.querySelector(".layer-compositing")!;
+  act(() =>
+    d.engine.execute({
+      type: "addPage",
+      page: createPage({ id: "other", layers: [createLayer("rectangle", { id: "other-layer" })] }),
+    }),
+  );
+  expect(document.querySelector(".layer-compositing")).toBe(controls);
+  act(() => d.engine.setPage(d.page.id));
+  expect(document.querySelector(".layer-compositing")).toBe(controls);
+  act(() => d.engine.select([d.rectangle.id]));
+  expect(document.querySelector(".layer-compositing")).toBe(controls);
+  expect(screen.getByRole("textbox", { name: "Opacité" })).toBeEnabled();
+});

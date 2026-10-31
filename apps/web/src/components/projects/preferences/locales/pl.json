@@ -1,4 +1,9 @@
 {
   "showCanvasZoom": "Pokaż sterowanie powiększeniem",
-  "showCanvasZoomDescription": "Wyświetl przyciski i procent powiększenia na płótnie."
+  "showCanvasZoomDescription": "Wyświetl przyciski i procent powiększenia na płótnie.",
+  "marqueeContain": "Obejmuj warstwy w całości",
+  "marqueeContainDescription": "Domyślnie wystarczy dotknąć warstwy, aby ją zaznaczyć. Włącz, aby zaznaczać tylko warstwy w całości wewnątrz prostokąta.",
+  "marqueeExample": "Przykłady prostokąta zaznaczenia",
+  "marqueeTouch": "Wystarczy dotknięcie",
+  "marqueeEnclose": "Tylko w całości wewnątrz"
 }

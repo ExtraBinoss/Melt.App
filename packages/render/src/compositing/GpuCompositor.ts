@@ -113,7 +113,8 @@ export class GpuCompositor {
       !input ||
       !sameCompositionInput(input.page.deref(), page) ||
       input.assets.deref() !== assets ||
-      input.motionFrame !== motionFrame ||
+      (input.motionFrame !== motionFrame &&
+        Boolean(input.motionFrame?.mediaRequests.length || motionFrame?.mediaRequests.length)) ||
       (page.layers.some((layer) => layer.kind === "video") && !motionFrame)
     )
       return null;
@@ -546,6 +547,7 @@ export class GpuCompositor {
       uploads: this.sources.uploads + this.texts.parses,
       targets: cache.targets,
       cacheBytes: cache.cacheBytes,
+      cacheEntries: cache.entries,
       frames: this.frames,
       cacheHits: this.cacheHits,
       vectorParses: this.vectors?.parses ?? 0,

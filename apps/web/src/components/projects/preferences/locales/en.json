@@ -24,5 +24,10 @@
   "tryObject": "Movable preview object",
   "tryReset": "Reset preview",
   "showCanvasZoom": "Show canvas zoom controls",
-  "showCanvasZoomDescription": "Display zoom buttons and the zoom percentage on the canvas."
+  "showCanvasZoomDescription": "Display zoom buttons and the zoom percentage on the canvas.",
+  "marqueeContain": "Require full enclosure",
+  "marqueeContainDescription": "By default, touching a layer selects it. Enable this to select only layers fully inside the selection rectangle.",
+  "marqueeExample": "Selection rectangle examples",
+  "marqueeTouch": "Touching selects",
+  "marqueeEnclose": "Fully inside only"
 }

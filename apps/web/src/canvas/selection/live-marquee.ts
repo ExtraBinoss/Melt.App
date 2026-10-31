@@ -1,4 +1,4 @@
-import type { EnginePort } from "@musart/core";
+import type { EnginePort, Composition } from "@musart/core";
 import { boxSelection } from "../interaction/gestures";
 import { captureGestureOrigin, isGestureOriginCurrent } from "../interaction/gesture-origin";
 import { attachmentSelection } from "../../state/selection/attachments";
@@ -15,7 +15,7 @@ interface Clock {
 }
 
 /** At most one selection publication per frame; release flushes, cancellation restores its own draft. */
-export function createLiveMarquee(engine: EnginePort, clock: Clock) {
+export function createLiveMarquee(engine: EnginePort, clock: Clock, readPage?: () => Composition) {
   let session: {
     origin: ReturnType<typeof captureGestureOrigin>;
     initial: readonly string[];
@@ -37,7 +37,9 @@ export function createLiveMarquee(engine: EnginePort, clock: Clock) {
       session = null;
       return;
     }
-    const page = snapshot.project.pages.find((item) => item.id === snapshot.pageId)!;
+    const canonical = snapshot.project.pages.find((item) => item.id === snapshot.pageId)!;
+    const presented = readPage?.();
+    const page = presented?.id === canonical.id ? presented : canonical;
     const selected = boxSelection(
       page,
       request.from,

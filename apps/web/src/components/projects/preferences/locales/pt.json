@@ -1,4 +1,9 @@
 {
   "showCanvasZoom": "Mostrar controlos de zoom",
-  "showCanvasZoomDescription": "Mostrar os botões e a percentagem de zoom na tela."
+  "showCanvasZoomDescription": "Mostrar os botões e a percentagem de zoom na tela.",
+  "marqueeContain": "Abranger as camadas por inteiro",
+  "marqueeContainDescription": "Por padrão, basta tocar numa camada para selecioná-la. Ative para selecionar apenas camadas inteiramente dentro do retângulo.",
+  "marqueeExample": "Exemplos do retângulo de seleção",
+  "marqueeTouch": "Basta tocar",
+  "marqueeEnclose": "Apenas inteiramente dentro"
 }

@@ -1,5 +1,13 @@
 import { afterEach, expect, it, vi } from "vitest";
-import { createLayer, createPage, createProject, EditorEngine } from "@musart/core";
+import {
+  createLayer,
+  createPage,
+  createProject,
+  EditorEngine,
+  compileMotion,
+  evaluateMotion,
+  applyMotionFrame,
+} from "@musart/core";
 import { GpuCompositor } from "../../src/compositing/GpuCompositor";
 import { makeGpuRenderer } from "../gpu-fixture";
 afterEach(() => vi.restoreAllMocks());
@@ -91,4 +99,43 @@ it("retains exact pixels through a composition deletion and canvas placement mig
   expect(graph.retainedFrame(changed.pages[0]!, changed.assets, 1)).toBeNull();
   await graph.dispose();
   expect(graph.stats()).toMatchObject({ targets: 0, cacheBytes: 0 });
+});
+
+it("retains a certified Motion pose through a new media-free plan, while media clocks stay authoritative", async () => {
+  const { renderer } = makeGpuRenderer(),
+    graph = new GpuCompositor(renderer);
+  const engine = new EditorEngine(
+    createProject({
+      pages: [
+        createPage({
+          id: "motion",
+          width: 64,
+          height: 64,
+          layers: [createLayer("rectangle", { width: 20, height: 20 })],
+        }),
+      ],
+    }),
+  );
+  engine.execute({ type: "setCompositionMode", mode: "motion" });
+  const project = engine.getSnapshot().project,
+    program = compileMotion(project, { compositionId: "motion" });
+  const plan = evaluateMotion(program, { value: 0, rate: 1 }),
+    page = applyMotionFrame(program, plan);
+  const frame = await graph.render(page, project.assets, { motionFrame: plan });
+  const later = evaluateMotion(program, { value: 1, rate: 1 });
+  expect(graph.retainedFrame(page, project.assets, 1, later)).toBe(frame);
+  const media = {
+    ...later,
+    mediaRequests: [
+      {
+        layerId: "video",
+        assetId: "video",
+        sourceTime: { value: 1, rate: 1 },
+        mute: false,
+        volume: 1,
+      },
+    ],
+  };
+  expect(graph.retainedFrame(page, project.assets, 1, media)).toBeNull();
+  await graph.dispose();
 });

@@ -83,7 +83,7 @@ test("right click alone, canceled/lost capture, Escape and stale gestures preser
     initial = engine.getSnapshot();
   pointerDrag(canvas, point(40, 40), point(40, 40), { button: 2 });
   expect(engine.getSnapshot()).toBe(initial);
-  expect(fireEvent.contextMenu(canvas)).toBe(false);
+  expect(fireEvent.contextMenu(canvas, { ...point(40, 40), button: 2 })).toBe(false);
   for (const cancel of [
     () => fireEvent.pointerCancel(canvas, { pointerId: 1 }),
     () => fireEvent.lostPointerCapture(canvas, { pointerId: 1 }),
@@ -94,7 +94,7 @@ test("right click alone, canceled/lost capture, Escape and stale gestures preser
     expect(box).toBeVisible();
     cancel();
     fireEvent.pointerUp(canvas, { ...point(100, 100), button: 2 });
-    expect(engine.getSnapshot().selection).toEqual(["two"]);
+    expect(engine.getSnapshot().selection, cancel.toString()).toEqual(["two"]);
     expect(box).not.toBeVisible();
   }
   fireEvent.pointerDown(canvas, { ...point(40, 40), button: 2 });

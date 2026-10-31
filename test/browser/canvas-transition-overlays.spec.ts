@@ -30,6 +30,10 @@ async function recordSwitch(page: Page, id: string, removeId?: string) {
     let entered = 0;
     const evidence = {
       done: false,
+      inputTimestamp: 0,
+      nextFrameTimestamp: 0,
+      secondFrameTimestamp: 0,
+      maxFrameGap: 0,
       initial,
       frames: [] as {
         deltas: number[];
@@ -40,7 +44,22 @@ async function recordSwitch(page: Page, id: string, removeId?: string) {
       }[],
     };
     (window as Window & { __dockSwitch?: typeof evidence }).__dockSwitch = evidence;
-    const frame = () => {
+    window.addEventListener(
+      "pointerdown",
+      (event) => {
+        evidence.inputTimestamp = event.timeStamp;
+      },
+      { capture: true, once: true },
+    );
+    let previousFrame = 0;
+    const frame = (time: number) => {
+      if (evidence.inputTimestamp) {
+        if (!evidence.nextFrameTimestamp) evidence.nextFrameTimestamp = performance.now();
+        else if (!evidence.secondFrameTimestamp) evidence.secondFrameTimestamp = performance.now();
+        if (previousFrame)
+          evidence.maxFrameGap = Math.max(evidence.maxFrameGap, time - previousFrame);
+      }
+      previousFrame = time;
       if (window.musart!.snapshot().pageId === id) {
         if (!entered) entered = performance.now();
         const rect = document
@@ -147,9 +166,21 @@ test("switching Static and Motion animates the timeline without jumping or stret
   await expect(
     page.locator('.motion-timeline-dock:not([data-motion-exiting="true"])'),
   ).not.toHaveAttribute("data-motion-animating");
+  await page.evaluate(() => {
+    (window as Window & { __retainedTimeline?: Element | null }).__retainedTimeline =
+      document.querySelector(".motion-timeline");
+  });
   const hidden = await recordSwitch(page, "still");
   expect(hidden.frames.some((frame) => frame.exiting > 0)).toBe(true);
+  await expect(page.getByRole("region", { name: "Timeline", exact: true })).toHaveCount(0);
   const pinned = await recordSwitch(page, "moving");
+  expect(
+    await page.evaluate(
+      () =>
+        (window as Window & { __retainedTimeline?: Element | null }).__retainedTimeline ===
+        document.querySelector(".motion-timeline"),
+    ),
+  ).toBe(true);
   await expect(
     page.locator('.motion-timeline-dock:not([data-motion-exiting="true"])'),
   ).toHaveAttribute("data-motion-pinned", "true");

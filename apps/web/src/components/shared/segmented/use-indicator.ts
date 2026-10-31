@@ -50,7 +50,8 @@ export function useSegmentedIndicator(
       opacity.set(1);
       initialized.current = true;
     }
-    measure();
+    // Initial ResizeObserver delivery runs after layout; do not flush the editor
+    // synchronously from each control's layout effect during a page switch.
     media.addEventListener("change", measure);
     const resize = new ResizeObserver(measure);
     resize.observe(element);

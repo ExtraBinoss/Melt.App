@@ -351,3 +351,27 @@ it("still pauses for reloads and source/processing edits even if audio identitie
   stop();
   source.dispose();
 });
+
+it("reuses an unchanged composition's sampled pose across navigation, then invalidates after an edit", () => {
+  const engine = new EditorEngine(
+    createProject({
+      pages: [
+        createPage({ id: "moving", layers: [createLayer("rectangle", { id: "box" })] }),
+        createPage({ id: "still" }),
+      ],
+    }),
+  );
+  engine.execute({ type: "setCompositionMode", mode: "motion" });
+  const transport = new MotionTransport(engine, clock().scheduler);
+  const original = transport.readFrame(),
+    plan = transport.readFramePlan();
+  engine.setPage("still");
+  expect(transport.readFrame()).toBeNull();
+  engine.setPage("moving");
+  expect(transport.readFrame()).toBe(original);
+  expect(transport.readFramePlan()).toBe(plan);
+  engine.execute({ type: "updateLayers", ids: ["box"], patch: { fill: "#ff0000" } });
+  expect(transport.readFrame()).not.toBe(original);
+  expect(transport.readFrame()!.layers[0]!.fill).toBe("#ff0000");
+  transport.dispose();
+});

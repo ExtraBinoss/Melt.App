@@ -13,16 +13,19 @@ test("constructs secondary selection scope without activating another page", () 
     initial: [],
     additive: false,
     intersect: true,
+    secondary: true,
   });
   expect(intersectingMarquee(engine, true, a.id)).toEqual({
     initial: [],
     additive: true,
     intersect: true,
+    secondary: true,
   });
   expect(intersectingMarquee(engine, false, b.id)).toEqual({
     initial: [],
     additive: false,
     intersect: true,
+    secondary: true,
     pageId: b.id,
   });
   expect(engine.getSnapshot()).toBe(before);

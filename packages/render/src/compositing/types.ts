@@ -38,6 +38,7 @@ export interface GpuStats {
   uploads: number;
   targets: number;
   cacheBytes: number;
+  cacheEntries?: number;
   frames: number;
   cacheHits: number;
   vectorParses: number;

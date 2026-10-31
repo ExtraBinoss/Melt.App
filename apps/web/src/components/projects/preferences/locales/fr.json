@@ -24,5 +24,10 @@
   "tryObject": "Objet à déplacer",
   "tryReset": "Recommencer",
   "showCanvasZoom": "Afficher les contrôles de zoom du canvas",
-  "showCanvasZoomDescription": "Afficher les boutons de zoom et le pourcentage sur le canvas."
+  "showCanvasZoomDescription": "Afficher les boutons de zoom et le pourcentage sur le canvas.",
+  "marqueeContain": "Englober entièrement les calques",
+  "marqueeContainDescription": "Par défaut, toucher un calque suffit à le sélectionner. Activez cette option pour sélectionner uniquement les calques entièrement dans le rectangle.",
+  "marqueeExample": "Exemples de rectangle de sélection",
+  "marqueeTouch": "Toucher suffit",
+  "marqueeEnclose": "Entièrement à l’intérieur"
 }

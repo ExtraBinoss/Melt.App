@@ -1,4 +1,9 @@
 {
   "showCanvasZoom": "显示画布缩放控件",
-  "showCanvasZoomDescription": "在画布上显示缩放按钮和缩放百分比。"
+  "showCanvasZoomDescription": "在画布上显示缩放按钮和缩放百分比。",
+  "marqueeContain": "完全框住图层才选中",
+  "marqueeContainDescription": "默认情况下，选框触及图层即可选中。开启后，仅选中完全位于选框内的图层。",
+  "marqueeExample": "框选示例",
+  "marqueeTouch": "触及即选中",
+  "marqueeEnclose": "仅选中完全框住的图层"
 }

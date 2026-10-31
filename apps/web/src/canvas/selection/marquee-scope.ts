@@ -14,6 +14,7 @@ export interface MarqueeScope {
     initial: readonly string[];
     additive: boolean;
     intersect: boolean;
+    secondary?: true;
     pageId?: string;
   };
 }
@@ -22,12 +23,14 @@ export function intersectingMarquee(
   engine: EnginePort,
   additive: boolean,
   pageId?: string,
+  intersect = true,
 ): NonNullable<MarqueeScope["boxSelection"]> {
   const snapshot = engine.getSnapshot();
   return {
     initial: snapshot.selection,
     additive,
-    intersect: true,
+    intersect,
+    secondary: true,
     ...(pageId && pageId !== snapshot.pageId ? { pageId } : {}),
   };
 }

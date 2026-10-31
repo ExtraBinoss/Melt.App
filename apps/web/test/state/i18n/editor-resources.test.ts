@@ -127,7 +127,15 @@ test("locked-state decoration uses a real translation in every supported locale"
 
 test("the optional zoom UI preference is translated in every enabled locale", () => {
   for (const { code } of supportedLocales) {
-    for (const key of ["showCanvasZoom", "showCanvasZoomDescription"] as const) {
+    for (const key of [
+      "showCanvasZoom",
+      "showCanvasZoomDescription",
+      "marqueeContain",
+      "marqueeContainDescription",
+      "marqueeExample",
+      "marqueeTouch",
+      "marqueeEnclose",
+    ] as const) {
       const value = preferences[code]?.[key];
       expect(typeof value).toBe("string");
       expect(i18n.t(`preferences:${key}`, { lng: code })).toBe(value);

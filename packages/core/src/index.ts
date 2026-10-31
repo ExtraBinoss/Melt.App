@@ -1,5 +1,6 @@
 export { validateAssetDescription } from "./assets/validation";
 export type { MorphPoint, MorphContour, MorphShapeFrame, ShapeMorph } from "./effects/morph/model";
+export { morphContentBounds } from "./effects/morph/bounds";
 export { compactShapeMorph } from "./effects/morph/compact";
 export { prepareMorphShape, prepareMorphShapeSteps } from "./effects/morph/geometry";
 export { validateShapeMorph } from "./effects/morph/validation";

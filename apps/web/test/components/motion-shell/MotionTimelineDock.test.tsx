@@ -133,7 +133,9 @@ test("only a successful canonical Static to Motion switch auto-pins, and each la
   const pause = vi.spyOn(createMotionTransport(d.engine), "pause");
   act(() => d.engine.execute({ type: "setCompositionMode", mode: "static" }));
   expect(pause).toHaveBeenCalled();
-  expect(document.querySelector(".motion-timeline-dock")).toBeNull();
+  // Canonical mode edits invalidate the retained document, unlike navigation alone.
+  expect(dock()).toBeNull();
+  expect(screen.queryByRole("region", { name: "Timeline" })).toBeNull();
   expect(d.engine.getSnapshot().project.pages[0]!.motion!.tracks).toEqual(motion.tracks);
   act(() => d.engine.execute({ type: "setCompositionMode", mode: "motion" }));
   expect(dock()).toHaveAttribute("data-motion-pinned", "true");
@@ -226,12 +228,16 @@ test("captures before a static/motion slot changes and applies after its final D
     phases: string[] = [],
     capture = vi.fn(() => {
       phases.push(
-        document.querySelector(".motion-timeline-dock") ? "before:motion" : "before:static",
+        document.querySelector(".motion-timeline-dock:not([inert])")
+          ? "before:motion"
+          : "before:static",
       );
       return {
         apply: () =>
           phases.push(
-            document.querySelector(".motion-timeline-dock") ? "after:motion" : "after:static",
+            document.querySelector(".motion-timeline-dock:not([inert])")
+              ? "after:motion"
+              : "after:static",
           ),
         cancel: vi.fn(),
         finished: Promise.resolve(),
@@ -242,6 +248,57 @@ test("captures before a static/motion slot changes and applies after its final D
   act(() => d.engine.execute({ type: "setCompositionMode", mode: "motion" }));
   act(() => d.engine.execute({ type: "setCompositionMode", mode: "static" }));
   expect(phases).toEqual(["before:static", "after:motion", "before:motion", "after:static"]);
+  view.unmount();
+  stop();
+});
+
+test("returning from Static reuses the same Motion controls and their pin state", () => {
+  const d = setup();
+  d.engine.execute({ type: "setCompositionMode", mode: "motion" });
+  d.engine.execute({ type: "addPage", page: createPage({ id: "still" }) });
+  d.engine.setPage(d.page.id);
+  const view = d.mount(<MotionTimelineDock engine={d.engine} />);
+  const panel = screen.getByRole("region", { name: "Timeline" });
+  const ruler = screen.getByRole("slider", { name: "Se déplacer dans la timeline" });
+  fireEvent.click(screen.getByRole("button", { name: "Épingler la timeline" }));
+  act(() => d.engine.setPage("still"));
+  expect(panel).toBeInTheDocument();
+  expect(dock()).toHaveAttribute("inert");
+  expect(dock()).toHaveAttribute("aria-hidden", "true");
+  act(() => d.engine.setPage(d.page.id));
+  expect(screen.getByRole("region", { name: "Timeline" })).toBe(panel);
+  expect(screen.getByRole("slider", { name: "Se déplacer dans la timeline" })).toBe(ruler);
+  expect(dock()).not.toHaveAttribute("inert");
+  expect(dock()).toHaveAttribute("data-motion-pinned", "true");
+  view.unmount();
+});
+
+test("deleting the retained Motion composition releases its hidden controls", () => {
+  const d = setup();
+  d.engine.execute({ type: "setCompositionMode", mode: "motion" });
+  d.engine.execute({ type: "addPage", page: createPage({ id: "still" }) });
+  d.engine.setPage(d.page.id);
+  const view = d.mount(<MotionTimelineDock engine={d.engine} />);
+  const panel = document.querySelector(".motion-timeline")!;
+  act(() => d.engine.setPage("still"));
+  expect(panel).toBeInTheDocument();
+  act(() => d.engine.execute({ type: "deletePage", id: d.page.id }));
+  expect(panel.isConnected).toBe(false);
+  expect(document.querySelector(".motion-timeline-dock")).toBeNull();
+  view.unmount();
+});
+
+test("ordinary navigation to a peek performs no viewport reservation reads", () => {
+  const d = setup();
+  d.engine.execute({ type: "setCompositionMode", mode: "motion" });
+  d.engine.execute({ type: "addPage", page: createPage({ id: "still" }) });
+  const capture = vi.fn(() => undefined);
+  const stop = createViewportResizeAnchor(d.engine).register(capture);
+  const view = d.mount(<MotionTimelineDock engine={d.engine} />);
+  act(() => d.engine.setPage(d.page.id));
+  expect(dock()).toHaveAttribute("data-motion-presence", "peek");
+  act(() => d.engine.setPage("still"));
+  expect(capture).not.toHaveBeenCalled();
   view.unmount();
   stop();
 });

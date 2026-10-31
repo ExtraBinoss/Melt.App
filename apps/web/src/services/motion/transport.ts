@@ -50,6 +50,10 @@ export class MotionTransport {
   private program: MotionProgram | null = null;
   private frame: Composition | null = null;
   private framePlan: MotionFramePlan | null = null;
+  private readonly poses = new Map<
+    string,
+    { program: MotionProgram; time: MotionTime; page: Composition; plan: MotionFramePlan }
+  >();
   private project: ReturnType<EnginePort["getSnapshot"]>["project"] | null = null;
   private readonly retained = new Map<
     string,
@@ -119,6 +123,7 @@ export class MotionTransport {
       return;
     }
     this.snapshot = snapshot;
+    if (this.project !== snapshot.project) this.poses.clear();
     this.audioMixPublication = null;
     this.stopDraft?.();
     if (this.state)
@@ -160,8 +165,28 @@ export class MotionTransport {
       return;
     }
     const program = this.draft ?? this.program;
+    const retained = !this.draft && this.poses.get(program.compositionId);
+    if (
+      retained &&
+      retained.program === program &&
+      compareMotionTime(retained.time, this.state.time) === 0
+    ) {
+      this.framePlan = retained.plan;
+      this.frame = retained.page;
+      return;
+    }
     this.framePlan = evaluateMotion(program, this.state.time, { terminalPreview: true });
     this.frame = applyMotionFrame(program, this.framePlan);
+    if (!this.draft) {
+      this.poses.delete(program.compositionId);
+      this.poses.set(program.compositionId, {
+        program,
+        time: this.state.time,
+        page: this.frame,
+        plan: this.framePlan,
+      });
+      if (this.poses.size > 8) this.poses.delete(this.poses.keys().next().value!);
+    }
   }
 
   private emit(): void {
@@ -389,6 +414,7 @@ export class MotionTransport {
   dispose = (): void => {
     if (this.disposed) return;
     this.disposed = true;
+    this.poses.clear();
     this.stopDraft?.();
     this.state = Object.freeze({ ...this.state, playing: false });
     this.stopTick();

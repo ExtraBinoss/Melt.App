@@ -1,4 +1,9 @@
 {
   "showCanvasZoom": "Zoombediening tonen",
-  "showCanvasZoomDescription": "Toon zoomknoppen en het zoompercentage op het canvas."
+  "showCanvasZoomDescription": "Toon zoomknoppen en het zoompercentage op het canvas.",
+  "marqueeContain": "Lagen volledig omsluiten",
+  "marqueeContainDescription": "Standaard selecteert aanraken een laag. Schakel dit in om alleen lagen volledig binnen de selectierechthoek te selecteren.",
+  "marqueeExample": "Voorbeelden van de selectierechthoek",
+  "marqueeTouch": "Aanraken is genoeg",
+  "marqueeEnclose": "Alleen volledig binnen"
 }

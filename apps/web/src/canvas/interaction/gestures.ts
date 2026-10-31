@@ -7,6 +7,7 @@ import {
   type Composition,
   type Layer,
 } from "@musart/core";
+import { selectionContentBounds } from "../selection/content-bounds";
 import type { Point } from "../viewport/view";
 
 export type Tool =
@@ -179,7 +180,7 @@ export function boxSelection(
   while (pending.length)
     for (const layer of index.children(pending.pop()!)) {
       if (!layer.visible || layer.opacity <= 0 || layer.locked || layer.maskSource) continue;
-      const bounds = index.worldBounds(layer.id);
+      const bounds = selectionContentBounds(index, layer);
       const selected =
         mode === "intersect"
           ? bounds.x < right &&
