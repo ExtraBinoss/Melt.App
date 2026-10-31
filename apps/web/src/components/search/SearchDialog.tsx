@@ -34,8 +34,11 @@ function SearchDialogLayers({ reduced, children, ...props }: ContentProps & { re
     if (!present || reduced) return;
     // Start after mounting/focus/style work, so it cannot consume the visual entrance clock.
     let active = true;
+    content.current?.setAttribute("data-search-reveal", "pending");
     const frame = requestAnimationFrame(() => {
-      if (active) void controls.start("visible");
+      if (!active) return;
+      content.current?.setAttribute("data-search-reveal", "running");
+      void controls.start("visible");
     });
     return () => {
       active = false;
@@ -71,6 +74,7 @@ function SearchDialogLayers({ reduced, children, ...props }: ContentProps & { re
           forceMount
           data-slot="dialog-content"
           data-magic-search
+          data-search-reveal={reduced ? "running" : "pending"}
           inert={!present || undefined}
           initial={reduced ? false : { opacity: 0, y: 8, scale: 0.985 }}
           variants={{ visible: { opacity: 1, y: 0, scale: 1 } }}

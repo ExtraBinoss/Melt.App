@@ -71,3 +71,19 @@ test("uses changed search/help bindings immediately and blocks another dialog or
   hook.unmount();
   localStorage.clear();
 });
+
+test("a focused closing dialog does not swallow the next search shortcut", () => {
+  const toggle = vi.fn();
+  const hook = renderHook(() => useSearchShortcuts(toggle, vi.fn()));
+  const dialog = document.createElement("div");
+  dialog.setAttribute("role", "dialog");
+  dialog.setAttribute("data-state", "closed");
+  const button = document.createElement("button");
+  dialog.append(button);
+  document.body.append(dialog);
+  button.focus();
+  fireEvent.keyDown(button, { key: "k", ctrlKey: true });
+  expect(toggle).toHaveBeenCalledOnce();
+  dialog.remove();
+  hook.unmount();
+});

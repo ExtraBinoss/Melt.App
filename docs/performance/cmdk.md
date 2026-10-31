@@ -115,3 +115,18 @@ MUSART_CMDK_SHA=<frozen-sha> MUSART_CMDK_OUTPUT=artifacts/cmdk-profile/cohort \
 Apply the scope and priority limits above to the build and browser commands. The original baseline steady-state cohort passed two tests in 43.8 seconds and its separate post-edit case passed in 6.2 seconds. The matched baseline passed all three in 37.0 seconds without rebuilding its executable. The first candidate passed three tests in 55.9 seconds; the final verified build passed three in 44.9 seconds. Cold-only diagnostics passed separately in 7.5/5.4/4.4 seconds. Production builds passed in 8.71/8.71/6.02 seconds. All preview processes were stopped after measurement.
 
 Ignored `artifacts/cmdk-profile/{baseline,baseline-matched,final,final-verified}` retain raw per-event JSON, counters, hashes, renderer metadata, screenshots, CPU profiles, Blink traces, build/browser logs, host/provenance records, source maps and exact compiled output. `summary.json` contains all raw latency arrays and mapped diagnostic source totals; `post-edit-150.json` retains the edit and input clocks. `run-commands.txt` and the ignored browser config retain the exact commands and server options. These files are local evidence, not published repository artifacts.
+
+## Content entrance ownership
+
+The palette holds its child CSS reveal clocks until the same first-RAF boundary
+that starts the visible dialog. Input, categories, headings and complete result
+rows form one top-to-bottom sequence. Row delays advance by 18 ms and saturate at
+264 ms; each reveal lasts 220 ms, bounding the full opening at 484 ms after that
+boundary. Retained results keep their original clocks during typing and selection.
+Disabled rows target their existing 0.48 opacity throughout the reveal, avoiding
+a contrast jump when the animation releases ownership. Reduced motion skips it.
+
+Categories reuse `HorizontalScroll` with masked ScrollShadow edges, native wheel,
+keyboard and drag access, and pointer-hover scrolling only while an overflowing
+edge is hovered. Transparent edge hit areas remain active on glass surfaces.
+These changes do not revise the historical latency measurements above.

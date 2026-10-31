@@ -6,6 +6,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Synchronize Cmd+K content reveals with the visible dialog entrance, sweep whole result rows from top to bottom with bounded blur staggering, preserve disabled contrast throughout the animation, and retain immediate focus, results and reduced-motion behavior. Add shared edge-hover scrolling and masked shadows to the category strip. Keep Cmd+K available while a previously closed dialog finishes its visual exit.
+
 - Move the dock shortcut limit into a compact parenthetical beside the customizer title and remove its footer line.
 
 - Make canvas zoom controls opt-in through device-local Editor preferences. Add a two-second undo/redo pill centered on the canvas, matched to the project pill's size and vertical alignment through panel/ruler/name changes, with contextual action labels, pause on hover/focus, explicit dismissal and twelve-locale resources. Classify edits from bounded, payload-free command field metadata rather than recomputing SVG/effect contents.

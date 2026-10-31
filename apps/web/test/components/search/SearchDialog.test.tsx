@@ -102,6 +102,7 @@ test("reduced motion skips visual entrance and Escape keeps the real Radix close
   );
   const dialog = screen.getByRole("dialog");
   expect(dialog).toHaveStyle({ opacity: "1" });
+  expect(dialog).toHaveAttribute("data-search-reveal", "running");
   expect(entrance.start).not.toHaveBeenCalled();
   await act(async () => {
     await Promise.resolve();
@@ -155,9 +156,11 @@ test("focus is immediate while the panel entrance starts only at the first avail
   );
   expect(screen.getByRole("textbox", { name: "Query" })).toHaveFocus();
   expect(screen.getByRole("dialog")).toHaveStyle({ opacity: "0" });
+  expect(screen.getByRole("dialog")).toHaveAttribute("data-search-reveal", "pending");
   expect(entrance.start).not.toHaveBeenCalled();
   expect(clock.pending.size).toBe(1);
   clock.flush();
+  expect(screen.getByRole("dialog")).toHaveAttribute("data-search-reveal", "running");
   expect(entrance.start).toHaveBeenCalledExactlyOnceWith("visible");
   view.unmount();
   expect(entrance.stop).toHaveBeenCalledOnce();

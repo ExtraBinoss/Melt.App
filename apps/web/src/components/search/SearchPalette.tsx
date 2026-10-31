@@ -13,6 +13,7 @@ import type { EnginePort } from "@musart/core";
 import type { BindingSnapshot } from "../../state/keybindings/model";
 import { useEngineValue } from "../../state/session/editor";
 import { ScrollShadow } from "../shared/scroll/ScrollShadow";
+import { HorizontalScroll } from "../shared/scroll/HorizontalScroll";
 import { Button } from "../ui/button";
 import { BlurReveal } from "../ui/blur-text-animation";
 import { DialogHeader, DialogTitle, DialogDescription } from "../ui/dialog";
@@ -33,7 +34,7 @@ import "./messages";
 
 // cmdk still scores newly registered items when shouldFilter=false. Ranking already belongs to our index.
 const alreadyRanked = () => 1;
-const SEARCH_REVEAL = { durationMs: 150, blur: 3 } as const;
+const SEARCH_REVEAL = { durationMs: 220, blur: 3 } as const;
 function keepButtonActivation(event: KeyboardEvent<HTMLButtonElement>) {
   // Let the browser activate this button; cmdk must not reinterpret its key as a result choice.
   if (event.key === "Enter" || event.key === " ") event.stopPropagation();
@@ -247,15 +248,15 @@ const ResultGroups = memo(function ResultGroups({
   }, [items]);
   if (!items.length)
     return (
-      <BlurReveal {...SEARCH_REVEAL} asChild order={2} delayMs={8}>
+      <BlurReveal {...SEARCH_REVEAL} asChild order={2} delayMs={48}>
         <div cmdk-empty="" role="presentation" className="py-6 text-center text-sm">
           {t("search:empty")}
         </div>
       </BlurReveal>
     );
   let order = 2;
-  const count = items.length + groups.size;
-  const delay = (rank: number) => 8 + ((rank - 2) / Math.max(1, count - 1)) * 40;
+  // Give visible rows a readable sweep; offscreen results never extend the opening beyond 484 ms.
+  const delay = (rank: number) => 48 + Math.min(rank - 2, 12) * 18;
   return [...groups].map(([value, group]) => {
     const headingOrder = order++;
     return (
@@ -295,22 +296,24 @@ const CategoryTabs = memo(function CategoryTabs({
   t: SearchTranslate;
 }) {
   return (
-    <BlurReveal {...SEARCH_REVEAL} asChild order={1} delayMs={4}>
-      <div className="magic-search-categories" role="group" aria-label={t("search:categories")}>
-        {(
-          ["all", ...SEARCH_CATEGORIES.filter((value) => available.has(value))] as SearchFilter[]
-        ).map((value) => (
-          <Button
-            key={value}
-            variant={category === value ? "secondary" : "ghost"}
-            size="sm"
-            aria-pressed={category === value}
-            onClick={() => onChange(value)}
-            onKeyDown={keepButtonActivation}
-          >
-            {t(`search:${value}`)}
-          </Button>
-        ))}
+    <BlurReveal {...SEARCH_REVEAL} asChild order={1} delayMs={24}>
+      <div className="magic-search-categories">
+        <HorizontalScroll label={t("search:categories")} edgeControls="shadows">
+          {(
+            ["all", ...SEARCH_CATEGORIES.filter((value) => available.has(value))] as SearchFilter[]
+          ).map((value) => (
+            <Button
+              key={value}
+              variant={category === value ? "secondary" : "ghost"}
+              size="sm"
+              aria-pressed={category === value}
+              onClick={() => onChange(value)}
+              onKeyDown={keepButtonActivation}
+            >
+              {t(`search:${value}`)}
+            </Button>
+          ))}
+        </HorizontalScroll>
       </div>
     </BlurReveal>
   );
@@ -329,13 +332,13 @@ const ResultRow = memo(
   }) {
     const Icon = getSearchIcon(item);
     return (
-      <CommandItem
-        value={item.id}
-        disabled={Boolean(item.disabled)}
-        aria-description={item.disabled}
-        onSelect={() => onChoose(item)}
-      >
-        <BlurReveal {...SEARCH_REVEAL} asChild order={order} delayMs={delayMs}>
+      <BlurReveal {...SEARCH_REVEAL} asChild order={order} delayMs={delayMs}>
+        <CommandItem
+          value={item.id}
+          disabled={Boolean(item.disabled)}
+          aria-description={item.disabled}
+          onSelect={() => onChoose(item)}
+        >
           <span className="magic-search-item-content">
             <Icon size={16} strokeWidth={1.6} />
             <span className="magic-search-item-copy">
@@ -350,8 +353,8 @@ const ResultRow = memo(
               </KbdGroup>
             )}
           </span>
-        </BlurReveal>
-      </CommandItem>
+        </CommandItem>
+      </BlurReveal>
     );
     // Entrance positions are captured at mount; changing their rank must not rebuild retained rows.
   },

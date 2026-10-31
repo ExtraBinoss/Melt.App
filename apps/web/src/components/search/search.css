@@ -38,6 +38,10 @@
   min-width: 0;
   transform-origin: top center;
 }
+/* Mount/focus work must not spend the child reveal clock behind an invisible panel. */
+.magic-search-dialog[data-search-reveal="pending"] .blur-reveal {
+  animation-play-state: paused;
+}
 .magic-search-item-content {
   display: flex;
   align-items: center;
@@ -75,12 +79,13 @@
   height: 58px;
 }
 .magic-search-categories {
+  min-width: 0;
+  border-bottom: 1px solid var(--border);
+}
+.magic-search-categories .horizontal-scroll-content {
   display: flex;
   gap: 3px;
   padding: 10px 12px;
-  overflow-x: auto;
-  scrollbar-width: thin;
-  border-bottom: 1px solid var(--border);
 }
 .magic-search-categories button {
   height: 27px;
@@ -122,6 +127,7 @@
   color: var(--foreground);
 }
 .magic-search-command [data-slot="command-item"][data-disabled="true"] {
+  --blur-reveal-opacity: 0.48;
   opacity: 0.48;
   cursor: default;
 }

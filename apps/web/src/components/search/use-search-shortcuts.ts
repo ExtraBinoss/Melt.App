@@ -13,7 +13,9 @@ export function useSearchShortcuts(onToggle: () => void, onShortcuts: () => void
       if (command !== "app:search" && command !== "action:shortcuts") return;
       const focus = target instanceof HTMLElement ? target : document.activeElement;
       const modal =
-        focus?.closest('[role="dialog"],[role="alertdialog"]') ??
+        focus?.closest(
+          '[role="dialog"]:not([data-state="closed"]),[role="alertdialog"]:not([data-state="closed"])',
+        ) ??
         [
           ...document.querySelectorAll(
             '[role="dialog"]:not([data-state="closed"]),[role="alertdialog"]:not([data-state="closed"])',

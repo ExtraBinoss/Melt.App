@@ -385,16 +385,18 @@ test("initial reveal uses one global top-to-bottom sequence and keeps retained r
     parseFloat(reveal.style.getPropertyValue("--blur-reveal-delay")),
   );
   expect(delays[0]).toBe(0);
-  expect(delays[1]).toBe(4);
-  expect(delays.at(-1)).toBe(48);
+  expect(delays[1]).toBe(24);
+  expect(delays[2]).toBe(48);
+  expect(delays.at(-1)).toBeLessThanOrEqual(264);
   expect(delays.every((delay, index) => !index || delay >= delays[index - 1]!)).toBe(true);
   fireEvent.change(d.input, { target: { value: "flou" } });
-  const row = screen.getAllByRole("option")[0]!.querySelector<HTMLElement>("[data-blur-reveal]")!;
+  const row = screen.getAllByRole("option")[0]!;
+  expect(row).toHaveAttribute("data-blur-reveal");
   const order = row.dataset.blurOrder,
     delay = row.style.getPropertyValue("--blur-reveal-delay"),
     icons = vi.mocked(getSearchIcon).mock.calls.length;
   fireEvent.change(d.input, { target: { value: "flou " } });
-  expect(screen.getAllByRole("option")[0]!.querySelector("[data-blur-reveal]")).toBe(row);
+  expect(screen.getAllByRole("option")[0]).toBe(row);
   expect(row.dataset.blurOrder).toBe(order);
   expect(row.style.getPropertyValue("--blur-reveal-delay")).toBe(delay);
   expect(getSearchIcon).toHaveBeenCalledTimes(icons);

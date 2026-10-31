@@ -89,3 +89,11 @@
   opacity: 1;
   pointer-events: auto;
 }
+
+/* Masked glass fades still need transparent hit areas for edge-hover scrolling. */
+.horizontal-scroll[data-scroll-controls="shadows"]
+  .scroll-shadow[data-scroll-shadow-fade="mask"]
+  > .scroll-shadow-side {
+  display: block;
+  background: none;
+}
