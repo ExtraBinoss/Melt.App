@@ -70,5 +70,7 @@
   "zoom": "Agrandir l’aperçu",
   "backgroundInfo": "Export en arrière-plan",
   "estimatedSize": "Poids estimé",
-  "estimateHint": "Poids estimé ; le fichier final peut varier."
+  "estimateHint": "Poids estimé ; le fichier final peut varier.",
+  "centerSelection": "Centrer le calque sélectionné",
+  "centerSelectionHint": "Conserve la taille du plan de travail et centre le calque sélectionné dans l’aperçu et l’export. Préserve son animation sans modifier le projet."
 }

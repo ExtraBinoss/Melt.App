@@ -10,7 +10,13 @@ export interface MotionPreviewState {
 }
 export interface MotionPreviewOptions extends Pick<
   MotionVideoExportOptions,
-  "selection" | "compositionId" | "mediaResolver" | "fontResolver" | "forceWebGL" | "maxGpuBytes"
+  | "centerSelection"
+  | "selection"
+  | "compositionId"
+  | "mediaResolver"
+  | "fontResolver"
+  | "forceWebGL"
+  | "maxGpuBytes"
 > {
   /** Physical raster edge, independent of delivered export resolution; maximum 768. */
   edge?: number;

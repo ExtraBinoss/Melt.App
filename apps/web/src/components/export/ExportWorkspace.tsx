@@ -1,3 +1,4 @@
+import { InfoTooltip } from "../shared/InfoTooltip";
 import { usePreviewAdmission } from "./use-preview-admission";
 import type { RefObject } from "react";
 import { freezeEffectPreviews } from "../../state/session/effect-preview";
@@ -45,6 +46,7 @@ export function ExportWorkspace({
     initialKind ?? (page.motion?.mode === "motion" ? "motion" : "image"),
   );
   const [whole, setWhole] = useState(false);
+  const [center, setCenter] = useState(false);
   const [allPages, setAllPages] = useState(false);
   const jobs = getExportJobs(engine);
   const busy = useSyncExternalStore(
@@ -103,6 +105,21 @@ export function ExportWorkspace({
           />
         </label>
       )}
+      {selection.length === 1 && (
+        <div className="switch-row">
+          <div className="export-label-help">
+            <Label htmlFor="export-center-selection">{t("centerSelection")}</Label>
+            <InfoTooltip label={t("centerSelection")}>{t("centerSelectionHint")}</InfoTooltip>
+          </div>
+          <Switch
+            id="export-center-selection"
+            aria-label={t("centerSelection")}
+            checked={center}
+            disabled={busy}
+            onCheckedChange={setCenter}
+          />
+        </div>
+      )}
       {(allPages || selection.length > 0) && (
         <p className="export-scope">
           {allPages
@@ -134,6 +151,7 @@ export function ExportWorkspace({
     origin,
     page,
     selection,
+    centerSelection: center && selection.length === 1,
     controls,
     onClose,
     previewActive,

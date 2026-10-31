@@ -224,3 +224,21 @@ test("the actual preview queue rejects a late second-page mask render after its 
     vi.unstubAllGlobals();
   }
 });
+test("centered selection previews retain artboard dimensions and cannot reuse a cropped or resized cached result", async () => {
+  const { engine, preview, run } = fixture();
+  const before = engine.getSnapshot();
+  await run({ selection: ["a"] });
+  await run({ selection: ["a"], centerSelection: true });
+  expect(preview.mock.calls[0]![0]).not.toBe(preview.mock.calls[1]![0]);
+  expect(preview.mock.calls[1]![1]).toMatchObject({
+    width: before.project.pages[0]!.width,
+    height: before.project.pages[0]!.height,
+  });
+  const current = preview.mock.calls[1]![3]!.isCurrent!;
+  expect(current()).toBe(true);
+  expect(engine.getSnapshot()).toBe(before);
+  engine.execute({ type: "updatePage", patch: { width: 600 } });
+  expect(current()).toBe(false);
+  await run({ selection: ["a"], centerSelection: true });
+  expect(preview.mock.calls[2]![0]).not.toBe(preview.mock.calls[1]![0]);
+});

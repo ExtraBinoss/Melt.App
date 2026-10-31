@@ -3,5 +3,7 @@
   "estimatedSize": "Szacowany rozmiar",
   "backgroundHint": "Eksport trwa dalej po zamknięciu tego okna.",
   "estimateHint": "Szacowany rozmiar; końcowy plik może się różnić.",
-  "job_running": "{{percent}}%"
+  "job_running": "{{percent}}%",
+  "centerSelection": "Wyśrodkuj wybraną warstwę",
+  "centerSelectionHint": "Zachowuje rozmiar obszaru roboczego i wyśrodkowuje wybraną warstwę w podglądzie i eksporcie. Zachowuje animację bez zmiany projektu."
 }

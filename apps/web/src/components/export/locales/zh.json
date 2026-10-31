@@ -3,5 +3,7 @@
   "estimatedSize": "预计大小",
   "backgroundHint": "关闭此对话框后，导出仍会继续。",
   "estimateHint": "此为预计大小，最终文件大小可能不同。",
-  "job_running": "{{percent}}%"
+  "job_running": "{{percent}}%",
+  "centerSelection": "居中选中的图层",
+  "centerSelectionHint": "保留画板尺寸，并在预览和导出时将选中的图层居中。不修改项目，同时保留动画。"
 }

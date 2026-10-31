@@ -3,5 +3,7 @@
   "estimatedSize": "Tamaño estimado",
   "backgroundHint": "La exportación continúa si cierras este diálogo.",
   "estimateHint": "Tamaño estimado; el archivo final puede variar.",
-  "job_running": "{{percent}}%"
+  "job_running": "{{percent}}%",
+  "centerSelection": "Centrar la capa seleccionada",
+  "centerSelectionHint": "Conserva el tamaño de la mesa de trabajo y centra la capa seleccionada en la vista previa y la exportación. Mantiene su animación sin modificar el proyecto."
 }

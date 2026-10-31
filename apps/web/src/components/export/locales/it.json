@@ -3,5 +3,7 @@
   "estimatedSize": "Dimensione stimata",
   "backgroundHint": "L’esportazione continua se chiudi questa finestra.",
   "estimateHint": "Dimensione stimata; il file finale può variare.",
-  "job_running": "{{percent}}%"
+  "job_running": "{{percent}}%",
+  "centerSelection": "Centra il livello selezionato",
+  "centerSelectionHint": "Mantiene le dimensioni della tavola e centra il livello selezionato nell’anteprima e nell’esportazione. Conserva l’animazione senza modificare il progetto."
 }

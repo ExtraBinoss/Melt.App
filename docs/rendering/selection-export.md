@@ -9,6 +9,15 @@
 | Multiple artboards    | Multi-artboard output remains an explicit ZIP option.                                                                                                   |
 | Export scale          | Scale changes affect delivered resolution rather than the size of the preview viewport.                                                                 |
 
+With exactly one selected layer, **Center selected layer** keeps the authored
+artboard size and centers the isolated subtree. Its information tooltip is
+translated in all twelve locales. The control is absent for no selection,
+multiple selections and whole-artboard/archive output. Centering is opt-in,
+retains transparent selection backgrounds and never edits the document.
+Motion and Timelapse apply one fixed offset, preserving animated displacement
+rather than following and cancelling it. Image, print and video previews use the
+same framing as their exports; centered preview cache keys include artboard size.
+
 ### Derived selection graph
 
 | Export topic        | Contract                                                                                                                                                                   |

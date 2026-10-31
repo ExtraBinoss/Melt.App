@@ -17,12 +17,14 @@ export function MotionExportPreview({
   paused = false,
   onReady,
   selection,
+  centerSelection = false,
 }: {
   project: Project;
   page: Composition;
   services: EditorServices;
   paused?: boolean;
   selection?: readonly string[];
+  centerSelection?: boolean;
   onReady?: (preview: ReturnType<typeof createMotionPreview> | null) => void;
 }) {
   const { t } = useTranslation("exportPanel");
@@ -31,7 +33,10 @@ export function MotionExportPreview({
   const [monitor, setMonitor] = useState<PreviewAudio | undefined>();
   const source = useRef<ReturnType<typeof createMotionPreview> | null>(null);
   const pauseRequested = useRef(paused);
-  const owner = useMemo(() => ({ project, page, selection }), [project, page, selection]);
+  const owner = useMemo(
+    () => ({ project, page, selection, centerSelection }),
+    [project, page, selection, centerSelection],
+  );
   const [playing, setPlaying] = useState(true);
   const [presentation, setPresentation] = useState<{
     owner: object;
@@ -56,6 +61,7 @@ export function MotionExportPreview({
         preview = createMotionPreview(project, {
           compositionId: page.id,
           selection,
+          centerSelection,
           edge: 768,
           presentation: getUiPresentation(),
           mediaResolver: services.mediaResolverFor?.(project.id),
@@ -153,7 +159,7 @@ export function MotionExportPreview({
       if (managed) void managed.dispose().catch(() => {});
       else if (preview) void preview.dispose().catch(() => {});
     };
-  }, [project, page, services, paused, onReady, slider, selection, owner]);
+  }, [project, page, services, paused, onReady, slider, selection, centerSelection, owner]);
   useEffect(() => {
     pauseRequested.current = paused;
     if (paused) source.current?.pause();

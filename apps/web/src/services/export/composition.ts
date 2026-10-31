@@ -68,6 +68,7 @@ export function createCompositionExporter(
         const result = await renderer.exportMotionVideo(project, {
           compositionId: page.id,
           selection: options.selection,
+          centerSelection: options.centerSelection,
           beforeFrame: options.beforeFrame,
           scale: options.scale,
           container: options.container,
@@ -94,11 +95,16 @@ export function createCompositionExporter(
           ? project.pages
           : [
               options.image.selectionOnly && ids.length
-                ? selectionComposition(page, ids, [
-                    project.id,
-                    ...project.pages.map((item) => item.id),
-                    ...Object.keys(project.assets),
-                  ])
+                ? selectionComposition(
+                    page,
+                    ids,
+                    [
+                      project.id,
+                      ...project.pages.map((item) => item.id),
+                      ...Object.keys(project.assets),
+                    ],
+                    { centerInArtboard: options.centerSelection },
+                  )
                 : page,
             ];
         const files: Record<string, Uint8Array> = {};

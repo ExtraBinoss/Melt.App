@@ -8,6 +8,7 @@ export interface VideoExportOptions {
   fontResolver?: FontResolver;
   mediaResolver?: MediaSourceResolver;
   selection?: readonly string[];
+  centerSelection?: boolean;
   beforeFrame?: () => Promise<void>;
   duration: number;
   fps: number;
@@ -74,7 +75,11 @@ export async function exportReplayVideo(
   const lastPage = final.pages.find((page) => page.id === pageId);
   if (!lastPage) throw new VideoExportError("missingPage");
   const selection = options.selection?.length
-    ? (await import("@musart/render")).selectionFrameScope(lastPage, options.selection)
+    ? (await import("@musart/render")).selectionFrameScope(
+        lastPage,
+        options.selection,
+        options.centerSelection,
+      )
     : { page: lastPage, frame: (page: Composition) => page };
   const width = Math.max(1, Math.round(selection.page.width * scale));
   const height = Math.max(1, Math.round(selection.page.height * scale));

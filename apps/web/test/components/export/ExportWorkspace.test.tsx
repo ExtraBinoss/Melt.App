@@ -120,3 +120,46 @@ test("the leave dialog offers a calm stay option and cancels only after explicit
   });
   expect(jobs.read()?.status).toBe("cancelled");
 });
+test("offers translated centering help only for one selected layer and forwards the same scope without document edits", async () => {
+  const d = setup();
+  d.engine.select([d.rectangle.id]);
+  const before = d.engine.getSnapshot();
+  d.services.exportComposition = vi.fn(async () => ({
+    mode: "static" as const,
+    filename: "center.png",
+    mimeType: "image/png",
+    bytes: 1,
+    width: d.page.width,
+    height: d.page.height,
+  }));
+  const view = d.mount(
+    <ExportWorkspace engine={d.engine} services={d.services} onClose={vi.fn()} />,
+  );
+  const control = screen.getByRole("switch", { name: "Centrer le calque sélectionné" });
+  expect(control).not.toBeChecked();
+  fireEvent.click(screen.getByRole("button", { name: "Centrer le calque sélectionné" }));
+  expect(await screen.findByRole("tooltip")).toHaveTextContent(
+    "Conserve la taille du plan de travail",
+  );
+  fireEvent.click(control);
+  expect(control).toBeChecked();
+  fireEvent.click(screen.getByRole("button", { name: "Exporter l’image" }));
+  await waitFor(() =>
+    expect(d.services.exportComposition).toHaveBeenCalledWith(
+      expect.objectContaining({ centerSelection: true, selection: [d.rectangle.id] }),
+      expect.anything(),
+    ),
+  );
+  expect(d.engine.getSnapshot()).toBe(before);
+  await waitFor(() => expect(getExportJobs(d.engine).pending).toBe(false));
+  view.unmount();
+  for (const ids of [[], [d.rectangle.id, d.text.id]]) {
+    d.engine.select(ids);
+    const hidden = d.mount(
+      <ExportWorkspace engine={d.engine} services={d.services} onClose={vi.fn()} />,
+    );
+    expect(screen.queryByRole("switch", { name: "Centrer le calque sélectionné" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Centrer le calque sélectionné" })).toBeNull();
+    hidden.unmount();
+  }
+});

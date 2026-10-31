@@ -6,6 +6,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Add a translated Center selected layer export switch and information tooltip only for a single selected layer. Preserve authored artboard dimensions, shift the isolated layer once without editing the document, and share identical framing across image, print, Motion and Timelapse previews and exports. Keep animated movement, masks, stale preview rejection and crop-cache identities intact.
+
 - Start canvas playback preparation without a redundant animation-frame wait, retaining RAF coalescing for still edits and one prepared playing pose until real display. Cancel retired microtasks on navigation/device loss/disposal and prevent superseded poses from blocking newer frames; preserve authored timing and buffering credits.
 - Fix video flashes from native BGRX/RGBX proxy frames: preserve packed RGB during the Three.js upload and force opaque coverage in the existing TSL pass instead of interpreting padding as alpha. Retain actual-alpha/YUV behavior, pooled textures and native lease ownership; add real WebGPU/WebGL padding and color regressions.
 - Add development-only Motion frame lineage to Chrome traces: decoded source PTS, GPU reuse/upload/gap decisions, completed composition textures and display submissions. Keep production disabled and runtime marks unretained; document the supplied remaining Bloom flashes and reproduction limits without claiming a verified fix.

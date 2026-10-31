@@ -38,6 +38,8 @@ export function createPreviewExport(
       throw new Error("Invalid preview size.");
     if (variant && (options.all || ids.length !== 1))
       throw new TypeError("Attachment previews require one selected layer.");
+    const centered =
+      options.centerSelection === true && !options.all && !variant && ids.length === 1;
     const identityOptions = { includeDisabledMasks: variant?.kind === "mask" };
     const page =
       !options.all && ids.length
@@ -50,6 +52,7 @@ export function createPreviewExport(
               ...Object.keys(snapshot.project.assets),
             ],
             variant,
+            centered,
           )
         : source;
     const appearance =
@@ -64,6 +67,7 @@ export function createPreviewExport(
       options.all ? [] : ids,
       edge,
       variant ?? null,
+      centered ? [source.width, source.height] : null,
       options.colorOutput ?? "display",
     ]);
     return thumbnails.preview(key, page, snapshot.project.assets, {
@@ -81,6 +85,11 @@ export function createPreviewExport(
           return false;
         const currentPage = current.project.pages.find((candidate) => candidate.id === sourceId);
         if (!currentPage) return false;
+        if (
+          centered &&
+          (currentPage.width !== source.width || currentPage.height !== source.height)
+        )
+          return false;
         if (appearance !== null) {
           try {
             return (

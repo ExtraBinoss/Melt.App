@@ -6,6 +6,8 @@ import type { FontResolver } from "../../surface/text/fonts";
 export interface MotionVideoExportOptions {
   compositionId: string;
   selection?: readonly string[];
+  /** Center a single selected layer in the authored artboard, with a fixed animation offset. */
+  centerSelection?: boolean;
   beforeFrame?: () => Promise<void>;
   frameRate?: MotionFrameRate;
   scale?: number;

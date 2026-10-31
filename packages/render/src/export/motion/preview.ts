@@ -21,7 +21,11 @@ export function createMotionPreview(project: Project, options: MotionPreviewOpti
       "missingMotion",
       "Motion preview requires an authored Motion composition.",
     );
-  const selection = selectionFrameScope(program.composition, options.selection);
+  const selection = selectionFrameScope(
+    program.composition,
+    options.selection,
+    options.centerSelection,
+  );
   const edge = options.edge ?? 768;
   if (!Number.isInteger(edge) || edge < 16 || edge > 768)
     throw new MotionExportError("invalidOptions", "Motion preview edge must be 16–768 pixels.");

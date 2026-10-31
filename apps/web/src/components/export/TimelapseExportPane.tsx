@@ -49,6 +49,7 @@ export function TimelapseExportPane(props: ExportPaneProps) {
     media,
     selection,
     true,
+    props.centerSelection,
   );
   useEffect(() => {
     const controller = new AbortController();
@@ -147,6 +148,7 @@ export function TimelapseExportPane(props: ExportPaneProps) {
               fontResolver: services.fonts?.resolve,
               mediaResolver: media,
               selection,
+              centerSelection: props.centerSelection,
               beforeFrame,
             });
             signal.throwIfAborted();

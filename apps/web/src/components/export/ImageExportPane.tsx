@@ -45,8 +45,11 @@ export function ImageExportPane(
   const [edge, setEdge] = useState<number | null>(null);
   const selectionOnly = selection.length > 0 && !allPages;
   const scope = useMemo(
-    () => (selectionOnly ? selectionComposition(page, selection) : page),
-    [page, selection, selectionOnly],
+    () =>
+      selectionOnly
+        ? selectionComposition(page, selection, [], { centerInArtboard: props.centerSelection })
+        : page,
+    [page, selection, selectionOnly, props.centerSelection],
   );
   const previewServices = useMemo(
     () => ({
@@ -58,13 +61,14 @@ export function ImageExportPane(
             services.previewExport!(
               {
                 ...request,
+                centerSelection: props.centerSelection,
                 colorOutput: options.colorMode === "cmyk" ? "source" : "display",
               },
               signal,
             )
         : undefined,
     }),
-    [services, options.colorMode],
+    [services, options.colorMode, props.centerSelection],
   );
   const preview = useExportPreview(
     page,
@@ -122,6 +126,7 @@ export function ImageExportPane(
           await services.exportComposition(
             {
               mode: "static",
+              centerSelection: props.centerSelection,
               compositionId: page.id,
               scale,
               image: { ...options, allPages, selectionOnly },

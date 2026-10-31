@@ -30,7 +30,11 @@ export async function exportMotionVideo(
     options.frameRate ?? program.composition.motion.frameRate,
     options.maxFrames,
   );
-  const selection = selectionFrameScope(program.composition, options.selection);
+  const selection = selectionFrameScope(
+    program.composition,
+    options.selection,
+    options.centerSelection,
+  );
   const scale = options.scale ?? 1;
   assertRenderSize(selection.page, scale);
   const width = rasterExtent(selection.page.width, scale),

@@ -348,11 +348,16 @@ export function createEditorServices(
         ? project.pages
         : [
             options.selectionOnly
-              ? selectionComposition(active, snapshot.selection, [
-                  project.id,
-                  ...project.pages.map((item) => item.id),
-                  ...Object.keys(project.assets),
-                ])
+              ? selectionComposition(
+                  active,
+                  snapshot.selection,
+                  [
+                    project.id,
+                    ...project.pages.map((item) => item.id),
+                    ...Object.keys(project.assets),
+                  ],
+                  { centerInArtboard: options.centerSelection },
+                )
               : active,
           ];
       const { exportComposition } = await renderer();

@@ -1,9 +1,13 @@
 import { selectionComposition, type Composition } from "@musart/core";
 
 /** Keep the authored selection's crop fixed across animation/replay instead of following its motion. */
-export function selectionFrameScope(origin: Composition, selection?: readonly string[]) {
+export function selectionFrameScope(
+  origin: Composition,
+  selection?: readonly string[],
+  centerSelection = false,
+) {
   if (!selection?.length) return { page: origin, frame: (page: Composition) => page };
-  const base = selectionComposition(origin, selection);
+  const base = selectionComposition(origin, selection, [], { centerInArtboard: centerSelection });
   const root = base.layers.find(
     (layer) => !layer.parentId && origin.layers.some((item) => item.id === layer.id),
   )!;

@@ -3,5 +3,7 @@
   "estimatedSize": "Geschätzte Größe",
   "backgroundHint": "Der Export läuft weiter, wenn du diesen Dialog schließt.",
   "estimateHint": "Geschätzte Größe; die endgültige Datei kann abweichen.",
-  "job_running": "{{percent}}%"
+  "job_running": "{{percent}}%",
+  "centerSelection": "Ausgewählte Ebene zentrieren",
+  "centerSelectionHint": "Behält die Größe der Zeichenfläche bei und zentriert die ausgewählte Ebene in Vorschau und Export. Die Animation bleibt erhalten, das Projekt unverändert."
 }

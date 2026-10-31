@@ -70,5 +70,7 @@
   "zoom": "Zoom preview",
   "backgroundInfo": "Background export",
   "estimatedSize": "Estimated size",
-  "estimateHint": "Estimated size; the final file may vary."
+  "estimateHint": "Estimated size; the final file may vary.",
+  "centerSelection": "Center selected layer",
+  "centerSelectionHint": "Keeps the artboard size and centers the selected layer for preview and export. Preserves its animation without changing the project."
 }

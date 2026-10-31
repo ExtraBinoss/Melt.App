@@ -3,5 +3,7 @@
   "estimatedSize": "Tamanho estimado",
   "backgroundHint": "A exportação continua se fechar esta janela.",
   "estimateHint": "Tamanho estimado; o ficheiro final pode variar.",
-  "job_running": "{{percent}}%"
+  "job_running": "{{percent}}%",
+  "centerSelection": "Centrar a camada selecionada",
+  "centerSelectionHint": "Mantém o tamanho da prancheta e centra a camada selecionada na pré-visualização e na exportação. Preserva a animação sem alterar o projeto."
 }

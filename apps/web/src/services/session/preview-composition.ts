@@ -12,8 +12,10 @@ export function previewComposition(
   ids: readonly string[],
   reserved: Iterable<string>,
   variant?: LayerPreviewVariant,
+  centerSelection = false,
 ): Composition {
-  if (!variant) return selectionComposition(page, ids, reserved);
+  if (!variant)
+    return selectionComposition(page, ids, reserved, { centerInArtboard: centerSelection });
   if (ids.length !== 1) throw new TypeError("Attachment previews require one layer owner.");
   const geometry = createLayerGeometryIndex(page),
     owner = geometry.get(ids[0]!);

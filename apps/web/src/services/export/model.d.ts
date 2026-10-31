@@ -11,6 +11,7 @@ export interface CompositionExportScope {
 }
 export type CompositionExportOptions = {
   compositionId: string;
+  centerSelection?: boolean;
   scale: number;
   signal?: AbortSignal;
   onProgress?: (fraction: number) => void;

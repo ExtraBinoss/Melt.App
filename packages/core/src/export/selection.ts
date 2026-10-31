@@ -125,6 +125,7 @@ export function selectionComposition(
   page: Composition,
   selection: readonly string[],
   reservedIds: Iterable<string> = [],
+  options: { centerInArtboard?: boolean } = {},
 ): Composition {
   const selected = new Set(selection);
   ensure(selected.size > 0, "INVALID_COMMAND", "Export selection is empty");
@@ -157,17 +158,20 @@ export function selectionComposition(
         ? { ...layer.mask, layerId: dependencies.ids.get(layer.mask.layerId)! }
         : layer.mask,
     }));
+  const centered = options.centerInArtboard === true && selected.size === 1;
+  const offsetX = centered ? (minX + maxX - page.width) / 2 : left;
+  const offsetY = centered ? (minY + maxY - page.height) / 2 : top;
   return {
     ...page,
     name: roots.length === 1 ? geometry.get(roots[0]!).name : page.name,
-    width: Math.max(1, right - left),
-    height: Math.max(1, bottom - top),
+    width: centered ? page.width : Math.max(1, right - left),
+    height: centered ? page.height : Math.max(1, bottom - top),
     background: "transparent",
     rulers: false,
     guides: [],
     margins: { top: 0, right: 0, bottom: 0, left: 0 },
     layers: [...dependencies.layers, ...originals].map((layer) =>
-      layer.parentId ? layer : { ...layer, x: layer.x - left, y: layer.y - top },
+      layer.parentId ? layer : { ...layer, x: layer.x - offsetX, y: layer.y - offsetY },
     ),
   };
 }

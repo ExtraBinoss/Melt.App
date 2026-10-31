@@ -25,6 +25,7 @@ export function useTimelapsePreview(
   mediaResolver?: MediaSourceResolver,
   selection?: readonly string[],
   autoPlay = false,
+  centerSelection = false,
 ) {
   const viewport = useRef<HTMLDivElement>(null);
   const slider = useMemo(() => createSliderValue([0]), []);
@@ -79,7 +80,11 @@ export function useTimelapsePreview(
         if (!final) throw new Error("Replay page is missing.");
         if (!crop)
           crop = selection?.length
-            ? (await import("@musart/render")).selectionFrameScope(final, selection)
+            ? (await import("@musart/render")).selectionFrameScope(
+                final,
+                selection,
+                centerSelection,
+              )
             : { page: final, frame: (page) => page };
         while (requested !== null && !stopped) {
           const index = requested;
@@ -164,6 +169,16 @@ export function useTimelapsePreview(
     return () => {
       void release().catch(() => {});
     };
-  }, [spec, pageId, active, fontResolver, mediaResolver, slider, selection, autoPlay]);
+  }, [
+    spec,
+    pageId,
+    active,
+    fontResolver,
+    mediaResolver,
+    slider,
+    selection,
+    autoPlay,
+    centerSelection,
+  ]);
   return { viewport, slider, clock, status, playing, controls };
 }

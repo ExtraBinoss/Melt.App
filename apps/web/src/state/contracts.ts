@@ -86,6 +86,7 @@ export interface ExportOptions {
   quality: number;
   allPages: boolean;
   selectionOnly?: boolean;
+  centerSelection?: boolean;
 }
 export interface ExportScope {
   page: Composition;
@@ -94,6 +95,7 @@ export interface ExportScope {
 }
 export type LayerPreviewVariant = { kind: "effect"; effectId: string } | { kind: "mask" };
 export interface ExportPreviewOptions {
+  centerSelection?: boolean;
   /** Bypass the canvas proof only when the next stage performs native CMYK conversion. */
   colorOutput?: "display" | "source";
   /** A genuine intermediate effect or mask coverage preview, scoped to one selected owner. */

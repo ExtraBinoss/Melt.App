@@ -3,5 +3,7 @@
   "estimatedSize": "Geschatte grootte",
   "backgroundHint": "De export gaat door als je dit venster sluit.",
   "estimateHint": "Geschatte grootte; het uiteindelijke bestand kan afwijken.",
-  "job_running": "{{percent}}%"
+  "job_running": "{{percent}}%",
+  "centerSelection": "Geselecteerde laag centreren",
+  "centerSelectionHint": "Behoudt het formaat van het tekengebied en centreert de geselecteerde laag in het voorbeeld en de export. Behoudt de animatie zonder het project te wijzigen."
 }

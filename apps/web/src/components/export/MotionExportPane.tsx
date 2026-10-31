@@ -32,8 +32,11 @@ export function MotionExportPane(props: ExportPaneProps) {
   }, []);
   const start = useStartExport(props, "motion");
   const scope = useMemo(
-    () => (selection.length ? selectionComposition(page, selection) : page),
-    [page, selection],
+    () =>
+      selection.length
+        ? selectionComposition(page, selection, [], { centerInArtboard: props.centerSelection })
+        : page,
+    [page, selection, props.centerSelection],
   );
   const motion = page.motion!;
   const rate =
@@ -58,6 +61,7 @@ export function MotionExportPane(props: ExportPaneProps) {
             page={page}
             services={services}
             selection={selection}
+            centerSelection={props.centerSelection}
             paused={busy || props.previewActive === false}
             onReady={receive}
           />
@@ -82,6 +86,7 @@ export function MotionExportPane(props: ExportPaneProps) {
           await services.exportComposition(
             {
               mode: "motion",
+              centerSelection: props.centerSelection,
               compositionId: page.id,
               scale,
               container,

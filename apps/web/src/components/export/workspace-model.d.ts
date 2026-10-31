@@ -6,6 +6,7 @@ export interface ExportPaneProps {
   origin: SessionSnapshot;
   page: Composition;
   selection: readonly string[];
+  centerSelection?: boolean;
   controls: ReactNode;
   services: EditorServices;
   previewActive?: boolean;
