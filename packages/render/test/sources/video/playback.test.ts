@@ -43,7 +43,7 @@ test("keeps one presentation-order stream across forward frames with bounded hot
   expect(d.starts).toEqual([0]);
   expect(d.consumed()).toBe(4);
   expect(d.cursor.stats().cacheHits).toBe(2);
-  expect(d.cursor.stats().cachedFrames).toBeLessThanOrEqual(2);
+  expect(d.cursor.stats().cachedFrames).toBe(2);
   await d.cursor.dispose();
   expect(d.closed).toHaveBeenCalledOnce();
   expect(d.frames.every((frame) => frame.closed && frame.closes === 1)).toBe(true);
@@ -62,6 +62,24 @@ test("cancels a long stream without draining it and waits for the borrowed frame
   lease!.release();
   await disposal;
   expect(d.consumed()).toBe(1);
+});
+test("shrinks retained history for dense playback without closing a borrowed frame", async () => {
+  const d = fixture();
+  const first = await d.cursor.requestFrame({ value: 0, rate: 1 });
+  first!.release();
+  const current = await d.cursor.requestFrame({ value: 1, rate: 1 });
+  expect(d.cursor.stats().cachedFrames).toBe(2);
+  d.cursor.setCacheLimit(1);
+  expect(d.cursor.stats()).toMatchObject({ cachedFrames: 1, borrowedFrames: 1 });
+  expect((current!.frame as unknown as FakeFrame).closed).toBe(false);
+  current!.release();
+  d.cursor.setCacheLimit(2);
+  const next = await d.cursor.requestFrame({ value: 2, rate: 1 });
+  next!.release();
+  expect(d.cursor.stats().cachedFrames).toBe(2);
+  await d.cursor.dispose();
+  expect(d.frames.every((frame) => frame.closed && frame.closes === 1)).toBe(true);
+  expect(() => d.cursor.setCacheLimit(1)).toThrow("closed");
 });
 test("rejects reverse, concurrent and stale native results without leaking decoded frames", async () => {
   const d = fixture(),

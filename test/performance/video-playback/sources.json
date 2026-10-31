@@ -1,0 +1,138 @@
+[
+  {
+    "name": "Flowing Water",
+    "page": "https://www.focastock.com/video/flowing-water",
+    "url": "https://cdn.focastock.com/videos/P6222019.mp4",
+    "file": "P6222019.mp4",
+    "license": "CC0-1.0",
+    "licenseUrl": "https://www.focastock.com/license",
+    "bytes": 22342572,
+    "sha256": "a0548dd0aa636db49eae41984dc1dc54712a399f09a7df59dbb3387cfdf88164",
+    "probe": {
+      "codec_name": "h264",
+      "width": 1920,
+      "height": 1080,
+      "avg_frame_rate": "30000/1001",
+      "duration": "10.010000"
+    }
+  },
+  {
+    "name": "Bees in Flower Garden",
+    "page": "https://www.focastock.com/video/bees-in-flower-garden",
+    "url": "https://cdn.focastock.com/videos/P1300184.mp4",
+    "file": "P1300184.mp4",
+    "license": "CC0-1.0",
+    "licenseUrl": "https://www.focastock.com/license",
+    "bytes": 32159154,
+    "sha256": "d2b00c46a3035b76696898da626b6dcdf8ae5a2652b3b9a4651f0d47bbcc397e",
+    "probe": {
+      "codec_name": "h264",
+      "width": 1920,
+      "height": 1080,
+      "avg_frame_rate": "60000/1001",
+      "duration": "10.493817"
+    }
+  },
+  {
+    "name": "Coding on Laptop",
+    "page": "https://www.focastock.com/video/coding-on-laptop",
+    "url": "https://cdn.focastock.com/videos/P1140574.mp4",
+    "file": "P1140574.mp4",
+    "license": "CC0-1.0",
+    "licenseUrl": "https://www.focastock.com/license",
+    "bytes": 21134986,
+    "sha256": "000ab58ee785dbb753e8f3f6c7eac2b7553b58adf4901f9ff7bd5bf07c6ccea5",
+    "probe": {
+      "codec_name": "h264",
+      "width": 1920,
+      "height": 1080,
+      "avg_frame_rate": "60000/1001",
+      "duration": "8.008000"
+    }
+  },
+  {
+    "name": "Cars and Buses on City Street",
+    "page": "https://www.focastock.com/video/cars-and-buses-on-city-street",
+    "url": "https://cdn.focastock.com/videos/P1080278.mp4",
+    "file": "P1080278.mp4",
+    "license": "CC0-1.0",
+    "licenseUrl": "https://www.focastock.com/license",
+    "bytes": 39255736,
+    "sha256": "b7d43d63515e2f5221a383edf17f0657ad22eda351c5d6c49f8fe103eb53b744",
+    "probe": {
+      "codec_name": "h264",
+      "width": 1920,
+      "height": 1080,
+      "avg_frame_rate": "60000/1001",
+      "duration": "12.629283"
+    }
+  },
+  {
+    "name": "Blurred Car Lights",
+    "page": "https://www.focastock.com/video/blurred-car-lights",
+    "url": "https://cdn.focastock.com/videos/P9210792.mp4",
+    "file": "P9210792.mp4",
+    "license": "CC0-1.0",
+    "licenseUrl": "https://www.focastock.com/license",
+    "bytes": 31781072,
+    "sha256": "490cb5bcafb16ce24bb5904d382957de852296f6b4229fd902b5122019eb5e05",
+    "probe": {
+      "codec_name": "h264",
+      "width": 1920,
+      "height": 1080,
+      "avg_frame_rate": "30000/1001",
+      "duration": "16.016000"
+    }
+  },
+  {
+    "name": "Blurred Car Lights in City",
+    "page": "https://www.focastock.com/video/blurred-car-lights-in-city",
+    "url": "https://cdn.focastock.com/videos/P1060070.mp4",
+    "file": "P1060070.mp4",
+    "license": "CC0-1.0",
+    "licenseUrl": "https://www.focastock.com/license",
+    "bytes": 46036201,
+    "sha256": "664939b2819e6e3499eb764a04d3d71cb09fd68f2e3da9c224952dfbcf563d21",
+    "probe": {
+      "codec_name": "h264",
+      "width": 1920,
+      "height": 1080,
+      "avg_frame_rate": "60000/1001",
+      "duration": "14.447767"
+    }
+  },
+  {
+    "name": "Brooklyn Bridge",
+    "page": "https://www.focastock.com/video/brooklyn-bridge",
+    "url": "https://cdn.focastock.com/videos/P1060587.mp4",
+    "file": "P1060587.mp4",
+    "license": "CC0-1.0",
+    "licenseUrl": "https://www.focastock.com/license",
+    "bytes": 62872345,
+    "sha256": "aec6b835a2964ae538bfca8f1c27a2baaa9f693d77bc944bfa2007243499ee69",
+    "probe": {
+      "codec_name": "h264",
+      "width": 1920,
+      "height": 1080,
+      "avg_frame_rate": "60000/1001",
+      "duration": "21.504817"
+    }
+  },
+  {
+    "name": "Cars and Bicycles on Brooklyn Street",
+    "page": "https://www.focastock.com/video/cars-and-bicycles-on-brooklyn-street",
+    "url": "https://cdn.focastock.com/videos/P1050229.mp4",
+    "file": "P1050229.mp4",
+    "license": "CC0-1.0",
+    "licenseUrl": "https://www.focastock.com/license",
+    "bytes": 41093705,
+    "sha256": "d7f2a5663a436e696c0a7e1255cc2b09bf2afb39b1b58d9dbe0463df0ee6a424",
+    "probe": {
+      "codec_name": "h264",
+      "width": 1920,
+      "height": 1080,
+      "avg_frame_rate": "60000/1001",
+      "duration": "11.611600"
+    }
+  }
+]

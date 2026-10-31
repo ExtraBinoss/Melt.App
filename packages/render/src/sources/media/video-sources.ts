@@ -189,8 +189,6 @@ export class MediaVideoSources {
         ? layers.filter((layer) => layer.kind === "video").map((layer) => `${pageId}:${layer.id}`)
         : [],
     );
-    if (playing.size > MAX_ACTIVE_ORIGINALS)
-      throw Error("The active composition exceeds its eight-stream playback decoder budget.");
     for (const [key, entry] of this.playback) {
       if (this.resolver === options.mediaResolver && playing.has(key)) continue;
       this.playback.delete(key);
@@ -212,6 +210,28 @@ export class MediaVideoSources {
     const requests = new Map(
       options.motionFrame?.mediaRequests.map((request) => [request.layerId, request]),
     );
+    const streamKeys = new Set(
+      layers
+        .filter((layer) => layer.kind === "video")
+        .map((layer) => {
+          const asset = assets[layer.assetId!]!;
+          if (!isVideoAsset(asset)) throw Error("Video layer original kind mismatch.");
+          return JSON.stringify([
+            assetOriginalIdentity(asset),
+            asset.width,
+            asset.height,
+            asset.orientation,
+            asset.timeResolution,
+            asset.duration,
+            asset.firstTimestamp,
+            normalizeMotionTime(requests.get(layer.id)?.sourceTime ?? asset.firstTimestamp),
+          ]);
+        }),
+    );
+    if (sequential && streamKeys.size > MAX_ACTIVE_ORIGINALS)
+      throw Error("The active composition exceeds its eight-stream playback decoder budget.");
+    const cacheLimit = streamKeys.size > 4 ? 1 : 2;
+    for (const entry of this.playback.values()) entry.cursor.setCacheLimit(cacheLimit);
     // Same original/PTS copies borrow one pinned texture for this frame only.
     // A fresh map per prepare prevents aliasing changed trims, proxies or originals.
     const sharedFrames = new Map<string, { texture: Texture; stamp: string }>();
@@ -263,8 +283,8 @@ export class MediaVideoSources {
         if (redundant) {
           this.playback.delete(cursorKey);
           await redundant.cursor.dispose();
-          await this.rasterizer?.retireStream(cursorKey);
         }
+        await this.rasterizer?.retireStream(cursorKey);
         this.current(options);
         this.prepared.set(layer.id, shared);
         this.timings.gpuReuses++;
@@ -352,6 +372,7 @@ export class MediaVideoSources {
             }),
           };
           this.playback.set(cursorKey, entry);
+          entry.cursor.setCacheLimit(cacheLimit);
         }
         try {
           const metadata = await entry.cursor.metadata();

@@ -24,6 +24,7 @@ const fake = vi.hoisted(() => ({
   proxyRead: vi.fn(),
   readTime: vi.fn(() => null as { value: number; rate: number } | null),
   retire: vi.fn(async () => {}),
+  cacheLimit: vi.fn(),
 }));
 vi.mock("../../../src/sources/video/source", () => ({
   createVideoFrameSource: (...args: unknown[]) => {
@@ -66,6 +67,7 @@ vi.mock("../../../src/sources/video/playback", () => ({
     requestFrame = fake.reads;
     dispose = fake.dispose;
     readTime = fake.readTime;
+    setCacheLimit = fake.cacheLimit;
     stats = () => ({});
   },
 }));
@@ -157,12 +159,12 @@ it("traces real upload, reuse and gap decisions only when requested, without ret
     vi.unstubAllGlobals();
   }
 });
-it("shares synchronized copies during playback with one cursor and one pinned GPU upload", async () => {
+it("shares twelve synchronized copies within the eight-decoder budget with one pinned GPU upload", async () => {
   const { renderer } = makeGpuRenderer(),
     cache = new GpuResourceCache();
   const sources = new MediaVideoSources(renderer, cache, 64);
   const resolver = { resolveOriginal: async () => new Blob(["v"]) };
-  const layers = Array.from({ length: 4 }, (_, index) => ({
+  const layers = Array.from({ length: 12 }, (_, index) => ({
     ...layer,
     id: `copy-${index}`,
     x: index * 100,
@@ -174,6 +176,7 @@ it("shares synchronized copies during playback with one cursor and one pinned GP
     { mediaResolver: resolver, mediaMode: "playback" },
   );
   expect(fake.cursorFactory).toHaveBeenCalledOnce();
+  expect(fake.cacheLimit).toHaveBeenLastCalledWith(2);
   expect(fake.reads).toHaveBeenCalledOnce();
   expect(fake.rasterize).toHaveBeenCalledOnce();
   expect(new Set(layers.map((item) => sources.image(item.id))).size).toBe(1);
@@ -401,6 +404,7 @@ it("plays five originals with one shared decoded budget and no duplicate poster 
   );
   expect(fake.factory).not.toHaveBeenCalled();
   expect(fake.cursorFactory).toHaveBeenCalledTimes(5);
+  expect(fake.cacheLimit).toHaveBeenLastCalledWith(1);
   expect(
     new Set(fake.cursorFactory.mock.calls.map(([options]) => options.decodedBudget)).size,
   ).toBe(1);

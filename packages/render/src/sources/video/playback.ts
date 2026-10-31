@@ -77,6 +77,10 @@ export class VideoPlaybackCursor {
   metadata(): Promise<VideoSourceMetadata> {
     return this.metadataPromise;
   }
+  /** Reduce history before admitting more simultaneous streams, preserving borrowed GPU leases. */
+  setCacheLimit(limit: 1 | 2): void {
+    this.pool.setCacheLimit(Math.min(limit, this.limits.maxCachedFrames));
+  }
   stats() {
     return {
       ...this.pool.stats(),

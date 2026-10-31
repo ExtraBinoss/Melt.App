@@ -6,6 +6,7 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Keep eight independent native 1080p playback streams within the existing decoded-memory budget by shrinking retained history only above four streams. Count synchronized source-time aliases once, retire redundant upload rings, and add a reproducible CC0 four-to-eight-video effects/motion workload with native cleanup and readback checks.
 - Share continuous playback phase and half-open loop sampling between the editor and library previews instead of imposing a separate 30 fps preview grid. Fit bounded preview output to the visible host, reuse native video frames between animation poses, and emit development-only preview lineage for decoded PTS and GPU submissions.
 
 - Share one native 3D scene, camera and light rig per composition, with cross-object opaque depth, native directional/point shadows and bounded scene-reflection probes for GLBs, text and shapes. Add genuine 3D parent groups/pivots, affine-preserving regrouping, Motion/history integration, triangle picking and consistent selection/print framing. Share typed intrinsic geometry bounds with native builders; keep exact export sampling deterministic and defer background captures during gestures.

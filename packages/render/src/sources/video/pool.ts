@@ -25,6 +25,7 @@ export class VideoFramePool {
 
   private readonly identity: VideoSourceIdentity;
   private readonly limits: VideoSourceBudgets;
+  private cacheLimit: number;
   constructor(
     identity: VideoSourceIdentity,
     limits: VideoSourceBudgets,
@@ -32,6 +33,14 @@ export class VideoFramePool {
   ) {
     this.identity = Object.freeze({ ...identity });
     this.limits = Object.freeze({ ...limits });
+    this.cacheLimit = limits.maxCachedFrames;
+  }
+  setCacheLimit(limit: number): void {
+    if (this.closed) throw new VideoSourceError("closed", "Video frame pool is closed.");
+    if (!Number.isSafeInteger(limit) || limit < 1 || limit > this.limits.maxCachedFrames)
+      throw new VideoSourceError("budgetExceeded", "Invalid decoded-frame cache limit.");
+    this.cacheLimit = limit;
+    while (this.cache.size > limit) this.evict();
   }
 
   private total(): number {
@@ -136,9 +145,8 @@ export class VideoFramePool {
         );
       if (this.closed) throw new VideoSourceError("closed", "Video frame pool is closed.");
       this.fit(bytes);
-      if (!cache || this.limits.maxCachedFrames === 0)
-        return this.lease(decoded, bytes, requestedTime);
-      while (this.cache.size >= this.limits.maxCachedFrames) this.evict();
+      if (!cache || this.cacheLimit === 0) return this.lease(decoded, bytes, requestedTime);
+      while (this.cache.size >= this.cacheLimit) this.evict();
       const key = `${decoded.timestamp.value}/${decoded.timestamp.rate}`;
       const previous = this.cache.get(key);
       if (previous) {
