@@ -39,10 +39,8 @@ export function ScrollShadow({
       bottomGutter = -1,
       rightGutter = -1,
       active = true;
-    function paint() {
-      if (!active || !wrapper || !(viewport instanceof HTMLElement)) return;
-      const top = viewport.scrollTop,
-        left = viewport.scrollLeft;
+    function paintAt(top: number, left: number) {
+      if (!active || !wrapper) return;
       wrapper.toggleAttribute("data-overflow-top", axis !== "horizontal" && top > 1);
       wrapper.toggleAttribute(
         "data-overflow-bottom",
@@ -51,11 +49,17 @@ export function ScrollShadow({
       wrapper.toggleAttribute("data-overflow-left", axis !== "vertical" && left > 1);
       wrapper.toggleAttribute("data-overflow-right", axis !== "vertical" && maximumLeft - left > 1);
     }
+    function paint() {
+      if (!active || !(viewport instanceof HTMLElement)) return;
+      paintAt(viewport.scrollTop, viewport.scrollLeft);
+    }
     function measure() {
       if (!active || !wrapper || !(viewport instanceof HTMLElement)) return;
       const height = viewport.clientHeight,
         width = viewport.clientWidth,
-        scrollWidth = viewport.scrollWidth;
+        scrollWidth = viewport.scrollWidth,
+        top = viewport.scrollTop,
+        left = viewport.scrollLeft;
       maximumTop = Math.max(0, viewport.scrollHeight - height);
       maximumLeft = Math.max(0, scrollWidth - width);
       // Overlay scrollbars occupy no layout gutter. Keep the shared six-pixel bar clear too.
@@ -69,7 +73,8 @@ export function ScrollShadow({
         rightGutter = right;
         wrapper.style.setProperty("--scroll-shadow-scrollbar-right", `${right}px`);
       }
-      paint();
+      // All geometry, including scroll offsets, is read before style/attribute writes.
+      paintAt(top, left);
     }
     const resize = new ResizeObserver(measure);
     function observeChildren() {

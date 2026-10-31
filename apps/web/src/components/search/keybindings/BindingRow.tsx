@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { memo, useRef, useState } from "react";
 import { ArrowLeft, ArrowRight, ArrowUp, ArrowDown, Search, RotateCcw, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import type { EffectType } from "@musart/core";
@@ -29,12 +29,16 @@ function iconFor(command: BindingCommand) {
 const bindingIcons = Object.fromEntries(
   BINDING_COMMANDS.map((command) => [command.id, iconFor(command)]),
 ) as Record<CommandId, ReturnType<typeof iconFor>>;
-export function BindingRow({
+export const BindingRow = memo(function BindingRow({
   command,
   snapshot,
+  position,
+  total,
 }: {
   command: BindingCommand;
   snapshot: BindingSnapshot;
+  position?: number;
+  total?: number;
 }) {
   const { t } = useTranslation(),
     label = t(command.label),
@@ -55,7 +59,13 @@ export function BindingRow({
     }
   }
   return (
-    <div role="listitem" className="binding-row" data-binding-command={command.id}>
+    <div
+      role="listitem"
+      aria-posinset={position}
+      aria-setsize={total}
+      className="binding-row"
+      data-binding-command={command.id}
+    >
       <Icon size={17} strokeWidth={1.5} aria-hidden />
       <div className="binding-command">
         <span>{label}</span>
@@ -133,4 +143,4 @@ export function BindingRow({
       )}
     </div>
   );
-}
+});

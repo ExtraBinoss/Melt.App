@@ -6,6 +6,11 @@ import { setup } from "../../../support/ui";
 test("the reusable settings body edits actual bindings, searches commands and reports reset storage failures", () => {
   const d = setup();
   d.mount(<ShortcutSettings />);
+  const navigation = screen.getByRole("region", { name: "Navigation du canvas" });
+  expect(
+    navigation.compareDocumentPosition(screen.getByRole("searchbox")) &
+      Node.DOCUMENT_POSITION_FOLLOWING,
+  ).toBeTruthy();
   fireEvent.change(screen.getByRole("searchbox"), { target: { value: "Enregistrer" } });
   expect(screen.getAllByRole("listitem")).toHaveLength(1);
   const capture = screen.getByRole("button", { name: "Modifier le raccourci de Enregistrer" });

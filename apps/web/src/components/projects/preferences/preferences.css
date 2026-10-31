@@ -248,7 +248,7 @@
 }
 .preferences-workspace[data-has-switched="true"]
   .preferences-page[data-state="active"]
-  .preferences-page-body {
+  .preferences-page-viewport {
   animation: preferences-page-reveal 220ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 @keyframes preferences-page-reveal {
@@ -266,7 +266,7 @@
 @media (prefers-reduced-motion: reduce) {
   .preferences-workspace[data-has-switched="true"]
     .preferences-page[data-state="active"]
-    .preferences-page-body {
+    .preferences-page-viewport {
     animation: none;
   }
 }

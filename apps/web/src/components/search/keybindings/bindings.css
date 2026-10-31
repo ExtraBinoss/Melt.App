@@ -58,8 +58,8 @@
   color: var(--destructive);
 }
 .binding-gestures {
-  border-top: 1px solid var(--border);
-  padding-top: 14px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 14px;
   font-size: 11px;
   color: var(--muted-foreground);
 }
@@ -91,4 +91,12 @@
   flex-direction: column;
   min-height: 0;
   gap: 12px;
+}
+
+.binding-window {
+  position: relative;
+}
+.binding-window-row {
+  position: absolute;
+  inset-inline: 0;
 }
