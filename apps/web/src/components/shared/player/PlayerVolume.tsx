@@ -3,6 +3,8 @@ import { Volume2, VolumeX } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "../../ui/button";
 import { Popover, PopoverTrigger, PopoverContent } from "../../ui/popover";
+import { useOverlayEntrance } from "../overlays/use-overlay-entrance";
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "../../ui/tooltip";
 import { Slider } from "../../ui/slider";
 import type { SliderValueSource } from "../../ui/slider-value";
 export interface PlayerAudio {
@@ -10,8 +12,17 @@ export interface PlayerAudio {
   value: SliderValueSource;
   setVolume: (percent: number) => void;
 }
-export function PlayerVolume({ audio, disabled }: { audio?: PlayerAudio; disabled?: boolean }) {
+export function PlayerVolume({
+  audio,
+  disabled,
+  audioContext = "preview",
+}: {
+  audio?: PlayerAudio;
+  disabled?: boolean;
+  audioContext?: "preview" | "artboard";
+}) {
   const { t } = useTranslation("mediaPlayer");
+  const prepare = useOverlayEntrance();
   const lastAudibleRef = useRef(100);
   const outputRef = useRef<HTMLOutputElement>(null);
   const muted = useSyncExternalStore(
@@ -28,16 +39,43 @@ export function PlayerVolume({ audio, disabled }: { audio?: PlayerAudio; disable
     update();
     return audio?.value.subscribe(update);
   }, [audio]);
+  if (!audio)
+    return (
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <span
+              className="media-player-no-audio"
+              tabIndex={disabled ? undefined : 0}
+              aria-label={t(audioContext === "artboard" ? "noArtboardAudio" : "silent")}
+            >
+              <Button variant="ghost" size="icon-sm" disabled aria-label={t("volume")}>
+                <VolumeX size={15} />
+              </Button>
+            </span>
+          </TooltipTrigger>
+          <TooltipContent>
+            {t(audioContext === "artboard" ? "noArtboardAudio" : "silent")}
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    );
   return (
-    <Popover>
+    <Popover modal={false}>
       <PopoverTrigger asChild>
         <Button
           variant="ghost"
           size="icon-sm"
           className="media-player-volume-trigger"
+          onPointerDownCapture={(event) => {
+            if (event.button === 0) prepare(true);
+          }}
+          onKeyDownCapture={(event) => {
+            if (event.key === "Enter" || event.key === " ") prepare(true);
+          }}
+          onBlur={() => prepare(false)}
           disabled={disabled}
           aria-label={t("volume")}
-          aria-description={!audio ? t("silent") : undefined}
         >
           {muted ? <VolumeX size={15} /> : <Volume2 size={15} />}
         </Button>
@@ -54,7 +92,7 @@ export function PlayerVolume({ audio, disabled }: { audio?: PlayerAudio; disable
           <Button
             variant="ghost"
             size="icon-sm"
-            disabled={!audio || disabled}
+            disabled={disabled}
             aria-label={t(muted ? "unmute" : "mute")}
             onClick={() => audio?.setVolume(muted ? lastAudibleRef.current : 0)}
           >
@@ -65,9 +103,8 @@ export function PlayerVolume({ audio, disabled }: { audio?: PlayerAudio; disable
             max={100}
             step={1}
             tone="primary"
-            valueSource={audio?.value}
-            value={audio ? undefined : [0]}
-            disabled={!audio || disabled}
+            valueSource={audio.value}
+            disabled={disabled}
             aria-label={t("volume")}
             onValueChange={([value]) => audio?.setVolume(value ?? 0)}
           />
@@ -80,7 +117,6 @@ export function PlayerVolume({ audio, disabled }: { audio?: PlayerAudio; disable
             0%
           </output>
         </div>
-        {!audio && <small>{t("silent")}</small>}
       </PopoverContent>
     </Popover>
   );

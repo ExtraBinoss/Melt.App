@@ -1,0 +1,7 @@
+{
+  "backgroundInfo": "バックグラウンドで書き出し",
+  "estimatedSize": "推定サイズ",
+  "backgroundHint": "このダイアログを閉じても書き出しは続きます。",
+  "estimateHint": "推定サイズです。実際のファイルサイズは異なる場合があります。",
+  "job_running": "{{percent}}%"
+}

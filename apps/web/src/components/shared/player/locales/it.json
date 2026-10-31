@@ -6,5 +6,7 @@
   "volume": "Volume",
   "mute": "Disattiva audio",
   "unmute": "Attiva audio",
-  "silent": "Anteprima senza audio"
+  "silent": "Questa anteprima non ha audio.",
+  "startTime": "Tempo di inizio",
+  "noArtboardAudio": "Questa tavola da disegno non ha audio."
 }

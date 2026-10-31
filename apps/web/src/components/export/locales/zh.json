@@ -1,0 +1,7 @@
+{
+  "backgroundInfo": "后台导出",
+  "estimatedSize": "预计大小",
+  "backgroundHint": "关闭此对话框后，导出仍会继续。",
+  "estimateHint": "此为预计大小，最终文件大小可能不同。",
+  "job_running": "{{percent}}%"
+}

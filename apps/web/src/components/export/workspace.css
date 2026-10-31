@@ -104,7 +104,7 @@
   min-height: 0;
   height: auto;
   border: 0;
-  background: #000;
+  background: var(--background);
 }
 .export-preview-pane .motion-export-preview-surface canvas {
   max-height: 100%;
@@ -276,4 +276,80 @@
   display: block;
   height: 100%;
   background: var(--primary);
+}
+
+.export-dialog[data-slot="dialog-content"][data-state="open"] {
+  animation: export-dialog-in 180ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.export-dialog[data-slot="dialog-content"][data-state="closed"] {
+  animation: export-dialog-out 140ms ease-in both;
+}
+@keyframes export-dialog-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 8px, 0) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+@keyframes export-dialog-out {
+  to {
+    opacity: 0;
+    transform: translate3d(0, 4px, 0) scale(0.99);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .export-dialog[data-slot="dialog-content"][data-state] {
+    animation: none;
+  }
+}
+
+.export-dialog-footer {
+  position: relative;
+  flex-shrink: 0;
+  min-height: 76px;
+}
+.export-footer-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  height: 36px;
+}
+.export-size-estimate {
+  color: var(--muted-foreground);
+  white-space: nowrap;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+.export-dialog-footer .export-job {
+  margin: 0;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.export-dialog-footer .export-job progress {
+  position: absolute;
+  inset: auto 0 0;
+  margin: 0;
+  width: 100%;
+  height: 3px;
+  border-radius: 0;
+}
+.export-dialog-footer .export-job-line {
+  gap: 8px;
+}
+@media (max-width: 699px) {
+  .export-dialog-footer {
+    grid-template-rows: 36px 36px;
+  }
+}
+
+.export-label-help {
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }

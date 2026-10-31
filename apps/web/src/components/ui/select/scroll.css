@@ -27,3 +27,23 @@
   display: block;
   width: 6px;
 }
+
+/* Keep the menu's physical width equal to its field throughout the entrance. */
+.select-scroll-content[data-slot="select-content"][data-state="open"] {
+  animation: select-surface-in 120ms ease-out both;
+}
+@keyframes select-surface-in {
+  from {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .select-scroll-content[data-slot="select-content"][data-state="open"] {
+    animation: none;
+  }
+}

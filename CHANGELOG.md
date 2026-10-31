@@ -6,6 +6,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Paint the Export dialog before admitting GPU preparation, reuse the canvas mascot/shimmer loader across image, Motion and Timelapse previews, and crossfade only after decoded or rendered pixels are ready. Preserve cancellation, stale ownership, errors and reduced-motion behavior. Remove black preview gutters, align the playhead with exact rail endpoints, add editable playback time, shorten volume-menu entrances and explain unavailable audio in twelve locales. Simplify dialog copy, move background help into one info tooltip, reserve footer geometry for progress, hide prior completed jobs on reopening and show approximate video sizes in MB. Preserve playback on untouched time-field focus, remove the hidden clock, yield preview GPU work to UI entrances and maintain Select field widths throughout parent/menu animations.
+
 - Preserve canvas framing when switching Static/Motion compositions or restoring pinned timelines: reserve final layout once, compose viewport/world-origin compensation, animate entry/exit without stretching artwork, and retire outgoing timeline input.
 
 - Paint live selection rectangles above artboard heading bars and backdrops so their borders and tint remain continuous across workspace overlays, without per-pointer React updates.

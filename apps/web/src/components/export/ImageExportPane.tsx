@@ -13,6 +13,7 @@ import type { ExportPaneProps } from "./workspace-model";
 import { SelectField } from "../shared/SelectField";
 import { Label } from "../ui/label";
 import { Switch } from "../ui/switch";
+import { InfoTooltip } from "../shared/InfoTooltip";
 import { NumberInput } from "../shared/NumberInput";
 import { PrintSettings } from "./PrintSettings";
 
@@ -71,7 +72,7 @@ export function ImageExportPane(
     selectionOnly,
     origin.revision,
     previewServices,
-    options.format === "pdf" ? null : edge,
+    options.format === "pdf" || props.previewActive === false ? null : edge,
   );
   const managed = useManagedPreview(preview, options);
   const printPreview = usePrintPreview(
@@ -79,7 +80,7 @@ export function ImageExportPane(
     scope,
     options,
     services,
-    busy ? null : edge,
+    busy || props.previewActive === false ? null : edge,
   );
   const proof = options.format === "pdf" ? printPreview : managed;
   const bleed = Math.ceil((options.print.bleedMm * options.print.dpi) / 25.4);
@@ -164,7 +165,12 @@ export function ImageExportPane(
         />
       </div>
       <div className="export-field">
-        <Label htmlFor="export-colors">{t("colors")}</Label>
+        <div className="export-label-help">
+          <Label htmlFor="export-colors">{t("colors")}</Label>
+          <InfoTooltip label={t("colors")}>
+            {t(options.colorMode === "cmyk" ? "cmykHint" : "srgbHint")}
+          </InfoTooltip>
+        </div>
         <SelectField
           id="export-colors"
           label={t("colors")}
@@ -183,7 +189,6 @@ export function ImageExportPane(
             setScale(1);
           }}
         />
-        <p className="export-scope">{t(options.colorMode === "cmyk" ? "cmykHint" : "srgbHint")}</p>
       </div>
       {options.format !== "pdf" && (
         <div className="export-field">
@@ -231,7 +236,6 @@ export function ImageExportPane(
             />
           </label>
         )}
-        <p className="export-scope">{t("previewHint")}</p>
       </ExportAdvanced>
     </ExportLayout>
   );

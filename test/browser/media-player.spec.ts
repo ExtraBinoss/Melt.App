@@ -30,6 +30,28 @@ async function init(page: Page) {
   await installReadbackProbe(page);
 }
 async function volume(page: Page) {
+  await page.evaluate(() => {
+    const timing = { start: 0, first: 0, settled: 0 };
+    Object.assign(window, { playerVolumeTiming: timing });
+    const down = (event: PointerEvent) => {
+      if (
+        !(event.target instanceof Element) ||
+        !event.target.closest(".media-player-volume-trigger")
+      )
+        return;
+      document.removeEventListener("pointerdown", down, true);
+      timing.start = event.timeStamp;
+      const sample = () => {
+        const panel = document.querySelector('.media-player-volume[data-state="open"]');
+        const opacity = panel ? Number(getComputedStyle(panel).opacity) : 0;
+        if (opacity > 0.01 && !timing.first) timing.first = performance.now() - timing.start;
+        if (opacity > 0.99) timing.settled = performance.now() - timing.start;
+        else if (performance.now() - timing.start < 1500) requestAnimationFrame(sample);
+      };
+      requestAnimationFrame(sample);
+    };
+    document.addEventListener("pointerdown", down, true);
+  });
   const control = page.locator('.media-player-volume [role="slider"]');
   await page.locator(".media-player").getByRole("button", { name: "Volume", exact: true }).click();
   const body = await page.locator("body").getAttribute("style");
@@ -45,10 +67,31 @@ async function volume(page: Page) {
   await page.getByRole("button", { name: "Unmute", exact: true }).click();
   await expect(control).toHaveAttribute("aria-valuenow", "50");
   await expect.poll(async () => (await playerAudioEnergy(page)).rms).toBeGreaterThan(0.002);
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () =>
+          (window as unknown as { playerVolumeTiming: { settled: number } }).playerVolumeTiming
+            .settled,
+      ),
+    )
+    .toBeGreaterThan(0);
   await page.keyboard.press("Escape");
   await expect(
     page.locator(".media-player").getByRole("button", { name: "Volume", exact: true }),
   ).toBeFocused();
+  const timing = await page.evaluate(
+    () =>
+      (window as unknown as { playerVolumeTiming: { first: number; settled: number } })
+        .playerVolumeTiming,
+  );
+  expect(timing.first).toBeGreaterThan(0);
+  expect(timing.first).toBeLessThan(200);
+  expect(timing.settled).toBeGreaterThan(0);
+  expect(timing.settled).toBeLessThan(300);
+  await test
+    .info()
+    .attach("volume-opening-ms", { body: JSON.stringify(timing), contentType: "application/json" });
 }
 test("tool player starts muted, seeks precisely, interpolates playback and monitors genuine audio", async ({
   page,

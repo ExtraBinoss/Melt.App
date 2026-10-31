@@ -1,0 +1,7 @@
+{
+  "backgroundInfo": "تصدير في الخلفية",
+  "estimatedSize": "الحجم التقريبي",
+  "backgroundHint": "يستمر التصدير إذا أغلقت هذه النافذة.",
+  "estimateHint": "حجم تقريبي؛ قد يختلف حجم الملف النهائي.",
+  "job_running": "{{percent}}%"
+}

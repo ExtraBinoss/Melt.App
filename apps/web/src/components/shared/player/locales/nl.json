@@ -6,5 +6,7 @@
   "volume": "Volume",
   "mute": "Dempen",
   "unmute": "Geluid aan",
-  "silent": "Voorbeeld zonder geluid"
+  "silent": "Dit voorbeeld heeft geen geluid.",
+  "startTime": "Starttijd",
+  "noArtboardAudio": "Dit tekengebied heeft geen geluid."
 }

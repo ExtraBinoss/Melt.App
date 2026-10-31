@@ -1,6 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { selectionComposition, type Composition, type Project } from "@musart/core";
+import { getUiPresentation } from "../../state/session/ui-presentation";
+import { PreviewPreparation } from "./PreviewPreparation";
 import { PreviewAudio } from "../../services/motion/audio/preview";
 import { MediaPlayer } from "../shared/player/MediaPlayer";
 import type { createMotionPreview } from "@musart/render";
@@ -29,10 +31,17 @@ export function MotionExportPreview({
   const [monitor, setMonitor] = useState<PreviewAudio | undefined>();
   const source = useRef<ReturnType<typeof createMotionPreview> | null>(null);
   const pauseRequested = useRef(paused);
-  const [playing, setPlaying] = useState(true),
-    [failed, setFailed] = useState(false);
+  const owner = useMemo(() => ({ project, page, selection }), [project, page, selection]);
+  const [playing, setPlaying] = useState(true);
+  const [presentation, setPresentation] = useState<{
+    owner: object;
+    status: "ready" | "failed";
+  } | null>(null);
+  const failed = presentation?.owner === owner && presentation.status === "failed";
+  const ready = presentation?.owner === owner && presentation.status === "ready";
   useEffect(() => {
     if (paused) return;
+    let presented = false;
     let active = true,
       preview: ReturnType<typeof createMotionPreview> | undefined;
     let stop: (() => void) | undefined, managed: ReturnType<typeof createMotionPreview> | undefined;
@@ -48,12 +57,17 @@ export function MotionExportPreview({
           compositionId: page.id,
           selection,
           edge: 768,
+          presentation: getUiPresentation(),
           mediaResolver: services.mediaResolverFor?.(project.id),
           fontResolver: services.fonts?.resolve,
           onFrame(canvas, backend) {
             if (backend) canvas.dataset.backend = backend;
             if (active && host.current && canvas.parentElement !== host.current)
               host.current.replaceChildren(canvas);
+            if (active && !presented) {
+              presented = true;
+              setPresentation({ owner, status: "ready" });
+            }
           },
         });
         source.current = preview;
@@ -92,7 +106,7 @@ export function MotionExportPreview({
               return resolver;
             },
             onError: () => {
-              if (active) setFailed(true);
+              if (active) setPresentation({ owner, status: "failed" });
             },
           });
         }
@@ -119,7 +133,7 @@ export function MotionExportPreview({
             shownPlaying = state.playing;
             setPlaying(state.playing);
           }
-          if (state.error) setFailed(true);
+          if (state.error) setPresentation({ owner, status: "failed" });
         };
         stop = preview.subscribe(paint);
         if (pauseRequested.current) preview.pause();
@@ -128,7 +142,7 @@ export function MotionExportPreview({
         hidden();
       })
       .catch(() => {
-        if (active) setFailed(true);
+        if (active) setPresentation({ owner, status: "failed" });
       });
     return () => {
       active = false;
@@ -139,7 +153,7 @@ export function MotionExportPreview({
       if (managed) void managed.dispose().catch(() => {});
       else if (preview) void preview.dispose().catch(() => {});
     };
-  }, [project, page, services, paused, onReady, slider, selection]);
+  }, [project, page, services, paused, onReady, slider, selection, owner]);
   useEffect(() => {
     pauseRequested.current = paused;
     if (paused) source.current?.pause();
@@ -147,14 +161,26 @@ export function MotionExportPreview({
   const duration = page.motion!.duration.value / page.motion!.duration.rate;
   return (
     <div className="motion-export-preview">
-      <div ref={host} className="motion-export-preview-surface" aria-label={t("preview")} />
-      {failed && <p role="alert">{t("failed")}</p>}
+      <div
+        className="motion-export-preview-surface"
+        aria-label={t("preview")}
+        data-preview-ready={ready}
+        aria-busy={!ready && !failed}
+      >
+        <div ref={host} className="export-preview-pixels" />
+        <PreviewPreparation
+          ready={ready}
+          failed={failed}
+          label={t("preparing")}
+          failure={t("failed")}
+        />
+      </div>
       <MediaPlayer
         identity={project}
         position={slider}
         duration={duration}
         playing={playing}
-        disabled={failed || paused}
+        disabled={failed || paused || !ready}
         onPlayingChange={(value) => {
           if (value) source.current?.play();
           else source.current?.pause();
@@ -163,6 +189,7 @@ export function MotionExportPreview({
           source.current?.seek({ value: Math.round(seconds * 1_000_000), rate: 1_000_000 })
         }
         audio={monitor}
+        audioContext="artboard"
       />
     </div>
   );

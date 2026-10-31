@@ -6,5 +6,7 @@
   "volume": "音量",
   "mute": "ミュート",
   "unmute": "ミュート解除",
-  "silent": "音声なしのプレビュー"
+  "silent": "このプレビューには音声がありません。",
+  "startTime": "開始時間",
+  "noArtboardAudio": "このアートボードには音声がありません。"
 }

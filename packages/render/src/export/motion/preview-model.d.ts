@@ -15,6 +15,8 @@ export interface MotionPreviewOptions extends Pick<
   /** Physical raster edge, independent of delivered export resolution; maximum 768. */
   edge?: number;
   onFrame: (canvas: HTMLCanvasElement, backend?: "webgpu" | "webgl" | null) => void;
+  /** Caller-owned UI admission. Waiting parks GPU work without changing the audio/playback clock. */
+  presentation?: { busy(): boolean; subscribe(listener: () => void): () => void };
   scheduler?: {
     now(): number;
     request(callback: () => void): number;

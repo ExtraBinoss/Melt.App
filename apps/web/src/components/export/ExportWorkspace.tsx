@@ -1,3 +1,5 @@
+import { usePreviewAdmission } from "./use-preview-admission";
+import type { RefObject } from "react";
 import { freezeEffectPreviews } from "../../state/session/effect-preview";
 import { createMotionTransport } from "../../services/motion/transport";
 import { SegmentedTabs } from "../shared/segmented/SegmentedTabs";
@@ -20,15 +22,18 @@ export function ExportWorkspace({
   services,
   initialCompositionId,
   initialKind,
+  entrance,
   onClose,
 }: {
   engine: EnginePort;
   services: EditorServices;
   initialCompositionId?: string;
   initialKind?: ExportKind;
+  entrance?: RefObject<HTMLElement | null>;
   onClose: () => void;
 }) {
   const { t } = useTranslation("exportPanel");
+  const previewActive = usePreviewAdmission(entrance);
   useLayoutEffect(() => {
     freezeEffectPreviews(engine);
     createMotionTransport(engine).pause();
@@ -98,13 +103,15 @@ export function ExportWorkspace({
           />
         </label>
       )}
-      <p className="export-scope">
-        {allPages
-          ? t("allArtboards")
-          : selection.length
-            ? t("selection", { count: selection.length })
-            : t("artboard", { name: page.name })}
-      </p>
+      {(allPages || selection.length > 0) && (
+        <p className="export-scope">
+          {allPages
+            ? t("allArtboards")
+            : selection.length
+              ? t("selection", { count: selection.length })
+              : t("artboard", { name: page.name })}
+        </p>
+      )}
     </>
   );
   const scopedServices = useMemo(
@@ -121,7 +128,16 @@ export function ExportWorkspace({
     }),
     [services, page.id],
   );
-  const props = { engine, services: scopedServices, origin, page, selection, controls, onClose };
+  const props = {
+    engine,
+    services: scopedServices,
+    origin,
+    page,
+    selection,
+    controls,
+    onClose,
+    previewActive,
+  };
   return kind === "motion" ? (
     <MotionExportPane key={page.id} {...props} />
   ) : kind === "timelapse" ? (

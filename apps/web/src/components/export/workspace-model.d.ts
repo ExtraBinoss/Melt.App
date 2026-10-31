@@ -8,5 +8,6 @@ export interface ExportPaneProps {
   selection: readonly string[];
   controls: ReactNode;
   services: EditorServices;
+  previewActive?: boolean;
   onClose: () => void;
 }

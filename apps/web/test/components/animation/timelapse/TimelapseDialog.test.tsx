@@ -9,23 +9,26 @@ import {
   type VideoExportOptions,
 } from "../../../../src/services/animation/export-video";
 
-vi.mock("../../../../src/components/animation/timelapse/use-timelapse-preview", () => ({
-  useTimelapsePreview: () => ({
-    viewport: { current: null },
-    scrubber: { current: null },
-    clock: { current: null },
-    status: "ready",
-    playing: false,
-    controls: {
-      current: {
-        pause: vi.fn(),
-        play: vi.fn(),
-        seek: vi.fn(),
-        release: vi.fn().mockResolvedValue(undefined),
+vi.mock("../../../../src/components/animation/timelapse/use-timelapse-preview", () => {
+  const value = [0];
+  return {
+    useTimelapsePreview: () => ({
+      viewport: { current: null },
+      slider: { read: () => value, subscribe: () => () => {} },
+      clock: { current: null },
+      status: "ready",
+      playing: false,
+      controls: {
+        current: {
+          pause: vi.fn(),
+          play: vi.fn(),
+          seek: vi.fn(),
+          release: vi.fn().mockResolvedValue(undefined),
+        },
       },
-    },
-  }),
-}));
+    }),
+  };
+});
 vi.mock("../../../../src/services/files/download", async (original) => ({
   ...(await original<typeof import("../../../../src/services/files/download")>()),
   downloadBlob: vi.fn(),
@@ -84,7 +87,9 @@ test("reports real codec errors, cancels export and ignores a late completed res
     await waitFor(() => expect(button).toBeEnabled());
     vi.mocked(exportReplayVideo).mockRejectedValueOnce(new VideoExportError("noCodec"));
     fireEvent.click(button);
-    expect(await screen.findByRole("alert")).toHaveTextContent("Ce navigateur");
+    await screen.findByRole("alert");
+    fireEvent.click(screen.getByRole("button", { name: "L’export n’a pas pu aboutir." }));
+    expect(await screen.findByRole("tooltip")).toHaveTextContent("Ce navigateur");
     let options!: VideoExportOptions;
     let finish!: (blob: Blob) => void;
     vi.mocked(exportReplayVideo).mockImplementationOnce((_spec, next) => {

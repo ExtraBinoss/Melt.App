@@ -1,9 +1,10 @@
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import type { EnginePort } from "@musart/core";
 import { useTranslation } from "react-i18next";
 import { Download } from "lucide-react";
 import { Button } from "../ui/button";
 import { ScrollShadow } from "../shared/scroll/ScrollShadow";
+import { InfoTooltip } from "../shared/InfoTooltip";
 import { ExportProgress } from "./ExportProgress";
 import { useExportJob } from "./use-export-job";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../ui/accordion";
@@ -34,6 +35,7 @@ export function ExportLayout({
   onClose,
   disabled = false,
   submitLabel,
+  estimatedBytes,
 }: {
   engine: EnginePort;
   controls: ReactNode;
@@ -43,6 +45,7 @@ export function ExportLayout({
   onClose: () => void;
   disabled?: boolean;
   submitLabel: string;
+  estimatedBytes?: number | null;
 }) {
   const { t } = useTranslation("exportPanel");
   return (
@@ -66,6 +69,7 @@ export function ExportLayout({
         onSubmit={onSubmit}
         onClose={onClose}
         submitLabel={submitLabel}
+        estimatedBytes={estimatedBytes}
       />
     </>
   );
@@ -76,24 +80,40 @@ function ExportDialogFooter({
   onSubmit,
   onClose,
   submitLabel,
+  estimatedBytes,
 }: {
   engine: EnginePort;
   disabled: boolean;
   onSubmit: () => void;
   onClose: () => void;
   submitLabel: string;
+  estimatedBytes?: number | null;
 }) {
-  const { t } = useTranslation("exportPanel");
+  const { t, i18n } = useTranslation("exportPanel");
   const { jobs, job } = useExportJob(engine);
+  const [initialSequence] = useState(() => (jobs.pending ? jobs.sequence - 1 : jobs.sequence));
+  const showProgress = jobs.sequence > initialSequence;
   return (
     <footer className="export-dialog-footer">
-      <div>
-        <p className="export-background-note">{t("backgroundHint")}</p>
-        <ExportProgress engine={engine} />
+      <div className="export-footer-meta">
+        <InfoTooltip label={t("backgroundInfo")}>
+          {t("backgroundHint")}
+          {estimatedBytes != null ? ` ${t("estimateHint")}` : ""}
+        </InfoTooltip>
+        {estimatedBytes != null && (
+          <span className="export-size-estimate" aria-label={t("estimatedSize")}>
+            ≈{" "}
+            {new Intl.NumberFormat(i18n.resolvedLanguage ?? "en", {
+              maximumFractionDigits: 1,
+            }).format(estimatedBytes / 1_000_000)}{" "}
+            MB
+          </span>
+        )}
+        <ExportProgress engine={engine} afterSequence={initialSequence} compact />
       </div>
       <div className="export-footer-actions">
         <Button variant="outline" onClick={onClose}>
-          {t(job ? "close" : "cancel")}
+          {t((showProgress && job) || jobs.pending ? "close" : "cancel")}
         </Button>
         <Button className="export-submit" disabled={disabled || jobs.pending} onClick={onSubmit}>
           <Download size={15} />

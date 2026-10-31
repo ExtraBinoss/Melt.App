@@ -1,13 +1,22 @@
 import type { EnginePort } from "@musart/core";
 import { useTranslation } from "react-i18next";
+import { InfoTooltip } from "../shared/InfoTooltip";
 import { Button } from "../ui/button";
 import { useExportJob } from "./use-export-job";
 import { formatUiError } from "../../state/i18n/errors/format";
 
-export function ExportProgress({ engine }: { engine: EnginePort }) {
+export function ExportProgress({
+  engine,
+  afterSequence,
+  compact = false,
+}: {
+  engine: EnginePort;
+  afterSequence?: number;
+  compact?: boolean;
+}) {
   const { t } = useTranslation("exportPanel");
   const { jobs, job } = useExportJob(engine);
-  if (!job) return null;
+  if (!job || (afterSequence !== undefined && jobs.sequence <= afterSequence)) return null;
   return (
     <div
       className="export-job"
@@ -30,7 +39,12 @@ export function ExportProgress({ engine }: { engine: EnginePort }) {
       {(jobs.pending || job.status === "complete") && (
         <progress max={100} value={job.percent} aria-label={t("progress")} />
       )}
-      {job.status === "failed" && <p className="export-job-error">{formatUiError(job.error)}</p>}
+      {job.status === "failed" &&
+        (compact ? (
+          <InfoTooltip label={t("job_failed")}>{formatUiError(job.error)}</InfoTooltip>
+        ) : (
+          <p className="export-job-error">{formatUiError(job.error)}</p>
+        ))}
     </div>
   );
 }

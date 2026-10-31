@@ -59,7 +59,8 @@ test("mounts its own GPU canvas and updates local clock controls without repaint
     state.time = { value: 1, rate: 2 };
     state.listener();
   });
-  expect(screen.getByLabelText("Temps de lecture")).toHaveTextContent("0:00.5 /");
+  expect(screen.getByLabelText("Temps de départ")).toHaveValue("0:00.5");
+  expect(document.querySelector("[data-player-time]")).toHaveAttribute("data-time", "0.5");
   expect(renders).toBe(1);
   expect(screen.getByRole("slider")).toHaveAttribute("aria-valuenow", "0.5");
   fireEvent.keyDown(screen.getByRole("slider"), { key: "ArrowRight" });
@@ -92,4 +93,41 @@ test("an export in progress allocates no preview renderer and later suspension d
   );
   mount.unmount();
   expect(state.dispose).toHaveBeenCalledOnce();
+});
+
+test("reveals only a rendered frame and rejects retired preview callbacks", async () => {
+  const frames: MotionPreviewOptions["onFrame"][] = [];
+  state.create.mockImplementation((_project: unknown, options: MotionPreviewOptions) => {
+    frames.push(options.onFrame);
+    return {
+      read: () => ({ playing: true, time: state.time, error: null }),
+      subscribe: () => state.stop,
+      dispose: state.dispose,
+      pause: state.pause,
+      play: state.play,
+      seek: state.seek,
+    };
+  });
+  const d = setup();
+  d.engine.execute({ type: "setCompositionMode", mode: "motion" });
+  const project = d.engine.getSnapshot().project;
+  const mount = d.mount(
+    <MotionExportPreview project={project} page={project.pages[0]!} services={d.services} />,
+  );
+  await waitFor(() => expect(frames).toHaveLength(1));
+  const surface = document.querySelector(".motion-export-preview-surface")!;
+  expect(surface).toHaveAttribute("aria-busy", "true");
+  expect(surface).toHaveAttribute("data-preview-ready", "false");
+  const oldFrame = document.createElement("canvas");
+  act(() => frames[0]!(oldFrame));
+  expect(surface).toHaveAttribute("data-preview-ready", "true");
+  const next = { ...project, name: "Next scope" };
+  mount.rerender(
+    <MotionExportPreview project={next} page={next.pages[0]!} services={d.services} />,
+  );
+  await waitFor(() => expect(frames).toHaveLength(2));
+  act(() => frames[0]!(document.createElement("canvas")));
+  expect(surface).toHaveAttribute("data-preview-ready", "false");
+  act(() => frames[1]!(document.createElement("canvas")));
+  expect(surface).toHaveAttribute("data-preview-ready", "true");
 });

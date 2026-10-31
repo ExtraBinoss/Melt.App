@@ -1,12 +1,6 @@
+import { preservePlayerTimeEdit } from "../shared/player/PlayerTimeField";
 import { useRef } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogTrigger,
-} from "../ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
 import { ExportWorkspace } from "./ExportWorkspace";
 import { ExportTriggerLabel } from "./ExportTriggerLabel";
 import { Download } from "lucide-react";
@@ -21,6 +15,7 @@ import "./export.css";
 
 export function ExportPopover(props: ExportPopoverProps) {
   const { t } = useTranslation();
+  const surface = useRef<HTMLDivElement>(null);
   if (!props.engine) return <LegacyExportPopover {...props} />;
   return (
     <Dialog open={props.open} onOpenChange={props.onOpenChange}>
@@ -29,12 +24,19 @@ export function ExportPopover(props: ExportPopoverProps) {
           <ExportTriggerLabel engine={props.engine} />
         </Button>
       </DialogTrigger>
-      <DialogContent className="export-dialog" data-canvas-control data-keybinding-capture>
+      <DialogContent
+        ref={surface}
+        onEscapeKeyDown={preservePlayerTimeEdit}
+        className="export-dialog"
+        aria-describedby={undefined}
+        data-canvas-control
+        data-keybinding-capture
+      >
         <DialogHeader className="export-dialog-header">
           <DialogTitle>{t("exportTitle")}</DialogTitle>
-          <DialogDescription>{t("exportPanel:dialogDescription")}</DialogDescription>
         </DialogHeader>
         <ExportWorkspace
+          entrance={surface}
           engine={props.engine}
           services={props.services}
           initialCompositionId={props.initialCompositionId}

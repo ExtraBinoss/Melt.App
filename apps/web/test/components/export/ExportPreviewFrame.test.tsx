@@ -155,17 +155,17 @@ test("bounds encoded resolution and tiny-source enlargement while ignoring a zer
   resize();
   expect(resolution).not.toHaveBeenCalled();
 });
-test("reports pending and unavailable real renders without a fabricated image", () => {
+test("reports pending and unavailable real renders without a fabricated image", async () => {
   const data = setup();
   const view = data.mount(
     <ExportPreviewFrame url={null} loading width={0} height={0} format="png" />,
   );
-  expect(screen.getByRole("status")).toHaveTextContent("Préparation de l’aperçu");
+  expect(await screen.findByRole("status")).toHaveTextContent("Préparation de l’aperçu");
   expect(screen.queryByRole("img")).toBeNull();
   view.rerender(
     <ExportPreviewFrame url={null} loading={false} width={0} height={0} format="webp" />,
   );
-  expect(screen.getByRole("status")).toHaveTextContent("Aperçu indisponible");
+  expect(screen.getByRole("alert")).toHaveTextContent("Aperçu indisponible");
   expect(screen.queryByRole("button")).toBeNull();
 });
 
@@ -216,4 +216,22 @@ test("bounds a tiny DPR3 scope's physical fit and expansion to the renderer's ei
   expect(Number.parseFloat(image.style.width) * 3).toBeCloseTo(128);
   expect(resolution).toHaveBeenLastCalledWith(128);
   expect(image).toHaveStyle({ maxWidth: "", maxHeight: "" });
+});
+
+test("waits for image decode and reports a real decode failure", () => {
+  const view = setup().mount(
+    <ExportPreviewFrame url="blob:first" loading={false} width={200} height={100} format="png" />,
+  );
+  const body = document.querySelector(".export-preview-body")!;
+  const image = screen.getByRole("img");
+  expect(body).toHaveAttribute("data-preview-ready", "false");
+  fireEvent.load(image);
+  expect(body).toHaveAttribute("data-preview-ready", "true");
+  view.rerender(
+    <ExportPreviewFrame url="blob:second" loading={false} width={200} height={100} format="png" />,
+  );
+  expect(body).toHaveAttribute("data-preview-ready", "false");
+  fireEvent.error(image);
+  expect(screen.getByRole("alert")).toHaveTextContent("Aperçu indisponible");
+  expect(body).toHaveAttribute("aria-busy", "false");
 });

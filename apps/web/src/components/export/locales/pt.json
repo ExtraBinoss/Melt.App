@@ -1,0 +1,7 @@
+{
+  "backgroundInfo": "Exportação em segundo plano",
+  "estimatedSize": "Tamanho estimado",
+  "backgroundHint": "A exportação continua se fechar esta janela.",
+  "estimateHint": "Tamanho estimado; o ficheiro final pode variar.",
+  "job_running": "{{percent}}%"
+}

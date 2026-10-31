@@ -60,6 +60,12 @@ test("exports the selected layer in two actions with sensible defaults; work sur
     finish();
   });
   expect(getExportJobs(d.engine).read()).toMatchObject({ status: "complete", percent: 100 });
+  const reopened = d.mount(
+    <ExportWorkspace engine={d.engine} services={d.services} onClose={close} />,
+  );
+  expect(screen.queryByRole("progressbar")).toBeNull();
+  expect(screen.getByRole("button", { name: "Exporter l’image" })).toBeEnabled();
+  reopened.unmount();
 });
 test("switches whole artboard and targets another artboard without editing it; advanced settings start collapsed", async () => {
   const d = setup(),
@@ -75,7 +81,7 @@ test("switches whole artboard and targets another artboard without editing it; a
   expect(screen.getByRole("switch", { name: "Plan de travail entier" })).toBeDisabled();
   fireEvent.click(screen.getByRole("switch", { name: "Tous les plans de travail (.zip)" }));
   fireEvent.click(screen.getByRole("switch", { name: "Plan de travail entier" }));
-  expect(screen.getByText(`Plan de travail · ${d.page.name}`)).toBeVisible();
+  expect(screen.getByRole("switch", { name: "Plan de travail entier" })).toBeChecked();
   await choose("Plan de travail", other.name);
   expect(screen.getByRole("combobox", { name: "Format de fichier" })).toHaveTextContent("PDF");
   expect(screen.getByRole("combobox", { name: "Couleurs de sortie" })).toHaveTextContent("CMJN");

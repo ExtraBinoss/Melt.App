@@ -6,5 +6,7 @@
   "volume": "Volume",
   "mute": "Couper le son",
   "unmute": "Activer le son",
-  "silent": "Aperçu muet"
+  "silent": "Cet aperçu n’a pas de son.",
+  "startTime": "Temps de départ",
+  "noArtboardAudio": "Ce plan de travail n’a pas de son."
 }

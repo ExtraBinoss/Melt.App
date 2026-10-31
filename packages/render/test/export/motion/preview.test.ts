@@ -175,3 +175,40 @@ it("audio buffering parks the local clock without changing Play or scheduling id
   second();
   expect(scheduler.callbacks.size).toBe(0);
 });
+
+it("parks GPU work during caller UI entrances, catches up the clock and releases the gate", async () => {
+  const scheduler = clock();
+  let busy = true;
+  let listener: () => void = () => {};
+  const stop = vi.fn();
+  const preview = createMotionPreview(motionProject(), {
+    compositionId: "composition",
+    scheduler,
+    onFrame: vi.fn(),
+    presentation: {
+      busy: () => busy,
+      subscribe: (fn) => {
+        listener = fn;
+        return stop;
+      },
+    },
+  });
+  expect(scheduler.callbacks.size).toBe(0);
+  busy = false;
+  listener();
+  await scheduler.step(0);
+  expect(state.render).toHaveBeenCalledOnce();
+  busy = true;
+  listener();
+  expect(scheduler.callbacks.size).toBe(0);
+  await scheduler.step(500);
+  expect(state.render).toHaveBeenCalledOnce();
+  busy = false;
+  listener();
+  await scheduler.step(600);
+  expect(preview.read().time.value / preview.read().time.rate).toBeCloseTo(0.6);
+  await preview.dispose();
+  expect(stop).toHaveBeenCalledOnce();
+  listener();
+  expect(scheduler.callbacks.size).toBe(0);
+});

@@ -1,0 +1,7 @@
+{
+  "backgroundInfo": "백그라운드 내보내기",
+  "estimatedSize": "예상 크기",
+  "backgroundHint": "이 창을 닫아도 내보내기는 계속됩니다.",
+  "estimateHint": "예상 크기이며 최종 파일 크기는 달라질 수 있습니다.",
+  "job_running": "{{percent}}%"
+}

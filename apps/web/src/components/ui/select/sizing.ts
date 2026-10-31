@@ -11,6 +11,10 @@ export function bindSelectSizing(
   const view = content.ownerDocument.defaultView;
   const wrapper = content.parentElement;
   if (!view || !wrapper || !content.isConnected) return () => {};
+  const entrance =
+    trigger
+      .closest<HTMLElement>('[data-slot="dialog-content"],[data-slot="popover-content"]')
+      ?.getAnimations?.() ?? [];
   let live = true;
   let frame: number | null = null;
   let measuredWidth = 0;
@@ -47,6 +51,7 @@ export function bindSelectSizing(
     frame = view!.requestAnimationFrame(() => {
       frame = null;
       sync();
+      if (entrance.some((animation) => animation.playState === "running")) schedule();
     });
   }
   const resize = new ResizeObserver((entries) => {
@@ -71,6 +76,7 @@ export function bindSelectSizing(
     placement.observe(wrapper, { attributes: true, attributeFilter: ["style"] });
   view.addEventListener("resize", schedule);
   sync();
+  if (entrance.some((animation) => animation.playState === "running")) schedule();
   return () => {
     live = false;
     if (frame !== null) view.cancelAnimationFrame(frame);

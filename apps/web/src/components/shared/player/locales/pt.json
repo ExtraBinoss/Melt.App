@@ -6,5 +6,7 @@
   "volume": "Volume",
   "mute": "Silenciar",
   "unmute": "Ativar som",
-  "silent": "Prévia sem som"
+  "silent": "Esta prévia não tem áudio.",
+  "startTime": "Tempo inicial",
+  "noArtboardAudio": "Esta prancheta não tem áudio."
 }

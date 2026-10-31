@@ -20,6 +20,10 @@ const active = new Set<ExportJobs>();
 export class ExportJobs {
   constructor(private readonly engine?: EnginePort) {}
   private value: ExportJob | null = null;
+  private serial = 0;
+  get sequence() {
+    return this.serial;
+  }
   private listeners = new Set<() => void>();
   private controller: AbortController | null = null;
   private work: Promise<void> | null = null;
@@ -40,6 +44,7 @@ export class ExportJobs {
     task: (work: ExportWork) => Promise<void>,
   ) {
     if (this.pending) return false;
+    this.serial++;
     const controller = new AbortController();
     this.controller = controller;
     active.add(this);

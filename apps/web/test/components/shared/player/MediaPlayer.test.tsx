@@ -3,7 +3,7 @@ import { beforeEach, expect, test, vi } from "vitest";
 import { i18n } from "../../../../src/state/i18n";
 import { MediaPlayer } from "../../../../src/components/shared/player/MediaPlayer";
 import { createSliderValue } from "../../../../src/components/ui/slider-value";
-import { playerTime } from "../../../../src/components/shared/player/clock";
+import { playerTime, parsePlayerTime } from "../../../../src/components/shared/player/clock";
 beforeEach(() => {
   void i18n.changeLanguage("en");
 });
@@ -29,7 +29,8 @@ test("clock frames stay local; keyboard scrubbing pauses, cancels and restores p
   }
   const view = render(<Host identity={first} />);
   act(() => position.set([1.2]));
-  expect(screen.getByLabelText("Playback time")).toHaveTextContent("0:01.2 / 0:05.0");
+  expect(screen.getByRole("textbox", { name: "Start time" })).toHaveValue("0:01.2");
+  expect(document.querySelector("[data-player-time]")).toHaveAttribute("data-time", "1.2");
   expect(renders).toBe(1);
   const slider = screen.getByRole("slider", { name: "Preview time" });
   fireEvent.keyDown(slider, { key: "ArrowRight" });
@@ -73,4 +74,59 @@ test("volume popover restores the last audible level and updates its percent out
   fireEvent.click(screen.getByRole("button", { name: "Mute" }));
   fireEvent.click(screen.getByRole("button", { name: "Unmute" }));
   expect(setVolume).toHaveBeenLastCalledWith(37);
+});
+
+test("time drafts survive frame updates, commit once, clamp and reject a retired owner", () => {
+  const position = createSliderValue([0]);
+  const seek = vi.fn((time: number) => position.set([time]));
+  const playing = vi.fn();
+  const first = {},
+    second = {};
+  const view = render(
+    <MediaPlayer
+      position={position}
+      duration={5}
+      playing={false}
+      identity={first}
+      onSeek={seek}
+      onPlayingChange={playing}
+    />,
+  );
+  const input = screen.getByRole("textbox", { name: "Start time" });
+  fireEvent.focus(input);
+  act(() => position.set([0.765]));
+  fireEvent.blur(input);
+  expect(seek).not.toHaveBeenCalled();
+  expect(playing).not.toHaveBeenCalled();
+  fireEvent.focus(input);
+  fireEvent.change(input, { target: { value: "0:02.75" } });
+  act(() => position.set([1]));
+  expect(input).toHaveValue("0:02.75");
+  fireEvent.keyDown(input, { key: "Enter" });
+  expect(seek).toHaveBeenCalledExactlyOnceWith(2.75);
+  fireEvent.focus(input);
+  fireEvent.change(input, { target: { value: "99" } });
+  fireEvent.blur(input);
+  expect(seek).toHaveBeenLastCalledWith(5);
+  fireEvent.focus(input);
+  fireEvent.change(input, { target: { value: "3" } });
+  fireEvent.keyDown(input, { key: "Escape" });
+  expect(seek).toHaveBeenCalledTimes(2);
+  fireEvent.focus(input);
+  fireEvent.change(input, { target: { value: "2" } });
+  view.rerender(
+    <MediaPlayer
+      position={position}
+      duration={5}
+      playing={false}
+      identity={second}
+      onSeek={seek}
+      onPlayingChange={playing}
+    />,
+  );
+  fireEvent.blur(input);
+  expect(seek).toHaveBeenCalledTimes(2);
+  expect(parsePlayerTime("1:02:03.5")).toBe(3723.5);
+  for (const text of ["-1", "0:60", "a", "", "0.5:20", "Infinity"])
+    expect(parsePlayerTime(text)).toBeNull();
 });

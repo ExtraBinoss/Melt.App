@@ -20,8 +20,8 @@
   "registrationMarks": "Repères de montage",
   "colorBars": "Barres de couleurs",
   "pageInfo": "Nom du document et profil couleur",
-  "backgroundHint": "L’export se poursuit en arrière-plan. Vous pouvez fermer cette fenêtre et continuer à travailler.",
-  "job_running": "Export en arrière-plan · {{percent}} %",
+  "backgroundHint": "L’export continue si vous fermez cette fenêtre.",
+  "job_running": "{{percent}}%",
   "job_cancelling": "Annulation de l’export…",
   "job_complete": "Export prêt.",
   "job_cancelled": "Export annulé.",
@@ -67,5 +67,8 @@
   "stale": "La cible de l’export a changé. Ouvrez à nouveau le panneau d’export.",
   "previewHint": "Le fichier exporté utilise la résolution choisie.",
   "fit": "Ajuster l’aperçu",
-  "zoom": "Agrandir l’aperçu"
+  "zoom": "Agrandir l’aperçu",
+  "backgroundInfo": "Export en arrière-plan",
+  "estimatedSize": "Poids estimé",
+  "estimateHint": "Poids estimé ; le fichier final peut varier."
 }

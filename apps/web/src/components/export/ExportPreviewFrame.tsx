@@ -1,5 +1,5 @@
-import { BrandStatus } from "../../ui/brand/BrandStatus";
-import { useCallback, useState } from "react";
+import { PreviewPreparation } from "./PreviewPreparation";
+import { useCallback, useLayoutEffect, useRef, useState } from "react";
 import { ZoomIn, ZoomOut } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { IconButton } from "../shared/IconButton";
@@ -49,6 +49,13 @@ export function ExportPreviewFrame({
 }) {
   const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
+  const latest = useRef(url);
+  useLayoutEffect(() => {
+    latest.current = url;
+  }, [url]);
+  const [decoded, setDecoded] = useState<{ url: string; failed: boolean } | null>(null);
+  const ready = !!url && decoded?.url === url && !decoded.failed;
+  const failed = (!url && !loading) || (decoded?.url === url && decoded?.failed === true);
   const [box, setBox] = useState<PreviewBox | null>(null);
   const viewport = useCallback(
     (element: HTMLDivElement | null) => {
@@ -98,6 +105,8 @@ export function ExportPreviewFrame({
           <div
             className="export-preview-body"
             data-expanded={expanded}
+            data-preview-ready={ready}
+            aria-busy={!ready && !failed}
             style={
               box && size
                 ? {
@@ -107,19 +116,27 @@ export function ExportPreviewFrame({
                 : undefined
             }
           >
-            {url ? (
+            {url && (
               <img
                 src={url}
+                className="export-preview-pixels"
+                onLoad={() => {
+                  if (latest.current === url) setDecoded({ url, failed: false });
+                }}
+                onError={() => {
+                  if (latest.current === url) setDecoded({ url, failed: true });
+                }}
                 alt={t("exportPanel:preview")}
                 data-format={format}
                 style={size ? { width: size.width, height: size.height } : undefined}
               />
-            ) : (
-              <span role="status">
-                {loading && <BrandStatus size={22} state="preparing" />}
-                {t(loading ? "exportPanel:preparing" : "exportPanel:failed")}
-              </span>
             )}
+            <PreviewPreparation
+              ready={ready}
+              failed={failed}
+              label={t("exportPanel:preparing")}
+              failure={t("exportPanel:failed")}
+            />
           </div>
         </div>
       </ScrollShadow>

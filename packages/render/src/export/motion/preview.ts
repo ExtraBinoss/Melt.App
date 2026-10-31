@@ -73,6 +73,7 @@ export function createMotionPreview(project: Project, options: MotionPreviewOpti
     if (
       !closed &&
       !state.error &&
+      !options.presentation?.busy() &&
       frame === null &&
       !pending &&
       ((state.playing && !clockHolds.size) || dirty)
@@ -83,7 +84,7 @@ export function createMotionPreview(project: Project, options: MotionPreviewOpti
       });
   };
   const paint = () => {
-    if (closed || pending || state.error) return;
+    if (closed || pending || state.error || options.presentation?.busy()) return;
     const seconds =
       state.playing && !clockHolds.size
         ? Math.floor(clock() * frameRate) / frameRate
@@ -137,6 +138,15 @@ export function createMotionPreview(project: Project, options: MotionPreviewOpti
         schedule();
       });
   };
+  const stopPresentation = options.presentation?.subscribe(() => {
+    if (closed) return;
+    if (options.presentation?.busy()) {
+      generation++;
+      dirty = true;
+      if (frame !== null) scheduler.cancel(frame);
+      frame = null;
+    } else schedule();
+  });
   schedule();
   return {
     read: () => state,
@@ -191,6 +201,7 @@ export function createMotionPreview(project: Project, options: MotionPreviewOpti
     dispose() {
       if (!closed) {
         closed = true;
+        stopPresentation?.();
         clockHolds.clear();
         generation++;
         abort.abort();

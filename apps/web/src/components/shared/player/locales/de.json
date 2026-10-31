@@ -6,5 +6,7 @@
   "volume": "Lautstärke",
   "mute": "Stummschalten",
   "unmute": "Ton einschalten",
-  "silent": "Stumme Vorschau"
+  "silent": "Diese Vorschau hat keinen Ton.",
+  "startTime": "Startzeit",
+  "noArtboardAudio": "Diese Zeichenfläche hat keinen Ton."
 }

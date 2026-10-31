@@ -152,3 +152,27 @@ Motion, Timelapse and local tools use the shared [media player](../guides/media-
 Motion preview monitoring starts muted and reuses the bounded audio mixer. Monitor
 volume never changes authored audio or the delivered file. Selection monitoring
 excludes independent audio tracks and unselected video sources.
+
+## Preview presentation
+
+Export controls and the dialog paint before GPU preparation. Image, Motion and
+Timelapse previews are admitted when the actual panel entrance animation finishes;
+reduced motion admits them on the first frame, with no artificial minimum wait.
+Closing before admission cancels it. All three outputs reuse the shared 56 px
+mascot/shimmer throbber used by the canvas, with the same delayed appearance.
+A 240 ms crossfade retires feedback only after image decode or an actual rendered
+canvas frame. Readiness belongs to the captured preview owner; stale callbacks,
+errors and cancelled scopes cannot reveal a different preview. Reduced motion
+skips the crossfade, and failures replace feedback with an honest error message.
+
+The footer reserves its control height and paints progress along its bottom edge,
+so job updates never resize the dialog or preview. Background behavior and the
+size caveat live in one information tooltip. Terminal jobs from earlier openings
+are hidden; a currently running job remains cancellable. Motion and Timelapse
+show an approximate decimal MB size from duration, target bitrate, enabled
+192 kb/s audio and a 2% mux allowance. VBR content can differ substantially.
+
+Motion preview GPU admission yields to shared overlay entrances while retaining
+the running transport/audio clock. The volume trigger acquires that lease at
+pointer-down or keyboard activation. Select menus keep their width during entry,
+tracking only a live ancestor entrance and releasing their observers on close.

@@ -6,5 +6,7 @@
   "volume": "음량",
   "mute": "음소거",
   "unmute": "음소거 해제",
-  "silent": "음소거된 미리보기"
+  "silent": "이 미리보기에는 오디오가 없습니다.",
+  "startTime": "시작 시간",
+  "noArtboardAudio": "이 아트보드에는 오디오가 없습니다."
 }

@@ -1,3 +1,4 @@
+import { estimateVideoBytes } from "./estimate";
 import { selectionComposition } from "@musart/core";
 import { useCallback, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { useTranslation } from "react-i18next";
@@ -48,6 +49,7 @@ export function MotionExportPane(props: ExportPaneProps) {
     <ExportLayout
       {...props}
       submitLabel={t("exportVideo")}
+      estimatedBytes={estimateVideoBytes(duration, bitrate, audio && hasAudio)}
       disabled={busy}
       preview={
         <>
@@ -56,7 +58,7 @@ export function MotionExportPane(props: ExportPaneProps) {
             page={page}
             services={services}
             selection={selection}
-            paused={busy}
+            paused={busy || props.previewActive === false}
             onReady={receive}
           />
           <div className="export-preview-caption">
@@ -179,7 +181,6 @@ export function MotionExportPane(props: ExportPaneProps) {
             onValueChange={(value) => setBitrate(Number(value))}
           />
         </div>
-        {hasAudio && audio && <p className="export-scope">{t("audioDefaults")}</p>}
       </ExportAdvanced>
     </ExportLayout>
   );

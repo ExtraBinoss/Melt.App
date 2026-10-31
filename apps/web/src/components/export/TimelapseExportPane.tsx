@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import type { ReplaySpec } from "@musart/core";
 import { useTranslation } from "react-i18next";
+import { estimateVideoBytes } from "./estimate";
+import { PreviewPreparation } from "./PreviewPreparation";
 import { MediaPlayer } from "../shared/player/MediaPlayer";
 import { getExportJobs } from "../../services/export/jobs";
 import { getAnimationSession } from "../../services/animation/session";
@@ -42,7 +44,7 @@ export function TimelapseExportPane(props: ExportPaneProps) {
     spec,
     page.id,
     valid ? duration : 10,
-    !busy && valid,
+    !busy && valid && props.previewActive !== false,
     services.fonts?.resolve,
     media,
     selection,
@@ -91,15 +93,24 @@ export function TimelapseExportPane(props: ExportPaneProps) {
     <ExportLayout
       {...props}
       submitLabel={t("export")}
+      estimatedBytes={valid ? estimateVideoBytes(duration, 8_000_000) : null}
       disabled={!spec || !valid || busy}
       preview={
         <>
-          <div ref={viewport} className="motion-export-preview-surface" aria-label={t("preview")} />
-          {(!spec || status !== "ready") && (
-            <p role="status" className="export-scope">
-              {error ? t(error) : t(status === "failed" ? "previewFailed" : "preparing")}
-            </p>
-          )}
+          <div
+            className="motion-export-preview-surface"
+            aria-label={t("preview")}
+            data-preview-ready={status === "ready" && !error}
+            aria-busy={status !== "ready" && !error}
+          >
+            <div ref={viewport} className="export-preview-pixels" />
+            <PreviewPreparation
+              ready={status === "ready"}
+              failed={!!error || status === "failed"}
+              label={t("preparing")}
+              failure={t(error || "previewFailed")}
+            />
+          </div>
           <MediaPlayer
             identity={spec}
             position={slider}
@@ -167,7 +178,7 @@ export function TimelapseExportPane(props: ExportPaneProps) {
           aria-describedby="timelapse-duration-hint"
           onChange={(event) => setDuration(event.target.value)}
         />
-        <p id="timelapse-duration-hint" className="export-scope">
+        <p id="timelapse-duration-hint" className={valid ? "sr-only" : "export-scope"}>
           {t(valid ? "durationHint" : "invalidDuration")}
         </p>
       </div>
@@ -186,7 +197,6 @@ export function TimelapseExportPane(props: ExportPaneProps) {
           onValueChange={(value) => setContainer(value as typeof container)}
         />
       </div>
-      {error && <p role="alert">{t(error)}</p>}
       <ExportAdvanced>
         <div className="export-field">
           <Label htmlFor="timelapse-scale">{common("resolution")}</Label>

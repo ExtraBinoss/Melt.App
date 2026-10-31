@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Button } from "../../ui/button";
 import { Slider } from "../../ui/slider";
 import type { SliderValueSource } from "../../ui/slider-value";
+import { PlayerTimeField } from "./PlayerTimeField";
 import { PlayerVolume, type PlayerAudio } from "./PlayerVolume";
 import { playerTime } from "./clock";
 import "./messages";
@@ -16,6 +17,7 @@ export function MediaPlayer({
   onPlayingChange,
   onSeek,
   audio,
+  audioContext = "preview",
   className = "",
   identity = position,
 }: {
@@ -26,11 +28,12 @@ export function MediaPlayer({
   onPlayingChange: (playing: boolean) => void;
   onSeek: (seconds: number) => void;
   audio?: PlayerAudio;
+  audioContext?: "preview" | "artboard";
   className?: string;
   identity?: unknown;
 }) {
   const { t } = useTranslation("mediaPlayer");
-  const outputRef = useRef<HTMLOutputElement>(null);
+  const outputRef = useRef<HTMLSpanElement>(null);
   const rootRef = useRef<HTMLDivElement>(null);
   const lastTimeRef = useRef<number | null>(null);
   const ownerRef = useRef<unknown>(null);
@@ -49,12 +52,21 @@ export function MediaPlayer({
       if (rootRef.current) {
         const last = lastTimeRef.current;
         rootRef.current.dataset.interpolate = String(
-          playing && !gestureRef.current && last !== null && time >= last && time - last < 0.4,
+          playing &&
+            time > 0 &&
+            time < duration &&
+            !gestureRef.current &&
+            last !== null &&
+            time >= last &&
+            time - last < 0.4,
+        );
+        rootRef.current.style.setProperty(
+          "--player-position",
+          `${usable ? (time / duration) * 100 : 0}%`,
         );
         lastTimeRef.current = time;
       }
       if (outputRef.current) {
-        outputRef.current.textContent = `${playerTime(time)} / ${playerTime(duration)}`;
         outputRef.current.dataset.time = String(time);
       }
     };
@@ -82,7 +94,7 @@ export function MediaPlayer({
       data-canvas-control
       data-keybinding-capture
     >
-      <div className="media-player-main">
+      <div className="media-player-main" role="group" aria-label={t("time")}>
         <Button
           variant="ghost"
           size="icon-sm"
@@ -94,11 +106,21 @@ export function MediaPlayer({
         >
           {playing ? <Pause size={15} /> : <Play size={15} />}
         </Button>
-        <output ref={outputRef} data-player-time="" aria-label={t("time")} aria-live="off">
-          {playerTime(0)} / {playerTime(duration)}
-        </output>
+        <PlayerTimeField
+          position={position}
+          duration={duration}
+          playing={playing}
+          disabled={disabled || !usable}
+          identity={identity}
+          onSeek={onSeek}
+          onPlayingChange={onPlayingChange}
+        />
+        <span className="media-player-duration" ref={outputRef} data-player-time="">
+          {" "}
+          / {playerTime(duration)}
+        </span>
         <span className="media-player-spacer" />
-        <PlayerVolume audio={audio} disabled={disabled} />
+        <PlayerVolume audio={audio} disabled={disabled} audioContext={audioContext} />
       </div>
       <Slider
         className="media-player-seek"

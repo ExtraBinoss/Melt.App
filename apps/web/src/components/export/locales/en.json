@@ -20,8 +20,8 @@
   "registrationMarks": "Registration marks",
   "colorBars": "Color bars",
   "pageInfo": "Document name and color profile",
-  "backgroundHint": "Export runs in the background. You can close this dialog and keep working.",
-  "job_running": "Exporting in the background · {{percent}}%",
+  "backgroundHint": "Export continues if you close this dialog.",
+  "job_running": "{{percent}}%",
   "job_cancelling": "Cancelling export…",
   "job_complete": "Export ready.",
   "job_cancelled": "Export cancelled.",
@@ -67,5 +67,8 @@
   "stale": "The export target changed. Open the export popover again.",
   "previewHint": "The exported file uses the selected resolution.",
   "fit": "Fit preview",
-  "zoom": "Zoom preview"
+  "zoom": "Zoom preview",
+  "backgroundInfo": "Background export",
+  "estimatedSize": "Estimated size",
+  "estimateHint": "Estimated size; the final file may vary."
 }

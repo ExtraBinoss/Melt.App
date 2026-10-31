@@ -6,5 +6,7 @@
   "volume": "Volume",
   "mute": "Mute",
   "unmute": "Unmute",
-  "silent": "Silent preview"
+  "silent": "This preview has no audio.",
+  "startTime": "Start time",
+  "noArtboardAudio": "This artboard has no audio."
 }

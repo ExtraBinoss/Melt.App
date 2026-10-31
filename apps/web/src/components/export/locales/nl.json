@@ -1,0 +1,7 @@
+{
+  "backgroundInfo": "Export op de achtergrond",
+  "estimatedSize": "Geschatte grootte",
+  "backgroundHint": "De export gaat door als je dit venster sluit.",
+  "estimateHint": "Geschatte grootte; het uiteindelijke bestand kan afwijken.",
+  "job_running": "{{percent}}%"
+}

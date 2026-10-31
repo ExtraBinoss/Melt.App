@@ -6,5 +6,7 @@
   "volume": "Głośność",
   "mute": "Wycisz",
   "unmute": "Włącz dźwięk",
-  "silent": "Podgląd bez dźwięku"
+  "silent": "Ten podgląd nie ma dźwięku.",
+  "startTime": "Czas początkowy",
+  "noArtboardAudio": "Ten obszar roboczy nie ma dźwięku."
 }

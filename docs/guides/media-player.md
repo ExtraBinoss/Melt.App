@@ -36,3 +36,16 @@ Color pickers retain fractional pointer coordinates until RGB/alpha serializatio
 with short thumb interpolation and unchanged coarse keyboard increments. Reduced
 motion disables these transitions. Glass popovers use a slightly more opaque light
 surface; automatic scroll masks reveal that same surface without another white layer.
+
+The current position is editable as seconds or a minutes/hours timecode. Drafts
+are not overwritten by playback; Enter or blur seeks once, Escape cancels, and
+new owners reject stale edits. The visible thumb center follows the exact rail
+endpoints, including paused start/end positions. Sources without audio expose
+a disabled volume control and a translated explanation instead of an empty
+volume popover; Motion uses an artboard-specific explanation in twelve locales.
+
+Focusing and leaving an unchanged time field never seeks or changes playback.
+Only a modified draft commits. The visible duration carries clock metadata;
+there is no continuously rewritten offscreen counter. Preview scheduling accepts
+a caller-owned UI admission port, which parks GPU jobs during menu entrances
+without pausing the audio/transport clock and unsubscribes on disposal.

@@ -13,7 +13,7 @@
   gap: 7px;
   min-width: 0;
 }
-.media-player output {
+.media-player .media-player-duration {
   color: var(--muted-foreground);
   font-size: 11px;
   font-variant-numeric: tabular-nums;
@@ -68,5 +68,61 @@
   .media-player[data-interpolate="true"] .media-player-seek > span:has([data-slot="slider-thumb"]),
   .media-player[data-interpolate="true"] .media-player-seek [data-slot="slider-range"] {
     transition: none;
+  }
+}
+
+.media-player .media-player-time-input {
+  width: 74px;
+  height: 27px;
+  padding: 0 5px;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  line-height: 1;
+  caret-color: var(--foreground);
+}
+.media-player-duration {
+  color: var(--muted-foreground);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.media-player .media-player-seek {
+  width: calc(100% - 8px);
+  margin-inline: 4px;
+}
+/* Radix owns input semantics; the visible thumb center shares the range's exact endpoints. */
+.media-player-seek:dir(ltr) > span:has([data-slot="slider-thumb"]) {
+  left: var(--player-position, 0%) !important;
+  right: auto !important;
+}
+.media-player-seek:dir(rtl) > span:has([data-slot="slider-thumb"]) {
+  right: var(--player-position, 0%) !important;
+  left: auto !important;
+}
+.media-player-volume[data-state="open"] {
+  animation: player-volume-in 100ms ease-out both;
+}
+.media-player-volume[data-state="closed"] {
+  animation: player-volume-out 80ms ease-in both;
+}
+@keyframes player-volume-in {
+  from {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes player-volume-out {
+  to {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .media-player-volume[data-state] {
+    animation: none;
   }
 }

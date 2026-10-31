@@ -6,5 +6,7 @@
   "volume": "Volumen",
   "mute": "Silenciar",
   "unmute": "Activar sonido",
-  "silent": "Vista previa sin sonido"
+  "silent": "Esta vista previa no tiene audio.",
+  "startTime": "Tiempo de inicio",
+  "noArtboardAudio": "Esta mesa de trabajo no tiene audio."
 }

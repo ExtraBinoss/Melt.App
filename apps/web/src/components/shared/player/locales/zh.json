@@ -6,5 +6,7 @@
   "volume": "音量",
   "mute": "静音",
   "unmute": "取消静音",
-  "silent": "静音预览"
+  "silent": "此预览没有音频。",
+  "startTime": "开始时间",
+  "noArtboardAudio": "此画板没有音频。"
 }
