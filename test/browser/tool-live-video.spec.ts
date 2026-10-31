@@ -37,7 +37,7 @@ async function movingFrames(page: Page, phase: string) {
   expect(sample.uniqueImages, `${phase}: genuine GPU frames must keep changing`).toBeGreaterThan(4);
 }
 
-test("video keeps rendering during numeric drafts and menu previews; advanced controls keep the layout anchored", async ({
+test("video keeps rendering during numeric drafts and menu previews; advanced controls expand after basic controls", async ({
   page,
 }) => {
   test.setTimeout(90000);
@@ -84,34 +84,70 @@ test("video keeps rendering during numeric drafts and menu previews; advanced co
     const before = {
       toggle: (await advanced.boundingBox())!,
       download: (await download.boundingBox())!,
+      contrast: (await contrast.boundingBox())!,
     };
+    expect(before.toggle.y).toBeGreaterThan(before.contrast.y + before.contrast.height);
+    // The bundled flower clip contains an audio track, even when it sounds silent.
+    await expect(page.locator('.tool-audio [role="switch"]')).toBeEnabled();
+    const player = (await page.locator(".tool-transport").boundingBox())!,
+      clipFields = (await page.locator(".tool-clip-fields").boundingBox())!;
+    expect(Math.abs(player.x - clipFields.x)).toBeLessThan(1);
+    expect(Math.abs(player.width - clipFields.width)).toBeLessThan(1);
+    expect(
+      await page.locator(".tool-transport").evaluate((node) => getComputedStyle(node).padding),
+    ).toBe("0px");
+    // Arm before native input: driver round trips can outlast this short animation.
+    await advanced.evaluate((button) => {
+      (
+        window as unknown as { advancedFrames: Promise<{ y: number; height: number }[]> }
+      ).advancedFrames = new Promise((resolve) => {
+        button.addEventListener(
+          "pointerdown",
+          () => {
+            const samples: { y: number; height: number }[] = [];
+            const sample = () => {
+              const node = document.querySelector(".tool-advanced-content");
+              if (node) {
+                const bounds = node.getBoundingClientRect();
+                samples.push({ y: bounds.y, height: bounds.height });
+              }
+              if (samples.length >= 16) resolve(samples);
+              else requestAnimationFrame(sample);
+            };
+            requestAnimationFrame(sample);
+          },
+          { once: true },
+        );
+      });
+    });
     await advanced.click();
     await expect(advanced).toHaveAttribute("aria-expanded", "true");
-    const frames = await page.locator(".tool-control-viewport").evaluate(async (node) => {
-      const samples: { y: number; height: number; filter: string }[] = [];
-      for (let i = 0; i < 16; i++) {
-        await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
-        samples.push({
-          y: node.getBoundingClientRect().y,
-          height: node.getBoundingClientRect().height,
-          filter: getComputedStyle(node.firstElementChild!).filter,
-        });
-      }
-      return samples;
-    });
-    expect(
-      frames.some(
-        (frame) => frame.filter.startsWith("blur(") && Number.parseFloat(frame.filter.slice(5)) > 0,
-      ),
-    ).toBe(true);
-    expect(
-      Math.max(...frames.map((f) => f.height)) - Math.min(...frames.map((f) => f.height)),
-    ).toBeLessThan(1);
+    const frames = await page.evaluate(
+      () =>
+        (window as unknown as { advancedFrames: Promise<{ y: number; height: number }[]> })
+          .advancedFrames,
+    );
+    expect(new Set(frames.map((frame) => Math.round(frame.height))).size).toBeGreaterThan(3);
     expect(Math.abs((await advanced.boundingBox())!.y - before.toggle.y)).toBeLessThan(1);
-    expect(Math.abs((await download.boundingBox())!.y - before.download.y)).toBeLessThan(1);
+    expect(Math.abs((await contrast.boundingBox())!.y - before.contrast.y)).toBeLessThan(1);
+    expect((await download.boundingBox())!.y).toBeGreaterThan(before.download.y + 100);
     await page.screenshot({ path: "artifacts/tool-live/controls.png" });
     await advanced.click();
+    await expect
+      .poll(async () => Math.abs((await download.boundingBox())!.y - before.download.y))
+      .toBeLessThan(1);
     expect(Math.abs((await advanced.boundingBox())!.y - before.toggle.y)).toBeLessThan(1);
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await advanced.focus();
+    await page.keyboard.press("Enter");
+    await expect(advanced).toHaveAttribute("aria-expanded", "true");
+    expect(
+      await page
+        .locator(".tool-advanced-content")
+        .evaluate((node) => getComputedStyle(node).animationName),
+    ).toBe("none");
+    await page.keyboard.press("Enter");
+    await expect(advanced).toHaveAttribute("aria-expanded", "false");
     expect(await page.evaluate(() => window.__musartVideoReadbacks)).toMatchObject({
       gpu: 0,
       webgl: 0,

@@ -9,7 +9,7 @@ export const TOOL_STYLES = [
   {
     id: "dither",
     effect: "bit-dither",
-    basic: ["method", "scale", "contrast", "foreground", "background"],
+    basic: ["method", "scale", "sourceColor", "contrast", "foreground", "background"],
   },
   { id: "halftone", effect: "halftone", basic: ["amount", "scale", "color"] },
   {

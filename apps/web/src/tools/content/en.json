@@ -84,15 +84,15 @@
     },
     "dither": {
       "name": "Dither",
-      "summary": "Reduce images to a two-color palette with ordered patterns and a distinct printed texture.",
-      "about": "Dithering represents intermediate tones by arranging pixels from a limited palette. This tool uses Melt’s two-color Bit Dither effect. Choose threshold, Bayer 2 × 2, Bayer 4 × 4, Bayer 8 × 8 or interleaved noise, then set the foreground and background colors. Contrast, gamma and pattern strength provide finer control in the advanced settings.",
+      "summary": "Reduce images to a black-and-white or source-color palette with ordered pixel patterns.",
+      "about": "Dithering represents tones with patterns from a limited palette. Choose threshold, Bayer 2 × 2, Bayer 4 × 4, Bayer 8 × 8 or interleaved noise. Source colors switches from black-and-white ink and paper to dithering each source RGB channel. Contrast, gamma and pattern strength refine the result.",
       "tips": [
         "Start with Bayer 4 × 4 for a balanced, recognizable pattern.",
         "Choose foreground and background colors with enough separation.",
         "Use a larger pattern scale for a chunky print-inspired texture."
       ],
       "question": "What is the difference between threshold and Bayer dithering?",
-      "answer": "Threshold assigns each sample directly to one of the two colors. Bayer uses an ordered matrix to distribute those colors and suggest more intermediate tones. The pattern sizes change the texture; neither option adds a hidden third color to the palette."
+      "answer": "Threshold makes a direct light-or-dark choice. Bayer distributes those choices with an ordered matrix to suggest intermediate tones. With Source colors off, the result uses your ink and paper colors. With it on, each RGB channel is dithered separately for up to eight colors."
     },
     "halftone": {
       "name": "Halftone",

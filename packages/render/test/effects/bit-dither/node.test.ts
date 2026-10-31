@@ -9,7 +9,8 @@ it("retains original per-pixel alpha and stable method/palette uniforms through 
     node = bitDitherNode(fixture),
     key = node.getCacheKey(),
     method = fixture.controls.parameters.method,
-    foreground = fixture.controls.colors.foreground;
+    foreground = fixture.controls.colors.foreground,
+    sourceColor = fixture.controls.parameters.sourceColor;
   expectSourceAlpha(node, fixture.input);
   for (const [index, name] of [
     "threshold",
@@ -25,6 +26,7 @@ it("retains original per-pixel alpha and stable method/palette uniforms through 
         seed: 2147483647,
         settings: {
           method: name,
+          sourceColor: index % 2 === 1,
           threshold: 0.75,
           strength: 0.5,
           invert: true,
@@ -39,6 +41,8 @@ it("retains original per-pixel alpha and stable method/palette uniforms through 
     expect(node.getCacheKey()).toBe(key);
     expect(fixture.controls.parameters.method).toBe(method);
     expect(method!.value).toBe(index);
+    expect(fixture.controls.parameters.sourceColor).toBe(sourceColor);
+    expect(sourceColor!.value).toBe(index % 2);
     expect(fixture.controls.colors.foreground).toBe(foreground);
     expect(fixture.controls.parameters.invert!.value).toBe(1);
     expect(fixture.controls.logicalResolution.value.toArray()).toEqual([960, 640]);

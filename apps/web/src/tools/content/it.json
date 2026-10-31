@@ -84,15 +84,15 @@
     },
     "dither": {
       "name": "Dither",
-      "summary": "Riduci le immagini a una tavolozza a due colori con motivi ordinati e una trama stampata distinta.",
-      "about": "Il dithering rappresenta i toni intermedi disponendo i pixel da una tavolozza limitata. Questo strumento utilizza l'effetto Bit Dither a due colori di Melt. Scegli la soglia, Bayer 2 × 2, Bayer 4 × 4, Bayer 8 × 8 o rumore interlacciato, quindi imposta i colori di primo piano e di sfondo. Contrasto, gamma e forza del pattern forniscono un controllo più preciso nelle impostazioni avanzate.",
+      "summary": "Riduci le immagini al bianco e nero o ai colori sorgente con motivi ordinati di pixel.",
+      "about": "Il dithering rappresenta i toni con motivi di una tavolozza limitata. Scegli soglia, Bayer 2 × 2, 4 × 4, 8 × 8 o rumore interlacciato. Colori sorgente applica il dithering a ogni canale RGB della sorgente invece del bianco e nero. Contrasto, gamma e intensità del motivo affinano il risultato.",
       "tips": [
         "Inizia con Bayer 4 × 4 per uno schema equilibrato e riconoscibile.",
         "Scegli i colori di primo piano e di sfondo con una separazione sufficiente.",
         "Utilizza una scala del modello più grande per una texture spessa ispirata alla stampa."
       ],
       "question": "Qual è la differenza tra soglia e Bayer dithering?",
-      "answer": "La soglia assegna ogni campione direttamente a uno dei due colori. Bayer utilizza una matrice ordinata per distribuire quei colori e suggerire toni più intermedi. Le dimensioni del disegno cambiano la trama; nessuna delle due opzioni aggiunge un terzo colore nascosto alla tavolozza."
+      "answer": "Soglia sceglie direttamente tra chiaro e scuro. Bayer distribuisce queste scelte con una matrice ordinata. Senza Colori sorgente si usano i colori di inchiostro e carta. Attivandolo, ogni canale RGB viene elaborato separatamente, fino a otto colori."
     },
     "halftone": {
       "name": "Mezzitoni",

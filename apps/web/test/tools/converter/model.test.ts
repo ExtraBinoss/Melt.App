@@ -95,3 +95,50 @@ test("unsupported and oversized uploads fail before renderer loading, including 
   expect(() => acceptToolFile(image().file, tool)).not.toThrow();
   expect(findTool("invented-image-converter")).toBeUndefined();
 });
+
+test("image and video dither share a validated source-color setting without committing drafts", () => {
+  for (const media of ["image", "video"] as const) {
+    const tool = findTool(`dither-${media}-converter`)!;
+    expect(tool.basic).toContain("sourceColor");
+    const source = image();
+    const doc = new ToolDocument(
+      media === "image"
+        ? source
+        : {
+            ...source,
+            file: new File(["video"], "clip.webm", { type: "video/webm" }),
+            duration: 2,
+            asset: {
+              id: source.asset.id,
+              name: "clip.webm",
+              width: source.asset.width,
+              height: source.asset.height,
+              kind: "video",
+              mime: "video/webm",
+              originalId: "original",
+              contentRevision: "revision",
+              byteLength: 5,
+              duration: { value: 2, rate: 1 },
+              firstTimestamp: { value: 0, rate: 1 },
+              timeResolution: 30,
+              orientation: {
+                rotation: 0,
+                flip: false,
+                pixelAspectRatio: { numerator: 1, denominator: 1 },
+              },
+            },
+          },
+      tool,
+    );
+    expect(doc.effect().settings!.sourceColor).toBe(false);
+    const before = doc.engine.getSnapshot();
+    const patch = { settings: { ...doc.effect().settings, sourceColor: true } };
+    expect(doc.draft(patch).settings!.sourceColor).toBe(true);
+    expect(doc.engine.getSnapshot()).toBe(before);
+    doc.commit(patch);
+    expect(doc.page().layers[0]!.effects[0]!.settings!.sourceColor).toBe(true);
+    doc.engine.undo();
+    expect(doc.effect().settings!.sourceColor).toBe(false);
+    expect(doc.engine.getSnapshot().canUndo).toBe(false);
+  }
+});

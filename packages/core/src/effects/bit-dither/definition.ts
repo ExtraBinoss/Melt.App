@@ -54,6 +54,13 @@ export const BIT_DITHER_PARAMETERS: readonly EffectParameter[] = [
     ...number("strength", 1, 0, 1),
     visibleWhen: { key: "method", values: ["bayer2", "bayer4", "bayer8", "interleaved"] },
   },
+  {
+    kind: "boolean",
+    scope: "settings",
+    key: "sourceColor",
+    default: false,
+    labelKey: "bit-ditherFx:parameter.sourceColor",
+  },
   number("contrast", 1, 0.05, 8),
   number("gamma", 1, 0.1, 5),
   {
@@ -68,6 +75,7 @@ export const BIT_DITHER_PARAMETERS: readonly EffectParameter[] = [
     scope: "settings",
     key,
     default: key === "foreground" ? "#000000" : "#ffffff",
+    visibleWhen: { key: "sourceColor", values: ["false"] },
     labelKey: `bit-ditherFx:parameter.${key}`,
   })),
 ];
@@ -79,7 +87,7 @@ export const BIT_DITHER_DEFAULT_SETTINGS = Object.freeze(
     ]),
   ),
 );
-/** Two-color quantization is separate from the existing multilevel Dither effect. */
+/** Binary channel quantization; monochrome defaults preserve the original two-color effect. */
 export const BIT_DITHER_DEFINITION = Object.freeze({
   ...defineEffect(
     "bit-dither",

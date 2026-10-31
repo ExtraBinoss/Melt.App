@@ -10,7 +10,8 @@
       "gamma": "Tone gamma",
       "invert": "Invert",
       "foreground": "Ink color",
-      "background": "Paper color"
+      "background": "Paper color",
+      "sourceColor": "Source colors"
     },
     "method": {
       "threshold": "Fixed threshold",
@@ -31,7 +32,8 @@
       "gamma": "Gamma des tons",
       "invert": "Inverser",
       "foreground": "Couleur de l’encre",
-      "background": "Couleur du papier"
+      "background": "Couleur du papier",
+      "sourceColor": "Couleurs source"
     },
     "method": {
       "threshold": "Seuil fixe",
@@ -39,6 +41,66 @@
       "bayer4": "Bayer 4×4",
       "bayer8": "Bayer 8×8",
       "interleaved": "Bruit de gradient entrelacé"
+    }
+  },
+  "de": {
+    "name": "Ein-Bit-Dithering",
+    "parameter": {
+      "sourceColor": "Quellfarben"
+    }
+  },
+  "es": {
+    "name": "Tramado de un bit",
+    "parameter": {
+      "sourceColor": "Colores de origen"
+    }
+  },
+  "it": {
+    "name": "Dithering a un bit",
+    "parameter": {
+      "sourceColor": "Colori sorgente"
+    }
+  },
+  "pt": {
+    "name": "Dithering de um bit",
+    "parameter": {
+      "sourceColor": "Cores de origem"
+    }
+  },
+  "nl": {
+    "name": "Eénbits-dithering",
+    "parameter": {
+      "sourceColor": "Bronkleuren"
+    }
+  },
+  "pl": {
+    "name": "Dithering jednobitowy",
+    "parameter": {
+      "sourceColor": "Kolory źródłowe"
+    }
+  },
+  "ja": {
+    "name": "1ビットディザ",
+    "parameter": {
+      "sourceColor": "元の色"
+    }
+  },
+  "ko": {
+    "name": "1비트 디더",
+    "parameter": {
+      "sourceColor": "원본 색상"
+    }
+  },
+  "zh": {
+    "name": "单比特抖动",
+    "parameter": {
+      "sourceColor": "源图颜色"
+    }
+  },
+  "ar": {
+    "name": "تنقيط أحادي البت",
+    "parameter": {
+      "sourceColor": "ألوان المصدر"
     }
   }
 }

@@ -84,15 +84,15 @@
     },
     "dither": {
       "name": "Dithering",
-      "summary": "Zredukuj obrazy do dwukolorowej palety z uporządkowanymi wzorami i wyrazistą drukowaną fakturą.",
-      "about": "Dithering reprezentuje tony pośrednie poprzez rozmieszczenie pikseli z ograniczonej palety. To narzędzie wykorzystuje dwukolorowy efekt Bit Dither Melt. Wybierz próg, Bayer 2 × 2, Bayer 4 × 4, Bayer 8 × 8 lub szum przeplatany, a następnie ustaw kolory pierwszego planu i tła. Kontrast, gamma i siła wzoru zapewniają lepszą kontrolę w ustawieniach zaawansowanych.",
+      "summary": "Ogranicz obrazy do czerni i bieli lub kolorów źródłowych z uporządkowanymi wzorami pikseli.",
+      "about": "Dithering odwzorowuje tony wzorami z ograniczonej palety. Wybierz próg, Bayer 2 × 2, 4 × 4, 8 × 8 lub szum przeplatany. Kolory źródłowe przetwarzają każdy kanał RGB źródła zamiast czerni i bieli. Kontrast, gamma i siła wzoru dopracowują efekt.",
       "tips": [
         "Zacznij od Bayer 4 × 4, aby uzyskać zrównoważony, rozpoznawalny wzór.",
         "Wybierz kolory pierwszego planu i tła z wystarczającą separacją.",
         "Użyj większej skali wzoru, aby uzyskać masywną teksturę inspirowaną nadrukiem."
       ],
       "question": "Jaka jest różnica pomiędzy progiem a ditheringiem Bayer?",
-      "answer": "Próg przypisuje każdą próbkę bezpośrednio do jednego z dwóch kolorów. Bayer wykorzystuje uporządkowaną matrycę do rozłożenia tych kolorów i sugeruje bardziej pośrednie tony. Rozmiary wzorów zmieniają teksturę; żadna z opcji nie dodaje do palety ukrytego trzeciego koloru."
+      "answer": "Próg wybiera bezpośrednio jasny lub ciemny ton. Bayer rozkłada te wybory za pomocą uporządkowanej macierzy. Bez Kolorów źródłowych używane są kolory tuszu i papieru. Po włączeniu każdy kanał RGB jest przetwarzany osobno, dając do ośmiu kolorów."
     },
     "halftone": {
       "name": "Raster",

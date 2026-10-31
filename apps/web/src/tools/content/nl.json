@@ -84,15 +84,15 @@
     },
     "dither": {
       "name": "Dither",
-      "summary": "Verklein afbeeldingen tot een tweekleurenpalet met geordende patronen en een duidelijke gedrukte textuur.",
-      "about": "Dithering vertegenwoordigt tussentonen door pixels uit een beperkt palet te rangschikken. Deze tool maakt gebruik van het tweekleurige Bit Dither-effect van Melt. Kies de drempelwaarde, Bayer 2 × 2, Bayer 4 × 4, Bayer 8 × 8 of verweven ruis, en stel vervolgens de voor- en achtergrondkleuren in. Contrast, gamma en patroonsterkte zorgen voor een fijnere controle in de geavanceerde instellingen.",
+      "summary": "Beperk beelden tot zwart-wit of bronkleuren met geordende pixelpatronen.",
+      "about": "Dithering beeldt tinten af met patronen uit een beperkt palet. Kies drempel, Bayer 2 × 2, 4 × 4, 8 × 8 of verweven ruis. Bronkleuren dithert elk RGB-kanaal van de bron in plaats van zwart-wit. Contrast, gamma en patroonsterkte verfijnen het resultaat.",
       "tips": [
         "Begin met Bayer 4 × 4 voor een evenwichtig, herkenbaar patroon.",
         "Kies voor- en achtergrondkleuren met voldoende scheiding.",
         "Gebruik een grotere patroonschaal voor een dikke, op print geïnspireerde textuur."
       ],
       "question": "Wat is het verschil tussen drempelwaarde en Bayer dithering?",
-      "answer": "De drempelwaarde wijst elk beeldmonster direct toe aan een van de twee kleuren. Bayer verdeelt de kleuren met een geordende matrix en wekt zo de indruk van meer tussentinten. De patroongrootte verandert de textuur; geen van beide opties voegt een verborgen derde kleur aan het palet toe."
+      "answer": "Drempel kiest direct tussen licht en donker. Bayer verdeelt die keuzes met een geordende matrix. Zonder Bronkleuren worden de inkt- en papierkleuren gebruikt. Ingeschakeld wordt elk RGB-kanaal afzonderlijk geditherd, voor maximaal acht kleuren."
     },
     "halftone": {
       "name": "Halftoon",

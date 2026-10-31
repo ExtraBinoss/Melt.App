@@ -84,15 +84,15 @@
     },
     "dither": {
       "name": "Dither",
-      "summary": "Reduza as imagens para uma paleta de duas cores com padrões ordenados e uma textura impressa distinta.",
-      "about": "Dithering representa tons intermediários organizando pixels de uma paleta limitada. Esta ferramenta usa o efeito Bit Dither de duas cores de Melt. Escolha limite, Bayer 2 × 2, Bayer 4 × 4, Bayer 8 × 8 ou ruído intercalado e, em seguida, defina as cores de primeiro plano e de fundo. O contraste, a gama e a intensidade do padrão proporcionam um controle mais preciso nas configurações avançadas.",
+      "summary": "Reduza imagens a preto e branco ou às cores de origem com padrões ordenados de píxeis.",
+      "about": "O dithering representa tons com padrões de uma paleta limitada. Escolha limiar, Bayer 2 × 2, 4 × 4, 8 × 8 ou ruído intercalado. Cores de origem aplica o dithering a cada canal RGB da fonte em vez de usar preto e branco. Contraste, gama e intensidade do padrão afinam o resultado.",
       "tips": [
         "Comece com Bayer 4 × 4 para obter um padrão reconhecível e equilibrado.",
         "Escolha as cores de primeiro plano e de fundo com separação suficiente.",
         "Use uma escala de padrão maior para uma textura robusta inspirada em estampas."
       ],
       "question": "Qual é a diferença entre limite e pontilhamento Bayer?",
-      "answer": "O limiar atribui cada amostra diretamente a uma das duas cores. Bayer usa uma matriz ordenada para distribuir essas cores e sugerir tons mais intermediários. Os tamanhos dos padrões alteram a textura; nenhuma das opções adiciona uma terceira cor oculta à paleta."
+      "answer": "Limiar escolhe diretamente entre claro e escuro. Bayer distribui essas escolhas com uma matriz ordenada. Sem Cores de origem são usadas as cores de tinta e papel. Ao ativar, cada canal RGB é processado separadamente, até oito cores."
     },
     "halftone": {
       "name": "Meio-tom",

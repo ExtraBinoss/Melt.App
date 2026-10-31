@@ -63,14 +63,22 @@ export async function inspectToolVideo(bytes: number[]) {
     const context = canvas.getContext("2d")!;
     const timestamps: number[] = [],
       signatures: number[] = [];
+    let coloredPixels = 0;
     for await (const sample of new VideoSampleSink(video).samples()) {
       try {
         timestamps.push(sample.timestamp);
         sample.draw(context, 0, 0);
         const pixels = context.getImageData(0, 0, 160, 120).data;
         let sum = 0;
-        for (let i = 0; i < pixels.length; i += 16)
+        for (let i = 0; i < pixels.length; i += 16) {
           sum += pixels[i]! + pixels[i + 1]! * 2 + pixels[i + 2]! * 3;
+          if (
+            Math.max(pixels[i]!, pixels[i + 1]!, pixels[i + 2]!) -
+              Math.min(pixels[i]!, pixels[i + 1]!, pixels[i + 2]!) >
+            30
+          )
+            coloredPixels++;
+        }
         signatures.push(sum);
       } finally {
         sample.close();
@@ -97,6 +105,7 @@ export async function inspectToolVideo(bytes: number[]) {
       rms: Math.sqrt(energy / Math.max(1, frames)),
       timestamps,
       uniqueFrames: new Set(signatures).size,
+      coloredPixels,
     };
   } finally {
     input.dispose();

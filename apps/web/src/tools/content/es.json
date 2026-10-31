@@ -84,15 +84,15 @@
     },
     "dither": {
       "name": "Tramado",
-      "summary": "Reduzca las imágenes a una paleta de dos colores con patrones ordenados y una textura impresa distintiva.",
-      "about": "El tramado representa tonos intermedios distribuyendo píxeles de una paleta limitada. Esta herramienta usa el efecto Bit Dither de dos colores de Melt. Elige umbral, Bayer 2 × 2, Bayer 4 × 4, Bayer 8 × 8 o ruido intercalado, y ajusta los colores de primer plano y fondo. Los ajustes avanzados permiten afinar el contraste, la gamma y la intensidad del patrón.",
+      "summary": "Reduce imágenes a blanco y negro o a colores de origen con patrones ordenados de píxeles.",
+      "about": "El tramado representa tonos con patrones de una paleta limitada. Elige umbral, Bayer 2 × 2, 4 × 4, 8 × 8 o ruido entrelazado. Colores de origen trama cada canal RGB de la fuente en lugar de usar blanco y negro. Contraste, gamma e intensidad del patrón afinan el resultado.",
       "tips": [
         "Comience con Bayer 4 × 4 para obtener un patrón equilibrado y reconocible.",
         "Elija los colores de primer plano y de fondo con suficiente separación.",
         "Utilice una escala de patrón más grande para obtener una textura inspirada en un estampado grueso."
       ],
       "question": "¿Qué diferencia hay entre el umbral y el tramado Bayer?",
-      "answer": "El umbral asigna cada muestra directamente a uno de los dos colores. Bayer utiliza una matriz ordenada para distribuir esos colores y sugerir tonos más intermedios. Los tamaños de los patrones cambian la textura; Ninguna de las opciones agrega un tercer color oculto a la paleta."
+      "answer": "Umbral elige directamente entre claro y oscuro. Bayer distribuye esas decisiones con una matriz ordenada. Sin Colores de origen se usan los colores de tinta y papel. Al activarlo, cada canal RGB se trama por separado para obtener hasta ocho colores."
     },
     "halftone": {
       "name": "Semitono",

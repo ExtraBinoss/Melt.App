@@ -1,6 +1,6 @@
 # Local effect converters
 
-Melt exposes six public, prerendered converters under `/tools`: ASCII, two-color
+Melt exposes six public, prerendered converters under `/tools`: ASCII, monochrome/source-color
 Dither, Halftone, Cyanotype, CRT and Posterize. Each page accepts images and videos
 and selects the appropriate controls and encoder from the chosen file. Former
 media-specific URLs redirect permanently to the shared effect page. The
@@ -87,7 +87,16 @@ commit, cancellation and source disposal invalidate that gesture's pending frame
 This avoids starving presentation when pointer input arrives faster than rendering.
 The engine's decoded-frame and GPU budgets remain in force.
 
-Basic and Advanced controls share a fixed-height scroll viewport. Their toggle
-stays above it and reveals the updated fields with a short blur/opacity/translation
-animation; resolution, transport and download controls keep their positions.
-Reduced-motion preferences skip that animation.
+Basic controls remain visible. Advanced controls follow them as the last disclosure
+in the parameter list and expand downward with an animated height; the output,
+transport and download controls move naturally with the list. Reduced-motion
+preferences skip that animation. The video player shares the trim fields’ horizontal
+bounds without an extra padded panel. Keep audio appears only for sources with an
+audio track.
+
+Dither starts with its original black-and-white ink/paper palette. Source colors
+switches the same one-bit effect to independent RGB-channel thresholding (up to
+eight colors), keeping all five existing pattern methods. Ink and paper controls
+are hidden in source-color mode. The validated `sourceColor` setting defaults to
+false for existing portable documents. Preview, image download and video export
+use the same retained TSL graph; neither mode reads GPU pixels into JavaScript.

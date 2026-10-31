@@ -57,13 +57,15 @@ export function bitDitherNode({ source, controls }: EffectNodeContext) {
         threshold.assign(bayerThreshold(point, 2));
       });
     const luminance = dot(blocked.rgb, vec3(0.2126, 0.7152, 0.0722)),
+      channel = mix(vec3(luminance), blocked.rgb, u.sourceColor!),
       tone = pow(
-        clamp(luminance.sub(0.5).mul(u.contrast!).add(0.5), 0, 1),
+        clamp(channel.sub(0.5).mul(u.contrast!).add(0.5), 0, 1),
         float(1).div(max(0.1, u.gamma!)),
       ),
       bit = step(u.threshold!, tone.add(float(0.5).sub(threshold).mul(u.strength!)));
     return mix(bit, bit.oneMinus(), u.invert!);
   })();
-  const color = mix(controls.colors.foreground!, controls.colors.background!, binary);
+  const palette = mix(controls.colors.foreground!, controls.colors.background!, binary),
+    color = mix(palette, binary, u.sourceColor!);
   return vec4(mix(original.rgb, color, controls.amount), original.a);
 }

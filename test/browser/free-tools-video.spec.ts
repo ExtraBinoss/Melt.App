@@ -66,7 +66,10 @@ test("ASCII and dither video tools export real moving frames, trims and source a
     await fields.nth(1).press("Enter");
     await fields.nth(0).fill("0.5");
     await fields.nth(0).press("Enter");
-    if (style === "dither") await page.locator('.tool-audio [role="switch"]').click();
+    if (style === "dither") {
+      await page.getByRole("switch", { name: "Source colors", exact: true }).click();
+      await page.locator('.tool-audio [role="switch"]').click();
+    }
     await page.getByRole("combobox", { name: "Download format", exact: true }).click();
     await page.getByRole("option", { name: "WebM", exact: true }).click();
     const pending = page.waitForEvent("download");
@@ -94,6 +97,7 @@ test("ASCII and dither video tools export real moving frames, trims and source a
     expect(decoded.duration).toBeCloseTo(1, 1);
     expect(decoded.timestamps).toHaveLength(30);
     expect(decoded.uniqueFrames).toBeGreaterThan(8);
+    if (style === "dither") expect(decoded.coloredPixels).toBeGreaterThan(1000);
     if (style === "ascii") expect(decoded.rms).toBeGreaterThan(0.05);
     await page.bringToFront();
     await page.locator(".tool-canvas-host").evaluate((node) => {
@@ -118,6 +122,13 @@ test("ASCII and dither video tools export real moving frames, trims and source a
     });
     await expect(page.locator(".tool-file-name")).toHaveText("replacement.webm");
     await expect(download).toBeEnabled();
+    if (style === "dither") {
+      // Reopen the genuinely silent exported clip, whose decoded audio absence was checked above.
+      await page.locator("[data-tool-file]").setInputFiles(output);
+      await expect(page.locator(".tool-file-name")).toHaveText("dither-clip.webm");
+      await expect(download).toBeEnabled();
+      await expect(page.locator(".tool-audio")).toHaveCount(0);
+    }
     const native = await page.evaluate(
       () =>
         (

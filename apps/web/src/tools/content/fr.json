@@ -84,15 +84,15 @@
     },
     "dither": {
       "name": "Dither",
-      "summary": "Réduisez les images à deux couleurs avec des motifs ordonnés et une texture graphique marquée.",
-      "about": "Le dithering représente les tons intermédiaires en répartissant les pixels d’une palette limitée. Cet outil utilise l’effet Bit Dither de Melt. Choisissez un seuil, Bayer 2 × 2, Bayer 4 × 4, Bayer 8 × 8 ou le bruit entrelacé, puis les couleurs du premier plan et du fond. Les réglages avancés ajoutent contraste, gamma et intensité du motif.",
+      "summary": "Réduisez les images à une palette noir et blanc ou colorée avec des motifs de pixels ordonnés.",
+      "about": "Le tramage représente les tons par des motifs dans une palette limitée. Choisissez un seuil, Bayer 2 × 2, Bayer 4 × 4, Bayer 8 × 8 ou le bruit entrelacé. Couleurs source remplace le noir et blanc par un tramage de chaque canal RVB de la source. Contraste, gamma et intensité du motif affinent le résultat.",
       "tips": [
         "Commencez avec Bayer 4 × 4 pour un motif équilibré.",
         "Choisissez deux couleurs suffisamment distinctes.",
         "Augmentez l’échelle pour une texture plus marquée, inspirée de l’impression."
       ],
       "question": "Quelle différence entre le seuil et le dithering Bayer ?",
-      "answer": "Le seuil attribue directement chaque échantillon à l’une des deux couleurs. Bayer utilise une matrice ordonnée pour répartir ces couleurs et suggérer des tons intermédiaires. Les tailles de motif changent la texture sans ajouter une troisième couleur cachée."
+      "answer": "Le seuil choisit directement un ton clair ou sombre. Bayer répartit ces choix dans une matrice ordonnée pour suggérer des tons intermédiaires. Sans Couleurs source, le résultat utilise vos couleurs d’encre et de papier. Avec cette option, chaque canal RVB est tramé séparément pour produire jusqu’à huit couleurs."
     },
     "halftone": {
       "name": "Halftone",

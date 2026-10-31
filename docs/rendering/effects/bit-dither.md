@@ -1,10 +1,18 @@
 # One-bit Dither
 
-One-bit Dither is a separate two-color effect. Existing multilevel Dither documents
-retain their current operator. The new effect samples luminance at authored cell
-centers, applies contrast and tone gamma, and chooses an ink or paper color using
+One-bit Dither defaults to a separate two-color effect. Existing multilevel Dither
+documents retain their current operator. The new effect samples luminance at
+authored cell centers, applies contrast and tone gamma, and chooses an ink or paper color using
 a fixed threshold, Bayer 2×2/4×4/8×8 ranks or interleaved gradient noise. Threshold,
 dither strength, palette and inversion remain explicit portable settings.
+
+The optional `sourceColor` setting defaults to false, including when omitted by
+existing documents. When enabled, the same contrast/gamma and threshold algorithm
+operate independently on the three source RGB channels, yielding up to eight
+colors instead of the ink/paper palette. The generic multilevel Dither already
+uses this per-channel principle; its operator and defaults stay unchanged. Palette
+controls are hidden in source-color mode. The shared renderer supplies this mode
+to editor/tool previews and native image/video exports.
 
 The Bayer ranks follow the standard recursive dispersed-dot construction. Each
 rank is centered in one of N² equal threshold bins, using `(rank + 0.5) / N²`.
@@ -27,8 +35,9 @@ worker, timer, GPU readback or persistent resource is added. Spatial coordinates
 and cell size use authored layer pixels; the common reference plane governs
 editor, thumbnail and export reduction. Source alpha is retained per pixel rather
 than replaced by cell-center coverage. At full amount each reference texel chooses
-one palette color; minification and fractional coverage can naturally blend those
-colors in the final image.
+one palette color in monochrome mode, or one binary RGB color in source-color mode;
+minification and fractional coverage can naturally blend those colors in the
+final image.
 
 Mirrored tests cover defaults, validation, immutable data, command undo/redo,
 uniform identity and original alpha. The frozen 2026-10-28 run of

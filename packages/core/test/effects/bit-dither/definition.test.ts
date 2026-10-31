@@ -6,6 +6,7 @@ import {
   createProject,
   EditorEngine,
   getEffectParameter,
+  isEffectParameterVisible,
   patchEffectParameter,
   validateEffectParameter,
 } from "@musart/core";
@@ -72,4 +73,26 @@ it("commits a palette/method edit once, rejects unknown modes and restores porta
   expect(engine.getSnapshot().project.pages[0]!.layers[0]!.effects[0]!.settings!.method).toBe(
     "interleaved",
   );
+});
+
+it("resolves missing source-color settings as monochrome and validates a single undoable switch", () => {
+  const original = createEffect("bit-dither"),
+    legacy = { ...original, settings: { method: "bayer4" } },
+    sourceColor = BIT_DITHER_DEFINITION.parameters.find((p) => p.key === "sourceColor")!,
+    foreground = BIT_DITHER_DEFINITION.parameters.find((p) => p.key === "foreground")!,
+    layer = createLayer("rectangle", { effects: [legacy] }),
+    engine = new EditorEngine(createProject({ pages: [createPage({ layers: [layer] })] }));
+  expect(getEffectParameter(legacy, sourceColor)).toBe(false);
+  expect(isEffectParameterVisible(legacy, foreground)).toBe(true);
+  expect(() => validateEffectParameter(sourceColor, "true")).toThrow();
+  const changed = { ...legacy, ...patchEffectParameter(legacy, sourceColor, true) };
+  engine.execute({ type: "updateLayers", ids: [layer.id], patch: { effects: [changed] } });
+  expect(getEffectParameter(changed, sourceColor)).toBe(true);
+  expect(isEffectParameterVisible(changed, foreground)).toBe(false);
+  expect(JSON.parse(JSON.stringify(changed)).settings.sourceColor).toBe(true);
+  engine.undo();
+  expect(engine.getSnapshot().project.pages[0]!.layers[0]!.effects[0]).toEqual(legacy);
+  expect(engine.getSnapshot().canUndo).toBe(false);
+  engine.redo();
+  expect(engine.getSnapshot().project.pages[0]!.layers[0]!.effects[0]).toEqual(changed);
 });
