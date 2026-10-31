@@ -6,6 +6,10 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Keep font samples alive across React effect replay and remove verbose renderer-ready messages. Skip empty-query indexing and unnecessary zero-position scroll access, focus through Radix after positioning and defer cancellable catalogue work past overlay presentation. In a bounded one-core production cohort, cold browser event duration fell from 488 to 200 ms and three warm openings from 104–184 to 80–96 ms; preserve raw measurements and their limits in the typography performance report.
+
+- Preserve authored text-morph timing and placement when changing font, weight or content, using the selected face's real glyph outlines. Treat font aliases consistently in contour/resource identity and replace generic superellipse inflation with a small outline-preserving offset.
+
 - Add a lazy SVG point editor with anchor/Bézier handles, corner/smooth/symmetric nodes, exact segment splitting, persistent corner radii, per-path ends/joins and zoom controls. Keep GPU gesture previews imperative, commit once per gesture, cancel stale edits safely and preserve undo/save compatibility.
 
 - Restore the original full-height Morph cadence with fresh Inter Variable MELT outlines and a fixed mouthless mascot on the left. Regenerate and version the real rendered poster/source, retain white card/detail backgrounds and place captions below the artwork.

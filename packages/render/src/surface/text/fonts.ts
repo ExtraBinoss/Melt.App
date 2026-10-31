@@ -48,6 +48,11 @@ const CACHED_FONTS = 5;
 export function fontFamilyKey(family: string): string {
   return families.get(normalizeFontFamily(family)) ?? "inter";
 }
+/** Aliases share an identity; unknown/custom families must never alias to the fallback. */
+export function fontFamilyIdentity(family: string): string {
+  const normalized = normalizeFontFamily(family);
+  return families.get(normalized) ?? normalized;
+}
 /** Resource identity keeps imported/remote families distinct from the bundled fallback. */
 export function normalizeFontFamily(family: string): string {
   return family.trim().replaceAll('"', "").replaceAll("'", "").replace(/\s+/g, " ").toLowerCase();

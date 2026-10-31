@@ -67,3 +67,77 @@ bunx playwright test test/browser/font-picker.spec.ts --config artifacts/font-pi
 ```
 
 This bounded UI investigation does not run the unrelated 50-image effect workload. It does not establish low-end mobile performance, every font/script's glyph coverage, a cold network guarantee, INP or a global speedup. Samples above 4 MiB or without a usable source show an explicit unavailable state; normal font installation retains its existing 32 MiB limit.
+
+## October 31: sample lifecycle, editable morphs and opening work
+
+A native development reproduction confirmed that React effect replay disposed the
+memoized sample cache before `resume()`/`acquire()`. Real Inter bytes decoded with
+`FontFace.load()`; mounted rows were using a disposed cache. The picker now retains
+ownership across replay and pauses pending requests immediately on release, with
+final disposal in a microtask if no owner returns. Renderer feedback stays in the
+trigger; the verbose ready paragraph was removed.
+
+The same investigation found an exact font-name comparison that treated Inter and
+Inter Variable as different sources. Any mismatch discarded authored morph poses
+and generated a two-state superellipse inflation. Canonical aliases now retain the
+same contour/resource identity. Different fonts, weights and text use their real
+shaped glyphs with the authored timing/placement envelope. Generic Inflate uses a
+small outline offset that retains stems, concavity and counter placement.
+
+### Frozen production opening cohort
+
+The frozen source is `88e627f` plus the owned font/morph overlay in
+`artifacts/font-popover-cohort/`. Baseline and candidate both contain the functional
+sample/morph corrections; this comparison isolates opening work. The baseline
+retains eager indexing, early input autofocus, the unconditional ref scroll access
+and immediate full-catalogue loading. The final candidate skips empty-query
+indexing, resolves five category translations once, focuses through Radix after
+positioning, avoids zero-position scroll access and defers optional metadata until
+the existing presentation boundary is free. Closing cancels that deferred read.
+
+Both production builds, matching maps, the saved baseline picker/search files and
+final source/hash manifests are retained under `artifacts/`. The initial diagnostic
+build setup failures (workspace aliases/dependency links) did not run a timing
+cohort. An intermediate candidate improved warm openings but retained the cold
+cost; its measurements are preserved rather than substituted for the final run.
+
+Environment: Chrome 156.0.8078.79, Linux, 1600 × 1000, DPR 1, native Intel xe-lpg
+adapter with `isFallbackAdapter: false`. Each build/browser check ran serially at
+low priority, CPU quota 100%, swap disabled, browser MemoryHigh 2,200 MiB and
+MemoryMax 3,000 MiB. This is a shared workstation, not a controlled performance lab.
+
+The same native test opens the picker four times on one selected Inter Variable
+text layer. It records the first viewport containing useful rows and the following
+RAF, plus browser Event Timing entries. Before each close it waits for the complete
+catalogue and decoded Inter sample, so warm comparisons do not hide deferred
+metadata/sample work. Five rows intersect the viewport, search owns focus, document
+snapshots/editor React counters remain unchanged and native pixel-readback probes
+remain zero. CPU profiling runs separately after those unprofiled samples.
+
+| Observation, cold then three warm openings                        | Baseline                     | Final candidate            |
+| ----------------------------------------------------------------- | ---------------------------- | -------------------------- |
+| Native pointer timestamp → observed presentation opportunity (ms) | 286.6 / 116.3 / 94.3 / 171.4 | 134.5 / 79.5 / 65.9 / 87.4 |
+| Browser Event Timing duration for opening interaction (ms)        | 488 / 120 / 104 / 184        | 200 / 88 / 80 / 96         |
+
+These are four raw observations, not p95, field INP or a universal instant-opening
+guarantee. The cold diagnostic trace is separately instrumented and slower: its
+mapped stack identifies the ref's `scrollTop` access forcing style/layout during
+commit, plus optional Google catalogue preparation. Earlier development and
+intermediate-production observations remain in their own JSON/profile files;
+they are not mixed into this table.
+
+Reproduce serially against each retained production preview, following the resource
+scope in [the shared protocol](protocol.md):
+
+```sh
+MUSART_FONT_OUTPUT=../font-popover/baseline-final \
+  bunx playwright test test/browser/font-popover-performance.spec.ts --config artifacts/baseline.config.ts --workers=1
+MUSART_FONT_OUTPUT=../font-popover/final \
+  bunx playwright test test/browser/font-popover-performance.spec.ts test/browser/font-morph-editing.spec.ts --config artifacts/final.config.ts --workers=1
+```
+
+Those temporary configurations live in the frozen worktree and point to its
+baseline/final preview servers on ports 4187/4189. The native morph case verifies
+actual decoded row samples, identical Inter alias pixels, changed readable Tinos
+pixels, cancellation, one-step commit/undo and native WebGPU/WebGL exports with
+mean RGB difference below one byte and zero production JavaScript pixel readbacks.

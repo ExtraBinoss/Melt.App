@@ -157,3 +157,26 @@ test("pause and resume restart a cancelled job for a still-mounted visible row",
   release();
   cache.dispose();
 });
+
+test("effect cleanup/replay retains a usable cache, while final cleanup releases decoded faces", async () => {
+  const faces = nativeFaces(),
+    cache = new FontSampleCache(bundledFontLibrary);
+  const firstOwner = cache.retain();
+  firstOwner();
+  const replayOwner = cache.retain();
+  await Promise.resolve();
+  cache.resume();
+  const listener = vi.fn();
+  const release = cache.acquire(FONT_CATALOG[0]!, true, listener);
+  await waitFor(() =>
+    expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ status: "ready" })),
+  );
+  expect(faces.loaded.size).toBe(1);
+  release();
+  replayOwner();
+  await Promise.resolve();
+  expect(faces.loaded.size).toBe(0);
+  const after = vi.fn();
+  cache.acquire(FONT_CATALOG[0]!, true, after);
+  expect(after).toHaveBeenLastCalledWith({ status: "error" });
+});

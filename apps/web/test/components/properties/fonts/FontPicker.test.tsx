@@ -397,7 +397,7 @@ test("shows the persisted user-font label while closed and never substitutes a f
   );
 });
 
-test("closed named-font triggers avoid platform metadata and full-catalog work until opened", () => {
+test("named-font triggers keep metadata work out of the closed picker and its opening presentation", async () => {
   const library = platform(),
     data = mount(false, library);
   expect(library.installed).not.toHaveBeenCalled();
@@ -412,8 +412,24 @@ test("closed named-font triggers avoid platform metadata and full-catalog work u
   expect(screen.getByRole("combobox", { name: "Police" })).toHaveTextContent("Tinos");
   expect(library.installed).not.toHaveBeenCalled();
   open();
+  expect(screen.getByRole("listbox")).toBeVisible();
+  expect(library.installed).not.toHaveBeenCalled();
+  expect(library.catalog).not.toHaveBeenCalled();
+  await waitFor(() => expect(library.catalog).toHaveBeenCalledOnce());
   expect(library.installed).toHaveBeenCalledOnce();
-  expect(library.catalog).toHaveBeenCalledOnce();
+});
+
+test("closing before presentation completes cancels optional catalogue reads", async () => {
+  const library = platform();
+  mount(false, library);
+  open();
+  fireEvent.keyDown(screen.getByRole("listbox"), { key: "Escape" });
+  await waitFor(() => expect(screen.queryByRole("listbox")).toBeNull());
+  await act(async () => {
+    await new Promise((resolve) => setTimeout(resolve, 300));
+  });
+  expect(library.catalog).not.toHaveBeenCalled();
+  expect(library.installed).not.toHaveBeenCalled();
 });
 
 test("scroll cancels pointer intent without a delayed canvas preview, while keyboard stays immediate", async () => {

@@ -28,7 +28,6 @@ export function FontPickerSearch({
     <div className={styles.search}>
       <SearchInput
         id={id}
-        autoFocus
         searchButton
         captureTyping
         role="combobox"

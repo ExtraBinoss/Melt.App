@@ -10,7 +10,22 @@ Each visible row shows its name, category and a phrase rendered by an actually d
 
 These samples use a separate ephemeral cache: at most eight retained faces, two concurrent jobs, 24 MiB of retained source bytes and 4 MiB per source. Remote and bundled samples fetch their catalog URLs directly, without installing originals in IndexedDB. Local samples use the native PostScript name; custom samples read only already installed originals. Unused faces are evicted with `document.fonts.delete()`. Closing aborts outstanding jobs; unmounting disposes the cache. A sample that exceeds the preview budget can still be chosen through the normal validated installation path.
 
+The picker retains its sample cache across React effect replay. A release pauses
+pending work immediately; final disposal runs in a microtask only if no owner has
+retained it again. Replaying setup must not leave mounted rows using a permanently
+disposed cache. Empty browsing does not build a search index; actual searches reuse
+one lazy index per catalogue/language, with five translated category labels.
+Focus enters the search through Radix after mounting and positioning the popover,
+rather than through an input autofocus that forces layout during the DOM commit.
+A new list at scroll position zero does not touch `scrollTop` in its ref callback;
+nonzero restoration still synchronizes the virtual window. Full catalogue refreshes
+wait for the existing overlay presentation boundary and cancel on close. Bundled
+rows remain immediately available while that optional metadata loads.
+
 Browser decoding and canvas rendering have separate readiness states. The picker owns a renderer ticket containing the project, page, text layer, logical family/weight and request generation. The loading indicator completes only when the projected request is actually drawn and `PlaneResources.present()` acknowledges that ticket. A prior preview, cancelled request, different revision or unmounted picker cannot mark a new request ready. Unavailable renderers and preparation failures remain explicit.
+
+Renderer feedback stays in the trigger's small loading/error indicator. There is
+no additional “font is ready” paragraph in the popover.
 
 The native baseline, functional pixel checks and measurement limits are recorded in [Typography performance](../performance/fonts.md).
 

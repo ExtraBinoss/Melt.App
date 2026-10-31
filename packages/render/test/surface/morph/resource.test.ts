@@ -8,6 +8,8 @@ test("retains geometry through progress, strength and order changes and disposes
   const resource = new MorphResource(layer, effect, effect.shapeMorph!);
   const geometry = resource.geometry;
   const key = morphResourceKey(layer, effect);
+  expect(morphResourceKey({ ...layer, fontFamily: "Inter Variable" }, effect)).toBe(key);
+  expect(morphResourceKey({ ...layer, fontFamily: "custom:Inter" }, effect)).not.toBe(key);
   const changed = {
     ...effect,
     amount: 0.3,

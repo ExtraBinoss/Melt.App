@@ -6,7 +6,17 @@ Preparation normalizes contour winding, associates holes by spatial continuity, 
 
 Preparation rejects over 256 shapes, 120 states per shape, 32 contours per state, 262,144 authored/prepared points, 1,024 curves per ray band or a 64 MiB atlas. Geometry resources and render targets use the existing bounded cache and disposal path. Immutable geometry has a session-local cache identity, keeping large contour arrays out of per-frame source-key serialization. That identity is never persisted.
 
-Editable text without custom targets generates reusable inflated contours from the native shaped glyph outlines. Authored targets can bind to text and font metadata; editing that text or font regenerates glyph geometry while preserving the original text anchor. This is not automatic morphing between arbitrary font families. Exact designed endpoints remain explicit authored contours. The current vector treatment uses one layer fill/gradient, not independent imported multicolor parts or animated strokes.
+Editable text without custom targets generates reusable inflated contours from the native shaped glyph outlines. Inflation offsets the actual outlines conservatively, preserving concave stems and counter positions; it does not replace each letter with a generic superellipse. Authored targets can bind to text and font metadata. Canonical aliases such as Inter/Inter Variable retain exactly the same authored contours and GPU resource identity. Unknown and custom families remain distinct.
+
+Editing bound text, family or weight regenerates the selected face's shaped glyph
+outlines while reusing the authored placement/timing envelope, including all 67
+poses in Melt Mascot. New glyph proportions determine packing within that envelope;
+font size scales it about its original anchor. It does not fall back to a separate
+two-state Inflate animation. Glyph geometry is prepared once for the new source;
+playback continues to use cached GPU data and uniforms. This is not automatic
+morphing between arbitrary font families: exact designed contour endpoints still
+belong to their original source. The current vector treatment uses one layer
+fill/gradient, not independent imported multicolor parts or animated strokes.
 
 Animation blocks own their independent effects. Where several geometry-source blocks affect one object, the most recently started enabled block supplies geometry; before any start, the earliest enabled block supplies its initial state. Other geometry sources are disabled only in the evaluated frame. Occurrence scope, authored effect enable keys, disabling, undo, exact seeks and ordinary effect composition remain authoritative. Saving or duplicating a preset captures live effect parameters and contour data.
 

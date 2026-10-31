@@ -38,7 +38,19 @@ export class FontSampleCache {
   private bytes = 0;
   private paused = true;
   private disposed = false;
+  private owners = 0;
   constructor(private readonly library: FontLibraryPort) {}
+  /** Effect replay may release and retain the same cache in one turn. */
+  retain(): () => void {
+    this.owners++;
+    return () => {
+      if (--this.owners) return;
+      this.pause();
+      queueMicrotask(() => {
+        if (!this.owners) this.dispose();
+      });
+    };
+  }
   resume(): void {
     if (!this.disposed) {
       this.paused = false;

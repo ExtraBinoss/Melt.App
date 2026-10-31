@@ -33,6 +33,7 @@ import { textPaint, textPaintNode, updateTextPaint } from "../text/paint";
 import { buildMorphAtlas, type MorphAtlas } from "./atlas";
 import { morphGeometry } from "./geometry";
 import { morphIdentity } from "./identity";
+import { fontFamilyIdentity } from "../text/fonts";
 
 export const sourceMorph = (layer: Layer) =>
   layer.kind === "text" && !layer.text.trim()
@@ -43,7 +44,7 @@ export function morphResourceKey(layer: Layer, effect: Effect): string {
   return JSON.stringify([
     layer.id,
     layer.text,
-    layer.fontFamily,
+    fontFamilyIdentity(layer.fontFamily),
     layer.fontSize,
     layer.fontWeight,
     layer.lineHeight,

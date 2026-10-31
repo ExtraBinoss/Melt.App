@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { LoaderCircle, Upload } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { FONT_CATALOG, MAX_FONT_FILE_BYTES, createSearchIndex } from "@musart/assets";
+import { MAX_FONT_FILE_BYTES } from "@musart/assets";
 import type { EnginePort, Layer } from "@musart/core";
 import type { FontLibraryPort } from "../../../services/fonts/model";
 import type { PropertyActions } from "../TextProperties";
@@ -18,12 +18,13 @@ import {
   mergeFontOptions as mergeFonts,
   type FontOption,
 } from "./catalog";
-import { invalidateFontMetadata, loadFontMetadata, peekFontMetadata } from "./metadata";
+import { usePickerMetadata } from "./use-picker-metadata";
 import { bundledFontLibrary, useFontLibrary } from "./library-context";
 import { FontSampleCache } from "./sample-cache";
 import { FontOptionRow } from "./FontOptionRow";
-import { FontRenderIndicator, FontRenderStatus } from "./FontRenderStatus";
+import { FontRenderIndicator } from "./FontRenderIndicator";
 import { FontCategoryTabs, type FontCategory } from "./FontCategoryTabs";
+import { createFontSearch } from "./search";
 import { useFontCanvasStatus } from "./canvas-status";
 import { createMotionTransport } from "../../../services/motion/transport";
 import styles from "./FontPicker.module.css";
@@ -50,6 +51,18 @@ export function FontPicker({
   const canvas = useFontCanvasStatus(engine);
   const { request: requestCanvas, cancel: cancelCanvas } = canvas;
   const [open, setOpen] = useState(false);
+  const {
+    fonts,
+    setFonts,
+    installedIds,
+    setInstalledIds,
+    recent,
+    setRecent,
+    metadataReady,
+    setMetadataReady,
+    error,
+    setError,
+  } = usePickerMetadata(library, open, layer.fontFamily);
   const [query, setQuery] = useState("");
   const [active, setActive] = useState(-1);
   const [windowRow, setWindowRow] = useState(0);
@@ -57,18 +70,9 @@ export function FontPicker({
     hoverTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined),
     pointerFont = useRef<string | null>(null),
     pointerBlockedUntil = useRef(0);
-  const [recent, setRecent] = useState<string[]>([]);
   const [category, setCategory] = useState<FontCategory>("all");
-  const [fonts, setFonts] = useState<readonly FontOption[]>(() =>
-    mergeFonts(FONT_CATALOG, peekFontMetadata(library) ?? []),
-  );
-  const [installedIds, setInstalledIds] = useState<ReadonlySet<string>>(
-    () => new Set(FONT_CATALOG.map((font) => font.id)),
-  );
   const [pending, setPending] = useState<string | null>(null);
-  const [error, setError] = useState("");
   const [localUnavailable, setLocalUnavailable] = useState(false);
-  const [metadataReady, setMetadataReady] = useState(false);
   const fileInput = useRef<HTMLInputElement>(null),
     list = useRef<HTMLDivElement>(null);
   const activePreview = useRef(false),
@@ -88,24 +92,12 @@ export function FontPicker({
       ? t(metadataReady ? "unavailable" : "loading")
       : layer.fontFamily);
   const search = useMemo(
-    () =>
-      open
-        ? createSearchIndex(fonts, {
-            text: (font) => font.label ?? font.family,
-            keywords: (font) => `${font.category} ${t(`category.${font.category}`)}`,
-          })
-        : null,
-    [fonts, t, open],
+    () => createFontSearch(fonts, (category) => t(`category.${category}`)),
+    [fonts, t],
   );
   const filtered = useMemo(
-    () =>
-      search?.search(query, {
-        limit: fonts.length,
-        filter: (font) =>
-          category === "all" ||
-          (category === "installed" ? installedIds.has(font.id) : font.category === category),
-      }) ?? [],
-    [search, query, category, installedIds, fonts.length],
+    () => (open ? search(query, category, installedIds) : []),
+    [search, query, category, installedIds, open],
   );
   const hints = useMemo(
     () => fonts.slice(0, 6).map((font) => ({ label: font.label ?? font.family })),
@@ -120,7 +112,9 @@ export function FontPicker({
   }, [cancel, layer, library]);
   const attachList = useCallback((node: HTMLDivElement | null) => {
     list.current = node;
-    if (node) {
+    // A fresh viewport is already at zero. Touching scrollTop here forces style/layout
+    // during React's ref commit, before Radix has positioned the new portal.
+    if (node && scrollPosition.current > 0) {
       node.scrollTop = scrollPosition.current;
       scrollPosition.current = node.scrollTop;
       setWindowRow(Math.floor(node.scrollTop / ROW_HEIGHT));
@@ -131,7 +125,7 @@ export function FontPicker({
     hoverTimer.current = undefined;
     pointerFont.current = null;
   }, []);
-  useEffect(() => () => samples.dispose(), [samples]);
+  useEffect(() => samples.retain(), [samples]);
   useEffect(() => {
     if (open) samples.resume();
     else samples.pause();
@@ -144,57 +138,6 @@ export function FontPicker({
       if (activePreview.current) cancelRef.current();
     };
   }, [clearIntent]);
-  const needsMetadata = open || /^(custom|local):/.test(layer.fontFamily);
-  useEffect(() => {
-    if (!needsMetadata) return;
-    let mounted = true,
-      revision = 0;
-    function refresh(changed = false) {
-      if (changed) invalidateFontMetadata(library);
-      const version = ++revision;
-      void Promise.all([
-        open ? library.catalog() : Promise.resolve(FONT_CATALOG),
-        loadFontMetadata(library),
-      ]).then(
-        ([catalog, installed]) => {
-          if (!mounted || version !== revision) return;
-          const merged = mergeFonts(FONT_CATALOG, catalog, installed);
-          setFonts((previous) => mergeFonts(previous, merged));
-          setInstalledIds(
-            (previous) =>
-              new Set([
-                ...previous,
-                ...FONT_CATALOG.map((font) => font.id),
-                ...installed.map((font) => font.id),
-              ]),
-          );
-          setMetadataReady(true);
-          const saved = readRecentFonts(merged);
-          if (saved.length) setRecent(saved);
-        },
-        () => {
-          if (mounted && version === revision) {
-            setMetadataReady(true);
-            setError(t("loadFailed"));
-          }
-        },
-      );
-    }
-    // Opening always refreshes browser-wide metadata, including changes from
-    // another tab. Closed pickers only need a lookup for a persisted custom ID.
-    if (
-      open ||
-      (peekFontMetadata(library) && !findFont(layer.fontFamily, peekFontMetadata(library)))
-    )
-      invalidateFontMetadata(library);
-    refresh();
-    const unsubscribe = library.subscribe(() => refresh(true));
-    return () => {
-      mounted = false;
-      unsubscribe();
-    };
-  }, [library, open, t, needsMetadata, layer.fontFamily]);
-
   const resetPreview = useCallback(() => {
     if (!activePreview.current) return;
     activePreview.current = false;
@@ -427,7 +370,15 @@ export function FontPicker({
           <DropdownChevron size={13} />
         </Button>
       </PopoverTrigger>
-      <PopoverContent side="left" align="start" className={`floating-panel ${styles.popover}`}>
+      <PopoverContent
+        side="left"
+        align="start"
+        className={`floating-panel ${styles.popover}`}
+        onOpenAutoFocus={(event) => {
+          event.preventDefault();
+          document.getElementById(`${id}-font-search`)?.focus({ preventScroll: true });
+        }}
+      >
         <div className={styles.header}>
           <strong>{t("title")}</strong>
           <span>
@@ -581,7 +532,6 @@ export function FontPicker({
             {error}
           </p>
         )}
-        <FontRenderStatus state={canvas.view} />
         {localUnavailable && library.supportsLocalFonts && (
           <p className={styles.status}>{t("localUnavailable")}</p>
         )}
