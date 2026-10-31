@@ -1,3 +1,4 @@
+import { committedLayerFields } from "./commit-info";
 import { applyCommand, currentPage } from "./commands";
 import { EngineError, ensure } from "../errors";
 import { createProject } from "../document/factories";
@@ -173,11 +174,17 @@ export class EditorEngine implements EnginePort {
     const snapshot = freeze(next);
     markPublishedProject(snapshot.project);
     if (kind) {
+      const layerFields = committedLayerFields(commands);
       // Capture before state listeners can synchronously publish another transaction.
       const detailed =
         detailedCommands ?? (this.commandListeners.size && !commands.length ? [] : undefined);
       this.commits.push({
-        info: freeze({ kind, types: commands.map((command) => command.type), snapshot }),
+        info: freeze({
+          kind,
+          types: commands.map((command) => command.type),
+          ...(layerFields.length ? { layerFields } : {}),
+          snapshot,
+        }),
         ...(detailed ? { detailed: freeze({ kind, commands: detailed, snapshot }) } : {}),
       });
     }

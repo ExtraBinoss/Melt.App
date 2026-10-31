@@ -1,7 +1,9 @@
 import { PanelBottomOpen, PanelBottomClose, Minus, Plus } from "lucide-react";
 import { useCallback, useSyncExternalStore } from "react";
 import type { EnginePort } from "@musart/core";
-import { useAtom } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
+import { zoomControlsAtom } from "../../state/viewport/preferences";
+import { HistoryNotice } from "../../components/notifications/history/HistoryNotice";
 import { timelineOpenAtom } from "../../state/motion/timeline-state";
 import "../../components/motion/messages";
 import { useTranslation } from "react-i18next";
@@ -23,6 +25,7 @@ export function ViewportControls({
   engine?: EnginePort;
 }) {
   const { t } = useTranslation();
+  const showZoom = useAtomValue(zoomControlsAtom);
   const [timelineOpen, setTimelineOpen] = useAtom(timelineOpenAtom);
   const bindings = useKeybindings();
   const readMode = useCallback(() => {
@@ -35,35 +38,38 @@ export function ViewportControls({
   const enabled = useSyncExternalStore(engine?.subscribe ?? subscribeNothing, readMode, readMode);
   return (
     <>
-      <div className="canvas-controls floating-panel" data-canvas-control>
-        <IconButton
-          size="icon"
-          tooltipSide="bottom"
-          label={t("zoomOut", { defaultValue: "Dézoomer" })}
-          shortcut={bindingLabel("action:zoomOut", bindings)}
-          onClick={() => actions.run("zoomOut")}
-        >
-          <Minus size={14} />
-        </IconButton>
-        <IconButton
-          className="canvas-zoom"
-          tooltipSide="bottom"
-          label={t("resetView", { defaultValue: "100 % et recentrer" })}
-          shortcut={bindingLabel("action:reset", bindings)}
-          onClick={() => actions.run("reset")}
-        >
-          {Math.round(view.zoom * 100)}%
-        </IconButton>
-        <IconButton
-          size="icon"
-          tooltipSide="bottom"
-          label={t("zoomIn", { defaultValue: "Zoomer" })}
-          shortcut={bindingLabel("action:zoomIn", bindings)}
-          onClick={() => actions.run("zoomIn")}
-        >
-          <Plus size={14} />
-        </IconButton>
-      </div>
+      {engine && <HistoryNotice engine={engine} />}
+      {showZoom && (
+        <div className="canvas-controls floating-panel" data-canvas-control>
+          <IconButton
+            size="icon"
+            tooltipSide="bottom"
+            label={t("zoomOut")}
+            shortcut={bindingLabel("action:zoomOut", bindings)}
+            onClick={() => actions.run("zoomOut")}
+          >
+            <Minus size={14} />
+          </IconButton>
+          <IconButton
+            className="canvas-zoom"
+            tooltipSide="bottom"
+            label={t("resetView")}
+            shortcut={bindingLabel("action:reset", bindings)}
+            onClick={() => actions.run("reset")}
+          >
+            {Math.round(view.zoom * 100)}%
+          </IconButton>
+          <IconButton
+            size="icon"
+            tooltipSide="bottom"
+            label={t("zoomIn")}
+            shortcut={bindingLabel("action:zoomIn", bindings)}
+            onClick={() => actions.run("zoomIn")}
+          >
+            <Plus size={14} />
+          </IconButton>
+        </div>
+      )}
       {enabled && (
         <IconButton
           className="canvas-timeline-toggle floating-panel"

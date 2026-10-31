@@ -71,7 +71,7 @@
 | Shape library          | Shapes hand focus to the existing searchable artwork library.                                                                                                                                                                     |
 | Stale sessions         | Canonical changes, navigation and playback close stale Quick Add sessions.                                                                                                                                                        |
 
-Tools, selection, ruler origins, dragged guides and file drops use a page-local view derived from the active artboard's center in the world layout. Artboard headings remain screen-sized while the artwork scales. Mode controls sit inside every artboard’s bottom-right corner, scale down with zoom (bounded at 0.45×), compact below 180 screen pixels and hide when the artboard is too small. Inactive controls activate their artboard. Each heading exposes validated rename/delete commands; the final artboard cannot be deleted. File drops activate their destination artboard before entering the normal import service.
+Tools, selection, ruler origins, dragged guides and file drops use a page-local view derived from the active artboard's center in the world layout. Artboard headings remain screen-sized while the artwork scales. Mode controls sit below every artboard’s bottom-right corner, scale down with zoom (bounded at 0.45×), compact below 180 screen pixels and hide when the artboard is too small. Inactive controls activate their artboard. Each heading exposes validated rename/delete commands; the final artboard cannot be deleted. File drops activate their destination artboard before entering the normal import service.
 
 ### Text drawing
 
@@ -128,4 +128,19 @@ Hover placement is an imperative, RAF-coalesced subscription with cached workspa
 
 Before a structural reframe paints, its world-center delta compensates the old screen pose. The transition starts its 240 ms clock at the first animation frame, so a busy commit cannot consume the animation beforehand. Per-frame presentation bypasses origin clamping during that transition and publishes a settled React pose once. Reduced motion finishes immediately. This is canvas navigation; page scrolling is unchanged.
 
-The focused native case `test/browser/canvas-artboard-controls.spec.ts` verifies all four directions, first-frame continuity, corner bounds at 100%/20%, one undo, real save/reload, hover commit counters, French resources after persisted reload. Captured RAF opportunities are diagnostic frame observations, not physical display timestamps.
+The focused native case `test/browser/canvas-artboard-controls.spec.ts` verifies all four directions, first-frame continuity, placement below the board at 100%/20%, one undo, real save/reload, hover commit counters, French resources after persisted reload. Captured RAF opportunities are diagnostic frame observations, not physical display timestamps.
+
+Mode controls use the shared persistent segmented indicator also used by Projects/Templates. It measures local button offsets on value, label/direction, preference or size changes, so CSS scale/translation of an artboard does not interrupt the wipe. Reads precede animated writes; ResizeObserver, media-query listeners and Motion animations are released explicitly. Changing reduced-motion preference finishes the current indicator immediately.
+
+Individual selection dimensions stay horizontal below the artwork’s visual world bounds. Their local placement and inverse affine basis account for nested rotations/nonuniform scale; very small near-singular frames suppress the decoration instead of throwing. Live gesture presentation updates this label without publishing React snapshots.
+
+Holding Shift during ordinary item rotation draws the constrained axis through
+the world-space pivot, with an upright angle label. Releasing Shift or ending or
+cancelling the gesture removes the guide. It uses imperative snap feedback and
+retains the existing 15-degree constraint and single undo transaction.
+
+Canvas zoom buttons and percentage are hidden by default. Editor preferences can
+restore them; the validated Jotai storage atom is device-local and independent of
+documents and undo. Wheel/trackpad, keyboard navigation, fit and recenter actions
+remain available. The compact SVG entry follows zoom between 60% and 85% of its
+small base size, without enlarging at overview zoom.

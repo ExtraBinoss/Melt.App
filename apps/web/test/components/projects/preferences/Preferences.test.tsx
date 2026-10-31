@@ -87,3 +87,16 @@ test("editor settings use the persisted snapping store without editing a documen
   view.unmount();
   snappingPreferences.reset();
 });
+
+test("canvas zoom UI is opt-in and persists without changing the document", () => {
+  const d = setup(),
+    before = d.engine.getSnapshot();
+  d.mount(<Preferences initialSection="editor" />);
+  const control = screen.getByRole("switch", { name: "Afficher les contrôles de zoom du canvas" });
+  expect(control).not.toBeChecked();
+  fireEvent.click(control);
+  expect(control).toBeChecked();
+  expect(localStorage.getItem("musart.canvas-zoom-controls.v1")).toBe("true");
+  expect(d.engine.getSnapshot()).toBe(before);
+  fireEvent.click(control);
+});

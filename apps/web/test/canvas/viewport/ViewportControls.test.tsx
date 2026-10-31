@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { Provider, createStore } from "jotai";
 import { TooltipProvider } from "../../../src/components/ui/tooltip";
 import { ViewportControls } from "../../../src/canvas/viewport/ViewportControls";
+import { ZOOM_CONTROLS_STORAGE_KEY } from "../../../src/state/viewport/preferences";
 import { createViewportActions } from "../../../src/canvas/session/viewport-actions";
 import { EditorEngine } from "@musart/core";
 vi.mock("react-i18next", () => ({ useTranslation: () => ({ t: (key: string) => key }) }));
@@ -17,10 +18,14 @@ const render = (node: ReactNode) => {
     ),
   });
 };
-it("keeps zoom controls and toggles the Motion timeline while recenter remains a shared action", () => {
+it("hides zoom controls by default, restores the device preference and keeps zoom controls and toggles the Motion timeline while recenter remains a shared action", () => {
   const actions = createViewportActions(new EditorEngine()),
     listener = vi.fn(),
     stop = actions.subscribe(listener);
+  const initial = render(<ViewportControls actions={actions} view={{ x: 0, y: 0, zoom: 1 }} />);
+  expect(screen.queryByLabelText("zoomOut")).toBeNull();
+  initial.unmount();
+  localStorage.setItem(ZOOM_CONTROLS_STORAGE_KEY, "true");
   const { rerender } = render(
     <ViewportControls actions={actions} view={{ x: 0, y: 0, zoom: 0.5 }} />,
   );
@@ -41,6 +46,7 @@ it("keeps zoom controls and toggles the Motion timeline while recenter remains a
   actions.run("recenter");
   expect(listener).toHaveBeenLastCalledWith("recenter");
   stop();
+  localStorage.removeItem(ZOOM_CONTROLS_STORAGE_KEY);
 });
 
 it("observes mode changes independently from the canvas geometry subscription", () => {

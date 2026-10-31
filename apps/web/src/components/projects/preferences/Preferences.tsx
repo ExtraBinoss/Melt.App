@@ -6,6 +6,7 @@ import { applyTheme, themeAtom } from "../../../state/session/editor";
 import { changeLanguage } from "../../../state/i18n";
 import { isSupportedLocale, supportedLocales } from "../../../state/i18n/locales";
 import { snappingAtom, DEFAULT_SNAPPING } from "../../../state/snapping/preferences";
+import { zoomControlsAtom } from "../../../state/viewport/preferences";
 import { clipboardAtom } from "../../../state/clipboard/preferences";
 import { SegmentedTabs } from "../../shared/segmented/SegmentedTabs";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "../../ui/tabs";
@@ -53,7 +54,8 @@ export function Preferences({
   const [switched, setSwitched] = useState(false);
   const [theme, setTheme] = useAtom(themeAtom),
     [snapping, setSnapping] = useAtom(snappingAtom),
-    [clipboard, setClipboard] = useAtom(clipboardAtom);
+    [clipboard, setClipboard] = useAtom(clipboardAtom),
+    [showZoom, setShowZoom] = useAtom(zoomControlsAtom);
   const modes = [
     ["system", Laptop],
     ["light", Sun],
@@ -143,6 +145,19 @@ export function Preferences({
         </Panel>
         <Panel section="editor">
           <div className="preferences-card">
+            <label className="preferences-setting-row">
+              <span>
+                <strong>{t("preferences:showCanvasZoom")}</strong>
+                <small className="preferences-setting-description">
+                  {t("preferences:showCanvasZoomDescription")}
+                </small>
+              </span>
+              <Switch
+                aria-label={t("preferences:showCanvasZoom")}
+                checked={showZoom}
+                onCheckedChange={setShowZoom}
+              />
+            </label>
             <label className="preferences-setting-row">
               <span>
                 <strong>{t("preferences:snapEnabled")}</strong>

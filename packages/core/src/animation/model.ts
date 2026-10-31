@@ -1,4 +1,4 @@
-import type { Asset, Command, Project, SessionSnapshot } from "../document/model";
+import type { Asset, Command, Layer, Project, SessionSnapshot } from "../document/model";
 export type ReplayState = Omit<Project, "assets" | "replay"> & { assetIds: string[] };
 export type ReplayPath = readonly (string | number)[];
 export type ReplayDelta =
@@ -41,6 +41,8 @@ export interface CommandCommit {
 export interface CommandCommitInfo {
   kind: CommandCommit["kind"];
   types: readonly Command["type"][];
+  /** Deduplicated patch field names; no values, paths or command payloads. */
+  layerFields?: readonly (keyof Layer)[];
   snapshot: SessionSnapshot;
 }
 /** Immutable references captured at commit time; preparation and persistence belong to the consumer. */

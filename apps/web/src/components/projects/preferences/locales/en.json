@@ -22,5 +22,7 @@
   "tryDescription": "Drag the object near the reference. Hold Alt to bypass snapping; arrow keys move it, and Shift increases the step.",
   "tryCanvas": "Snapping preview",
   "tryObject": "Movable preview object",
-  "tryReset": "Reset preview"
+  "tryReset": "Reset preview",
+  "showCanvasZoom": "Show canvas zoom controls",
+  "showCanvasZoomDescription": "Display zoom buttons and the zoom percentage on the canvas."
 }

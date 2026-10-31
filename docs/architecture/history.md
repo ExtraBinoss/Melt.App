@@ -148,3 +148,21 @@ Mirrored tests cover transactions, pagination, fingerprints, resume, write error
 | Report               | It writes timings and logical serialized payload sizes to `artifacts/performance-history.json`.                                                                                                                    |
 | Size interpretation  | Logical JSON size is not an estimate of browser database allocation.                                                                                                                                               |
 | Environment boundary | The report records its browser and machine context; timing results are specific to that environment.                                                                                                               |
+
+## Undo/redo feedback
+
+The editor observes the lightweight commit-info port, including optional frozen
+`layerFields`: deduplicated names of properties in layer patches, never their
+values or command payloads. Classification therefore does not stringify vectors
+or compare effect contents. The UI retains at most 100 tiny action descriptions,
+matching the engine's maximum undo capacity, and one current immutable snapshot
+reference. Undo/redo consumes the matching description; branching clears redo,
+load clears all descriptions and any visible notice. History predating a mounted
+observer uses a generic edit label.
+
+A canvas-local leaf renders one animated two-second notice. Hover and keyboard
+focus independently pause its remaining timer; dismiss/load/unmount clear it.
+Its horizontal anchor is 50% of the actual canvas viewport. A local ResizeObserver
+matches the project pill's width/height; the same workspace/ruler spacing aligns
+its top edge. Panel resizing, project renaming and ruler changes preserve these
+relationships without a page-wide mutation observer or gesture React updates.

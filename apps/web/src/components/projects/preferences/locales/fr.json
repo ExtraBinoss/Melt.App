@@ -22,5 +22,7 @@
   "tryDescription": "Faites glisser l’objet près du repère. Maintenez Alt pour ignorer l’accrochage ; les flèches déplacent l’objet et Maj augmente le pas.",
   "tryCanvas": "Aperçu de l’accrochage",
   "tryObject": "Objet à déplacer",
-  "tryReset": "Recommencer"
+  "tryReset": "Recommencer",
+  "showCanvasZoom": "Afficher les contrôles de zoom du canvas",
+  "showCanvasZoomDescription": "Afficher les boutons de zoom et le pourcentage sur le canvas."
 }

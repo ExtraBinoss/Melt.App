@@ -1,0 +1,40 @@
+.history-notice-anchor {
+  position: absolute;
+  left: 50%;
+  top: max(var(--workspace-gap, 18px), env(safe-area-inset-top));
+  transform: translateX(-50%);
+  width: 150px;
+  height: var(--floating-size, 42px);
+  max-width: calc(100% - 24px);
+  z-index: 30;
+  pointer-events: none;
+}
+.workspace:has(.canvas-rulers:not([hidden])) .history-notice-anchor {
+  top: calc(max(var(--workspace-gap, 18px), env(safe-area-inset-top)) + 20px);
+}
+.history-notice {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  height: 100%;
+  padding-inline: 10px 5px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 550;
+  pointer-events: auto;
+}
+.history-notice > svg {
+  flex-shrink: 0;
+}
+.history-notice > span {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.history-notice button {
+  flex-shrink: 0;
+  border-radius: 999px;
+}

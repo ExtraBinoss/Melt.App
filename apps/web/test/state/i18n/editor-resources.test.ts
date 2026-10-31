@@ -9,6 +9,8 @@ import { messages as startup } from "../../../src/bootstrap/messages";
 import { messages as items } from "../../../src/components/projects/items/messages";
 import { resources as templates } from "../../../src/components/projects/templates/messages";
 import { messages as previews } from "../../../src/components/projects/templates/motion-preview/messages";
+import { messages as historyNotice } from "../../../src/components/notifications/history/messages";
+import { messages as preferences } from "../../../src/components/projects/preferences/messages";
 import { messages as motion } from "../../../src/components/motion/messages";
 
 function leaves(value: Record<string, unknown>, prefix = ""): Record<string, string> {
@@ -22,6 +24,7 @@ function leaves(value: Record<string, unknown>, prefix = ""): Record<string, str
   );
 }
 const complete = {
+  historyNotice,
   vectorEditor: vector,
   fonts,
   artboards,
@@ -85,6 +88,11 @@ const canvasCopy = [
   "composition",
   "fontFamily",
   "close",
+  "rotate",
+  "resize",
+  "zoomIn",
+  "zoomOut",
+  "resetView",
 ];
 const commonJson = import.meta.glob("../../../src/state/i18n/locales/common/*.json", {
   eager: true,
@@ -99,6 +107,30 @@ test("canvas hints and font labels resolve from the saved locale instead of loca
     for (const key of canvasCopy) {
       expect(resource[key]?.trim(), `${code}:${key}`).toBeTruthy();
       expect(i18n.t(key, { lng: code })).toBe(resource[key]);
+    }
+  }
+});
+
+const locks = import.meta.glob("../../../src/components/layers/locales/*.json", {
+  eager: true,
+  import: "default",
+});
+test("locked-state decoration uses a real translation in every supported locale", () => {
+  for (const { code } of supportedLocales) {
+    const resource = locks[`../../../src/components/layers/locales/${code}.json`] as Record<
+      string,
+      string
+    >;
+    expect(resource.lockedState?.trim()).toBeTruthy();
+  }
+});
+
+test("the optional zoom UI preference is translated in every enabled locale", () => {
+  for (const { code } of supportedLocales) {
+    for (const key of ["showCanvasZoom", "showCanvasZoomDescription"] as const) {
+      const value = preferences[code]?.[key];
+      expect(typeof value).toBe("string");
+      expect(i18n.t(`preferences:${key}`, { lng: code })).toBe(value);
     }
   }
 });
