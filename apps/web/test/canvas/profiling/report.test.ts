@@ -15,6 +15,7 @@ test("budget inputs use real work percentiles, keep cadence separate and admit e
     hostMs,
     hostStarted: at - hostMs,
     gpuMs,
+    gpuPasses: { video: 0.5, "effects/ascii": 0.25, display: 0.25 },
     drawCommands: 3,
     stats: null,
     passes: 2,
@@ -45,6 +46,9 @@ test("budget inputs use real work percentiles, keep cadence separate and admit e
       uploadsBefore: 0,
       hitsBefore: 0,
     });
+    expect(report.metrics.find((metric) => metric.id === "gpuPass:effects/ascii")?.value).toBe(
+      0.25,
+    );
     expect(report.frame.value).toBe(33);
     expect(report.cpu.value).toBe(5);
     expect(report.gpu).toEqual({ availability: "measured", value: 1 });
@@ -78,6 +82,7 @@ test("overlapping synchronous Motion and renderer preparation are counted once",
         hostStarted: 10,
         hostMs: 5,
         gpuMs: null,
+        gpuPasses: null,
         drawCommands: 1,
         stats: null,
         passes: 0,

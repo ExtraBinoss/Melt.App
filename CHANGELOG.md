@@ -6,6 +6,7 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Extend the on-demand composition profiler with actual per-pass Three.js GPU timestamps for video, effects, masks, composition and display. Sum captured passes instead of using only Three’s last internal frame, and reuse bounded sequential decoding during diagnostic sampling; see `docs/performance/gpu-passes.md` for measurements and limitations.
 - Share a bounded presentation clock across the canvas, library previews and export preview. Slow frame preparation and UI transitions no longer accumulate playback catch-up; hover previews park scheduling while a frame is pending.
 - Add a translated Center selected layer export switch and information tooltip only for a single selected layer. Preserve authored artboard dimensions, shift the isolated layer once without editing the document, and share identical framing across image, print, Motion and Timelapse previews and exports. Keep animated movement, masks, stale preview rejection and crop-cache identities intact.
 

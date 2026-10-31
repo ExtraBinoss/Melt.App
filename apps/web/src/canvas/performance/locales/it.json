@@ -84,5 +84,22 @@
     "spatialTriangles": "Triangoli 3D"
   },
   "warmthNote": "Riflette lo stato attuale della cache. Il tempo CPU host può includere attese asincrone e non misura l’utilizzo della CPU.",
-  "sharedNote": "La memoria delle texture e i contatori riguardano la cache condivisa del renderer. I comandi di disegno e i passaggi di rendering riguardano questo campione."
+  "sharedNote": "La memoria delle texture e i contatori riguardano la cache condivisa del renderer. I comandi di disegno e i passaggi di rendering riguardano questo campione.",
+  "gpuStages": {
+    "clear": "GPU pulizia",
+    "copy": "GPU copia",
+    "mask": "GPU maschere",
+    "composition": "GPU composizione",
+    "shapes": "GPU forme",
+    "video": "GPU video",
+    "text": "GPU testo",
+    "vector": "GPU vettori",
+    "morph": "GPU morphing",
+    "spatial": "GPU 3D",
+    "spatial-output": "GPU uscita 3D",
+    "color": "GPU colore",
+    "effects": "GPU effetto",
+    "display": "GPU visualizzazione",
+    "other": "GPU altro"
+  }
 }

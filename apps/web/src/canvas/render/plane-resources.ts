@@ -368,6 +368,7 @@ export class PlaneResources {
         ...(import.meta.env.DEV && request.motionFrame ? { traceFrames: true } : {}),
         ...(this.videoProxyActivity ? { videoProxy: this.videoProxyActivity } : {}),
         ...(this.profileVideo || this.profile.active ? { profileVideo: true } : {}),
+        ...(this.profile.active ? { mediaSequential: true } : {}),
         signal: abort.signal,
         canRender: () => this.canPresent(request),
       });

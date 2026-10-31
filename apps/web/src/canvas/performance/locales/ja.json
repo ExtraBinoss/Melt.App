@@ -84,5 +84,22 @@
     "spatialTriangles": "3D三角形"
   },
   "warmthNote": "現在のキャッシュ状態を反映します。CPUホスト時間には非同期の待機が含まれる場合があり、CPU使用率の測定ではありません。",
-  "sharedNote": "テクスチャメモリとキャッシュカウンターはレンダラーの共有キャッシュ全体が対象です。描画コマンドとレンダリングパスはこのサンプルが対象です。"
+  "sharedNote": "テクスチャメモリとキャッシュカウンターはレンダラーの共有キャッシュ全体が対象です。描画コマンドとレンダリングパスはこのサンプルが対象です。",
+  "gpuStages": {
+    "clear": "GPU クリア",
+    "copy": "GPU コピー",
+    "mask": "GPU マスク",
+    "composition": "GPU 合成",
+    "shapes": "GPU 図形",
+    "video": "GPU 動画",
+    "text": "GPU テキスト",
+    "vector": "GPU ベクター",
+    "morph": "GPU モーフ",
+    "spatial": "GPU 3D",
+    "spatial-output": "GPU 3D 出力",
+    "color": "GPU カラー",
+    "effects": "GPU エフェクト",
+    "display": "GPU 表示",
+    "other": "GPU その他"
+  }
 }

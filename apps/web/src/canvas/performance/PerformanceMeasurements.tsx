@@ -45,6 +45,14 @@ export function PerformanceMeasurements({
       }).format(value.value / 100);
     return unit === "ms" ? t("milliseconds", { value: number(value.value) }) : number(value.value);
   }
+  function metricLabel(id: string): string {
+    if (id.startsWith("gpuPass:")) {
+      const [kind, ...stage] = id.slice(8).split("/");
+      const label = t(`gpuStages.${kind}`, { defaultValue: t("gpuStages.other") });
+      return stage.length ? `${label} · ${stage.join("/")}` : label;
+    }
+    return performanceMetrics.has(id) ? t(`metrics.${id}`) : t("additionalMetric", { id });
+  }
   return (
     <>
       <div className="composition-performance-timings">
@@ -109,9 +117,7 @@ export function PerformanceMeasurements({
                     {metrics.map((metric) => (
                       <div key={metric.id} className="composition-performance-row">
                         <dt>
-                          {performanceMetrics.has(metric.id)
-                            ? t(`metrics.${metric.id}`)
-                            : t("additionalMetric", { id: metric.id })}
+                          {metricLabel(metric.id)}
                           <small>{t(`kinds.${metric.kind}`)}</small>
                         </dt>
                         <dd>{valueLabel(metric, metric.unit)}</dd>

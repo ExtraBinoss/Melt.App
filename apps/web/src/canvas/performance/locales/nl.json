@@ -84,5 +84,22 @@
     "spatialTriangles": "3D-driehoeken"
   },
   "warmthNote": "Toont de huidige cachestatus. De CPU-hosttijd kan asynchrone wachttijd bevatten en meet geen CPU-gebruik.",
-  "sharedNote": "Textuurgeheugen en cachetellers gelden voor de gedeelde renderercache. Tekenopdrachten en renderpassen gelden voor deze meting."
+  "sharedNote": "Textuurgeheugen en cachetellers gelden voor de gedeelde renderercache. Tekenopdrachten en renderpassen gelden voor deze meting.",
+  "gpuStages": {
+    "clear": "GPU wissen",
+    "copy": "GPU kopie",
+    "mask": "GPU maskers",
+    "composition": "GPU compositie",
+    "shapes": "GPU vormen",
+    "video": "GPU video",
+    "text": "GPU tekst",
+    "vector": "GPU vectoren",
+    "morph": "GPU morphing",
+    "spatial": "GPU 3D",
+    "spatial-output": "GPU 3D-uitvoer",
+    "color": "GPU kleur",
+    "effects": "GPU effect",
+    "display": "GPU weergave",
+    "other": "GPU overig"
+  }
 }

@@ -24,7 +24,7 @@ interface Item {
 export class NormalBatch {
   passes = 0;
   private readonly compiled = new WeakSet<Item>();
-  private readonly scene = new Scene();
+  private readonly scene = Object.assign(new Scene(), { name: "melt:composition" });
   private readonly camera = new OrthographicCamera(0, 1, 0, 1, 0, 10);
   private readonly geometry = new PlaneGeometry(1, 1);
   private readonly items = new Map<string, Item>();

@@ -60,7 +60,7 @@ export function morphResourceKey(layer: Layer, effect: Effect): string {
 }
 export class MorphResource implements GpuResource {
   readonly targets = 0;
-  readonly scene = new Scene();
+  readonly scene = Object.assign(new Scene(), { name: "melt:morph" });
   readonly paint = textPaint();
   readonly progress = uniform(0);
   readonly spread = uniform(0);

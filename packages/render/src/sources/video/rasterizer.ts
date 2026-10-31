@@ -59,7 +59,7 @@ export class VideoRasterizer {
   private readonly matrix = uniform(new Matrix3());
   private readonly opaqueRgb = uniform(0);
   private readonly textureNode = texture(this.placeholder, this.matrix.mul(vec3(uv(), 1)).xy);
-  private readonly scene = new Scene();
+  private readonly scene = Object.assign(new Scene(), { name: "melt:video" });
   private readonly camera = new OrthographicCamera(-1, 1, 1, -1, 0, 1);
   private readonly geometry = new PlaneGeometry(2, 2);
   private readonly material = new MeshBasicNodeMaterial({

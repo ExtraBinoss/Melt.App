@@ -110,6 +110,25 @@ registerPerformanceContributor({
   },
 });
 registerPerformanceContributor({
+  id: "gpu-passes",
+  collect: ({ samples }) => {
+    const names = [...new Set(samples.flatMap((sample) => Object.keys(sample.gpuPasses ?? {})))];
+    return names
+      .slice(0, 64)
+      .map((name) =>
+        metric(
+          `gpuPass:${name}`,
+          "gpu",
+          "ms",
+          percentile95(
+            samples.flatMap((sample) => (sample.gpuPasses ? [sample.gpuPasses[name] ?? 0] : [])),
+          ),
+          "timing",
+        ),
+      );
+  },
+});
+registerPerformanceContributor({
   id: "preparation",
   collect: ({ samples }) => [
     metric(

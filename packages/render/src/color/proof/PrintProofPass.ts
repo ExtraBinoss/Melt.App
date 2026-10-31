@@ -29,7 +29,7 @@ export class PrintProofPass implements GpuResource {
   private readonly source = texture(this.placeholder);
   private readonly flipY = uniform(0);
   private readonly premultiplied = uniform(0);
-  private readonly scene = new Scene();
+  private readonly scene = Object.assign(new Scene(), { name: "melt:color" });
   private readonly camera = new OrthographicCamera(-1, 1, 1, -1, 0, 1);
   private readonly geometry = new PlaneGeometry(2, 2);
   private readonly material = new MeshBasicNodeMaterial({

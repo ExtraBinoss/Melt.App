@@ -30,7 +30,7 @@ export class PrimitiveBatch implements GpuResource {
   readonly targets = 0;
   passes = 0;
   instances = 0;
-  private readonly scene = new Scene();
+  private readonly scene = Object.assign(new Scene(), { name: "melt:shapes" });
   private readonly camera = new OrthographicCamera(0, 1, 0, 1, 0, 10);
   private readonly material = new MeshBasicNodeMaterial({
     transparent: true,

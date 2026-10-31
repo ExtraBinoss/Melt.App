@@ -84,5 +84,22 @@
     "spatialTriangles": "3D triangles"
   },
   "warmthNote": "Reflects the current cache state. CPU host timing can include async waiting; it does not measure CPU utilization.",
-  "sharedNote": "Texture memory and cache counters cover the shared renderer cache. Draw commands and render passes cover this sample."
+  "sharedNote": "Texture memory and cache counters cover the shared renderer cache. Draw commands and render passes cover this sample.",
+  "gpuStages": {
+    "clear": "GPU clear",
+    "copy": "GPU copy",
+    "mask": "GPU masks",
+    "composition": "GPU composition",
+    "shapes": "GPU shapes",
+    "video": "GPU video rasterization",
+    "text": "GPU text",
+    "vector": "GPU vectors",
+    "morph": "GPU morph",
+    "spatial": "GPU 3D",
+    "spatial-output": "GPU 3D output",
+    "color": "GPU color",
+    "effects": "GPU effect",
+    "display": "GPU display",
+    "other": "GPU other"
+  }
 }

@@ -36,7 +36,7 @@ function partPaint(layer: Layer, part: VectorPart, kind: "fill" | "stroke"): Vec
 const createPaint = () => uniform(new Vector4());
 class VectorResource implements GpuResource {
   readonly targets = 0;
-  readonly scene = new Scene();
+  readonly scene = Object.assign(new Scene(), { name: "melt:vector" });
   readonly importedP3 = uniform(0);
   readonly camera: OrthographicCamera;
   readonly items: {

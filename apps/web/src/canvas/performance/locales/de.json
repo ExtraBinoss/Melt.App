@@ -84,5 +84,22 @@
     "spatialTriangles": "3D-Dreiecke"
   },
   "warmthNote": "Zeigt den aktuellen Cache-Zustand. Die CPU-Host-Zeit kann asynchrone Wartezeiten enthalten und misst keine CPU-Auslastung.",
-  "sharedNote": "Texturspeicher und Cache-Zähler gelten für den gemeinsamen Renderer-Cache. Zeichenbefehle und Renderdurchläufe gelten für diese Stichprobe."
+  "sharedNote": "Texturspeicher und Cache-Zähler gelten für den gemeinsamen Renderer-Cache. Zeichenbefehle und Renderdurchläufe gelten für diese Stichprobe.",
+  "gpuStages": {
+    "clear": "GPU Löschen",
+    "copy": "GPU Kopie",
+    "mask": "GPU Masken",
+    "composition": "GPU Komposition",
+    "shapes": "GPU Formen",
+    "video": "GPU Video",
+    "text": "GPU Text",
+    "vector": "GPU Vektoren",
+    "morph": "GPU Morphing",
+    "spatial": "GPU 3D",
+    "spatial-output": "GPU 3D-Ausgabe",
+    "color": "GPU Farbe",
+    "effects": "GPU Effekt",
+    "display": "GPU Anzeige",
+    "other": "GPU Sonstiges"
+  }
 }

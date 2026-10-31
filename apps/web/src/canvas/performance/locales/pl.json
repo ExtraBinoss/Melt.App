@@ -84,5 +84,22 @@
     "spatialTriangles": "Trójkąty 3D"
   },
   "warmthNote": "Odzwierciedla bieżący stan pamięci podręcznej. Czas hosta CPU może obejmować oczekiwanie asynchroniczne; nie mierzy wykorzystania CPU.",
-  "sharedNote": "Pamięć tekstur i liczniki dotyczą wspólnej pamięci podręcznej renderera. Polecenia rysowania i przebiegi renderowania dotyczą tej próbki."
+  "sharedNote": "Pamięć tekstur i liczniki dotyczą wspólnej pamięci podręcznej renderera. Polecenia rysowania i przebiegi renderowania dotyczą tej próbki.",
+  "gpuStages": {
+    "clear": "GPU czyszczenie",
+    "copy": "GPU kopiowanie",
+    "mask": "GPU maski",
+    "composition": "GPU kompozycja",
+    "shapes": "GPU kształty",
+    "video": "GPU wideo",
+    "text": "GPU tekst",
+    "vector": "GPU wektory",
+    "morph": "GPU morfing",
+    "spatial": "GPU 3D",
+    "spatial-output": "GPU wyjście 3D",
+    "color": "GPU kolor",
+    "effects": "GPU efekt",
+    "display": "GPU wyświetlanie",
+    "other": "GPU inne"
+  }
 }

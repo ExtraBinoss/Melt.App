@@ -60,6 +60,11 @@ export class GpuPasses {
   constructor(private readonly renderer: WebGPURenderer) {
     this.scene.add(this.mesh);
     this.mesh.material.dispose();
+    this.clearMaterial.name = "melt:clear";
+    this.copyMaterial.name = "melt:copy";
+    this.maskMaterial.name = "melt:mask";
+    this.blendMaterial.name = "melt:composition";
+    this.shapeMaterial.name = "melt:shapes";
     this.clearMaterial.fragmentNode = this.clearColor;
     this.copyMaterial.fragmentNode = copyNode(this.copy);
     this.maskMaterial.fragmentNode = maskNode(this.mask);
@@ -126,6 +131,7 @@ export class GpuPasses {
     try {
       this.renderer.autoClear = false;
       this.mesh.material = material;
+      this.scene.name = material.name;
       this.renderer.setRenderTarget(target);
       this.renderer.render(this.scene, this.camera);
       this.passes++;

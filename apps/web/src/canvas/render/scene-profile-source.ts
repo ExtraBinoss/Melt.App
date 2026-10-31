@@ -1,3 +1,4 @@
+import { GpuPassProfile } from "./gpu-pass-profile";
 import type { GpuStats } from "@musart/render";
 import type { WebGPURenderer } from "three/webgpu";
 
@@ -8,6 +9,7 @@ export interface SceneFrameSample {
   hostMs: number | null;
   hostStarted: number | null;
   gpuMs: number | null;
+  gpuPasses: Readonly<Record<string, number>> | null;
   drawCommands: number;
   stats: GpuStats | null;
   passes: number;
@@ -20,6 +22,7 @@ export class SceneProfileSource {
   private sink: ((sample: SceneFrameSample) => void) | null = null;
   private restore: (() => void) | null = null;
   private pendingGpu = false;
+  private readonly gpuPasses: GpuPassProfile;
   private gpuSupported = false;
   private frame: {
     revision: number;
@@ -31,7 +34,9 @@ export class SceneProfileSource {
   constructor(
     private readonly renderer: WebGPURenderer,
     private readonly stats: () => GpuStats | null,
-  ) {}
+  ) {
+    this.gpuPasses = new GpuPassProfile(renderer);
+  }
   get active() {
     return this.token !== null;
   }
@@ -55,7 +60,9 @@ export class SceneProfileSource {
     this.gpuSupported =
       timestamps !== null &&
       typeof timestamps.get === "function" &&
-      this.renderer.hasFeature("timestamp-query");
+      this.renderer.hasFeature("timestamp-query") &&
+      this.gpuPasses.supported;
+    if (this.gpuSupported) this.gpuPasses.open();
     if (timestamps && this.gpuSupported) timestamps.trackTimestamp = true;
     this.renderer.info.autoReset = false;
     const close = () => {
@@ -64,6 +71,7 @@ export class SceneProfileSource {
       this.sink = null;
       if (this.renderer.domElement) this.renderer.domElement.dataset.compositionProfiling = "false";
       this.frame = null;
+      this.gpuPasses.close();
       if (timestamps && previousTrack !== undefined) timestamps.trackTimestamp = previousTrack;
       if (timestamps && previousTrack === false && typeof timestamps.get === "function") {
         // Three caches the canvas descriptor; retire our borrowed timestamp writes too.
@@ -82,6 +90,7 @@ export class SceneProfileSource {
   begin(revision: number) {
     if (!this.active) return;
     this.renderer.info.reset();
+    this.gpuPasses.begin();
     const stats = this.stats();
     this.frame = {
       revision,
@@ -110,6 +119,7 @@ export class SceneProfileSource {
       hostMs: this.frame.hostMs,
       hostStarted: this.frame.hostMs === null ? null : this.frame.started,
       gpuMs: null,
+      gpuPasses: null,
       drawCommands: this.renderer.info.render.drawCalls,
       stats,
       passes: Math.max(0, (stats?.passes ?? 0) - this.frame.passes),
@@ -120,6 +130,8 @@ export class SceneProfileSource {
         compose: phase("compose"),
       },
     };
+    const batch = this.gpuPasses.take();
+    this.frame = null;
     if (!this.gpuSupported || this.pendingGpu) {
       sink(sample);
       return;
@@ -128,8 +140,10 @@ export class SceneProfileSource {
     // Timestamps are metadata, never texture/pixel readbacks. There is at most one pending map.
     void this.renderer
       .resolveTimestampsAsync("render")
-      .then((time) => {
-        if (typeof time === "number" && Number.isFinite(time) && time >= 0) sample.gpuMs = time;
+      .then(() => {
+        sample.gpuPasses = this.gpuPasses.resolve(batch);
+        if (sample.gpuPasses)
+          sample.gpuMs = Object.values(sample.gpuPasses).reduce((a, b) => a + b, 0);
       })
       .catch(() => {})
       .finally(() => {

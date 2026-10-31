@@ -84,5 +84,22 @@
     "spatialTriangles": "3D 三角形"
   },
   "warmthNote": "反映当前缓存状态。CPU主机耗时可能包含异步等待，并非CPU利用率测量。",
-  "sharedNote": "纹理内存和缓存计数器覆盖渲染器的共享缓存。绘制命令和渲染通道仅覆盖此样本。"
+  "sharedNote": "纹理内存和缓存计数器覆盖渲染器的共享缓存。绘制命令和渲染通道仅覆盖此样本。",
+  "gpuStages": {
+    "clear": "GPU 清除",
+    "copy": "GPU 复制",
+    "mask": "GPU 蒙版",
+    "composition": "GPU 合成",
+    "shapes": "GPU 形状",
+    "video": "GPU 视频",
+    "text": "GPU 文字",
+    "vector": "GPU 矢量",
+    "morph": "GPU 变形",
+    "spatial": "GPU 3D",
+    "spatial-output": "GPU 3D 输出",
+    "color": "GPU 颜色",
+    "effects": "GPU 效果",
+    "display": "GPU 显示",
+    "other": "GPU 其他"
+  }
 }

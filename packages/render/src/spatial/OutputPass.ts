@@ -33,7 +33,7 @@ export class SpatialOutputPass {
     toneMapped: false,
   });
   private readonly geometry = new PlaneGeometry(2, 2);
-  private readonly scene = new Scene();
+  private readonly scene = Object.assign(new Scene(), { name: "melt:spatial-output" });
   private readonly camera = new OrthographicCamera(-1, 1, 1, -1, 0, 1);
   private compiled = false;
   constructor(private readonly renderer: WebGPURenderer) {

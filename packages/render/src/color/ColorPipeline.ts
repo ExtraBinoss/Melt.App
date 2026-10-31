@@ -13,7 +13,7 @@ import { colorControls, colorNode } from "./nodes";
 export class ColorPipeline {
   passes = 0;
   private readonly controls = colorControls();
-  private readonly scene = new Scene();
+  private readonly scene = Object.assign(new Scene(), { name: "melt:color" });
   private readonly camera = new OrthographicCamera(-1, 1, 1, -1, 0, 1);
   private readonly geometry = new PlaneGeometry(2, 2);
   private readonly material = new MeshBasicNodeMaterial({

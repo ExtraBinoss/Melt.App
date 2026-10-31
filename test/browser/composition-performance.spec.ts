@@ -84,8 +84,11 @@ test("performance footer samples the actual Motion canvas, restores its pose and
     () => (window as Window & { __profileBufferReads?: string[] }).__profileBufferReads ?? [],
   );
   expect(reads.every((label) => label.startsWith("buffer_timestamp_result_"))).toBe(true);
-  if (await popup.getByRole("meter", { name: "GPU timestamp duration" }).count())
+  if (await popup.getByRole("meter", { name: "GPU timestamp duration" }).count()) {
     expect(reads.length).toBeGreaterThan(0);
+    await expect(popup.getByRole("term").filter({ hasText: "GPU display" })).toBeVisible();
+    await expect(popup.getByRole("term").filter({ hasText: "GPU morph" })).toBeVisible();
+  }
   expect(await page.evaluate(() => window.__musartVideoReadbacks)).toMatchObject({
     webgl: 0,
     canvas: 0,

@@ -54,7 +54,7 @@ export function textResourceKey(layer: Layer): string {
 
 export class TextResource implements GpuResource {
   readonly targets = 0;
-  readonly scene = new Scene();
+  readonly scene = Object.assign(new Scene(), { name: "melt:text" });
   readonly paint = textPaint();
   readonly camera: OrthographicCamera;
   readonly atlas: CurveAtlas;

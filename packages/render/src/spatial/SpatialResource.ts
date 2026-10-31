@@ -37,7 +37,7 @@ import { disposeModel } from "./glb";
 export type SpatialNativeLight = DirectionalLight | PointLight | SpotLight;
 /** A normal layer's lit 3D source. Layout, blend, mask and effects remain in the document graph. */
 export class SpatialResource implements GpuResource {
-  readonly scene = new Scene();
+  readonly scene = Object.assign(new Scene(), { name: "melt:spatial" });
   readonly root = new Group();
   readonly material = new MeshPhysicalNodeMaterial();
   readonly target = new RenderTarget(1, 1, { type: HalfFloatType, depthBuffer: true, samples: 4 });

@@ -53,7 +53,7 @@ export interface GpuEffectStats {
 
 /** Shared-renderer GPU operator. Intermediate and result pixels remain on the device. */
 export class GpuEffects {
-  private readonly scene = new Scene();
+  private readonly scene = Object.assign(new Scene(), { name: "melt:effects" });
   private readonly camera = new OrthographicCamera(-1, 1, 1, -1, 0, 1);
   private readonly geometry = new PlaneGeometry(2, 2);
   private readonly passes = new Map<string, EffectPass>();
