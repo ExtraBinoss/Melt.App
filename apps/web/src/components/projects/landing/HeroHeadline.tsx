@@ -13,7 +13,7 @@ export function HeroHeadline({ lines }: { lines: readonly string[] }) {
     <h1 ref={element} className="landing-headline" aria-label={lines.join(" ")}>
       {lines.map((line, row) => (
         <span className="hero-line" key={line} aria-hidden>
-          {Array.from(line).map((letter, index) => (
+          {(/\p{Script=Arabic}/u.test(line) ? [line] : Array.from(line)).map((letter, index) => (
             <span className="hero-letter-mask" key={`${index}:${letter}`}>
               <span
                 className="hero-letter"

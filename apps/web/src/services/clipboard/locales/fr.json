@@ -1,0 +1,10 @@
+{
+  "unavailable": "Le presse-papiers est indisponible. Utilisez Copier ou Coller dans le navigateur lorsque le canvas est actif.",
+  "readFailed": "Impossible de lire le presse-papiers. Autorisez son accès ou utilisez la commande Coller du navigateur.",
+  "writeFailed": "Impossible de copier la sélection dans le presse-papiers.",
+  "invalid": "Le contenu du presse-papiers n’est pas un document {{brandName}} pris en charge.",
+  "missingImages": "Les images originales sont absentes de ce projet. Recopiez avec Inclure les images activé dans Général.",
+  "tooLarge": "Cette sélection dépasse la limite de 32 Mio du presse-papiers. Copiez moins d’éléments ou excluez les images dans Général.",
+  "stale": "La composition a changé pendant la lecture du presse-papiers. Collez à nouveau.",
+  "empty": "Sélectionnez un élément à copier ou utilisez Copier la composition."
+}

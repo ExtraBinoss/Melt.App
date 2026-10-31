@@ -1,74 +1,9 @@
-import { registerFeatureTranslations } from "../../state/i18n/feature-resources";
-export const messages = {
-  en: {
-    renameChanged: "The layer changed. Start renaming it again.",
-    renameFailed: "The layer could not be renamed.",
-    mixed: "Mixed",
-    actions: "Layer actions",
-    createActions: "Add effects and adjustments",
-    selectionActions: "Selection actions",
-    add: "Add an effect, adjustment or mask",
-    moreEffects_one: "Show {{count}} more effect",
-    moreEffects_other: "Show {{count}} more effects",
-    deleteSelection: "Delete selection ({{count}})",
-    compositing: "Layer compositing",
-    alignParent: "Align to group",
-    alignSelection: "Align to selection",
-    alignPage: "Align to artboard",
-    dropBefore: "Insert above",
-    dropAfter: "Insert below",
-    dropInside: "Move into group",
-    dropMask: "Add as mask",
-    dropRejected: {
-      locked: "Unlock this layer and its parents before moving it.",
-      cycle: "A layer cannot contain or mask itself through its children.",
-      animatedHierarchy:
-        "Animated layers must stay in their current group. You can reorder them within it.",
-      crossComposition: "Move layers within the same composition.",
-      property: "Drop on a layer row to change the stacking order.",
-    },
-    projectTree: "Project layers",
-    artboardLayers: "{{name}} · {{count}} layers",
-    selectMaskSource: "Select mask source",
-    collapseArtboard: "Collapse {{name}}",
-    expandArtboard: "Expand {{name}}",
-    lockedState: "Locked",
-    lockedByParent: "Locked by {{name}}",
-  },
-  fr: {
-    renameChanged: "Le calque a changé. Relancez le renommage.",
-    renameFailed: "Le calque n’a pas pu être renommé.",
-    mixed: "Mixte",
-    actions: "Actions des calques",
-    createActions: "Ajouter des effets et corrections",
-    selectionActions: "Actions de la sélection",
-    add: "Ajouter un effet, réglage ou masque",
-    moreEffects_one: "Afficher {{count}} autre effet",
-    moreEffects_other: "Afficher {{count}} autres effets",
-    deleteSelection: "Supprimer la sélection ({{count}})",
-    compositing: "Composition des calques",
-    alignParent: "Aligner dans le groupe",
-    alignSelection: "Aligner dans la sélection",
-    alignPage: "Aligner dans le plan de travail",
-    dropBefore: "Insérer au-dessus",
-    dropAfter: "Insérer en dessous",
-    dropInside: "Déplacer dans le groupe",
-    dropMask: "Ajouter comme masque",
-    dropRejected: {
-      locked: "Déverrouillez ce calque et ses parents avant de le déplacer.",
-      cycle: "Un calque ne peut pas se contenir ou se masquer à travers ses enfants.",
-      animatedHierarchy:
-        "Les calques animés doivent garder leur groupe. Vous pouvez les réordonner dans ce groupe.",
-      crossComposition: "Déplacez les calques dans la même composition.",
-      property: "Déposez sur une ligne de calque pour changer l’ordre d’empilement.",
-    },
-    projectTree: "Calques du projet",
-    artboardLayers: "{{name}} · {{count}} calques",
-    selectMaskSource: "Sélectionner la source du masque",
-    collapseArtboard: "Replier {{name}}",
-    expandArtboard: "Déplier {{name}}",
-    lockedState: "Verrouillé",
-    lockedByParent: "Verrouillé par {{name}}",
-  },
-};
+import { localeResources, registerFeatureTranslations } from "../../state/i18n/feature-resources";
+import en from "./locales/en.json";
+import fr from "./locales/fr.json";
+
+export const messages = localeResources(
+  { en, fr },
+  import.meta.glob("./locales/*.json", { eager: true, import: "default" }),
+);
 registerFeatureTranslations("layerControls", messages);

@@ -1,61 +1,12 @@
-import { brand } from "../../../ui/brand/config";
-import { registerFeatureTranslations } from "../../../state/i18n/feature-resources";
-export const messages = {
-  en: {
-    home: `${brand.name} home`,
-    backHome: "Back",
-    createActions: "Creation options",
-    backHomeLabel: "Back to home",
-    searchProjects: "Search projects",
-    noResults: "No matching project in the loaded items. Load more or try another name.",
-    preferencesHint: "Personalize the editor’s appearance and language.",
-    editShortcuts: "Customize shortcuts",
-    title: `${brand.name} dashboard`,
-    tabs: "Workspace",
-    projects: "Projects",
-    modeStatic: "Static",
-    modeMotion: "Motion",
-    templates: "Templates",
-    question: "What project would you like to create?",
-    projectHeading: "Your projects",
-    description: "Start from a template or make room for your next idea.",
-    projectsHint: "Your work stays on this device. Pick up where you left off.",
-    import: "Import .musart",
-    custom: "Custom canvas",
-    back: "Back to templates",
-    new: "New project",
-    download: "Download .musart project",
-    createHint: "Give it a name and choose a canvas size. You can add more artboards later.",
-    previewCount: "{{current}} of {{total}} artboards",
-  },
-  fr: {
-    home: `Accueil ${brand.name}`,
-    backHome: "Retour",
-    createActions: "Options de création",
-    backHomeLabel: "Retour à l’accueil",
-    searchProjects: "Rechercher un projet",
-    noResults:
-      "Aucun projet correspondant parmi les éléments chargés. Chargez la suite ou essayez un autre nom.",
-    preferencesHint: "Personnalisez l’apparence et la langue de l’éditeur.",
-    editShortcuts: "Personnaliser les raccourcis",
-    title: `Tableau de bord ${brand.name}`,
-    tabs: "Espace de travail",
-    projects: "Projets",
-    modeStatic: "Statique",
-    modeMotion: "Motion",
-    templates: "Templates",
-    question: "Quel projet voulez-vous créer ?",
-    projectHeading: "Vos projets",
-    description: "Partez d’un template ou faites place à votre prochaine idée.",
-    projectsHint: "Votre travail reste sur cet appareil. Reprenez là où vous en étiez.",
-    import: "Importer .musart",
-    custom: "Canvas personnalisé",
-    back: "Retour aux templates",
-    new: "Nouveau projet",
-    download: "Télécharger le projet .musart",
-    createHint:
-      "Donnez-lui un nom et choisissez un format. Vous pourrez ajouter d’autres plans de travail.",
-    previewCount: "{{current}} plans de travail sur {{total}}",
-  },
-};
+import {
+  localeResources,
+  registerFeatureTranslations,
+} from "../../../state/i18n/feature-resources";
+import en from "./locales/en.json";
+import fr from "./locales/fr.json";
+
+export const messages = localeResources(
+  { en, fr },
+  import.meta.glob("./locales/*.json", { eager: true, import: "default" }),
+);
 registerFeatureTranslations("dashboard", messages);

@@ -1,3 +1,4 @@
+import { supportedLocales } from "../../../state/i18n/locales";
 import { EFFECT_CATALOG, type SessionSnapshot } from "@musart/core";
 import { layerSelection } from "../../layers/menu/selection";
 import { SEARCH_CATEGORIES, type SearchItem, type SearchTranslate } from "./model";
@@ -59,7 +60,16 @@ export function createSearchCommandItems(
       shortcut: shortcut(`effect:${effect.type}`),
       target: { kind: "effect", effect: effect.type },
     }));
-  return [...actions, ...effects].sort(
+  const languages: SearchItem[] = supportedLocales
+    .filter(({ code }) => code !== "en" && code !== "fr")
+    .map(({ code, label, englishLabel }) => ({
+      id: `language:${code}`,
+      category: "preferences",
+      label: `${t("language")}: ${label}`,
+      terms: `${code} ${label} ${englishLabel} language langue`,
+      target: { kind: "language", language: code },
+    }));
+  return [...actions, ...effects, ...languages].sort(
     (a, b) => SEARCH_CATEGORIES.indexOf(a.category) - SEARCH_CATEGORIES.indexOf(b.category),
   );
 }

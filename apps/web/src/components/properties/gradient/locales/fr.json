@@ -1,0 +1,19 @@
+{
+  "type": "Type de remplissage",
+  "solid": "Uni",
+  "gradient": "Dégradé",
+  "gradientType": "Type de dégradé",
+  "linear": "Linéaire",
+  "radial": "Radial",
+  "angleLabel": "Angle",
+  "angle": "Angle du dégradé",
+  "stops": "Points",
+  "stop": "Point {{number}}",
+  "stopPosition": "Position du point {{number}}",
+  "stopColor": "Couleur du point {{number}}",
+  "stopHex": "Couleur hexadécimale du point {{number}}",
+  "stopOpacity": "Opacité du point {{number}}",
+  "add": "Ajouter un point de couleur",
+  "removeStop": "Supprimer le point {{number}}",
+  "preview": "Aperçu du dégradé"
+}

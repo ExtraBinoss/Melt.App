@@ -1,0 +1,6 @@
+{
+  "invalid": "La demande de conversion Motion est invalide.",
+  "busy": "Une autre conversion Motion attend votre réponse.",
+  "stale": "La composition a changé pendant l’import vidéo. Réessayez.",
+  "unavailable": "La conversion Motion nécessite la boîte de confirmation de l’éditeur."
+}

@@ -1,0 +1,19 @@
+{
+  "type": "Fill type",
+  "solid": "Solid",
+  "gradient": "Gradient",
+  "gradientType": "Gradient type",
+  "linear": "Linear",
+  "radial": "Radial",
+  "angleLabel": "Angle",
+  "angle": "Gradient angle",
+  "stops": "Stops",
+  "stop": "Stop {{number}}",
+  "stopPosition": "Stop {{number}} position",
+  "stopColor": "Stop {{number}} color",
+  "stopHex": "Stop {{number}} hex color",
+  "stopOpacity": "Stop {{number}} opacity",
+  "add": "Add color stop",
+  "removeStop": "Remove stop {{number}}",
+  "preview": "Gradient preview"
+}

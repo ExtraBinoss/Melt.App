@@ -11,9 +11,21 @@ Melt is a browser-based creative editor. Projects are stored on the device and c
 | Jotai                             | Interface state such as selection presentation and open controls; the document engine owns saved edits.                  |
 | Tailwind CSS, shadcn/ui and Radix | Shared styling and accessible dialogs, menus, tabs and controls. Copied components retain their provenance and licenses. |
 | Motion                            | Interface transitions that respect reduced-motion preferences.                                                           |
-| i18next and react-i18next         | English and French interface resources.                                                                                  |
+| i18next and react-i18next         | Feature-owned JSON resources, an extensible locale registry and English fallback.                                        |
 
 Exact dependency versions are pinned in [package.json](../../package.json) and `bun.lock`. Version numbers across the application and workspaces stay synchronized.
+
+## Localization
+
+i18next owns runtime resources and react-i18next supplies React subscriptions. English is the default and fallback language. Server rendering and the first client render both start in English; the hydrated leaf route then restores a supported saved `musart.language` preference in the shared instance and its React provider. Restoring in the document shell before lazy route HTML hydrates would create a server/client text mismatch. Missing, invalid or inaccessible preferences use English. Changing the language updates the shared i18next instance, document language/direction and saved preference.
+
+`apps/web/src/state/i18n/locales.ts` is the locale registry used by public navigation, editor preferences, onboarding and search. The public site, landing and tools provide English, French, German, Spanish, Italian, Portuguese, Dutch, Polish, Japanese, Korean, Chinese and Arabic. Editor resources currently cover English and French; other locales use the English fallback for untranslated editor namespaces. Arabic sets the document direction to RTL.
+
+Each feature keeps editable JSON resources beside its implementation in `locales/<language>.json`. Multiple catalogs in one feature use descriptive subdirectories, for example `components/properties/effects/locales/gradient/`. The tools retain their categorized `tools/content/<language>.json` resources because SEO metadata also reads English content there. Existing effect-library JSON stays inside each effect's directory. Shared editor catalogs live under `state/i18n/locales/{common,interface-v2,projects}/` and retain their existing public translation keys.
+
+Feature `messages.ts` modules contain only JSON imports/discovery and namespace registration. `localeResources` discovers all JSON languages in that feature with Vite's `import.meta.glob`; feature imports remain lazy, so adding a translation does not make unrelated editor catalogs eager. The helper resolves only `{{brandName}}` and `{{brandNameUpper}}` through the shared brand configuration; ordinary i18next interpolation and plural suffixes remain intact. `registerFeatureTranslations` accepts any language map and preserves registrations made before i18next initialization.
+
+To add a public language, translate the full English schemas in `components/site/locales`, `components/projects/landing/locales` and `tools/content`, retain interpolation variables, then add its code and native/English names to `supportedLocales`. Feature loaders and language selectors discover it without component changes. Additional editor namespaces can be translated incrementally in their owning feature directories. Focused localization regressions check public completeness, matching English/French feature keys, interpolation, supported saved preferences and fallback behavior.
 
 ## Rendering
 

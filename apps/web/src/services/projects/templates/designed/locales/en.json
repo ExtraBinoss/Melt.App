@@ -1,0 +1,6 @@
+{
+  "unavailable": "Atomic template installation is unavailable in this editor.",
+  "download": "The template could not be downloaded. Please try again.",
+  "invalid": "This template is invalid or does not match the selected design.",
+  "tooLarge": "This template exceeds the 1 MB download limit."
+}

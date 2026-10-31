@@ -1,0 +1,7 @@
+{
+  "copy": "Copy",
+  "copying": "Copying…",
+  "copied": "Copied",
+  "unavailable": "Clipboard access is unavailable in this browser context.",
+  "failed": "Copy failed. Allow clipboard access and try again."
+}

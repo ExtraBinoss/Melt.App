@@ -32,11 +32,9 @@ export const libraryMessages = {
 for (const [type, messages] of Object.entries(libraryMessages)) {
   registerFeatureTranslations(`${type}Fx`, messages);
 }
-registerFeatureTranslations("translation", {
-  en: Object.fromEntries(
-    Object.entries(libraryMessages).map(([type, messages]) => [type, messages.en.name]),
-  ),
-  fr: Object.fromEntries(
-    Object.entries(libraryMessages).map(([type, messages]) => [type, messages.fr.name]),
-  ),
-});
+const labels: Record<string, Record<string, string>> = {};
+for (const [type, messages] of Object.entries(libraryMessages)) {
+  for (const [language, resource] of Object.entries(messages))
+    (labels[language] ??= {})[type] = resource.name;
+}
+registerFeatureTranslations("translation", labels);

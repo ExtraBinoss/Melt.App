@@ -1,0 +1,14 @@
+{
+  "navigation": "Outils de l’éditeur",
+  "properties": "Propriétés",
+  "layers": "Calques",
+  "motion": "Motion",
+  "tools": "Outils",
+  "export": "Exporter",
+  "close": "Fermer le panneau",
+  "dismiss": "Glisser vers le bas pour fermer",
+  "slider": "Régler {{label}}",
+  "motionHint": "Passez en Motion pour animer votre création.",
+  "enableMotion": "Passer en mode Motion",
+  "precision": "Valeur précise : {{label}}"
+}

@@ -1,0 +1,6 @@
+{
+  "unavailable": "Cet éditeur ne peut pas installer ce modèle de façon atomique.",
+  "download": "Impossible de télécharger le modèle. Réessayez.",
+  "invalid": "Ce modèle est invalide ou ne correspond pas au design choisi.",
+  "tooLarge": "Ce modèle dépasse la limite de téléchargement de 1 Mo."
+}

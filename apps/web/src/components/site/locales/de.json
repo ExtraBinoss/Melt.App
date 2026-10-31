@@ -1,0 +1,47 @@
+{
+  "tools": "Kostenlose Tools",
+  "features": "Funktionen",
+  "faq": "Deine Fragen, unsere Antworten.",
+  "faqNav": "FAQ",
+  "studio": "Das Studio",
+  "resources": "Erkunden",
+  "templates": "Vorlagen",
+  "editor": "Editor öffnen",
+  "code": "Quellcode",
+  "changes": "Änderungsprotokoll",
+  "feedback": "Feedback",
+  "license": "MIT-Lizenz",
+  "footerDescription": "Ein wenig Magie. Viel Raum zum Gestalten. Bilder, Text und Bewegung, gemeinsam in deinem Browser.",
+  "footerNote": "Open Source. Für deinen Browser gemacht.",
+  "backTop": "Zurück nach oben",
+  "language": "Sprache",
+  "images": "Bild",
+  "videos": "Video",
+  "try": "Melt ausprobieren",
+  "faqItems": [
+    {
+      "question": "Was kann ich mit Melt machen?",
+      "answer": "Gestalte Poster, Grafiken für soziale Medien, animierte Typografie und kurze Animationen. Kombiniere Bilder, Text, Formen und Videos, wende Effekte an und animiere mit Vorlagen oder öffne die Zeitleiste für mehr Kontrolle."
+    },
+    {
+      "question": "Brauche ich ein Konto?",
+      "answer": "Nein. Starte direkt im Browser mit einer Vorlage oder einer leeren Leinwand. Auch die kostenlosen Konvertierungswerkzeuge funktionieren ohne Anmeldung."
+    },
+    {
+      "question": "Wo werden meine Projekte und Dateien gespeichert?",
+      "answer": "Editorprojekte werden in diesem Browser auf diesem Gerät gespeichert. Sie werden nicht automatisch mit anderen Browsern oder Computern synchronisiert. Lade eine bearbeitbare Projektdatei als Sicherung herunter. Beim Löschen von Browserdaten können lokale Projekte verloren gehen. Dateien in den Werkzeugen werden lokal verarbeitet."
+    },
+    {
+      "question": "Muss ich Keyframes lernen?",
+      "answer": "Starte mit einer Bewegungsvorlage und passe Dauer und Intensität an. Öffne bei Bedarf die Details und die Keyframe-Zeitleiste, um einzelne Eigenschaften zu gestalten. Einfache und detaillierte Animationen verwenden dieselbe Engine."
+    },
+    {
+      "question": "Wie unterscheidet sich Melt von einem herkömmlichen Videoeditor?",
+      "answer": "Melt beginnt mit einer Komposition aus Ebenen: Grafiken, Typografie, Effekte und Bewegung in einem Arbeitsbereich. Es eignet sich für gestaltete Bilder und kurze kreative Animationen. Nutze die kostenlosen Werkzeuge für einen schnellen Effekt und entdecke dann im Studio Vorlagen und weitere Möglichkeiten für Komposition und Animation."
+    },
+    {
+      "question": "Sind die Tools kostenlos und was kann ich herunterladen?",
+      "answer": "Die Werkzeuge laufen lokal, ohne Konto und ohne von Melt hinzugefügtes Wasserzeichen. Lade Bilder als PNG, JPEG oder WebP und Videos als MP4 oder WebM herunter, wenn dein Browser das unterstützt. Die Videokodierung hängt von deinem Gerät und Browser ab."
+    }
+  ]
+}

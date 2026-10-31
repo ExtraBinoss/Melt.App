@@ -1,28 +1,9 @@
-import { registerFeatureTranslations } from "../../state/i18n/feature-resources";
+import { localeResources, registerFeatureTranslations } from "../../state/i18n/feature-resources";
+import en from "./locales/en.json";
+import fr from "./locales/fr.json";
 
-registerFeatureTranslations("artboards", {
-  en: {
-    activate: "Edit {{name}}",
-    options: "Artboard options: {{name}}",
-    optionsHint: "Artboard options",
-    rename: "Rename",
-    export: "Export composition…",
-    remove: "Delete",
-    name: "Artboard name",
-    preparing: "Preparing preview",
-    unavailable: "Preview unavailable · click to edit",
-    retry: "Retry previews",
-  },
-  fr: {
-    activate: "Modifier {{name}}",
-    options: "Options du plan de travail : {{name}}",
-    optionsHint: "Options du plan de travail",
-    rename: "Renommer",
-    export: "Exporter la composition…",
-    remove: "Supprimer",
-    name: "Nom du plan de travail",
-    preparing: "Préparation de l’aperçu",
-    unavailable: "Aperçu indisponible · cliquer pour modifier",
-    retry: "Réessayer les aperçus",
-  },
-});
+export const messages = localeResources(
+  { en, fr },
+  import.meta.glob("./locales/*.json", { eager: true, import: "default" }),
+);
+registerFeatureTranslations("artboards", messages);

@@ -18,18 +18,8 @@ import {
   isGestureOriginCurrent,
   type GestureOrigin,
 } from "../interaction/gesture-origin";
-import { registerFeatureTranslations } from "../../state/i18n/feature-resources";
 import "./guides.css";
-registerFeatureTranslations("guides", {
-  en: {
-    horizontal: "Horizontal ruler: drag to add a horizontal guide",
-    vertical: "Vertical ruler: drag to add a vertical guide",
-  },
-  fr: {
-    horizontal: "Règle horizontale : glisser pour ajouter un repère horizontal",
-    vertical: "Règle verticale : glisser pour ajouter un repère vertical",
-  },
-});
+import "./messages";
 
 export function Rulers({
   engine,

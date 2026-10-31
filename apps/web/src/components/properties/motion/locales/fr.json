@@ -1,0 +1,8 @@
+{
+  "add": "Ajouter une image clé · {{property}}",
+  "update": "Modifier l’image clé · {{property}}",
+  "armed": "Propriété animée · {{property}}",
+  "macro": "Ce préréglage modifie plusieurs paramètres. Animez ses paramètres individuellement.",
+  "inactive": "Placez la tête de lecture dans un clip de ce calque pour modifier ses propriétés.",
+  "visibility": "Visibilité"
+}

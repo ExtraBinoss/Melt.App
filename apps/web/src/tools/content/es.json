@@ -1,0 +1,153 @@
+{
+  "hubTitle": "Herramientas creativas gratuitas. Algo fuera de lo común.",
+  "hubIntro": "Convierte una imagen o un vídeo corto en algo con carácter. Seis efectos del motor Melt, con procesamiento y controles locales que realmente puedes entender.",
+  "titleImage": "Convertidor de imágenes {{style}} gratuito",
+  "titleVideo": "Conversor de vídeo {{style}} gratuito",
+  "image": "Imagen",
+  "video": "Vídeo",
+  "free": "Herramienta gratuita",
+  "home": "Inicio",
+  "hub": "Herramientas gratuitas",
+  "local": "Procesado en tu dispositivo. Sin cuenta ni subidas de archivos.",
+  "chooseImage": "Elige una imagen",
+  "chooseVideo": "Elige un vídeo",
+  "dropImage": "Deja tu imagen aquí",
+  "dropVideo": "Deja tu vídeo aquí",
+  "dropHintImage": "PNG, JPEG, WebP, AVIF o GIF ≤ 50 MiB · SVG seguro ≤ 256 KiB",
+  "dropHintVideo": "Un vídeo compatible con el navegador · hasta 512 MiB",
+  "sample": "Prueba una muestra",
+  "replace": "Elige otro archivo",
+  "preparing": "Preparando tu lienzo...",
+  "loadingEngine": "Preparando Melt…",
+  "exporting": "Exportando tu resultado…",
+  "parameters": "Hazlo tuyo",
+  "advanced": "Controles avanzados",
+  "basic": "Controles básicos",
+  "format": "Formato de descarga",
+  "downloadImage": "Descargar imagen",
+  "downloadVideo": "Descargar vídeo",
+  "cancel": "Cancelar",
+  "retry": "Inténtalo de nuevo",
+  "error": "Esta operación no se pudo completar.",
+  "readError": "Este archivo no se pudo abrir.",
+  "details": "Detalles",
+  "resolution": "Lado más largo",
+  "outputSize": "Salida: {{width}} × {{height}} px",
+  "compare": "Mantén presionado para comparar",
+  "play": "Reproducir vista previa",
+  "pause": "Pausar vista previa",
+  "seek": "Posición de la vista previa",
+  "clipStart": "El clip comienza en",
+  "clipLength": "Duración del clip",
+  "clipHint": "Elige hasta 60 segundos de tu video. Los archivos más grandes no se cargan.",
+  "sourceDuration": "Duración de la fuente: {{seconds}} s",
+  "mute": "Mantener audio original",
+  "silentPreview": "La vista previa está en silencio. El audio original se conserva en la descarga cuando está habilitado.",
+  "progress": "{{percent}}% renderizado",
+  "resultReady": "Tu descarga está lista.",
+  "auto": "Automático",
+  "moreTools": "Prueba otro efecto",
+  "about": "Cómo funciona el efecto {{style}}",
+  "tips": "Algunas formas de darle forma al resultado",
+  "how": "Cómo convertir tu {{media}}",
+  "steps": [
+    "Elige un archivo local o arrástralo a la vista previa. El motor de renderizado solo se carga cuando lo necesitas.",
+    "Ajusta el efecto y compáralo con el original. Los controles básicos están a mano; los ajustes avanzados son opcionales.",
+    "Elige los ajustes de salida y descarga el resultado. El procesamiento y la codificación se realizan en tu navegador."
+  ],
+  "imageIntro": "Ajuste el tratamiento en una imagen fija y descargue un PNG, JPEG o WebP. La salida mantiene la relación de aspecto de la fuente y puede tener hasta 1920 píxeles en su borde más largo.",
+  "videoIntro": "Aplica el tratamiento a un clip seleccionado y descarga MP4 o WebM, dependiendo de tu navegador. Establezca el punto de partida y una duración de hasta 60 segundos; El audio original se puede conservar.",
+  "faq": "Es bueno saberlo",
+  "privacyQ": "¿Mi archivo se envía a un servidor?",
+  "privacyA": "No. El archivo se lee localmente y se procesa con el procesador Melt de su navegador. La página puede descargar el código de la aplicación y la imagen de ejemplo opcional, pero no carga los medios seleccionados.",
+  "outputQ": "¿Qué puedo descargar?",
+  "outputImageA": "Elija PNG para una imagen sin pérdidas, JPEG para una fotografía compacta o WebP cuando sea compatible. El borde de salida más largo tiene un límite de 1920 píxeles y las fuentes más pequeñas no se amplían. El tratamiento ASCII se exporta visualmente, no como un archivo de texto.",
+  "outputVideoA": "Elija codificación automática, MP4 o WebM. Los códecs admitidos dependen de su navegador. El clip seleccionado puede durar hasta 60 segundos, a 30 fps, con hasta 1920 píxeles en su borde más largo. El audio se incluye cuando está habilitado y presente en la fuente.",
+  "controlsQ": "¿Puedo cambiar el aspecto después de elegir un archivo?",
+  "controlsA": "Sí. El efecto permanece ajustable mientras obtienes una vista previa. Cambie sus parámetros, compare la fuente y el resultado y descargue nuevamente. El archivo fuente no se modifica. Su selección se libera cuando abandona la herramienta.",
+  "noFile": "Elija un archivo para comenzar.",
+  "fileTooLarge": "Este archivo excede el tamaño admitido por esta herramienta.",
+  "invalidFile": "Elija un archivo compatible con esta herramienta.",
+  "leave": "¿Salir de esta página y cancelar la exportación actual?",
+  "styles": {
+    "ascii": {
+      "name": "ASCII",
+      "summary": "Convierta fotografías en cuadrículas de caracteres, desde finos detalles tipográficos hasta bloques de texto contundentes.",
+      "about": "El arte ASCII construye una imagen con caracteres en lugar de una superficie continua. Melt analiza el brillo de cada celda y utiliza su propio atlas de glifos para dibujar símbolos más densos o ligeros. El resultado usa el mismo efecto TSL que el estudio. El modo de color conserva los tonos del original; el monocromo crea una imagen tipográfica sobria.",
+      "tips": [
+        "Utilice caracteres más pequeños para conservar caras y pequeños detalles.",
+        "Aumente el tamaño de la celda para obtener un cartel de gran fuerza visual o un resultado deliberadamente abstracto.",
+        "Mezcla un poco del original con el control de Cantidad para un tratamiento más suave."
+      ],
+      "question": "¿El convertidor ASCII exporta texto editable?",
+      "answer": "Esta herramienta crea un tratamiento visual ASCII y exporta una imagen o video. Los caracteres se representan como parte de la imagen, en lugar de como un documento de texto sin formato. Utilice los controles de tamaño y color de los caracteres para darle forma al aspecto antes de descargarlo."
+    },
+    "dither": {
+      "name": "Tramado",
+      "summary": "Reduzca las imágenes a una paleta de dos colores con patrones ordenados y una textura impresa distintiva.",
+      "about": "El tramado representa tonos intermedios distribuyendo píxeles de una paleta limitada. Esta herramienta usa el efecto Bit Dither de dos colores de Melt. Elige umbral, Bayer 2 × 2, Bayer 4 × 4, Bayer 8 × 8 o ruido intercalado, y ajusta los colores de primer plano y fondo. Los ajustes avanzados permiten afinar el contraste, la gamma y la intensidad del patrón.",
+      "tips": [
+        "Comience con Bayer 4 × 4 para obtener un patrón equilibrado y reconocible.",
+        "Elija los colores de primer plano y de fondo con suficiente separación.",
+        "Utilice una escala de patrón más grande para obtener una textura inspirada en un estampado grueso."
+      ],
+      "question": "¿Qué diferencia hay entre el umbral y el tramado Bayer?",
+      "answer": "El umbral asigna cada muestra directamente a uno de los dos colores. Bayer utiliza una matriz ordenada para distribuir esos colores y sugerir tonos más intermedios. Los tamaños de los patrones cambian la textura; Ninguna de las opciones agrega un tercer color oculto a la paleta."
+    },
+    "halftone": {
+      "name": "Semitono",
+      "summary": "Dé a fotografías y secuencias una superficie punteada inspirada en impresiones con un tamaño de punto ajustable.",
+      "about": "El semitono utiliza un tratamiento de puntos normal para reinterpretar la imagen de origen. En Melt, el tamaño de celda controla la escala de la textura impresa, Cantidad mezcla el tratamiento con el original y Color elige entre un resultado coloreado y monocromático. Es útil para imágenes editoriales, carteles texturizados, portadas y fondos gráficos en movimiento.",
+      "tips": [
+        "Pruebe con un tamaño de punto más grande para imágenes vistas a distancia.",
+        "Utilice un tamaño menor cuando un rostro o producto necesite permanecer reconocible.",
+        "Compare versiones coloreadas y monocromáticas antes de elegir el tratamiento final."
+      ],
+      "question": "¿Puedo ajustar los puntos de medios tonos sin cambiar el tamaño de mi archivo?",
+      "answer": "Sí. La escala del efecto cambia su cuadrícula de puntos independientemente de la configuración del tamaño de salida. Puede probar un patrón fino o grueso manteniendo las mismas dimensiones de salida. La vista previa utiliza los mismos parámetros de efecto que el resultado descargado."
+    },
+    "cyanotype": {
+      "name": "Cianotipia",
+      "summary": "Cree un tratamiento de impresión fotográfica azul con controles de tinta, papel, exposición y textura.",
+      "about": "La cianotipia se inspira en la característica apariencia azul y papel de las impresiones fotográficas. Melt recrea digitalmente ese tratamiento visual: la exposición y el contraste dan forma al sujeto, los colores de tinta y papel definen la paleta, y los controles avanzados agregan lavado, irregularidad, vetas, fibras y desvanecimiento de bordes. Es un efecto digital, no un proceso de impresión química.",
+      "tips": [
+        "Ajuste la exposición primero para que el sujeto sea legible.",
+        "Cambie la tinta y el papel juntos para mantener una paleta coherente.",
+        "Usa un grano y una aguada sutiles para que la fotografía siga siendo el centro de atención."
+      ],
+      "question": "¿Puedo cambiar los colores azul y papel?",
+      "answer": "Sí. Los controles básicos incluyen el color de tinta y el de papel. Abre los controles avanzados para ajustar densidad, aguada, textura, fibras y bordes. Todo se procesa localmente con el mismo efecto de cianotipia que el editor completo de Melt."
+    },
+    "crt": {
+      "name": "CRT",
+      "summary": "Agregue líneas de escaneo, máscaras de visualización, curvatura y brillo para un tratamiento de pantalla retro.",
+      "about": "Un filtro inspirado en CRT cambia la apariencia de la pantalla en lugar de simplemente colocar rayas sobre la imagen. Melt combina una máscara de pantalla configurable, líneas de escaneo, curvatura, convergencia y brillo. Los controles básicos exponen el aspecto principal; La configuración avanzada le permite ajustar la visualización más fina y las propiedades tonales. Pruébelo en tipografía, obras de arte, imágenes de juegos o un videoclip corto.",
+      "tips": [
+        "Mantenga las líneas de exploración sutiles cuando la fuente contenga texto pequeño.",
+        "Utilice la curvatura y el brillo con moderación para obtener una pantalla retro más limpia.",
+        "Compare los patrones de máscara disponibles para encontrar una textura que se adapte al sujeto."
+      ],
+      "question": "¿Es CRT lo mismo que un filtro VHS?",
+      "answer": "Este conversor se centra en un tratamiento de visualización retro: máscaras de pantalla, líneas de exploración, curvatura y brillo. No pretende simular todos los aspectos de un flujo de trabajo de cinta analógica. El resultado es un efecto digital estilizado que puedes ajustar con los controles de Melt."
+    },
+    "posterize": {
+      "name": "Posterizar",
+      "summary": "Simplifique los tonos continuos en menos niveles de color para obras de arte gráficas tipo póster.",
+      "about": "La posterización reduce la cantidad de niveles tonales utilizados para representar una imagen. Los niveles inferiores crean regiones de color amplias y claramente separadas; los valores más altos retienen transiciones más sutiles. El control Cantidad de Melt combina la imagen cuantificada con la fuente. Esto hace que la herramienta sea útil para estudios gráficos, activos sociales y metraje que se beneficia de una apariencia más plana e ilustrativa.",
+      "tips": [
+        "Comience con seis niveles, luego reduzca el valor para obtener una apariencia gráfica más fuerte.",
+        "Aumente el recuento de niveles cuando los tonos o degradados de la piel se vuelvan demasiado ásperos.",
+        "Utilice Cantidad para combinar el tratamiento en lugar de cambiar el archivo original."
+      ],
+      "question": "¿La posterización utiliza el mismo proceso que el tramado?",
+      "answer": "No. La posterización cuantifica los colores en un número menor de niveles. El tramado distribuye una paleta limitada en patrones para sugerir tonos intermedios. Producen diferentes texturas; Pruebe el conversor de tramado relacionado cuando desee un patrón de píxeles visible."
+    }
+  },
+  "reload": "Recargar herramienta",
+  "breadcrumbs": "Ruta de navegación",
+  "title": "Conversor {{style}} gratuito",
+  "chooseFile": "Elegir un archivo",
+  "dropFile": "Suelta una imagen o un vídeo aquí",
+  "dropHintFile": "Imágenes hasta 50 MiB · SVG seguro hasta 256 KiB · vídeos hasta 512 MiB",
+  "file": "Archivo"
+}

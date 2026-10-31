@@ -1,0 +1,19 @@
+{
+  "modeFilter": "Content mode",
+  "all": "All",
+  "static": "Static",
+  "motion": "Motion",
+  "navigation": "Studio navigation",
+  "projects": "Projects",
+  "templates": "Templates",
+  "community": "Community",
+  "soon": "Soon",
+  "recent": "Recent projects",
+  "openRecent": "Open recent project {{name}}",
+  "empty": "Your next projects will appear here.",
+  "loading": "Loading recent projects…",
+  "unavailable": "Recent projects are unavailable.",
+  "previewUnavailable": "Project preview is unavailable.",
+  "retry": "Try again",
+  "preferences": "Preferences"
+}

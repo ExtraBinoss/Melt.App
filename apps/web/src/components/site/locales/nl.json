@@ -1,0 +1,47 @@
+{
+  "tools": "Gratis tools",
+  "features": "Functies",
+  "faq": "Antwoorden op je vragen.",
+  "faqNav": "Veelgestelde vragen",
+  "studio": "De studio",
+  "resources": "Verkennen",
+  "templates": "Sjablonen",
+  "editor": "Open de editor",
+  "code": "Broncode",
+  "changes": "Wijzigingslog",
+  "feedback": "Feedback",
+  "license": "MIT-licentie",
+  "footerDescription": "Een beetje verwondering. Veel om te maken. Afbeeldingen, tekst en beweging, samen in je browser.",
+  "footerNote": "Open source. Gemaakt voor je browser.",
+  "backTop": "Terug naar boven",
+  "language": "Taal",
+  "images": "Afbeelding",
+  "videos": "Video",
+  "try": "Probeer Melt",
+  "faqItems": [
+    {
+      "question": "Wat kan ik maken met Melt?",
+      "answer": "Maak posters, sociale visuals, geanimeerde typografie en korte motion-composities. Combineer afbeeldingen, tekst, vormen en video, pas effecten toe en animeer vervolgens met voorinstellingen of open de tijdlijn voor meer controle."
+    },
+    {
+      "question": "Heb ik een account nodig?",
+      "answer": "Nee. Je kunt rechtstreeks in je browser beginnen met een sjabloon of een leeg canvas. Ook de gratis conversietools werken zonder registratie."
+    },
+    {
+      "question": "Waar worden mijn projecten en bestanden opgeslagen?",
+      "answer": "Editorprojecten worden in deze browser op dit apparaat opgeslagen. Ze worden niet automatisch gesynchroniseerd met een andere browser of computer. Download een bewerkbaar projectbestand om een back-up te bewaren; het wissen van browsergegevens kan lokale projecten verwijderen. Bestanden die in de tools zijn geselecteerd, worden lokaal verwerkt."
+    },
+    {
+      "question": "Moet ik keyframes leren?",
+      "answer": "Begin met een bewegingspreset en pas de timing en intensiteit aan. Open de optionele details en de keyframe-tijdlijn wanneer je afzonderlijke eigenschappen wilt aanpassen. Eenvoudige en gedetailleerde animaties gebruiken dezelfde engine."
+    },
+    {
+      "question": "Waarin verschilt Melt van een traditionele video-editor?",
+      "answer": "Melt begint met een gelaagde compositie: artwork, typografie, effecten en beweging in één werkruimte. Het is gebouwd voor ontworpen beelden en korte creatieve stukken. U kunt de gratis tools gebruiken voor een snel effect en vervolgens de sjablonen in de volledige studio verkennen voor meer compositie- en animatiebediening."
+    },
+    {
+      "question": "Zijn de tools gratis en wat kan ik downloaden?",
+      "answer": "De tools draaien lokaal zonder dat er een account of een watermerk is toegevoegd door Melt. Download afbeeldingen als PNG, JPEG of WebP, en video's als MP4 of WebM indien ondersteund door uw browser. De videocoderingsmogelijkheden zijn afhankelijk van uw apparaat en browser."
+    }
+  ]
+}

@@ -25,6 +25,8 @@ import { Kbd } from "../ui/kbd";
 import { MeltLogo } from "../../ui/brand/MeltLogo";
 import { GradientArtwork } from "./GradientArtwork";
 import { changeLanguage } from "../../state/i18n";
+import { isSupportedLocale, supportedLocales } from "../../state/i18n/locales";
+import { SelectField } from "../shared/SelectField";
 import { completeOnboarding } from "../../state/onboarding/preferences";
 import { modifierLabel } from "../search/shortcuts";
 import type { OnboardingPalette } from "../../services/onboarding/gradient";
@@ -132,16 +134,15 @@ export function OnboardingDialog({ onComplete }: { onComplete: () => void }) {
               <Sparkles size={13} />
               {t("free")}
             </span>
-            <Button
-              variant="ghost"
-              size="sm"
+            <SelectField
               className="onboarding-language"
-              aria-label={t("language")}
-              onClick={() => void changeLanguage(i18n.resolvedLanguage === "fr" ? "en" : "fr")}
-            >
-              {i18n.resolvedLanguage === "fr" ? "EN" : "FR"}
-              <span aria-hidden="true">↗</span>
-            </Button>
+              label={t("translation:language")}
+              value={i18n.language}
+              options={supportedLocales.map(({ code, label }) => ({ value: code, label }))}
+              onValueChange={(language) => {
+                if (isSupportedLocale(language)) void changeLanguage(language);
+              }}
+            />
           </header>
           <div ref={scroll} className="onboarding-scroll scrollable-panel">
             <motion.div

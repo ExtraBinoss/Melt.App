@@ -1,0 +1,13 @@
+{
+  "transitionDescription": "{{count}} items will be added to the timeline before choosing a transition.",
+  "transitionTiming": "Existing artwork spans the composition. Its design stays editable.",
+  "transitionAccept": "Yes, enable Motion",
+  "transitionCancel": "No, keep Static",
+  "title": "Bring this composition into Motion?",
+  "description": "{{count}} items, including the imported video, will be added to the timeline.",
+  "timing": "Existing artwork spans the composition. Each video keeps its own source duration.",
+  "groups": "Groups and their child layers are included. Effect and property rows are not counted.",
+  "preserve": "Your layers stay editable. Switching back to Static preserves the timeline.",
+  "accept": "Yes, import in Motion",
+  "cancel": "No, cancel import"
+}

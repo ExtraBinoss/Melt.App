@@ -1,9 +1,8 @@
 import { confirmExportLeave } from "../services/export/leave";
 import { hasActiveExports } from "../services/export/jobs";
-import { lazy, Suspense, useEffect } from "react";
+import { lazy, Suspense } from "react";
 import { useNavigate, useRouterState, useBlocker } from "@tanstack/react-router";
-import { useTranslation } from "react-i18next";
-import { readLanguage } from "../state/i18n";
+import { useRestoreLocale } from "../state/i18n/use-locale";
 import { StudioPreparation } from "../bootstrap/StudioPreparation";
 const Studio = lazy(() =>
   import("../bootstrap/Studio").then((module) => ({ default: module.Studio })),
@@ -11,11 +10,7 @@ const Studio = lazy(() =>
 
 /** A pathless client layout keeps one editor/runtime alive across dashboard/editor navigation. */
 export function WorkspaceRoute() {
-  const { i18n } = useTranslation();
-  useEffect(() => {
-    void i18n.changeLanguage(readLanguage());
-    document.documentElement.lang = readLanguage();
-  }, [i18n]);
+  useRestoreLocale();
   useBlocker({
     shouldBlockFn: async () => !(await confirmExportLeave()),
     enableBeforeUnload: hasActiveExports,

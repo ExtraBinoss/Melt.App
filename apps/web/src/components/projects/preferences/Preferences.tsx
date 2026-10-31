@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Laptop, Sun, Moon, Keyboard, SlidersHorizontal, Paintbrush, Magnet } from "lucide-react";
 import { applyTheme, themeAtom } from "../../../state/session/editor";
 import { changeLanguage } from "../../../state/i18n";
+import { isSupportedLocale, supportedLocales } from "../../../state/i18n/locales";
 import { snappingAtom, DEFAULT_SNAPPING } from "../../../state/snapping/preferences";
 import { clipboardAtom } from "../../../state/clipboard/preferences";
 import { SegmentedTabs } from "../../shared/segmented/SegmentedTabs";
@@ -101,12 +102,9 @@ export function Preferences({
                 id="preferences-language"
                 label={t("language")}
                 value={i18n.language}
-                options={[
-                  { value: "fr", label: t("french") },
-                  { value: "en", label: t("english") },
-                ]}
+                options={supportedLocales.map(({ code, label }) => ({ value: code, label }))}
                 onValueChange={(language) => {
-                  void changeLanguage(language as "fr" | "en");
+                  if (isSupportedLocale(language)) void changeLanguage(language);
                 }}
               />
             </div>

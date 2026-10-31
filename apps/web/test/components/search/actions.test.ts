@@ -400,3 +400,11 @@ test("a lazy template cannot add artwork into a project opened while it loads", 
   expect(d.engine.getSnapshot().project).toEqual(other);
   expect(d.engine.getSnapshot().canUndo).toBe(false);
 });
+
+test("a registry locale target changes language without editing the document", async () => {
+  const d = context();
+  const original = d.engine.getSnapshot();
+  await executeSearchItem(item({ kind: "language", language: "ja" }), d.context);
+  expect(d.context.setLanguage).toHaveBeenCalledExactlyOnceWith("ja");
+  expect(d.engine.getSnapshot()).toBe(original);
+});

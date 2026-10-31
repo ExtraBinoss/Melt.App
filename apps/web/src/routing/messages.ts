@@ -1,16 +1,9 @@
-import { registerFeatureTranslations } from "../state/i18n/feature-resources";
-export const messages = {
-  en: {
-    navigation: "Main navigation",
-    dashboard: "Dashboard",
-    editor: "Open editor",
-    home: "Home",
-  },
-  fr: {
-    navigation: "Navigation principale",
-    dashboard: "Mes projets",
-    editor: "Ouvrir l’éditeur",
-    home: "Accueil",
-  },
-};
+import { localeResources, registerFeatureTranslations } from "../state/i18n/feature-resources";
+import en from "./locales/en.json";
+import fr from "./locales/fr.json";
+
+export const messages = localeResources(
+  { en, fr },
+  import.meta.glob("./locales/*.json", { eager: true, import: "default" }),
+);
 registerFeatureTranslations("routing", messages);

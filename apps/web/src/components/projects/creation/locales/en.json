@@ -1,0 +1,15 @@
+{
+  "title": "A fresh space for your ideas.",
+  "hint": "A name, a size. You’re ready to go.",
+  "format": "Choose a format",
+  "custom": "Custom",
+  "social": "Social",
+  "video": "Video",
+  "print": "Print",
+  "screen": "Screen",
+  "link": "Lock aspect ratio",
+  "unlink": "Unlock aspect ratio",
+  "preview": "Canvas preview",
+  "ready": "Your next idea goes here.",
+  "size": "{{width}} × {{height}} px"
+}

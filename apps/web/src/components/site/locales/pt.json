@@ -1,0 +1,47 @@
+{
+  "tools": "Ferramentas gratuitas",
+  "features": "Recursos",
+  "faq": "Perguntas respondidas.",
+  "faqNav": "Perguntas frequentes",
+  "studio": "O estúdio",
+  "resources": "Explorar",
+  "templates": "Modelos",
+  "editor": "Abra o editor",
+  "code": "Código fonte",
+  "changes": "Registro de alterações",
+  "feedback": "Comentários",
+  "license": "Licença MIT",
+  "footerDescription": "Um pouco de magia. Muito para criar. Imagens, texto e movimento, juntos no seu navegador.",
+  "footerNote": "Código aberto. Feito para o seu navegador.",
+  "backTop": "Voltar ao topo",
+  "language": "Idioma",
+  "images": "Imagem",
+  "videos": "Vídeo",
+  "try": "Experimente o Melt",
+  "faqItems": [
+    {
+      "question": "O que posso fazer com Melt?",
+      "answer": "Crie pôsteres, imagens para redes sociais, tipografia animada e composições curtas em movimento. Combine imagens, texto, formas e vídeos, aplique efeitos e anime com predefinições ou abra a linha do tempo para ter mais controle."
+    },
+    {
+      "question": "Preciso de uma conta?",
+      "answer": "Não. Você pode começar a partir de um modelo ou de uma tela vazia diretamente no seu navegador. As ferramentas de conversão gratuitas também funcionam sem inscrição."
+    },
+    {
+      "question": "Onde meus projetos e arquivos são armazenados?",
+      "answer": "Os projetos do editor são salvos neste navegador neste dispositivo. Eles não são sincronizados automaticamente com outro navegador ou computador. Baixe um arquivo de projeto editável para manter um backup; limpar os dados do navegador pode remover projetos locais. Os arquivos selecionados nas ferramentas são processados localmente."
+    },
+    {
+      "question": "Tenho que aprender quadros-chave?",
+      "answer": "Comece com uma predefinição de movimento e ajuste seu tempo e intensidade. Abra os detalhes opcionais e a linha do tempo do quadro-chave quando desejar moldar propriedades individuais. Animações simples e detalhadas compartilham o mesmo mecanismo."
+    },
+    {
+      "question": "Qual a diferença entre Melt e um editor de vídeo tradicional?",
+      "answer": "O Melt parte de uma composição em camadas: imagens, tipografia, efeitos e movimento no mesmo espaço de trabalho. Foi feito para criações gráficas e animações curtas. Use as ferramentas gratuitas para aplicar um efeito rápido e depois explore os modelos do estúdio completo para acessar mais controles de composição e animação."
+    },
+    {
+      "question": "As ferramentas são gratuitas e o que posso baixar?",
+      "answer": "As ferramentas são executadas localmente sem uma conta ou marca d'água adicionada por Melt. Baixe imagens como PNG, JPEG ou WebP e vídeos como MP4 ou WebM quando compatível com seu navegador. Os recursos de codificação de vídeo dependem do seu dispositivo e navegador."
+    }
+  ]
+}

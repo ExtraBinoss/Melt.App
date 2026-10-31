@@ -5,6 +5,7 @@ import { formatUiError } from "../../../../src/state/i18n/errors/format";
 afterEach(() => changeLanguage("fr"));
 
 test("localizes layout restore/save failures while preserving the storage cause", async () => {
+  await changeLanguage("fr");
   const cause = new Error("quota denied");
   const error = Object.assign(new Error("diagnostic", { cause }), {
     code: "PROJECT_PREFERENCES_SAVE_FAILED",

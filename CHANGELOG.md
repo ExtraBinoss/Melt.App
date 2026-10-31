@@ -6,6 +6,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Move interface translations into feature-owned JSON resources, default new sessions and server-rendered pages to English, and share an extensible locale registry across public navigation, onboarding, preferences and search. Provide public site/landing/tools content in twelve languages, preserve saved preferences and Arabic direction, and fall back to English for untranslated editor namespaces.
+
 - Reuse the canvas mascot/shimmer throbber for studio runtime and editor/module loading phases, with an immediately visible accessible label and reduced-motion support instead of restarting the reveal delay between startup states.
 
 - Keep font samples alive across React effect replay and remove verbose renderer-ready messages. Skip empty-query indexing and unnecessary zero-position scroll access, focus through Radix after positioning and defer cancellable catalogue work past overlay presentation. In a bounded one-core production cohort, cold browser event duration fell from 488 to 200 ms and three warm openings from 104–184 to 80–96 ms; preserve raw measurements and their limits in the typography performance report.

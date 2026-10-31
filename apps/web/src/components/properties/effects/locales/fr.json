@@ -1,0 +1,25 @@
+{
+  "resetAll": "Réinitialiser tous les paramètres de l’effet",
+  "playLive": "Animer",
+  "pauseLive": "Pause",
+  "liveTime": "Phase affichée",
+  "seed": "Graine",
+  "falloff": "Atténuation",
+  "composite": "Composition alpha",
+  "replacement": "Remplacement de l’effet (défaut)",
+  "operation": {
+    "source-over": "Source au-dessus",
+    "destination-over": "Destination au-dessus",
+    "source-in": "Source à l’intérieur",
+    "destination-in": "Destination à l’intérieur",
+    "source-out": "Source à l’extérieur",
+    "destination-out": "Destination à l’extérieur",
+    "source-atop": "Source par-dessus",
+    "destination-atop": "Destination par-dessus",
+    "xor": "Chevauchement exclusif",
+    "copy": "Source seule",
+    "destination": "Destination seule",
+    "clear": "Effacer",
+    "lighter": "Additionner source et destination"
+  }
+}

@@ -1,41 +1,12 @@
-import { registerFeatureTranslations } from "../../../state/i18n/feature-resources";
-registerFeatureTranslations("libraryItem", {
-  en: {
-    options: "Item options",
-    open: "Open in Melt",
-    preview: "Preview {{name}}",
-    openNamed: "Open {{name}}",
-    favorite: "Add to favorites",
-    unfavorite: "Remove from favorites",
-    favorites: "Favorites",
-    author: "Created by",
-    me: "You",
-    empty: "Your favorites will appear here.",
-    failed: "This preview could not be loaded.",
-    saveFailed: "Favorites could not be saved.",
-    readFailed: "Favorites could not be loaded.",
-    retry: "Try again",
-    hint: "Double-click a card to open it directly.",
-    project: "Project",
-    template: "Template",
-  },
-  fr: {
-    options: "Options de l’élément",
-    open: "Ouvrir dans Melt",
-    preview: "Aperçu de {{name}}",
-    openNamed: "Ouvrir {{name}}",
-    favorite: "Ajouter aux favoris",
-    unfavorite: "Retirer des favoris",
-    favorites: "Favoris",
-    author: "Créé par",
-    me: "Vous",
-    empty: "Vos favoris apparaîtront ici.",
-    failed: "Impossible de charger cet aperçu.",
-    saveFailed: "Impossible d’enregistrer les favoris.",
-    readFailed: "Impossible de charger les favoris.",
-    retry: "Réessayer",
-    hint: "Double-cliquez sur une carte pour l’ouvrir directement.",
-    project: "Projet",
-    template: "Template",
-  },
-});
+import {
+  localeResources,
+  registerFeatureTranslations,
+} from "../../../state/i18n/feature-resources";
+import en from "./locales/en.json";
+import fr from "./locales/fr.json";
+
+export const messages = localeResources(
+  { en, fr },
+  import.meta.glob("./locales/*.json", { eager: true, import: "default" }),
+);
+registerFeatureTranslations("libraryItem", messages);

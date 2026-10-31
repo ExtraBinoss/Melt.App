@@ -1,0 +1,7 @@
+{
+  "unsupported": "Cet éditeur ne peut pas installer les modèles multimédias.",
+  "download": "Le modèle n’a pas pu être téléchargé. Réessayez.",
+  "invalid": "Le modèle est invalide.",
+  "integrity": "Le média du modèle ne correspond pas à sa source originale.",
+  "tooLarge": "Le modèle dépasse sa limite de téléchargement."
+}

@@ -1,0 +1,47 @@
+{
+  "tools": "Darmowe narzędzia",
+  "features": "Funkcje",
+  "faq": "Odpowiedzi na Twoje pytania.",
+  "faqNav": "FAQ",
+  "studio": "Studio",
+  "resources": "Odkrywaj",
+  "templates": "Szablony",
+  "editor": "Otwórz edytor",
+  "code": "Kod źródłowy",
+  "changes": "Dziennik zmian",
+  "feedback": "Prześlij opinię",
+  "license": "Licencja MIT",
+  "footerDescription": "Odrobina magii. Mnóstwo możliwości. Obrazy, tekst i ruch — razem w Twojej przeglądarce.",
+  "footerNote": "Open source. Stworzone dla Twojej przeglądarki.",
+  "backTop": "Powrót do góry",
+  "language": "Język",
+  "images": "Obraz",
+  "videos": "Wideo",
+  "try": "Wypróbuj Melt",
+  "faqItems": [
+    {
+      "question": "Co mogę zrobić z Melt?",
+      "answer": "Twórz plakaty, grafiki do mediów społecznościowych, animowaną typografię i krótkie kompozycje w ruchu. Łącz obrazy, tekst, kształty i wideo, dodawaj efekty, a następnie animuj za pomocą gotowych ustawień lub otwórz oś czasu, aby uzyskać większą kontrolę."
+    },
+    {
+      "question": "Czy potrzebuję konta?",
+      "answer": "Nie. Możesz zacząć od szablonu lub pustego płótna bezpośrednio w przeglądarce. Bezpłatne narzędzia do konwersji działają również bez rejestracji."
+    },
+    {
+      "question": "Gdzie są przechowywane moje projekty i pliki?",
+      "answer": "Projekty edytora są zapisywane w tej przeglądarce na tym urządzeniu. Nie są one automatycznie synchronizowane z inną przeglądarką lub komputerem. Pobierz edytowalny plik projektu, aby zachować kopię zapasową; wyczyszczenie danych przeglądarki może spowodować usunięcie lokalnych projektów. Pliki wybrane w narzędziach przetwarzane są lokalnie."
+    },
+    {
+      "question": "Czy muszę uczyć się klatek kluczowych?",
+      "answer": "Zacznij od ustawienia wstępnego ruchu i dostosuj jego czas i intensywność. Otwórz opcjonalne szczegóły i oś czasu klatek kluczowych, jeśli chcesz kształtować poszczególne właściwości. Prosta i szczegółowa animacja ma ten sam silnik."
+    },
+    {
+      "question": "Czym Melt różni się od tradycyjnego edytora wideo?",
+      "answer": "Melt zaczyna od kompozycji z warstw: grafiki, typografii, efektów i ruchu w jednym miejscu. Służy do tworzenia projektów graficznych i krótkich animacji. Użyj darmowych narzędzi, aby szybko nałożyć efekt, a potem poznaj szablony pełnego studia i dodatkowe możliwości kompozycji i animacji."
+    },
+    {
+      "question": "Czy narzędzia są bezpłatne i co mogę pobrać?",
+      "answer": "Narzędzia działają lokalnie bez konta i znaku wodnego dodanego przez Melt. Pobierz obrazy w formacie PNG, JPEG lub WebP, a filmy w formacie MP4 lub WebM, jeśli obsługuje to Twoja przeglądarka. Możliwości kodowania wideo zależą od urządzenia i przeglądarki."
+    }
+  ]
+}

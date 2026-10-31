@@ -1,84 +1,12 @@
-import { registerFeatureTranslations } from "../../../state/i18n/feature-resources";
+import {
+  localeResources,
+  registerFeatureTranslations,
+} from "../../../state/i18n/feature-resources";
+import en from "./locales/en.json";
+import fr from "./locales/fr.json";
 
-export const messages = {
-  en: {
-    title: "Fonts",
-    search: "Search fonts",
-    searchPrefix: "Search",
-    recent: "Recent",
-    empty: "No matching fonts",
-    categories: "Font category",
-    all: "All",
-    installed: "Installed",
-    import: "Import font",
-    loading: "Loading fonts…",
-    installing: "Adding font…",
-    sample: "Ideas take shape.",
-    sampleLoading: "Loading preview…",
-    sampleUnavailable: "Preview unavailable",
-    rendering: "Rendering {{font}}…",
-    renderUnavailable: "{{font}} could not be previewed",
-    loadFailed: "The font library could not be loaded. Try again.",
-    installFailed: "This font could not be added. Try again.",
-    importFailed: "This font could not be imported. Choose a valid TTF or OTF file.",
-    tooLarge: "Choose a font smaller than 32 MB.",
-    importHint: "TTF or OTF · saved in your library",
-    localUnavailable: "System fonts are unavailable. You can import a font file.",
-    unavailable: "Font unavailable",
-    filter: {
-      sans: "Sans",
-      serif: "Serif",
-      mono: "Mono",
-      display: "Display",
-      handwriting: "Handwriting",
-    },
-    category: {
-      sans: "Sans serif",
-      serif: "Serif",
-      mono: "Monospace",
-      display: "Display",
-      handwriting: "Handwriting",
-    },
-  },
-  fr: {
-    title: "Polices",
-    search: "Rechercher une police",
-    searchPrefix: "Rechercher",
-    recent: "Récentes",
-    empty: "Aucune police trouvée",
-    categories: "Catégorie de police",
-    all: "Toutes",
-    installed: "Installées",
-    import: "Importer une police",
-    loading: "Chargement des polices…",
-    installing: "Ajout de la police…",
-    sample: "Les idées prennent forme.",
-    sampleLoading: "Chargement de l’aperçu…",
-    sampleUnavailable: "Aperçu indisponible",
-    rendering: "Rendu de {{font}}…",
-    renderUnavailable: "Impossible de prévisualiser {{font}}",
-    loadFailed: "La bibliothèque de polices n’a pas pu être chargée. Réessayez.",
-    installFailed: "Impossible d’ajouter cette police. Réessayez.",
-    importFailed: "Impossible d’importer cette police. Choisissez un fichier TTF ou OTF valide.",
-    tooLarge: "Choisissez une police de moins de 32 Mo.",
-    importHint: "TTF ou OTF · enregistrée dans votre bibliothèque",
-    localUnavailable: "Les polices système sont indisponibles. Vous pouvez importer un fichier.",
-    unavailable: "Police indisponible",
-    filter: {
-      sans: "Sans",
-      serif: "Serif",
-      mono: "Mono",
-      display: "Titres",
-      handwriting: "Manuscrites",
-    },
-    category: {
-      sans: "Sans empattement",
-      serif: "À empattement",
-      mono: "Chasse fixe",
-      display: "Titres",
-      handwriting: "Manuscrite",
-    },
-  },
-};
-
+export const messages = localeResources(
+  { en, fr },
+  import.meta.glob("./locales/*.json", { eager: true, import: "default" }),
+);
 registerFeatureTranslations("fonts", messages);

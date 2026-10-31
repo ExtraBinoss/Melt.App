@@ -1,0 +1,47 @@
+{
+  "tools": "Outils gratuits",
+  "features": "Fonctionnalités",
+  "faq": "Vos questions, nos réponses.",
+  "faqNav": "FAQ",
+  "studio": "L’atelier",
+  "resources": "Explorer",
+  "templates": "Modèles",
+  "editor": "Ouvrir l’éditeur",
+  "code": "Code source",
+  "changes": "Journal des modifications",
+  "feedback": "Vos retours",
+  "license": "Licence MIT",
+  "footerDescription": "Un peu de magie. Beaucoup à créer. Images, textes et mouvement, ensemble dans votre navigateur.",
+  "footerNote": "Open source. Conçu pour votre navigateur.",
+  "backTop": "Haut de page",
+  "language": "Langue",
+  "images": "Image",
+  "videos": "Vidéo",
+  "try": "Try Melt",
+  "faqItems": [
+    {
+      "question": "Que peut-on créer avec Melt ?",
+      "answer": "Des affiches, des visuels pour les réseaux, de la typographie animée et de courtes compositions Motion. Combinez images, textes, formes et vidéos, appliquez des effets, puis animez avec des presets ou la timeline pour aller plus loin."
+    },
+    {
+      "question": "Faut-il créer un compte ?",
+      "answer": "Non. Commencez avec un modèle ou un canevas vide directement dans votre navigateur. Les outils de conversion gratuits fonctionnent aussi sans inscription."
+    },
+    {
+      "question": "Où sont enregistrés mes projets et mes fichiers ?",
+      "answer": "Les projets de l’éditeur sont enregistrés dans ce navigateur, sur cet appareil. Ils ne sont pas synchronisés automatiquement ailleurs. Téléchargez un fichier de projet modifiable pour en garder une copie ; effacer les données du navigateur peut supprimer les projets locaux. Les fichiers choisis dans les outils sont traités localement."
+    },
+    {
+      "question": "Faut-il apprendre à manipuler les keyframes ?",
+      "answer": "Commencez avec un preset Motion, puis ajustez son timing et son intensité. Ouvrez les détails et la timeline de keyframes facultative pour modifier chaque propriété. Les animations simples et détaillées utilisent le même moteur."
+    },
+    {
+      "question": "Quelle différence avec un logiciel de montage vidéo ?",
+      "answer": "Melt part d’une composition en calques : visuels, typographie, effets et mouvement réunis dans un atelier. Il convient aux créations graphiques et aux courtes animations. Les outils gratuits appliquent rapidement un effet ; les modèles de l’atelier donnent accès à davantage de possibilités de composition et d’animation."
+    },
+    {
+      "question": "Les outils sont-ils gratuits, et que peut-on télécharger ?",
+      "answer": "Les outils fonctionnent localement, sans compte ni filigrane ajouté par Melt. Téléchargez les images en PNG, JPEG ou WebP, et les vidéos en MP4 ou WebM si votre navigateur le permet. Les capacités d’encodage vidéo dépendent de l’appareil et du navigateur."
+    }
+  ]
+}

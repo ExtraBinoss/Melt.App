@@ -1,0 +1,12 @@
+{
+  "activate": "Modifier {{name}}",
+  "options": "Options du plan de travail : {{name}}",
+  "optionsHint": "Options du plan de travail",
+  "rename": "Renommer",
+  "export": "Exporter la composition…",
+  "remove": "Supprimer",
+  "name": "Nom du plan de travail",
+  "preparing": "Préparation de l’aperçu",
+  "unavailable": "Aperçu indisponible · cliquer pour modifier",
+  "retry": "Réessayer les aperçus"
+}

@@ -1,0 +1,6 @@
+{
+  "center": "Effect center",
+  "radius": "Effect radius",
+  "innerRadius": "Protected radius",
+  "hint": "Drag the center or radius · Escape to cancel"
+}

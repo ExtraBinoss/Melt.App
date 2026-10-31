@@ -1,18 +1,12 @@
 import { useNavigate } from "@tanstack/react-router";
 import { LandingPage } from "../components/projects/landing/LandingPage";
-import { useTranslation } from "react-i18next";
 import { useTheme } from "../state/session/editor";
 import "./messages";
-import { useEffect } from "react";
-import { readLanguage } from "../state/i18n";
+import { useRestoreLocale } from "../state/i18n/use-locale";
 
 export function LandingRoute() {
-  const navigate = useNavigate(),
-    { i18n } = useTranslation("routing");
-  useEffect(() => {
-    void i18n.changeLanguage(readLanguage());
-    document.documentElement.lang = readLanguage();
-  }, [i18n]);
+  useRestoreLocale();
+  const navigate = useNavigate();
   useTheme();
   return (
     <LandingPage

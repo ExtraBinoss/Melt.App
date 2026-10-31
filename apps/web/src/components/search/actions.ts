@@ -1,3 +1,4 @@
+import type { Locale } from "../../state/i18n/locales";
 import { createMotionTransport } from "../../services/motion/transport";
 import { createEffect, createPage, createLayerGeometryIndex, type EnginePort } from "@musart/core";
 import type { Tool } from "../../canvas/EditorCanvas";
@@ -24,7 +25,7 @@ export interface SearchActions {
   onShortcuts: () => void;
   setTool: (tool: Tool) => void;
   setTheme: (theme: Theme) => void;
-  setLanguage: (language: "en" | "fr") => Promise<void>;
+  setLanguage: (language: Locale) => Promise<void>;
 }
 function selection(engine: EnginePort) {
   const snapshot = engine.getSnapshot();
@@ -158,6 +159,7 @@ export function createSearchActions(context: SearchActions) {
 }
 export function executeSearchItem(item: SearchItem, context: SearchActions): void | Promise<void> {
   const { target } = item;
+  if (target.kind === "language") return context.setLanguage(target.language);
   if (target.kind === "action") return createSearchActions(context)[target.action]();
   if (target.kind === "page") return context.engine.setPage(target.pageId);
   if (target.kind === "layer") {

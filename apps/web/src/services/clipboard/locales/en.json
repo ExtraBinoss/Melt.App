@@ -1,0 +1,10 @@
+{
+  "unavailable": "Clipboard access is unavailable. Use the browser’s Copy or Paste command while the canvas is focused.",
+  "readFailed": "The clipboard could not be read. Allow clipboard access or use your browser’s Paste command.",
+  "writeFailed": "The selection could not be copied to the clipboard.",
+  "invalid": "This clipboard content is not a supported {{brandName}} document.",
+  "missingImages": "The original images are unavailable in this project. Copy again with Include images enabled in General settings.",
+  "tooLarge": "This selection exceeds the 32 MiB clipboard limit. Copy fewer items or exclude images in General settings.",
+  "stale": "The composition changed while reading the clipboard. Paste again.",
+  "empty": "Select at least one item to copy, or use Copy composition."
+}

@@ -1,0 +1,47 @@
+{
+  "tools": "Free tools",
+  "features": "Features",
+  "faq": "Questions, answered.",
+  "faqNav": "FAQ",
+  "studio": "The studio",
+  "resources": "Explore",
+  "templates": "Templates",
+  "editor": "Open the editor",
+  "code": "Source code",
+  "changes": "Changelog",
+  "feedback": "Feedback",
+  "license": "MIT license",
+  "footerDescription": "A little wonder. A lot to create. Images, type and motion, together in your browser.",
+  "footerNote": "Open source. Made for your browser.",
+  "backTop": "Back to top",
+  "language": "Language",
+  "images": "Image",
+  "videos": "Video",
+  "try": "Try Melt",
+  "faqItems": [
+    {
+      "question": "What can I make with Melt?",
+      "answer": "Build posters, social visuals, animated typography and short motion compositions. Combine images, text, shapes and video, apply effects, then animate with presets or open the timeline for more control."
+    },
+    {
+      "question": "Do I need an account?",
+      "answer": "No. You can start from a template or an empty canvas directly in your browser. The free conversion tools work without signing up too."
+    },
+    {
+      "question": "Where are my projects and files stored?",
+      "answer": "Editor projects are saved in this browser on this device. They are not automatically synced to another browser or computer. Download an editable project file to keep a backup; clearing browser data can remove local projects. Files selected in the tools are processed locally."
+    },
+    {
+      "question": "Do I have to learn keyframes?",
+      "answer": "Start with a Motion preset and adjust its timing and intensity. Open the optional details and keyframe timeline when you want to shape individual properties. Simple and detailed animation share the same engine."
+    },
+    {
+      "question": "How is Melt different from a traditional video editor?",
+      "answer": "Melt starts with a layered composition: artwork, typography, effects and motion in one workspace. It is built for designed visuals and short creative pieces. You can use the free tools for a quick effect, then explore templates in the full studio for more composition and animation controls."
+    },
+    {
+      "question": "Are the tools free, and what can I download?",
+      "answer": "The tools run locally without an account or a watermark added by Melt. Download images as PNG, JPEG or WebP, and videos as MP4 or WebM when supported by your browser. Video encoding capabilities depend on your device and browser."
+    }
+  ]
+}

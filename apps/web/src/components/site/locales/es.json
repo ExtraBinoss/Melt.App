@@ -1,0 +1,47 @@
+{
+  "tools": "Herramientas gratuitas",
+  "features": "Funciones",
+  "faq": "Tus preguntas, con respuesta.",
+  "faqNav": "Preguntas frecuentes",
+  "studio": "El estudio",
+  "resources": "Explorar",
+  "templates": "Plantillas",
+  "editor": "Abre el editor",
+  "code": "Código fuente",
+  "changes": "Registro de cambios",
+  "feedback": "Comentarios",
+  "license": "Licencia MIT",
+  "footerDescription": "Un poco de magia. Mucho por crear. Imágenes, texto y movimiento, juntos en tu navegador.",
+  "footerNote": "Código abierto. Hecho para tu navegador.",
+  "backTop": "Volver al inicio",
+  "language": "Idioma",
+  "images": "Imagen",
+  "videos": "Vídeo",
+  "try": "Prueba Melt",
+  "faqItems": [
+    {
+      "question": "¿Qué puedo hacer con Melt?",
+      "answer": "Crea carteles, imágenes para redes sociales, tipografía animada y composiciones breves en movimiento. Combina imágenes, texto, formas y vídeo, aplica efectos y anima con preajustes o abre la línea de tiempo para tener más control."
+    },
+    {
+      "question": "¿Necesito una cuenta?",
+      "answer": "No. Puedes empezar con una plantilla o un lienzo vacío directamente en tu navegador. Las herramientas de conversión gratuitas también funcionan sin registrarse."
+    },
+    {
+      "question": "¿Dónde se almacenan mis proyectos y archivos?",
+      "answer": "Los proyectos del editor se guardan en este navegador, en este dispositivo. No se sincronizan automáticamente con otro navegador u ordenador. Descarga un archivo de proyecto editable como copia de seguridad; borrar los datos del navegador puede eliminar los proyectos locales. Los archivos elegidos en las herramientas se procesan localmente."
+    },
+    {
+      "question": "¿Tengo que aprender a usar fotogramas clave?",
+      "answer": "Empieza con un preajuste de movimiento y ajusta su duración e intensidad. Abre los detalles y la línea de tiempo de fotogramas clave cuando quieras modificar propiedades individuales. Las animaciones sencillas y detalladas comparten el mismo motor."
+    },
+    {
+      "question": "¿En qué se diferencia Melt de un editor de vídeo tradicional?",
+      "answer": "Melt parte de una composición por capas: imágenes, tipografía, efectos y movimiento en un mismo espacio. Está pensado para creaciones gráficas y piezas breves. Usa las herramientas gratuitas para aplicar un efecto rápido y explora después las plantillas del estudio completo para acceder a más controles de composición y animación."
+    },
+    {
+      "question": "¿Las herramientas son gratuitas y qué puedo descargar?",
+      "answer": "Las herramientas funcionan localmente, sin cuenta ni marcas de agua añadidas por Melt. Descarga imágenes en PNG, JPEG o WebP y vídeos en MP4 o WebM si tu navegador lo permite. La codificación de vídeo depende de tu dispositivo y navegador."
+    }
+  ]
+}

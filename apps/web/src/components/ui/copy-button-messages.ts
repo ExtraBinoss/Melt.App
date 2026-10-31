@@ -1,19 +1,9 @@
-import { registerFeatureTranslations } from "../../state/i18n/feature-resources";
+import { localeResources, registerFeatureTranslations } from "../../state/i18n/feature-resources";
+import en from "./locales/copy-button/en.json";
+import fr from "./locales/copy-button/fr.json";
 
-export const messages = {
-  en: {
-    copy: "Copy",
-    copying: "Copying…",
-    copied: "Copied",
-    unavailable: "Clipboard access is unavailable in this browser context.",
-    failed: "Copy failed. Allow clipboard access and try again.",
-  },
-  fr: {
-    copy: "Copier",
-    copying: "Copie…",
-    copied: "Copié",
-    unavailable: "Le presse-papiers est indisponible dans ce contexte du navigateur.",
-    failed: "La copie a échoué. Autorisez l’accès au presse-papiers et réessayez.",
-  },
-};
+export const messages = localeResources(
+  { en, fr },
+  import.meta.glob("./locales/copy-button/*.json", { eager: true, import: "default" }),
+);
 registerFeatureTranslations("copyButton", messages);

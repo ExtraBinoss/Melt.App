@@ -1,10 +1,12 @@
-import { registerFeatureTranslations } from "../../../state/i18n/feature-resources";
+import {
+  localeResources,
+  registerFeatureTranslations,
+} from "../../../state/i18n/feature-resources";
+import en from "./locales/en.json";
+import fr from "./locales/fr.json";
 
-export const messages = {
-  en: { left: "Scroll {{label}} left", right: "Scroll {{label}} right" },
-  fr: {
-    left: "Faire défiler {{label}} vers la gauche",
-    right: "Faire défiler {{label}} vers la droite",
-  },
-};
+export const messages = localeResources(
+  { en, fr },
+  import.meta.glob("./locales/*.json", { eager: true, import: "default" }),
+);
 registerFeatureTranslations("scroll", messages);

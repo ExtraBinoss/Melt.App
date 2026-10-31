@@ -1,6 +1,9 @@
-import { registerFeatureTranslations } from "../state/i18n/feature-resources";
-export const messages = {
-  en: { opening: "Opening your studio…", dismiss: "Dismiss message" },
-  fr: { opening: "Ouverture de votre atelier…", dismiss: "Fermer le message" },
-};
+import { localeResources, registerFeatureTranslations } from "../state/i18n/feature-resources";
+import en from "./locales/en.json";
+import fr from "./locales/fr.json";
+
+export const messages = localeResources(
+  { en, fr },
+  import.meta.glob("./locales/*.json", { eager: true, import: "default" }),
+);
 registerFeatureTranslations("startup", messages);

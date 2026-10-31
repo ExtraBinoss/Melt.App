@@ -1,0 +1,19 @@
+{
+  "options": "Options de l’élément",
+  "open": "Ouvrir dans Melt",
+  "preview": "Aperçu de {{name}}",
+  "openNamed": "Ouvrir {{name}}",
+  "favorite": "Ajouter aux favoris",
+  "unfavorite": "Retirer des favoris",
+  "favorites": "Favoris",
+  "author": "Créé par",
+  "me": "Vous",
+  "empty": "Vos favoris apparaîtront ici.",
+  "failed": "Impossible de charger cet aperçu.",
+  "saveFailed": "Impossible d’enregistrer les favoris.",
+  "readFailed": "Impossible de charger les favoris.",
+  "retry": "Réessayer",
+  "hint": "Double-cliquez sur une carte pour l’ouvrir directement.",
+  "project": "Projet",
+  "template": "Template"
+}

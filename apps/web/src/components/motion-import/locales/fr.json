@@ -1,0 +1,13 @@
+{
+  "transitionDescription": "{{count}} éléments seront ajoutés à la timeline avant de choisir une transition.",
+  "transitionTiming": "La composition existante couvre toute la durée. Son dessin reste éditable.",
+  "transitionAccept": "Oui, activer Motion",
+  "transitionCancel": "Non, garder statique",
+  "title": "Passer cette composition en Motion ?",
+  "description": "{{count}} éléments, dont la vidéo importée, seront ajoutés à la timeline.",
+  "timing": "La composition existante couvre toute la durée. Chaque vidéo garde la durée de sa source.",
+  "groups": "Les groupes et leurs enfants sont inclus. Les lignes d’effets et de propriétés ne sont pas comptées.",
+  "preserve": "Vos calques restent éditables. Revenir en mode statique conserve la timeline.",
+  "accept": "Oui, importer en Motion",
+  "cancel": "Non, annuler l’import"
+}

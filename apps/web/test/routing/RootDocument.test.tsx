@@ -11,7 +11,7 @@ test("the server emits a complete document, theme bootstrap and visible content"
       <main>Artwork</main>
     </RootDocument>,
   );
-  expect(html).toContain('<html lang="fr">');
+  expect(html).toContain('<html lang="en" dir="ltr">');
   expect(html).toContain("<title>Melt</title>");
   expect(html).toContain("musart.theme");
   expect(html).toContain("<main>Artwork</main>");

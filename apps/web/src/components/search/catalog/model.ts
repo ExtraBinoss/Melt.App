@@ -1,3 +1,4 @@
+import type { Locale } from "../../../state/i18n/locales";
 import type { EffectType } from "@musart/core";
 
 export const SEARCH_CATEGORIES = [
@@ -67,6 +68,7 @@ export type SearchAction =
   | "languageFrench"
   | "shortcuts";
 export type SearchTarget =
+  | { kind: "language"; language: Locale }
   | { kind: "action"; action: SearchAction }
   | { kind: "page"; pageId: string }
   | { kind: "layer"; pageId: string; layerId: string }

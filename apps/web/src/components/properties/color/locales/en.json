@@ -1,0 +1,5 @@
+{
+  "sample": "Pick a screen color",
+  "failed": "Screen color sampling failed. Try again.",
+  "pending": "Choose a color on screen, or press Escape to cancel."
+}

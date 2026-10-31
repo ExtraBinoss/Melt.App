@@ -1,6 +1,7 @@
 import { beforeEach, expect, test, vi } from "vitest";
 import { fireEvent, screen, waitFor } from "@testing-library/react";
 import { setup } from "../../support/ui";
+import { choose } from "../../support/select";
 import { OnboardingDialog } from "../../../src/components/onboarding/OnboardingDialog";
 import { ONBOARDING_STORAGE_KEY } from "../../../src/state/onboarding/preferences";
 
@@ -55,7 +56,7 @@ test("lets users try palettes, pause the decoration and choose their language", 
   expect(screen.getByTestId("gradient")).toHaveAttribute("data-paused", "true");
   fireEvent.click(screen.getByRole("button", { name: "Animer le dégradé" }));
   expect(screen.getByTestId("gradient")).toHaveAttribute("data-paused", "false");
-  fireEvent.click(screen.getByRole("button", { name: "Passer en anglais" }));
+  await choose("Langue", "English");
   await screen.findByRole("dialog", { name: "Welcome to Melt" });
   expect(screen.getByRole("button", { name: "Show me around" })).toBeVisible();
   expect(localStorage.getItem("musart.language")).toBe("en");

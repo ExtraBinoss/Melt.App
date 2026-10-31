@@ -1,0 +1,15 @@
+{
+  "copy": "Copy",
+  "paste": "Paste",
+  "duplicate": "Duplicate",
+  "group": "Group",
+  "ungroup": "Ungroup",
+  "mask": "Create mask",
+  "hide": "Hide",
+  "show": "Show",
+  "lock": "Lock",
+  "unlock": "Unlock",
+  "remove": "Delete",
+  "removeAnimation": "Delete animation",
+  "selectAll": "Select all"
+}

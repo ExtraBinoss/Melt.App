@@ -1,0 +1,7 @@
+{
+  "unsupported": "This editor cannot install media templates.",
+  "download": "The template could not be downloaded. Please try again.",
+  "invalid": "The template bundle is invalid.",
+  "integrity": "The template media does not match its original source.",
+  "tooLarge": "The template bundle exceeds its download limit."
+}

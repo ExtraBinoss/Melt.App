@@ -1,72 +1,12 @@
-import { i18n } from "../../../state/i18n";
+import {
+  localeResources,
+  registerFeatureTranslations,
+} from "../../../state/i18n/feature-resources";
+import en from "./locales/en.json";
+import fr from "./locales/fr.json";
 
-const resources = {
-  en: {
-    morphingType: "Melt Mascot",
-    morphingTypeDescription: "6 s · Curious mascot and full-height MELT letter morphing",
-    shareYourWork: "Too Hot to Haunt",
-    shareYourWorkDescription:
-      "1.2 s · Seamless photo collage, scale, blur and editable motion blocks",
-    soundPlayground: "Sound Playground",
-    soundPlaygroundDescription: "6 s · Original SFX, playful groups, fades and transitions",
-    orbit: "Orbit Study",
-    orbitDescription: "5 s · Living color fields and orbital motion",
-    paper: "Paper Motion",
-    paperDescription: "5 s · Nested paper collage, springs and reveals",
-    colorfield: "Colorfield",
-    colorfieldDescription: "Editable shapes, color and gradient studies",
-    atlas: "Transition Atlas",
-    atlasDescription: "30 GPU styles · Independent clips · One shared layer",
-    afterhours: "AFTERHOURS — Techno",
-    bloom: "In Bloom — Motion showcase",
-    stress: "Motion stress lab",
-    bloomDescription: "5 s · Video, photo collages, springs and live effects",
-    stressDescription: "50 photo layers · 100 effects · 3 video clips",
-    filter: "Template mode",
-    all: "All templates",
-    static: "Static",
-    motion: "Motion",
-    search: "Search templates",
-    use: "Create from {{name}}",
-    editable: "150 editable layers · Music poster",
-    blank: "Blank canvas",
-    empty: "No matching templates.",
-    opening: "Preparing template…",
-    cancel: "Cancel",
-  },
-  fr: {
-    morphingType: "Mascotte Melt",
-    morphingTypeDescription: "6 s · Mascotte curieuse et lettres MELT étirées sur toute la hauteur",
-    shareYourWork: "Too Hot to Haunt",
-    shareYourWorkDescription:
-      "1,2 s · Collage photo en boucle continue, scale, flou et blocs modifiables",
-    soundPlayground: "Sound Playground",
-    soundPlaygroundDescription: "6 s · Sons originaux, groupes animés, fondus et transitions",
-    orbit: "Orbit Study",
-    orbitDescription: "5 s · Couleurs vivantes et mouvement orbital",
-    paper: "Paper Motion",
-    paperDescription: "5 s · Collage groupé, ressorts et révélations",
-    colorfield: "Colorfield",
-    colorfieldDescription: "Études de formes, couleurs et dégradés éditables",
-    atlas: "Atlas des transitions",
-    atlasDescription: "30 styles GPU · Clips indépendants · Un seul calque",
-    afterhours: "AFTERHOURS — Techno",
-    bloom: "In Bloom — Démo Motion",
-    stress: "Laboratoire Motion",
-    bloomDescription: "5 s · Vidéo, collages photo, ressorts et effets animés",
-    stressDescription: "50 calques photo · 100 effets · 3 clips vidéo",
-    filter: "Mode du modèle",
-    all: "Tous les modèles",
-    static: "Statique",
-    motion: "Motion",
-    search: "Rechercher un modèle",
-    use: "Créer depuis {{name}}",
-    editable: "150 calques éditables · Affiche musicale",
-    blank: "Plan de travail vierge",
-    empty: "Aucun modèle correspondant.",
-    opening: "Préparation du modèle…",
-    cancel: "Annuler",
-  },
-};
-for (const [language, values] of Object.entries(resources))
-  i18n.addResourceBundle(language, "templates", values, true, true);
+export const resources = localeResources(
+  { en, fr },
+  import.meta.glob("./locales/*.json", { eager: true, import: "default" }),
+);
+registerFeatureTranslations("templates", resources);

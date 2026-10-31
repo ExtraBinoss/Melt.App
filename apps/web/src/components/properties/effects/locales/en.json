@@ -1,0 +1,25 @@
+{
+  "resetAll": "Reset all effect parameters",
+  "playLive": "Play live",
+  "pauseLive": "Pause live",
+  "liveTime": "Displayed phase",
+  "seed": "Seed",
+  "falloff": "Falloff",
+  "composite": "Alpha composition",
+  "replacement": "Effect replacement (default)",
+  "operation": {
+    "source-over": "Source over",
+    "destination-over": "Destination over",
+    "source-in": "Source in",
+    "destination-in": "Destination in",
+    "source-out": "Source out",
+    "destination-out": "Destination out",
+    "source-atop": "Source atop",
+    "destination-atop": "Destination atop",
+    "xor": "Exclusive overlap",
+    "copy": "Source only",
+    "destination": "Destination only",
+    "clear": "Clear",
+    "lighter": "Add source and destination"
+  }
+}

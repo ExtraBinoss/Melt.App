@@ -4,23 +4,9 @@ import type { TemplateLoadOptions } from "../motion/loader";
 import { DESIGNED_TEMPLATES, type DesignedTemplateId } from "./catalog";
 import { i18n } from "../../../../state/i18n";
 
+import { messages as resources } from "./messages";
+
 const MAX_BYTES = 1024 * 1024;
-const resources = {
-  en: {
-    unavailable: "Atomic template installation is unavailable in this editor.",
-    download: "The template could not be downloaded. Please try again.",
-    invalid: "This template is invalid or does not match the selected design.",
-    tooLarge: "This template exceeds the 1 MB download limit.",
-  },
-  fr: {
-    unavailable: "Cet éditeur ne peut pas installer ce modèle de façon atomique.",
-    download: "Impossible de télécharger le modèle. Réessayez.",
-    invalid: "Ce modèle est invalide ou ne correspond pas au design choisi.",
-    tooLarge: "Ce modèle dépasse la limite de téléchargement de 1 Mo.",
-  },
-};
-for (const language of ["en", "fr"] as const)
-  i18n.addResourceBundle(language, "designedTemplates", resources[language], true, true);
 export class DesignedTemplateError extends Error {
   constructor(readonly code: keyof typeof resources.en) {
     super(i18n.t(`designedTemplates:${code}`));

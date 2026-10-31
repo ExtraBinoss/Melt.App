@@ -6,23 +6,8 @@ import {
   type MotionInitializationPlan,
 } from "@musart/core";
 import { i18n } from "../i18n";
-import { registerFeatureTranslations } from "../i18n/feature-resources";
 
-const errors = {
-  en: {
-    invalid: "The Motion conversion request is invalid.",
-    busy: "Another Motion conversion is awaiting your decision.",
-    stale: "The composition changed during video import. Please try again.",
-    unavailable: "Motion conversion needs the editor confirmation dialog.",
-  },
-  fr: {
-    invalid: "La demande de conversion Motion est invalide.",
-    busy: "Une autre conversion Motion attend votre réponse.",
-    stale: "La composition a changé pendant l’import vidéo. Réessayez.",
-    unavailable: "La conversion Motion nécessite la boîte de confirmation de l’éditeur.",
-  },
-};
-registerFeatureTranslations("motionConfirmation", errors);
+import { messages as errors } from "./motion-confirmation-messages";
 
 export class MotionConfirmationError extends Error {
   constructor(readonly code: keyof typeof errors.en) {

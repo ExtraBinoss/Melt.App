@@ -1,0 +1,8 @@
+{
+  "hover": "Hover to preview",
+  "play": "Play preview",
+  "pause": "Pause preview",
+  "loading": "Preparing live preview…",
+  "failed": "Preview unavailable. You can still open this project.",
+  "playing": "Live Motion preview"
+}

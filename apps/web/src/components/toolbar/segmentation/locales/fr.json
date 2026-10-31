@@ -1,0 +1,15 @@
+{
+  "megabytes": "{{value}} Mo",
+  "downloading": "Téléchargement du modèle local…",
+  "initializing": "Initialisation du modèle local…",
+  "downloadProgress": "Téléchargement du modèle",
+  "progress": "{{loaded}} sur {{total}}, {{percent}} pour cent",
+  "loadCached": "Charger le modèle local",
+  "cached": "Sur cet appareil · {{size}}",
+  "remove": "Supprimer le modèle téléchargé",
+  "removing": "Suppression…",
+  "localHint": "Fonctionne sur votre appareil. Vos images ne sont jamais envoyées.",
+  "unavailable": "Le stockage du navigateur est indisponible. Le modèle reste utilisable dans cette session.",
+  "inspectError": "Impossible de vérifier le modèle téléchargé.",
+  "prepareError": "L’opération sur le modèle a échoué. Réessayez."
+}

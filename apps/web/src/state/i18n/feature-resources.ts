@@ -1,24 +1,51 @@
 import i18n from "i18next";
+import { brand } from "../../ui/brand/config";
 
-type FeatureMessages = { en: Record<string, unknown>; fr: Record<string, unknown> };
-const pending = new Map<string, FeatureMessages>();
+type FeatureMessages = Record<string, Record<string, unknown>>;
+const pending: [string, FeatureMessages][] = [];
 let listening = false;
+
+function brandValues(value: unknown): unknown {
+  if (typeof value === "string")
+    return value
+      .replaceAll("{{brandName}}", brand.name)
+      .replaceAll("{{brandNameUpper}}", brand.name.toUpperCase());
+  if (Array.isArray(value)) return value.map(brandValues);
+  if (value && typeof value === "object")
+    return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, brandValues(item)]));
+  return value;
+}
+
+/** Discover only this feature's JSON files, retaining typed base-language exports. */
+export function localeResources<T extends FeatureMessages>(
+  base: T,
+  modules: Record<string, unknown>,
+): T & FeatureMessages {
+  const resources: FeatureMessages = { ...base };
+  for (const [path, resource] of Object.entries(modules)) {
+    const language = /\/([^/]+)\.json$/.exec(path)?.[1];
+    if (language && resource && typeof resource === "object" && !Array.isArray(resource))
+      resources[language] = resource as Record<string, unknown>;
+  }
+  return brandValues(resources) as T & FeatureMessages;
+}
+
 function install(namespace: string, messages: FeatureMessages) {
-  for (const language of ["en", "fr"] as const)
-    i18n.addResourceBundle(language, namespace, messages[language], true, true);
+  for (const [language, resource] of Object.entries(messages))
+    i18n.addResourceBundle(language, namespace, resource, true, true);
 }
 function flush() {
   for (const [namespace, messages] of pending) install(namespace, messages);
-  pending.clear();
+  pending.length = 0;
   listening = false;
   i18n.off("initialized", flush);
 }
 
-/** A feature owns its messages; the app keeps one shared locale and storage preference. */
+/** Feature imports own their resources; every locale shares the same app preference. */
 export function registerFeatureTranslations(namespace: string, messages: FeatureMessages): void {
   if (i18n.isInitialized) install(namespace, messages);
   else {
-    pending.set(namespace, messages);
+    pending.push([namespace, messages]);
     if (!listening) {
       listening = true;
       i18n.on("initialized", flush);

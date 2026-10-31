@@ -10,24 +10,7 @@ import { i18n } from "../../../../state/i18n";
 import type { MediaOriginalInput } from "../../media/model";
 import type { MotionTemplateId, MotionTemplateManifest } from "./model";
 
-const resources = {
-  en: {
-    unsupported: "This editor cannot install media templates.",
-    download: "The template could not be downloaded. Please try again.",
-    invalid: "The template bundle is invalid.",
-    integrity: "The template media does not match its original source.",
-    tooLarge: "The template bundle exceeds its download limit.",
-  },
-  fr: {
-    unsupported: "Cet éditeur ne peut pas installer les modèles multimédias.",
-    download: "Le modèle n’a pas pu être téléchargé. Réessayez.",
-    invalid: "Le modèle est invalide.",
-    integrity: "Le média du modèle ne correspond pas à sa source originale.",
-    tooLarge: "Le modèle dépasse sa limite de téléchargement.",
-  },
-};
-for (const [language, values] of Object.entries(resources))
-  i18n.addResourceBundle(language, "motionTemplates", values, true, true);
+import { messages as resources } from "./messages";
 
 export class MotionTemplateError extends Error {
   constructor(readonly code: keyof typeof resources.en) {

@@ -98,3 +98,15 @@ test("builds command availability for ten thousand selected layers through index
   expect(items.find((item) => item.id === "action:toggleLock")?.disabled).toBeUndefined();
   expect(items.find((item) => item.id === "action:group")?.disabled).toBeTruthy();
 });
+
+test("indexes registry languages alongside the preserved English/French action IDs", () => {
+  const d = setup();
+  const items = createSearchCommandItems(d.engine.getSnapshot(), t);
+  expect(items.find((item) => item.id === "language:ja")).toMatchObject({
+    label: "Langue: 日本語",
+    terms: expect.stringContaining("Japanese"),
+    target: { kind: "language", language: "ja" },
+  });
+  expect(items.find((item) => item.id === "action:languageEnglish")).toBeDefined();
+  expect(items.find((item) => item.id === "action:languageFrench")).toBeDefined();
+});

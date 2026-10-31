@@ -1,0 +1,15 @@
+{
+  "presets": "Modèles",
+  "color": "Couleur du repère",
+  "title": "Modèles de repères",
+  "description": "Ajouter un cadre de format éditable, centré dans la cible actuelle.",
+  "category": "Catégorie de format",
+  "all": "Tous",
+  "social": "Réseaux",
+  "video": "Vidéo",
+  "horizontal": "Horizontaux",
+  "vertical": "Verticaux",
+  "addHorizontal": "Ajouter horizontal",
+  "addVertical": "Ajouter vertical",
+  "append": "Ajouter les repères {{name}}"
+}

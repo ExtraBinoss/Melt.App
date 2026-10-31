@@ -1,0 +1,153 @@
+{
+  "hubTitle": "Gratis creatieve tools. Iets minder gewoontjes.",
+  "hubIntro": "Verander een afbeelding of een korte video in iets met karakter. Zes effecten van de Melt-engine, met lokale verwerking en bedieningselementen die u daadwerkelijk kunt begrijpen.",
+  "titleImage": "Gratis {{style}} beeldconverter",
+  "titleVideo": "Gratis {{style}} video-omzetter",
+  "image": "Afbeelding",
+  "video": "Video",
+  "free": "Gratis tool",
+  "home": "Startpagina",
+  "hub": "Gratis tools",
+  "local": "Verwerkt op uw apparaat. Geen account, geen upload.",
+  "chooseImage": "Kies een afbeelding",
+  "chooseVideo": "Kies een video",
+  "dropImage": "Zet je afbeelding hier neer",
+  "dropVideo": "Zet je video hier neer",
+  "dropHintImage": "PNG, JPEG, WebP, AVIF of GIF ≤ 50 MiB · veilige SVG ≤ 256 KiB",
+  "dropHintVideo": "Een browserondersteunde video · maximaal 512 MiB",
+  "sample": "Probeer een voorbeeld",
+  "replace": "Kies een ander bestand",
+  "preparing": "Je canvas voorbereiden…",
+  "loadingEngine": "Melt wordt voorbereid…",
+  "exporting": "Je resultaat exporteren…",
+  "parameters": "Geef het je eigen stijl",
+  "advanced": "Geavanceerde bedieningselementen",
+  "basic": "Basisbediening",
+  "format": "Downloadformaat",
+  "downloadImage": "Afbeelding downloaden",
+  "downloadVideo": "Video downloaden",
+  "cancel": "Annuleren",
+  "retry": "Probeer het opnieuw",
+  "error": "Deze bewerking kon niet worden voltooid.",
+  "readError": "Dit bestand kon niet worden geopend.",
+  "details": "Details",
+  "resolution": "Langste zijde",
+  "outputSize": "Uitvoer: {{width}} × {{height}} px",
+  "compare": "Houd ingedrukt om te vergelijken",
+  "play": "Voorbeeld afspelen",
+  "pause": "Pauzeer voorbeeld",
+  "seek": "Tijdstip in voorbeeld",
+  "clipStart": "Clip begint om",
+  "clipLength": "Cliplengte",
+  "clipHint": "Kies maximaal 60 seconden uit je video. Grotere bestanden worden niet geüpload.",
+  "sourceDuration": "Bronduur: {{seconds}} s",
+  "mute": "Behoud originele audio",
+  "silentPreview": "Het voorbeeld is stil. Originele audio blijft behouden in de download als deze is ingeschakeld.",
+  "progress": "{{percent}}% weergegeven",
+  "resultReady": "Je download is klaar.",
+  "auto": "Automatisch",
+  "moreTools": "Probeer een ander effect",
+  "about": "Hoe het {{style}}-effect werkt",
+  "tips": "Een paar manieren om het resultaat vorm te geven",
+  "how": "Hoe u uw {{media}} kunt converteren",
+  "steps": [
+    "Kies een lokaal bestand of sleep het naar het voorbeeld. De renderer wordt alleen geladen wanneer u deze nodig heeft.",
+    "Pas het effect aan en vergelijk het met het origineel. De basisinstellingen zijn direct toegankelijk; geavanceerde instellingen zijn optioneel.",
+    "Kies uw uitvoerinstellingen en download het resultaat. Verwerking en codering gebeuren in uw browser."
+  ],
+  "imageIntro": "Pas de behandeling van een stilstaand beeld aan en download een PNG, JPEG of WebP. De uitvoer behoudt de beeldverhouding van de bron en kan aan de langste rand maximaal 1920 pixels bedragen.",
+  "videoIntro": "Pas de behandeling toe op een geselecteerde clip en download MP4 of WebM, afhankelijk van uw browser. Stel het startpunt en een duur van maximaal 60 seconden in; de originele audio kan worden bewaard.",
+  "faq": "Goed om te weten",
+  "privacyQ": "Wordt mijn bestand naar een server verzonden?",
+  "privacyA": "Nee. Het bestand wordt lokaal gelezen en verwerkt met de renderer Melt in uw browser. De pagina kan de applicatiecode en de optionele voorbeeldafbeelding downloaden, maar uploadt de door u geselecteerde media niet.",
+  "outputQ": "Wat kan ik downloaden?",
+  "outputImageA": "Kies PNG voor een verliesvrije afbeelding, JPEG voor een compacte foto, of WebP indien ondersteund. De langste uitvoerrand is beperkt tot 1920 pixels en kleinere bronnen worden niet vergroot. De ASCII-behandeling wordt visueel geëxporteerd, niet als tekstbestand.",
+  "outputVideoA": "Kies automatische codering, MP4 of WebM. Ondersteunde codecs zijn afhankelijk van uw browser. De geselecteerde clip kan maximaal 60 seconden duren, op 30 fps, met maximaal 1920 pixels aan de langste rand. Audio wordt opgenomen wanneer deze is ingeschakeld en aanwezig is in de bron.",
+  "controlsQ": "Kan ik het uiterlijk wijzigen nadat ik een bestand heb gekozen?",
+  "controlsA": "Ja. Het effect blijft instelbaar terwijl u een voorbeeld bekijkt. Wijzig de parameters, vergelijk de bron en het resultaat en download opnieuw. Het bronbestand wordt niet gewijzigd. Uw selectie wordt vrijgegeven wanneer u de tool verlaat.",
+  "noFile": "Kies een bestand om te starten.",
+  "fileTooLarge": "Dit bestand overschrijdt de grootte die door deze tool wordt ondersteund.",
+  "invalidFile": "Kies een ondersteund bestand voor deze tool.",
+  "leave": "Deze pagina verlaten en de huidige export annuleren?",
+  "styles": {
+    "ascii": {
+      "name": "ASCII",
+      "summary": "Verander foto's in rasters van tekens, van fijne typografische details tot opvallende tekstblokken.",
+      "about": "ASCII-kunst bouwt een afbeelding op uit tekens. Melt meet de helderheid van elke cel en gebruikt een eigen glyph-atlas om dichtere of lichtere tekens te tekenen. Dit gebeurt met hetzelfde TSL-effect als in de studio. De kleurmodus behoudt de tinten van het origineel; de monochrome modus geeft een ingetogen typografisch beeld.",
+      "tips": [
+        "Gebruik kleinere tekens om gezichten en kleine details te behouden.",
+        "Vergroot de celgrootte voor een opvallende poster of een bewust abstract resultaat.",
+        "Meng een beetje van het origineel met de Hoeveelheidsregelaar voor een zachtere behandeling."
+      ],
+      "question": "Exporteert de ASCII converter bewerkbare tekst?",
+      "answer": "Deze tool maakt een visuele ASCII behandeling en exporteert een afbeelding of video. De tekens worden weergegeven als onderdeel van de afbeelding, in plaats van als een document met platte tekst. Gebruik de tekengrootte- en kleurinstellingen om het uiterlijk vorm te geven voordat u gaat downloaden."
+    },
+    "dither": {
+      "name": "Dither",
+      "summary": "Verklein afbeeldingen tot een tweekleurenpalet met geordende patronen en een duidelijke gedrukte textuur.",
+      "about": "Dithering vertegenwoordigt tussentonen door pixels uit een beperkt palet te rangschikken. Deze tool maakt gebruik van het tweekleurige Bit Dither-effect van Melt. Kies de drempelwaarde, Bayer 2 × 2, Bayer 4 × 4, Bayer 8 × 8 of verweven ruis, en stel vervolgens de voor- en achtergrondkleuren in. Contrast, gamma en patroonsterkte zorgen voor een fijnere controle in de geavanceerde instellingen.",
+      "tips": [
+        "Begin met Bayer 4 × 4 voor een evenwichtig, herkenbaar patroon.",
+        "Kies voor- en achtergrondkleuren met voldoende scheiding.",
+        "Gebruik een grotere patroonschaal voor een dikke, op print geïnspireerde textuur."
+      ],
+      "question": "Wat is het verschil tussen drempelwaarde en Bayer dithering?",
+      "answer": "De drempelwaarde wijst elk beeldmonster direct toe aan een van de twee kleuren. Bayer verdeelt de kleuren met een geordende matrix en wekt zo de indruk van meer tussentinten. De patroongrootte verandert de textuur; geen van beide opties voegt een verborgen derde kleur aan het palet toe."
+    },
+    "halftone": {
+      "name": "Halftoon",
+      "summary": "Geef fotografie en beeldmateriaal een gestippeld, op print geïnspireerd oppervlak met een aanpasbare puntgrootte.",
+      "about": "Halftoon gebruikt een reguliere puntbehandeling om de bronafbeelding opnieuw te interpreteren. In Melt bepaalt de celgrootte de schaal van de afgedrukte textuur, De effectsterkte mengt de behandeling met het origineel en Kleur kiest tussen een gekleurd en monochroom resultaat. Het is handig voor redactionele afbeeldingen, gestructureerde posters, omslagkunst en grafische bewegende achtergronden.",
+      "tips": [
+        "Probeer een grotere puntgrootte voor afbeeldingen die op afstand worden bekeken.",
+        "Gebruik een kleiner formaat als een gezicht of product herkenbaar moet blijven.",
+        "Vergelijk gekleurde en monochrome versies voordat u de uiteindelijke behandeling kiest."
+      ],
+      "question": "Kan ik de halftoonpunten aanpassen zonder het formaat van mijn bestand te wijzigen?",
+      "answer": "Ja. De schaal van het effect verandert het puntenraster onafhankelijk van de instelling voor de uitvoergrootte. U kunt een fijn of grof patroon testen terwijl u dezelfde uitvoerafmetingen behoudt. Het voorbeeld gebruikt dezelfde effectparameters als het gedownloade resultaat."
+    },
+    "cyanotype": {
+      "name": "Cyanotypie",
+      "summary": "Maak een blauwe fotografische afdrukbehandeling met inkt, papier, belichting en textuurcontroles.",
+      "about": "Cyanotypie is geïnspireerd op het kenmerkende blauw en papier van fotografische afdrukken. Melt bootst dat uiterlijk digitaal na: belichting en contrast geven het onderwerp vorm, inkt- en papierkleuren bepalen het palet, en de geavanceerde instellingen voegen wassing, oneffenheden, korrel, vezels en vervagende randen toe. Het is een digitaal effect, geen chemisch drukproces.",
+      "tips": [
+        "Pas eerst de belichting aan, zodat het onderwerp leesbaar is.",
+        "Verwissel inkt en papier samen om een samenhangend palet te behouden.",
+        "Gebruik subtiele korrels en wassingen als je wilt dat de foto centraal blijft staan."
+      ],
+      "question": "Kan ik de blauwe en papieren kleuren wijzigen?",
+      "answer": "Ja. Inktkleur en papierkleur staan bij de basisinstellingen. Open de geavanceerde instellingen voor dichtheid, wassing, textuur, vezels en randen. Alles wordt lokaal gerenderd met hetzelfde cyanotypie-effect als in de volledige Melt-editor."
+    },
+    "crt": {
+      "name": "CRT",
+      "summary": "Voeg scanlijnen, weergavemaskers, kromming en glans toe voor een retro-schermbehandeling.",
+      "about": "Een op CRT geïnspireerd filter verandert het uiterlijk van het scherm in plaats van eenvoudigweg strepen over de afbeelding te leggen. Melt combineert een configureerbaar schermmasker, scanlijnen, kromming, convergentie en gloed. De basisbediening legt de hoofdlook bloot; Met geavanceerde instellingen kunt u de fijnere weergave en tooneigenschappen aanpassen. Probeer het op typografie, artwork, gamebeelden of een korte videoclip.",
+      "tips": [
+        "Houd scanlijnen subtiel als de bron kleine tekst bevat.",
+        "Gebruik spaarzaam kromming en glans voor een netter retrodisplay.",
+        "Vergelijk de beschikbare maskerpatronen om een textuur te vinden die bij het onderwerp past."
+      ],
+      "question": "Is CRT hetzelfde als een VHS-filter?",
+      "answer": "Deze converter richt zich op een retro-weergavebehandeling: schermmaskers, scanlijnen, kromming en gloed. Het pretendeert niet elk aspect van een analoge tape-workflow te simuleren. Het resultaat is een gestileerd digitaal effect dat u kunt aanpassen met de regelaars van Melt."
+    },
+    "posterize": {
+      "name": "Posteriseren",
+      "summary": "Vereenvoudig doorlopende tinten in minder kleurniveaus voor grafische, posterachtige illustraties.",
+      "about": "Posterisatie vermindert het aantal toonniveaus dat wordt gebruikt om een afbeelding weer te geven. Lagere niveaus creëren brede, duidelijk gescheiden kleurgebieden; hogere waarden behouden subtielere overgangen. De Hoeveelheidsregelaar van Melt mengt de gekwantiseerde afbeelding met de bron. Dit maakt de tool nuttig voor grafische studies, sociale media en beeldmateriaal dat profiteert van een vlakkere, meer illustratieve uitstraling.",
+      "tips": [
+        "Begin met zes niveaus en verlaag vervolgens de waarde voor een sterker grafisch uiterlijk.",
+        "Verhoog het aantal niveaus wanneer huidtinten of -gradiënten te hard worden.",
+        "Gebruik Hoeveelheid om de behandeling te mengen in plaats van het originele bestand te wijzigen."
+      ],
+      "question": "Gebruikt posterisatie hetzelfde proces als dithering?",
+      "answer": "Nee. Posterisatie kwantiseert kleuren in een kleiner aantal niveaus. Dithering verdeelt een beperkt palet in patronen om tussentonen te suggereren. Ze produceren verschillende texturen; probeer de gerelateerde Dither-converter als je een zichtbaar pixelpatroon wilt."
+    }
+  },
+  "reload": "Tool opnieuw laden",
+  "breadcrumbs": "Navigatiepad",
+  "title": "Gratis converter voor {{style}}",
+  "chooseFile": "Kies een bestand",
+  "dropFile": "Sleep hier een afbeelding of video naartoe",
+  "dropHintFile": "Afbeeldingen tot 50 MiB · veilige SVG tot 256 KiB · video’s tot 512 MiB",
+  "file": "Bestand"
+}

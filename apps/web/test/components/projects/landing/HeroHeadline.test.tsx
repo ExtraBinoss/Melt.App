@@ -26,3 +26,11 @@ test("pauses the finite reveal while hidden and removes its visibility listener"
   view.unmount();
   expect(remove).toHaveBeenCalledWith("visibilitychange", expect.any(Function));
 });
+
+test("Arabic text keeps connected glyph shaping while Latin titles retain per-letter reveals", () => {
+  const { container } = render(<HeroHeadline lines={["ابتكر.", "Create."]} />);
+  const rows = container.querySelectorAll(".hero-line");
+  expect(rows[0]!.querySelectorAll(".hero-letter")).toHaveLength(1);
+  expect(rows[0]).toHaveTextContent("ابتكر.");
+  expect(rows[1]!.querySelectorAll(".hero-letter")).toHaveLength(7);
+});

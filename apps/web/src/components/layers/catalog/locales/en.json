@@ -1,0 +1,18 @@
+{
+  "search": "Search effects",
+  "searchAdjustment": "Search adjustments",
+  "familyLabel": "Category",
+  "all": "All categories",
+  "empty": "No matching effects",
+  "emptyAdjustment": "No matching adjustments",
+  "family": {
+    "tone": "Light & tone",
+    "color": "Color",
+    "texture": "Texture & print",
+    "distortion": "Distortion",
+    "light": "Lighting & focus",
+    "blur": "Blur",
+    "retro": "Retro & screens",
+    "motion": "Motion & transitions"
+  }
+}

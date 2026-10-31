@@ -1,0 +1,12 @@
+{
+  "activate": "Edit {{name}}",
+  "options": "Artboard options: {{name}}",
+  "optionsHint": "Artboard options",
+  "rename": "Rename",
+  "export": "Export composition…",
+  "remove": "Delete",
+  "name": "Artboard name",
+  "preparing": "Preparing preview",
+  "unavailable": "Preview unavailable · click to edit",
+  "retry": "Retry previews"
+}

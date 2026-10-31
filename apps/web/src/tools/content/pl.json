@@ -1,0 +1,153 @@
+{
+  "hubTitle": "Darmowe narzędzia kreatywne. Odrobina niezwykłości.",
+  "hubIntro": "Zamień zdjęcie lub krótki film w coś z charakterem. Sześć efektów z silnika Melt z lokalnym przetwarzaniem i sterowaniem, które naprawdę możesz zrozumieć.",
+  "titleImage": "Darmowy konwerter obrazów z efektem {{style}}",
+  "titleVideo": "Darmowy konwerter wideo z efektem {{style}}",
+  "image": "Obraz",
+  "video": "Wideo",
+  "free": "Darmowe narzędzie",
+  "home": "Strona główna",
+  "hub": "Darmowe narzędzia",
+  "local": "Przetwarzane na Twoim urządzeniu. Bez konta, bez przesyłania.",
+  "chooseImage": "Wybierz obraz",
+  "chooseVideo": "Wybierz film",
+  "dropImage": "Upuść tutaj swój obraz",
+  "dropVideo": "Upuść tutaj swój film",
+  "dropHintImage": "PNG, JPEG, WebP, AVIF lub GIF ≤ 50 MiB · bezpieczny SVG ≤ 256 KiB",
+  "dropHintVideo": "Wideo obsługiwane przez przeglądarkę · do 512 MiB",
+  "sample": "Wypróbuj przykład",
+  "replace": "Wybierz inny plik",
+  "preparing": "Przygotowywanie płótna…",
+  "loadingEngine": "Przygotowywanie Melt…",
+  "exporting": "Eksportowanie wyniku…",
+  "parameters": "Nadaj własny styl",
+  "advanced": "Ustawienia zaawansowane",
+  "basic": "Ustawienia podstawowe",
+  "format": "Format pobierania",
+  "downloadImage": "Pobierz obraz",
+  "downloadVideo": "Pobierz wideo",
+  "cancel": "Anuluj",
+  "retry": "Spróbuj ponownie",
+  "error": "Ta operacja nie mogła zostać ukończona.",
+  "readError": "Nie można otworzyć tego pliku.",
+  "details": "Szczegóły",
+  "resolution": "Najdłuższy bok",
+  "outputSize": "Wyjście: {{width}} × {{height}} px",
+  "compare": "Przytrzymaj, aby porównać",
+  "play": "Odtwórz podgląd",
+  "pause": "Wstrzymaj podgląd",
+  "seek": "Czas podglądu",
+  "clipStart": "Początek klipu",
+  "clipLength": "Długość klipu",
+  "clipHint": "Wybierz maksymalnie 60 sekund swojego filmu. Większe pliki nie są przesyłane.",
+  "sourceDuration": "Czas trwania źródła: {{seconds}} s",
+  "mute": "Zachowaj oryginalny dźwięk",
+  "silentPreview": "Podgląd jest cichy. Jeśli opcja ta jest włączona, oryginalny dźwięk jest zachowywany w pobranym pliku.",
+  "progress": "{{percent}}% wyrenderowanych",
+  "resultReady": "Twoje pobieranie jest gotowe.",
+  "auto": "Automatyczny",
+  "moreTools": "Wypróbuj inny efekt",
+  "about": "Jak działa efekt {{style}}",
+  "tips": "Kilka sposobów na kształtowanie wyniku",
+  "how": "Jak przekonwertować {{media}}",
+  "steps": [
+    "Wybierz plik lokalny lub przeciągnij go do podglądu. Moduł renderujący jest ładowany tylko wtedy, gdy jest potrzebny.",
+    "Dostosuj efekt i porównaj go z oryginałem. Podstawowe ustawienia są pod ręką, a zaawansowane opcje możesz otworzyć w razie potrzeby.",
+    "Wybierz ustawienia wyjściowe i pobierz wynik. Przetwarzanie i kodowanie odbywa się w przeglądarce."
+  ],
+  "imageIntro": "Dostosuj efekt na nieruchomym obrazie i pobierz PNG, JPEG lub WebP. Wynik zachowuje proporcje źródła i może mieć do 1920 pikseli na najdłuższym boku.",
+  "videoIntro": "Zastosuj efekt na wybranym klipie i pobierz MP4 lub WebM, w zależności od przeglądarki. Ustaw punkt początkowy i czas trwania do 60 sekund; oryginalny dźwięk może zostać zachowany.",
+  "faq": "Dobrze wiedzieć",
+  "privacyQ": "Czy mój plik jest wysyłany na serwer?",
+  "privacyA": "Nie. Plik jest odczytywany lokalnie i przetwarzany za pomocą modułu renderującego Melt w przeglądarce. Strona może pobrać kod aplikacji i opcjonalny przykładowy obraz, ale nie przesyła wybranych multimediów.",
+  "outputQ": "Co mogę pobrać?",
+  "outputImageA": "Wybierz PNG, aby uzyskać obraz bezstratny, JPEG, aby uzyskać kompaktowe zdjęcie lub WebP, jeśli jest obsługiwane. Najdłuższa krawędź wyjściowa jest ograniczona do 1920 pikseli, a mniejsze źródła nie są powiększane. Efekt ASCII jest eksportowany wizualnie, a nie jako plik tekstowy.",
+  "outputVideoA": "Wybierz automatyczne kodowanie, MP4 lub WebM. Obsługiwane kodeki zależą od przeglądarki. Wybrany klip może mieć maksymalnie 60 sekund, 30 fps i maksymalnie 1920 pikseli na dłuższej krawędzi. Dźwięk jest dołączany, jeśli jest włączony i obecny w źródle.",
+  "controlsQ": "Czy mogę zmienić wygląd po wybraniu pliku?",
+  "controlsA": "Tak. Efekt można regulować podczas podglądu. Zmień jego parametry, porównaj źródło i wynik, a następnie pobierz ponownie. Plik źródłowy nie jest modyfikowany. Twój wybór zostanie zwolniony po opuszczeniu narzędzia.",
+  "noFile": "Wybierz plik, aby rozpocząć.",
+  "fileTooLarge": "Ten plik przekracza rozmiar obsługiwany przez to narzędzie.",
+  "invalidFile": "Wybierz obsługiwany plik dla tego narzędzia.",
+  "leave": "Opuścić tę stronę i anulować bieżący eksport?",
+  "styles": {
+    "ascii": {
+      "name": "ASCII",
+      "summary": "Zamień zdjęcia w siatkę znaków, od drobnych szczegółów typograficznych po pogrubione bloki tekstu.",
+      "about": "Grafika ASCII buduje obraz ze znaków zamiast z ciągłej powierzchni. Melt próbkuje jasność każdej komórki i używa własnego atlasu glifów, aby rysować gęstsze lub jaśniejsze symbole. Wynik powstaje przy użyciu tego samego efektu TSL co w studiu. Tryb kolorowy zachowuje barwy oryginału, a monochromatyczny tworzy stonowaną kompozycję typograficzną.",
+      "tips": [
+        "Używaj mniejszych znaków, aby zachować twarze i drobne szczegóły.",
+        "Zwiększ rozmiar komórki, aby uzyskać odważny plakat lub celowo abstrakcyjny efekt.",
+        "Wymieszaj odrobinę oryginału za pomocą regulatora ilości, aby uzyskać delikatniejszy efekt."
+      ],
+      "question": "Czy konwerter ASCII eksportuje edytowalny tekst?",
+      "answer": "To narzędzie tworzy obróbkę wizualną ASCII i eksportuje obraz lub wideo. Znaki są renderowane jako część obrazu, a nie dokument w postaci zwykłego tekstu. Użyj elementów sterujących rozmiarem znaku i kolorem, aby ukształtować wygląd przed pobraniem."
+    },
+    "dither": {
+      "name": "Dithering",
+      "summary": "Zredukuj obrazy do dwukolorowej palety z uporządkowanymi wzorami i wyrazistą drukowaną fakturą.",
+      "about": "Dithering reprezentuje tony pośrednie poprzez rozmieszczenie pikseli z ograniczonej palety. To narzędzie wykorzystuje dwukolorowy efekt Bit Dither Melt. Wybierz próg, Bayer 2 × 2, Bayer 4 × 4, Bayer 8 × 8 lub szum przeplatany, a następnie ustaw kolory pierwszego planu i tła. Kontrast, gamma i siła wzoru zapewniają lepszą kontrolę w ustawieniach zaawansowanych.",
+      "tips": [
+        "Zacznij od Bayer 4 × 4, aby uzyskać zrównoważony, rozpoznawalny wzór.",
+        "Wybierz kolory pierwszego planu i tła z wystarczającą separacją.",
+        "Użyj większej skali wzoru, aby uzyskać masywną teksturę inspirowaną nadrukiem."
+      ],
+      "question": "Jaka jest różnica pomiędzy progiem a ditheringiem Bayer?",
+      "answer": "Próg przypisuje każdą próbkę bezpośrednio do jednego z dwóch kolorów. Bayer wykorzystuje uporządkowaną matrycę do rozłożenia tych kolorów i sugeruje bardziej pośrednie tony. Rozmiary wzorów zmieniają teksturę; żadna z opcji nie dodaje do palety ukrytego trzeciego koloru."
+    },
+    "halftone": {
+      "name": "Raster",
+      "summary": "Nadaj fotografii i filmom kropkowaną, inspirowaną nadrukiem powierzchnię z regulowaną wielkością kropki.",
+      "about": "Raster wykorzystuje zwykłą obróbkę kropkową w celu reinterpretacji obrazu źródłowego. W opcji Melt rozmiar komórki kontroluje skalę drukowanej tekstury, Ilość łączy obróbkę z oryginałem, a Kolor wybiera pomiędzy efektem kolorowym i monochromatycznym. Jest przydatny w przypadku obrazów redakcyjnych, plakatów z teksturą, okładek i graficznych ruchomych teł.",
+      "tips": [
+        "Wypróbuj większy rozmiar punktu w przypadku obrazów oglądanych z dużej odległości.",
+        "Użyj mniejszego rozmiaru, jeśli twarz lub produkt ma pozostać rozpoznawalny.",
+        "Porównaj wersję kolorową i monochromatyczną przed wyborem ostatecznego efektu."
+      ],
+      "question": "Czy mogę dostosować punkty rastra bez zmiany rozmiaru pliku?",
+      "answer": "Tak. Skala efektu zmienia siatkę punktów niezależnie od ustawienia rozmiaru wyjściowego. Można przetestować drobny lub gruby wzór, zachowując te same wymiary wyjściowe. Podgląd wykorzystuje te same parametry efektu, co pobrany wynik."
+    },
+    "cyanotype": {
+      "name": "Cyjanotypia",
+      "summary": "Utwórz niebieską obróbkę odbitek fotograficznych za pomocą atramentu, papieru, kontroli ekspozycji i tekstury.",
+      "about": "Cyjanotypia jest inspirowana charakterystycznym niebiesko-papierowym wyglądem odbitek fotograficznych. Melt odtwarza cyfrowo tę obróbkę wizualną: ekspozycja i kontrast kształtują obiekt, kolory atramentu i papieru definiują paletę, a zaawansowane elementy sterujące dodają efekt sprania, nierówności, ziarnistości, włókien i blaknięcia krawędzi. Jest to efekt cyfrowy, a nie proces drukowania chemicznego.",
+      "tips": [
+        "Najpierw wyreguluj ekspozycję, aby obiekt był czytelny.",
+        "Zmieniaj tusz i papier, aby zachować spójną paletę.",
+        "Użyj delikatnego ziarna i efektu sprania, aby zdjęcie pozostało na pierwszym planie."
+      ],
+      "question": "Czy mogę zmienić kolor niebieski i papierowy?",
+      "answer": "Tak. Podstawowe ustawienia obejmują kolor atramentu i papieru. Otwórz ustawienia zaawansowane, aby dostosować gęstość, efekt sprania, teksturę, włókna i krawędzie. Wszystko jest renderowane lokalnie tym samym efektem cyjanotypii co w pełnym edytorze Melt."
+    },
+    "crt": {
+      "name": "CRT",
+      "summary": "Dodaj linie skanowania, maski wyświetlania, krzywiznę i poświatę, aby uzyskać efekt retro na ekranie.",
+      "about": "Filtr inspirowany CRT zmienia wygląd wyświetlacza, zamiast po prostu nakładać paski na obraz. Melt łączy w sobie konfigurowalną maskę ekranu, linie skanowania, krzywiznę, zbieżność i poświatę. Podstawowe elementy sterujące eksponują główny wygląd; ustawienia zaawansowane umożliwiają dostosowanie dokładniejszego wyświetlania i właściwości tonalnych. Wypróbuj go na typografii, grafice, obrazach gier lub krótkim klipie wideo.",
+      "tips": [
+        "Kiedy źródło zawiera mały tekst, zachowaj subtelność linii skanowania.",
+        "Używaj krzywizny i oszczędnego świecenia, aby uzyskać czystszy wyświetlacz retro.",
+        "Porównaj dostępne wzory masek, aby znaleźć teksturę pasującą do tematu."
+      ],
+      "question": "Czy CRT to to samo, co filtr VHS?",
+      "answer": "Ten konwerter koncentruje się na obróbce wyświetlacza retro: maskach ekranowych, liniach skanowania, krzywiźnie i blasku. Nie pretenduje do symulowania każdego aspektu przepływu pracy z taśmą analogową. Rezultatem jest stylizowany efekt cyfrowy, który można regulować za pomocą elementów sterujących Melt."
+    },
+    "posterize": {
+      "name": "Posteryzacja",
+      "summary": "Uprość ciągłe tony do mniejszej liczby poziomów kolorów w przypadku grafik przypominających plakaty.",
+      "about": "Posteryzacja zmniejsza liczbę poziomów tonalnych używanych do przedstawienia obrazu. Niższe poziomy tworzą szerokie, wyraźnie oddzielone obszary kolorów; wyższe wartości powodują zachowanie bardziej subtelnych przejść. Kontrola ilości w Melt łączy skwantowany obraz ze źródłem. Dzięki temu narzędzie jest przydatne w przypadku badań graficznych, materiałów do mediów społecznościowych i materiałów filmowych, które mają bardziej płaski, ilustracyjny wygląd.",
+      "tips": [
+        "Zacznij od sześciu poziomów, a następnie obniż wartość, aby uzyskać silniejszy wygląd graficzny.",
+        "Zwiększ liczbę poziomów, gdy odcienie lub gradienty skóry staną się zbyt ostre.",
+        "Użyj opcji Ilość, aby połączyć obróbkę zamiast zmieniać oryginalny plik."
+      ],
+      "question": "Czy posteryzacja wykorzystuje ten sam proces co dithering?",
+      "answer": "Nie. Posteryzacja kwantyzuje kolory na mniejszą liczbę poziomów. Dithering rozdziela ograniczoną paletę na wzory, aby zasugerować tony pośrednie. Tworzą różne tekstury; wypróbuj powiązany konwerter Dither, jeśli chcesz uzyskać widoczny wzór pikseli."
+    }
+  },
+  "reload": "Wczytaj narzędzie ponownie",
+  "breadcrumbs": "Ścieżka nawigacji",
+  "title": "Darmowy konwerter z efektem {{style}}",
+  "chooseFile": "Wybierz plik",
+  "dropFile": "Upuść tutaj obraz lub wideo",
+  "dropHintFile": "Obrazy do 50 MiB · bezpieczny SVG do 256 KiB · wideo do 512 MiB",
+  "file": "Plik"
+}

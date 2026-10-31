@@ -1,13 +1,12 @@
-import { registerFeatureTranslations } from "../../../state/i18n/feature-resources";
-registerFeatureTranslations("color", {
-  en: {
-    sample: "Pick a screen color",
-    failed: "Screen color sampling failed. Try again.",
-    pending: "Choose a color on screen, or press Escape to cancel.",
-  },
-  fr: {
-    sample: "Prélever une couleur à l’écran",
-    failed: "Le prélèvement a échoué. Réessayez.",
-    pending: "Choisissez une couleur à l’écran, ou appuyez sur Échap pour annuler.",
-  },
-});
+import {
+  localeResources,
+  registerFeatureTranslations,
+} from "../../../state/i18n/feature-resources";
+import en from "./locales/en.json";
+import fr from "./locales/fr.json";
+
+export const messages = localeResources(
+  { en, fr },
+  import.meta.glob("./locales/*.json", { eager: true, import: "default" }),
+);
+registerFeatureTranslations("color", messages);

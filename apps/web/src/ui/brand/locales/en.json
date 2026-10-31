@@ -1,0 +1,5 @@
+{
+  "working": "{{brandName}} is working",
+  "loading": "{{brandName}} is loading",
+  "preparing": "{{brandName}} is preparing your creation"
+}

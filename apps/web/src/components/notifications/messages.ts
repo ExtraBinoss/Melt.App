@@ -1,14 +1,9 @@
-import { registerFeatureTranslations } from "../../state/i18n/feature-resources";
-export const messages = {
-  en: {
-    close: "Dismiss notification",
-    copy: "Copy message and diagnostics",
-    details: "Technical details",
-  },
-  fr: {
-    close: "Fermer la notification",
-    copy: "Copier le message et le diagnostic",
-    details: "Détails techniques",
-  },
-};
+import { localeResources, registerFeatureTranslations } from "../../state/i18n/feature-resources";
+import en from "./locales/en.json";
+import fr from "./locales/fr.json";
+
+export const messages = localeResources(
+  { en, fr },
+  import.meta.glob("./locales/*.json", { eager: true, import: "default" }),
+);
 registerFeatureTranslations("notices", messages);

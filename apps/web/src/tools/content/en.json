@@ -1,0 +1,153 @@
+{
+  "hubTitle": "Free creative tools. A little less ordinary.",
+  "hubIntro": "Turn an image or a short video into something with character. Six effects from the Melt engine, with local processing and controls you can actually understand.",
+  "titleImage": "Free {{style}} image converter",
+  "titleVideo": "Free {{style}} video converter",
+  "image": "Image",
+  "video": "Video",
+  "free": "Free tool",
+  "home": "Home",
+  "hub": "Free tools",
+  "local": "Processed on your device. No account, no upload.",
+  "chooseImage": "Choose an image",
+  "chooseVideo": "Choose a video",
+  "dropImage": "Drop your image here",
+  "dropVideo": "Drop your video here",
+  "dropHintImage": "PNG, JPEG, WebP, AVIF or GIF ≤ 50 MiB · safe SVG ≤ 256 KiB",
+  "dropHintVideo": "A browser-supported video · up to 512 MiB",
+  "sample": "Try a sample",
+  "replace": "Choose another file",
+  "preparing": "Preparing your canvas…",
+  "loadingEngine": "Preparing Melt…",
+  "exporting": "Exporting your result…",
+  "parameters": "Make it yours",
+  "advanced": "Advanced controls",
+  "basic": "Basic controls",
+  "format": "Download format",
+  "downloadImage": "Download image",
+  "downloadVideo": "Download video",
+  "cancel": "Cancel",
+  "retry": "Try again",
+  "error": "This operation could not be completed.",
+  "readError": "This file could not be opened.",
+  "details": "Details",
+  "resolution": "Maximum edge",
+  "outputSize": "Output: {{width}} × {{height}} px",
+  "compare": "Hold to compare",
+  "play": "Play preview",
+  "pause": "Pause preview",
+  "seek": "Preview time",
+  "clipStart": "Clip starts at",
+  "clipLength": "Clip length",
+  "clipHint": "Choose up to 60 seconds from your video. Larger files are not uploaded.",
+  "sourceDuration": "Source duration: {{seconds}} s",
+  "mute": "Keep original audio",
+  "silentPreview": "The preview is silent. Original audio is kept in the download when enabled.",
+  "progress": "{{percent}}% rendered",
+  "resultReady": "Your download is ready.",
+  "auto": "Automatic",
+  "moreTools": "Try another treatment",
+  "about": "How the {{style}} effect works",
+  "tips": "A few ways to shape the result",
+  "how": "How to convert your {{media}}",
+  "steps": [
+    "Choose a local file or drag it into the preview. The renderer is loaded only when you need it.",
+    "Adjust the effect and compare it with the original. Basic controls stay close; advanced settings are optional.",
+    "Choose your output settings and download the result. Processing and encoding happen in your browser."
+  ],
+  "imageIntro": "Adjust the treatment on a still image and download a PNG, JPEG or WebP. The output keeps the source aspect ratio and can be up to 1920 pixels on its longest edge.",
+  "videoIntro": "Apply the treatment to a selected clip and download MP4 or WebM, depending on your browser. Set the starting point and a duration of up to 60 seconds; the original audio can be kept.",
+  "faq": "Good to know",
+  "privacyQ": "Is my file sent to a server?",
+  "privacyA": "No. The file is read locally and processed with the Melt renderer in your browser. The page can download application code and the optional example image, but it does not upload your selected media.",
+  "outputQ": "What can I download?",
+  "outputImageA": "Choose PNG for a lossless image, JPEG for a compact photograph, or WebP when supported. The longest output edge is capped at 1920 pixels and smaller sources are not enlarged. The ASCII treatment is exported visually, not as a text file.",
+  "outputVideoA": "Choose automatic encoding, MP4 or WebM. Supported codecs depend on your browser. The selected clip can be up to 60 seconds, at 30 fps, with up to 1920 pixels on its longest edge. Audio is included when enabled and present in the source.",
+  "controlsQ": "Can I change the look after I choose a file?",
+  "controlsA": "Yes. The effect stays adjustable while you preview. Change its parameters, compare the source and result, and download again. The source file is not modified. Your selection is released when you leave the tool.",
+  "noFile": "Choose a file to start.",
+  "fileTooLarge": "This file exceeds the size supported by this tool.",
+  "invalidFile": "Choose a supported file for this tool.",
+  "leave": "Leave this page and cancel the current export?",
+  "styles": {
+    "ascii": {
+      "name": "ASCII",
+      "summary": "Turn photographs into grids of characters, from fine typographic detail to bold blocks of text.",
+      "about": "ASCII art builds an image from characters instead of a smooth surface. Melt samples the brightness of each cell and uses its own glyph atlas to draw denser or lighter symbols. The result is rendered by the same TSL effect used in the studio. Color mode keeps tones from the source; monochrome produces a restrained typographic image.",
+      "tips": [
+        "Use smaller characters to preserve faces and small details.",
+        "Increase the cell size for a bold poster or a deliberately abstract result.",
+        "Mix in a little of the original with the Amount control for a softer treatment."
+      ],
+      "question": "Does the ASCII converter export editable text?",
+      "answer": "This tool creates a visual ASCII treatment and exports an image or video. The characters are rendered as part of the picture, rather than a plain-text document. Use the character-size and color controls to shape the look before downloading."
+    },
+    "dither": {
+      "name": "Dither",
+      "summary": "Reduce images to a two-color palette with ordered patterns and a distinct printed texture.",
+      "about": "Dithering represents intermediate tones by arranging pixels from a limited palette. This tool uses Melt’s two-color Bit Dither effect. Choose threshold, Bayer 2 × 2, Bayer 4 × 4, Bayer 8 × 8 or interleaved noise, then set the foreground and background colors. Contrast, gamma and pattern strength provide finer control in the advanced settings.",
+      "tips": [
+        "Start with Bayer 4 × 4 for a balanced, recognizable pattern.",
+        "Choose foreground and background colors with enough separation.",
+        "Use a larger pattern scale for a chunky print-inspired texture."
+      ],
+      "question": "What is the difference between threshold and Bayer dithering?",
+      "answer": "Threshold assigns each sample directly to one of the two colors. Bayer uses an ordered matrix to distribute those colors and suggest more intermediate tones. The pattern sizes change the texture; neither option adds a hidden third color to the palette."
+    },
+    "halftone": {
+      "name": "Halftone",
+      "summary": "Give photography and footage a dotted, print-inspired surface with an adjustable dot size.",
+      "about": "Halftone uses a regular dot treatment to reinterpret the source image. In Melt, the cell size controls the scale of the printed texture, Amount mixes the treatment with the original, and Color chooses between a colored and monochrome result. It is useful for editorial images, textured posters, cover art and graphic motion backgrounds.",
+      "tips": [
+        "Try a larger dot size for imagery viewed at a distance.",
+        "Use a smaller size when a face or product needs to stay recognizable.",
+        "Compare colored and monochrome versions before choosing the final treatment."
+      ],
+      "question": "Can I adjust the halftone dots without resizing my file?",
+      "answer": "Yes. The effect’s scale changes its dot grid independently of the output-size setting. You can test a fine or coarse pattern while keeping the same output dimensions. The preview uses the same effect parameters as the downloaded result."
+    },
+    "cyanotype": {
+      "name": "Cyanotype",
+      "summary": "Create a blue photographic-print treatment with ink, paper, exposure and texture controls.",
+      "about": "Cyanotype is inspired by the characteristic blue-and-paper appearance of photographic prints. Melt recreates that visual treatment digitally: exposure and contrast shape the subject, ink and paper colors define the palette, and the advanced controls add wash, unevenness, grain, fibers and edge fade. It is a digital effect, not a chemical printing process.",
+      "tips": [
+        "Adjust exposure first so the subject is readable.",
+        "Change ink and paper together to keep a coherent palette.",
+        "Use subtle grain and wash when you want the photograph to remain the focus."
+      ],
+      "question": "Can I change the blue and paper colors?",
+      "answer": "Yes. Ink Color and Paper Color are available in the basic controls. Open Advanced for density, wash, texture, fibers and edge treatment. All of these settings are rendered locally using the same cyanotype effect as the full Melt editor."
+    },
+    "crt": {
+      "name": "CRT",
+      "summary": "Add scanlines, display masks, curvature and glow for a retro screen treatment.",
+      "about": "A CRT-inspired filter changes the appearance of the display rather than simply laying stripes over the picture. Melt combines a configurable screen mask, scanlines, curvature, convergence and glow. The basic controls expose the main look; advanced settings let you adjust the finer display and tonal properties. Try it on typography, artwork, game imagery or a short video clip.",
+      "tips": [
+        "Keep scanlines subtle when the source contains small text.",
+        "Use curvature and glow sparingly for a cleaner retro display.",
+        "Compare the available mask patterns to find a texture that suits the subject."
+      ],
+      "question": "Is CRT the same as a VHS filter?",
+      "answer": "This converter focuses on a retro display treatment: screen masks, scanlines, curvature and glow. It does not claim to simulate every aspect of an analog tape workflow. The result is a stylized digital effect that you can adjust with Melt’s controls."
+    },
+    "posterize": {
+      "name": "Posterize",
+      "summary": "Simplify continuous tones into fewer color levels for graphic, poster-like artwork.",
+      "about": "Posterization reduces the number of tonal levels used to represent an image. Lower levels create broad, clearly separated color regions; higher values retain more subtle transitions. Melt’s Amount control blends the quantized image with the source. This makes the tool useful for graphic studies, social assets and footage that benefits from a flatter, more illustrative look.",
+      "tips": [
+        "Begin with six levels, then lower the value for a stronger graphic look.",
+        "Increase the level count when skin tones or gradients become too harsh.",
+        "Use Amount to blend the treatment instead of changing the original file."
+      ],
+      "question": "Does posterization use the same process as dithering?",
+      "answer": "No. Posterization quantizes colors into a smaller number of levels. Dithering distributes a limited palette into patterns to suggest intermediate tones. They produce different textures; try the related Dither converter when you want a visible pixel pattern."
+    }
+  },
+  "reload": "Reload tool",
+  "breadcrumbs": "Breadcrumb",
+  "title": "Free {{style}} converter",
+  "chooseFile": "Choose a file",
+  "dropFile": "Drop an image or video here",
+  "dropHintFile": "Images up to 50 MiB · safe SVG up to 256 KiB · videos up to 512 MiB",
+  "file": "File"
+}

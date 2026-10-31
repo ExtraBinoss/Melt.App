@@ -1,0 +1,15 @@
+{
+  "presets": "Presets",
+  "color": "Guide color",
+  "title": "Guide presets",
+  "description": "Append an editable format frame, centered inside the current target.",
+  "category": "Format category",
+  "all": "All",
+  "social": "Social",
+  "video": "Video",
+  "horizontal": "Horizontal",
+  "vertical": "Vertical",
+  "addHorizontal": "Add horizontal",
+  "addVertical": "Add vertical",
+  "append": "Append {{name}} guides"
+}

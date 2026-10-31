@@ -1,41 +1,12 @@
-import { registerFeatureTranslations } from "../../../state/i18n/feature-resources";
+import {
+  localeResources,
+  registerFeatureTranslations,
+} from "../../../state/i18n/feature-resources";
+import en from "./locales/en.json";
+import fr from "./locales/fr.json";
 
-export const messages = {
-  en: {
-    title: "Customize dock",
-    scrollUp: "Scroll tools up",
-    scrollDown: "Scroll tools down",
-    pinned: "Pinned shortcuts",
-    available: "Available commands",
-    search: "Search commands",
-    pin: "Pin {{name}}",
-    unpin: "Unpin {{name}}",
-    unpinned: "{{name}} unpinned",
-    options: "Shortcut options for {{name}}",
-    up: "Move {{name}} up",
-    down: "Move {{name}} down",
-    hint: "Drag shortcuts to reorder. Use the arrow buttons here with a keyboard.",
-    limit: "Pin up to {{count}} shortcuts.",
-    empty: "No matching commands",
-    reordered: "Shortcut order updated",
-  },
-  fr: {
-    title: "Personnaliser le dock",
-    scrollUp: "Faire défiler les outils vers le haut",
-    scrollDown: "Faire défiler les outils vers le bas",
-    pinned: "Raccourcis épinglés",
-    available: "Commandes disponibles",
-    search: "Rechercher une commande",
-    pin: "Épingler {{name}}",
-    unpin: "Désépingler {{name}}",
-    unpinned: "{{name}} désépinglé",
-    options: "Options du raccourci {{name}}",
-    up: "Monter {{name}}",
-    down: "Descendre {{name}}",
-    hint: "Glissez les raccourcis pour les déplacer. Au clavier, utilisez les flèches ici.",
-    limit: "Épinglez jusqu’à {{count}} raccourcis.",
-    empty: "Aucune commande correspondante",
-    reordered: "Ordre des raccourcis modifié",
-  },
-};
+export const messages = localeResources(
+  { en, fr },
+  import.meta.glob("./locales/*.json", { eager: true, import: "default" }),
+);
 registerFeatureTranslations("dock", messages);

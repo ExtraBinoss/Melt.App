@@ -1,43 +1,12 @@
-import { registerFeatureTranslations } from "../../../state/i18n/feature-resources";
+import {
+  localeResources,
+  registerFeatureTranslations,
+} from "../../../state/i18n/feature-resources";
+import en from "./locales/library/en.json";
+import fr from "./locales/library/fr.json";
 
-export const messages = {
-  en: {
-    modeFilter: "Content mode",
-    all: "All",
-    static: "Static",
-    motion: "Motion",
-    navigation: "Studio navigation",
-    projects: "Projects",
-    templates: "Templates",
-    community: "Community",
-    soon: "Soon",
-    recent: "Recent projects",
-    openRecent: "Open recent project {{name}}",
-    empty: "Your next projects will appear here.",
-    loading: "Loading recent projects…",
-    unavailable: "Recent projects are unavailable.",
-    previewUnavailable: "Project preview is unavailable.",
-    retry: "Try again",
-    preferences: "Preferences",
-  },
-  fr: {
-    modeFilter: "Mode du contenu",
-    all: "Tous",
-    static: "Statique",
-    motion: "Motion",
-    navigation: "Navigation de l’atelier",
-    projects: "Projets",
-    templates: "Templates",
-    community: "Communauté",
-    soon: "Bientôt",
-    recent: "Projets récents",
-    openRecent: "Ouvrir le projet récent {{name}}",
-    empty: "Vos prochains projets apparaîtront ici.",
-    loading: "Chargement des projets récents…",
-    unavailable: "Les projets récents sont indisponibles.",
-    previewUnavailable: "L’aperçu du projet est indisponible.",
-    retry: "Réessayer",
-    preferences: "Préférences",
-  },
-};
+export const messages = localeResources(
+  { en, fr },
+  import.meta.glob("./locales/library/*.json", { eager: true, import: "default" }),
+);
 registerFeatureTranslations("library", messages);

@@ -1,0 +1,47 @@
+{
+  "tools": "Strumenti gratuiti",
+  "features": "Funzionalità",
+  "faq": "Le risposte alle tue domande.",
+  "faqNav": "FAQ",
+  "studio": "Lo studio",
+  "resources": "Esplora",
+  "templates": "Modelli",
+  "editor": "Apri l'editor",
+  "code": "Codice sorgente",
+  "changes": "Registro modifiche",
+  "feedback": "Feedback",
+  "license": "Licenza MIT",
+  "footerDescription": "Un po’ di magia. Tanto da creare. Immagini, testo e movimento, insieme nel tuo browser.",
+  "footerNote": "Open source. Realizzato per il tuo browser.",
+  "backTop": "Torna all'inizio",
+  "language": "Lingua",
+  "images": "Immagine",
+  "videos": "Video",
+  "try": "Prova Melt",
+  "faqItems": [
+    {
+      "question": "Cosa posso fare con Melt?",
+      "answer": "Crea poster, immagini per i social, tipografia animata e brevi composizioni in movimento. Combina immagini, testo, forme e video, applica effetti e anima con le preimpostazioni o apri la timeline per un maggiore controllo."
+    },
+    {
+      "question": "Ho bisogno di un account?",
+      "answer": "No. Puoi iniziare da un modello o da una tela vuota direttamente nel tuo browser. Gli strumenti di conversione gratuiti funzionano anche senza registrazione."
+    },
+    {
+      "question": "Dove sono archiviati i miei progetti e file?",
+      "answer": "I progetti dell'editor vengono salvati in questo browser su questo dispositivo. Non vengono sincronizzati automaticamente con un altro browser o computer. Scarica un file di progetto modificabile per conservare un backup; la cancellazione dei dati del browser può rimuovere progetti locali. I file selezionati negli strumenti vengono elaborati localmente."
+    },
+    {
+      "question": "Devo imparare i fotogrammi chiave?",
+      "answer": "Inizia con una preimpostazione Movimento e regolane i tempi e l'intensità. Apri i dettagli facoltativi e la sequenza temporale dei fotogrammi chiave quando desideri modellare le singole proprietà. Animazioni semplici e dettagliate condividono lo stesso motore."
+    },
+    {
+      "question": "In che modo Melt è diverso da un editor video tradizionale?",
+      "answer": "Melt parte da una composizione a livelli: immagini, tipografia, effetti e movimento in un unico spazio di lavoro. È pensato per creazioni grafiche e brevi animazioni. Usa gli strumenti gratuiti per applicare rapidamente un effetto, poi esplora i modelli dello studio completo per avere più controlli di composizione e animazione."
+    },
+    {
+      "question": "Gli strumenti sono gratuiti e cosa posso scaricare?",
+      "answer": "Gli strumenti vengono eseguiti localmente senza un account o una filigrana aggiunta da Melt. Scarica immagini come PNG, JPEG o WebP e video come MP4 o WebM se supportato dal tuo browser. Le funzionalità di codifica video dipendono dal dispositivo e dal browser."
+    }
+  ]
+}

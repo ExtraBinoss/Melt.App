@@ -1,0 +1,14 @@
+{
+  "navigation": "Editor tools",
+  "properties": "Properties",
+  "layers": "Layers",
+  "motion": "Motion",
+  "tools": "Tools",
+  "export": "Export",
+  "close": "Close panel",
+  "dismiss": "Drag down to close",
+  "slider": "Adjust {{label}}",
+  "motionHint": "Switch to Motion to animate your creation.",
+  "enableMotion": "Switch to Motion",
+  "precision": "Precise value: {{label}}"
+}

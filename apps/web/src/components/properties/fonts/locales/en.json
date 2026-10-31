@@ -1,0 +1,39 @@
+{
+  "title": "Fonts",
+  "search": "Search fonts",
+  "searchPrefix": "Search",
+  "recent": "Recent",
+  "empty": "No matching fonts",
+  "categories": "Font category",
+  "all": "All",
+  "installed": "Installed",
+  "import": "Import font",
+  "loading": "Loading fonts…",
+  "installing": "Adding font…",
+  "sample": "Ideas take shape.",
+  "sampleLoading": "Loading preview…",
+  "sampleUnavailable": "Preview unavailable",
+  "rendering": "Rendering {{font}}…",
+  "renderUnavailable": "{{font}} could not be previewed",
+  "loadFailed": "The font library could not be loaded. Try again.",
+  "installFailed": "This font could not be added. Try again.",
+  "importFailed": "This font could not be imported. Choose a valid TTF or OTF file.",
+  "tooLarge": "Choose a font smaller than 32 MB.",
+  "importHint": "TTF or OTF · saved in your library",
+  "localUnavailable": "System fonts are unavailable. You can import a font file.",
+  "unavailable": "Font unavailable",
+  "filter": {
+    "sans": "Sans",
+    "serif": "Serif",
+    "mono": "Mono",
+    "display": "Display",
+    "handwriting": "Handwriting"
+  },
+  "category": {
+    "sans": "Sans serif",
+    "serif": "Serif",
+    "mono": "Monospace",
+    "display": "Display",
+    "handwriting": "Handwriting"
+  }
+}

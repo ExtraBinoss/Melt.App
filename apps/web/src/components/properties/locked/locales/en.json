@@ -1,0 +1,6 @@
+{
+  "locked": "This layer is locked",
+  "multiple": "Selected layers are locked",
+  "parents": "Blocking groups: {{names}}",
+  "unlock": "Unlock"
+}

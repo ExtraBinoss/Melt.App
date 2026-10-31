@@ -1,0 +1,19 @@
+{
+  "modeFilter": "Mode du contenu",
+  "all": "Tous",
+  "static": "Statique",
+  "motion": "Motion",
+  "navigation": "Navigation de l’atelier",
+  "projects": "Projets",
+  "templates": "Templates",
+  "community": "Communauté",
+  "soon": "Bientôt",
+  "recent": "Projets récents",
+  "openRecent": "Ouvrir le projet récent {{name}}",
+  "empty": "Vos prochains projets apparaîtront ici.",
+  "loading": "Chargement des projets récents…",
+  "unavailable": "Les projets récents sont indisponibles.",
+  "previewUnavailable": "L’aperçu du projet est indisponible.",
+  "retry": "Réessayer",
+  "preferences": "Préférences"
+}

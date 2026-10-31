@@ -1,0 +1,8 @@
+{
+  "add": "Add keyframe · {{property}}",
+  "update": "Update keyframe · {{property}}",
+  "armed": "Animated property · {{property}}",
+  "macro": "This preset changes several parameters. Animate its individual parameters instead.",
+  "inactive": "Move the playhead inside this layer's clip to edit its properties.",
+  "visibility": "Visibility"
+}
