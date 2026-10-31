@@ -6,6 +6,7 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Buffer the infinite-canvas Motion clock until an actual frame is displayed. Credit normal frame preparation time but exclude cold decode/shader stalls, preventing unseen time from accumulating and rushing playback on recovery.
 - Share one pinned GPU frame and playback decoder between synchronized copies of the same video sample; keep different trims and source variants independent. Bound large forward catch-up seeks and reuse exact original cursors during sequential export. Let continuous previews present through the ordered GPU queue while preserving exact export fences and native upload ownership.
 - Keep editing handles above composition controls and isolate canvas layout; make infinite-canvas wheel zoom follow one bounded nearby target without queued catch-up, repeated constraint layout reads or per-frame moving-handle backdrop filters.
 - Match direct SVG multisample coverage between the editor, Motion preview and encoded video, while preserving authored effect/mask references; verify decoded MP4 vector edges and native analytical text.

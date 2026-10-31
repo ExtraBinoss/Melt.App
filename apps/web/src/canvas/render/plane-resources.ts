@@ -23,6 +23,7 @@ import {
   type WebGPURenderer,
 } from "three/webgpu";
 import { texture, uv } from "three/tsl";
+import { CanvasPlaybackBuffering } from "./playback-buffering";
 import { SceneProfileSource } from "./scene-profile-source";
 import { previewScale } from "./preview-quality";
 import { CanvasVideoProxyActivity } from "./video-proxy-activity";
@@ -60,6 +61,7 @@ const canvasOwners = new WeakMap<HTMLCanvasElement, PlaneResources>();
 /** Owns one display plane and a latest-only queue. GPU allocation begins at activation. */
 export class PlaneResources {
   readonly profile: SceneProfileSource;
+  private readonly buffering: CanvasPlaybackBuffering;
   private videoProxyActivity: CanvasVideoProxyActivity | null = null;
   private readonly profileVideo = new URLSearchParams(location.search).get("profileVideo") === "1";
   readonly placeholder = new DataTexture(new Uint8Array(4), 1, 1, RGBAFormat);
@@ -120,7 +122,9 @@ export class PlaneResources {
     private readonly fontResolver?: FontResolver,
     private readonly mediaResolver?: MediaSourceResolver,
     private readonly mediaResolverFor?: (projectId: string) => MediaSourceResolver,
+    holdPlayback?: () => () => void,
   ) {
+    this.buffering = new CanvasPlaybackBuffering(holdPlayback);
     this.maxTextureDimension = gpuTextureLimit(renderer);
     renderer.domElement.dataset.gpuTextureLimit = String(this.maxTextureDimension);
     this.placeholder.needsUpdate = true;
@@ -220,6 +224,7 @@ export class PlaneResources {
       ...(motionFrame ? { motionFrame } : {}),
       playback,
     };
+    this.buffering.pending(playback);
     if (this.latest) this.coalesced++;
     const fontTicket = presentation && this.fontPresenter?.capture(page, presentation.origin);
     this.latest = {
@@ -434,6 +439,7 @@ export class PlaneResources {
       this.canPresent(this.preparedRequest) &&
       this.presentedRevision !== this.preparedRevision
     ) {
+      this.buffering.presented();
       this.profile.presented(this.preparedRequest.page.id, this.preparedRevision);
       this.presentedRevision = this.preparedRevision;
       element.dataset.rendererReady = String(this.preparedRevision === this.revision);
@@ -483,6 +489,7 @@ export class PlaneResources {
   private report(error: unknown) {
     const message = error instanceof Error ? error.message : String(error);
     this.renderer.domElement.dataset.renderError = message;
+    this.buffering.presented();
     this.presenter?.unavailable();
     this.onError?.(formatUiError(error), errorDiagnostics(error));
   }
@@ -517,6 +524,7 @@ export class PlaneResources {
   dispose(): Promise<void> {
     if (this.disposal) return this.disposal;
     this.disposed = true;
+    this.buffering.presented();
     this.profile.dispose();
     this.videoProxyActivity?.dispose();
     this.videoProxyActivity = null;

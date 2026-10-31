@@ -19,7 +19,11 @@ vi.mock("@musart/render", async (original) => ({
 const result = () => ({ texture: new Texture(), width: 320, height: 200 });
 const origin = { projectId: "project-a", revision: 4 };
 const presentation = { origin, canonical: false };
-function fixture(renderer?: WebGPURenderer, resolverFor?: (id: string) => MediaSourceResolver) {
+function fixture(
+  renderer?: WebGPURenderer,
+  resolverFor?: (id: string) => MediaSourceResolver,
+  hold?: () => () => void,
+) {
   const target =
     renderer ??
     ({
@@ -28,7 +32,7 @@ function fixture(renderer?: WebGPURenderer, resolverFor?: (id: string) => MediaS
       compileAsync: vi.fn().mockResolvedValue(undefined),
       getRenderTarget: () => null,
     } as unknown as WebGPURenderer);
-  const resources = new PlaneResources(target, undefined, undefined, resolverFor);
+  const resources = new PlaneResources(target, undefined, undefined, resolverFor, hold);
   const release = resources.activate(new Scene(), new OrthographicCamera(), vi.fn());
   return { renderer: target, resources, release };
 }
@@ -186,4 +190,22 @@ test("an older resource's delayed disposal cannot hide the new canvas owner", as
   first.release();
   next.release();
   await next.resources.dispose();
+});
+
+test("canvas buffering ends at the real display draw, not GPU preparation, and cleans up on close", async () => {
+  const resume = vi.fn(),
+    hold = vi.fn(() => resume),
+    d = fixture(undefined, undefined, hold);
+  const page = createPage();
+  d.resources.submit(page, {}, presentation, undefined, true);
+  expect(hold).toHaveBeenCalledTimes(1);
+  await frame();
+  expect(resume).not.toHaveBeenCalled();
+  d.resources.present();
+  expect(resume).toHaveBeenCalledTimes(1);
+  d.resources.submit({ ...page }, {}, presentation, undefined, true);
+  expect(hold).toHaveBeenCalledTimes(2);
+  d.release();
+  await d.resources.dispose();
+  expect(resume).toHaveBeenCalledTimes(2);
 });

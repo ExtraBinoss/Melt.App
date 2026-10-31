@@ -347,7 +347,10 @@ export class MotionTransport {
   };
 
   /** Buffering parks the presentation clock, without changing Play or the authored document. */
-  holdPlayback = (): ((delayMs?: number) => void) => {
+  holdPlayback = (frameBudgetMs = 0): ((delayMs?: number) => void) => {
+    if (!Number.isFinite(frameBudgetMs) || frameBudgetMs < 0 || frameBudgetMs > 100)
+      throw new RangeError("Invalid playback frame budget.");
+    const heldAt = this.scheduler.now();
     if (this.disposed || !this.state.playing) return () => {};
     if (!this.clockHolds.size) {
       this.stopTick();
@@ -365,7 +368,8 @@ export class MotionTransport {
       if (!Number.isFinite(delayMs) || delayMs < 0)
         throw new RangeError("Invalid playback clock delay.");
       if (!this.clockHolds.delete(token) || this.clockHolds.size || !this.state.playing) return;
-      this.anchorClock = this.scheduler.now() + delayMs;
+      const now = this.scheduler.now();
+      this.anchorClock = now + delayMs - Math.min(frameBudgetMs, Math.max(0, now - heldAt));
       if (this.tickId === null) this.tickId = this.scheduler.request(this.tick);
     };
   };

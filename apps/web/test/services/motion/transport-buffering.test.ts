@@ -105,3 +105,22 @@ it("preserves ping-pong reverse direction while buffering instead of jumping to 
   expect(motionTimeToSeconds(d.transport.read().time)).toBeCloseTo(1.4);
   d.transport.dispose();
 });
+
+it("credits fast canvas frames but excludes a cold render stall instead of catching up", () => {
+  const d = fixture();
+  d.transport.play();
+  let release = d.transport.holdPlayback(1000 / 30);
+  d.advance(20);
+  release();
+  d.advance(10);
+  expect(motionTimeToSeconds(d.transport.read().time)).toBeCloseTo(0.03);
+  release = d.transport.holdPlayback(1000 / 30);
+  d.advance(1500);
+  expect(motionTimeToSeconds(d.transport.read().time)).toBeCloseTo(0.03);
+  release();
+  d.advance(10);
+  expect(motionTimeToSeconds(d.transport.read().time)).toBeCloseTo(0.073333);
+  expect(() => d.transport.holdPlayback(-1)).toThrow(RangeError);
+  expect(() => d.transport.holdPlayback(Infinity)).toThrow(RangeError);
+  d.transport.dispose();
+});

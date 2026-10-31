@@ -72,6 +72,8 @@ export class SceneController {
     this.playback = createPlaybackSource(engine);
     this.motion = createMotionTransport(engine);
   }
+  holdPlayback = () => this.motion.holdPlayback(1000 / 30);
+
   read = (): SceneFrame => {
     const playback = this.playback.read();
     if (playback) {

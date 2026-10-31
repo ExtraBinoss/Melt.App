@@ -78,8 +78,15 @@ export function CompositionPlane({
   const scene = useThree((state) => state.scene);
   const camera = useThree((state) => state.camera) as OrthographicCamera;
   const resources = useMemo(
-    () => new PlaneResources(renderer, fontResolver, undefined, mediaResolverFor),
-    [renderer, fontResolver, mediaResolverFor],
+    () =>
+      new PlaneResources(
+        renderer,
+        fontResolver,
+        undefined,
+        mediaResolverFor,
+        controller.holdPlayback,
+      ),
+    [renderer, fontResolver, mediaResolverFor, controller],
   );
   useFrame(() => density.prepare(renderer), -1);
   useEffect(() => {
