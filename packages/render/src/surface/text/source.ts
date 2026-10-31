@@ -188,7 +188,7 @@ export class TextSources {
       for (const layer of byParent.get(parents.pop()!) ?? []) {
         if (!layer.visible || (layer.opacity === 0 && page.motion?.mode !== "motion")) continue;
         if (layer.kind === "group") parents.push(layer.id);
-        if (layer.kind !== "text") continue;
+        if (layer.kind !== "text" || layer.spatial?.enabled) continue;
         this.assertOpen();
         const key = `text:${textResourceKey(layer)}`;
         let resource = this.cache.get<TextResource | MorphResource>(key);

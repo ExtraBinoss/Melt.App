@@ -1,6 +1,6 @@
 import {
   isVideoAsset,
-  isImageAsset,
+  isEmbeddedAsset,
   isAudioAsset,
   assetOriginalIdentity,
   type Asset,
@@ -83,7 +83,7 @@ export class AssetIdentities {
       // Verify both current content and its memoized identity: mutable external assets
       // must not donate an old token after changing their dataUrl.
       if (
-        isImageAsset(original) &&
+        isEmbeddedAsset(original) &&
         previous?.dataUrl === original.dataUrl &&
         original.dataUrl === asset.dataUrl
       ) {

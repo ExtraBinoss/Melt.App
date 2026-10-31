@@ -15,6 +15,7 @@ import { useTranslation } from "react-i18next";
 import { toolAtom } from "../../state/session/editor";
 import { ToolbarScroll } from "./dock/ToolbarScroll";
 import { IconButton } from "../shared/IconButton";
+import { SpatialLibrary } from "../spatial/SpatialLibrary";
 import { ShapeToolSlot } from "../assets/ShapeToolSlot";
 import { Separator } from "../ui/separator";
 import { MagicSearch, type MagicSearchProps, type SearchSurface } from "../search/MagicSearch";
@@ -94,6 +95,7 @@ const StaticTools = memo(function StaticTools({ engine }: { engine: EnginePort }
         </IconButton>
       ))}
       <ShapeToolSlot engine={engine} />
+      <SpatialLibrary engine={engine} />
     </>
   );
 });

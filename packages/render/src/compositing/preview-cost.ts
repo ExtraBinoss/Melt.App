@@ -92,7 +92,10 @@ export function estimatePreviewCost(
     seen.add(key);
     let w = rasterExtent(l.width, density),
       h = rasterExtent(l.height, density);
-    if (l.kind === "group") children(l.id, l.width, l.height, density, fixed, window);
+    if (l.spatial?.enabled) {
+      if (fixed) fixedBytes += w * h * 60;
+      else scaledBytes += w * h * 60;
+    } else if (l.kind === "group") children(l.id, l.width, l.height, density, fixed, window);
     else if (l.kind !== "image" && l.kind !== "video")
       target(w, h, fixed, false, vectorAntialias && !fixed && l.kind === "vector" ? 4 : 0);
     else {
@@ -146,6 +149,7 @@ export function estimatePreviewCost(
   // Shared effect scratch/backdrop are high-water resources, not one pair per layer.
   fixedBytes += scratch + backdrop;
   if (page.colorSpace === "cmyk") fixedBytes += PRINT_PROOF_BYTES;
+  if (page.layers.some((layer) => layer.spatial?.enabled)) fixedBytes += 40 * 1024 * 1024;
   return {
     bytes: originalBytes + fixedBytes + scaledBytes,
     originalBytes,

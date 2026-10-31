@@ -7,6 +7,7 @@ import {
   createLayer,
   createPage,
   createProject,
+  createSpatialLayer,
   EditorEngine,
   evaluateMotion,
   extractMotionAnimationPreset,
@@ -20,13 +21,22 @@ import {
   type MotionAnimationPreset,
 } from "../../src/index";
 const time = (value: number) => ({ value: Math.round(value * 1000), rate: 1000 });
-function fixture(kind: "rectangle" | "text" = "rectangle") {
+function fixture(kind: "rectangle" | "text" = "rectangle", spatial = false) {
   const engine = new EditorEngine(
     createProject({
       pages: [
         createPage({
           id: "page",
-          layers: [createLayer(kind, { id: "subject", x: 100, y: 80, width: 200, height: 100 })],
+          layers: [
+            createLayer(kind, {
+              id: "subject",
+              x: 100,
+              y: 80,
+              width: 200,
+              height: 100,
+              ...(spatial ? { spatial: createSpatialLayer("extrude") } : {}),
+            }),
+          ],
         }),
       ],
     }),
@@ -56,7 +66,17 @@ describe("editable motion actions", () => {
     );
     for (const preset of MOTION_ANIMATION_PRESETS) {
       validateMotionAnimationPreset(preset);
-      const f = fixture(preset.category === "typography" ? "text" : "rectangle");
+      const spatial = preset.channels.some(
+        (channel) =>
+          channel.target.kind === "layer" && channel.target.property.startsWith("spatial."),
+      );
+      if (spatial) {
+        const flat = fixture(),
+          before = flat.engine.getSnapshot();
+        expect(() => flat.apply(preset.id)).toThrow("Missing animation target");
+        expect(flat.engine.getSnapshot()).toBe(before);
+      }
+      const f = fixture(preset.category === "typography" ? "text" : "rectangle", spatial);
       f.apply(preset.id);
       const halfway = f.sample(0.5);
       f.sample(0.99);

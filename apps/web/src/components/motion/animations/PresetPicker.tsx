@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import {
   ANIMATION_CATEGORIES,
   MOTION_ANIMATION_PRESETS,
+  type Layer,
   type EnginePort,
   type MotionAnimationPreset,
 } from "@musart/core";
@@ -19,7 +20,16 @@ import { HorizontalScroll } from "../../shared/scroll/HorizontalScroll";
 import "./messages";
 import "./animations.css";
 
-function compatible(preset: MotionAnimationPreset, kind: string) {
+function compatible(preset: MotionAnimationPreset, kind: string, subject?: Layer) {
+  const spatial = preset.channels.filter(
+    (channel) => channel.target.kind === "layer" && channel.target.property.startsWith("spatial."),
+  );
+  if (spatial.length && !subject?.spatial?.enabled) return false;
+  if (
+    spatial.some((channel) => channel.target.property === "spatial.depth") &&
+    subject?.spatial?.source !== "extrude"
+  )
+    return false;
   return (
     !preset.effects.some((effect) => effect.type === "morph") ||
     kind === "text" ||
@@ -31,9 +41,11 @@ export function PresetPicker({
   engine,
   apply,
   subjectKind = "image",
+  subject,
 }: {
   engine: EnginePort;
   subjectKind?: string;
+  subject?: Layer;
   apply: (preset: MotionAnimationPreset) => void;
 }) {
   const { t } = useTranslation("animations");
@@ -75,13 +87,13 @@ export function PresetPicker({
         : saved.map((record) => record.preset)
       ).filter(
         (preset) =>
-          compatible(preset, subjectKind) &&
+          compatible(preset, subjectKind, subject) &&
           (category === "all" || preset.category === category) &&
           `${preset.name} ${t(`category.${preset.category}`)}`
             .toLocaleLowerCase()
             .includes(query.toLocaleLowerCase()),
       ),
-    [source, saved, category, query, t, subjectKind],
+    [source, saved, category, query, t, subjectKind, subject],
   );
   async function more() {
     if (!before || !store || busy) return;
@@ -128,8 +140,9 @@ export function PresetPicker({
           {t("count", {
             count:
               source === "library"
-                ? MOTION_ANIMATION_PRESETS.filter((preset) => compatible(preset, subjectKind))
-                    .length
+                ? MOTION_ANIMATION_PRESETS.filter((preset) =>
+                    compatible(preset, subjectKind, subject),
+                  ).length
                 : saved.length,
           })}
         </span>

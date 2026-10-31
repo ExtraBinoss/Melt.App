@@ -1,3 +1,8 @@
+import {
+  SPATIAL_MOTION_SCHEMAS,
+  isSpatialMotionProperty,
+  readSpatialMotionValue,
+} from "../../spatial/motion";
 import type { Layer } from "../../document/model";
 import { BLEND_MODES } from "../../layers/blending/catalog";
 import type { LayerMotionProperty, MotionPropertySchema } from "./model";
@@ -15,6 +20,7 @@ const choice = (options: readonly string[]): MotionPropertySchema => ({
 });
 const color: MotionPropertySchema = { kind: "color", format: "rgba", interpolation: "continuous" };
 const schemas: Readonly<Record<LayerMotionProperty, MotionPropertySchema>> = Object.freeze({
+  ...SPATIAL_MOTION_SCHEMAS,
   x: number(-1_000_000, 1_000_000),
   y: number(-1_000_000, 1_000_000),
   width: number(0.01, 32768),
@@ -70,6 +76,7 @@ export function layerMotionSchema(
   property: LayerMotionProperty,
 ): MotionPropertySchema | null {
   if (!Object.hasOwn(schemas, property)) return null;
+  if (isSpatialMotionProperty(property) && !layer.spatial) return null;
   if (textProperties.has(property) && layer.kind !== "text") return null;
   if (property === "radius" && layer.kind !== "rectangle") return null;
   if (
@@ -81,6 +88,7 @@ export function layerMotionSchema(
 }
 
 export function readLayerMotionValue(layer: Layer, property: LayerMotionProperty): unknown {
+  if (isSpatialMotionProperty(property)) return readSpatialMotionValue(layer, property);
   if (property === "scaleX" || property === "scaleY") return layer[property] ?? 1;
   if (property === "fillGradient.angle") return layer.fillGradient?.angle;
   if (property === "fillGradient.kind") return layer.fillGradient?.kind;

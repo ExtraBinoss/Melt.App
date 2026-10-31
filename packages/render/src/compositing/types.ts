@@ -37,6 +37,7 @@ export interface GpuStats {
   passes: number;
   readbacks: number;
   video?: ReturnType<import("../sources/media/video-sources").MediaVideoSources["stats"]> | null;
+  spatial?: { sources: number; meshes: number; vertices: number; triangles: number } | null;
   uploads: number;
   targets: number;
   cacheBytes: number;

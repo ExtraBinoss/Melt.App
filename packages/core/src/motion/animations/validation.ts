@@ -1,3 +1,4 @@
+import { createSpatialLayer } from "../../spatial/defaults";
 import { assertList, assertNumber, assertRecord, assertUniqueId } from "../../document/guards";
 import { createLayer } from "../../document/factories";
 import { validateEffect } from "../../document/validation";
@@ -55,6 +56,7 @@ export function validateMotionAnimationPreset(
   });
   const subject = createLayer("rectangle", {
     id: "animation-subject",
+    spatial: createSpatialLayer(),
     effects: effects as Layer["effects"],
     fillGradient: {
       kind: "linear",

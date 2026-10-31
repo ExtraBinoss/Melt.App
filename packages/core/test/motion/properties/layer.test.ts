@@ -1,4 +1,6 @@
 import { expect, it } from "vitest";
+import { createSpatialLayer } from "../../../src/spatial/defaults";
+import { isSpatialMotionProperty } from "../../../src/spatial/motion";
 import { createLayer } from "../../../src/document/factories";
 import {
   LAYER_MOTION_PROPERTIES,
@@ -17,11 +19,28 @@ it("inventories scalar transforms, paints and text through explicit whitelists",
       ],
     },
   });
+  const volume = { ...layer, spatial: createSpatialLayer("extrude") };
   for (const property of LAYER_MOTION_PROPERTIES) {
     if (property === "radius") continue;
-    expect(layerMotionSchema(layer, property), property).not.toBeNull();
-    expect(readLayerMotionValue(layer, property), property).not.toBeUndefined();
+    const subject = isSpatialMotionProperty(property) ? volume : layer;
+    expect(layerMotionSchema(subject, property), property).not.toBeNull();
+    expect(readLayerMotionValue(subject, property), property).not.toBeUndefined();
+    if (isSpatialMotionProperty(property)) {
+      expect(layerMotionSchema(layer, property)).toBeNull();
+      expect(readLayerMotionValue(layer, property)).toBeUndefined();
+    }
   }
+  expect(layerMotionSchema(volume, "spatial.clip")).toMatchObject({
+    kind: "integer",
+    interpolation: "hold",
+  });
+  for (const property of [
+    "spatial.source",
+    "spatial.enabled",
+    "spatial.material.preset",
+    "spatial.__proto__",
+  ])
+    expect(layerMotionSchema(volume, property as never)).toBeNull();
   expect(readLayerMotionValue(layer, "fillGradient.angle")).toBe(35);
   expect(readLayerMotionValue(layer, "fillGradient.kind")).toBe("linear");
   expect(layerMotionSchema(layer, "text")).toMatchObject({ interpolation: "hold", minLength: 0 });

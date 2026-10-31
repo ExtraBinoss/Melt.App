@@ -286,6 +286,12 @@ export class PlaneResources {
     this.publish();
     this.schedule();
   }
+  spatialSource(layerId: string) {
+    return this.compositor?.spatialSource(layerId) ?? null;
+  }
+  borrowRenderer() {
+    return this.disposed || this.deviceLost ? null : this.renderer;
+  }
   requestProfileFrame() {
     const current = this.current;
     if (!current) return undefined;
@@ -576,4 +582,12 @@ export function canvasProfileSource(canvas: HTMLCanvasElement) {
         force: () => owner.requestProfileFrame(),
       }
     : null;
+}
+
+/** Borrowed, canvas-scoped native 3D resources. The display plane retains ownership. */
+export function canvasSpatialSource(canvas: HTMLCanvasElement, layerId: string) {
+  return canvasOwners.get(canvas)?.spatialSource(layerId) ?? null;
+}
+export function canvasNativeRenderer(canvas: HTMLCanvasElement) {
+  return canvasOwners.get(canvas)?.borrowRenderer() ?? null;
 }

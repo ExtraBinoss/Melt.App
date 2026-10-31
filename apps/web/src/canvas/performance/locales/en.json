@@ -49,7 +49,8 @@
     "animation": "Animation",
     "audio": "Audio",
     "gpu": "GPU",
-    "videos": "Videos"
+    "videos": "Videos",
+    "spatial": "3D"
   },
   "metrics": {
     "layers": "Layers",
@@ -76,7 +77,11 @@
     "videos": "Videos",
     "animationChannels": "Animation channels",
     "audioProcessing": "Audio processing time",
-    "animationUpdate": "Animation host update"
+    "animationUpdate": "Animation host update",
+    "spatialLayers": "3D layers",
+    "spatialMeshes": "3D meshes",
+    "spatialVertices": "3D vertices",
+    "spatialTriangles": "3D triangles"
   },
   "warmthNote": "Reflects the current cache state. CPU host timing can include async waiting; it does not measure CPU utilization.",
   "sharedNote": "Texture memory and cache counters cover the shared renderer cache. Draw commands and render passes cover this sample."

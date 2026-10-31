@@ -1,3 +1,5 @@
+import { animationPresetName } from "../../spatial/presentation";
+import { MaterialSwatch } from "../../spatial/MaterialPicker";
 import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { Trash2 } from "lucide-react";
@@ -122,7 +124,7 @@ export function PresetGrid({
                     <button
                       className="animation-preset-card"
                       type="button"
-                      aria-label={preset.name}
+                      aria-label={animationPresetName(preset, t)}
                       data-preset-index={index}
                       onKeyDown={(event) => {
                         const delta =
@@ -143,17 +145,19 @@ export function PresetGrid({
                           focus(event.key === "Home" ? 0 : entries.length - 1);
                         }
                       }}
-                      onClick={() => apply(preset)}
+                      onClick={() => apply({ ...preset, name: animationPresetName(preset, t) })}
                     >
                       <span className="animation-card-image">
-                        {preset.category === "typography" ? (
+                        {preset.id.startsWith("spatial-") ? (
+                          <MaterialSwatch index={0} />
+                        ) : preset.category === "typography" ? (
                           <span className="animation-card-type">MORPH</span>
                         ) : (
                           <img src={ANIMATION_PREVIEW_IMAGE} alt="" loading="lazy" />
                         )}
                         <div className="animation-card-live" aria-hidden />
                       </span>
-                      <span className="animation-card-name">{preset.name}</span>
+                      <span className="animation-card-name">{animationPresetName(preset, t)}</span>
                       <span className="animation-card-category">
                         {t(`category.${preset.category}`)}
                       </span>

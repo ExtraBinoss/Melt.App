@@ -146,6 +146,10 @@ export function MotionPopover({
         <PresetPicker
           engine={engine}
           apply={apply}
+          subject={engine
+            .getSnapshot()
+            .project.pages.find((page) => page.id === compositionId)
+            ?.layers.find((layer) => layer.id === layerId)}
           subjectKind={
             engine
               .getSnapshot()

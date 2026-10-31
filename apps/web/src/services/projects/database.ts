@@ -1,5 +1,5 @@
 import { openDB, type DBSchema } from "idb";
-import type { ImageAsset, OriginalMediaAsset, Project } from "@musart/core";
+import type { EmbeddedAsset, OriginalMediaAsset, Project } from "@musart/core";
 import type { StoredMediaHeader, StoredMediaOriginal } from "./media/model";
 import type {
   HistoryMetadata,
@@ -8,7 +8,7 @@ import type {
   StoredHistoryAsset,
 } from "../history/model";
 
-export type AssetMetadata = Omit<ImageAsset, "dataUrl"> | OriginalMediaAsset;
+export type AssetMetadata = Omit<EmbeddedAsset, "dataUrl"> | OriginalMediaAsset;
 type ProjectManifest = Omit<Project, "assets"> & { assets: Record<string, AssetMetadata> };
 export interface ProjectBytes {
   manifest: number;

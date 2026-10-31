@@ -54,6 +54,42 @@ registerPerformanceContributor({
   collect: ({ page }) => compositionInventory(page),
 });
 registerPerformanceContributor({
+  id: "spatial",
+  collect: ({ page, samples }) => {
+    const counts = samples.at(-1)?.stats?.spatial;
+    return [
+      metric(
+        "spatialLayers",
+        "spatial",
+        "count",
+        page.layers.filter((layer) => layer.spatial?.enabled).length,
+        "inventory",
+      ),
+      metric(
+        "spatialMeshes",
+        "spatial",
+        "count",
+        counts?.meshes ?? (page.layers.some((layer) => layer.spatial?.enabled) ? null : 0),
+        "inventory",
+      ),
+      metric(
+        "spatialVertices",
+        "spatial",
+        "count",
+        counts?.vertices ?? (page.layers.some((layer) => layer.spatial?.enabled) ? null : 0),
+        "inventory",
+      ),
+      metric(
+        "spatialTriangles",
+        "spatial",
+        "count",
+        counts?.triangles ?? (page.layers.some((layer) => layer.spatial?.enabled) ? null : 0),
+        "inventory",
+      ),
+    ];
+  },
+});
+registerPerformanceContributor({
   id: "render",
   collect: ({ samples, uploadsBefore, hitsBefore }) => {
     const stats = samples.at(-1)?.stats;

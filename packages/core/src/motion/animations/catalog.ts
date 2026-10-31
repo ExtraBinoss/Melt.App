@@ -1,3 +1,4 @@
+import { SPATIAL_ANIMATIONS } from "../../spatial/animations";
 import { freezeValue } from "../../document/immutable";
 import { createEffect } from "../../document/factories";
 import { TRANSITION_CATALOG } from "../../effects/transition/catalog";
@@ -151,6 +152,7 @@ for (const recipe of recipes.filter((recipe) => recipe.id === "scale-grow"))
 /** Real native GPU operators plus authored property recipes, rather than aliases counted twice. */
 export const MOTION_ANIMATION_PRESETS: readonly MotionAnimationPreset[] = freezeValue([
   ...recipes,
+  ...SPATIAL_ANIMATIONS,
   ...[
     ["inflate", "Inflate", 0.9, 1],
     ["inflate-stretch", "Inflate & stretch", 0.9, 3],

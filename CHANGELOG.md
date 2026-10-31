@@ -6,6 +6,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Add native 3D sources to classic layers: editable shaped text/SVG extrusion, six primitives, self-contained animated GLB import, thirty rendered material presets, and composition lighting, environments and cameras. Keep normal effects, masks, ordering, keyframes, action recipes and exports; add an object-anchored 2D/3D switch, Three transform/orbit controls, snapped G/R/S gestures and owned one-transaction previews. Bound worker/GPU resources, decode HDR/EXR off-thread, retain transparent transmission reflections and SVG paints, expose measured 3D inventories, and translate controls in twelve locales. Await native wheel delivery before releasing Ctrl in browser zoom witnesses.
+
 - Add Bloom Windows, a 1920 × 1080 Motion template with a natural-speed twelve-second flower loop and a continuous 1.2-second carousel of live dither, ASCII and cyanotype windows, bare labels and soft shadows. Preserve exact decoded source endpoints and ship a verified lightweight raw-video derivative for hover previews.
 - Share one pinned GPU frame and playback decoder between synchronized copies of the same video sample; keep different trims and source variants independent. Bound large forward catch-up seeks and reuse exact original cursors during sequential export. Let continuous previews present through the ordered GPU queue while preserving exact export fences and native upload ownership.
 - Use continuous video playback for template/project hover previews, prevent negative bootstrap clocks, isolate lightweight preview sources from full-original installation, and remove the Hover to preview card badge.

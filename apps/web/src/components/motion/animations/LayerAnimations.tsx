@@ -1,3 +1,4 @@
+import { animationPresetName } from "../../spatial/presentation";
 import { AnimatedCollapsibleContent } from "../../shared/disclosure/AnimatedCollapsibleContent";
 import { useState } from "react";
 import { ChevronRight, Plus, Sparkles } from "lucide-react";
@@ -99,13 +100,15 @@ export function LayerAnimations({ engine, layerId }: { engine: EnginePort; layer
                     variant="ghost"
                     size="icon-xs"
                     className="animation-disclosure-trigger"
-                    aria-label={`${t("details")} · ${animation.preset.name}`}
+                    aria-label={`${t("details")} · ${animationPresetName(animation.preset, t)}`}
                   >
                     <ChevronRight size={12} />
                   </Button>
                 </CollapsibleTrigger>
                 <CollapsibleTrigger asChild>
-                  <button className="animation-instance-name">{animation.preset.name}</button>
+                  <button className="animation-instance-name">
+                    {animationPresetName(animation.preset, t)}
+                  </button>
                 </CollapsibleTrigger>
                 <Switch
                   aria-label={t("enabled")}

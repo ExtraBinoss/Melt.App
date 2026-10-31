@@ -1,5 +1,7 @@
 import {
   applyMotionValue,
+  isSpatialMotionProperty,
+  readSpatialMotionValue,
   getMotionOccurrenceAt,
   compareMotionTime,
   listMotionProperties,
@@ -104,13 +106,27 @@ export function motionPreviewPatch(
 ): Partial<Layer> {
   if (origin.mode !== "motion" || ids.length !== 1) return patch;
   if (!origin.occurrences.has(ids[0]!)) return {};
-  if (!intent && !patch.fillGradient) return patch;
+  if (!intent && !patch.fillGradient && !patch.spatial) return patch;
   const page = origin.snapshot.project.pages.find((item) => item.id === origin.snapshot.pageId)!;
   const base = page.layers.find((layer) => layer.id === ids[0]);
   let live = createMotionTransport(engine)
     .readFrame()
     ?.layers.find((layer) => layer.id === ids[0]);
   if (!base || !live) return patch;
+  if (patch.spatial && base.spatial && live.spatial) {
+    const touched = new Set(
+      patchTargets(page, { ...base, ...patch }, patch, origin).map((d) => d.target.property),
+    );
+    let next = { ...live, spatial: patch.spatial };
+    for (const descriptor of listMotionProperties({ ...page, layers: [live] }))
+      if (
+        descriptor.target.kind === "layer" &&
+        isSpatialMotionProperty(descriptor.target.property) &&
+        !touched.has(descriptor.target.property)
+      )
+        next = applyMotionValue(next, descriptor.target, descriptor.value) as typeof next;
+    return { ...patch, spatial: next.spatial };
+  }
   for (const descriptor of patchTargets(page, { ...base, ...patch }, patch, origin, intent))
     live = applyMotionValue(live, descriptor.target, descriptor.value);
   return {
@@ -171,6 +187,11 @@ export function motionTimeChanges(engine: EnginePort) {
 /** Revert keyed fields in a proposed base patch, including absence of optional/default fields. */
 function restoreBase(layer: Layer, base: Layer, target: MotionPropertyTarget): Layer {
   if (target.kind === "layer") {
+    if (isSpatialMotionProperty(target.property)) {
+      const value = readSpatialMotionValue(base, target.property);
+      if (typeof value !== "number") throw new Error("Missing 3D animation base value");
+      return applyMotionValue(layer, target, value);
+    }
     if (target.property.startsWith("fillGradient."))
       return {
         ...layer,

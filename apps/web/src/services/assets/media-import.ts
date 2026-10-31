@@ -3,6 +3,8 @@ import {
   compareMotionTime,
   addMotionTime,
   isAudioAsset,
+  isImageAsset,
+  isVideoAsset,
   type AudioAsset,
   createLayer,
   planMotionInitialization,
@@ -132,7 +134,7 @@ export async function importMediaFiles(
   }
   assertCurrent();
   const layers = assets
-    .filter((asset) => !isAudioAsset(asset))
+    .filter((asset) => isImageAsset(asset) || isVideoAsset(asset))
     .map((asset, index) => fitLayer(asset, page, index));
   const commands: Command[] = [{ type: "addLayers", layers, assets }];
   if (longest) {

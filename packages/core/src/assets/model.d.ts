@@ -52,4 +52,12 @@ export interface AudioAsset {
 }
 
 export type OriginalMediaAsset = VideoAsset | AudioAsset;
-export type Asset = ImageAsset | OriginalMediaAsset;
+/** Embedded binary originals share the portable asset store, never individual layer metadata. */
+export interface SceneAsset extends AssetDescription {
+  kind: "model3d" | "environment";
+  clips?: { name: string; duration: number }[];
+  dataUrl: string;
+  byteLength: number;
+}
+export type EmbeddedAsset = ImageAsset | SceneAsset;
+export type Asset = EmbeddedAsset | OriginalMediaAsset;

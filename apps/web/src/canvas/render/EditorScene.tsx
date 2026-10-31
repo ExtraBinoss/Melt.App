@@ -1,3 +1,5 @@
+import { SpatialControlsSlot } from "../spatial/SpatialControlsSlot";
+import type { EnginePort } from "@musart/core";
 import { CanvasPreparation } from "./CanvasPreparation";
 import { Component, memo, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
@@ -20,6 +22,7 @@ import "../../state/i18n/errors/messages";
 import "./loading.css";
 
 export interface SceneProps {
+  engine?: EnginePort;
   controller: SceneController;
   onError?: (message: string, details?: string) => void;
   zoom?: number;
@@ -171,6 +174,7 @@ class GpuBoundary extends Component<
   }
 }
 export const EditorScene = memo(function EditorScene({
+  engine,
   controller,
   onError,
   zoom = 1,
@@ -234,6 +238,7 @@ export const EditorScene = memo(function EditorScene({
           gl={async (props) => makeRenderer(props.canvas as HTMLCanvasElement)}
           style={{ width: "100%", height: "100%" }}
         >
+          {engine && <SpatialControlsSlot engine={engine} controller={controller} />}
           <CompositionPlane
             controller={controller}
             onError={onError}

@@ -1,4 +1,4 @@
-import { isImageAsset, validateProject, type Asset, type Project } from "@musart/core";
+import { isEmbeddedAsset, validateProject, type Asset, type Project } from "@musart/core";
 import type { IDBPDatabase } from "idb";
 import type { StudioDatabase } from "../database";
 import { readProjectWriteRevision } from "../writes/revision";
@@ -51,7 +51,7 @@ export async function readProjectPreview(
       project = record.project;
       let bytes = 0;
       for (const asset of Object.values(project.assets)) {
-        if (isImageAsset(asset)) bytes += asset.dataUrl.length * 2;
+        if (isEmbeddedAsset(asset)) bytes += asset.dataUrl.length * 2;
         if (bytes > MAX_PREVIEW_ORIGINAL_BYTES)
           throw new Error("The saved preview exceeds its original-data budget.");
       }

@@ -1,3 +1,4 @@
+import { spatialPropertyLabel } from "../../spatial/presentation";
 import { memo } from "react";
 import { useTranslation } from "react-i18next";
 import {
@@ -112,7 +113,10 @@ export const TimelineRowView = memo(function TimelineRowView(props: TimelineRowV
   const { t } = useTranslation("motion"),
     { t: common } = useTranslation();
   function propertyName(target: MotionPropertyTarget, row: TimelineRow): string {
-    if (target.kind === "layer") return t(propertyLabels[target.property] ?? target.property);
+    if (target.kind === "layer")
+      return target.property.startsWith("spatial.")
+        ? spatialPropertyLabel(target.property, t)
+        : t(propertyLabels[target.property] ?? target.property);
     const effect = row.layer.effects.find((item) => item.id === target.effectId);
     if (!effect) return target.property;
     const definition = getEffectDefinition(effect.type);

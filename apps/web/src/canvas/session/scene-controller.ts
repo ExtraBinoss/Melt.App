@@ -54,7 +54,9 @@ export class SceneController {
   private cachedPlayback: { source: PlaybackFrame; frame: SceneFrame } | null = null;
   private stopPreview: (() => void) | null = null;
   private patches: LayerPatch[] = [];
+  private gestureOwner: object | null = null;
   private draft: Layer | null = null;
+  private flatSource: string | null = null;
   private gestureRevision = 0;
   private cached: SceneFrame | null = null;
   private cachedProject: Project | null = null;
@@ -130,10 +132,19 @@ export class SceneController {
             ]
           : this.patches;
     const presented = motionFrame ?? page;
-    const next = applyPreview(
+    let next = applyPreview(
       preview?.target === "page" ? { ...presented, ...preview.patch } : presented,
       layerPatches,
     );
+    if (this.flatSource)
+      next = {
+        ...next,
+        layers: next.layers.map((layer) =>
+          layer.id === this.flatSource && layer.spatial?.enabled
+            ? { ...layer, spatial: { ...layer.spatial, enabled: false } }
+            : layer,
+        ),
+      };
     this.cachedProject = snapshot.project;
     this.cachedPageId = snapshot.pageId;
     this.cachedPreview = preview;
@@ -152,7 +163,12 @@ export class SceneController {
         // A paused evaluated frame acknowledges the committed revision just like a still.
         // Playback/gesture drafts must not admit background journal/thumbnail GPU work.
         canonical:
-          !motionPlaying && !motionPreviewing && !preview && !this.patches.length && !this.draft,
+          !motionPlaying &&
+          !motionPreviewing &&
+          !preview &&
+          !this.patches.length &&
+          !this.draft &&
+          !this.flatSource,
       },
     };
     return this.cached;
@@ -186,7 +202,17 @@ export class SceneController {
       }
     };
   };
-  setGesture(patches: LayerPatch[], draft: Layer | null = null): void {
+  setFlatSource(layerId: string | null): void {
+    if (this.flatSource === layerId) return;
+    this.flatSource = layerId;
+    this.gestureRevision++;
+    this.change();
+  }
+  clearGesture(owner: object): void {
+    if (this.gestureOwner === owner) this.setGesture([]);
+  }
+  setGesture(patches: LayerPatch[], draft: Layer | null = null, owner: object | null = null): void {
+    this.gestureOwner = owner;
     if (patches.length === 0 && this.patches.length === 0 && draft === this.draft) return;
     this.patches = patches;
     this.draft = draft;

@@ -49,7 +49,8 @@
     "animation": "Animación",
     "audio": "Audio",
     "gpu": "GPU",
-    "videos": "Vídeos"
+    "videos": "Vídeos",
+    "spatial": "3D"
   },
   "metrics": {
     "layers": "Capas",
@@ -76,7 +77,11 @@
     "videos": "Vídeos",
     "animationChannels": "Canales de animación",
     "audioProcessing": "Tiempo de procesamiento de audio",
-    "animationUpdate": "Actualización de animación en el host"
+    "animationUpdate": "Actualización de animación en el host",
+    "spatialLayers": "Capas 3D",
+    "spatialMeshes": "Mallas 3D",
+    "spatialVertices": "Vértices 3D",
+    "spatialTriangles": "Triángulos 3D"
   },
   "warmthNote": "Refleja el estado actual de la caché. El tiempo del host CPU puede incluir esperas asíncronas; no mide el uso de CPU.",
   "sharedNote": "La memoria de texturas y los contadores de caché abarcan la caché compartida del renderizador. Los comandos de dibujo y las pasadas de renderizado corresponden a esta muestra."

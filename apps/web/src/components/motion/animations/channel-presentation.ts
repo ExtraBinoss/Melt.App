@@ -1,3 +1,4 @@
+import { spatialPropertyLabel } from "../../spatial/presentation";
 import {
   getEffectDefinition,
   type AnimationChannel,
@@ -42,9 +43,11 @@ export function channelPresentation(
   );
   const name =
     channel.target.kind === "layer"
-      ? layerLabels[property]
-        ? t(layerLabels[property], { ns: "animations" })
-        : t(motionLabels[property] ?? property, { ns: "motion" })
+      ? property.startsWith("spatial.")
+        ? spatialPropertyLabel(property, t)
+        : layerLabels[property]
+          ? t(layerLabels[property], { ns: "animations" })
+          : t(motionLabels[property] ?? property, { ns: "motion" })
       : `${definition ? t(definition.nameKey, { ns: "translation" }) : t("effect", { ns: "animations" })} · ${parameter ? t(parameter.labelKey, { ns: "translation" }) : t(property, { ns: "motion", defaultValue: property })}`;
   const percent =
     !!channel.unit ||
@@ -54,7 +57,9 @@ export function channelPresentation(
   const factor = percent ? 100 : 1;
   const unit = percent
     ? "%"
-    : property === "rotation" || property === "fillGradient.angle"
+    : property === "rotation" ||
+        property === "fillGradient.angle" ||
+        property.startsWith("spatial.rotation")
       ? "°"
       : channel.target.kind === "layer" && pixelProperties.has(property)
         ? "px"

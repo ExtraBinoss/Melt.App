@@ -1,4 +1,12 @@
-import type { Asset, AudioAsset, ImageAsset, OriginalMediaAsset, VideoAsset } from "./model";
+import type {
+  Asset,
+  AudioAsset,
+  EmbeddedAsset,
+  SceneAsset,
+  ImageAsset,
+  OriginalMediaAsset,
+  VideoAsset,
+} from "./model";
 
 export function isVideoAsset(asset: Asset): asset is VideoAsset {
   return asset.kind === "video";
@@ -28,8 +36,15 @@ export function sameAssetOriginal(left: Asset | undefined, right: Asset | undefi
     Boolean(
       left &&
       right &&
-      isImageAsset(left) === isImageAsset(right) &&
+      (left.kind ?? "image") === (right.kind ?? "image") &&
       assetOriginalIdentity(left) === assetOriginalIdentity(right),
     )
   );
+}
+
+export function isSceneAsset(asset: Asset): asset is SceneAsset {
+  return asset.kind === "model3d" || asset.kind === "environment";
+}
+export function isEmbeddedAsset(asset: Asset): asset is EmbeddedAsset {
+  return !isOriginalMediaAsset(asset);
 }

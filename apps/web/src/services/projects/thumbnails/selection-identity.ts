@@ -179,6 +179,16 @@ export class SelectionPreviewIdentity {
     const nodes = [...included].sort((a, b) => order!.get(a)! - order!.get(b)!);
     return JSON.stringify([
       page.colorSpace ?? "srgb",
+      ...(nodes.some((id) => geometry.get(id).spatial?.enabled)
+        ? [
+            page.spatial,
+            this.asset(
+              page.spatial?.environment.assetId
+                ? assets[page.spatial.environment.assetId]
+                : undefined,
+            ),
+          ]
+        : []),
       [...ids].sort(),
       nodes.map((id) => {
         const layer = geometry.get(id);

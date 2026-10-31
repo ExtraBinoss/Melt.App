@@ -40,7 +40,9 @@ export function invertMatrix(matrix: Matrix): Matrix {
     (matrix[1] * matrix[4] - matrix[0] * matrix[5]) / determinant,
   ];
 }
-export function layerTransform(layer: Layer): Matrix {
+export function layerTransform(
+  layer: Pick<Layer, "x" | "y" | "width" | "height" | "rotation" | "scaleX" | "scaleY">,
+): Matrix {
   const radians = (layer.rotation * Math.PI) / 180;
   const cosine = Math.cos(radians);
   const sine = Math.sin(radians);

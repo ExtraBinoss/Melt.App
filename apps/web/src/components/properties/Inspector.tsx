@@ -1,4 +1,6 @@
 import "../export/messages";
+import { SpatialLayerProperties } from "../spatial/SpatialLayerProperties";
+import { SpatialSceneProperties } from "../spatial/SpatialSceneProperties";
 import { VectorProperties } from "./vector/VectorProperties";
 import { LayerAnimations } from "../motion/animations/LayerAnimations";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
@@ -16,7 +18,8 @@ import {
 } from "lucide-react";
 import {
   createLayerGeometryIndex,
-  isAudioAsset,
+  isImageAsset,
+  isVideoAsset,
   type Composition,
   type EnginePort,
   type Layer,
@@ -112,6 +115,12 @@ export const Inspector = memo(
       if (layer) edit.previewLayer(patch);
     }
     function fillPatch(fill: string): Partial<Layer> {
+      if (
+        layer?.spatial?.enabled &&
+        layer.spatial.source === "glb" &&
+        layer.spatial.useModelMaterials
+      )
+        return { fill, spatial: { ...layer.spatial, useModelMaterials: false } };
       return layer?.kind === "vector" && layer.vector?.parts?.length
         ? { fill, vector: { ...layer.vector, preserveColors: false } }
         : { fill };
@@ -200,7 +209,8 @@ export const Inspector = memo(
     const original = layer?.assetId
       ? (assets ?? engine.getSnapshot().project.assets)[layer.assetId]
       : undefined;
-    const asset = original && !isAudioAsset(original) ? original : undefined;
+    const asset =
+      original && (isImageAsset(original) || isVideoAsset(original)) ? original : undefined;
     return (
       <MotionFieldProvider editor={edit}>
         <ScrollShadow className="inspector-scroll">
@@ -215,7 +225,9 @@ export const Inspector = memo(
                 {selected.length > 1
                   ? t("multiSelection")
                   : layer
-                    ? t(layer.kind)
+                    ? layer.spatial?.enabled
+                      ? t("spatial:title")
+                      : t(layer.kind)
                     : t("composition")}
               </span>
             </div>
@@ -339,7 +351,9 @@ export const Inspector = memo(
                         {field("width", t("width"), 1, 32768)}
                         {field("height", t("height"), 1, 32768)}
                         {field("rotation", t("rotation"), -360, 360, "°")}
-                        {layer.kind === "rectangle" && field("radius", t("cornerRadius"), 0, 4096)}
+                        {layer.kind === "rectangle" &&
+                          !layer.spatial?.enabled &&
+                          field("radius", t("cornerRadius"), 0, 4096)}
                       </div>
                       <MotionField
                         engine={engine}
@@ -404,6 +418,13 @@ export const Inspector = memo(
                     <fieldset className="locked-layer-controls" disabled={locked}>
                       <AlignmentPanel engine={engine} selected={selected} run={runCurrent} />
                     </fieldset>
+                    <SpatialLayerProperties
+                      engine={engine}
+                      layer={displayLayer!}
+                      patch={patch}
+                      preview={preview}
+                      cancel={cancel}
+                    />
                     {layer.kind === "vector" && (
                       <VectorProperties layer={displayLayer!} engine={engine} />
                     )}
@@ -416,42 +437,47 @@ export const Inspector = memo(
                         cancel={cancel}
                       />
                     )}
-                    {["rectangle", "ellipse", "vector"].includes(layer.kind) && (
-                      <section className="inspector-section">
-                        <h3>{t("stroke")}</h3>
-                        <div className="fields-grid">
-                          {field("strokeWidth", t("stroke"), 0, 128)}
-                          <MotionField
-                            engine={engine}
-                            target={{ kind: "layer", layerId: layer.id, property: "stroke" }}
-                            label={t("strokeHex")}
-                            disabled={locked}
-                          >
-                            <MotionValueField
+                    {!layer.spatial?.enabled &&
+                      ["rectangle", "ellipse", "vector"].includes(layer.kind) && (
+                        <section className="inspector-section">
+                          <h3>{t("stroke")}</h3>
+                          <div className="fields-grid">
+                            {field("strokeWidth", t("stroke"), 0, 128)}
+                            <MotionField
                               engine={engine}
                               target={{ kind: "layer", layerId: layer.id, property: "stroke" }}
-                              fallback={layer.stroke}
+                              label={t("strokeHex")}
+                              disabled={locked}
                             >
-                              {(stroke) => (
-                                <MotionStringInput
-                                  engine={engine}
-                                  target={{ kind: "layer", layerId: layer.id, property: "stroke" }}
-                                  validate={(stroke) =>
-                                    /^#(?:[\da-f]{6}|[\da-f]{8})$/i.test(stroke)
-                                  }
-                                  value={String(stroke)}
-                                  disabled={locked}
-                                  label={t("strokeHex")}
-                                  onPreview={(stroke) => preview({ stroke })}
-                                  onCommit={(stroke) => patch({ stroke })}
-                                  onCancel={cancel}
-                                />
-                              )}
-                            </MotionValueField>
-                          </MotionField>
-                        </div>
-                      </section>
-                    )}
+                              <MotionValueField
+                                engine={engine}
+                                target={{ kind: "layer", layerId: layer.id, property: "stroke" }}
+                                fallback={layer.stroke}
+                              >
+                                {(stroke) => (
+                                  <MotionStringInput
+                                    engine={engine}
+                                    target={{
+                                      kind: "layer",
+                                      layerId: layer.id,
+                                      property: "stroke",
+                                    }}
+                                    validate={(stroke) =>
+                                      /^#(?:[\da-f]{6}|[\da-f]{8})$/i.test(stroke)
+                                    }
+                                    value={String(stroke)}
+                                    disabled={locked}
+                                    label={t("strokeHex")}
+                                    onPreview={(stroke) => preview({ stroke })}
+                                    onCommit={(stroke) => patch({ stroke })}
+                                    onCancel={cancel}
+                                  />
+                                )}
+                              </MotionValueField>
+                            </MotionField>
+                          </div>
+                        </section>
+                      )}
                   </>
                 ) : (
                   <section className="inspector-section">
@@ -487,6 +513,10 @@ export const Inspector = memo(
                     <p className="muted-description">{t("selectLayer")}</p>
                   </section>
                 )}
+                {(!layer || layer.spatial?.enabled) &&
+                  (page.spatial || page.layers.some((item) => item.spatial?.enabled)) && (
+                    <SpatialSceneProperties engine={engine} page={page} run={runCurrent} />
+                  )}
                 {layer && <LayerAnimations engine={engine} layerId={layer.id} />}
                 <SpacingPanel
                   page={page}

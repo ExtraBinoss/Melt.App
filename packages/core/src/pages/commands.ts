@@ -22,6 +22,7 @@ export const updatePage: CommandHandler<"updatePage"> = ({ project, page, pageId
         "colorSpace",
         "guides",
         "canvasPosition",
+        "spatial",
       ].includes(key),
     ),
     "INVALID_COMMAND",

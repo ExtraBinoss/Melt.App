@@ -1,6 +1,7 @@
 import {
   compileMotion,
   createLayer,
+  createSpatialLayer,
   createPage,
   createProject,
   EditorEngine,
@@ -33,20 +34,25 @@ export async function createAnimationPreviewDocument(
   preset: MotionAnimationPreset,
   duration: number,
 ) {
-  const image = await previewPhoto();
+  const spatial = preset.channels.some(
+    (channel) => channel.target.kind === "layer" && channel.target.property.startsWith("spatial."),
+  );
+  const image = spatial ? "" : await previewPhoto();
   const engine = new EditorEngine(
     createProject({
       id: "animation-preview",
-      assets: {
-        photo: {
-          id: "photo",
-          name: "Alpine lake — Luca Bravo",
-          mime: "image/jpeg",
-          width: 1280,
-          height: 960,
-          dataUrl: image,
-        },
-      },
+      assets: spatial
+        ? {}
+        : {
+            photo: {
+              id: "photo",
+              name: "Alpine lake — Luca Bravo",
+              mime: "image/jpeg",
+              width: 1280,
+              height: 960,
+              dataUrl: image,
+            },
+          },
       pages: [
         createPage({
           id: "preview",
@@ -54,20 +60,30 @@ export async function createAnimationPreviewDocument(
           height: 144,
           background: "#20232b",
           layers: [
-            createLayer(preset.category === "typography" ? "text" : "image", {
-              id: "subject",
-              assetId: preset.category === "typography" ? null : "photo",
-              text: "MORPH",
-              fontSize: 32,
-              fontWeight: 800,
-              fontFamily: "Inter Variable",
-              fill: "#00bdf5",
-              textAlign: "center",
-              x: 21,
-              y: 15.75,
-              width: 150,
-              height: 112.5,
-            }),
+            createLayer(
+              spatial ? "rectangle" : preset.category === "typography" ? "text" : "image",
+              {
+                id: "subject",
+                assetId: spatial || preset.category === "typography" ? null : "photo",
+                ...(spatial
+                  ? {
+                      spatial: createSpatialLayer(
+                        preset.id === "spatial-extrude" ? "extrude" : "box",
+                      ),
+                    }
+                  : {}),
+                text: "MORPH",
+                fontSize: 32,
+                fontWeight: 800,
+                fontFamily: "Inter Variable",
+                fill: "#00bdf5",
+                textAlign: "center",
+                x: 21,
+                y: 15.75,
+                width: 150,
+                height: 112.5,
+              },
+            ),
           ],
         }),
       ],

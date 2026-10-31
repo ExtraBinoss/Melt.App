@@ -1,3 +1,4 @@
+import { isSpatialMotionProperty, withSpatialMotionValue } from "../../spatial/motion";
 import type { Layer } from "../../document/model";
 import { ensure } from "../../errors";
 import { resolveLayerMotionProperty } from "./registry";
@@ -28,6 +29,10 @@ export function applyMotionValues(
     if (Object.is(descriptor.value, value)) continue;
     if (result === layer) result = { ...layer };
     if (target.kind === "layer") {
+      if (isSpatialMotionProperty(target.property)) {
+        result = withSpatialMotionValue(result, target.property, value);
+        continue;
+      }
       if (target.property === "fillGradient.angle" || target.property === "fillGradient.kind") {
         if (result.fillGradient === layer.fillGradient)
           result.fillGradient = { ...layer.fillGradient! };

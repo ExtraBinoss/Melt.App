@@ -39,6 +39,7 @@ export function validateProjectWrite(frame: ProjectWriteFrame): void {
     ids.add(asset.id);
   }
   const originals = new Set<string>();
+  const descriptions = new Map(frame.descriptions.map((asset) => [asset.id, asset]));
   const imageIds = new Set(
     frame.descriptions
       .filter((asset) => asset.kind !== "video" && asset.kind !== "audio")
@@ -51,7 +52,9 @@ export function validateProjectWrite(frame: ProjectWriteFrame): void {
       !imageIds.has(asset.assetId) ||
       originals.has(asset.assetId) ||
       typeof asset.dataUrl !== "string" ||
-      !asset.dataUrl.startsWith("data:image/")
+      !(descriptions.get(asset.assetId)?.kind === "model3d"
+        ? asset.dataUrl.startsWith("data:model/gltf-binary;base64,")
+        : asset.dataUrl.startsWith("data:image/"))
     )
       throw Error("Invalid captured original.");
     originals.add(asset.assetId);

@@ -1,7 +1,9 @@
+import type { SpatialMotionProperty } from "../../spatial/motion";
 /** Serializable animation values; structural document edits are not keyframe values. */
 export type MotionValue = number | string | boolean;
 
 export type LayerMotionProperty =
+  | SpatialMotionProperty
   | "x"
   | "y"
   | "width"

@@ -54,9 +54,10 @@ export async function thumbnailRevision(
   const captured = isPublishedComposition(page) ? page : structuredClone(page);
   const ids = [
     ...new Set(
-      captured.layers
-        .flatMap((layer) => [layer.assetId, layer.mask?.assetId])
-        .filter((id): id is string => !!id),
+      [
+        ...captured.layers.flatMap((layer) => [layer.assetId, layer.mask?.assetId]),
+        captured.spatial?.environment.assetId,
+      ].filter((id): id is string => !!id),
     ),
   ].sort();
   const pendingSources = ids.map((id) => {

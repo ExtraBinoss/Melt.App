@@ -49,7 +49,8 @@
     "animation": "Animazione",
     "audio": "Audio",
     "gpu": "GPU",
-    "videos": "Video"
+    "videos": "Video",
+    "spatial": "3D"
   },
   "metrics": {
     "layers": "Livelli",
@@ -76,7 +77,11 @@
     "videos": "Video",
     "animationChannels": "Canali di animazione",
     "audioProcessing": "Tempo di elaborazione audio",
-    "animationUpdate": "Aggiornamento animazione sul sistema host"
+    "animationUpdate": "Aggiornamento animazione sul sistema host",
+    "spatialLayers": "Livelli 3D",
+    "spatialMeshes": "Mesh 3D",
+    "spatialVertices": "Vertici 3D",
+    "spatialTriangles": "Triangoli 3D"
   },
   "warmthNote": "Riflette lo stato attuale della cache. Il tempo CPU host può includere attese asincrone e non misura l’utilizzo della CPU.",
   "sharedNote": "La memoria delle texture e i contatori riguardano la cache condivisa del renderer. I comandi di disegno e i passaggi di rendering riguardano questo campione."

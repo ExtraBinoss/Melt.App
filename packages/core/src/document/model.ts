@@ -1,3 +1,4 @@
+import type { SpatialLayer, SpatialScene } from "../spatial/model";
 import type { BlendMode } from "../layers/blending/catalog";
 import type { VectorDefinition } from "../vector/model";
 import type { ShapeMorph } from "../effects/morph/model";
@@ -83,6 +84,7 @@ export interface LayerMask {
   inverted: boolean;
 }
 export interface Layer {
+  spatial?: SpatialLayer;
   id: string;
   kind: LayerKind;
   name: string;
@@ -127,6 +129,7 @@ export interface Guide {
   color?: string;
 }
 export interface Composition {
+  spatial?: SpatialScene;
   id: string;
   name: string;
   width: number;

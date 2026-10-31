@@ -1,3 +1,5 @@
+import { drawLayerSource } from "./layer-source";
+import type { SpatialSources } from "../spatial/SpatialSources";
 import {
   createLayerGeometryIndex,
   isPublishedComposition,
@@ -49,12 +51,14 @@ export class GpuCompositor {
   private readonly maxTextureDimension: number;
   private readonly cache: GpuResourceCache;
   private readonly sources: TextureSources;
+  private readonly fontResolver?: FontResolver;
   private readonly texts: TextSources;
   private effects: EffectResources | null = null;
   private passes: GpuPasses | null = null;
   private normal: NormalBatch | null = null;
   private primitives: PrimitiveBatch | null = null;
   private vectors: VectorSources | null = null;
+  private spatial: SpatialSources | null = null;
   private color: ColorPipeline | null = null;
   private queue: Promise<unknown> = Promise.resolve();
   private disposed = false;
@@ -75,12 +79,14 @@ export class GpuCompositor {
     if (samples.length > 256) samples.shift();
   }
   private retainedRoot = "";
+  private currentSpatial: GpuStats["spatial"] = null;
   private readonly retainedInputs = new WeakMap<
     LayerTargets,
     {
       page: WeakRef<Composition>;
       assets: WeakRef<Record<string, Asset>>;
       motionFrame?: MotionFramePlan;
+      spatial: GpuStats["spatial"];
     }
   >();
 
@@ -88,6 +94,7 @@ export class GpuCompositor {
     private readonly renderer: WebGPURenderer,
     options: { maxBytes?: number; fontResolver?: FontResolver } = {},
   ) {
+    this.fontResolver = options.fontResolver;
     this.maxTextureDimension = gpuTextureLimit(renderer);
     this.cache = new GpuResourceCache(options.maxBytes);
     this.sources = new TextureSources(this.cache, this.maxTextureDimension, renderer);
@@ -119,6 +126,7 @@ export class GpuCompositor {
     )
       return null;
     this.retainedRoot = key;
+    this.currentSpatial = input.spatial;
     input.page = new WeakRef(page);
     this.cacheHits++;
     return entry.output;
@@ -210,6 +218,17 @@ export class GpuCompositor {
       const textStarted = options.profileVideo ? performance.now() : 0;
       await this.texts.prepare(page, { target: preparationTarget, canContinue: canPrepare });
       this.sample("text", textStarted, options.profileVideo);
+      if (this.spatial || page.layers.some((layer) => layer.spatial?.enabled)) {
+        this.spatial ??= new (await import("../spatial/SpatialSources")).SpatialSources(
+          this.renderer,
+          this.cache,
+          { fontResolver: options.fontResolver ?? this.fontResolver },
+        );
+        const started = options.profileVideo ? performance.now() : 0;
+        await this.spatial.prepare(page, assets, scale, preparationTarget, canPrepare);
+        if (options.profileVideo && this.profile)
+          this.profile.sources[this.profile.sources.length - 1]! += performance.now() - started;
+      }
       const composeStarted = options.profileVideo ? performance.now() : 0;
       if (options.canRender && !options.canRender())
         throw new DOMException("Rendering deferred.", "AbortError");
@@ -299,11 +318,13 @@ export class GpuCompositor {
     assets: Record<string, Asset>,
     motionFrame?: MotionFramePlan,
   ): void {
+    this.currentSpatial = this.spatial?.stats() ?? null;
     if (isPublishedComposition(page) && isPublishedAssets(assets))
       this.retainedInputs.set(entry, {
         page: new WeakRef(page),
         assets: new WeakRef(assets),
         motionFrame,
+        spatial: this.currentSpatial,
       });
     else this.retainedInputs.delete(entry);
   }
@@ -349,67 +370,35 @@ export class GpuCompositor {
     entry.signature = "";
     const width = rasterExtent(layer.width, scale);
     const height = rasterExtent(layer.height, scale);
-    let source: FrameTexture;
-    if (layer.kind === "group")
-      source = this.children(
-        layer.id,
-        layer.width,
-        layer.height,
-        "transparent",
-        entry,
-        key,
-        frame,
-        viewport,
-      );
-    else if (layer.kind === "image" || layer.kind === "video")
-      source = {
-        texture: this.sources.image(layer.assetId, layer.kind === "video" ? layer.id : undefined),
-        width,
-        height,
-        premultiplied: false,
-      };
-    else if (layer.kind === "text") {
-      const target = this.target(entry, key, "text", width, height);
-      this.passes!.clear(target);
-      this.texts.render(layer, target);
-      source = {
-        texture: target.texture,
-        width,
-        height,
-        premultiplied: true,
-      };
-    } else if (layer.kind === "vector") {
-      const target = this.target(
-        entry,
-        key,
-        "vector",
-        width,
-        height,
-        false,
-        vectorAntialias ? 4 : 0,
-      );
-      this.passes!.clear(target);
-      this.vectors!.render(layer, target, page.colorSpace === "display-p3");
-      source = { texture: target.texture, width, height, premultiplied: true };
-    } else {
-      const target = this.target(entry, key, "shape", width, height);
-      const paint = JSON.stringify([
-        layer.kind,
-        layer.width,
-        layer.height,
-        layer.fill,
-        layer.stroke,
-        layer.strokeWidth,
-        layer.radius,
-        scale,
-      ]);
-      if (entry.sourceSignature !== paint) {
-        this.passes!.shapeTo(layer, scale, target);
-        entry.sourceSignature = paint;
-      }
-      source = { texture: target.texture, width, height, premultiplied: false };
-    }
-    if (page.colorSpace === "display-p3" && (layer.kind === "image" || layer.kind === "video")) {
+    let source = drawLayerSource(layer, {
+      width,
+      height,
+      scale,
+      vectorAntialias,
+      displayP3: page.colorSpace === "display-p3",
+      entry,
+      sources: this.sources,
+      texts: this.texts,
+      vectors: this.vectors!,
+      spatial: this.spatial,
+      passes: this.passes!,
+      target: (role, samples = 0) => this.target(entry, key, role, width, height, false, samples),
+      children: () =>
+        this.children(
+          layer.id,
+          layer.width,
+          layer.height,
+          "transparent",
+          entry,
+          key,
+          frame,
+          viewport,
+        ),
+    });
+    if (
+      page.colorSpace === "display-p3" &&
+      (layer.kind === "image" || layer.kind === "video" || layer.spatial?.enabled)
+    ) {
       const converted = this.target(entry, key, "working-color", width, height);
       this.color!.render(source, converted, "to-p3");
       source = { ...source, texture: converted.texture };
@@ -531,6 +520,7 @@ export class GpuCompositor {
         (this.normal?.passes ?? 0) +
         (this.primitives?.passes ?? 0) +
         (this.vectors?.passes ?? 0) +
+        (this.spatial?.passes ?? 0) +
         this.texts.passes +
         (this.color?.passes ?? 0) +
         (effects?.passes ?? 0),
@@ -544,7 +534,8 @@ export class GpuCompositor {
           }
         : null,
       video: this.sources.videoStats(),
-      uploads: this.sources.uploads + this.texts.parses,
+      spatial: this.currentSpatial,
+      uploads: this.sources.uploads + this.texts.parses + (this.spatial?.parses ?? 0),
       targets: cache.targets,
       cacheBytes: cache.cacheBytes,
       cacheEntries: cache.entries,
@@ -556,6 +547,9 @@ export class GpuCompositor {
       primitiveInstances: this.primitives?.instances ?? 0,
       primitiveBytes: this.primitives?.bytes ?? 0,
     };
+  }
+  spatialSource(layerId: string) {
+    return this.spatial?.peek(layerId) ?? null;
   }
   /** Exact/export adapters await native source uploads; interactive preview pipelines them. */
   settleMedia(): Promise<void> {
@@ -572,6 +566,7 @@ export class GpuCompositor {
         failures.push(error);
       }
       for (const release of [
+        () => this.spatial?.dispose(),
         () => this.cache.clear(),
         () => this.passes?.dispose(),
         () => this.normal?.dispose(),

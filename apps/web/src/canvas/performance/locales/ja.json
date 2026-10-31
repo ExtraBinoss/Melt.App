@@ -49,7 +49,8 @@
     "animation": "アニメーション",
     "audio": "オーディオ",
     "gpu": "GPU",
-    "videos": "動画"
+    "videos": "動画",
+    "spatial": "3D"
   },
   "metrics": {
     "layers": "レイヤー",
@@ -76,7 +77,11 @@
     "videos": "動画",
     "animationChannels": "アニメーションチャンネル",
     "audioProcessing": "オーディオ処理時間",
-    "animationUpdate": "ホスト側のアニメーション更新"
+    "animationUpdate": "ホスト側のアニメーション更新",
+    "spatialLayers": "3Dレイヤー",
+    "spatialMeshes": "3Dメッシュ",
+    "spatialVertices": "3D頂点",
+    "spatialTriangles": "3D三角形"
   },
   "warmthNote": "現在のキャッシュ状態を反映します。CPUホスト時間には非同期の待機が含まれる場合があり、CPU使用率の測定ではありません。",
   "sharedNote": "テクスチャメモリとキャッシュカウンターはレンダラーの共有キャッシュ全体が対象です。描画コマンドとレンダリングパスはこのサンプルが対象です。"

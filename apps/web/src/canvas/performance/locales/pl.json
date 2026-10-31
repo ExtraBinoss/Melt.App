@@ -49,7 +49,8 @@
     "animation": "Animacja",
     "audio": "Dźwięk",
     "gpu": "GPU",
-    "videos": "Wideo"
+    "videos": "Wideo",
+    "spatial": "3D"
   },
   "metrics": {
     "layers": "Warstwy",
@@ -76,7 +77,11 @@
     "videos": "Wideo",
     "animationChannels": "Kanały animacji",
     "audioProcessing": "Czas przetwarzania dźwięku",
-    "animationUpdate": "Aktualizacja animacji po stronie hosta"
+    "animationUpdate": "Aktualizacja animacji po stronie hosta",
+    "spatialLayers": "Warstwy 3D",
+    "spatialMeshes": "Siatki 3D",
+    "spatialVertices": "Wierzchołki 3D",
+    "spatialTriangles": "Trójkąty 3D"
   },
   "warmthNote": "Odzwierciedla bieżący stan pamięci podręcznej. Czas hosta CPU może obejmować oczekiwanie asynchroniczne; nie mierzy wykorzystania CPU.",
   "sharedNote": "Pamięć tekstur i liczniki dotyczą wspólnej pamięci podręcznej renderera. Polecenia rysowania i przebiegi renderowania dotyczą tej próbki."

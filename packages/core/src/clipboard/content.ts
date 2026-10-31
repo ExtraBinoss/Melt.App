@@ -58,6 +58,7 @@ export function copyContent(
     if (layer.mask?.assetId) assetIds.add(layer.mask.assetId);
   }
   for (const track of page.motion?.audioTracks ?? []) assetIds.add(track.assetId);
+  if (page.spatial?.environment.assetId) assetIds.add(page.spatial.environment.assetId);
   const assets = Object.fromEntries([...assetIds].map((id) => [id, snapshot.project.assets[id]!]));
   const document = createProject({
     id: snapshot.project.id,

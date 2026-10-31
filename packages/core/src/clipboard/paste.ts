@@ -9,6 +9,7 @@ function reservedIds(project: Project): Set<string> {
   const result = new Set([project.id, ...Object.keys(project.assets)]);
   for (const page of project.pages) {
     result.add(page.id);
+    for (const light of page.spatial?.lights ?? []) result.add(light.id);
     for (const guide of page.guides) result.add(guide.id);
     for (const track of page.motion?.audioTracks ?? []) result.add(track.id);
     for (const track of page.motion?.tracks ?? []) {
@@ -67,6 +68,7 @@ export function pasteContent(
     if (!existing) assets.push({ ...asset, id: identity });
   }
   ids.set(page.id, allocate());
+  for (const light of page.spatial?.lights ?? []) ids.set(light.id, allocate());
   for (const guide of page.guides) ids.set(guide.id, allocate());
   for (const layer of page.layers) {
     ids.set(layer.id, allocate());
@@ -92,6 +94,20 @@ export function pasteContent(
   const cloned: Composition = {
     ...page,
     id: ids.get(page.id)!,
+    ...(page.spatial
+      ? {
+          spatial: {
+            ...page.spatial,
+            environment: {
+              ...page.spatial.environment,
+              assetId: page.spatial.environment.assetId
+                ? ids.get(page.spatial.environment.assetId)!
+                : null,
+            },
+            lights: page.spatial.lights.map((light) => ({ ...light, id: ids.get(light.id)! })),
+          },
+        }
+      : {}),
     ...(page.motion
       ? {
           motion: {

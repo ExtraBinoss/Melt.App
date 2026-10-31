@@ -61,6 +61,11 @@ export function CanvasVectorEditing({
   const matchesScope =
     editing?.projectId === snapshot.project.id && editing?.pageId === snapshot.pageId;
   const active = enabled && !playback && layer && matchesScope && editing?.layerId === layer.id;
+  useEffect(() => {
+    if (!active || !layer?.spatial?.enabled) return;
+    controller.setFlatSource(layer.id);
+    return () => controller.setFlatSource(null);
+  }, [active, controller, layer?.id, layer?.spatial?.enabled]);
   const cancel = useCallback(() => controller.setGesture([]), [controller]);
   const surface = useMemo(
     () => ({ engine, controller, view: viewSource, viewport, layerId: layer?.id ?? "" }),
@@ -80,7 +85,7 @@ export function CanvasVectorEditing({
   }, [editing, enabled, playback, layer, setEditing, matchesScope]);
   useEffect(() => {
     const element = viewport.current;
-    if (!element || !enabled || !layer) return;
+    if (!element || !enabled || !layer || layer.spatial?.enabled) return;
     const doubleClick = (event: MouseEvent) => {
       if (
         event.button !== 0 ||
@@ -152,7 +157,7 @@ export function CanvasVectorEditing({
   return (
     <>
       <AnimatePresence>
-        {enabled && layer && !playback && !active && (
+        {enabled && layer && !layer.spatial?.enabled && !playback && !active && (
           <VectorEditEntry
             key={`${snapshot.project.id}:${page.id}:${layer.id}`}
             controller={controller}

@@ -3,6 +3,7 @@ import type { CompositionPerformanceMetric } from "../../state/session/compositi
 /** Feature domains and counters are data definitions, so new profilers need no UI switch. */
 export const performanceDomains = [
   "scene",
+  "spatial",
   "images",
   "videos",
   "shapes",
@@ -13,6 +14,10 @@ export const performanceDomains = [
 ] as const;
 export const performanceMetrics = new Set([
   "layers",
+  "spatialLayers",
+  "spatialMeshes",
+  "spatialVertices",
+  "spatialTriangles",
   "visibleLayers",
   "images",
   "videos",

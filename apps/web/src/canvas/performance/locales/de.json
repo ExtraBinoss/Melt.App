@@ -49,7 +49,8 @@
     "animation": "Animation",
     "audio": "Audio",
     "gpu": "GPU",
-    "videos": "Videos"
+    "videos": "Videos",
+    "spatial": "3D"
   },
   "metrics": {
     "layers": "Ebenen",
@@ -76,7 +77,11 @@
     "videos": "Videos",
     "animationChannels": "Animationskanäle",
     "audioProcessing": "Audioverarbeitungszeit",
-    "animationUpdate": "Animationsaktualisierung auf dem Host"
+    "animationUpdate": "Animationsaktualisierung auf dem Host",
+    "spatialLayers": "3D-Ebenen",
+    "spatialMeshes": "3D-Netze",
+    "spatialVertices": "3D-Eckpunkte",
+    "spatialTriangles": "3D-Dreiecke"
   },
   "warmthNote": "Zeigt den aktuellen Cache-Zustand. Die CPU-Host-Zeit kann asynchrone Wartezeiten enthalten und misst keine CPU-Auslastung.",
   "sharedNote": "Texturspeicher und Cache-Zähler gelten für den gemeinsamen Renderer-Cache. Zeichenbefehle und Renderdurchläufe gelten für diese Stichprobe."

@@ -69,7 +69,7 @@ import { PixelSelectionOverlay, PixelSelectionToolbar } from "./selection/PixelS
 import { attachmentSelection } from "../state/selection/attachments";
 import { useTransformSnapping } from "./interaction/snapping/use-transform-snapping";
 import { CanvasMarquee } from "./selection/CanvasMarquee";
-import { CanvasVectorEditing } from "./vector/CanvasVectorEditing";
+import { CanvasObjectEditing } from "./shared/CanvasObjectEditing";
 import { EffectGizmo } from "./effects/EffectGizmo";
 import "./canvas.css";
 export type { Tool } from "./interaction/gestures";
@@ -523,6 +523,7 @@ export function EditorCanvas({
             style={artboardStyle(activeBoard, layout, shown)}
           >
             <EditorScene
+              engine={engine}
               controller={controller}
               onError={onError}
               zoom={view.zoom}
@@ -551,7 +552,7 @@ export function EditorCanvas({
             viewSource={pageViewSource}
             viewport={viewport}
           />
-          <CanvasVectorEditing
+          <CanvasObjectEditing
             engine={engine}
             controller={controller}
             viewSource={pageViewSource}

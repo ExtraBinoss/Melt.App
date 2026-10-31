@@ -49,7 +49,8 @@
     "animation": "Animatie",
     "audio": "Audio",
     "gpu": "GPU",
-    "videos": "Video’s"
+    "videos": "Video’s",
+    "spatial": "3D"
   },
   "metrics": {
     "layers": "Lagen",
@@ -76,7 +77,11 @@
     "videos": "Video’s",
     "animationChannels": "Animatiekanalen",
     "audioProcessing": "Audioverwerkingstijd",
-    "animationUpdate": "Animatie-update op de host"
+    "animationUpdate": "Animatie-update op de host",
+    "spatialLayers": "3D-lagen",
+    "spatialMeshes": "3D-mazen",
+    "spatialVertices": "3D-hoekpunten",
+    "spatialTriangles": "3D-driehoeken"
   },
   "warmthNote": "Toont de huidige cachestatus. De CPU-hosttijd kan asynchrone wachttijd bevatten en meet geen CPU-gebruik.",
   "sharedNote": "Textuurgeheugen en cachetellers gelden voor de gedeelde renderercache. Tekenopdrachten en renderpassen gelden voor deze meting."

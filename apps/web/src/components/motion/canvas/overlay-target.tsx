@@ -1,3 +1,4 @@
+import { spatialPropertyLabel } from "../../spatial/presentation";
 import { motionTimeToSeconds, getEffectDefinition } from "@musart/core";
 import { Spline } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -30,16 +31,18 @@ export function CanvasTimelineTarget(props: CanvasTimelineTargetProps) {
   if (row.kind === "property") {
     const target = row.property.target;
     if (target.kind === "layer")
-      name = t(
-        (
-          {
-            x: "positionX",
-            y: "positionY",
-            "fillGradient.angle": "gradientAngle",
-            "fillGradient.kind": "gradientKind",
-          } as Record<string, string>
-        )[target.property] ?? target.property,
-      );
+      name = target.property.startsWith("spatial.")
+        ? spatialPropertyLabel(target.property, t)
+        : t(
+            (
+              {
+                x: "positionX",
+                y: "positionY",
+                "fillGradient.angle": "gradientAngle",
+                "fillGradient.kind": "gradientKind",
+              } as Record<string, string>
+            )[target.property] ?? target.property,
+          );
     else {
       const effect = row.layer.effects.find((effect) => effect.id === target.effectId),
         definition = effect && getEffectDefinition(effect.type),

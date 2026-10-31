@@ -49,7 +49,8 @@
     "animation": "动画",
     "audio": "音频",
     "gpu": "GPU",
-    "videos": "视频"
+    "videos": "视频",
+    "spatial": "3D"
   },
   "metrics": {
     "layers": "图层",
@@ -76,7 +77,11 @@
     "videos": "视频",
     "animationChannels": "动画通道",
     "audioProcessing": "音频处理时间",
-    "animationUpdate": "主机动画更新"
+    "animationUpdate": "主机动画更新",
+    "spatialLayers": "3D 图层",
+    "spatialMeshes": "3D 网格",
+    "spatialVertices": "3D 顶点",
+    "spatialTriangles": "3D 三角形"
   },
   "warmthNote": "反映当前缓存状态。CPU主机耗时可能包含异步等待，并非CPU利用率测量。",
   "sharedNote": "纹理内存和缓存计数器覆盖渲染器的共享缓存。绘制命令和渲染通道仅覆盖此样本。"

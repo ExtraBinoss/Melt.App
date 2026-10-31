@@ -1,3 +1,4 @@
+import { validateSpatialSource, validateSpatialScene } from "../spatial/validation";
 import { ensure } from "../errors";
 import { FORMAT_VERSION, type Project } from "./model";
 import { EFFECT_CATALOG } from "../effects/catalog";
@@ -121,6 +122,7 @@ function validateLayer(value: unknown, ids: Set<string>, assets: Record<string, 
   if (value.maskSource !== undefined) assertBoolean(value.maskSource);
   if (value.kind === "vector") validateVector(value.vector);
   else if (value.vector !== undefined) validateVector(value.vector);
+  validateSpatialSource(value, assets);
   validateLayerLayout(value, ids);
 
   assertList(value.effects, 64);
@@ -207,6 +209,7 @@ export function validateProject(value: unknown): asserts value is Project {
     validateHierarchy(page.layers);
     validateMaskGraph(page.layers);
     validatePageLayout(page);
+    if (page.spatial !== undefined) validateSpatialScene(page.spatial, ids, value.assets);
     validateCompositionMotion(
       page as unknown as Composition,
       ids,

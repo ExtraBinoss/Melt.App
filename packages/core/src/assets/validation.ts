@@ -60,6 +60,42 @@ export function validateAssetDescription(asset: Record<string, unknown>): void {
   }
   assertNumber(asset.width, 1, 32768);
   assertNumber(asset.height, 1, 32768);
+  if (asset.kind === "model3d" || asset.kind === "environment") {
+    const mimes =
+      asset.kind === "model3d"
+        ? ["model/gltf-binary"]
+        : ["image/vnd.radiance", "image/x-exr", "image/png", "image/jpeg", "image/webp"];
+    ensure(
+      mimes.includes(String(asset.mime)),
+      "INVALID_DOCUMENT",
+      "Unsupported 3D original MIME type",
+    );
+    assertNumber(asset.byteLength, 1, 64 * 1024 * 1024);
+    ensure(
+      Number.isSafeInteger(asset.byteLength),
+      "INVALID_DOCUMENT",
+      "Invalid 3D original length",
+    );
+    assertText(asset.dataUrl, 90_000_000);
+    ensure(
+      typeof asset.dataUrl === "string" && asset.dataUrl.startsWith(`data:${asset.mime};base64,`),
+      "INVALID_DOCUMENT",
+      "3D originals must be embedded base64",
+    );
+    if (asset.clips !== undefined) {
+      ensure(
+        asset.kind === "model3d" && Array.isArray(asset.clips) && asset.clips.length <= 64,
+        "INVALID_DOCUMENT",
+        "Invalid model clips",
+      );
+      for (const clip of asset.clips as unknown[]) {
+        assertRecord(clip);
+        assertText(clip.name, 256);
+        assertNumber(clip.duration, 0, 86400);
+      }
+    }
+    return;
+  }
   if (asset.kind === "video") {
     ensure(/^video\/[\w.+-]+$/.test(asset.mime), "INVALID_DOCUMENT", "Unsupported video MIME type");
     ensure(

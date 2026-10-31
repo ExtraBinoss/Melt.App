@@ -268,3 +268,28 @@ export type { VectorCorner, VectorNodeEditing } from "./vector/model";
 
 export { arrangeArtboards, ARTBOARD_GAP } from "./pages/workspace";
 export type { ArtboardGeometry, ArtboardPlacement, ArtboardWorkspace } from "./pages/workspace";
+
+export type {
+  SpatialLayer,
+  SpatialScene,
+  SpatialLight,
+  SpatialMaterial,
+  SpatialSource,
+  SpatialPrimitive,
+} from "./spatial/model";
+export {
+  createSpatialLayer,
+  createSpatialScene,
+  createSpatialLight,
+  DEFAULT_SPATIAL_SCENE,
+  SPATIAL_ENVIRONMENTS,
+} from "./spatial/defaults";
+export { SPATIAL_MATERIALS, spatialMaterial } from "./spatial/materials";
+export {
+  SPATIAL_MOTION_SCHEMAS,
+  isSpatialMotionProperty,
+  readSpatialMotionValue,
+} from "./spatial/motion";
+export type { SpatialMotionProperty } from "./spatial/motion";
+export { isSceneAsset, isEmbeddedAsset } from "./assets/identity";
+export type { SceneAsset, EmbeddedAsset } from "./assets/model";

@@ -1,4 +1,5 @@
 import { useAtomValue } from "jotai";
+import { spatialEditingAtom } from "../../state/session/spatial-editing";
 import { vectorEditingAtom } from "../../state/session/vector-editing";
 import { memo, useLayoutEffect, useMemo, useRef, type PointerEvent, type RefObject } from "react";
 import { createLayerGeometryIndex, type EnginePort } from "@musart/core";
@@ -27,6 +28,7 @@ export const CanvasSelection = memo(function CanvasSelection({
   onHandle: (event: PointerEvent<HTMLButtonElement>) => void;
 }) {
   const editing = useAtomValue(vectorEditingAtom(engine));
+  const spatialEditing = useAtomValue(spatialEditingAtom(engine));
   const page = useEngineValue(
     engine,
     (snapshot) =>
@@ -53,6 +55,7 @@ export const CanvasSelection = memo(function CanvasSelection({
       />
       <SelectionPlane controller={controller} viewSource={viewSource}>
         {showHandles &&
+          !spatialEditing &&
           !(
             selected.length === 1 &&
             editing?.layerId === selected[0]!.id &&

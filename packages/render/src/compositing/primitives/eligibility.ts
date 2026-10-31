@@ -2,6 +2,7 @@ import type { Layer } from "@musart/core";
 /** Complex paint/compositing stays on the exact isolated-surface path. */
 export function isInstancedPrimitive(layer: Layer): boolean {
   return (
+    !layer.spatial?.enabled &&
     (layer.kind === "rectangle" || layer.kind === "ellipse") &&
     layer.blendMode === "normal" &&
     !layer.mask?.enabled &&

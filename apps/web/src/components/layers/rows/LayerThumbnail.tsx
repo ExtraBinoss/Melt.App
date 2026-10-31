@@ -1,5 +1,5 @@
 import { memo, useEffect, useMemo, useRef, useState } from "react";
-import { Image, Type, Shapes, Folder, Square, Circle, Clapperboard } from "lucide-react";
+import { Image, Type, Shapes, Folder, Square, Circle, Clapperboard, Box } from "lucide-react";
 import { isImageAsset, type Layer, type Asset } from "@musart/core";
 import { scheduleLayerThumbnail } from "./thumbnail-idle";
 import { observeLayerThumbnail } from "./thumbnail-visibility";
@@ -110,7 +110,7 @@ export const LayerThumbnail = memo(function LayerThumbnail({
       controller.abort();
     };
   }, [visible, previewExport, layer.id, key, pageId, requestVariant]);
-  const Icon = icons[layer.kind];
+  const Icon = layer.spatial?.enabled ? Box : icons[layer.kind];
   const source =
     value?.key === key && value.exporter === previewExport
       ? value.url

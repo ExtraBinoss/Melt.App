@@ -103,6 +103,10 @@ export function createSourceKeys(
           },
           scale,
           page.colorSpace ?? "srgb",
+          layer.spatial?.enabled ? (page.spatial ?? null) : null,
+          layer.spatial?.enabled && page.spatial?.environment.assetId
+            ? assetIdentity(assets[page.spatial.environment.assetId])
+            : null,
           maskKey,
           assetIdentity(layer.assetId ? assets[layer.assetId] : undefined),
           layer.kind === "video" ? (options.videoStamp?.(layer.id) ?? null) : null,
