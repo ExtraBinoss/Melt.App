@@ -12,6 +12,13 @@ import { useHydrated } from "@tanstack/react-router";
 import { formatUiError } from "../../state/i18n/errors/format";
 import { ImagePlus, Upload, RotateCcw } from "lucide-react";
 import { Button } from "../../components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "../../components/ui/dropdown-menu";
+import { DropdownChevron } from "../../components/shared/DropdownChevron";
 import { Throbber } from "../../components/ui/throbber/Throbber";
 import { createBrandActivity } from "../../ui/brand/activity";
 import type { BrandActivity } from "../../ui/brand/playback";
@@ -90,7 +97,7 @@ export function Converter({ tool }: { tool: ToolDefinition }) {
     },
     [Workspace, activity, tool],
   );
-  async function sample() {
+  async function sample(media: "image" | "video") {
     sampleRequest.current?.abort();
     const abort = new AbortController();
     sampleRequest.current = abort;
@@ -99,14 +106,29 @@ export function Converter({ tool }: { tool: ToolDefinition }) {
     setLabel("loadingEngine");
     activity.set(true);
     try {
-      const response = await fetch(publicHref("/benchmark/06-boathouse-1.jpg"), {
+      // Flower is the existing locally hosted MDN CC0 clip used by the motion templates.
+      const example =
+        media === "image"
+          ? {
+              path: "/benchmark/06-boathouse-1.jpg",
+              name: "melt-example.jpg",
+              type: "image/jpeg",
+              budget: 1024 * 1024,
+            }
+          : {
+              path: "/templates/motion/media/flower.mp4",
+              name: "melt-example.mp4",
+              type: "video/mp4",
+              budget: 2 * 1024 * 1024,
+            };
+      const response = await fetch(publicHref(example.path), {
         signal: abort.signal,
       });
       if (!response.ok) throw new Error(`The example could not be loaded (${response.status}).`);
       const blob = await response.blob();
-      if (blob.size > 1024 * 1024) throw new Error("The example exceeds its size budget.");
+      if (blob.size > example.budget) throw new Error("The example exceeds its size budget.");
       if (life.current.alive && request === life.current.request)
-        choose(new File([blob], "melt-example.jpg", { type: "image/jpeg" }));
+        choose(new File([blob], example.name, { type: example.type }));
     } catch (failure) {
       if (!abort.signal.aborted && life.current.alive && request === life.current.request) {
         setError(failure);
@@ -156,9 +178,25 @@ export function Converter({ tool }: { tool: ToolDefinition }) {
                 <Upload size={14} />
                 {t("chooseFile")}
               </Button>
-              <Button disabled={!ready} variant="ghost" size="sm" onClick={() => void sample()}>
-                {t("sample")}
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button disabled={!ready} variant="ghost" size="sm">
+                    {t("sample")}
+                    <DropdownChevron />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  align="center"
+                  style={{ width: "var(--radix-dropdown-menu-trigger-width)" }}
+                >
+                  <DropdownMenuItem onSelect={() => void sample("image")}>
+                    {t("image")}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onSelect={() => void sample("video")}>
+                    {t("video")}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           )}
           <Loading activity={activity} label={t(label)} />

@@ -120,9 +120,6 @@ function ToolControls({
                 label: `${value} px`,
               }))}
             />
-            <p className="tool-output-size">
-              {t("outputSize", { width: state.width, height: state.height })}
-            </p>
             <Button
               className="tool-compare"
               variant="outline"
@@ -219,9 +216,18 @@ function ToolControls({
                 </Button>
               </>
             ) : (
-              <Button disabled={blocked} onClick={() => void controller.download(format)}>
+              <Button
+                className="tool-download-button"
+                disabled={blocked}
+                onClick={() => void controller.download(format)}
+              >
                 <Download size={15} />
-                {t(tool.media === "image" ? "downloadImage" : "downloadVideo")}
+                <span>
+                  <span>{t(tool.media === "image" ? "downloadImage" : "downloadVideo")}</span>
+                  <span className="tool-download-size" aria-hidden="true">
+                    {state.width} × {state.height} px
+                  </span>
+                </span>
               </Button>
             )}
           </div>

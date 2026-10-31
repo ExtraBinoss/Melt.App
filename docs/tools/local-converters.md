@@ -66,3 +66,9 @@ validation reads are not part of production rendering.
 
 Preview cards are derived from actual Melt exports of the existing Luca Bravo
 boathouse fixture. See the public preview attribution for the source and license.
+
+The sample chooser offers Image and Video before loading the renderer. The image
+reuses the boathouse fixture; the video reuses the locally hosted MDN CC0 flower
+clip, with provenance in `apps/web/public/templates/motion/media/sources.json`.
+Sample requests are abortable and reject stale responses. Output dimensions live
+inside the download button for both media types.

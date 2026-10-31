@@ -6,6 +6,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Offer image and video examples from the local tool sample menu, reusing the bundled CC0 flower clip, and show output dimensions inside the download button instead of below resolution controls.
+
 - Make every shared Select match its trigger width in both item-aligned and popper modes, including effect color modes. Remove per-screen sizing flags, retain editor positioning and keyboard focus, and track open-field resizing with local observers.
 
 - Hide language-menu scroll arrows while retaining scroll shadows, native wheel input and keyboard selection. Match standalone tool/language menus to their trigger width without adding floating ancestor tracking to item-aligned editor menus. Organize converter guides into numbered steps, compact output notes and spaced tips.
