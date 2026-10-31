@@ -1,4 +1,5 @@
 import { registerFeatureTranslations } from "../../../state/i18n/feature-resources";
+import { messages as ascii } from "./library/ascii/messages";
 import shadow from "./library/shadow/messages.json";
 import morph from "./library/morph/messages.json";
 import ripple from "./library/ripple/messages.json";
@@ -15,6 +16,7 @@ import receipt from "./library/receipt/messages.json";
 import pinkPhosphor from "./library/pink-phosphor/messages.json";
 /** UI resources stay on the web side; the core catalog only contains stable label keys. */
 export const libraryMessages = {
+  ascii,
   morph,
   shadow,
   ripple,
@@ -35,6 +37,6 @@ for (const [type, messages] of Object.entries(libraryMessages)) {
 const labels: Record<string, Record<string, string>> = {};
 for (const [type, messages] of Object.entries(libraryMessages)) {
   for (const [language, resource] of Object.entries(messages))
-    (labels[language] ??= {})[type] = resource.name;
+    if (typeof resource.name === "string") (labels[language] ??= {})[type] = resource.name;
 }
 registerFeatureTranslations("translation", labels);

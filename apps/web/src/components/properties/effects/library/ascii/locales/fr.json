@@ -1,0 +1,21 @@
+{
+  "name": "ASCII",
+  "charactersHint": "Classez les caractères du plus léger au plus dense. Les espaces comptent. Utilisez 1 à 64 caractères ; les doublons renforcent une nuance.",
+  "parameter": {
+    "scale": "Taille des caractères",
+    "characters": "Caractères",
+    "brightness": "Luminosité",
+    "contrast": "Contraste",
+    "gamma": "Détail des ombres",
+    "palette": "Mode de couleur",
+    "foreground": "Encre / teinte",
+    "background": "Arrière-plan",
+    "shades": "Nuances",
+    "invert": "Inverser la densité",
+    "cellAspect": "Largeur des cellules",
+    "glyphScale": "Taille des glyphes",
+    "weight": "Épaisseur de l’encre",
+    "color": "Couleurs de la source"
+  },
+  "palette": { "image": "Tons de l’image", "tonal": "Encre nuancée", "solid": "Encre unie" }
+}

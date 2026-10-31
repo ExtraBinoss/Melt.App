@@ -30,6 +30,7 @@ export function createParameterUniforms(effect: Effect): ParameterUniforms {
   for (const parameter of getEffectDefinition(effect.type).parameters.filter(scoped)) {
     const value = settings[parameter.key];
     validateEffectParameter(parameter, value, "INVALID_DOCUMENT");
+    if (parameter.kind === "text") continue;
     if (parameter.kind === "color") {
       const color = parseColor(String(value));
       colors[parameter.key] = uniform(new Vector3(color.x, color.y, color.z));
@@ -44,6 +45,7 @@ export function updateParameterUniforms(controls: ParameterUniforms, effect: Eff
   for (const parameter of getEffectDefinition(effect.type).parameters.filter(scoped)) {
     const value = settings[parameter.key];
     validateEffectParameter(parameter, value, "INVALID_DOCUMENT");
+    if (parameter.kind === "text") continue;
     if (parameter.kind === "color") {
       const color = parseColor(String(value));
       controls.colors[parameter.key]!.value.set(color.x, color.y, color.z);

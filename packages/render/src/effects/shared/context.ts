@@ -1,5 +1,6 @@
 import type { Node, Texture, TextureNode } from "three/webgpu";
 import type { EffectUniforms } from "./uniforms";
+import type { GlyphAtlasBinding } from "../ascii/binding";
 
 /** GPU-only inputs. Source pixels and intermediate results never cross this boundary. */
 export interface EffectNodeContext {
@@ -7,6 +8,7 @@ export interface EffectNodeContext {
   readonly backdrop?: TextureNode<"vec4">;
   readonly controls: EffectUniforms;
   readonly getGlyphAtlas: () => Texture;
+  readonly bindGlyphAtlas?: () => GlyphAtlasBinding;
 }
 export type EffectNodeBuilder = (context: EffectNodeContext) => Node<"vec4">;
 /** Authored layer dimensions, independent of its current raster density. */

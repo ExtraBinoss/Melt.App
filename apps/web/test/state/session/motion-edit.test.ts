@@ -184,7 +184,9 @@ test("every catalog effect routes real typed parameter edits through the shared 
           ? !value
           : parameter.kind === "color"
             ? "#123456"
-            : (parameter.options.find((option) => option.value !== value)?.value ?? value);
+            : parameter.kind === "text"
+              ? " .#"
+              : (parameter.options.find((option) => option.value !== value)?.value ?? value);
     const target: MotionPropertyTarget =
       parameter.scope === "settings"
         ? { kind: "effectSetting", layerId: "shape", effectId: "fx", property: parameter.key }

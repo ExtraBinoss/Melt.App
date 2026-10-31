@@ -8,6 +8,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 - Hide language-menu scroll arrows while retaining scroll shadows, native wheel input and keyboard selection. Match standalone tool/language menus to their trigger width without adding floating ancestor tracking to item-aligned editor menus. Organize converter guides into numbered steps, compact output notes and spaced tips.
 
+- Extend the shared ASCII effect with editable character ramps, tonal/shadow controls, ink/background colors, density reversal and cell/glyph shaping. Add validated generic text parameters with hold animation and single-commit drafts. Reuse compiled passes with a bounded eight-atlas cache; preserve legacy pixels and verify fifty photographic images / one hundred effects on both Three backends with zero production readbacks.
+
 - Move artboard mode controls inside each bottom-right corner with bounded zoom scaling. Replace heading plus buttons with one imperative canvas action on free sides, persist directional placement through validated atomic commands and one undo, and preserve the first screen pose before a reduced-motion-aware reframe.
 
 - Translate the edited SVG, font picker, artboard, studio loading, library card, template and preview interfaces into all twelve advertised languages, including composition-mode confirmations. Remove remaining local English/French fallbacks in the canvas changes and resolve shared copy through feature JSON, with interpolation and RTL regressions. Restore native SVG dialog opener focus and reserve RTL title space for its close control; keep font specimens honest for bundled Latin-only faces.

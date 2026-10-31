@@ -43,11 +43,23 @@ export interface ColorEffectParameter {
   readonly default: string;
   readonly visibleWhen?: { readonly key: string; readonly values: readonly string[] };
 }
+export interface TextEffectParameter {
+  readonly kind: "text";
+  readonly key: string;
+  readonly scope: "settings";
+  readonly default: string;
+  readonly labelKey: string;
+  readonly descriptionKey?: string;
+  readonly minLength: number;
+  readonly maxLength: number;
+  readonly visibleWhen?: { readonly key: string; readonly values: readonly string[] };
+}
 export type EffectParameter =
   | NumberEffectParameter
   | BooleanEffectParameter
   | ChoiceEffectParameter
-  | ColorEffectParameter;
+  | ColorEffectParameter
+  | TextEffectParameter;
 export interface EffectDefinition {
   readonly source?: "geometry";
   readonly type: EffectType;

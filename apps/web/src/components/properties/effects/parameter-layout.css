@@ -73,3 +73,34 @@
 .layer-effect-details .effect-compositing {
   grid-template-columns: minmax(0, 1fr);
 }
+.effect-text-field {
+  display: grid;
+  grid-template-columns: var(--effect-label-width) minmax(0, 1fr);
+  align-items: center;
+  min-width: 0;
+  height: var(--effect-control-height, 30px);
+}
+.effect-text-field > span {
+  font-size: 11px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding-inline-end: 8px;
+}
+.effect-text-field input {
+  min-width: 0;
+  width: 100%;
+  height: var(--effect-control-height, 30px);
+  padding-inline: 7px;
+  font: 11px var(--font-mono, monospace);
+}
+.effect-text-label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.effect-text-label label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

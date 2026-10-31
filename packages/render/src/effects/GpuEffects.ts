@@ -1,5 +1,11 @@
 import { compileGpuScene } from "../compositing/compile";
-import { getEffectDefinition, resolveGradientSettings, type Effect } from "@musart/core";
+import {
+  ASCII_DEFAULT_CHARACTERS,
+  getEffectDefinition,
+  resolveEffectSettings,
+  resolveGradientSettings,
+  type Effect,
+} from "@musart/core";
 import {
   Mesh,
   MeshBasicNodeMaterial,
@@ -11,13 +17,13 @@ import {
   RenderTarget,
   Scene,
   UnsignedByteType,
-  type CanvasTexture,
   type Texture,
   type TextureNode,
   type WebGPURenderer,
 } from "three/webgpu";
-import { texture, uv } from "three/tsl";
-import { createGlyphAtlas } from "./ascii/atlas";
+import { texture, uniform, uv } from "three/tsl";
+import { GlyphAtlasCache } from "./ascii/cache";
+import type { GlyphAtlasBinding } from "./ascii/binding";
 import { assertTextureSize, gpuTextureLimit } from "../cache/texture-limits";
 import { effectStages, type EffectStage } from "./pipeline";
 import { compositeEffect } from "./shared/compositing/node";
@@ -34,6 +40,7 @@ interface EffectPass {
   readonly source: TextureNode<"vec4">;
   readonly backdrop: TextureNode<"vec4">;
   readonly controls: EffectUniforms;
+  readonly glyph: { characters: string; binding: GlyphAtlasBinding | null };
 }
 export interface GpuEffectStats {
   /** Successful draws since this operator was constructed. */
@@ -52,7 +59,7 @@ export class GpuEffects {
   private readonly passes = new Map<string, EffectPass>();
   private readonly compiled = new WeakSet<EffectPass>();
   private mesh: Mesh<PlaneGeometry, MeshBasicNodeMaterial> | null = null;
-  private atlas: CanvasTexture | null = null;
+  private readonly atlases = new GlyphAtlasCache();
   private scratch: RenderTarget | null = null;
   private backdrop: RenderTarget | null = null;
   private renderedPasses = 0;
@@ -62,9 +69,17 @@ export class GpuEffects {
 
   private getGlyphAtlas = (): Texture => {
     assertTextureSize(256, 16, gpuTextureLimit(this.renderer));
-    this.atlas ??= createGlyphAtlas();
-    return this.atlas;
+    return this.atlases.get();
   };
+  private characters(effect: Effect): string {
+    return effect.type === "ascii"
+      ? String(resolveEffectSettings(effect).characters)
+      : ASCII_DEFAULT_CHARACTERS;
+  }
+  private glyphTexture(characters: string): Texture {
+    assertTextureSize(Array.from(characters).length * 16, 16, gpuTextureLimit(this.renderer));
+    return this.atlases.get(characters);
+  }
   private getPass(
     effect: Effect,
     stage: EffectStage,
@@ -83,7 +98,18 @@ export class GpuEffects {
       const source = texture(input),
         backdrop = texture(original);
       const controls = createEffectUniforms(effect, width, height, logical);
-      const node = stage.builder({ source, backdrop, controls, getGlyphAtlas: this.getGlyphAtlas });
+      const glyph: EffectPass["glyph"] = { characters: this.characters(effect), binding: null };
+      const node = stage.builder({
+        source,
+        backdrop,
+        controls,
+        getGlyphAtlas: this.getGlyphAtlas,
+        bindGlyphAtlas: () =>
+          (glyph.binding ??= {
+            texture: texture(this.glyphTexture(glyph.characters)),
+            count: uniform(Array.from(glyph.characters).length),
+          }),
+      });
       const material = new MeshBasicNodeMaterial({
         depthTest: false,
         depthWrite: false,
@@ -99,7 +125,7 @@ export class GpuEffects {
             advanced,
           )
         : node;
-      pass = { material, source, backdrop, controls };
+      pass = { material, source, backdrop, controls, glyph };
       this.passes.set(passKey, pass);
     }
     pass.source.value = input;
@@ -107,6 +133,11 @@ export class GpuEffects {
     pass.controls.sourceFlipY.value = input.isRenderTargetTexture ? 1 : 0;
     pass.controls.backdropFlipY.value = original.isRenderTargetTexture ? 1 : 0;
     updateEffectUniforms(pass.controls, effect, width, height, logical);
+    pass.glyph.characters = this.characters(effect);
+    if (pass.glyph.binding) {
+      pass.glyph.binding.texture.value = this.glyphTexture(pass.glyph.characters);
+      pass.glyph.binding.count.value = Array.from(pass.glyph.characters).length;
+    }
     if (stage.treatment) {
       pass.controls.amount.value = 1;
       pass.controls.scale.value = resolveGradientSettings(effect.settings).size;
@@ -176,15 +207,15 @@ export class GpuEffects {
       : this.backdrop
         ? this.backdrop.width * this.backdrop.height * 4
         : 0;
-    const atlas =
-      this.atlas ||
-      enabled.some(
+    const glyphs = enabled
+      .filter(
         (effect) =>
           effect.type === "ascii" ||
           (effect.type === "gradient" &&
             resolveGradientSettings(effect.settings).treatment === "ascii"),
-      );
-    return scratch + backdrop + (atlas ? 256 * 16 * 4 : 0);
+      )
+      .map((effect) => this.characters(effect));
+    return scratch + backdrop + this.atlases.projectedBytes(glyphs);
   }
   private getBackdrop(width: number, height: number): RenderTarget {
     this.backdrop ??= new RenderTarget(width, height, {
@@ -285,7 +316,7 @@ export class GpuEffects {
       targets: Number(Boolean(this.scratch)) + Number(Boolean(this.backdrop)),
       bytes:
         (this.scratch ? this.scratch.width * this.scratch.height * 4 : 0) +
-        (this.atlas ? 256 * 16 * 4 : 0) +
+        this.atlases.bytes() +
         (this.backdrop ? this.backdrop.width * this.backdrop.height * 4 : 0),
       materials: this.passes.size,
     };
@@ -297,8 +328,7 @@ export class GpuEffects {
     this.backdrop = null;
     this.scratch?.dispose();
     this.scratch = null;
-    this.atlas?.dispose();
-    this.atlas = null;
+    this.atlases.dispose();
     for (const pass of this.passes.values()) pass.material.dispose();
     this.passes.clear();
     if (this.mesh) this.scene.remove(this.mesh);

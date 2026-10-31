@@ -32,7 +32,10 @@ export class ToolDocument {
     this.clipLength = Math.min(60, source.duration);
     this.keepAudio = source.hasAudio;
     const { width, height } = this.size(this.edge);
-    const effect = createEffect(tool.effect, { id: crypto.randomUUID() });
+    const effect = createEffect(tool.effect, {
+      id: crypto.randomUUID(),
+      ...(tool.initialSettings ? { settings: { ...tool.initialSettings } } : {}),
+    });
     const layer = createLayer(tool.media === "video" ? "video" : "image", {
       id: this.layerId,
       name: source.file.name,

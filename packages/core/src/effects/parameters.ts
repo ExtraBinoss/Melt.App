@@ -35,6 +35,14 @@ export function validateEffectParameter(
       code,
       "Effect colors must be six-digit RGB hex values.",
     );
+  else if (parameter.kind === "text")
+    ensure(
+      typeof value === "string" &&
+        value.length >= parameter.minLength &&
+        value.length <= parameter.maxLength,
+      code,
+      "Effect text is outside its length bounds.",
+    );
   else
     ensure(
       typeof value === "string" && parameter.options.some((option) => option.value === value),

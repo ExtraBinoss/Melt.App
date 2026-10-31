@@ -78,6 +78,13 @@ function parameterSchema(parameter: EffectParameter): MotionPropertySchema {
   if (parameter.kind === "boolean") return { kind: "boolean", interpolation: "hold" };
   if (parameter.kind === "color")
     return { kind: "color", format: "rgb", interpolation: "continuous" };
+  if (parameter.kind === "text")
+    return {
+      kind: "string",
+      minLength: parameter.minLength,
+      maxLength: parameter.maxLength,
+      interpolation: "hold",
+    };
   return choice(parameter.options.map((option) => option.value));
 }
 

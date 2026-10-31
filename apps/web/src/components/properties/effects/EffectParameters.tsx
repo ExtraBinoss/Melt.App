@@ -25,6 +25,7 @@ import { SelectField } from "../../shared/SelectField";
 import { Switch } from "../../ui/switch";
 import { EffectPlayback } from "./EffectPlayback";
 import { EffectColor } from "./EffectColor";
+import { EffectText } from "./EffectText";
 import { IconButton } from "../../shared/IconButton";
 import { freezeEffectPreviews } from "../../../state/session/effect-preview";
 import { useResetFeedback } from "../../shared/use-reset-feedback";
@@ -264,6 +265,28 @@ const ParameterField = memo(function ParameterField({
     : undefined;
   const change = (next: number | boolean | string, preview = false) =>
     onChange(patchEffectParameter(effect, parameter, next), preview);
+  if (parameter.kind === "text")
+    return (
+      <MotionField engine={engine} target={target} label={label} disabled={disabled}>
+        <MotionValueField engine={engine} target={target} fallback={value}>
+          {(live) => (
+            <EffectText
+              identity={effect}
+              label={label}
+              value={String(live)}
+              minLength={parameter.minLength}
+              maxLength={parameter.maxLength}
+              hint={parameter.descriptionKey ? t(parameter.descriptionKey) : undefined}
+              disabled={disabled}
+              onStart={onStart}
+              onPreview={(next) => change(next, true)}
+              onCommit={(next) => change(next)}
+              onCancel={onCancel}
+            />
+          )}
+        </MotionValueField>
+      </MotionField>
+    );
   if (parameter.kind === "boolean")
     return (
       <MotionField engine={engine} target={target} label={label} disabled={disabled}>
@@ -290,6 +313,7 @@ const ParameterField = memo(function ParameterField({
             <label className="effect-select-field">
               <span>{label}</span>
               <SelectField
+                matchTriggerWidth={!engine}
                 identity={effect}
                 label={label}
                 value={String(live)}
@@ -356,6 +380,7 @@ const ParameterField = memo(function ParameterField({
       engine={engine}
       target={target}
       displayScale={parameter.displayScale}
+      decimalScale={parameter.integer ? 0 : undefined}
       identity={effect}
       label={label}
       value={Number(value) * parameter.displayScale}

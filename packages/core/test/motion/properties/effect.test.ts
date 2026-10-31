@@ -98,3 +98,18 @@ it("rejects foreign settings, prototype keys, unknown effects and scope confusio
   expect(readEffectMotionValue(unknown, "amount", false)).toBeUndefined();
   expect(effectMotionCapabilityInventory(unknown.type)).toEqual([]);
 });
+
+it("custom effect text has a bounded hold schema instead of numeric interpolation", () => {
+  const effect = createEffect("ascii"),
+    schema = effectMotionSchema(effect, "characters", true)!;
+  expect(schema).toMatchObject({
+    kind: "string",
+    minLength: 1,
+    maxLength: 64,
+    interpolation: "hold",
+  });
+  expect(isValidMotionValue(schema, " 01@█")).toBe(true);
+  expect(isValidMotionValue(schema, "")).toBe(false);
+  expect(isValidMotionValue(schema, "x".repeat(65))).toBe(false);
+  expect(isValidMotionValue(schema, 42)).toBe(false);
+});

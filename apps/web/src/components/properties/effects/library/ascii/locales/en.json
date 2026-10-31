@@ -1,0 +1,21 @@
+{
+  "name": "ASCII",
+  "charactersHint": "Order characters from light to dense. Spaces count. Use 1–64 characters; duplicates can give a tone more weight.",
+  "parameter": {
+    "scale": "Character size",
+    "characters": "Characters",
+    "brightness": "Brightness",
+    "contrast": "Contrast",
+    "gamma": "Shadow detail",
+    "palette": "Color mode",
+    "foreground": "Ink / tint",
+    "background": "Background",
+    "shades": "Tonal steps",
+    "invert": "Reverse density",
+    "cellAspect": "Cell width",
+    "glyphScale": "Glyph size",
+    "weight": "Ink weight",
+    "color": "Source colors"
+  },
+  "palette": { "image": "Image tones", "tonal": "Shaded ink", "solid": "Solid ink" }
+}

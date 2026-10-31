@@ -256,7 +256,7 @@ test.each(Object.keys(EFFECT_CATALOG) as EffectType[])(
       expect(label).not.toContain(":");
       expect(
         screen.getByRole(
-          parameter.kind === "number"
+          parameter.kind === "number" || parameter.kind === "text"
             ? "textbox"
             : parameter.kind === "boolean"
               ? "switch"
@@ -269,7 +269,7 @@ test.each(Object.keys(EFFECT_CATALOG) as EffectType[])(
     }
   },
 );
-test("Dither and Grain expose actual seeds while ASCII keeps its fixed glyph quantization private", () => {
+test("Dither and Grain expose seeds while ASCII exposes its own tonal steps", () => {
   const d = setup(),
     change = vi.fn();
   const view = d.mount(<EffectParameters effect={createEffect("dither")} onChange={change} />);
@@ -282,6 +282,7 @@ test("Dither and Grain expose actual seeds while ASCII keeps its fixed glyph qua
   view.rerender(<EffectParameters effect={createEffect("ascii")} onChange={change} />);
   expect(screen.queryByRole("textbox", { name: "Graine" })).not.toBeInTheDocument();
   expect(screen.queryByRole("textbox", { name: "Niveaux" })).not.toBeInTheDocument();
+  expect(screen.getByRole("textbox", { name: "Nuances" })).toHaveValue("16");
 });
 test("Gradient treatment controls expose actual Dither levels and fine chromatic shift in document units", () => {
   const d = setup(),

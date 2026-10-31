@@ -73,6 +73,7 @@ export type {
   NumberEffectParameter,
   ChoiceEffectParameter,
   ColorEffectParameter,
+  TextEffectParameter,
 } from "./effects/catalog";
 export {
   getEffectParameter,
@@ -82,6 +83,7 @@ export {
 } from "./effects/parameters";
 export type { EffectParameterValue } from "./effects/parameters";
 export { resolveEffectSettings } from "./effects/settings";
+export { ASCII_DEFAULT_CHARACTERS } from "./effects/ascii/definition";
 export type { EffectSettings } from "./document/model";
 export { GRADIENT_STYLES, GRADIENT_TREATMENTS } from "./effects/gradient/model";
 export type {

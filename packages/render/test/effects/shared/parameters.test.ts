@@ -51,3 +51,19 @@ it("reports malformed settings instead of creating invalid GPU values", () => {
     updateParameterUniforms(controls, { ...effect, settings: { tintColor: "invalid" } }),
   ).toThrow();
 });
+
+it("validates text resources without coercing character lists into NaN uniforms", () => {
+  const effect = createEffect("ascii"),
+    controls = createParameterUniforms(effect),
+    contrast = controls.parameters.contrast!;
+  expect(controls.parameters.characters).toBeUndefined();
+  updateParameterUniforms(controls, { ...effect, settings: { characters: " 01@", contrast: 1.5 } });
+  expect(controls.parameters.contrast).toBe(contrast);
+  expect(contrast.value).toBe(1.5);
+  expect(Object.values(controls.parameters).every((node) => Number.isFinite(node.value))).toBe(
+    true,
+  );
+  expect(() =>
+    updateParameterUniforms(controls, { ...effect, settings: { characters: "" } }),
+  ).toThrow();
+});

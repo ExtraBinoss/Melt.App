@@ -6,6 +6,7 @@ export type {
   BooleanEffectParameter,
   ChoiceEffectParameter,
   ColorEffectParameter,
+  TextEffectParameter,
   EffectParameter,
   EffectDefinition,
 } from "./definition";
@@ -27,11 +28,12 @@ import { TRANSITION_DEFINITION } from "./transition/definition";
 import { BLUR_DEFINITION } from "./blur/definition";
 import { SHADOW_DEFINITION } from "./shadow/definition";
 import { MORPH_DEFINITION } from "./morph/definition";
+import { ASCII_DEFINITION } from "./ascii/definition";
 /** Portable effect metadata shared by factories, validation and client controls. */
 export const EFFECT_CATALOG: Readonly<Record<EffectType, EffectDefinition>> = Object.freeze({
   morph: MORPH_DEFINITION,
   dither: defineEffect("dither", {}, [AMOUNT, SCALE, LEVELS, COLOR, SEED]),
-  ascii: defineEffect("ascii", { scale: 10, levels: 10, color: true }, [AMOUNT, SCALE, COLOR]),
+  ascii: ASCII_DEFINITION,
   brightness: defineEffect("brightness", { amount: 0.5 }, [AMOUNT], "adjustment"),
   contrast: defineEffect("contrast", { amount: 0.5 }, [AMOUNT], "adjustment"),
   grayscale: defineEffect("grayscale", {}, [AMOUNT], "adjustment"),
