@@ -1,4 +1,12 @@
-import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
+import {
+  useCallback,
+  useEffect,
+  useId,
+  useLayoutEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
 import { useTranslation } from "react-i18next";
 import { formatUiError } from "../../state/i18n/errors/format";
 import { ChevronDown, Download, Eye } from "lucide-react";
@@ -49,6 +57,9 @@ function ToolControls({
 }: Pick<WorkspaceProps, "file" | "tool"> & { controller: ToolController }) {
   const { t } = useTranslation("tools");
   const state = useSyncExternalStore(controller.subscribe, controller.read, controller.read);
+  const viewportId = useId();
+  const viewportRef = useRef<HTMLDivElement>(null);
+  const previousAdvancedRef = useRef(false);
   const [advanced, setAdvanced] = useState(false),
     [format, setFormat] = useState<ImageOutput | VideoOutput>(
       tool.media === "image" ? "png" : "auto",
@@ -63,6 +74,20 @@ function ToolControls({
   useEffect(() => {
     controller.open(file, tool);
   }, [controller, file, tool]);
+  useLayoutEffect(() => {
+    if (previousAdvancedRef.current === advanced) return;
+    previousAdvancedRef.current = advanced;
+    const node = viewportRef.current?.firstElementChild;
+    if (!node || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const animation = node.animate(
+      [
+        { opacity: 0.45, filter: "blur(3px)", transform: "translateY(4px)" },
+        { opacity: 1, filter: "blur(0)", transform: "translateY(0)" },
+      ],
+      { duration: 200, easing: "cubic-bezier(0.16, 1, 0.3, 1)" },
+    );
+    return () => animation.cancel();
+  }, [advanced]);
   const blocked = state.phase !== "ready";
   return (
     <TooltipProvider>
@@ -88,8 +113,19 @@ function ToolControls({
       )}
       {state.effect && (
         <>
+          <Button
+            className="tool-advanced"
+            variant="ghost"
+            size="sm"
+            aria-expanded={advanced}
+            aria-controls={viewportId}
+            onClick={() => setAdvanced(!advanced)}
+          >
+            {t(advanced ? "basic" : "advanced")}
+            <ChevronDown size={13} />
+          </Button>
           <ScrollShadow className="tool-control-scroll" fade="mask">
-            <div className="tool-control-viewport">
+            <div className="tool-control-viewport" id={viewportId} ref={viewportRef}>
               <EffectParameters
                 effect={state.effect}
                 parameterKeys={advanced ? undefined : tool.basic}
@@ -99,16 +135,6 @@ function ToolControls({
               />
             </div>
           </ScrollShadow>
-          <Button
-            className="tool-advanced"
-            variant="ghost"
-            size="sm"
-            aria-expanded={advanced}
-            onClick={() => setAdvanced(!advanced)}
-          >
-            {t(advanced ? "basic" : "advanced")}
-            <ChevronDown size={13} />
-          </Button>
           <div className="tool-output-controls">
             <SelectField
               label={t("resolution")}

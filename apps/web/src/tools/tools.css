@@ -239,7 +239,7 @@
 }
 .tool-control-viewport {
   overflow-y: auto;
-  max-height: 340px;
+  height: clamp(240px, 34dvh, 340px);
   padding-right: 5px;
 }
 .tool-controls .effect-controls {
@@ -268,7 +268,7 @@
 .tool-advanced {
   width: 100%;
   justify-content: space-between;
-  margin-top: 8px;
+  margin: 0 0 8px;
   color: var(--muted-foreground);
 }
 .tool-output-controls,
@@ -482,9 +482,6 @@
     grid-template-columns: 1fr;
     gap: 24px;
     padding-top: 50px;
-  }
-  .tool-control-viewport {
-    max-height: none;
   }
   .tool-tips ul {
     grid-template-columns: 1fr;

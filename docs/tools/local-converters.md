@@ -72,3 +72,22 @@ reuses the boathouse fixture; the video reuses the locally hosted MDN CC0 flower
 clip, with provenance in `apps/web/public/templates/motion/media/sources.json`.
 Sample requests are abortable and reject stale responses. Output dimensions live
 inside the download button for both media types.
+
+## Live effect controls
+
+The foreground tool preview uses the engine's sequential playback cursor while
+playing and its still-preview path while paused. Exact source frames remain an
+export concern. Numeric/text/color drafts no longer freeze the transport clock or
+yield to an unrelated menu entrance lease. Hidden/offscreen views and exports
+still suspend playback work.
+
+A retained session admits one in-flight frame and coalesces the next draft.
+Updates inside one gesture may finish in order while a newer draft is queued;
+commit, cancellation and source disposal invalidate that gesture's pending frame.
+This avoids starving presentation when pointer input arrives faster than rendering.
+The engine's decoded-frame and GPU budgets remain in force.
+
+Basic and Advanced controls share a fixed-height scroll viewport. Their toggle
+stays above it and reveals the updated fields with a short blur/opacity/translation
+animation; resolution, transport and download controls keep their positions.
+Reduced-motion preferences skip that animation.

@@ -6,6 +6,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Keep tool videos playing during effect drafts and menu previews, use sequential engine decoding for playback, and coalesce rapid edits without starving presentation. Preserve exact exports, stale-gesture rejection and bounded resources. Anchor Basic/Advanced controls in a fixed scroll area with a reduced-motion-aware blur reveal.
+
 - Offer image and video examples from the local tool sample menu, reusing the bundled CC0 flower clip, and show output dimensions inside the download button instead of below resolution controls.
 
 - Make every shared Select match its trigger width in both item-aligned and popper modes, including effect color modes. Remove per-screen sizing flags, retain editor positioning and keyboard focus, and track open-field resizing with local observers.

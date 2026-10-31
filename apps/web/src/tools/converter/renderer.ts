@@ -6,7 +6,6 @@ import {
   type Effect,
   type MotionProgram,
 } from "@musart/core";
-import { getUiPresentation } from "../../state/session/ui-presentation";
 import type { ToolDocument } from "./model";
 import type { ImageOutput, ToolRenderApi } from "./types";
 
@@ -14,14 +13,11 @@ import type { ImageOutput, ToolRenderApi } from "./types";
 export class ToolRenderer {
   private readonly session: ReturnType<ToolRenderApi["createRenderSession"]>;
   private readonly abort = new AbortController();
-  private readonly presentation = getUiPresentation();
   private readonly observer: IntersectionObserver;
-  private readonly unsubscribe: () => void;
   private frame: number | null = null;
   private pending: Promise<void> | null = null;
   private program: MotionProgram | null = null;
   private dirty = true;
-  private foreground = false;
   private draft: Effect | null = null;
   private comparing = false;
   private generation = 0;
@@ -57,7 +53,6 @@ export class ToolRenderer {
       signal: this.abort.signal,
     });
     this.update();
-    this.unsubscribe = this.presentation.subscribe(this.environment);
     this.observer = new IntersectionObserver(
       (entries) => {
         this.visible = (entries[0]?.intersectionRatio ?? 0) > 0;
@@ -69,13 +64,7 @@ export class ToolRenderer {
     document.addEventListener("visibilitychange", this.environment);
   }
   private blocked() {
-    return (
-      this.frozen ||
-      !this.visible ||
-      document.hidden ||
-      this.presentation.busy() ||
-      this.draft !== null
-    );
+    return this.frozen || !this.visible || document.hidden;
   }
   private clock() {
     return this.anchor === null
@@ -106,7 +95,6 @@ export class ToolRenderer {
       this.pending
     )
       return;
-    if (this.blocked() && !this.foreground) return;
     if (this.dirty || this.playing) this.frame = requestAnimationFrame(this.tick);
   }
   update() {
@@ -119,9 +107,11 @@ export class ToolRenderer {
     this.request(true);
   }
   preview(effect: Effect | null) {
-    this.freezeClock();
+    const invalidate = effect === null || this.draft === null;
     this.draft = effect;
-    this.request(true);
+    // One in-flight preview may finish while newer draft values coalesce. Commit/cancel
+    // invalidate the gesture so a late draft cannot replace the canonical result.
+    this.request(invalidate);
   }
   compare(original: boolean) {
     this.comparing = original;
@@ -152,10 +142,9 @@ export class ToolRenderer {
       this.schedule();
     }
   }
-  private request(foreground: boolean) {
-    this.generation++;
+  private request(invalidate: boolean) {
+    if (invalidate) this.generation++;
     this.dirty = true;
-    this.foreground ||= foreground;
     this.schedule();
   }
   private page(
@@ -192,12 +181,8 @@ export class ToolRenderer {
     this.frame = null;
     if (this.closed || this.abort.signal.aborted || this.frozen || !this.visible || document.hidden)
       return;
-    if (this.blocked()) {
-      this.freezeClock();
-      if (!this.foreground) return;
-    } else if (this.playing && this.anchor === null)
-      this.anchor = performance.now() - this.time * 1000;
-    const time = this.playing && !this.blocked() ? Math.floor(this.clock() * 30) / 30 : this.time;
+    if (this.playing && this.anchor === null) this.anchor = performance.now() - this.time * 1000;
+    const time = this.playing ? Math.floor(this.clock() * 30) / 30 : this.time;
     if (!this.dirty && time === this.time) {
       this.schedule();
       return;
@@ -206,7 +191,6 @@ export class ToolRenderer {
     const { page, plan } = this.page(time, true),
       generation = this.generation;
     this.dirty = false;
-    this.foreground = false;
     this.pending = this.session
       .withCanvasFrame(
         page,
@@ -217,6 +201,8 @@ export class ToolRenderer {
           if (canvas.parentElement !== this.host) this.host.replaceChildren(canvas);
           if (this.first) {
             this.first = false;
+            // Cold shader/decoder preparation must not consume the beginning of the clip.
+            if (this.playing && this.anchor !== null) this.anchor = performance.now() - time * 1000;
             this.callbacks.ready();
           }
           if (performance.now() - this.notified > 100) {
@@ -228,7 +214,8 @@ export class ToolRenderer {
           scale: Math.min(1, 768 / Math.max(page.width, page.height)),
           motionFrame: plan,
           mediaResolver: this.model.source.resolver,
-          mediaMode: "exact",
+          // Sequential native decoding for live previews; deterministic exports remain exact.
+          mediaMode: this.playing ? "playback" : "preview",
           signal: this.abort.signal,
           canRender: () =>
             !this.closed && generation === this.generation && !this.abort.signal.aborted,
@@ -238,7 +225,6 @@ export class ToolRenderer {
         if (this.closed || this.abort.signal.aborted || generation !== this.generation) return;
         this.playing = false;
         this.dirty = false;
-        this.foreground = false;
         this.callbacks.error(error);
       })
       .finally(() => {
@@ -275,7 +261,6 @@ export class ToolRenderer {
     this.abort.abort();
     this.unlink();
     this.observer.disconnect();
-    this.unsubscribe();
     document.removeEventListener("visibilitychange", this.environment);
     if (this.frame !== null) cancelAnimationFrame(this.frame);
     this.disposal = (async () => {
