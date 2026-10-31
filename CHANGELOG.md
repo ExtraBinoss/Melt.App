@@ -6,6 +6,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Add an original Cornell Box Motion template with a procedural red/green 3D room, native shadows, silver sphere and editable brand-violet chrome text. Use two minimal A/B/A Motion actions at 60 fps with matching loop endpoints, a real rendered cover and twelve localized gallery descriptions.
+
 - Expand the native 3D library to all 21 Three geometry families and sixteen bundled CC0 Kenney GLBs, with real rendered thumbnails, a single retained rotating/orbitable preview, shared animated tabs and scroll shadows. Keep previews outside editor documents, bound original/GPU caches, verify bundled hashes and publish Add as one undoable transaction. Preserve provenance and commercial-use notices; translate controls and model names in twelve locales.
 
 - Replace Bloom Windows' sampled position curves with an exact hierarchy of two-keyframe interpolated rotations (26 keys total), register every effect window against the shared source, keep labels above all cards, and remove white shadow backings. Add native full-orbit coverage checks and sparse-preset interpolation regressions.

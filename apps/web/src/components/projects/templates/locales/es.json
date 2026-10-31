@@ -30,5 +30,7 @@
   "blank": "Lienzo en blanco",
   "empty": "No hay plantillas coincidentes.",
   "opening": "Preparando plantilla…",
-  "cancel": "Cancelar"
+  "cancel": "Cancelar",
+  "cornellBox": "Caja de Cornell",
+  "cornellBoxDescription": "Un estudio 3D en bucle con texto cromado, paredes de color y sombras proyectadas."
 }

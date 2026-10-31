@@ -6,6 +6,7 @@ export type MotionTemplateId =
   | "morphing-type"
   | "in-bloom"
   | "bloom-windows"
+  | "cornell-box"
   | "motion-stress-lab"
   | "sound-playground"
   | "share-your-work";

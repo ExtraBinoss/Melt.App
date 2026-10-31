@@ -30,5 +30,7 @@
   "blank": "Leere Arbeitsfläche",
   "empty": "Keine passenden Vorlagen.",
   "opening": "Vorlage wird vorbereitet…",
-  "cancel": "Abbrechen"
+  "cancel": "Abbrechen",
+  "cornellBox": "Cornell-Box",
+  "cornellBoxDescription": "Eine 3D-Schleife mit Chromschrift, farbigen Wänden und geworfenen Schatten."
 }

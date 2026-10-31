@@ -30,5 +30,7 @@
   "blank": "Puste płótno",
   "empty": "Brak pasujących szablonów.",
   "opening": "Przygotowywanie szablonu…",
-  "cancel": "Anuluj"
+  "cancel": "Anuluj",
+  "cornellBox": "Pudełko Cornella",
+  "cornellBoxDescription": "Zapętlona scena 3D z chromowanym tekstem, kolorowymi ścianami i rzucanymi cieniami."
 }

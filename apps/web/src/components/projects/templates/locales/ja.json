@@ -30,5 +30,7 @@
   "blank": "空のキャンバス",
   "empty": "一致するテンプレートはありません。",
   "opening": "テンプレートを準備中…",
-  "cancel": "キャンセル"
+  "cancel": "キャンセル",
+  "cornellBox": "コーネルボックス",
+  "cornellBoxDescription": "クローム文字、色付きの壁、影を備えたループする3Dシーン。"
 }

@@ -1,5 +1,9 @@
 # Motion templates
 
+Generate the native 3D **Cornell Box** study with `bun scripts/templates/cornell-box.ts`.
+See [Cornell Box](../../docs/guides/cornell-box.md) for original geometry, minimal
+Motion actions and native poster/export verification.
+
 Generate both editable projects without a browser or editor UI:
 
 ```sh

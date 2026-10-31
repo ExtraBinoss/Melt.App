@@ -48,6 +48,7 @@ export function validateCoverOptions(options: CoverOptions): void {
       (id) =>
         id !== "in-bloom" &&
         id !== "bloom-windows" &&
+        id !== "cornell-box" &&
         id !== "motion-stress-lab" &&
         id !== "sound-playground" &&
         id !== "morphing-type" &&
@@ -74,6 +75,7 @@ export async function renderTemplateCovers(options: CoverOptions) {
   );
   const { chromium } = await import("@playwright/test");
   const browser = await chromium.launch({
+    executablePath: process.env.CHROME_PATH,
     args: [
       "--no-sandbox",
       "--enable-unsafe-webgpu",

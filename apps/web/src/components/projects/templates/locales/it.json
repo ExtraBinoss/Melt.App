@@ -30,5 +30,7 @@
   "blank": "Tela vuota",
   "empty": "Nessun modello corrispondente.",
   "opening": "Preparazione del modello…",
-  "cancel": "Annulla"
+  "cancel": "Annulla",
+  "cornellBox": "Cornell Box",
+  "cornellBoxDescription": "Uno studio 3D in loop con testo cromato, pareti colorate e ombre proiettate."
 }

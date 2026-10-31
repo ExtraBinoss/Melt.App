@@ -30,5 +30,7 @@
   "blank": "空白画布",
   "empty": "没有匹配的模板。",
   "opening": "正在准备模板…",
-  "cancel": "取消"
+  "cancel": "取消",
+  "cornellBox": "康奈尔盒",
+  "cornellBoxDescription": "循环播放的 3D 场景，包含镀铬文字、彩色墙壁和投射阴影。"
 }

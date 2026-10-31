@@ -30,5 +30,7 @@
   "blank": "Blank canvas",
   "empty": "No matching templates.",
   "opening": "Preparing template…",
-  "cancel": "Cancel"
+  "cancel": "Cancel",
+  "cornellBox": "Cornell Box",
+  "cornellBoxDescription": "A looping 3D study with chrome type, colored walls and cast shadows."
 }

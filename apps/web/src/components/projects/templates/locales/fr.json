@@ -30,5 +30,7 @@
   "blank": "Plan de travail vierge",
   "empty": "Aucun modèle correspondant.",
   "opening": "Préparation du modèle…",
-  "cancel": "Annuler"
+  "cancel": "Annuler",
+  "cornellBox": "Cornell Box",
+  "cornellBoxDescription": "Une étude 3D en boucle avec un texte chromé, des murs colorés et des ombres portées."
 }

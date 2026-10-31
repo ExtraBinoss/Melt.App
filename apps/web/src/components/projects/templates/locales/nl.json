@@ -30,5 +30,7 @@
   "blank": "Leeg canvas",
   "empty": "Geen overeenkomende sjablonen.",
   "opening": "Sjabloon voorbereiden…",
-  "cancel": "Annuleren"
+  "cancel": "Annuleren",
+  "cornellBox": "Cornell-box",
+  "cornellBoxDescription": "Een herhalende 3D-studie met chromen tekst, gekleurde muren en slagschaduwen."
 }

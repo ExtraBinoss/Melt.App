@@ -30,5 +30,7 @@
   "blank": "Tela em branco",
   "empty": "Nenhum modelo correspondente.",
   "opening": "A preparar o modelo…",
-  "cancel": "Cancelar"
+  "cancel": "Cancelar",
+  "cornellBox": "Caixa de Cornell",
+  "cornellBoxDescription": "Um estudo 3D em loop com texto cromado, paredes coloridas e sombras projetadas."
 }
