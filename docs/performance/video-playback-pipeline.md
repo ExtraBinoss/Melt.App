@@ -88,3 +88,35 @@ The native-copy experiment is not yet a production change. Chromium supports
 both accelerated and software bitmap construction, so an ImageBitmap API call
 alone does not establish GPU residency or absence of internal browser readbacks.
 See the [Chromium video-frame implementation](https://chromium.googlesource.com/chromium/src/+/main/third_party/blink/renderer/modules/webcodecs/video_frame.cc).
+
+## No-readback constraint and rejected upload experiments
+
+Inspection of Chromium's native implementation revealed two important limits:
+
+- `premultiplyAlpha: "none"` can select the CPU pixmap/readPixels transformation.
+- On Linux, `CopyStaticImageBitmapToWGPUTexture` explicitly forces an accelerated
+  bitmap through `MakeUnaccelerated()` before uploading. Thus zero **JavaScript**
+  read API calls do not prove zero **internal browser** GPU readbacks.
+
+Sources: [bitmap transforms](https://chromium.googlesource.com/chromium/src/+/main/third_party/blink/renderer/platform/graphics/static_bitmap_image_transform.cc)
+and [external-image uploads](https://chromium.googlesource.com/chromium/src/+/main/third_party/blink/renderer/modules/webgpu/external_image_utils.cc).
+Both direct ImageBitmap experiments were rejected; the committed rendering path
+continues to upload native VideoFrames without an added bitmap or software canvas.
+
+Additional bounded default-Chrome probes further narrowed the issue:
+
+| Diagnostic variant                                               | Captured frames | Black captures |
+| ---------------------------------------------------------------- | --------------: | -------------: |
+| Existing WebGPU VideoFrame upload                                |             114 |              7 |
+| Native bitmap converted back into a shared-image RGBX VideoFrame |             121 |              9 |
+| Prefer hardware decoder (observed NV12 rather than I420)         |             120 |              5 |
+| Request core adapter rather than compatibility adapter           |             122 |              6 |
+| Three WebGPURenderer with its WebGL backend                      |             154 |              0 |
+
+These are separate diagnostic sequences, not synchronized pixel-by-pixel cohorts.
+The WebGL sample's last warm two-second window recorded 57.6 preparations/s with
+9.3 ms median / 17.8 ms p95 preparation time. This suggests a GPU-backend-specific
+problem rather than missing or incorrectly timed decoded source frames, but does
+not establish the exact upstream fault. No automatic browser/GPU blocklist or
+renderer switch was shipped from this one-machine result. The more stable WebGL
+path remains a candidate for a measured compatibility workaround.
