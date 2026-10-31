@@ -1,0 +1,6 @@
+/* Native text selection accepts a solid background, shared across public pages and the studio. */
+::selection {
+  background-color: var(--action, #7c3aed);
+  color: #fff;
+  text-shadow: none;
+}

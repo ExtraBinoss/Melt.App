@@ -364,3 +364,16 @@ test("legacy numeric and boolean parameters retain normalized document values an
   expect(screen.getByLabelText("Intensité")).toBeDisabled();
   expect(screen.getByRole("switch", { name: "Couleur" })).toBeDisabled();
 });
+
+test("concise tool surfaces reuse registry controls and reveal the remaining parameters on demand", () => {
+  const d = setup(),
+    effect = createEffect("ascii"),
+    onChange = vi.fn();
+  const { container, rerender } = d.mount(
+    <EffectParameters effect={effect} parameterKeys={["scale"]} onChange={onChange} />,
+  );
+  expect(container.querySelectorAll(".effect-parameter-row")).toHaveLength(1);
+  expect(screen.getByRole("textbox")).toHaveValue("10");
+  rerender(<EffectParameters effect={effect} onChange={onChange} />);
+  expect(container.querySelectorAll(".effect-parameter-row").length).toBeGreaterThan(1);
+});

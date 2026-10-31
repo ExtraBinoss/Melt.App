@@ -1,4 +1,5 @@
 import { defineConfig } from "vite";
+import { TOOL_PAGES } from "./apps/web/src/tools/catalog.ts";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import { fileURLToPath, URL } from "node:url";
@@ -17,6 +18,7 @@ export default defineConfig({
       sitemap: { host: "https://melt.plinka.eu" },
       prerender: {
         enabled: true,
+        autoStaticPathsDiscovery: false,
         concurrency: 1,
         crawlLinks: false,
         retryCount: 0,
@@ -24,6 +26,8 @@ export default defineConfig({
       },
       pages: [
         { path: "/" },
+        { path: "/tools" },
+        ...TOOL_PAGES.map((tool) => ({ path: `/tools/${tool.slug}` })),
         { path: "/dashboard", sitemap: { exclude: true } },
         { path: "/editor", sitemap: { exclude: true } },
         { path: "/ssr", sitemap: { exclude: true } },

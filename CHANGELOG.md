@@ -6,6 +6,10 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Add six prerendered local effect converters accepting images and videos for ASCII, Dither, Halftone, Cyanotype, CRT and Posterize, with real shared TSL effects, registry-driven basic/advanced controls, lazy renderer loading, bounded cancellable sessions and native downloads. Add unique guides, FAQs, canonical URLs, sitemap entries and footer links; retain shared mascot loading and development-only preparation timings.
+
+- Center the shared public navigation across landing and tools, animate active/hover underlines, remove the Try Melt border, add violet text selection and a responsive two-column FAQ with a sticky heading. Extend the footer with local-tool links and an accessible language selector.
+
 - Move interface translations into feature-owned JSON resources, default new sessions and server-rendered pages to English, and share an extensible locale registry across public navigation, onboarding, preferences and search. Provide public site/landing/tools content in twelve languages, preserve saved preferences and Arabic direction, and fall back to English for untranslated editor namespaces.
 
 - Reuse the canvas mascot/shimmer throbber for studio runtime and editor/module loading phases, with an immediately visible accessible label and reduced-motion support instead of restarting the reveal delay between startup states.

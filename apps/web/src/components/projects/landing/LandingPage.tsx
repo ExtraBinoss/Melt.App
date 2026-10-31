@@ -1,8 +1,10 @@
 import { BrandStatus } from "../../../ui/brand/BrandStatus";
-import { brand } from "../../../ui/brand/config";
+import { SiteHeader } from "../../site/SiteHeader";
+import { SiteFooter } from "../../site/SiteFooter";
+import { Faq, type FaqItem } from "../../site/Faq";
+import "../../site/messages";
 import { ArrowUpRight, Play } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { MeltLogo } from "../../../ui/brand/MeltLogo";
 import { Button } from "../../ui/button";
 import { HeroHeadline } from "./HeroHeadline";
 import { ShowcaseCarousel } from "./ShowcaseCarousel";
@@ -26,24 +28,8 @@ export function LandingPage({
 }) {
   const { t } = useTranslation("landing");
   return (
-    <div className="landing-page">
-      <header className="landing-nav">
-        <a href="#musart-intro" className="landing-brand">
-          <MeltLogo size={30} interactive />
-          {brand.name}
-        </a>
-        <Button
-          className="landing-try"
-          variant="ghost"
-          disabled={busy}
-          onClick={onCreate}
-          onPointerEnter={onPrepare}
-          onFocus={onPrepare}
-        >
-          {t("try")}
-          <ArrowUpRight size={16} />
-        </Button>
-      </header>
+    <div className="landing-page" id="top">
+      <SiteHeader landing onTry={onCreate} onPrepare={onPrepare} disabled={busy} />
       <section className="landing-intro" id="musart-intro">
         <HeroHeadline lines={[t("titleFirst"), t("titleSecond")]} />
         <Button className="landing-cta" disabled={busy} onClick={onCreate}>
@@ -60,7 +46,7 @@ export function LandingPage({
           <ArrowUpRight size={18} />
         </Button>
       </section>
-      <section className="landing-features" aria-label={t("features")}>
+      <section id="features" className="landing-features" aria-label={t("features")}>
         {features.map((feature) => (
           <article className="landing-feature-tile" key={feature} data-feature={feature}>
             <div className="landing-feature-copy">
@@ -76,17 +62,15 @@ export function LandingPage({
           </article>
         ))}
       </section>
-      <footer className="landing-footer">
+      <Faq title={t("site:faq")} items={t("site:faqItems", { returnObjects: true }) as FaqItem[]} />
+      <section className="landing-footer">
         <h2>{t("end")}</h2>
         <Button className="landing-cta" disabled={busy} onClick={onCreate}>
           {t("create")}
           <ArrowUpRight size={18} />
         </Button>
-        <span className="landing-footer-brand">
-          <MeltLogo size={26} />
-          {brand.name}
-        </span>
-      </footer>
+      </section>
+      <SiteFooter />
       {busy && (
         <div className="landing-loading" role="status">
           <BrandStatus size={22} state="preparing" />

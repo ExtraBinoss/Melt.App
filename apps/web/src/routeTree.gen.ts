@@ -8,8 +8,11 @@ import { Route as rootRouteImport } from "./routes/__root";
 import { Route as IndexRouteImport } from "./routes/index";
 import { Route as WorkspaceRouteImport } from "./routes/_workspace";
 import { Route as SsrRouteImport } from "./routes/ssr";
+import { Route as ToolsRouteImport } from "./routes/tools";
 import { Route as WorkspaceDashboardRouteImport } from "./routes/_workspace.dashboard";
 import { Route as WorkspaceEditorRouteImport } from "./routes/_workspace.editor";
+import { Route as ToolsIndexRouteImport } from "./routes/tools.index";
+import { Route as ToolsToolRouteImport } from "./routes/tools.$tool";
 
 const IndexRoute = IndexRouteImport.update({
   id: "/",
@@ -25,6 +28,11 @@ const SsrRoute = SsrRouteImport.update({
   path: "/ssr",
   getParentRoute: () => rootRouteImport,
 } as any);
+const ToolsRoute = ToolsRouteImport.update({
+  id: "/tools",
+  path: "/tools",
+  getParentRoute: () => rootRouteImport,
+} as any);
 const WorkspaceDashboardRoute = WorkspaceDashboardRouteImport.update({
   id: "/dashboard",
   path: "/dashboard",
@@ -35,45 +43,67 @@ const WorkspaceEditorRoute = WorkspaceEditorRouteImport.update({
   path: "/editor",
   getParentRoute: () => WorkspaceRoute,
 } as any);
+const ToolsIndexRoute = ToolsIndexRouteImport.update({
+  id: "/",
+  path: "/",
+  getParentRoute: () => ToolsRoute,
+} as any);
+const ToolsToolRoute = ToolsToolRouteImport.update({
+  id: "/$tool",
+  path: "/$tool",
+  getParentRoute: () => ToolsRoute,
+} as any);
 
 export interface FileRoutesByFullPath {
   "/": typeof IndexRoute;
   "/ssr": typeof SsrRoute;
+  "/tools": typeof ToolsRouteWithChildren;
   "/dashboard": typeof WorkspaceDashboardRoute;
   "/editor": typeof WorkspaceEditorRoute;
+  "/tools/$tool": typeof ToolsToolRoute;
+  "/tools/": typeof ToolsIndexRoute;
 }
 export interface FileRoutesByTo {
   "/": typeof IndexRoute;
   "/ssr": typeof SsrRoute;
   "/dashboard": typeof WorkspaceDashboardRoute;
   "/editor": typeof WorkspaceEditorRoute;
+  "/tools/$tool": typeof ToolsToolRoute;
+  "/tools": typeof ToolsIndexRoute;
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport;
   "/": typeof IndexRoute;
   "/_workspace": typeof WorkspaceRouteWithChildren;
   "/ssr": typeof SsrRoute;
+  "/tools": typeof ToolsRouteWithChildren;
   "/_workspace/dashboard": typeof WorkspaceDashboardRoute;
   "/_workspace/editor": typeof WorkspaceEditorRoute;
+  "/tools/$tool": typeof ToolsToolRoute;
+  "/tools/": typeof ToolsIndexRoute;
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath;
-  fullPaths: "/" | "/ssr" | "/dashboard" | "/editor";
+  fullPaths: "/" | "/ssr" | "/tools" | "/dashboard" | "/editor" | "/tools/$tool" | "/tools/";
   fileRoutesByTo: FileRoutesByTo;
-  to: "/" | "/ssr" | "/dashboard" | "/editor";
+  to: "/" | "/ssr" | "/dashboard" | "/editor" | "/tools/$tool" | "/tools";
   id:
     | "__root__"
     | "/"
     | "/_workspace"
     | "/ssr"
+    | "/tools"
     | "/_workspace/dashboard"
-    | "/_workspace/editor";
+    | "/_workspace/editor"
+    | "/tools/$tool"
+    | "/tools/";
   fileRoutesById: FileRoutesById;
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute;
   WorkspaceRoute: typeof WorkspaceRouteWithChildren;
   SsrRoute: typeof SsrRoute;
+  ToolsRoute: typeof ToolsRouteWithChildren;
 }
 
 declare module "@tanstack/react-router" {
@@ -99,6 +129,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof SsrRouteImport;
       parentRoute: typeof rootRouteImport;
     };
+    "/tools": {
+      id: "/tools";
+      path: "/tools";
+      fullPath: "/tools";
+      preLoaderRoute: typeof ToolsRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     "/_workspace/dashboard": {
       id: "/_workspace/dashboard";
       path: "/dashboard";
@@ -113,6 +150,20 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof WorkspaceEditorRouteImport;
       parentRoute: typeof WorkspaceRoute;
     };
+    "/tools/": {
+      id: "/tools/";
+      path: "/";
+      fullPath: "/tools/";
+      preLoaderRoute: typeof ToolsIndexRouteImport;
+      parentRoute: typeof ToolsRoute;
+    };
+    "/tools/$tool": {
+      id: "/tools/$tool";
+      path: "/$tool";
+      fullPath: "/tools/$tool";
+      preLoaderRoute: typeof ToolsToolRouteImport;
+      parentRoute: typeof ToolsRoute;
+    };
   }
 }
 
@@ -126,14 +177,25 @@ const WorkspaceRouteChildren: WorkspaceRouteChildren = {
   WorkspaceEditorRoute: WorkspaceEditorRoute,
 };
 
-const WorkspaceRouteWithChildren = WorkspaceRoute._addFileChildren(
-  WorkspaceRouteChildren,
-);
+const WorkspaceRouteWithChildren = WorkspaceRoute._addFileChildren(WorkspaceRouteChildren);
+
+interface ToolsRouteChildren {
+  ToolsToolRoute: typeof ToolsToolRoute;
+  ToolsIndexRoute: typeof ToolsIndexRoute;
+}
+
+const ToolsRouteChildren: ToolsRouteChildren = {
+  ToolsToolRoute: ToolsToolRoute,
+  ToolsIndexRoute: ToolsIndexRoute,
+};
+
+const ToolsRouteWithChildren = ToolsRoute._addFileChildren(ToolsRouteChildren);
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   WorkspaceRoute: WorkspaceRouteWithChildren,
   SsrRoute: SsrRoute,
+  ToolsRoute: ToolsRouteWithChildren,
 };
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

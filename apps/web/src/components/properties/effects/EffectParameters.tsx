@@ -38,6 +38,7 @@ export function EffectParameters({
   onStart,
   onCancel,
   deferOffscreen = false,
+  parameterKeys,
 }: {
   effect: Effect;
   engine?: EnginePort;
@@ -47,6 +48,8 @@ export function EffectParameters({
   onStart?: () => void;
   onCancel?: () => void;
   deferOffscreen?: boolean;
+  /** Optional concise surfaces reuse the registry controls without duplicating them. */
+  parameterKeys?: readonly string[];
 }) {
   const { t } = useTranslation();
   const definition = getEffectDefinition(effect.type);
@@ -69,13 +72,17 @@ export function EffectParameters({
   const shape = useCallback(
     () =>
       definition.parameters
-        .filter((parameter) => isEffectParameterVisible(displayed(), parameter))
+        .filter(
+          (parameter) =>
+            (!parameterKeys || parameterKeys.includes(parameter.key)) &&
+            isEffectParameterVisible(displayed(), parameter),
+        )
         .map((parameter) => `${parameter.scope}:${parameter.key}`)
         .join("|"),
-    [definition, displayed],
+    [definition, displayed, parameterKeys],
   );
   useSyncExternalStore(transport?.subscribe ?? noSubscription, shape, shape);
-  const owner = `${effect.id}:${effect.type}`;
+  const owner = `${effect.id}:${effect.type}:${parameterKeys?.join("|") ?? "all"}`;
   const [colorOwner, setColorOwner] = useState(owner);
   const [openColorKey, setOpenColorKey] = useState<string | null>(null);
   const [resetVersion, setResetVersion] = useState(0);
@@ -88,8 +95,10 @@ export function EffectParameters({
   const root = useRef<HTMLDivElement>(null);
   const list = useRef<HTMLDivElement>(null);
   const feedback = useResetFeedback(root);
-  const parameters = definition.parameters.filter((parameter) =>
-    isEffectParameterVisible(displayed(), parameter),
+  const parameters = definition.parameters.filter(
+    (parameter) =>
+      (!parameterKeys || parameterKeys.includes(parameter.key)) &&
+      isEffectParameterVisible(displayed(), parameter),
   );
   const window = useParameterWindow(list, owner, parameters.length, deferOffscreen);
   if (colorOwner !== owner) {

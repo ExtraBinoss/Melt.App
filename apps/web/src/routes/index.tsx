@@ -8,6 +8,7 @@ export const Route = createFileRoute("/")({
       throw redirect({ to: "/editor", search: location.search, replace: true });
   },
   head: () => ({
+    links: [{ rel: "canonical", href: "https://melt.plinka.eu/" }],
     meta: [
       { title: "Melt — Design with ease. Animate to captivate." },
       { property: "og:title", content: "Melt — Design with ease. Animate to captivate." },

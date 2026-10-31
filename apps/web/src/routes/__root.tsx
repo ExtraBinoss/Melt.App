@@ -23,7 +23,6 @@ export const Route = createRootRoute({
       },
     ],
     links: [
-      { rel: "canonical", href: `${brand.site}/` },
       {
         rel: "icon",
         type: "image/svg+xml",

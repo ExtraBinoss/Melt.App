@@ -1,8 +1,19 @@
-import { expect, test, vi } from "vitest";
+import { beforeEach, expect, test, vi } from "vitest";
 import { act, fireEvent, screen, within } from "@testing-library/react";
 import { LandingPage } from "../../../../src/components/projects/landing/LandingPage";
 import { setup } from "../../../support/ui";
 import { i18n } from "../../../../src/state/i18n";
+
+beforeEach(() => {
+  vi.stubGlobal(
+    "IntersectionObserver",
+    class {
+      observe() {}
+      unobserve() {}
+      disconnect() {}
+    },
+  );
+});
 
 test("shows the animated headline, real templates and four deliberate video slots", () => {
   const d = setup(),

@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /editor
+Disallow: /dashboard
+Disallow: /ssr
+
+Sitemap: https://melt.plinka.eu/sitemap.xml
