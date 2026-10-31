@@ -13,6 +13,9 @@ interface Transition {
   from: View;
   to: View;
   start: number;
+  preserveOrigin?: boolean;
+  waitingForFrame?: boolean;
+  duration: number;
 }
 const equal = (a: View, b: View) => a.x === b.x && a.y === b.y && a.zoom === b.zoom;
 
@@ -70,13 +73,12 @@ export class ViewMotion implements ViewSource {
     for (const listener of this.settledListeners) listener();
   }
   private sample() {
-    if (!this.transition) return;
-    const duration = this.options.duration ?? 160;
+    if (!this.transition || this.transition.waitingForFrame) return;
+    const duration = this.transition.duration;
     const progress =
       duration <= 0 ? 1 : (this.options.clock.now() - this.transition.start) / duration;
-    this.publish(
-      this.options.constrain(interpolateView(this.transition.from, this.transition.to, progress)),
-    );
+    const next = interpolateView(this.transition.from, this.transition.to, progress);
+    this.publish(this.transition.preserveOrigin ? next : this.options.constrain(next));
   }
   private clearFrame() {
     if (this.frame !== null) this.options.clock.cancel(this.frame);
@@ -90,7 +92,12 @@ export class ViewMotion implements ViewSource {
       return;
     }
     const transition = this.transition;
-    if (this.options.clock.now() - transition.start >= (this.options.duration ?? 160)) {
+    // Structural reframing starts with the first visible frame, not a busy commit's clock.
+    if (transition.waitingForFrame) {
+      transition.start = this.options.clock.now();
+      transition.waitingForFrame = false;
+    }
+    if (this.options.clock.now() - transition.start >= transition.duration) {
       this.finish();
     } else {
       this.sample();
@@ -117,24 +124,28 @@ export class ViewMotion implements ViewSource {
     this.publish(next, moving);
     if (commit) this.settle();
   }
-  animateTo(next: View): void {
+  animateTo(next: View, preserveOrigin = false): void {
     if (this.closed) return;
     this.sample();
-    this.begin(next);
+    this.begin(next, preserveOrigin);
   }
-  private begin(next: View): void {
+  private begin(next: View, preserveOrigin = false): void {
     if (this.closed) return;
     this.clearFrame();
     const target = this.options.constrain(next);
-    if (
-      this.options.reduced() ||
-      equal(this.current, target) ||
-      (this.options.duration ?? 160) <= 0
-    ) {
+    const duration = this.options.duration ?? (preserveOrigin ? 240 : 160);
+    if (this.options.reduced() || equal(this.current, target) || duration <= 0) {
       this.jump(target);
       return;
     }
-    this.transition = { from: this.current, to: target, start: this.options.clock.now() };
+    this.transition = {
+      from: this.current,
+      to: target,
+      start: this.options.clock.now(),
+      preserveOrigin,
+      waitingForFrame: preserveOrigin,
+      duration,
+    };
     this.publish(this.current, true);
     this.frame = this.options.clock.request(this.step);
   }

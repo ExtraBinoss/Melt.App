@@ -1,4 +1,7 @@
 import { useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
+import { Button } from "../../components/ui/button";
+import { ModeIcon } from "../../components/motion/ModeIcon";
 import { useSetAtom } from "jotai";
 import type { EnginePort } from "@musart/core";
 import { CompositionMode } from "../../components/motion/CompositionMode";
@@ -7,7 +10,7 @@ import { timelineOpenAtom } from "../../state/motion/timeline-state";
 import { createViewportActions } from "../session/viewport-actions";
 import type { View } from "../viewport/view";
 import type { ArtboardWorkspace } from "./layout";
-import { artboardFooterPosition } from "./footer-layout";
+import { artboardFooterPosition, artboardFooterSmall } from "./footer-layout";
 
 export function ArtboardModeFooter({
   engine,
@@ -19,7 +22,7 @@ export function ArtboardModeFooter({
   view: View;
 }) {
   const snapshot = useDocumentSnapshot(engine);
-  const board = workspace.boards.find((item) => item.id === snapshot.pageId);
+  const { t } = useTranslation("motion");
   const setOpen = useSetAtom(timelineOpenAtom);
   const fit = useRef<number | null>(null);
   useEffect(
@@ -28,27 +31,45 @@ export function ArtboardModeFooter({
     },
     [],
   );
-  if (!board) return null;
-  return (
-    <div
-      className="artboard-mode-footer floating-panel"
-      data-artboard-id={board.id}
-      data-compact={board.width * view.zoom < 180}
-      data-canvas-control
-      style={{ transform: artboardFooterPosition(board, workspace, view) }}
-    >
-      <CompositionMode
-        engine={engine}
-        snapshot={snapshot}
-        onMotionEnabled={() => {
-          setOpen(true);
-          if (fit.current !== null) cancelAnimationFrame(fit.current);
-          fit.current = requestAnimationFrame(() => {
-            fit.current = null;
-            createViewportActions(engine).run("fit");
-          });
-        }}
-      />
-    </div>
-  );
+  return workspace.boards.map((board) => {
+    const active = board.id === snapshot.pageId,
+      mode = snapshot.project.pages.find((page) => page.id === board.id)?.motion?.mode ?? "static";
+    return (
+      <div
+        key={board.id}
+        className="artboard-mode-footer floating-panel"
+        data-artboard-id={board.id}
+        data-compact={board.width * view.zoom < 180}
+        data-small={artboardFooterSmall(board, view)}
+        data-active={active}
+        data-canvas-control
+        style={{ transform: artboardFooterPosition(board, workspace, view) }}
+      >
+        {active ? (
+          <CompositionMode
+            engine={engine}
+            snapshot={snapshot}
+            onMotionEnabled={() => {
+              setOpen(true);
+              if (fit.current !== null) cancelAnimationFrame(fit.current);
+              fit.current = requestAnimationFrame(() => {
+                fit.current = null;
+                createViewportActions(engine).run("fit");
+              });
+            }}
+          />
+        ) : (
+          <Button
+            className="artboard-mode-activate"
+            variant="ghost"
+            onClick={() => engine.setPage(board.id)}
+            aria-label={`${board.name} · ${t(mode)}`}
+          >
+            <ModeIcon mode={mode} size={16} />
+            <span className="segmented-tab-label">{t(mode)}</span>
+          </Button>
+        )}
+      </div>
+    );
+  });
 }

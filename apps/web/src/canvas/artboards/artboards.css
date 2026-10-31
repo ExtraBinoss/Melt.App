@@ -54,6 +54,29 @@
   z-index: 7;
   width: max-content;
   max-width: calc(100% - 32px);
+  transform-origin: 0 0;
+}
+.artboard-mode-footer[data-small="true"] {
+  visibility: hidden;
+  pointer-events: none;
+}
+.artboard-mode-footer[data-active="false"] {
+  opacity: 0.65;
+}
+.artboard-mode-footer[data-active="false"]:hover {
+  opacity: 1;
+}
+.artboard-mode-footer .segmented-tab,
+.artboard-mode-footer .artboard-mode-activate {
+  height: 26px;
+  min-height: 26px;
+  font-size: 10px;
+  padding-inline: 7px;
+  gap: 4px;
+}
+.artboard-mode-footer .segmented-tab svg {
+  width: 15px;
+  height: 15px;
 }
 .artboard-mode-footer .motion-mode {
   min-width: 0;

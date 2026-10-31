@@ -175,3 +175,21 @@ it("rebases a viewport origin without clamping its first screen pose or publishi
   d.motion.reframe({ x: 1, y: 1, zoom: 1 });
   expect(d.motion.read()).toEqual({ x: 0, y: 20, zoom: 1 });
 });
+
+it("smoothly leaves a rebased out-of-bounds origin instead of clamping its first animation frame", () => {
+  const d = fixture(false, undefined, (view) => ({ ...view, y: Math.min(20, view.y) }));
+  d.motion.reframe({ x: 0, y: 100, zoom: 1 }, false);
+  const settled = vi.fn();
+  d.motion.subscribeSettled(settled);
+  d.motion.animateTo({ x: 0, y: 10, zoom: 1 }, true);
+  expect(d.motion.read().y).toBe(100);
+  d.advance(16);
+  expect(d.motion.read().y).toBe(100);
+  d.advance(32);
+  expect(d.motion.read().y).toBeGreaterThan(20);
+  expect(d.motion.read().y).toBeLessThan(100);
+  expect(settled).not.toHaveBeenCalled();
+  d.advance(300);
+  expect(d.motion.read().y).toBe(10);
+  expect(settled).toHaveBeenCalledOnce();
+});

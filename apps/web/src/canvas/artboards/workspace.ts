@@ -12,8 +12,12 @@ export function createWorkspace(engine: EnginePort, controller: SceneController)
     previousWidth = 0,
     previousHeight = 0;
   const read = () => {
-    const page = controller.read().page;
     const snapshot = engine.getSnapshot();
+    const evaluated = controller.read().page;
+    const page =
+      controller.read().playback || evaluated.id === snapshot.pageId
+        ? evaluated
+        : snapshot.project.pages.find((page) => page.id === snapshot.pageId)!;
     if (
       snapshot.project === previousProject &&
       snapshot.pageId === previousId &&
@@ -32,6 +36,7 @@ export function createWorkspace(engine: EnginePort, controller: SceneController)
       name: item.id === snapshot.pageId ? page.name : item.name,
       width: item.id === snapshot.pageId ? page.width : item.width,
       height: item.id === snapshot.pageId ? page.height : item.height,
+      ...(item.canvasPosition ? { canvasPosition: item.canvasPosition } : {}),
     }));
     const next = JSON.stringify(pages);
     if (signature !== next) {

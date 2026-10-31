@@ -43,8 +43,7 @@ import { ViewportControls } from "./viewport/ViewportControls";
 import { createWorkspace, createArtboardView } from "./artboards/workspace";
 import { artboardAt, viewForArtboard } from "./artboards/layout";
 import { artboardStyle } from "./artboards/presentation";
-import { ArtboardHeadings } from "./artboards/ArtboardHeadings";
-import { ArtboardModeFooter } from "./artboards/ArtboardModeFooter";
+import { ArtboardControls } from "./artboards/ArtboardControls";
 import { InactiveArtboards } from "./artboards/InactiveArtboards";
 import { captureGestureOrigin } from "./interaction/gesture-origin";
 import {
@@ -95,7 +94,7 @@ export function EditorCanvas({
   const workspace = useMemo(() => createWorkspace(engine, controller), [engine, controller]);
   const layout = workspace.read();
   const layoutKey = JSON.stringify(
-    snapshot.project.pages.map((item) => [item.id, item.width, item.height]),
+    snapshot.project.pages.map((item) => [item.id, item.width, item.height, item.canvasPosition]),
   );
   const viewport = useRef<HTMLDivElement>(null);
   useRenderMetrics(viewport);
@@ -276,7 +275,7 @@ export function EditorCanvas({
                 y: point.y,
                 width: 1,
                 height: 1,
-                text: t("newText", { defaultValue: "Votre texte" }),
+                text: t("newText"),
                 fontSize: 48,
                 fill: "#202024",
               })
@@ -304,10 +303,7 @@ export function EditorCanvas({
         );
         if (tool === "segment") onImagePoint?.(hit.id, local.x, local.y);
         else if (!wand.begin(event, hit.id, local.x, local.y)) onError?.(t("selectImageFirst"));
-      } else
-        onError?.(
-          t("selectImageFirst", { defaultValue: "Cliquez sur une image pour créer son masque." }),
-        );
+      } else onError?.(t("selectImageFirst"));
       return;
     }
     if (!hit) {
@@ -466,7 +462,7 @@ export function EditorCanvas({
       <div
         className="editor-canvas"
         data-testid="editor-canvas"
-        aria-label={t("canvas", { defaultValue: "Zone de création" })}
+        aria-label={t("canvas")}
         ref={viewport}
         tabIndex={0}
         style={{ cursor }}
@@ -556,15 +552,14 @@ export function EditorCanvas({
             viewSource={pageViewSource}
             viewport={viewport}
           />
-          <ArtboardHeadings
+          <ArtboardControls
             controller={controller}
             engine={engine}
-            workspace={layout}
-            activeId={page.id}
-            view={shown}
+            workspace={workspace}
+            view={motion}
+            viewport={viewport}
             onError={onError}
           />
-          <ArtboardModeFooter engine={engine} workspace={layout} view={shown} />
         </div>
         <CanvasRulers
           controller={controller}
@@ -584,16 +579,8 @@ export function EditorCanvas({
           controller={controller}
           onError={onError}
         />
-        {tool !== "pointer" && (
-          <div className="canvas-help">
-            {t("toolHint", { defaultValue: "Cliquez ou tracez sur le canvas" })}
-          </div>
-        )}
-        {dragOver && (
-          <div className="canvas-drag-overlay">
-            {t("dropImages", { defaultValue: "Déposez vos images ici" })}
-          </div>
-        )}
+        {tool !== "pointer" && <div className="canvas-help">{t("toolHint")}</div>}
+        {dragOver && <div className="canvas-drag-overlay">{t("dropImages")}</div>}
       </div>
     </CanvasContextMenu>
   );

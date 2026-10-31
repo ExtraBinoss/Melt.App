@@ -23,8 +23,6 @@ import {
   type GestureOrigin,
 } from "../interaction/gesture-origin";
 import "./messages";
-import { AddArtboardOverlay } from "./AddArtboardOverlay";
-import type { SceneController } from "../session/scene-controller";
 
 function ArtboardHeading({
   board,
@@ -33,7 +31,6 @@ function ArtboardHeading({
   placement,
   engine,
   onError,
-  controller,
 }: {
   board: ArtboardPlacement;
   workspace: ArtboardWorkspace;
@@ -41,7 +38,6 @@ function ArtboardHeading({
   placement: ArtboardHeadingPlacement;
   engine: EnginePort;
   onError?: (message: string) => void;
-  controller?: SceneController;
 }) {
   const { t } = useTranslation("artboards");
   const [editing, setEditing] = useState(false),
@@ -122,7 +118,6 @@ function ArtboardHeading({
       <span className="artboard-dimensions">
         {board.width} × {board.height}
       </span>
-      {active && <AddArtboardOverlay engine={engine} controller={controller} onError={onError} />}
       <DropdownMenu>
         <Tooltip>
           <TooltipTrigger asChild>
@@ -196,7 +191,6 @@ export function ArtboardHeadings({
   view: View;
   engine: EnginePort;
   onError?: (message: string) => void;
-  controller?: SceneController;
 }) {
   const headings = layoutArtboardHeadings(workspace, view);
   return workspace.boards.map((board) => (

@@ -323,7 +323,9 @@ test("real artboards share one GPU scene, preserve world navigation and retain l
     await expect(active).toHaveAttribute("data-pan-x", "0");
     await page.screenshot({ path: "artifacts/screenshots/artboard-workspace.png" });
     const beforeAdd = await page.evaluate(() => window.musart!.snapshot().project.pages.length);
-    await page.locator('.artboard-heading[data-active="true"]').hover();
+    const edge = (await active.boundingBox())!;
+    await page.mouse.move(edge.x + edge.width + 24, edge.y + edge.height / 2);
+    await expect(page.getByTestId("canvas-add-artboard")).toHaveAttribute("data-visible", "true");
     await page.getByTestId("canvas-add-artboard").click();
     await expect
       .poll(() => page.evaluate(() => window.musart!.snapshot().project.pages.length))

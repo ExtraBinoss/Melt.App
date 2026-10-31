@@ -1,13 +1,19 @@
 import type { ArtboardPlacement, ArtboardWorkspace } from "./layout";
 import type { View } from "../viewport/view";
 
-/** Controls stay in screen pixels immediately below their own composition. */
+/** Anchor to the inside bottom-right corner; keep distant boards visually quiet. */
 export function artboardFooterPosition(
   board: ArtboardPlacement,
   workspace: ArtboardWorkspace,
   view: View,
 ) {
-  const x = view.x + (board.x + board.width / 2 - workspace.width / 2) * view.zoom;
-  const y = view.y + (board.y + board.height - workspace.height / 2) * view.zoom + 12;
-  return `translate3d(${x}px, ${y}px, 0) translateX(-50%)`;
+  const scale = artboardFooterScale(view),
+    gap = 6 * scale;
+  const x = view.x + (board.x + board.width - workspace.width / 2) * view.zoom - gap;
+  const y = view.y + (board.y + board.height - workspace.height / 2) * view.zoom - gap;
+  return `translate3d(${x}px, ${y}px, 0) scale(${scale}) translate(-100%, -100%)`;
 }
+export const artboardFooterScale = (view: View) =>
+  Math.min(1, Math.max(0.45, Math.sqrt(view.zoom)));
+export const artboardFooterSmall = (board: ArtboardPlacement, view: View) =>
+  board.width * view.zoom < 64 || board.height * view.zoom < 50;

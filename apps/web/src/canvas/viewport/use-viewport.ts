@@ -1,4 +1,11 @@
-import { useEffect, useMemo, useRef, useSyncExternalStore, type RefObject } from "react";
+import {
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useSyncExternalStore,
+  type RefObject,
+} from "react";
 import type { EnginePort } from "@musart/core";
 import type { WorkspaceSource } from "../artboards/workspace";
 import { createViewportActions } from "../session/viewport-actions";
@@ -6,6 +13,7 @@ import { createViewportResizeAnchor } from "../session/viewport-resize";
 import { animatePresentationProgress } from "../../components/shared/motion/presentation-spring";
 import { createResizeAnchor } from "./resize-anchor";
 import { ViewMotion } from "./motion";
+import type { ArtboardWorkspace } from "../artboards/layout";
 import {
   constrainView,
   fitView,
@@ -91,6 +99,32 @@ export function useViewport({
     [motion, viewport, workspace, media, engine],
   );
   const panIdle = useMemo<PanIdle>(() => ({ timer: undefined }), []);
+  const previousLayout = useRef<{ projectId: string; layout: ArtboardWorkspace } | null>(null);
+  useLayoutEffect(() => {
+    const layout = workspace.read(),
+      previous = previousLayout.current;
+    previousLayout.current = { projectId, layout };
+    if (!previous || previous.projectId !== projectId || previous.layout === layout) return;
+    const rect = viewport.current?.getBoundingClientRect();
+    if (!rect) return;
+    const shown = motion.read(),
+      old = previous.layout;
+    motion.reframe(
+      {
+        ...shown,
+        x:
+          shown.x +
+          ((layout.origin?.x ?? 0) + layout.width / 2 - (old.origin?.x ?? 0) - old.width / 2) *
+            shown.zoom,
+        y:
+          shown.y +
+          ((layout.origin?.y ?? 0) + layout.height / 2 - (old.origin?.y ?? 0) - old.height / 2) *
+            shown.zoom,
+      },
+      false,
+    );
+    motion.animateTo(fitView(layout, rect), true);
+  }, [motion, viewport, projectId, layoutKey, workspace]);
   useEffect(() => {
     motion.activate();
     viewRef.current = motion.read();
@@ -123,7 +157,7 @@ export function useViewport({
       if (rect) motion.jump(fitView(workspace.read(), rect));
     });
     return () => cancelAnimationFrame(frame);
-  }, [motion, viewport, projectId, layoutKey, workspace]);
+  }, [motion, viewport, projectId, workspace]);
   useEffect(
     () =>
       actions.subscribe((action) => {

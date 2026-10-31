@@ -37,6 +37,11 @@ export function validateLayerLayout(layer: Record<string, unknown>, ids: Set<str
   }
 }
 export function validatePageLayout(page: Record<string, unknown>): void {
+  if (page.canvasPosition !== undefined) {
+    assertRecord(page.canvasPosition);
+    assertNumber(page.canvasPosition.x, -1_000_000, 1_000_000);
+    assertNumber(page.canvasPosition.y, -1_000_000, 1_000_000);
+  }
   if (page.margins !== undefined)
     validateInsets(page.margins, Number(page.width), Number(page.height));
   if (page.rulers !== undefined) assertBoolean(page.rulers);

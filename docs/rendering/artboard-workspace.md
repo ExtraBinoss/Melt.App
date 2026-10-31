@@ -2,13 +2,13 @@
 
 ## Workspace layout
 
-| Workspace feature              | Behavior                                                                                                                                              |
-| ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| World viewport                 | Project pages are displayed together as artboards on a single world viewport.                                                                         |
-| Placement                      | A deterministic two-column shelf layout uses a 128-unit gap and the maximum height of each row.                                                       |
-| Fit and panning                | Workspace bounds drive fit and bounded trackpad panning.                                                                                              |
-| Activation and project changes | Activating another page preserves the world pose; opening another project or changing artboard dimensions/count fits the updated workspace.           |
-| View controls                  | The shared fit action remains available in command search, while the floating controls expose minus, exact 100% reset, plus and conditional recenter. |
+| Workspace feature              | Behavior                                                                                                                                                                                |
+| ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| World viewport                 | Project pages are displayed together as artboards on a single world viewport.                                                                                                           |
+| Placement                      | Legacy pages use the deterministic two-column shelves. Optional persisted `canvasPosition` metadata places added neighbors on any free side, with a 128-unit gap.                       |
+| Fit and panning                | Workspace bounds drive fit and bounded trackpad panning.                                                                                                                                |
+| Activation and project changes | Activating another page preserves the world pose. Structural layout changes preserve existing artboards’ first screen pose, then animate to fit; opening another project fits directly. |
+| View controls                  | The shared fit action remains available in command search, while the floating controls expose minus, exact 100% reset, plus and conditional recenter.                                   |
 
 ### Active canvas and backdrops
 
@@ -58,20 +58,20 @@
 
 ### Quick Add
 
-| Workspace feature      | Behavior                                                                                                                                          |
-| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Plus visibility        | A single contextual plus in the active artboard heading appears when its heading/artwork is hovered or a heading control receives keyboard focus. |
-| Keyboard access        | It remains keyboard-focusable while visually quiet; artboards do not create per-layer add controls.                                               |
-| Tooltips               | The plus and options button expose translated Radix tooltips.                                                                                     |
-| Shared add-page action | The workspace plus invokes the same add-page command as Magic Search.                                                                             |
-| Double-click target    | Double-clicking outside every artboard opens Quick Add at the pointer; artboard backgrounds and painted layers are excluded.                      |
-| Command catalog        | Its items are a capability-filtered subset of the shared command catalogue and use the shared search index and mounted command port.              |
-| File picker            | File inputs are opened synchronously in the user gesture.                                                                                         |
-| Text and primitives    | New text and primitive frames fit within the active artboard and are centered there, each with one undo entry.                                    |
-| Shape library          | Shapes hand focus to the existing searchable artwork library.                                                                                     |
-| Stale sessions         | Canonical changes, navigation and playback close stale Quick Add sessions.                                                                        |
+| Workspace feature      | Behavior                                                                                                                                                                                                                          |
+| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Plus visibility        | One canvas-level plus appears beside an artboard when the pointer is in its empty top/right/bottom/left strip. A candidate whose full destination overlaps another artboard is excluded.                                          |
+| Keyboard access        | Focusing the canvas exposes a free candidate for keyboard activation. Touch release in a free side strip can expose it too. The same button is reused rather than mounting controls on every artboard.                            |
+| Tooltips               | The plus and options button expose translated Radix tooltips.                                                                                                                                                                     |
+| Shared add-page action | Directional addition uses one validated transaction: retain the existing legacy positions, then add a blank same-size artboard inheriting background and color target. One undo removes the addition and its placement migration. |
+| Double-click target    | Double-clicking outside every artboard opens Quick Add at the pointer; artboard backgrounds and painted layers are excluded.                                                                                                      |
+| Command catalog        | Its items are a capability-filtered subset of the shared command catalogue and use the shared search index and mounted command port.                                                                                              |
+| File picker            | File inputs are opened synchronously in the user gesture.                                                                                                                                                                         |
+| Text and primitives    | New text and primitive frames fit within the active artboard and are centered there, each with one undo entry.                                                                                                                    |
+| Shape library          | Shapes hand focus to the existing searchable artwork library.                                                                                                                                                                     |
+| Stale sessions         | Canonical changes, navigation and playback close stale Quick Add sessions.                                                                                                                                                        |
 
-Tools, selection, ruler origins, dragged guides and file drops use a page-local view derived from the active artboard's center in the world layout. Artboard headings remain screen-sized while the artwork scales. Each heading exposes validated rename/delete commands; the final artboard cannot be deleted. File drops activate their destination artboard before entering the normal import service.
+Tools, selection, ruler origins, dragged guides and file drops use a page-local view derived from the active artboard's center in the world layout. Artboard headings remain screen-sized while the artwork scales. Mode controls sit inside every artboard’s bottom-right corner, scale down with zoom (bounded at 0.45×), compact below 180 screen pixels and hide when the artboard is too small. Inactive controls activate their artboard. Each heading exposes validated rename/delete commands; the final artboard cannot be deleted. File drops activate their destination artboard before entering the normal import service.
 
 ### Text drawing
 
@@ -119,3 +119,13 @@ Tools, selection, ruler origins, dragged guides and file drops use a page-local 
 Historical playback can reference a page that no longer exists in the canonical project. Its geometry is presented in the current active artboard slot, preserving the document and avoiding an invalid lookup by the historical page ID. Ending playback restores the canonical geometry through the same presentation source.
 
 Mirrored unit tests cover deterministic placement, exact coordinate conversion, view preservation, local edits/undo, visibility batching, URL ownership, stale results, request errors and cleanup. `test/browser/artboards.spec.ts` exercises real decoded thumbnails, native pan/zoom, page activation, one retained editing canvas/context, local transforms, undo, ruler dragging, rename/add/delete and actual JavaScript readback instrumentation. Its screenshot and measured evidence are written under ignored `artifacts/`.
+
+## Directional insertion and presentation
+
+`canvasPosition` is portable workspace metadata, independent of local artwork coordinates and export dimensions. Validation accepts finite coordinates within ±1,000,000 units. Targeted `updatePage` commands can position an inactive page without activating it; single-command drafting clones that target before editing. Mixed layouts place automatic pages outside positioned rectangles, while projects without placements retain their old shelf layout.
+
+Hover placement is an imperative, RAF-coalesced subscription with cached workspace candidates. It does not publish pointer positions through React. The candidate captures project identity and revision, is consumed before insertion, and is revalidated against current geometry. Playback, active gestures, moving views and occupied destinations suppress the action; disposal releases RAF, subscriptions and native listeners.
+
+Before a structural reframe paints, its world-center delta compensates the old screen pose. The transition starts its 240 ms clock at the first animation frame, so a busy commit cannot consume the animation beforehand. Per-frame presentation bypasses origin clamping during that transition and publishes a settled React pose once. Reduced motion finishes immediately. This is canvas navigation; page scrolling is unchanged.
+
+The focused native case `test/browser/canvas-artboard-controls.spec.ts` verifies all four directions, first-frame continuity, corner bounds at 100%/20%, one undo, real save/reload, hover commit counters, French resources after persisted reload. Captured RAF opportunities are diagnostic frame observations, not physical display timestamps.

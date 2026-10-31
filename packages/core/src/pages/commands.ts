@@ -8,7 +8,7 @@ export const addPage: CommandHandler<"addPage"> = ({ project, nextId }, command)
   project.pages.push(page);
   return { pageId: page.id, selection: [] };
 };
-export const updatePage: CommandHandler<"updatePage"> = ({ page, pageId }, command) => {
+export const updatePage: CommandHandler<"updatePage"> = ({ project, page, pageId }, command) => {
   ensure(
     Object.keys(command.patch).every((key) =>
       [
@@ -20,12 +20,16 @@ export const updatePage: CommandHandler<"updatePage"> = ({ page, pageId }, comma
         "rulers",
         "colorSpace",
         "guides",
+        "canvasPosition",
       ].includes(key),
     ),
     "INVALID_COMMAND",
     "Propriété de composition non modifiable",
   );
-  Object.assign(page, command.patch);
+  const target =
+    command.targetId === undefined ? page : project.pages.find((p) => p.id === command.targetId);
+  ensure(target, "NOT_FOUND", "NOT_FOUND");
+  Object.assign(target, command.patch);
   return { pageId };
 };
 export const deletePage: CommandHandler<"deletePage"> = ({ project, pageId }, command) => {

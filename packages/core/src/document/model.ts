@@ -138,6 +138,8 @@ export interface Composition {
   rulers?: boolean;
   colorSpace?: WorkingColorSpace;
   motion?: CompositionMotion;
+  /** Artboard placement on the workspace; independent of its exported content. */
+  canvasPosition?: { x: number; y: number };
 }
 export interface Project {
   version: typeof FORMAT_VERSION;
@@ -169,7 +171,7 @@ export type Command =
   | { type: "groupLayers"; ids: string[] }
   | { type: "ungroupLayers"; ids: string[] }
   | { type: "addPage"; page?: Composition }
-  | { type: "updatePage"; patch: Partial<Composition> }
+  | { type: "updatePage"; patch: Partial<Composition>; targetId?: string }
   | { type: "deletePage"; id: string }
   | { type: "renameProject"; name: string }
   | { type: "addGuide"; guide: Guide; targetId?: string }

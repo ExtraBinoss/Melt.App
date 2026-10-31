@@ -25,7 +25,7 @@ it("selection changes retain the artboard mode controls", () => {
   expect(commits).toHaveBeenCalled();
 });
 
-it("keeps accessible mode icons at extreme zoom and edits the active composition", () => {
+it("keeps compact mode icons at overview zoom and edits the active composition", () => {
   const fixture = setup();
   fixture.engine.execute({ type: "addLayers", layers: [createLayer("rectangle")] });
   const workspace = arrangeArtboards(fixture.engine.getSnapshot().project.pages);
@@ -33,7 +33,7 @@ it("keeps accessible mode icons at extreme zoom and edits the active composition
     <ArtboardModeFooter
       engine={fixture.engine}
       workspace={workspace}
-      view={{ x: 0, y: 0, zoom: 0.01 }}
+      view={{ x: 0, y: 0, zoom: 0.15 }}
     />,
   );
   expect(view.container.querySelector(".artboard-mode-footer")).toHaveAttribute(

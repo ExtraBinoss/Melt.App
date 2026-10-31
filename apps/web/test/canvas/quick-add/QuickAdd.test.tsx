@@ -6,6 +6,7 @@ import { act, fireEvent, render as renderBase, screen, waitFor } from "@testing-
 import { afterEach, expect, it, vi } from "vitest";
 import { createPage, createProject, EditorEngine } from "@musart/core";
 import { AddArtboardOverlay } from "../../../src/canvas/artboards/AddArtboardOverlay";
+import { ViewMotion } from "../../../src/canvas/viewport/motion";
 import { QuickAdd } from "../../../src/canvas/quick-add/QuickAdd";
 import { createWorkspace } from "../../../src/canvas/artboards/workspace";
 import { SceneController } from "../../../src/canvas/session/scene-controller";
@@ -38,12 +39,20 @@ function fixture() {
     width: 1000,
     height: 800,
   } as DOMRect);
-  const viewSource = { read: () => ({ x: 0, y: 0, zoom: 1 }), subscribe: () => () => {} },
+  const viewSource = new ViewMotion({
+      clock: {
+        now: () => performance.now(),
+        request: requestAnimationFrame,
+        cancel: cancelAnimationFrame,
+      },
+      constrain: (view) => view,
+      reduced: () => true,
+    }),
     onError = vi.fn();
   const props = { engine, controller, workspace, viewport, viewSource, onError },
     view = render(
       <>
-        <AddArtboardOverlay engine={engine} controller={controller} onError={onError} />
+        <AddArtboardOverlay {...props} />
         <QuickAdd {...props} />
       </>,
       { container: viewport.current },
@@ -95,7 +104,8 @@ it("uses the shared command port synchronously for file imports, artboard creati
     stop = createCommandPort(d.engine).subscribe(run),
     library = vi.fn(),
     stopLibrary = createLibraryActions(d.engine).subscribe(library);
-  fireEvent.click(screen.getByTestId("canvas-add-artboard"));
+  d.open();
+  fireEvent.click(screen.getByRole("option", { name: "addPage" }));
   expect(run).toHaveBeenLastCalledWith("action:addPage");
   d.open();
   fireEvent.click(screen.getByRole("button", { name: "search:files" }));
@@ -143,11 +153,16 @@ it("cancels stale/wheel/playback sessions, reports command rejection and cleans 
   d.open();
   act(() => createPlaybackSource(d.engine).set({ page: d.page, assets: {} }));
   await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
-  expect(screen.getByTestId("canvas-add-artboard")).toBeDisabled();
+  await waitFor(() =>
+    expect(screen.getByTestId("canvas-add-artboard")).toHaveAttribute("data-visible", "false"),
+  );
   d.open();
   expect(screen.queryByRole("dialog")).toBeNull();
   act(() => createPlaybackSource(d.engine).set(null));
   fireEvent.click(screen.getByTestId("canvas-add-artboard"));
+  expect(d.engine.getSnapshot().project.pages).toHaveLength(1);
+  d.open();
+  fireEvent.click(screen.getByRole("option", { name: "import" }));
   expect(d.onError).toHaveBeenCalledWith("quickAdd:unavailable");
   const remove = vi.spyOn(d.viewport.current!, "removeEventListener");
   d.view.unmount();
@@ -169,7 +184,7 @@ it("does no catalog construction or search normalization while closed through do
     act(() => d.engine.execute({ type: "renameProject", name: "Closed quick add" }));
     d.view.rerender(
       <>
-        <AddArtboardOverlay engine={d.engine} controller={d.controller} onError={d.onError} />
+        <AddArtboardOverlay {...d.props} />
         <QuickAdd {...d.props} />
       </>,
     );
@@ -186,7 +201,7 @@ it("does no catalog construction or search normalization while closed through do
     act(() => d.engine.execute({ type: "renameProject", name: "Closed after insertion" }));
     d.view.rerender(
       <>
-        <AddArtboardOverlay engine={d.engine} controller={d.controller} onError={d.onError} />
+        <AddArtboardOverlay {...d.props} />
         <QuickAdd {...d.props} />
       </>,
     );

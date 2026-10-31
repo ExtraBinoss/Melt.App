@@ -30,10 +30,12 @@ const factories: DraftFactories = Object.freeze({
           },
     ),
   }),
-  updatePage: (project, pageId) => ({
+  updatePage: (project, pageId, command) => ({
     ...project,
     // updatePage assigns permitted top-level metadata; it never mutates layer/asset data.
-    pages: project.pages.map((page) => (page.id === pageId ? { ...page } : page)),
+    pages: project.pages.map((page) =>
+      page.id === (command.targetId ?? pageId) ? { ...page } : page,
+    ),
   }),
   updateLayers: (project, pageId, command) =>
     createLayerPatchDraft(
