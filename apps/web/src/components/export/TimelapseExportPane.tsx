@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import type { ReplaySpec } from "@musart/core";
 import { useTranslation } from "react-i18next";
-import { Pause, Play } from "lucide-react";
+import { MediaPlayer } from "../shared/player/MediaPlayer";
 import { getExportJobs } from "../../services/export/jobs";
 import { getAnimationSession } from "../../services/animation/session";
 import { isTimelapseDuration } from "../../services/animation/replay-timing";
@@ -13,8 +13,6 @@ import { useStartExport } from "./use-start-export";
 import type { ExportPaneProps } from "./workspace-model";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
-import { Button } from "../ui/button";
-import { Slider } from "../ui/slider";
 import { SelectField } from "../shared/SelectField";
 import "../animation/timelapse/messages";
 
@@ -40,7 +38,7 @@ export function TimelapseExportPane(props: ExportPaneProps) {
     () => services.mediaResolverFor?.(origin.project.id),
     [services, origin.project.id],
   );
-  const { viewport, slider, clock, controls, status, playing } = useTimelapsePreview(
+  const { viewport, slider, controls, status, playing } = useTimelapsePreview(
     spec,
     page.id,
     valid ? duration : 10,
@@ -102,27 +100,18 @@ export function TimelapseExportPane(props: ExportPaneProps) {
               {error ? t(error) : t(status === "failed" ? "previewFailed" : "preparing")}
             </p>
           )}
-          <div className="motion-export-preview-controls">
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              aria-label={t(playing ? "pause" : "play")}
-              disabled={!spec || !valid || busy || status !== "ready"}
-              onClick={() => (playing ? controls.current?.pause() : controls.current?.play())}
-            >
-              {playing ? <Pause size={15} /> : <Play size={15} />}
-            </Button>
-            <Slider
-              valueSource={slider}
-              min={0}
-              max={valid ? duration : 10}
-              step={1 / 30}
-              aria-label={t("position")}
-              disabled={!spec || !valid || busy}
-              onValueChange={([value]) => controls.current?.seek(value ?? 0)}
-            />
-            <output ref={clock}>0.0 / {valid ? duration : "–"} s</output>
-          </div>
+          <MediaPlayer
+            identity={spec}
+            position={slider}
+            duration={valid ? duration : 0}
+            playing={playing}
+            disabled={!spec || !valid || busy || status !== "ready"}
+            onPlayingChange={(value) => {
+              if (value) controls.current?.play();
+              else controls.current?.pause();
+            }}
+            onSeek={(seconds) => controls.current?.seek(seconds)}
+          />
           <div className="export-preview-caption">
             <strong>{page.name}</strong>
             <span>{common("timelapse")} · sRGB</span>

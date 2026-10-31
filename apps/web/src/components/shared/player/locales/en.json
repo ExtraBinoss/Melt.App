@@ -1,0 +1,10 @@
+{
+  "play": "Play preview",
+  "pause": "Pause preview",
+  "seek": "Preview time",
+  "time": "Playback time",
+  "volume": "Volume",
+  "mute": "Mute",
+  "unmute": "Unmute",
+  "silent": "Silent preview"
+}

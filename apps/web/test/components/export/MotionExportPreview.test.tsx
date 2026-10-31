@@ -59,13 +59,15 @@ test("mounts its own GPU canvas and updates local clock controls without repaint
     state.time = { value: 1, rate: 2 };
     state.listener();
   });
-  expect(screen.getByText("0.500 s")).toBeVisible();
+  expect(screen.getByLabelText("Temps de lecture")).toHaveTextContent("0:00.5 /");
   expect(renders).toBe(1);
-  expect(screen.getByRole("slider")).toHaveAttribute("aria-valuenow", "500");
+  expect(screen.getByRole("slider")).toHaveAttribute("aria-valuenow", "0.5");
   fireEvent.keyDown(screen.getByRole("slider"), { key: "ArrowRight" });
-  expect(state.seek).toHaveBeenCalledWith({ value: 501, rate: 1000 });
-  fireEvent.click(screen.getByRole("button", { name: "Mettre l’aperçu d’export en pause" }));
-  expect(state.pause).toHaveBeenCalledOnce();
+  expect(state.seek).toHaveBeenCalledWith({ value: 501000, rate: 1000000 });
+  fireEvent.keyUp(screen.getByRole("slider"), { key: "ArrowRight" });
+  expect(state.play).toHaveBeenCalledOnce();
+  fireEvent.click(screen.getByRole("button", { name: "Mettre l’aperçu en pause" }));
+  expect(state.pause).toHaveBeenCalledTimes(2);
   mount.unmount();
   expect(state.stop).toHaveBeenCalledOnce();
   expect(state.dispose).toHaveBeenCalledOnce();
@@ -82,7 +84,7 @@ test("an export in progress allocates no preview renderer and later suspension d
     await Promise.resolve();
   });
   expect(state.create).not.toHaveBeenCalled();
-  expect(screen.getByRole("button")).toBeDisabled();
+  expect(screen.getByRole("button", { name: "Mettre l’aperçu en pause" })).toBeDisabled();
   mount.rerender(<MotionExportPreview project={project} page={page} services={d.services} />);
   await waitFor(() => expect(state.create).toHaveBeenCalledOnce());
   mount.rerender(

@@ -1,4 +1,11 @@
-import { useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import {
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type KeyboardEvent,
+} from "react";
 import { HsvColorPicker, type HsvColor } from "react-colorful";
 import { useTranslation } from "react-i18next";
 import { Slider } from "../../ui/slider";
@@ -74,9 +81,9 @@ export function ColorPalette({
         return false;
       const unit = (value: number) => Math.min(1, Math.max(0, value));
       return state.preview({
-        h: Math.round(current.current.h),
-        s: Math.round(unit((event.clientX - gesture.box.left) / gesture.box.width) * 100),
-        v: Math.round((1 - unit((event.clientY - gesture.box.top) / gesture.box.height)) * 100),
+        h: current.current.h,
+        s: unit((event.clientX - gesture.box.left) / gesture.box.width) * 100,
+        v: (1 - unit((event.clientY - gesture.box.top) / gesture.box.height)) * 100,
       });
     }
     function move(event: PointerEvent) {
@@ -113,6 +120,22 @@ export function ColorPalette({
       window.removeEventListener("pointercancel", cancel, true);
     };
   }, []);
+  function channelKey(event: KeyboardEvent, channel: "h" | "a") {
+    const direction =
+      event.key === "ArrowRight" || event.key === (channel === "h" ? "ArrowDown" : "ArrowUp")
+        ? 1
+        : event.key === "ArrowLeft" || event.key === (channel === "h" ? "ArrowUp" : "ArrowDown")
+          ? -1
+          : 0;
+    if (!direction || disabled) return;
+    event.preventDefault();
+    event.stopPropagation();
+    preview(
+      channel === "h"
+        ? { h: Math.max(0, Math.min(360, current.current.h + direction)) }
+        : { a: Math.max(0, Math.min(1, current.current.a + direction * 0.01)) },
+    );
+  }
   return (
     <div
       className="color-channels"
@@ -167,8 +190,9 @@ export function ColorPalette({
         inverted
         min={0}
         max={360}
-        step={1}
+        step={0.1}
         value={[color.h]}
+        onKeyDownCapture={(event) => channelKey(event, "h")}
         onValueChange={([h]) => preview({ h: h! })}
       />
       {alpha && (
@@ -179,9 +203,10 @@ export function ColorPalette({
           orientation="vertical"
           min={0}
           max={100}
-          step={1}
+          step={0.1}
           value={[color.a * 100]}
           style={{ "--color-channel-fill": hsvaToHex({ ...color, a: 1 }) } as CSSProperties}
+          onKeyDownCapture={(event) => channelKey(event, "a")}
           onValueChange={([a]) => preview({ a: a! / 100 })}
         />
       )}

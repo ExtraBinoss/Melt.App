@@ -1,0 +1,10 @@
+.motion-playhead[data-interpolate="true"],
+.motion-ruler-playhead[data-interpolate="true"] {
+  transition: transform 45ms linear;
+}
+@media (prefers-reduced-motion: reduce) {
+  .motion-playhead[data-interpolate="true"],
+  .motion-ruler-playhead[data-interpolate="true"] {
+    transition: none;
+  }
+}

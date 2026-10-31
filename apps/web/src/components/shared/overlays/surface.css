@@ -1,0 +1,8 @@
+/* One translucent layer: child scroll fades reveal this surface instead of adding white. */
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  :root:not(.dark) [data-slot="popover-content"].floating-panel {
+    --floating-popover-surface: color-mix(in srgb, var(--popover) 88%, transparent);
+    --scroll-shadow-surface: var(--floating-popover-surface);
+    background: var(--floating-popover-surface);
+  }
+}

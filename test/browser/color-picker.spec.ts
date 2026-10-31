@@ -57,6 +57,8 @@ test("compact vertical hue/alpha preview real GPU pixels with no editor React co
   page,
 }) => {
   test.setTimeout(120000);
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.addInitScript(() => localStorage.setItem("musart.language", "fr"));
   await installReadbackProbe(page);
   await page.goto("/?automation=1");
   await page.waitForFunction(() => Boolean(window.musart));
@@ -99,6 +101,10 @@ test("compact vertical hue/alpha preview real GPU pixels with no editor React co
       hue: (await hue.boundingBox())!,
       alpha: (await alpha.boundingBox())!,
     };
+    await expect(hue.locator('[data-slot="slider-thumb"]').locator("..")).toHaveCSS(
+      "transition-duration",
+      "0.055s, 0.055s, 0.055s, 0.055s",
+    );
     expect(boxes.sv.height).toBe(132);
     expect(boxes.hue.height).toBe(132);
     expect(boxes.alpha.height).toBe(132);

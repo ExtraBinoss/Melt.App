@@ -12,7 +12,12 @@ async function movingFrames(page: Page, phase: string) {
       await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
       if (performance.now() - start - last < 100) continue;
       last = performance.now() - start;
-      values.push(Number(document.querySelector<HTMLInputElement>(".tool-transport input")!.value));
+      values.push(
+        Number(
+          document.querySelector<HTMLOutputElement>(".tool-transport [data-player-time]")!.dataset
+            .time,
+        ),
+      );
       // Native browser encoding is inspected only by this witness, never the effect pipeline.
       images.add(
         document.querySelector<HTMLCanvasElement>("canvas[data-tool-renderer]")!.toDataURL(),

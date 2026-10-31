@@ -1,11 +1,10 @@
 import { useEffect, useRef, useState } from "react";
-import { Pause, Play } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import type { Composition, Project } from "@musart/core";
+import { selectionComposition, type Composition, type Project } from "@musart/core";
+import { PreviewAudio } from "../../services/motion/audio/preview";
+import { MediaPlayer } from "../shared/player/MediaPlayer";
 import type { createMotionPreview } from "@musart/render";
 import type { EditorServices } from "../../state/contracts";
-import { Button } from "../ui/button";
-import { Slider } from "../ui/slider";
 import { createSliderValue } from "../ui/slider-value";
 
 /** Canvas ownership and clock updates stay local; React sees only play/error transitions. */
@@ -27,7 +26,7 @@ export function MotionExportPreview({
   const { t } = useTranslation("exportPanel");
   const host = useRef<HTMLDivElement>(null);
   const [slider] = useState(() => createSliderValue([0]));
-  const counter = useRef<HTMLOutputElement>(null);
+  const [monitor, setMonitor] = useState<PreviewAudio | undefined>();
   const source = useRef<ReturnType<typeof createMotionPreview> | null>(null);
   const pauseRequested = useRef(paused);
   const [playing, setPlaying] = useState(true),
@@ -36,7 +35,8 @@ export function MotionExportPreview({
     if (paused) return;
     let active = true,
       preview: ReturnType<typeof createMotionPreview> | undefined;
-    let stop: (() => void) | undefined,
+    let stop: (() => void) | undefined, managed: ReturnType<typeof createMotionPreview> | undefined;
+    let audio: PreviewAudio | undefined,
       shownPlaying = true;
     const hidden = () => {
       if (document.hidden) preview?.pause();
@@ -57,13 +57,64 @@ export function MotionExportPreview({
           },
         });
         source.current = preview;
-        onReady?.(preview);
+        let monitored = project;
+        if (selection?.length) {
+          const selected = selectionComposition(page, selection);
+          const ids = new Set(selected.layers.map((layer) => layer.id));
+          monitored = {
+            ...project,
+            pages: [
+              {
+                ...selected,
+                motion: {
+                  ...page.motion!,
+                  tracks: page.motion!.tracks.filter((track) => ids.has(track.layerId)),
+                  audioTracks: [],
+                },
+              },
+            ],
+          };
+        }
+        const monitoredPage = monitored.pages.find((item) => item.id === page.id)!;
+        if (
+          monitoredPage.layers.some((layer) => layer.kind === "video") ||
+          monitoredPage.motion?.audioTracks?.length
+        ) {
+          audio = new PreviewAudio({
+            source: () => ({ project: monitored, pageId: page.id }),
+            read: () => preview!.read(),
+            subscribe: (listener) => preview!.subscribe(listener),
+            holdPlayback: () => preview!.holdPlayback(),
+            pause: () => preview!.pause(),
+            resolver: () => {
+              const resolver = services.mediaResolverFor?.(project.id);
+              if (!resolver) throw new Error("Audio originals are unavailable.");
+              return resolver;
+            },
+            onError: () => {
+              if (active) setFailed(true);
+            },
+          });
+        }
+        setMonitor(audio);
+        managed = {
+          ...preview,
+          dispose: async () => {
+            const results = await Promise.allSettled([audio?.dispose(), preview!.dispose()]);
+            const errors = results.filter((result) => result.status === "rejected");
+            if (errors.length)
+              throw new AggregateError(
+                errors.map((result) => result.reason),
+                "Preview cleanup failed.",
+              );
+          },
+        };
+        onReady?.(managed);
         const paint = () => {
           if (!active || !preview) return;
           const state = preview.read(),
             seconds = state.time.value / state.time.rate;
-          slider.set([seconds * 1000]);
-          if (counter.current) counter.current.textContent = seconds.toFixed(3) + " s";
+          slider.set([seconds]);
           if (state.playing !== shownPlaying) {
             shownPlaying = state.playing;
             setPlaying(state.playing);
@@ -85,9 +136,10 @@ export function MotionExportPreview({
       document.removeEventListener("visibilitychange", hidden);
       if (source.current === preview) source.current = null;
       onReady?.(null);
-      if (preview) void preview.dispose().catch(() => {});
+      if (managed) void managed.dispose().catch(() => {});
+      else if (preview) void preview.dispose().catch(() => {});
     };
-  }, [project, page.id, services, paused, onReady, slider, selection]);
+  }, [project, page, services, paused, onReady, slider, selection]);
   useEffect(() => {
     pauseRequested.current = paused;
     if (paused) source.current?.pause();
@@ -97,38 +149,21 @@ export function MotionExportPreview({
     <div className="motion-export-preview">
       <div ref={host} className="motion-export-preview-surface" aria-label={t("preview")} />
       {failed && <p role="alert">{t("failed")}</p>}
-      <div className="motion-export-preview-controls">
-        <Button
-          size="icon-sm"
-          variant="ghost"
-          disabled={failed || paused}
-          aria-label={t(playing ? "pausePreview" : "playPreview")}
-          onClick={() => {
-            const preview = source.current;
-            if (preview?.read().playing) preview.pause();
-            else preview?.play();
-          }}
-        >
-          {playing ? <Pause size={14} /> : <Play size={14} />}
-        </Button>
-        <Slider
-          className="motion-export-preview-slider"
-          tone="primary"
-          min={0}
-          max={duration * 1000}
-          step={1}
-          valueSource={slider}
-          aria-label={t("previewTime")}
-          disabled={failed || paused}
-          onValueChange={(values) => {
-            const value = values[0] ?? 0;
-            slider.set([value]);
-            source.current?.seek({ value, rate: 1000 });
-          }}
-        />
-        <output ref={counter}>0.000 s</output>
-      </div>
-      <small className="export-preview-audio-note">{t("mutedPreview")}</small>
+      <MediaPlayer
+        identity={project}
+        position={slider}
+        duration={duration}
+        playing={playing}
+        disabled={failed || paused}
+        onPlayingChange={(value) => {
+          if (value) source.current?.play();
+          else source.current?.pause();
+        }}
+        onSeek={(seconds) =>
+          source.current?.seek({ value: Math.round(seconds * 1_000_000), rate: 1_000_000 })
+        }
+        audio={monitor}
+      />
     </div>
   );
 }

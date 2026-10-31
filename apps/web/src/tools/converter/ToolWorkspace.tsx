@@ -199,10 +199,6 @@ function ToolControls({
                   onCommit={(length) => controller.clip(state.clipStart, length)}
                 />
               </div>
-              <p>
-                {t("sourceDuration", { seconds: state.sourceDuration.toFixed(2) })} ·{" "}
-                {t("clipHint")}
-              </p>
               <label className="tool-audio">
                 <span>{t("mute")}</span>
                 <Switch
@@ -211,7 +207,6 @@ function ToolControls({
                   onCheckedChange={controller.audio}
                 />
               </label>
-              {state.hasAudio && <p>{t("silentPreview")}</p>}
             </div>
           )}
           <div className="tool-download-controls">

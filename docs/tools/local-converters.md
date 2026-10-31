@@ -36,7 +36,7 @@ subscriptions, so animation frames do not rerender the controls.
   sizes are 720, 1280 or 1920 on the long edge, preserving aspect ratio and never
   upscaling. GPU previews have a 768-pixel long edge.
 - Video exports contain at most 60 seconds / 1800 frames at 30 fps. Source audio
-  can be kept or muted; the preview is silent. The initial rational source duration
+  can be kept or muted; preview monitoring starts muted and can be enabled through the shared player. The initial rational source duration
   is preserved and a rounded trim is clamped against the actual remaining span.
 - GPU sessions are capped at 192 MiB; encoded video output at 128 MiB. Source
   video decoding retains the existing renderer's bounded original-frame cache.

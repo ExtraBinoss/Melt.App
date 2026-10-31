@@ -3,6 +3,7 @@
 
 import * as React from "react";
 import { cn } from "./utils";
+import "../shared/overlays/surface.css";
 import { withPresentationBoundary } from "../shared/overlays/PresentationBoundary";
 import { useOverlayEntrance } from "../shared/overlays/use-overlay-entrance";
 import { Popover as PopoverPrimitive } from "radix-ui";

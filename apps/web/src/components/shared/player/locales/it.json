@@ -1,0 +1,10 @@
+{
+  "play": "Riproduci anteprima",
+  "pause": "Pausa anteprima",
+  "seek": "Posizione dell’anteprima",
+  "time": "Tempo di riproduzione",
+  "volume": "Volume",
+  "mute": "Disattiva audio",
+  "unmute": "Attiva audio",
+  "silent": "Anteprima senza audio"
+}

@@ -296,14 +296,6 @@
   margin-top: 8px;
   touch-action: none;
 }
-.tool-transport {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.tool-transport .number-field {
-  flex: 1;
-}
 .tool-clip-fields {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

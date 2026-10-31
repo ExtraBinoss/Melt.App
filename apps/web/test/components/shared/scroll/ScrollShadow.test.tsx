@@ -538,3 +538,25 @@ test("horizontal fades and an explicit nested viewport coexist for Select-style 
   expect(wrapper).toHaveAttribute("data-overflow-left");
   expect(wrapper).not.toHaveAttribute("data-overflow-right");
 });
+
+test("glass ancestors automatically fade content instead of painting a second opaque surface", () => {
+  const view = render(
+    <div className="floating-panel">
+      <ScrollShadow>
+        <div role="list" />
+      </ScrollShadow>
+    </div>,
+  );
+  expect(screen.getByRole("list").parentElement).toHaveAttribute("data-scroll-shadow-fade", "mask");
+  view.rerender(
+    <div className="floating-panel">
+      <ScrollShadow fade="surface">
+        <div role="list" />
+      </ScrollShadow>
+    </div>,
+  );
+  expect(screen.getByRole("list").parentElement).toHaveAttribute(
+    "data-scroll-shadow-fade",
+    "surface",
+  );
+});

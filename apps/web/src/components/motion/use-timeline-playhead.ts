@@ -1,5 +1,6 @@
 import { useLayoutEffect, type RefObject } from "react";
 import { compareMotionTime, motionTimeToSeconds } from "@musart/core";
+import "./playhead.css";
 import type { TimelineTransport } from "./model";
 
 type Options = {
@@ -36,6 +37,7 @@ export function useTimelinePlayhead({
 }: Options) {
   useLayoutEffect(() => {
     let previous: number | null = null;
+    let lastPaint: { time: number; left: number } | null = null;
     const paint = () => {
       const state = transport.read();
       const node = viewportRef.current;
@@ -46,6 +48,15 @@ export function useTimelinePlayhead({
         playheadClipRef.current.style.left = `${gutter + left}px`;
         // The overlay must never enlarge the native scroll extent at either edge.
         playheadClipRef.current.style.width = `${Math.max(0, Math.min(visibleWidth, width - left))}px`;
+        const seconds = motionTimeToSeconds(state.time);
+        const interpolate =
+          state.playing &&
+          lastPaint !== null &&
+          left === lastPaint.left &&
+          Math.abs(seconds - lastPaint.time) < 0.25 &&
+          !(state.playbackMode === "loop" && seconds < lastPaint.time);
+        playheadRef.current.dataset.interpolate = String(interpolate);
+        lastPaint = { time: seconds, left };
         playheadRef.current.style.transform = `translateX(${x - left}px)`;
         playheadRef.current.dataset.atEnd = String(
           compareMotionTime(state.time, state.duration) === 0,

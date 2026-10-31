@@ -147,3 +147,8 @@ Primary references: [ICC CRPC6 profile and license](https://registry.color.org/p
 [Affinity soft-proof/export guidance](https://www.affinity.studio/blog/screen-to-paper-how-to-hand-off-your-logo),
 [native ICC conversion API](https://github.com/dlemstra/magick-wasm),
 [canvas serialization color contract](https://html.spec.whatwg.org/multipage/canvas.html).
+
+Motion, Timelapse and local tools use the shared [media player](../guides/media-player.md).
+Motion preview monitoring starts muted and reuses the bounded audio mixer. Monitor
+volume never changes authored audio or the delivered file. Selection monitoring
+excludes independent audio tracks and unselected video sources.

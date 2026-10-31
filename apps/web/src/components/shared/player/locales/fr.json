@@ -1,0 +1,10 @@
+{
+  "play": "Lire l’aperçu",
+  "pause": "Mettre l’aperçu en pause",
+  "seek": "Position de l’aperçu",
+  "time": "Temps de lecture",
+  "volume": "Volume",
+  "mute": "Couper le son",
+  "unmute": "Activer le son",
+  "silent": "Aperçu muet"
+}

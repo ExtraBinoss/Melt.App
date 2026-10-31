@@ -1,14 +1,16 @@
-import { compileMotion, motionTimeToSeconds, type EnginePort } from "@musart/core";
+import { compileMotion, motionTimeToSeconds } from "@musart/core";
 import type { MediaSourceResolver } from "@musart/render";
 import { createWorkerAudioMixer } from "./mixer-worker-client";
 import { abortableAudio } from "./abort";
 import type { AudioMixPublication } from "./commit-policy";
-import type { MotionTransport } from "../transport";
+import type { AudioPlaybackSource, AudioPlaybackClock } from "./playback-port";
 type Mixer = Awaited<ReturnType<typeof createWorkerAudioMixer>>;
 
 /** Native audio clock + bounded PCM lookahead. No React state, frame loop or document commands. */
 export class MotionAudioPlayback {
   private context: AudioContext | null = null;
+  private outputGain: GainNode | null = null;
+  private masterVolume: number | null = null;
   private mixer: Mixer | null = null;
   private controller: AbortController | null = null;
   private timer: ReturnType<typeof setInterval> | null = null;
@@ -36,8 +38,8 @@ export class MotionAudioPlayback {
   private opening: Promise<Mixer> | null = null;
   private retiring: Promise<void> = Promise.resolve();
   constructor(
-    private readonly engine: EnginePort,
-    private readonly transport: MotionTransport,
+    private readonly engine: AudioPlaybackSource,
+    private readonly transport: AudioPlaybackClock,
     private readonly resolver: (projectId: string) => MediaSourceResolver,
     private readonly onError: (error: unknown) => void,
     private readonly createContext = () =>
@@ -114,6 +116,7 @@ export class MotionAudioPlayback {
     // This subscriber runs synchronously inside the Play click/Space gesture.
     try {
       this.context ??= this.createContext();
+      if (this.masterVolume !== null) this.applyMasterVolume();
     } catch (error) {
       this.fail(error);
       return;
@@ -271,7 +274,7 @@ export class MotionAudioPlayback {
           }
           const source = context.createBufferSource();
           source.buffer = buffer;
-          source.connect(context.destination);
+          source.connect(this.outputGain ?? context.destination);
           this.nodes.add(source);
           source.onended = () => {
             source.disconnect();
@@ -322,6 +325,28 @@ export class MotionAudioPlayback {
       node.disconnect();
     }
     this.nodes.clear();
+  }
+  /** Local monitor gain; never rewrites the authored mix or restarts its worker. */
+  setMasterVolume(value: number) {
+    if (!Number.isFinite(value) || value < 0 || value > 1)
+      throw new RangeError("Invalid monitor volume.");
+    if (this.closed) return;
+    this.masterVolume = value;
+    if (this.context) this.applyMasterVolume();
+  }
+  private applyMasterVolume() {
+    const context = this.context;
+    if (!context || this.masterVolume === null) return;
+    if (!this.outputGain) {
+      this.outputGain = context.createGain();
+      this.outputGain.gain.value = this.masterVolume;
+      this.outputGain.connect(context.destination);
+      for (const node of this.nodes) {
+        node.disconnect();
+        node.connect(this.outputGain);
+      }
+    }
+    this.outputGain.gain.setTargetAtTime(this.masterVolume, context.currentTime, 0.015);
   }
   previewVolume(trackId: string, volume: number | null) {
     if (!this.transport.read().playing) {
@@ -406,6 +431,8 @@ export class MotionAudioPlayback {
     const context = this.context;
     this.context = null;
     await this.retiring;
+    this.outputGain?.disconnect();
+    this.outputGain = null;
     if (context) await context.close();
   }
 }

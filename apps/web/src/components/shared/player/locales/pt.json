@@ -1,0 +1,10 @@
+{
+  "play": "Reproduzir prévia",
+  "pause": "Pausar prévia",
+  "seek": "Posição da prévia",
+  "time": "Tempo de reprodução",
+  "volume": "Volume",
+  "mute": "Silenciar",
+  "unmute": "Ativar som",
+  "silent": "Prévia sem som"
+}

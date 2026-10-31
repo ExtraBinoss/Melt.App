@@ -63,7 +63,7 @@ it("autoplays a frozen program with one acknowledged job and a bounded physical 
   project.pages[0]!.layers[0]!.x = 999;
   await scheduler.step(100);
   expect(state.render.mock.calls[1]![0].layers[0].x).toBeCloseTo(2);
-  expect(state.render.mock.calls[1]![3]).toMatchObject({ scale: 1, mediaMode: "exact" });
+  expect(state.render.mock.calls[1]![3]).toMatchObject({ scale: 1, mediaMode: "playback" });
   expect(state.options).toHaveBeenCalledWith(
     expect.objectContaining({ maxBytes: 256 * 1024 * 1024 }),
   );
@@ -106,6 +106,7 @@ it("backpressure bounds work and seek/pause reject a superseded canvas before re
   });
   expect(state.render.mock.calls.at(-1)![0].layers[0].x).toBe(10);
   expect(scheduler.callbacks.size).toBe(0);
+  expect(state.render.mock.calls.at(-1)![3].mediaMode).toBe("preview");
   preview.play();
   await scheduler.step(301);
   expect(preview.read().time.value / preview.read().time.rate).toBeCloseTo(0.6);
@@ -148,4 +149,29 @@ it("rejects invalid/static requests without allocating GPU resources and cleans 
   preview.play();
   preview.seek({ value: 0, rate: 1 });
   expect(listener).toHaveBeenCalledTimes(calls);
+});
+
+it("audio buffering parks the local clock without changing Play or scheduling idle frames", async () => {
+  const scheduler = clock();
+  const preview = createMotionPreview(motionProject(), {
+    compositionId: "composition",
+    scheduler,
+    onFrame: vi.fn(),
+  });
+  await scheduler.step(0);
+  const release = preview.holdPlayback();
+  const second = preview.holdPlayback();
+  await scheduler.step(500);
+  expect(preview.read().playing).toBe(true);
+  expect(preview.read().time.value).toBe(0);
+  expect(scheduler.callbacks.size).toBe(0);
+  release();
+  expect(scheduler.callbacks.size).toBe(0);
+  second(10);
+  await scheduler.step(610);
+  expect(preview.read().time.value / preview.read().time.rate).toBeCloseTo(0.1);
+  await preview.dispose();
+  release();
+  second();
+  expect(scheduler.callbacks.size).toBe(0);
 });

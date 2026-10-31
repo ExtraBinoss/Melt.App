@@ -26,6 +26,7 @@ export class ToolRenderer {
   private visible = true;
   private first = true;
   private anchor: number | null = null;
+  private readonly clockHolds = new Set<symbol>();
   private time = 0;
   private notified = 0;
   playing: boolean;
@@ -71,6 +72,9 @@ export class ToolRenderer {
       ? this.time
       : Math.max(0, (performance.now() - this.anchor) / 1000) % this.model.clipLength;
   }
+  readTime() {
+    return this.playing && !this.clockHolds.size ? this.clock() : this.time;
+  }
   private freezeClock() {
     if (this.anchor !== null) this.time = this.clock();
     this.anchor = null;
@@ -95,7 +99,8 @@ export class ToolRenderer {
       this.pending
     )
       return;
-    if (this.dirty || this.playing) this.frame = requestAnimationFrame(this.tick);
+    if (this.dirty || (this.playing && !this.clockHolds.size))
+      this.frame = requestAnimationFrame(this.tick);
   }
   update() {
     this.program =
@@ -124,6 +129,17 @@ export class ToolRenderer {
     this.callbacks.time(this.time, this.playing);
     this.request(true);
   }
+  holdPlayback = () => {
+    this.freezeClock();
+    const owner = Symbol("preview-audio");
+    this.clockHolds.add(owner);
+    return (delayMs = 0) => {
+      if (!Number.isFinite(delayMs) || delayMs < 0) throw new RangeError("Invalid clock delay.");
+      if (!this.clockHolds.delete(owner) || this.clockHolds.size || this.closed) return;
+      this.anchor = this.playing ? performance.now() + delayMs - this.time * 1000 : null;
+      this.schedule();
+    };
+  };
   play(value: boolean) {
     this.freezeClock();
     this.playing = value;
@@ -181,8 +197,10 @@ export class ToolRenderer {
     this.frame = null;
     if (this.closed || this.abort.signal.aborted || this.frozen || !this.visible || document.hidden)
       return;
-    if (this.playing && this.anchor === null) this.anchor = performance.now() - this.time * 1000;
-    const time = this.playing ? Math.floor(this.clock() * 30) / 30 : this.time;
+    if (this.playing && !this.clockHolds.size && this.anchor === null)
+      this.anchor = performance.now() - this.time * 1000;
+    const time =
+      this.playing && !this.clockHolds.size ? Math.floor(this.clock() * 30) / 30 : this.time;
     if (!this.dirty && time === this.time) {
       this.schedule();
       return;
@@ -202,7 +220,8 @@ export class ToolRenderer {
           if (this.first) {
             this.first = false;
             // Cold shader/decoder preparation must not consume the beginning of the clip.
-            if (this.playing && this.anchor !== null) this.anchor = performance.now() - time * 1000;
+            if (this.playing && !this.clockHolds.size && this.anchor !== null)
+              this.anchor = performance.now() - time * 1000;
             this.callbacks.ready();
           }
           if (performance.now() - this.notified > 100) {
@@ -258,6 +277,7 @@ export class ToolRenderer {
   dispose(): Promise<void> {
     if (this.disposal) return this.disposal;
     this.closed = true;
+    this.clockHolds.clear();
     this.abort.abort();
     this.unlink();
     this.observer.disconnect();

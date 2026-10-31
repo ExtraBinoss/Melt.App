@@ -9,7 +9,7 @@ export function ScrollShadow({
   surface,
   viewportSelector,
   axis = "vertical",
-  fade = "surface",
+  fade = "auto",
 }: {
   children: ReactElement;
   className?: string;
@@ -20,12 +20,14 @@ export function ScrollShadow({
   viewportSelector?: string;
   axis?: "vertical" | "horizontal" | "both";
   /** Fade content itself on translucent/blurred panels, without painting an opaque surface. */
-  fade?: "surface" | "mask";
+  fade?: "auto" | "surface" | "mask";
 }) {
   const root = useRef<HTMLDivElement>(null);
   useLayoutEffect(() => {
     const wrapper = root.current;
     if (!wrapper) return;
+    wrapper.dataset.scrollShadowFade =
+      fade === "auto" ? (wrapper.closest(".floating-panel") ? "mask" : "surface") : fade;
     for (const side of ["top", "bottom", "left", "right"])
       wrapper.removeAttribute(`data-overflow-${side}`);
     const viewport = viewportSelector
@@ -88,7 +90,7 @@ export function ScrollShadow({
       resize.disconnect();
       childrenObserver.disconnect();
     };
-  }, [children.type, children.key, viewportSelector, axis]);
+  }, [children.type, children.key, viewportSelector, axis, fade]);
   return (
     <div
       className={cn("scroll-shadow", className)}

@@ -11,6 +11,10 @@
   flex-shrink: 0;
 }
 .export-actions .export-trigger {
+  position: relative;
+  inset: auto;
+  min-width: 0;
+  margin: 0;
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
 }
@@ -60,24 +64,6 @@
   width: 100%;
   height: 100%;
   object-fit: contain;
-}
-.motion-export-preview-controls {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.motion-export-preview-slider {
-  min-width: 0;
-  flex: 1;
-}
-.motion-export-preview-controls output {
-  font-size: 10px;
-  white-space: nowrap;
-  font-variant-numeric: tabular-nums;
-}
-.export-preview-audio-note {
-  font-size: 10px;
-  color: var(--muted-foreground);
 }
 .export-settings-panel progress {
   width: 100%;

@@ -110,13 +110,6 @@
   max-height: 100%;
   object-fit: contain;
 }
-.export-preview-pane > .motion-export-preview-controls {
-  flex: 0 0 auto;
-}
-.export-preview-pane .motion-export-preview-controls [data-slot="slider"] {
-  flex: 1;
-  min-width: 0;
-}
 .export-preview-caption {
   display: grid;
   gap: 5px;

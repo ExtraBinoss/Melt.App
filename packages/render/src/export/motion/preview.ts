@@ -41,10 +41,10 @@ export function createMotionPreview(project: Project, options: MotionPreviewOpti
     fontResolver: options.fontResolver,
     forceWebGL: options.forceWebGL,
     maxBytes: options.maxGpuBytes ?? 256 * 1024 * 1024,
-    mediaMode: "exact",
   });
   const abort = new AbortController(),
-    listeners = new Set<() => void>();
+    listeners = new Set<() => void>(),
+    clockHolds = new Set<symbol>();
   let state: MotionPreviewState = {
     playing: true,
     time: { value: 0, rate: 1 },
@@ -70,7 +70,13 @@ export function createMotionPreview(project: Project, options: MotionPreviewOpti
   const sample = (seconds: number) =>
     normalizeMotionTime({ value: Math.round(seconds * 1_000_000), rate: 1_000_000 });
   const schedule = () => {
-    if (!closed && !state.error && frame === null && !pending && (state.playing || dirty))
+    if (
+      !closed &&
+      !state.error &&
+      frame === null &&
+      !pending &&
+      ((state.playing && !clockHolds.size) || dirty)
+    )
       frame = scheduler.request(() => {
         frame = null;
         paint();
@@ -78,9 +84,10 @@ export function createMotionPreview(project: Project, options: MotionPreviewOpti
   };
   const paint = () => {
     if (closed || pending || state.error) return;
-    const seconds = state.playing
-      ? Math.floor(clock() * frameRate) / frameRate
-      : motionTimeToSeconds(state.time);
+    const seconds =
+      state.playing && !clockHolds.size
+        ? Math.floor(clock() * frameRate) / frameRate
+        : motionTimeToSeconds(state.time);
     const owner = generation,
       time = sample(seconds);
     if (!dirty && time.value === state.time.value && time.rate === state.time.rate) {
@@ -99,20 +106,21 @@ export function createMotionPreview(project: Project, options: MotionPreviewOpti
       {
         scale: Math.min(1, edge / Math.max(selection.page.width, selection.page.height)),
         motionFrame: plan,
-        mediaMode: "exact",
+        mediaMode: state.playing ? "playback" : "preview",
         signal: abort.signal,
+        canRender: () => !closed && owner === generation,
       },
     );
     pending = job
       .then(
         () => {
           if (closed || owner !== generation) return;
-          if (state.playing && anchor === null)
+          if (state.playing && !clockHolds.size && anchor === null)
             anchor = scheduler.now() - motionTimeToSeconds(time) * 1000;
           publish({ time, busy: false });
         },
         (error: unknown) => {
-          if (!closed) publish({ playing: false, busy: false, error });
+          if (!closed && owner === generation) publish({ playing: false, busy: false, error });
         },
       )
       .finally(() => {
@@ -136,6 +144,21 @@ export function createMotionPreview(project: Project, options: MotionPreviewOpti
       listeners.add(listener);
       return () => {
         listeners.delete(listener);
+      };
+    },
+    holdPlayback() {
+      if (closed || !state.playing) return () => {};
+      if (!clockHolds.size) {
+        state = { ...state, time: sample(clock()) };
+        anchor = null;
+      }
+      const owner = Symbol("preview-audio");
+      clockHolds.add(owner);
+      return (delayMs = 0) => {
+        if (!Number.isFinite(delayMs) || delayMs < 0) throw new RangeError("Invalid clock delay.");
+        if (!clockHolds.delete(owner) || clockHolds.size || closed || !state.playing) return;
+        anchor = scheduler.now() + delayMs - motionTimeToSeconds(state.time) * 1000;
+        schedule();
       };
     },
     play() {
@@ -168,6 +191,7 @@ export function createMotionPreview(project: Project, options: MotionPreviewOpti
     dispose() {
       if (!closed) {
         closed = true;
+        clockHolds.clear();
         generation++;
         abort.abort();
         if (frame !== null) scheduler.cancel(frame);

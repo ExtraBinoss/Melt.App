@@ -1,0 +1,10 @@
+{
+  "play": "Vorschau abspielen",
+  "pause": "Vorschau pausieren",
+  "seek": "Vorschauposition",
+  "time": "Wiedergabezeit",
+  "volume": "Lautstärke",
+  "mute": "Stummschalten",
+  "unmute": "Ton einschalten",
+  "silent": "Stumme Vorschau"
+}

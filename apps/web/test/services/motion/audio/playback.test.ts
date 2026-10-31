@@ -341,3 +341,29 @@ it.each([{ volume: 0 }, { mute: true }])(
     d.transport.dispose();
   },
 );
+
+it("local monitor volume uses one smoothed output gain without changing the document or reopening the mixer", async () => {
+  const d = setup(),
+    before = d.engine.getSnapshot();
+  const gain = {
+    gain: { value: 1, setTargetAtTime: vi.fn() },
+    connect: vi.fn(),
+    disconnect: vi.fn(),
+  };
+  const createGain = vi.fn(() => gain);
+  Object.defineProperty(d.context, "createGain", { value: createGain });
+  d.playback.setMasterVolume(0.25);
+  d.transport.play();
+  await d.flush();
+  expect(createGain).toHaveBeenCalledOnce();
+  expect(d.nodes[0]!.connect).toHaveBeenCalledWith(gain);
+  const mixer = state.mix.mock.calls.length;
+  d.playback.setMasterVolume(0.8);
+  expect(gain.gain.setTargetAtTime).toHaveBeenLastCalledWith(0.8, d.context.currentTime, 0.015);
+  expect(state.mix).toHaveBeenCalledTimes(mixer);
+  expect(d.engine.getSnapshot()).toBe(before);
+  expect(() => d.playback.setMasterVolume(2)).toThrow();
+  await d.playback.dispose();
+  expect(gain.disconnect).toHaveBeenCalledOnce();
+  d.transport.dispose();
+});

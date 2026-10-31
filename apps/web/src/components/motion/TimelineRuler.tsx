@@ -11,6 +11,7 @@ import {
 import type { TimelineTransport, TimelineUnit } from "./model";
 import { formatTimelineTime, timelineTicks, timelineTime } from "./time";
 import "./messages";
+import "./playhead.css";
 import { FlagTriangleRight } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 
@@ -61,8 +62,21 @@ export const TimelineRuler = memo(function TimelineRuler({
     [transport],
   );
   useLayoutEffect(() => {
+    let lastPaint: { seconds: number; scroll: number } | null = null;
     const sync = () => {
       const state = transport.read();
+      const seconds = motionTimeToSeconds(state.time);
+      const scroll =
+        ruler.current?.closest<HTMLElement>(".motion-timeline-scroll")?.scrollLeft ?? 0;
+      if (playhead.current)
+        playhead.current.dataset.interpolate = String(
+          state.playing &&
+            lastPaint !== null &&
+            scroll === lastPaint.scroll &&
+            Math.abs(seconds - lastPaint.seconds) < 0.25 &&
+            !(state.playbackMode === "loop" && seconds < lastPaint.seconds),
+        );
+      lastPaint = { seconds, scroll };
       ruler.current?.setAttribute("aria-valuenow", String(motionTimeToSeconds(state.time)));
       ruler.current?.setAttribute(
         "aria-valuetext",
@@ -79,6 +93,7 @@ export const TimelineRuler = memo(function TimelineRuler({
     const node = ruler.current;
     const viewport = node?.closest(".motion-timeline-scroll");
     const invalidateBounds = () => {
+      if (playhead.current) playhead.current.dataset.interpolate = "false";
       if (gesture.current) gesture.current.bounds = null;
     };
     viewport?.addEventListener("scroll", invalidateBounds, { passive: true });

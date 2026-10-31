@@ -1,0 +1,10 @@
+{
+  "play": "Odtwórz podgląd",
+  "pause": "Wstrzymaj podgląd",
+  "seek": "Pozycja podglądu",
+  "time": "Czas odtwarzania",
+  "volume": "Głośność",
+  "mute": "Wycisz",
+  "unmute": "Włącz dźwięk",
+  "silent": "Podgląd bez dźwięku"
+}

@@ -1,3 +1,4 @@
+import { PreviewAudio } from "../../services/motion/audio/preview";
 import type { Effect } from "@musart/core";
 import { beginProjectTiming } from "../../services/performance/project-timing";
 import { ToolDocument } from "./model";
@@ -69,6 +70,10 @@ export class ToolController {
   };
   private model: ToolDocument | null = null;
   private renderer: ToolRenderer | null = null;
+  private monitor: PreviewAudio | null = null;
+  get previewAudio() {
+    return this.monitor ?? undefined;
+  }
   private sourceAbort: AbortController | null = null;
   private exportAbort: AbortController | null = null;
   private queued: { file: File; tool: ToolDefinition; id: number } | null = null;
@@ -139,8 +144,18 @@ export class ToolController {
       const active = () => !this.closed && request.id === this.generation && !abort.signal.aborted;
       try {
         await this.exporting;
-        await this.renderer?.dispose();
+        const retired = await Promise.allSettled([
+          this.monitor?.dispose(),
+          this.renderer?.dispose(),
+        ]);
+        this.monitor = null;
         this.renderer = null;
+        const failed = retired.filter((result) => result.status === "rejected");
+        if (failed.length)
+          throw new AggregateError(
+            failed.map((result) => result.reason),
+            "Preview cleanup failed.",
+          );
         this.model = null;
         if (!active()) continue;
         const timing = beginProjectTiming(`Tool ${request.tool.slug}`);
@@ -176,6 +191,29 @@ export class ToolController {
             }
           },
         });
+        if (source.hasAudio)
+          this.monitor = new PreviewAudio({
+            source: () => ({ project: model.project(), pageId: model.page().id }),
+            read: () => ({
+              playing: this.transportState.playing,
+              time: {
+                value: Math.round(
+                  (this.renderer?.readTime() ?? this.transportState.time) * 1_000_000,
+                ),
+                rate: 1_000_000,
+              },
+            }),
+            subscribe: this.transport.subscribe,
+            holdPlayback: () => this.renderer!.holdPlayback(),
+            pause: () => this.renderer?.play(false),
+            resolver: () => {
+              if (!source.resolver) throw new Error("Audio originals are unavailable.");
+              return source.resolver;
+            },
+            onError: (error) => {
+              if (active()) this.publish({ error });
+            },
+          });
       } catch (error) {
         if (active()) {
           this.publish({ phase: "error", error });
@@ -209,6 +247,7 @@ export class ToolController {
   clip = (start: number, length: number) => {
     if (this.model && this.state.phase === "ready") {
       this.model.clip(start, length);
+      this.monitor?.refresh();
       this.renderer?.update();
       this.renderer?.seek(0);
       this.publishModel();
@@ -217,6 +256,7 @@ export class ToolController {
   audio = (keep: boolean) => {
     if (this.model && this.state.phase === "ready") {
       this.model.audio(keep);
+      this.monitor?.refresh();
       this.renderer?.update();
       this.publishModel();
     }
@@ -349,9 +389,16 @@ export class ToolController {
     this.disposal = (async () => {
       await this.exporting;
       await this.opening;
-      await this.renderer?.dispose();
+      const retired = await Promise.allSettled([this.monitor?.dispose(), this.renderer?.dispose()]);
+      this.monitor = null;
       this.model = null;
       this.renderer = null;
+      const failed = retired.filter((result) => result.status === "rejected");
+      if (failed.length)
+        throw new AggregateError(
+          failed.map((result) => result.reason),
+          "Preview cleanup failed.",
+        );
     })();
     return this.disposal;
   }

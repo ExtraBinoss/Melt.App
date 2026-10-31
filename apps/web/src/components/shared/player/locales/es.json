@@ -1,0 +1,10 @@
+{
+  "play": "Reproducir vista previa",
+  "pause": "Pausar vista previa",
+  "seek": "Posición de la vista previa",
+  "time": "Tiempo de reproducción",
+  "volume": "Volumen",
+  "mute": "Silenciar",
+  "unmute": "Activar sonido",
+  "silent": "Vista previa sin sonido"
+}
