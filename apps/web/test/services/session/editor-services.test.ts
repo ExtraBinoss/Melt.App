@@ -460,6 +460,7 @@ it("uses persistent UUIDs for new, duplicate and colliding portable projects wit
   uuid.mockReturnValueOnce(ids[2]);
   await services.openPortable(new File([serializeProject(inactive)], "existing.musart"));
   expect(engine.getSnapshot().project.id).toBe(ids[2]);
+  expect(engine.getSnapshot().project.name).toBe("Keep me 1");
   expect((await store.load(inactive.id)).name).toBe("Keep me");
 });
 it("adapts paginated metadata, rename, storage insights, history clearing and thumbnail notifications", async () => {

@@ -79,7 +79,9 @@ export async function createRuntime(
   const engine = new EditorEngine(project, { now: () => new Date().toISOString() });
   if (!welcome && !restored) {
     try {
-      await store.save(project);
+      const installed = await store.create(project);
+      if (installed !== project) engine.load(installed);
+      project = installed;
     } catch (error) {
       onError(error);
     }

@@ -38,7 +38,7 @@ function fixture(count = 0) {
   engine.subscribeCommands(events);
   const store = {
     prepareSaveCurrent: vi.fn(async (project: Project, _options?: unknown) => ({ project })),
-    persistPrepared: vi.fn(async () => {}),
+    persistPrepared: vi.fn(async () => engine.getSnapshot().project),
   };
   const probe = vi.fn(async () => metadata);
   const file = new File(["video"], "clip.mp4", { type: "video/mp4" });
@@ -50,6 +50,7 @@ it("publishes the probed binary clip, Motion conversion and duration as one dura
   d.store.persistPrepared.mockImplementation(async () => {
     expect(d.engine.getSnapshot()).toBe(before);
     expect(() => d.engine.undo()).toThrow("busy");
+    return before.project;
   });
   await importMediaFiles(d.engine, [d.file], d);
   const snapshot = d.engine.getSnapshot(),

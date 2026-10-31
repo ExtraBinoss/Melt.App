@@ -150,7 +150,7 @@ export class ProjectStore {
     return token;
   }
   /** Only native transactional I/O remains here; hashing and confirmation happen before locking. */
-  async persistPrepared(token: PreparedProjectSave): Promise<void> {
+  async persistPrepared(token: PreparedProjectSave): Promise<Project> {
     const prepared = this.preparedWrites.get(token);
     if (!prepared) throw Error("Unknown or already consumed prepared project write.");
     this.preparedWrites.delete(token);
@@ -183,6 +183,23 @@ export class ProjectStore {
       };
       this.observeWrite(project.id, result.writeRevision);
     }
+    return result.projectName === undefined
+      ? project
+      : snapshotProject({ ...project, name: result.projectName });
+  }
+  /** New-project identity and its first free name are reserved in the same durable transaction. */
+  async create(
+    input: Project,
+    options: Pick<SaveProjectOptions, "remember" | "mediaOriginals"> = {},
+  ): Promise<Project> {
+    return this.persistPrepared(
+      await this.prepareSave(input, undefined, {
+        ...options,
+        requireAbsent: true,
+        expectedRevision: "",
+        uniqueName: true,
+      }),
+    );
   }
   async save(input: Project, thumbnail?: string, options: SaveProjectOptions = {}): Promise<void> {
     await this.persistPrepared(await this.prepareSave(input, thumbnail, options));

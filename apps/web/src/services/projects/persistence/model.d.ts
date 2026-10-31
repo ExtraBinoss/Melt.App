@@ -14,12 +14,14 @@ export interface ProjectWriteFrame {
   thumbnail?: string;
   expectedRevision: string;
   requireAbsent: boolean;
+  uniqueName?: boolean;
   remember: boolean;
 }
 export interface ProjectWriteResult {
   projectId: string;
   assetsRevision: string;
   writeRevision: string;
+  projectName?: string;
 }
 export type PersistenceResult =
   | { kind: "save"; value: ProjectWriteResult }

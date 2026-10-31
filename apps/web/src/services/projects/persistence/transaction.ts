@@ -1,3 +1,4 @@
+import { projectNameCandidate } from "@musart/core";
 import type { IDBPDatabase } from "idb";
 import type { AssetMetadata, StoredProject, StudioDatabase } from "../database";
 import { logicalBytes } from "../logical-bytes";
@@ -133,11 +134,17 @@ export async function persistProjectWrite(
         await tx.objectStore("thumbnails").delete([id, info.pageId]);
       }
     thumbnailsBytes += legacyThumbnailBytes(preview) - legacyThumbnailBytes(previous?.thumbnail);
+    let name = frame.document.name;
+    if (frame.uniqueName) {
+      const names = tx.objectStore("projects").index("by-name");
+      for (let increment = 1; (await names.getKey(name)) !== undefined; increment++)
+        name = projectNameCandidate(frame.document.name, increment);
+    }
     const record: StoredProject = {
       id,
       storageVersion: 2,
       assetsRevision: revision,
-      project: { ...frame.document, assets: metadata },
+      project: { ...frame.document, name, assets: metadata },
       pageRevisions: frame.pageRevisions,
       thumbnailRenderVersion: frame.thumbnailRenderVersion,
       thumbnailInfo: infos.filter((info) => Object.hasOwn(frame.pageRevisions, info.pageId)),
@@ -154,7 +161,12 @@ export async function persistProjectWrite(
     const writeRevision = await renewProjectWriteRevision(tx.objectStore("preferences"), id);
     if (frame.remember) await tx.objectStore("preferences").put(id, "last-project");
     await done;
-    return { projectId: id, assetsRevision: revision, writeRevision };
+    return {
+      projectId: id,
+      assetsRevision: revision,
+      writeRevision,
+      ...(name !== frame.document.name ? { projectName: name } : {}),
+    };
   } catch (error) {
     try {
       tx.abort();

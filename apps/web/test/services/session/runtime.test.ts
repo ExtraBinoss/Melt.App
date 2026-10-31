@@ -152,7 +152,7 @@ describe("editor platform lifecycle", () => {
     history.replaceState(null, "", "/?automation=1");
     const store = new ProjectStore(crypto.randomUUID());
     vi.spyOn(store, "last").mockRejectedValueOnce(new Error("Storage blocked"));
-    vi.spyOn(store, "save").mockRejectedValueOnce(new Error("Quota reached"));
+    vi.spyOn(store, "create").mockRejectedValueOnce(new Error("Quota reached"));
     const onError = vi.fn();
     const runtime = await createRuntime(onError, { store });
     expect(onError).toHaveBeenCalledTimes(2);
@@ -359,7 +359,7 @@ it("keeps a failed create in welcome without enabling draft persistence or repor
   const d = welcomeResources(),
     runtime = await createRuntime(vi.fn(), d),
     original = runtime.engine.getSnapshot();
-  d.save.mockRejectedValueOnce(new Error("Quota reached"));
+  vi.spyOn(d.store, "create").mockRejectedValueOnce(new Error("Quota reached"));
   await expect(
     runtime.services.createProject({
       name: "Cannot save",

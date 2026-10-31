@@ -8,7 +8,7 @@ function setup() {
     list: vi.fn(async () => []),
     isDeleted: vi.fn(async () => false),
     prepareSave: vi.fn(async () => ({ project })),
-    persistPrepared: vi.fn(async () => {}),
+    persistPrepared: vi.fn(async () => project),
   };
   const open = createMediaProjectOpener(engine, { store });
   return { engine, project, store, open };
@@ -20,6 +20,7 @@ it("loads only after durable acknowledgement and locks concurrent document mutat
     expect(d.engine.getSnapshot()).toBe(before);
     expect(() => d.engine.execute({ type: "renameProject", name: "Race" })).toThrow("busy");
     expect(() => d.engine.load(createProject())).toThrow("busy");
+    return d.project;
   });
   await d.open(d.project, []);
   expect(d.engine.getSnapshot().project).toEqual(d.project);

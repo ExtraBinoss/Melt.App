@@ -64,7 +64,8 @@ export function persistenceResult(value: unknown): PersistenceResult {
     result.value &&
     token(result.value.projectId) &&
     token(result.value.assetsRevision) &&
-    token(result.value.writeRevision)
+    token(result.value.writeRevision) &&
+    (result.value.projectName === undefined || token(result.value.projectName))
   )
     return result as PersistenceResult;
   throw Error("Malformed project persistence response.");

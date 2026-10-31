@@ -11,7 +11,12 @@ export function prepareProjectWrite(
   project: Project,
   pageRevisions: Record<string, string>,
   pagePayloads: (number | undefined)[],
-  options: { remember?: boolean; requireAbsent?: boolean; expectedRevision: string },
+  options: {
+    remember?: boolean;
+    requireAbsent?: boolean;
+    uniqueName?: boolean;
+    expectedRevision: string;
+  },
   thumbnail?: string,
   basis?: AssetBasis,
 ) {
@@ -39,6 +44,7 @@ export function prepareProjectWrite(
     thumbnailRenderVersion: THUMBNAIL_RENDER_VERSION,
     expectedRevision: options.expectedRevision,
     requireAbsent: options.requireAbsent ?? false,
+    ...(options.uniqueName ? { uniqueName: true } : {}),
     remember: options.remember !== false,
     ...(matching ? { basis: matching.revision } : {}),
     ...(thumbnail === undefined ? {} : { thumbnail }),

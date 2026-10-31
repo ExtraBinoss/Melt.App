@@ -99,7 +99,7 @@ it("reports a failed recreated import and preserves the current session", async 
     portable = createProject();
   await d.store.remove(portable.id);
   const original = d.engine.getSnapshot();
-  vi.spyOn(d.store, "save").mockRejectedValueOnce(new Error("Quota reached"));
+  vi.spyOn(d.store, "create").mockRejectedValueOnce(new Error("Quota reached"));
   await expect(
     d.services.openPortable(new File([serializeProject(portable)], "failed.musart")),
   ).rejects.toThrow("Quota reached");

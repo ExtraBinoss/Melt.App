@@ -102,7 +102,7 @@ export function createEditorServices(
       const now = new Date().toISOString();
       const preset = PRESETS.find((item) => item.id === options.presetId);
       const safe = preset?.safeArea;
-      const project = createProject({
+      let project = createProject({
         id: crypto.randomUUID(),
         name: options.name,
         createdAt: now,
@@ -130,7 +130,7 @@ export function createEditorServices(
         ],
       });
       timing?.stage("Persist new project");
-      await store.save(project);
+      project = await store.create(project);
       thumbnails?.schedule(project);
       timing?.stage("Publish document");
       engine.load(project);
@@ -231,7 +231,7 @@ export function createEditorServices(
       await switchReady();
       const source = await store.load(id, { observe: false });
       const now = new Date().toISOString();
-      const duplicate = {
+      let duplicate: Project = {
         ...source,
         id: crypto.randomUUID(),
         name: `${source.name} — copie`,
@@ -251,7 +251,7 @@ export function createEditorServices(
           blob: await store.loadMediaOriginal(id, asset),
         })),
       );
-      await store.save(duplicate, undefined, { remember: false, mediaOriginals: originals });
+      duplicate = await store.create(duplicate, { remember: false, mediaOriginals: originals });
       for (const thumbnail of await store.thumbnails(id))
         await store.saveThumbnail({ ...thumbnail, projectId: duplicate.id, updatedAt: now });
       thumbnails?.schedule(duplicate);
@@ -306,12 +306,12 @@ export function createEditorServices(
         await switchReady();
         timing?.stage("Persist imported project");
         try {
-          await store.save(project);
+          project = await store.create(project);
         } catch (error) {
           // Another session can retire the identity after the import's initial read.
           if (!(error instanceof DeletedProjectError)) throw error;
-          project = { ...parsed, id: crypto.randomUUID() };
-          await store.save(project);
+          project = { ...project, id: crypto.randomUUID() };
+          project = await store.create(project);
         }
         thumbnails?.schedule(project);
         timing?.stage("Publish document");

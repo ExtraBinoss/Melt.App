@@ -63,21 +63,22 @@ export function createMediaProjectOpener(
         const prepared = await dependencies.store.prepareSave(project, undefined, {
           mediaOriginals: originals,
           requireAbsent: true,
+          uniqueName: true,
           expectedRevision: "",
         });
         assertOrigin();
         reservation.lock();
         timing?.stage("Persist project atomically");
-        await dependencies.store.persistPrepared(prepared);
+        const installed = await dependencies.store.persistPrepared(prepared);
         // A closed gallery never replaces the current editor, even if its durable write completed.
         // Native commit acknowledgement is the durability boundary; an aborted post-commit open
         // may leave a valid unused library entry, never a partially installed project.
         assertOrigin();
         reservation.cancel();
         timing?.stage("Publish document");
-        engine.load(prepared.project);
+        engine.load(installed);
         timing?.waitForFrame(engine.getSnapshot());
-        dependencies.schedule?.(prepared.project);
+        dependencies.schedule?.(installed);
       } finally {
         reservation.cancel();
       }

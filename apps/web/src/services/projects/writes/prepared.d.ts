@@ -5,6 +5,7 @@ export interface SaveProjectOptions {
   remember?: boolean;
   expectedRevision?: string;
   requireAbsent?: boolean;
+  uniqueName?: boolean;
   mediaOriginals?: readonly MediaOriginalInput[];
 }
 /** Opaque single-use preparation token owned by the creating ProjectStore. */

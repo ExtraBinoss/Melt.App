@@ -18,6 +18,8 @@ export function validateProjectWrite(frame: ProjectWriteFrame): void {
     typeof frame.expectedRevision !== "string" ||
     typeof frame.requireAbsent !== "boolean" ||
     typeof frame.remember !== "boolean" ||
+    (frame.uniqueName !== undefined &&
+      (typeof frame.uniqueName !== "boolean" || (frame.uniqueName && !frame.requireAbsent))) ||
     frame.thumbnailRenderVersion !== THUMBNAIL_RENDER_VERSION ||
     (frame.basis !== undefined && typeof frame.basis !== "string") ||
     !frame.pageRevisions ||

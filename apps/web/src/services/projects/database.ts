@@ -47,7 +47,11 @@ export interface StoredAsset {
   dataUrl: string;
 }
 export interface StudioDatabase extends DBSchema {
-  projects: { key: string; value: StoredProject; indexes: { "by-updated": [string, string] } };
+  projects: {
+    key: string;
+    value: StoredProject;
+    indexes: { "by-updated": [string, string]; "by-name": string };
+  };
   thumbnails: { key: [string, string]; value: StoredThumbnail; indexes: { "by-project": string } };
   preferences: { key: string; value: string };
   journalMeta: { key: string; value: HistoryMetadata };
@@ -81,7 +85,7 @@ export interface StudioDatabase extends DBSchema {
 
 /** One versioned connection schema; history records never enter project manifests. */
 export function openStudioDatabase(name: string) {
-  const opening = openDB<StudioDatabase>(name, 7, {
+  const opening = openDB<StudioDatabase>(name, 8, {
     upgrade(db, previousVersion, _newVersion, transaction) {
       if (previousVersion < 1) {
         db.createObjectStore("projects", { keyPath: "id" });
@@ -117,6 +121,8 @@ export function openStudioDatabase(name: string) {
         transaction
           .objectStore("journalEvents")
           .createIndex("by-operation", ["projectId", "operationId"], { unique: true });
+      if (previousVersion < 8)
+        transaction.objectStore("projects").createIndex("by-name", "project.name");
       if (previousVersion < 7) {
         for (const name of ["mediaOriginals", "mediaOriginalMeta"] as const) {
           const originals = db.createObjectStore(name, { keyPath: ["projectId", "originalId"] });

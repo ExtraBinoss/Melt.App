@@ -202,3 +202,26 @@ Measure browser-process RSS, JavaScript heap, DOM nodes, retained object URLs an
 | Memory stays high after disposal                | Pending snapshot ownership, leased URLs, worker termination and renderer/source cache cleanup          |
 
 Regression tests should verify captured values, atomicity, retry/clear/delete races, bounded reads and cleanup. Keep a native restore and actual next-input case for changes to these boundaries; fake IndexedDB timings and mocked workers do not establish browser responsiveness.
+
+## New-project names
+
+`ProjectStore.create()` is the shared creation boundary for blank/user projects,
+portable imports and duplicates. Prepared media/template installation requests the
+same `uniqueName` policy. `projectNameCandidate()` in pure core defines the
+portable naming rule: keep the requested name when free, otherwise append a space
+and the first available positive integer. Names remain within 256 UTF-16 units,
+without splitting a surrogate pair.
+
+Schema 8 adds a nonunique `by-name` index. The persistence worker probes only its
+keys and reserves the selected name in the same read/write transaction that
+creates the project. Independent tabs therefore cannot both allocate the same
+candidate. Existing projects and explicit renames retain their names; ordinary
+saves do not add another suffix. Legacy duplicate names are allowed by the index.
+No existing manifests are read into JavaScript to allocate a name.
+
+The small write acknowledgment includes an allocated name only when it changed.
+Creation publishes the acknowledged document into the editor, so its title,
+subsequent autosaves and stored manifest agree. Page hashes and originals remain
+unchanged. A future remote/user-scoped adapter must reserve candidates within its
+own library/owner transaction using the same core rule; a display-name check in
+an interface alone is insufficient.

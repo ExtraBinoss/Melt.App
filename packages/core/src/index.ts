@@ -1,3 +1,4 @@
+export { projectNameCandidate } from "./document/naming";
 export { validateAssetDescription } from "./assets/validation";
 export type { MorphPoint, MorphContour, MorphShapeFrame, ShapeMorph } from "./effects/morph/model";
 export { morphContentBounds } from "./effects/morph/bounds";
