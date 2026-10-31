@@ -43,3 +43,11 @@ and included in the web distribution under `/licenses/`.
 The unmodified CGATS21 CRPC6 output profile is provided by Idealliance,
 copyright X-Rite, Inc.; sRGB-v4 is CC0 from Compact-ICC-Profiles. Their original
 terms and sources are preserved in the [profile notice](packages/render/assets/profiles/NOTICE.md).
+
+## Filled 3D outlines
+
+The geometry worker uses [clipper-lib](https://github.com/junmer/clipper-lib)
+6.4.2 to resolve nonzero/even-odd overlaps before native Three.js extrusion.
+Its Boost Software License 1.0, original author notices and bundled Tom Wu JSBN
+license are retained in [the distributed notice](apps/web/public/licenses/clipper-LICENSE.txt)
+and [docs/legal/clipper](docs/legal/clipper/). No clipping work runs in React.

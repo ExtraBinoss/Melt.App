@@ -1,3 +1,4 @@
+import { filledContourShapes } from "./filled-contours";
 import { spatialMorphPaths } from "./morph";
 import {
   BufferAttribute,
@@ -46,7 +47,10 @@ export function buildSpatialGeometry(job: SpatialGeometryJob): BufferGeometry {
       else if (c.type === "C") path.bezierCurveTo(c.x1!, c.y1!, c.x2!, c.y2!, c.x!, c.y!);
       else path.currentPath?.closePath();
     }
-    batches.push({ shapes: path.toShapes(), part: job.pathParts?.[index] ?? 0 });
+    batches.push({
+      shapes: filledContourShapes(path, job.curveSegments, job.pathFillRules?.[index]),
+      part: job.pathParts?.[index] ?? 0,
+    });
   }
   const built: BufferGeometry[] = [];
   try {

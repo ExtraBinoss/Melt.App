@@ -27,6 +27,9 @@ Text extrusion consumes the actual shaped glyph contours, kerning and layout.
 Its editable gradients are live material uniforms. SVG parts retain their fill
 rules, transforms and optional original paints; paint changes retain geometry.
 ShapeMorph contours are sampled deterministically in the geometry worker.
+Filled contours are flattened at the authored curve subdivision, then unioned
+with their nonzero/even-odd winding rule before Three triangulation. This handles
+self-overlapping variable glyphs and SVGs without filling their counters.
 
 ## Authoring and Motion
 

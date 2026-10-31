@@ -13,6 +13,7 @@
     "@imagemagick/magick-wasm": "0.0.45",
     "@musart/assets": "workspace:*",
     "@musart/core": "workspace:*",
+    "clipper-lib": "6.4.2",
     "mediabunny": "1.62.1",
     "text-shaper": "0.1.28",
     "three": "0.186.1"
