@@ -16,13 +16,19 @@ import {
   createSpatialCamera,
   updateSpatialCamera,
   updateSpatialObject,
+  updateCompositionCamera,
 } from "@musart/render/spatial";
-import { createLayerGeometryIndex, DEFAULT_SPATIAL_SCENE, type EnginePort } from "@musart/core";
+import {
+  createLayerGeometryIndex,
+  DEFAULT_SPATIAL_SCENE,
+  SpatialGeometry,
+  type EnginePort,
+} from "@musart/core";
 import type { SpatialEditTarget } from "../../state/session/spatial-editing";
 import { spatialEditingAtom } from "../../state/session/spatial-editing";
 import type { SceneController } from "../session/scene-controller";
 import { SpatialGesture } from "./gesture";
-import { projectLayerCamera } from "./projection";
+import { canvasHit } from "../selection/hit";
 interface Props {
   engine: EnginePort;
   controller: SceneController;
@@ -48,7 +54,10 @@ export default function SpatialControls({ engine, controller, target }: Props) {
     const canvas = renderer.domElement,
       viewport = canvas.closest<HTMLElement>(".editor-canvas");
     const helper = new Scene(),
-      proxy = new Group();
+      proxy = new Group(),
+      anchor = new Group();
+    anchor.matrixAutoUpdate = false;
+    anchor.add(proxy);
     const diagnostic = new URLSearchParams(location.search).has("profile3d");
     const settings = controller.read().page.spatial ?? DEFAULT_SPATIAL_SCENE;
     const orbitCamera = createSpatialCamera(settings.camera, 1);
@@ -68,7 +77,7 @@ export default function SpatialControls({ engine, controller, target }: Props) {
     orbit.enabled = false;
     transform.setSize(0.72);
     transform.attach(proxy);
-    helper.add(proxy, transform.getHelper());
+    helper.add(anchor, transform.getHelper());
     const source = () => {
       const frame = controller.read(),
         snapshot = engine.getSnapshot(),
@@ -97,15 +106,15 @@ export default function SpatialControls({ engine, controller, target }: Props) {
         return false;
       }
       const { frame, layer } = current;
+      anchor.matrix.fromArray(
+        new SpatialGeometry(frame.page, current.index.byId).anchorMatrix(layer.id),
+      );
+      anchor.updateMatrixWorld(true);
       if (!transform.dragging) updateSpatialObject(proxy, layer.spatial!);
       if (!gesture.active)
-        updateSpatialCamera(
-          orbitCamera,
-          (frame.page.spatial ?? DEFAULT_SPATIAL_SCENE).camera,
-          layer.width / layer.height,
-        );
+        updateCompositionCamera(orbitCamera, frame.page, renderer.coordinateSystem);
       const sourceCamera = orbitCamera;
-      projectLayerCamera(sourceCamera, camera, frame.page, layer);
+      (camera as Camera).copy(sourceCamera, false);
       if (transform.mode !== tool.current) transform.setMode(tool.current);
       transform.getHelper().visible = true;
       helper.updateMatrixWorld(true);
@@ -169,8 +178,11 @@ export default function SpatialControls({ engine, controller, target }: Props) {
         ((event.clientX - box.left) / box.width) * current.frame.page.width,
         ((event.clientY - box.top) / box.height) * current.frame.page.height,
       );
-      const hit = current.index.hitTest(local, { includeLocked: false });
-      return hit?.id === target.layerId;
+      const hit = canvasHit(current.frame.page, local)?.layer;
+      return (
+        hit?.id === target.layerId ||
+        (!!hit && current.index.ancestors(hit.id).some((parent) => parent.id === target.layerId))
+      );
     };
     const gate = (event: PointerEvent) => {
       admitted = Boolean(transform.axis || inside(event));

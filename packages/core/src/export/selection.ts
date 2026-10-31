@@ -1,6 +1,7 @@
 import type { Composition, Layer } from "../document/model";
 import { createLayerGeometryIndex, type LayerGeometryIndex } from "../layers/geometry-index";
 import { ensure } from "../errors";
+import { reframeSpatialScene } from "../spatial/framing";
 function pixelEdge(value: number, round: (value: number) => number): number {
   const integer = Math.round(value);
   return Math.abs(value - integer) <= Number.EPSILON * 64 * Math.max(1, Math.abs(value))
@@ -134,6 +135,16 @@ export function selectionComposition(
   const roots = selectionRoots(selected, geometry);
   const { painted, paths } = paintedLayers(roots, geometry);
   const dependencies = dependencyCopies(page, maskDependencies(painted, geometry), reservedIds);
+  const spatialSelection = page.layers.some(
+    (layer) => painted.has(layer.id) && layer.spatial?.enabled,
+  );
+  const context = new Set<string>();
+  if (spatialSelection)
+    for (const layer of page.layers) {
+      if (!layer.spatial?.enabled || geometry.isMaskSource(layer.id)) continue;
+      context.add(layer.id);
+      for (const ancestor of geometry.ancestors(layer.id)) context.add(ancestor.id);
+    }
   let minX = Infinity,
     minY = Infinity,
     maxX = -Infinity,
@@ -150,19 +161,23 @@ export function selectionComposition(
     right = pixelEdge(maxX, Math.ceil),
     bottom = pixelEdge(maxY, Math.ceil);
   const originals = page.layers
-    .filter((layer) => painted.has(layer.id))
+    .filter((layer) => painted.has(layer.id) || context.has(layer.id))
     .map((layer): Layer => ({
       ...layer,
+      ...(!painted.has(layer.id) ? { spatialContext: true, effects: [], mask: null } : {}),
       ...(paths.has(layer.id) && layer.maskSource ? { maskSource: false } : {}),
-      mask: layer.mask?.layerId
-        ? { ...layer.mask, layerId: dependencies.ids.get(layer.mask.layerId)! }
-        : layer.mask,
+      mask: !painted.has(layer.id)
+        ? null
+        : layer.mask?.layerId
+          ? { ...layer.mask, layerId: dependencies.ids.get(layer.mask.layerId)! }
+          : layer.mask,
     }));
   const centered = options.centerInArtboard === true && selected.size === 1;
   const offsetX = centered ? (minX + maxX - page.width) / 2 : left;
   const offsetY = centered ? (minY + maxY - page.height) / 2 : top;
   return {
     ...page,
+    ...(spatialSelection ? { spatial: reframeSpatialScene(page, offsetX, offsetY) } : {}),
     name: roots.length === 1 ? geometry.get(roots[0]!).name : page.name,
     width: centered ? page.width : Math.max(1, right - left),
     height: centered ? page.height : Math.max(1, bottom - top),

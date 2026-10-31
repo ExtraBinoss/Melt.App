@@ -190,5 +190,15 @@
   "shapes": "أشكال",
   "models": "نماذج GLB",
   "add": "إضافة",
-  "preview": "معاينة ثلاثية الأبعاد"
+  "preview": "معاينة ثلاثية الأبعاد",
+  "reflections": "الانعكاسات",
+  "sceneReflections": "المشهد",
+  "environmentReflections": "البيئة",
+  "reflectionQuality": "جودة الانعكاسات",
+  "reflectionQualities": {
+    "draft": "مسودة",
+    "balanced": "متوازنة",
+    "high": "عالية"
+  },
+  "reflectionsHint": "تعكس العناصر ثلاثية الأبعاد القريبة. تتوقف التحديثات أثناء التحرير. تُطبّق التأثيرات ثنائية الأبعاد والأقنعة لاحقًا."
 }

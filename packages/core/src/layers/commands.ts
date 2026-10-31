@@ -1,3 +1,4 @@
+import { captureSpatialReparent } from "../spatial/reparent";
 import { ensure } from "../errors";
 import {
   getAncestors,
@@ -89,6 +90,7 @@ export const reorderLayer: CommandHandler<"reorderLayer"> = ({ page, pageId }, c
     "Position de calque invalide",
   );
   if (command.parentId !== undefined) {
+    const restoreSpatial = captureSpatialReparent(page, [layer.id]);
     if (command.parentId !== layer.parentId)
       assertMotionHierarchyChange(page, [
         layer.id,
@@ -114,16 +116,23 @@ export const reorderLayer: CommandHandler<"reorderLayer"> = ({ page, pageId }, c
     layer.y = local[5] - cy + Math.sin(rotation) * cx + Math.cos(rotation) * cy;
     layer.rotation = (rotation * 180) / Math.PI;
     layer.parentId = command.parentId;
+    restoreSpatial();
   }
   page.layers.splice(page.layers.indexOf(layer), 1);
   page.layers.splice(command.index, 0, layer);
   return { pageId };
 };
 export const createGroup: CommandHandler<"groupLayers"> = ({ page, pageId, nextId }, command) => {
-  assertMotionHierarchyChange(page, command.ids);
+  if (!selectedRoots(page, command.ids).every((layer) => layer.spatial?.enabled))
+    assertMotionHierarchyChange(page, command.ids);
   return { pageId, selection: [groupLayers(page, command.ids, nextId)] };
 };
 export const removeGroup: CommandHandler<"ungroupLayers"> = ({ page, pageId }, command) => {
-  assertMotionHierarchyChange(page, command.ids);
+  if (
+    !selectedRoots(page, command.ids).every(
+      (layer) => layer.spatial?.enabled && layer.spatial.source === "group",
+    )
+  )
+    assertMotionHierarchyChange(page, command.ids);
   return { pageId, selection: ungroupLayers(page, command.ids) };
 };

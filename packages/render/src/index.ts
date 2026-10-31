@@ -5,7 +5,7 @@ export type { ExportOptions } from "./export/export";
 export { sourcePixels } from "./surface/sources";
 export { GpuEffects } from "./effects/GpuEffects";
 export { GpuCompositor } from "./compositing/GpuCompositor";
-export type { FrameTexture, GpuStats } from "./compositing/types";
+export type { BackgroundGpuActivity, FrameTexture, GpuStats } from "./compositing/types";
 
 export { createRenderSession } from "./export/standalone";
 export { exportMotionVideo, MotionExportError, createMotionPreview } from "./export/motion";

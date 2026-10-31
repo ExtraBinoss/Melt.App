@@ -2,7 +2,14 @@ import type { Texture } from "three/webgpu";
 import type { Bounds, Composition, MotionFramePlan } from "@musart/core";
 import type { MediaSourceResolver } from "../sources/media/model";
 import type { FontResolver } from "../surface/text/fonts";
+export interface BackgroundGpuActivity {
+  read(): boolean;
+  subscribe(listener: () => void): () => void;
+  ready?(): void;
+}
 export interface RenderOptions {
+  /** Admission for optional GPU work; preview interactions can defer captures without React. */
+  backgroundGpu?: BackgroundGpuActivity;
   scale?: number;
   /** Display applies the document ICC proof. Source is reserved for native CMYK encoding. */
   colorOutput?: "display" | "source";
@@ -39,7 +46,13 @@ export interface GpuStats {
   passes: number;
   readbacks: number;
   video?: ReturnType<import("../sources/media/video-sources").MediaVideoSources["stats"]> | null;
-  spatial?: { sources: number; meshes: number; vertices: number; triangles: number } | null;
+  spatial?: {
+    sources: number;
+    meshes: number;
+    vertices: number;
+    triangles: number;
+    reflections?: import("../spatial/reflections/model").ReflectionStats;
+  } | null;
   uploads: number;
   targets: number;
   cacheBytes: number;

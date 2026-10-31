@@ -1,24 +1,11 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
-import { serializeProject, validateProject, type SceneAsset } from "../../packages/core/src/index";
+import { serializeProject, validateProject } from "../../packages/core/src/index";
 import { createCornellBox } from "../../apps/web/src/services/projects/templates/motion/cornell-box";
-import { cornellRoomGlb } from "./cornell/room";
 import type { MotionTemplateManifest } from "../../apps/web/src/services/projects/templates/motion/model";
 
 export async function generateCornellBox(output = "apps/web/public/templates/motion") {
-  const bytes = cornellRoomGlb();
-  const room: SceneAsset = {
-    id: "cornell-room-original",
-    kind: "model3d",
-    name: "Cornell Box / original procedural room",
-    mime: "model/gltf-binary",
-    width: 1080,
-    height: 1080,
-    byteLength: bytes.byteLength,
-    dataUrl: `data:model/gltf-binary;base64,${Buffer.from(bytes).toString("base64")}`,
-    clips: [],
-  };
-  const { project, initial, batches } = createCornellBox(room);
+  const { project, initial, batches } = createCornellBox();
   validateProject(project);
   const manifest: MotionTemplateManifest = {
     version: 1,

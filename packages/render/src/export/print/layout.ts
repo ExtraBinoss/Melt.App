@@ -1,4 +1,4 @@
-import type { Composition } from "@musart/core";
+import { reframeSpatialScene, type Composition } from "@musart/core";
 import type { PrintExportOptions } from "./model";
 
 export const DEFAULT_PRINT: Readonly<PrintExportOptions> = Object.freeze({
@@ -27,8 +27,10 @@ export function validatePrint(options: PrintExportOptions) {
 export function printComposition(page: Composition, options: PrintExportOptions): Composition {
   validatePrint(options);
   const bleed = Math.ceil((options.bleedMm * options.dpi) / 25.4);
+  const spatial = reframeSpatialScene(page, -bleed, -bleed);
   return {
     ...page,
+    ...(spatial ? { spatial } : {}),
     width: page.width + 2 * bleed,
     height: page.height + 2 * bleed,
     layers: page.layers.map((layer) =>

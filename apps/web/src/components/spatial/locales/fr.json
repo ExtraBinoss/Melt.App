@@ -190,5 +190,15 @@
   "shapes": "Formes",
   "models": "Modèles GLB",
   "add": "Ajouter",
-  "preview": "Aperçu 3D"
+  "preview": "Aperçu 3D",
+  "reflections": "Reflets",
+  "sceneReflections": "Scène",
+  "environmentReflections": "Environnement",
+  "reflectionQuality": "Qualité des reflets",
+  "reflectionQualities": {
+    "draft": "Brouillon",
+    "balanced": "Équilibrée",
+    "high": "Élevée"
+  },
+  "reflectionsHint": "Reflète les objets 3D voisins. Les mises à jour attendent la fin des manipulations. Les effets 2D et les masques sont appliqués ensuite."
 }

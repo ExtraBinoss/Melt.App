@@ -77,6 +77,12 @@ export function layerMotionSchema(
 ): MotionPropertySchema | null {
   if (!Object.hasOwn(schemas, property)) return null;
   if (isSpatialMotionProperty(property) && !layer.spatial) return null;
+  if (
+    isSpatialMotionProperty(property) &&
+    layer.spatial?.source === "group" &&
+    !/^spatial\.(x|y|z|rotation[XYZ]|scale[XYZ])$/.test(property)
+  )
+    return null;
   if (textProperties.has(property) && layer.kind !== "text") return null;
   if (property === "radius" && layer.kind !== "rectangle") return null;
   if (

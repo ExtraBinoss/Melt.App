@@ -25,7 +25,8 @@ interface Props {
 export function SpatialLayerProperties({ engine, layer, patch, preview, cancel }: Props) {
   const { t } = useTranslation("spatial");
   const spatial = layer.spatial;
-  if (!["rectangle", "ellipse", "text", "vector"].includes(layer.kind)) return null;
+  const group = layer.kind === "group" && spatial?.source === "group";
+  if (!group && !["rectangle", "ellipse", "text", "vector"].includes(layer.kind)) return null;
   const settings =
     spatial ??
     createSpatialLayer(
@@ -133,38 +134,42 @@ export function SpatialLayerProperties({ engine, layer, patch, preview, cancel }
           <Box size={13} />
           {t("title")}
         </h3>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <span tabIndex={unsupported ? 0 : undefined}>
-              <Switch
-                aria-label={t("enable")}
-                checked={Boolean(spatial?.enabled)}
-                disabled={locked || Boolean(unsupported && !spatial?.enabled)}
-                onCheckedChange={(enabled) => patch({ spatial: { ...settings, enabled } })}
-              />
-            </span>
-          </TooltipTrigger>
-          {unsupported && <TooltipContent>{t(unsupported)}</TooltipContent>}
-        </Tooltip>
+        {!group && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span tabIndex={unsupported ? 0 : undefined}>
+                <Switch
+                  aria-label={t("enable")}
+                  checked={Boolean(spatial?.enabled)}
+                  disabled={locked || Boolean(unsupported && !spatial?.enabled)}
+                  onCheckedChange={(enabled) => patch({ spatial: { ...settings, enabled } })}
+                />
+              </span>
+            </TooltipTrigger>
+            {unsupported && <TooltipContent>{t(unsupported)}</TooltipContent>}
+          </Tooltip>
+        )}
       </div>
       {spatial?.enabled && (
         <>
-          <MaterialPicker
-            disabled={locked}
-            value={settings.material.preset}
-            onChoose={(id) => {
-              const material = spatialMaterial(id);
-              patch({
-                fill: material.color,
-                ...(layer.vector ? { vector: { ...layer.vector, preserveColors: false } } : {}),
-                spatial: {
-                  ...settings,
-                  useModelMaterials: false,
-                  material: { ...material.settings },
-                },
-              });
-            }}
-          />
+          {!group && (
+            <MaterialPicker
+              disabled={locked}
+              value={settings.material.preset}
+              onChoose={(id) => {
+                const material = spatialMaterial(id);
+                patch({
+                  fill: material.color,
+                  ...(layer.vector ? { vector: { ...layer.vector, preserveColors: false } } : {}),
+                  spatial: {
+                    ...settings,
+                    useModelMaterials: false,
+                    material: { ...material.settings },
+                  },
+                });
+              }}
+            />
+          )}
           {settings.source === "glb" && (
             <label className="spatial-compact-row">
               {t("originalMaterials")}
@@ -182,10 +187,12 @@ export function SpatialLayerProperties({ engine, layer, patch, preview, cancel }
             </div>
           )}
           {settings.source === "box" && field("bevel", 0, 0.8, 0.01)}
-          <div className="fields-grid">
-            {materialField("roughness")}
-            {materialField("metalness")}
-          </div>
+          {!group && (
+            <div className="fields-grid">
+              {materialField("roughness")}
+              {materialField("metalness")}
+            </div>
+          )}
           {settings.source === "glb" && clips.length > 0 && (
             <>
               <SelectField
@@ -226,39 +233,41 @@ export function SpatialLayerProperties({ engine, layer, patch, preview, cancel }
                 </div>
               </AccordionContent>
             </AccordionItem>
-            <AccordionItem value="advanced">
-              <AccordionTrigger>{t("advanced")}</AccordionTrigger>
-              <AccordionContent>
-                <div className="spatial-accordion-body">
-                  <div className="fields-grid">
-                    {materialField("transmission")}
-                    {materialField("ior", 1, 2.333)}
-                    {materialField("clearcoat")}
-                    {materialField("clearcoatRoughness")}
-                    {materialField("sheen")}
-                    {materialField("iridescence")}
-                    {materialField("emissiveIntensity", 0, 10)}
-                    {materialField("opacity")}
-                    {settings.source === "extrude" && (
-                      <>
-                        {field("bevelSegments", 1, 12, 1)}
-                        {field("curveSegments", 3, 64, 1)}
-                      </>
-                    )}
+            {!group && (
+              <AccordionItem value="advanced">
+                <AccordionTrigger>{t("advanced")}</AccordionTrigger>
+                <AccordionContent>
+                  <div className="spatial-accordion-body">
+                    <div className="fields-grid">
+                      {materialField("transmission")}
+                      {materialField("ior", 1, 2.333)}
+                      {materialField("clearcoat")}
+                      {materialField("clearcoatRoughness")}
+                      {materialField("sheen")}
+                      {materialField("iridescence")}
+                      {materialField("emissiveIntensity", 0, 10)}
+                      {materialField("opacity")}
+                      {settings.source === "extrude" && (
+                        <>
+                          {field("bevelSegments", 1, 12, 1)}
+                          {field("curveSegments", 3, 64, 1)}
+                        </>
+                      )}
+                    </div>
+                    {(["castShadow", "receiveShadow"] as const).map((key) => (
+                      <label key={key} className="spatial-compact-row">
+                        {t(key)}
+                        <Switch
+                          checked={settings[key]}
+                          disabled={locked}
+                          onCheckedChange={(value) => update({ [key]: value }, true)}
+                        />
+                      </label>
+                    ))}
                   </div>
-                  {(["castShadow", "receiveShadow"] as const).map((key) => (
-                    <label key={key} className="spatial-compact-row">
-                      {t(key)}
-                      <Switch
-                        checked={settings[key]}
-                        disabled={locked}
-                        onCheckedChange={(value) => update({ [key]: value }, true)}
-                      />
-                    </label>
-                  ))}
-                </div>
-              </AccordionContent>
-            </AccordionItem>
+                </AccordionContent>
+              </AccordionItem>
+            )}
           </Accordion>
         </>
       )}

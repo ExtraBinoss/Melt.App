@@ -28,6 +28,9 @@ export function selectionFrameScope(
         dy = current.y - currentRoot.y - top;
       return {
         ...cropped,
+        ...(cropped.spatial?.viewport && base.spatial?.viewport
+          ? { spatial: { ...cropped.spatial, viewport: base.spatial.viewport } }
+          : {}),
         width: base.width,
         height: base.height,
         layers: cropped.layers.map((layer) =>

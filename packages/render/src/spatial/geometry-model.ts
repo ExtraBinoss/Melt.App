@@ -9,7 +9,7 @@ export type PathCommand = {
   y2?: number;
 };
 export interface SpatialGeometryJob {
-  source: Exclude<SpatialLayer["source"], "glb">;
+  source: Exclude<SpatialLayer["source"], "glb" | "group">;
   depth: number;
   bevel: number;
   bevelSegments: number;

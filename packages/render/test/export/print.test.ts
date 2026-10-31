@@ -1,5 +1,11 @@
 import { expect, test } from "vitest";
-import { createLayer, createPage } from "@musart/core";
+import {
+  createLayer,
+  createPage,
+  createSpatialLayer,
+  createSpatialScene,
+  SpatialGeometry,
+} from "@musart/core";
 import { DEFAULT_PRINT, printComposition } from "../../src/export/print/layout";
 import { printGeometry } from "../../src/export/print/geometry";
 import { createPrintPdf } from "../../src/export/print/pdf";
@@ -17,6 +23,27 @@ test("bleed retains artwork beyond the trim without scaling, moving nested child
   expect(root.x).toBe(-10);
   expect(() => printComposition(page, { ...DEFAULT_PRINT, dpi: NaN })).toThrow();
   expect(() => printComposition(page, { ...DEFAULT_PRINT, bleedMm: -1 })).toThrow();
+});
+test("print bleed preserves the shared 3D world and original camera gate", () => {
+  const layer = createLayer("rectangle", {
+    id: "native",
+    x: 40,
+    y: 20,
+    width: 180,
+    height: 120,
+    spatial: createSpatialLayer("box"),
+  });
+  const page = createPage({
+    width: 300,
+    height: 200,
+    spatial: createSpatialScene(),
+    layers: [layer],
+  });
+  const printed = printComposition(page, { ...DEFAULT_PRINT, bleedMm: 3 });
+  const expected = new SpatialGeometry(page).worldMatrix(layer.id),
+    actual = new SpatialGeometry(printed).worldMatrix(layer.id);
+  actual.forEach((value, i) => expect(value).toBeCloseTo(expected[i]!, 10));
+  expect(printed.spatial?.viewport).toEqual({ width: 300, height: 200, x: -36, y: -36 });
 });
 test("PDF and preview share print boxes and marks; ICC data, four CMYK channels and Unicode document name are preserved", async () => {
   const page = {

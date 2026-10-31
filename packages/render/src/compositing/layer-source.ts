@@ -19,17 +19,28 @@ interface SourceContext {
   vectors: VectorSources;
   spatial: SpatialSources | null;
   passes: GpuPasses;
-  target(role: string, samples?: number): RenderTarget;
+  target(role: string, samples?: number, width?: number, height?: number): RenderTarget;
   children(): FrameTexture;
+}
+/** Groups already contain working-space children; native/media surfaces arrive encoded as sRGB. */
+export function isSrgbLayerSource(layer: Layer) {
+  return (
+    layer.kind === "image" ||
+    layer.kind === "video" ||
+    (layer.kind !== "group" && !!layer.spatial?.enabled)
+  );
 }
 /** Source owners prepare independently; ordinary composition/effects never know their geometry. */
 export function drawLayerSource(layer: Layer, context: SourceContext): FrameTexture {
   const { width, height, scale, entry } = context;
   if (layer.kind === "group") return context.children();
   if (layer.spatial?.enabled) {
-    const target = context.target("spatial");
+    const bounds = context.spatial!.bounds(layer.id);
+    const w = Math.max(1, Math.ceil((bounds?.width ?? layer.width) * scale)),
+      h = Math.max(1, Math.ceil((bounds?.height ?? layer.height) * scale));
+    const target = context.target("spatial", 0, w, h);
     context.spatial!.render(layer, target);
-    return { texture: target.texture, width, height, premultiplied: true };
+    return { texture: target.texture, width: w, height: h, premultiplied: true, bounds };
   }
   if (layer.kind === "image" || layer.kind === "video")
     return {

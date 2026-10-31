@@ -211,11 +211,45 @@ test("inline 3D mode keeps native gizmo edits, orbit and undo on the classic lay
   expect(
     await page.evaluate(() => window.musart!.snapshot().project.pages[0]!.layers[0]!.spatial),
   ).toEqual(spatial);
-  await page.mouse.move(box!.x + (box!.width * 85) / 900, box!.y + (box!.height * 145) / 600);
+  let orbitPoint: { x: number; y: number } | null = null;
+  for (const [dx, dy] of [
+    [25, 25],
+    [-25, 15],
+    [15, -15],
+    [-15, -30],
+    [0, 20],
+  ]) {
+    const at = { x: x + dx!, y: y + dy! };
+    await page.mouse.move(at.x, at.y);
+    const state = JSON.parse((await canvas.getAttribute("data-spatial-gizmo")) ?? "{}") as {
+      axis?: string | null;
+    };
+    if (state.axis) continue;
+    const hit = await page.evaluate(async (at) => {
+      const url = "/src/canvas/selection/hit.ts";
+      const { canvasHit } = (await import(
+        url
+      )) as typeof import("../../apps/web/src/canvas/selection/hit");
+      const canvas = document.querySelector<HTMLCanvasElement>(".editor-gpu-scene canvas")!,
+        rect = canvas.getBoundingClientRect();
+      const page = window.musart!.snapshot().project.pages[0]!;
+      return canvasHit(page, {
+        x: ((at.x - rect.x) / rect.width) * page.width,
+        y: ((at.y - rect.y) / rect.height) * page.height,
+      })?.layer.id;
+    }, at);
+    if (hit === "box") {
+      orbitPoint = at;
+      break;
+    }
+  }
+  expect(
+    orbitPoint,
+    "orbit must start on visible geometry away from the transform rings",
+  ).not.toBeNull();
+  await page.mouse.move(orbitPoint!.x, orbitPoint!.y);
   await page.mouse.down();
-  await page.mouse.move(box!.x + (box!.width * 125) / 900, box!.y + (box!.height * 165) / 600, {
-    steps: 8,
-  });
+  await page.mouse.move(orbitPoint!.x + 35, orbitPoint!.y + 25, { steps: 8 });
   await page.mouse.up();
   const camera = await page.evaluate(
     () => window.musart!.snapshot().project.pages[0]!.spatial!.camera,

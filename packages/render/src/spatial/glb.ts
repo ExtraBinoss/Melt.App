@@ -1,3 +1,4 @@
+import { SPATIAL_MODEL_EXTENT } from "@musart/core";
 import {
   AnimationClip,
   Box3,
@@ -156,8 +157,8 @@ export function normalizeModel(root: Object3D) {
   if (!Number.isFinite(extent) || extent <= 0) throw Error("GLB has no renderable bounds");
   // Put normalization on a parent so authored animation tracks retain their original transforms.
   const wrapper = new Object3D();
-  wrapper.scale.setScalar(1.8 / extent);
-  wrapper.position.copy(center).multiplyScalar(-1.8 / extent);
+  wrapper.scale.setScalar(SPATIAL_MODEL_EXTENT / extent);
+  wrapper.position.copy(center).multiplyScalar(-SPATIAL_MODEL_EXTENT / extent);
   wrapper.add(root);
   return wrapper;
 }

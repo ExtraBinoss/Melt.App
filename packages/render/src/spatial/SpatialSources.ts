@@ -1,3 +1,6 @@
+import { SceneReflections } from "./reflections/SceneReflections";
+import { CompositionScene } from "./scene/CompositionScene";
+import type { RenderOptions } from "../compositing/types";
 import {
   createLayerGeometryIndex,
   DEFAULT_SPATIAL_SCENE,
@@ -28,8 +31,10 @@ export class SpatialSources {
   private readonly builder = new GeometryBuilder();
   private readonly environments: EnvironmentSources;
   private readonly output: SpatialOutputPass;
+  private readonly reflections: SceneReflections;
   private readonly prepared = new Map<string, Prepared>();
   private readonly retained = new Map<string, WeakRef<SpatialResource>>();
+  private stage: CompositionScene | null = null;
   private closed = false;
   private readonly diagnostics =
     typeof location !== "undefined" && new URLSearchParams(location.search).has("profile3d");
@@ -47,6 +52,7 @@ export class SpatialSources {
     this.fonts = new FontRepository({ resolver: options.fontResolver });
     this.environments = new EnvironmentSources(renderer, cache);
     this.output = new SpatialOutputPass(renderer);
+    this.reflections = new SceneReflections(renderer, cache, this.environments);
   }
   async prepare(
     page: Composition,
@@ -54,6 +60,7 @@ export class SpatialSources {
     scale: number,
     target: RenderTarget,
     canContinue: () => boolean,
+    options: RenderOptions = {},
   ) {
     this.trace("start");
     this.prepared.clear();
@@ -61,12 +68,18 @@ export class SpatialSources {
     const layers = page.layers.filter(
       (layer) =>
         layer.spatial?.enabled &&
+        layer.spatial.source !== "group" &&
         (geometry.isVisible(layer.id) ||
           (page.motion?.mode === "motion" &&
             layer.visible &&
             geometry.ancestors(layer.id).every((parent) => parent.visible))),
     );
-    if (!layers.length) return;
+    if (!layers.length) {
+      this.reflections.dispose();
+      this.stage?.releaseSources();
+      this.stage = null;
+      return;
+    }
     if (layers.length > 64) throw new RangeError("Composition exceeds the active 3D source budget");
     const settings = page.spatial ?? DEFAULT_SPATIAL_SCENE;
     this.trace("environment");
@@ -121,18 +134,63 @@ export class SpatialSources {
         this.cache.set(key, resource);
         this.parses++;
       }
-      const reference = layer.effects.some((effect) => effect.enabled) || !!layer.mask?.enabled;
-      const w = Math.max(1, Math.ceil(layer.width * (reference ? 1 : scale))),
-        h = Math.max(1, Math.ceil(layer.height * (reference ? 1 : scale)));
-      this.cache.ensureCapacity(key, resource.projectedBytes(w, h));
-      resource.update(layer, settings, environment, w, h);
+      resource.update(
+        layer,
+        { ...settings, lights: [], shadows: false },
+        environment,
+        resource.target.width,
+        resource.target.height,
+      );
       this.cache.synchronize(key);
-      this.trace(`material:${layer.id}`);
-      await resource.prepare(this.renderer, settings, canContinue);
       this.check(canContinue);
       this.prepared.set(layer.id, { resource, settings });
       this.retained.set(layer.id, new WeakRef(resource));
     }
+    const stageKey = `spatial:composition:${page.id}`;
+    let stage = this.cache.get<CompositionScene>(stageKey);
+    if (!stage) {
+      stage = new CompositionScene(this.renderer, settings);
+      this.cache.set(stageKey, stage);
+    }
+    if (this.stage !== stage) this.stage?.releaseSources();
+    this.stage = stage;
+    const sources = layers.map((layer) => ({
+      layer,
+      resource: this.prepared.get(layer.id)!.resource,
+    }));
+    const density = Math.max(
+      scale,
+      ...layers.map((l) => (l.effects.some((e) => e.enabled) || l.mask?.enabled ? 1 : scale)),
+    );
+    this.cache.ensureCapacity(
+      stageKey,
+      stage.projectedBytes(
+        Math.ceil(page.width * density),
+        Math.ceil(page.height * density),
+        sources.length,
+      ),
+    );
+    stage.sync(page, settings, sources, environment, scale);
+    for (const { layer, resource } of sources) {
+      const original = layer.assetId ? assets[layer.assetId] : undefined;
+      const key = `spatial:source:${layer.id}:${layer.spatial!.source === "glb" ? assetIdentity(original) : spatialGeometryKey(layer)}`;
+      this.cache.ensureCapacity(
+        key,
+        resource.projectedBytes(resource.target.width, resource.target.height),
+      );
+      this.cache.synchronize(key);
+    }
+    await this.reflections.prepare(
+      page,
+      settings,
+      sources,
+      environment,
+      options,
+      canContinue,
+      stage.scene,
+    );
+    await stage.prepare(canContinue);
+    this.cache.synchronize(stageKey);
     this.trace("ready");
     const ids = new Set(page.layers.map((layer) => layer.id));
     for (const id of this.retained.keys()) if (!ids.has(id)) this.retained.delete(id);
@@ -147,7 +205,19 @@ export class SpatialSources {
       vertices += inventory.vertices;
       triangles += inventory.triangles;
     }
-    return { sources: this.prepared.size, meshes, vertices, triangles };
+    return {
+      sources: this.prepared.size,
+      meshes,
+      vertices,
+      triangles,
+      ...(this.reflections.stats() ? { reflections: this.reflections.stats() } : {}),
+    };
+  }
+  reflectionStamp(layerId: string) {
+    return `${this.stage?.stamp ?? ""}:${this.reflections.stamp(layerId) ?? ""}`;
+  }
+  bounds(layerId: string) {
+    return this.stage?.bounds(layerId);
   }
   peek(layerId: string): SpatialResource | null {
     const value = this.retained.get(layerId)?.deref();
@@ -156,7 +226,8 @@ export class SpatialSources {
   render(layer: Layer, target: RenderTarget) {
     const prepared = this.prepared.get(layer.id);
     if (!prepared || prepared.resource.closed) throw Error("3D source is not prepared");
-    prepared.resource.render(this.renderer, prepared.settings);
+    if (!this.stage) throw Error("Composition 3D scene is not prepared");
+    this.stage.render(layer);
     this.output.render(prepared.resource.target.texture, target);
     this.passes += 2;
   }
@@ -167,8 +238,11 @@ export class SpatialSources {
   dispose() {
     if (this.closed) return;
     this.closed = true;
+    this.stage?.releaseSources();
+    this.stage = null;
     this.builder.dispose();
     this.fonts.clear();
+    this.reflections.dispose();
     this.environments.dispose();
     this.output.dispose();
     this.prepared.clear();

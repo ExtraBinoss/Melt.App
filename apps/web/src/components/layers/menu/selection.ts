@@ -1,4 +1,4 @@
-import { createLayerGeometryIndex, type Composition } from "@musart/core";
+import { canUngroupSpatial, createLayerGeometryIndex, type Composition } from "@musart/core";
 type SelectionState = ReturnType<typeof analyzeSelection>;
 const cached = new WeakMap<Composition, WeakMap<readonly string[], SelectionState>>();
 /** Immutable documents share the geometry index; all selection predicates are linear in selected rows. */
@@ -58,7 +58,9 @@ function analyzeSelection(page: Composition, selection: readonly string[]) {
           !layer.effects.length &&
           !layer.mask &&
           layer.opacity === 1 &&
-          layer.blendMode === "normal",
+          layer.blendMode === "normal" &&
+          (!(layer.spatial?.enabled && layer.spatial.source === "group") ||
+            canUngroupSpatial(page, layer)),
       ),
   });
 }

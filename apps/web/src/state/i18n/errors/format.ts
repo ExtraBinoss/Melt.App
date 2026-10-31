@@ -2,6 +2,7 @@ import { i18n } from "..";
 import "./messages";
 
 const platformCodes = {
+  ANIMATED_SPATIAL_GROUP: "animatedSpatialGroup",
   PROJECT_PREFERENCES_LOAD_FAILED: "projectPreferencesLoadFailed",
   PROJECT_PREFERENCES_SAVE_FAILED: "projectPreferencesSaveFailed",
   STALE_PROJECT_WRITE: "staleProjectWrite",

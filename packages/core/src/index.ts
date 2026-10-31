@@ -274,6 +274,8 @@ export { SPATIAL_PRIMITIVES } from "./spatial/model";
 export type {
   SpatialLayer,
   SpatialScene,
+  SpatialReflections,
+  SpatialReflectionQuality,
   SpatialLight,
   SpatialMaterial,
   SpatialSource,
@@ -295,3 +297,16 @@ export {
 export type { SpatialMotionProperty } from "./spatial/motion";
 export { isSceneAsset, isEmbeddedAsset } from "./assets/identity";
 export type { SceneAsset, EmbeddedAsset } from "./assets/model";
+export { SpatialGeometry, SPATIAL_LAYOUT_SPAN } from "./spatial/geometry";
+export {
+  multiplySpatial,
+  invertSpatial,
+  transformSpatial,
+  spatialTranslation,
+  SPATIAL_IDENTITY,
+} from "./spatial/matrix";
+export type { SpatialMatrix } from "./spatial/matrix";
+export { canUngroupSpatial } from "./spatial/grouping";
+export { reframeSpatialScene } from "./spatial/framing";
+
+export { SPATIAL_GEOMETRY_DEFINITIONS, SPATIAL_MODEL_EXTENT } from "./spatial/bounds/definitions";

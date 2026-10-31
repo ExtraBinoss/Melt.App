@@ -190,5 +190,15 @@
   "shapes": "Vormen",
   "models": "GLB-modellen",
   "add": "Toevoegen",
-  "preview": "3D-voorbeeld"
+  "preview": "3D-voorbeeld",
+  "reflections": "Reflecties",
+  "sceneReflections": "Scène",
+  "environmentReflections": "Omgeving",
+  "reflectionQuality": "Reflectiekwaliteit",
+  "reflectionQualities": {
+    "draft": "Concept",
+    "balanced": "Gebalanceerd",
+    "high": "Hoog"
+  },
+  "reflectionsHint": "Weerspiegelt nabije 3D-objecten. Updates pauzeren tijdens het bewerken. 2D-effecten en maskers worden daarna toegepast."
 }

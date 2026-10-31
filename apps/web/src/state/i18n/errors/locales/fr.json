@@ -24,5 +24,6 @@
   "videoHdrUnsupported": "La vidéo HDR nécessite une conversion colorimétrique encore indisponible. Convertissez le clip en SDR avant l’import.",
   "videoBudgetExceeded": "L’aperçu vidéo a atteint sa limite mémoire ou de décodage. Réduisez les calques vidéo actifs ou la taille de la source d’aperçu.",
   "videoDecodeFailed": "Une image vidéo n’a pas pu être décodée. Rouvrez le clip ; si le problème persiste, réencodez la source ou remplacez le fichier endommagé.",
-  "videoBusy": "Le décodeur vidéo termine une autre demande. Patientez un instant, puis réessayez."
+  "videoBusy": "Le décodeur vidéo termine une autre demande. Patientez un instant, puis réessayez.",
+  "animatedSpatialGroup": "Ce groupe ou ses positions 2D sont animés. Retirez ces animations avant de dégrouper."
 }

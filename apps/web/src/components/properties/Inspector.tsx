@@ -1,3 +1,4 @@
+import { SelectionGroupAction } from "./SelectionGroupAction";
 import "../export/messages";
 import { SpatialLayerProperties } from "../spatial/SpatialLayerProperties";
 import { SpatialSceneProperties } from "../spatial/SpatialSceneProperties";
@@ -231,6 +232,12 @@ export const Inspector = memo(
                     : t("composition")}
               </span>
             </div>
+            <SelectionGroupAction
+              engine={engine}
+              page={page}
+              selected={selected}
+              run={runCurrent}
+            />
             <LockedLayerNotice engine={engine} page={page} layers={selected} run={runCurrent} />
             {selected.length > 1 ? (
               <>

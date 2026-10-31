@@ -1,4 +1,4 @@
-import { useEffect, useSyncExternalStore, type RefObject } from "react";
+import { useEffect, useLayoutEffect, useSyncExternalStore, type RefObject } from "react";
 import { useAtom } from "jotai";
 import { AnimatePresence } from "motion/react";
 import { createLayerGeometryIndex, type EnginePort } from "@musart/core";
@@ -56,6 +56,35 @@ export function CanvasSpatialEditing({
     editing.layerId === layer?.id,
   );
   const visible = enabled && supported && !playback && !vector;
+  useLayoutEffect(() => {
+    const element = viewport.current;
+    if (!active || !element) return;
+    const key = (event: KeyboardEvent) => {
+      if (
+        element.querySelector("canvas[data-keybinding-capture]") ||
+        event.metaKey ||
+        event.ctrlKey ||
+        event.altKey ||
+        (event.target as Element).closest(
+          "input,textarea,[contenteditable=true],[data-canvas-control]",
+        )
+      )
+        return;
+      const value = event.key.toLowerCase();
+      if (!["g", "r", "s", "escape"].includes(value)) return;
+      event.preventDefault();
+      event.stopPropagation();
+      setEditing((current) =>
+        value === "escape"
+          ? null
+          : current
+            ? { ...current, tool: value === "r" ? "rotate" : value === "s" ? "scale" : "translate" }
+            : current,
+      );
+    };
+    element.addEventListener("keydown", key, true);
+    return () => element.removeEventListener("keydown", key, true);
+  }, [active, setEditing, viewport]);
   function enter() {
     if (!layer || !supported) return;
     createMotionTransport(engine).pause();

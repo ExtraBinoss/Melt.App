@@ -190,5 +190,15 @@
   "shapes": "Shapes",
   "models": "GLB models",
   "add": "Add",
-  "preview": "3D preview"
+  "preview": "3D preview",
+  "reflections": "Reflections",
+  "sceneReflections": "Scene",
+  "environmentReflections": "Environment",
+  "reflectionQuality": "Reflection quality",
+  "reflectionQualities": {
+    "draft": "Draft",
+    "balanced": "Balanced",
+    "high": "High"
+  },
+  "reflectionsHint": "Reflects nearby 3D objects. Updates pause during editing. 2D effects and masks are applied afterward."
 }

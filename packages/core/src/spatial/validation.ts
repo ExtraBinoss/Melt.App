@@ -10,6 +10,7 @@ import { ensure } from "../errors";
 import { SPATIAL_ENVIRONMENTS } from "./defaults";
 import { SPATIAL_MATERIALS } from "./materials";
 import { SPATIAL_PRIMITIVES, type SpatialLayer } from "./model";
+import { invertSpatial } from "./matrix";
 export const SPATIAL_NUMBERS = {
   x: [-1000, 1000],
   y: [-1000, 1000],
@@ -43,10 +44,31 @@ export function validateSpatialLayer(value: unknown): asserts value is SpatialLa
   assertRecord(value);
   assertBoolean(value.enabled);
   ensure(
-    [...SPATIAL_PRIMITIVES, "extrude", "glb"].includes(String(value.source)),
+    [...SPATIAL_PRIMITIVES, "extrude", "glb", "group"].includes(String(value.source)),
     "INVALID_DOCUMENT",
     "Unknown 3D source",
   );
+  if (value.pivot !== undefined) {
+    assertList(value.pivot, 3);
+    ensure(value.pivot.length === 3, "INVALID_DOCUMENT", "Invalid 3D pivot");
+    for (const part of value.pivot) assertNumber(part, -1e9, 1e9);
+  }
+  if (value.basis !== undefined) {
+    assertList(value.basis, 16);
+    ensure(value.basis.length === 16, "INVALID_DOCUMENT", "Invalid 3D basis");
+    for (const part of value.basis) assertNumber(part, -1e12, 1e12);
+    const basis = value.basis as number[];
+    ensure(
+      [3, 7, 11].every((i) => basis[i] === 0) && basis[15] === 1,
+      "INVALID_DOCUMENT",
+      "3D basis must be affine",
+    );
+    try {
+      invertSpatial(value.basis as number[]);
+    } catch {
+      ensure(false, "INVALID_DOCUMENT", "3D basis must be invertible");
+    }
+  }
   for (const [key, [min, max]] of Object.entries(SPATIAL_NUMBERS))
     assertNumber(value[key], min, max);
   for (const key of ["bevelSegments", "curveSegments", "clip"])
@@ -74,6 +96,26 @@ export function validateSpatialScene(
   assets: Record<string, unknown>,
 ): void {
   assertRecord(value);
+  if (value.viewport !== undefined) {
+    assertRecord(value.viewport);
+    assertNumber(value.viewport.width, 1, 1e6);
+    assertNumber(value.viewport.height, 1, 1e6);
+    assertNumber(value.viewport.x, -1e9, 1e9);
+    assertNumber(value.viewport.y, -1e9, 1e9);
+  }
+  if (value.reflections !== undefined) {
+    assertRecord(value.reflections);
+    ensure(
+      ["environment", "scene"].includes(String(value.reflections.mode)),
+      "INVALID_DOCUMENT",
+      "Unknown reflection mode",
+    );
+    ensure(
+      ["draft", "balanced", "high"].includes(String(value.reflections.quality)),
+      "INVALID_DOCUMENT",
+      "Unknown reflection quality",
+    );
+  }
   assertRecord(value.environment);
   ensure(
     SPATIAL_ENVIRONMENTS.includes(
@@ -132,7 +174,9 @@ export function validateSpatialSource(
   validateSpatialLayer(layer.spatial);
   const settings = layer.spatial;
   ensure(
-    ["rectangle", "ellipse", "text", "vector"].includes(String(layer.kind)),
+    settings.source === "group"
+      ? layer.kind === "group"
+      : ["rectangle", "ellipse", "text", "vector"].includes(String(layer.kind)),
     "INVALID_DOCUMENT",
     "This layer cannot have a 3D source",
   );

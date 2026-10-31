@@ -1,5 +1,6 @@
 import type { Composition, Layer } from "../document/model";
 import { ensure } from "../errors";
+import { SpatialGeometry } from "../spatial/geometry";
 import {
   IDENTITY,
   invertMatrix,
@@ -50,7 +51,8 @@ export class LayerGeometryIndex {
   private readonly localInverses = new Map<string, Matrix>();
   private readonly bounds = new Map<string, Readonly<Bounds>>();
   private readonly flags = new Map<string, { locked: boolean; visible: boolean }>();
-  constructor(page: Composition) {
+  private spatial: SpatialGeometry | null = null;
+  constructor(private readonly page: Composition) {
     const byId = new Map<string, Layer>();
     this.#lookup = byId;
     const children = new Map<string | null, Layer[]>();
@@ -132,10 +134,20 @@ export class LayerGeometryIndex {
     this.worldMatrix(id);
     return this.flags.get(id)!.visible;
   }
+  isMaskSource(id: string): boolean {
+    return this.get(id).maskSource === true || this.ancestors(id).some((layer) => layer.maskSource);
+  }
   worldBounds(id: string): Readonly<Bounds> {
     const cached = this.bounds.get(id);
     if (cached) return cached;
     const layer = this.get(id);
+    if (layer.spatial?.enabled) {
+      const bounds = Object.freeze(
+        (this.spatial ??= new SpatialGeometry(this.page, this.byId)).projectedBounds(id),
+      );
+      this.bounds.set(id, bounds);
+      return bounds;
+    }
     if (
       layer.parentId === null &&
       layer.rotation === 0 &&
@@ -179,6 +191,7 @@ export class LayerGeometryIndex {
       const layer = this.#lookup.get(id);
       if (!layer) continue;
       const bounds =
+        !layer.spatial?.enabled &&
         layer.parentId === null &&
         layer.rotation === 0 &&
         (layer.scaleX ?? 1) === 1 &&
@@ -200,6 +213,7 @@ export class LayerGeometryIndex {
     options: {
       includeLocked?: boolean;
       contentBounds?: (layer: Layer) => Readonly<Bounds> | null;
+      spatialHit?: (layer: Layer) => boolean;
     } = {},
   ): Layer | null {
     const roots = this.children(null);
@@ -222,6 +236,24 @@ export class LayerGeometryIndex {
       )
         continue;
       let local: Point;
+      if (layer.spatial?.enabled) {
+        if (layer.kind !== "group" && options.spatialHit) {
+          if (options.spatialHit(layer)) return layer;
+          continue;
+        }
+        const bounds = this.worldBounds(layer.id);
+        if (
+          point.x < bounds.x ||
+          point.y < bounds.y ||
+          point.x > bounds.x + bounds.width ||
+          point.y > bounds.y + bounds.height
+        )
+          continue;
+        if (layer.kind !== "group") return layer;
+        const children = this.children(layer.id);
+        stack.push({ children, at: children.length - 1, point: frame.point, fallback: layer });
+        continue;
+      }
       if (layer.rotation === 0 && (layer.scaleX ?? 1) === 1 && (layer.scaleY ?? 1) === 1) {
         const x = frame.point.x - layer.x,
           y = frame.point.y - layer.y;

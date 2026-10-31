@@ -111,6 +111,8 @@ export interface Layer {
   padding?: Insets;
   guides?: Guide[];
   maskSource?: boolean;
+  /** Shading-only neighbours retained by a derived selection export. */
+  spatialContext?: boolean;
   text: string;
   fontFamily: string;
   fontSize: number;

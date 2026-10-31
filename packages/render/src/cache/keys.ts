@@ -34,6 +34,7 @@ export function createSourceKeys(
     trail?: ReadonlySet<string>;
     geometry?: LayerGeometryIndex;
     videoStamp?: (layerId: string) => string | null;
+    spatialStamp?: (layerId: string) => string | null;
   } = {},
 ): (layer: Layer) => string {
   const geometry = options.geometry ?? createLayerGeometryIndex(page);
@@ -104,6 +105,7 @@ export function createSourceKeys(
           scale,
           page.colorSpace ?? "srgb",
           layer.spatial?.enabled ? (page.spatial ?? null) : null,
+          layer.spatial?.enabled ? (options.spatialStamp?.(layer.id) ?? null) : null,
           layer.spatial?.enabled && page.spatial?.environment.assetId
             ? assetIdentity(assets[page.spatial.environment.assetId])
             : null,

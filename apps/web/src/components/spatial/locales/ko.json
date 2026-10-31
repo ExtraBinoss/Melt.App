@@ -190,5 +190,15 @@
   "shapes": "도형",
   "models": "GLB 모델",
   "add": "추가",
-  "preview": "3D 미리보기"
+  "preview": "3D 미리보기",
+  "reflections": "반사",
+  "sceneReflections": "장면",
+  "environmentReflections": "환경",
+  "reflectionQuality": "반사 품질",
+  "reflectionQualities": {
+    "draft": "초안",
+    "balanced": "균형",
+    "high": "높음"
+  },
+  "reflectionsHint": "주변 3D 오브젝트를 반사합니다. 편집 중에는 업데이트를 일시 중지합니다. 2D 효과와 마스크는 나중에 적용됩니다."
 }

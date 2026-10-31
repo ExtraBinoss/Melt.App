@@ -24,5 +24,6 @@
   "videoHdrUnsupported": "HDR video needs color conversion that this editor does not support yet. Convert the clip to SDR before importing.",
   "videoBudgetExceeded": "Video preview reached its memory or decoder limit. Reduce active video layers or use a smaller preview source.",
   "videoDecodeFailed": "A video frame could not be decoded. Reopen the clip; if it persists, re-encode the source or replace a damaged file.",
-  "videoBusy": "The video decoder is still finishing another request. Wait a moment, then retry."
+  "videoBusy": "The video decoder is still finishing another request. Wait a moment, then retry.",
+  "animatedSpatialGroup": "This group has an animated transform or layout. Remove that animation before ungrouping."
 }

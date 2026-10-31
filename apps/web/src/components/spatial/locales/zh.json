@@ -190,5 +190,15 @@
   "shapes": "形状",
   "models": "GLB 模型",
   "add": "添加",
-  "preview": "3D 预览"
+  "preview": "3D 预览",
+  "reflections": "反射",
+  "sceneReflections": "场景",
+  "environmentReflections": "环境",
+  "reflectionQuality": "反射质量",
+  "reflectionQualities": {
+    "draft": "草稿",
+    "balanced": "均衡",
+    "high": "高"
+  },
+  "reflectionsHint": "反射附近的3D对象。编辑时暂停更新。二维效果和蒙版在之后应用。"
 }

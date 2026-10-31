@@ -190,5 +190,15 @@
   "shapes": "Kształty",
   "models": "Modele GLB",
   "add": "Dodaj",
-  "preview": "Podgląd 3D"
+  "preview": "Podgląd 3D",
+  "reflections": "Odbicia",
+  "sceneReflections": "Scena",
+  "environmentReflections": "Otoczenie",
+  "reflectionQuality": "Jakość odbić",
+  "reflectionQualities": {
+    "draft": "Robocza",
+    "balanced": "Zrównoważona",
+    "high": "Wysoka"
+  },
+  "reflectionsHint": "Odbija pobliskie obiekty 3D. Aktualizacje są wstrzymywane podczas edycji. Efekty 2D i maski są nakładane później."
 }

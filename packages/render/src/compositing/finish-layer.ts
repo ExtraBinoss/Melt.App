@@ -33,25 +33,26 @@ export function finishLayerSource(
   context: Context,
 ): FrameTexture {
   let source = input;
-  let bounds: Bounds = { x: 0, y: 0, width: layer.width, height: layer.height };
+  const original: Bounds = input.bounds ?? { x: 0, y: 0, width: layer.width, height: layer.height };
+  let bounds: Bounds = original;
   const enabled = layer.effects.some((effect) => effect.enabled);
   if (enabled) {
     const outset = effectFootprint(layer.effects);
     bounds = {
-      x: -outset.left,
-      y: -outset.top,
-      width: layer.width + outset.left + outset.right,
-      height: layer.height + outset.top + outset.bottom,
+      x: original.x - outset.left,
+      y: original.y - outset.top,
+      width: original.width + outset.left + outset.right,
+      height: original.height + outset.top + outset.bottom,
     };
     const width = rasterExtent(bounds.width, scale),
       height = rasterExtent(bounds.height, scale);
     if (source.premultiplied || outset.left || outset.top || outset.right || outset.bottom) {
       const straight = context.target("straight", width, height);
       context.passes.copyTo(source, straight, source.premultiplied, false, {
-        x: bounds.x / layer.width,
-        y: 1 - (bounds.y + bounds.height) / layer.height,
-        width: bounds.width / layer.width,
-        height: bounds.height / layer.height,
+        x: (bounds.x - original.x) / original.width,
+        y: 1 - (bounds.y - original.y + bounds.height) / original.height,
+        width: bounds.width / original.width,
+        height: bounds.height / original.height,
       });
       source = { texture: straight.texture, width, height, premultiplied: false };
     }

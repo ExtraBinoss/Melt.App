@@ -190,5 +190,15 @@
   "shapes": "シェイプ",
   "models": "GLBモデル",
   "add": "追加",
-  "preview": "3Dプレビュー"
+  "preview": "3Dプレビュー",
+  "reflections": "反射",
+  "sceneReflections": "シーン",
+  "environmentReflections": "環境",
+  "reflectionQuality": "反射の品質",
+  "reflectionQualities": {
+    "draft": "ドラフト",
+    "balanced": "バランス",
+    "high": "高"
+  },
+  "reflectionsHint": "近くの3Dオブジェクトを反射します。編集中は更新を停止します。2Dエフェクトとマスクは後から適用されます。"
 }

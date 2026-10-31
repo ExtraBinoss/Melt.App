@@ -2,6 +2,11 @@ import { ensure } from "../errors";
 import { createLayer } from "../document/factories";
 import type { Composition } from "../document/model";
 import { getLayer, assertEditable, selectedRoots } from "./access";
+import { createSpatialLayer } from "../spatial/defaults";
+import { SpatialGeometry } from "../spatial/geometry";
+import { invertSpatial, transformSpatial } from "../spatial/matrix";
+import { captureSpatialReparent } from "../spatial/reparent";
+import { canUngroupSpatial } from "../spatial/grouping";
 export function groupLayers(
   page: Composition,
   ids: string[],
@@ -28,6 +33,26 @@ export function groupLayers(
     name: "Groupe",
     fill: "transparent",
   });
+  if (selected.every((layer) => layer.spatial?.enabled)) {
+    const geometry = new SpatialGeometry(page);
+    const centers = selected.map((layer) =>
+      transformSpatial(geometry.worldMatrix(layer.id), [0, 0, 0]),
+    );
+    const center = [0, 1, 2].map(
+      (axis) => centers.reduce((sum, p) => sum + p[axis]!, 0) / centers.length,
+    );
+    // The group pivot belongs to the inherited frame, independently of its children's TRS.
+    const probe = createLayer("group", {
+      ...group,
+      spatial: { ...createSpatialLayer("group"), pivot: [0, 0, 0] },
+    });
+    const probePage = { ...page, layers: [...page.layers, probe] };
+    const pivot = transformSpatial(
+      invertSpatial(new SpatialGeometry(probePage).anchorMatrix(probe.id)),
+      center,
+    );
+    group.spatial = { ...createSpatialLayer("group"), pivot: [pivot[0]!, pivot[1]!, pivot[2]!] };
+  }
   const indices = selected.map((layer) => page.layers.indexOf(layer));
   page.layers.splice(Math.max(...indices) + 1, 0, group);
   for (const layer of selected) layer.parentId = group.id;
@@ -45,6 +70,16 @@ export function ungroupLayers(page: Composition, ids: string[]): string[] {
     const cx = group.width / 2;
     const cy = group.height / 2;
     const children = page.layers.filter((layer) => layer.parentId === group.id);
+    const spatial = group.spatial?.enabled && group.spatial.source === "group";
+    const restoreSpatial = captureSpatialReparent(
+      page,
+      children.map((child) => child.id),
+    );
+    ensure(
+      !spatial || canUngroupSpatial(page, group),
+      "ANIMATED_SPATIAL_GROUP",
+      "This hierarchy needs timed transform baking before ungrouping",
+    );
     // Group effects/opacity/masks cannot be flattened losslessly into independent layers.
     ensure(
       group.effects.length === 0 &&
@@ -65,6 +100,7 @@ export function ungroupLayers(page: Composition, ids: string[]): string[] {
       layer.parentId = group.parentId;
       nextSelection.push(layer.id);
     }
+    restoreSpatial();
     const childIds = new Set(children.map((layer) => layer.id));
     const insertion = page.layers
       .slice(0, page.layers.indexOf(group))

@@ -1,5 +1,5 @@
 import { completeGpuFrame } from "./publication";
-import { drawLayerSource } from "./layer-source";
+import { drawLayerSource, isSrgbLayerSource } from "./layer-source";
 import type { SpatialSources } from "../spatial/SpatialSources";
 import {
   createLayerGeometryIndex,
@@ -226,7 +226,7 @@ export class GpuCompositor {
           { fontResolver: options.fontResolver ?? this.fontResolver },
         );
         const started = options.profileVideo ? performance.now() : 0;
-        await this.spatial.prepare(page, assets, scale, preparationTarget, canPrepare);
+        await this.spatial.prepare(page, assets, scale, preparationTarget, canPrepare, options);
         if (options.profileVideo && this.profile)
           this.profile.sources[this.profile.sources.length - 1]! += performance.now() - started;
       }
@@ -242,10 +242,12 @@ export class GpuCompositor {
         keyFor: createSourceKeys(page, assets, scale, {
           geometry,
           videoStamp: (id) => this.sources.videoStamp(id),
+          spatialStamp: (id) => this.spatial?.reflectionStamp(id) ?? null,
         }),
         referenceKeyFor: createSourceKeys(page, assets, 1, {
           geometry,
           videoStamp: (id) => this.sources.videoStamp(id),
+          spatialStamp: (id) => this.spatial?.reflectionStamp(id) ?? null,
         }),
         geometry,
       };
@@ -386,7 +388,8 @@ export class GpuCompositor {
       vectors: this.vectors!,
       spatial: this.spatial,
       passes: this.passes!,
-      target: (role, samples = 0) => this.target(entry, key, role, width, height, false, samples),
+      target: (role, samples = 0, w = width, h = height) =>
+        this.target(entry, key, role, w, h, false, samples),
       children: () =>
         this.children(
           layer.id,
@@ -399,11 +402,8 @@ export class GpuCompositor {
           viewport,
         ),
     });
-    if (
-      page.colorSpace === "display-p3" &&
-      (layer.kind === "image" || layer.kind === "video" || layer.spatial?.enabled)
-    ) {
-      const converted = this.target(entry, key, "working-color", width, height);
+    if (page.colorSpace === "display-p3" && isSrgbLayerSource(layer)) {
+      const converted = this.target(entry, key, "working-color", source.width, source.height);
       this.color!.render(source, converted, "to-p3");
       source = { ...source, texture: converted.texture };
     }
@@ -470,7 +470,8 @@ export class GpuCompositor {
       primitiveRun = [];
     };
     for (const layer of layers) {
-      if (!layer.visible || layer.opacity <= 0 || layer.maskSource) continue;
+      if (!layer.visible || layer.opacity <= 0 || layer.maskSource || layer.spatialContext)
+        continue;
       if (isInstancedPrimitive(layer)) {
         flush();
         primitiveRun.push(layer);

@@ -5,7 +5,8 @@ export type EngineErrorCode =
   | "LOCKED"
   | "INVALID_HIERARCHY"
   | "LAST_PAGE"
-  | "BUSY";
+  | "BUSY"
+  | "ANIMATED_SPATIAL_GROUP";
 
 export class EngineError extends Error {
   constructor(

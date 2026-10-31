@@ -1,3 +1,4 @@
+import { InfoTooltip } from "../shared/InfoTooltip";
 import { useTranslation } from "react-i18next";
 import { Plus, Sun, Trash2, Upload } from "lucide-react";
 import {
@@ -162,6 +163,45 @@ export function SpatialSceneProperties({
           onCancel={edit.cancel}
         />
       </div>
+      <div className="spatial-title">
+        <span>{t("reflections")}</span>
+        <InfoTooltip label={t("reflections")}>{t("reflectionsHint")}</InfoTooltip>
+      </div>
+      <SelectField
+        label={t("reflections")}
+        identity={page}
+        value={settings.reflections?.mode ?? "scene"}
+        options={[
+          { value: "scene", label: t("sceneReflections") },
+          { value: "environment", label: t("environmentReflections") },
+        ]}
+        onValueChange={(mode) =>
+          edit.commit({
+            ...settings,
+            reflections: {
+              mode: mode as "scene" | "environment",
+              quality: settings.reflections?.quality ?? "balanced",
+            },
+          })
+        }
+      />
+      {(settings.reflections?.mode ?? "scene") === "scene" && (
+        <SelectField
+          label={t("reflectionQuality")}
+          identity={page}
+          value={settings.reflections?.quality ?? "balanced"}
+          options={["draft", "balanced", "high"].map((value) => ({
+            value,
+            label: t(`reflectionQualities.${value}`),
+          }))}
+          onValueChange={(quality) =>
+            edit.commit({
+              ...settings,
+              reflections: { mode: "scene", quality: quality as "draft" | "balanced" | "high" },
+            })
+          }
+        />
+      )}
       <div className="spatial-title">
         <h3>{t("lights")}</h3>
         <Popover>

@@ -120,6 +120,7 @@ function validateLayer(value: unknown, ids: Set<string>, assets: Record<string, 
   }
   if (value.mask !== null) validateMaskSource(value.mask, assets);
   if (value.maskSource !== undefined) assertBoolean(value.maskSource);
+  if (value.spatialContext !== undefined) assertBoolean(value.spatialContext);
   if (value.kind === "vector") validateVector(value.vector);
   else if (value.vector !== undefined) validateVector(value.vector);
   validateSpatialSource(value, assets);

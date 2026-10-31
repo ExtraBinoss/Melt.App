@@ -6,6 +6,8 @@ import {
   Mesh,
   type RenderTarget,
   type Texture,
+  type Scene,
+  type Vector3,
   type WebGPURenderer,
 } from "three/webgpu";
 import { decodeEnvironment, disposeEnvironmentInput } from "./environment-input";
@@ -29,6 +31,40 @@ export class EnvironmentSources {
     private readonly renderer: WebGPURenderer,
     private readonly cache: GpuResourceCache,
   ) {}
+  private getGenerator() {
+    if (!this.generator) {
+      this.cache.reserveExternal("spatial:pmrem", 32 * 1024 * 1024);
+      this.generator = new PMREMGenerator(this.renderer);
+    }
+    return this.generator;
+  }
+  async captureScene(
+    scene: Scene,
+    position: Vector3,
+    size: number,
+    target: RenderTarget | null,
+    canContinue: () => boolean,
+  ) {
+    const generator = this.getGenerator();
+    await generator.compileCubemapShader();
+    if (!canContinue()) throw new DOMException("3D capture superseded", "AbortError");
+    const previous = this.renderer.getRenderTarget(),
+      face = this.renderer.getActiveCubeFace(),
+      mip = this.renderer.getActiveMipmapLevel();
+    const auto = this.renderer.autoClear,
+      shadow = this.renderer.shadowMap.enabled,
+      alpha = this.renderer.getClearAlpha(),
+      color = this.renderer.getClearColor(new Color());
+    try {
+      this.renderer.shadowMap.enabled = false;
+      return generator.fromScene(scene, 0, 0.01, 10000, { size, position, renderTarget: target });
+    } finally {
+      this.renderer.setRenderTarget(previous, face, mip);
+      this.renderer.autoClear = auto;
+      this.renderer.shadowMap.enabled = shadow;
+      this.renderer.setClearColor(color, alpha);
+    }
+  }
   async prepare(
     settings: SpatialScene["environment"],
     assets: Record<string, Asset>,
@@ -41,10 +77,7 @@ export class EnvironmentSources {
     if (cached) return cached.target.texture;
     if (!canContinue()) throw new DOMException("3D preparation superseded", "AbortError");
     this.cache.ensureCapacity(key, 40 * 1024 * 1024);
-    if (!this.generator) {
-      this.cache.reserveExternal("spatial:pmrem", 32 * 1024 * 1024);
-      this.generator = new PMREMGenerator(this.renderer);
-    }
+    this.getGenerator();
     let target: RenderTarget;
     if (asset) {
       if (!isSceneAsset(asset) || asset.kind !== "environment")
@@ -56,9 +89,9 @@ export class EnvironmentSources {
         if (image.width > 4096 || image.height > 2048)
           throw Error("Environment exceeds 4096 × 2048 pixels");
         texture.mapping = EquirectangularReflectionMapping;
-        await this.generator.compileEquirectangularShader();
+        await this.generator!.compileEquirectangularShader();
         if (!canContinue()) throw new DOMException("3D preparation superseded", "AbortError");
-        target = this.generator.fromEquirectangular(texture);
+        target = this.generator!.fromEquirectangular(texture);
       } finally {
         disposeEnvironmentInput(texture);
       }
@@ -84,9 +117,9 @@ export class EnvironmentSources {
               if ("color" in material && material.color instanceof Color)
                 material.color.multiply(tint);
         });
-        await this.generator.compileCubemapShader();
+        await this.generator!.compileCubemapShader();
         if (!canContinue()) throw new DOMException("3D preparation superseded", "AbortError");
-        target = this.generator.fromScene(room, 0.04, 0.1, 100, { size: 128 });
+        target = this.generator!.fromScene(room, 0.04, 0.1, 100, { size: 128 });
       } finally {
         room.dispose();
       }

@@ -79,7 +79,8 @@ export function spatialGeometryKey(layer: Layer): string {
 }
 export function spatialGeometryJob(layer: Layer, font?: OutlineFont): SpatialGeometryJob {
   const s = layer.spatial!;
-  if (s.source === "glb") throw new Error("GLB geometry uses its original scene");
+  if (s.source === "glb" || s.source === "group")
+    throw new Error("Source has no generated geometry");
   const job: SpatialGeometryJob = {
     source: s.source,
     depth: s.depth,

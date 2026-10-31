@@ -1,5 +1,12 @@
-import type { SpatialScene } from "@musart/core";
-import { MathUtils, OrthographicCamera, PerspectiveCamera, type Object3D } from "three/webgpu";
+import { DEFAULT_SPATIAL_SCENE, type Composition, type SpatialScene } from "@musart/core";
+import {
+  MathUtils,
+  Matrix4,
+  OrthographicCamera,
+  PerspectiveCamera,
+  type Object3D,
+  type CoordinateSystem,
+} from "three/webgpu";
 export type SpatialCamera = OrthographicCamera | PerspectiveCamera;
 export function createSpatialCamera(
   settings: SpatialScene["camera"],
@@ -53,4 +60,42 @@ export function updateSpatialObject(
   );
   object.scale.set(spatial.scaleX, spatial.scaleY, spatial.scaleZ);
   object.updateMatrixWorld(true);
+}
+/** The same physical camera gate serves display, triangle picking and reframed exports. */
+export function updateCompositionCamera(
+  camera: SpatialCamera,
+  page: Composition,
+  coordinateSystem: CoordinateSystem,
+) {
+  const settings = page.spatial ?? DEFAULT_SPATIAL_SCENE,
+    viewport = settings.viewport;
+  camera.coordinateSystem = coordinateSystem;
+  updateSpatialCamera(
+    camera,
+    settings.camera,
+    (viewport?.width ?? page.width) / (viewport?.height ?? page.height),
+  );
+  if (viewport) {
+    camera.projectionMatrix.premultiply(
+      new Matrix4().set(
+        viewport.width / page.width,
+        0,
+        0,
+        (viewport.width - 2 * viewport.x) / page.width - 1,
+        0,
+        viewport.height / page.height,
+        0,
+        1 - (viewport.height - 2 * viewport.y) / page.height,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+      ),
+    );
+    camera.projectionMatrixInverse.copy(camera.projectionMatrix).invert();
+  }
 }

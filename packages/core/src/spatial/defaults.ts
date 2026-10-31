@@ -60,6 +60,7 @@ export function createSpatialLight(type: SpatialLight["type"] = "directional"): 
 }
 export function createSpatialScene(): SpatialScene {
   return {
+    reflections: { mode: "scene", quality: "balanced" },
     environment: { preset: "studio", assetId: null, intensity: 1, rotation: 0 },
     camera: { projection: "perspective", yaw: 25, pitch: 15, distance: 4.5, fov: 35 },
     lights: [createSpatialLight()],
@@ -67,6 +68,7 @@ export function createSpatialScene(): SpatialScene {
   };
 }
 const defaultScene = createSpatialScene();
+Object.freeze(defaultScene.reflections);
 Object.freeze(defaultScene.environment);
 Object.freeze(defaultScene.camera);
 for (const light of defaultScene.lights) Object.freeze(light);

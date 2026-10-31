@@ -1,4 +1,5 @@
 import { ensure } from "../errors";
+import { createLayerGeometryIndex } from "./geometry-index";
 import type { Composition, Layer } from "../document/model";
 
 export interface Point {
@@ -98,6 +99,7 @@ export function getWorldMatrix(page: Composition, layerId: string): Matrix {
 export function getWorldBounds(page: Composition, layerId: string): Bounds {
   const layer = page.layers.find((item) => item.id === layerId);
   ensure(layer, "NOT_FOUND", "Calque introuvable");
+  if (layer.spatial?.enabled) return createLayerGeometryIndex(page).worldBounds(layerId);
   const matrix = getWorldMatrix(page, layerId);
   const corners = [
     { x: 0, y: 0 },
@@ -112,6 +114,8 @@ export function getWorldBounds(page: Composition, layerId: string): Bounds {
   return { x, y, width: Math.max(...xs) - x, height: Math.max(...ys) - y };
 }
 export function hitTest(page: Composition, point: Point): Layer | null {
+  if (page.layers.some((layer) => layer.spatial?.enabled))
+    return createLayerGeometryIndex(page).hitTest(point);
   function visit(parentId: string | null, matrix: Matrix): Layer | null {
     const children = page.layers.filter((layer) => layer.parentId === parentId);
     for (let index = children.length - 1; index >= 0; index -= 1) {

@@ -6,6 +6,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Share one native 3D scene, camera and light rig per composition, with cross-object opaque depth, native directional/point shadows and bounded scene-reflection probes for GLBs, text and shapes. Add genuine 3D parent groups/pivots, affine-preserving regrouping, Motion/history integration, triangle picking and consistent selection/print framing. Share typed intrinsic geometry bounds with native builders; keep exact export sampling deterministic and defer background captures during gestures.
+- Rebuild Cornell Box as nine editable native objects under one looping 3D parent action. Soften the silver sphere, regenerate its native poster and portable journals, and invalidate the matching gallery/source revisions together.
 - Add constant-speed clockwise/counterclockwise Spin presets with a simple Turns control. Author Bloom Windows rotations through these editable presets rather than raw property tracks, preserving the 1080p twelve-second loop, counter-rotation registration and two-point interpolation; refresh its portable bundles and preview cache revision.
 - Replace native keyframe-diamond titles with the shared translated tooltip above the control, including disabled explanations. Normalize field spacing and button padding without subscribing Inspector or canvas roots to playback ticks.
 - Add rounded side resize handles with single-axis shrinking and proportional Shift resizing. Preserve opposite edge/corner anchors under rotated, mirrored and scaled parents, reuse transform snapping and undo, and choose one solid black/white handle ink per frame from bounded authored paint estimates instead of per-handle backdrop filters or GPU readbacks.

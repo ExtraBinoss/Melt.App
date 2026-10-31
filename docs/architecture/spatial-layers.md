@@ -12,16 +12,48 @@ to `packages/render`. UI state and borrowed R3F controls belong to `apps/web`;
 
 ## Rendering
 
-Each layer renders a lit source into a linear half-float target with depth and
-four-sample coverage. A native TSL pass applies ACES and the working RGB transfer
-before the existing composition graph. The same graph serves the canvas,
+Each composition has one retained native scene, camera, environment and light rig.
+The pure core `SpatialGeometry` maps authored layout frames into a stable world
+plane, independently of camera orbit. A typed source registry shares canonical
+primitive dimensions and intrinsic box/ellipsoid bounds with native builders.
+Imported models use the same normalization extent; actual render cropping and
+picking use prepared native mesh geometry. Portable TRS, optional affine bases and group
+pivots determine object matrices; Three objects never enter document state.
+
+A shared GPU depth prepass supplies inter-object occlusion and updates the common
+shadow maps once. Each source renders its color contribution into a cropped,
+linear half-float, four-sample surface. A native TSL depth comparison preserves
+shared opaque depth while keeping independent layer/group treatments. Transport
+bounds are expressed in the original layer's local coordinates, so the ordinary
+compositor applies classic layout exactly once. A native TSL pass applies ACES and
+the working RGB transfer before the existing composition graph. The same graph serves the canvas,
 selection previews, still exports and Motion encoding, including Three's WebGL
 fallback. No production GPU pixel readbacks are introduced.
 
-Layers retain the classic 2D stacking order. Depth, refraction and shadows work
-inside an individual source, including an imported GLB's complete internal
-hierarchy. Separate layers do not occlude or cast physical shadows onto one
-another. Lighting and the camera settings are shared by their composition.
+Separate native objects share opaque depth and cast shadows onto one another.
+Classic paint, blending, post-effects and masks retain their document ordering.
+Transparent contributions retain that ordering; this is raster rendering, not
+order-independent transparency or path-traced global illumination.
+
+Scene reflections use a bounded set of native PMREM probes capturing actual
+neighbour geometry and the shared lighting. Probes are shared by receivers,
+cached by capture inputs, deferred during active preview gestures and throttled
+during playback. Exact exports update deterministically for their sampled scene.
+GLB meshes (including original materials and animated skinning), extruded text and
+native shapes all participate through their actual meshes and material properties;
+reflection selection never branches on a primitive or template name. They do not
+recursively reflect themselves or include post-composite 2D effects.
+Draft/balanced/high limits bound capture resolution, probe count, meshes, triangles
+and update cadence. Geometry, textures and skeletons remain borrowed; private
+capture/material resources are explicitly disposed and charged to the GPU cache.
+
+A group of enabled native objects receives a genuine 3D parent transform and a
+shared pivot. Children retain independent editable sources and Motion tracks.
+Ungrouping a fixed transform preserves the complete affine parent frame, including
+nonuniform scale and shear, without decomposing or rewriting children's keys.
+Animated group transforms must be removed before dissolving their hierarchy.
+Selection exports retain a camera gate and shading-only neighbours so cropping
+does not change the world, lighting, shadows or reflections.
 
 Text extrusion consumes the actual shaped glyph contours, kerning and layout.
 Its editable gradients are live material uniforms. SVG parts retain their fill
@@ -80,7 +112,9 @@ Focused core, source-preparation, gesture and persistence tests cover validated
 values, animation evaluation, asset dependencies, undo/redo, cancellation and
 resource disposal. The native Chrome witnesses live in
 `test/browser/spatial-render.spec.ts` and
-`test/browser/spatial-import-motion.spec.ts`. They decode both backend PNGs and
+`test/browser/spatial-import-motion.spec.ts`. Shared-scene regressions also live in
+`spatial-composition.spec.ts`, `spatial-groups.spec.ts`,
+`spatial-shadows.spec.ts` and `spatial-model-reflections.spec.ts`. They decode both backend PNGs and
 an animated GLB video, import a real HDR panorama, drag native rotation rings,
 orbit the camera, switch projections and undo. Gesture assertions check the
 large React surfaces, retained renderer ownership and idle frame stability;

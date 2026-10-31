@@ -190,5 +190,15 @@
   "shapes": "Formen",
   "models": "GLB-Modelle",
   "add": "Hinzufügen",
-  "preview": "3D-Vorschau"
+  "preview": "3D-Vorschau",
+  "reflections": "Reflexionen",
+  "sceneReflections": "Szene",
+  "environmentReflections": "Umgebung",
+  "reflectionQuality": "Reflexionsqualität",
+  "reflectionQualities": {
+    "draft": "Entwurf",
+    "balanced": "Ausgewogen",
+    "high": "Hoch"
+  },
+  "reflectionsHint": "Spiegelt benachbarte 3D-Objekte. Aktualisierungen pausieren beim Bearbeiten. 2D-Effekte und Masken werden anschließend angewendet."
 }

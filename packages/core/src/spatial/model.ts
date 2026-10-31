@@ -22,7 +22,7 @@ export const SPATIAL_PRIMITIVES = [
   "shape",
 ] as const;
 export type SpatialPrimitive = (typeof SPATIAL_PRIMITIVES)[number];
-export type SpatialSource = SpatialPrimitive | "extrude" | "glb";
+export type SpatialSource = SpatialPrimitive | "extrude" | "glb" | "group";
 export interface SpatialMaterial {
   preset: string;
   metalness: number;
@@ -37,6 +37,10 @@ export interface SpatialMaterial {
   opacity: number;
 }
 export interface SpatialLayer {
+  /** Affine parent frame retained when a transformed group is dissolved. */
+  basis?: number[];
+  /** Group pivot in the stable composition layout plane. */
+  pivot?: [number, number, number];
   enabled: boolean;
   source: SpatialSource;
   x: number;
@@ -76,7 +80,16 @@ export interface SpatialLight {
   castShadow: boolean;
   enabled: boolean;
 }
+export type SpatialReflectionQuality = "draft" | "balanced" | "high";
+export interface SpatialReflections {
+  mode: "environment" | "scene";
+  quality: SpatialReflectionQuality;
+}
 export interface SpatialScene {
+  /** Original camera gate for selection crops; contains no renderer state. */
+  viewport?: { width: number; height: number; x: number; y: number };
+  /** Missing settings use the shared, bounded scene-reflection defaults. */
+  reflections?: SpatialReflections;
   environment: {
     preset: string;
     assetId: string | null;
