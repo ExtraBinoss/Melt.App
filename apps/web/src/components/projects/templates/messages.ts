@@ -3,7 +3,7 @@ import { i18n } from "../../../state/i18n";
 const resources = {
   en: {
     morphingType: "Melt Mascot",
-    morphingTypeDescription: "2.4 s · Melt mascot, seamless vector morph and editable wordmark",
+    morphingTypeDescription: "6 s · Curious mascot and full-height MELT letter morphing",
     shareYourWork: "Too Hot to Haunt",
     shareYourWorkDescription:
       "1.2 s · Seamless photo collage, scale, blur and editable motion blocks",
@@ -36,8 +36,7 @@ const resources = {
   },
   fr: {
     morphingType: "Mascotte Melt",
-    morphingTypeDescription:
-      "2,4 s · Mascotte Melt, morphing vectoriel en boucle et texte modifiable",
+    morphingTypeDescription: "6 s · Mascotte curieuse et lettres MELT étirées sur toute la hauteur",
     shareYourWork: "Too Hot to Haunt",
     shareYourWorkDescription:
       "1,2 s · Collage photo en boucle continue, scale, flou et blocs modifiables",

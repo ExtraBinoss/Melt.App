@@ -1,3 +1,4 @@
+import { MOTION_TEMPLATE_ASSET_REVISIONS } from "./motion/asset-revisions";
 import { beginProjectTiming } from "../../performance/project-timing";
 import { PRESETS, createProject, serializeProject } from "@musart/core";
 import type { EditorServices } from "../../../state/contracts";
@@ -11,6 +12,7 @@ export interface ProjectTemplate {
   readonly height: number;
   readonly brandId?: string;
   readonly preview?: string;
+  readonly previewBackground?: string;
   readonly category: "artwork" | "social" | "video" | "print" | "screen";
   readonly mode: "static" | "motion";
   readonly descriptionKey?: string;
@@ -18,13 +20,14 @@ export interface ProjectTemplate {
 export const TEMPLATE_CATALOG: readonly ProjectTemplate[] = Object.freeze([
   Object.freeze({
     id: "morphing-type",
+    previewBackground: "#ffffff",
     nameKey: "templates:morphingType",
     descriptionKey: "templates:morphingTypeDescription",
     width: 1920,
     height: 1080,
     mode: "motion",
     category: "artwork",
-    preview: `${import.meta.env.BASE_URL}templates/motion/morphing-type.webp?v=melt-mascot-1`,
+    preview: `${import.meta.env.BASE_URL}templates/motion/morphing-type.webp?v=${MOTION_TEMPLATE_ASSET_REVISIONS["morphing-type"]!}`,
   }),
   ...DESIGNED_TEMPLATES.map((template) =>
     Object.freeze({

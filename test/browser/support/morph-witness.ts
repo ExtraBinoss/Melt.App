@@ -19,7 +19,7 @@ export async function runMorphWitness(forceWebGL: boolean) {
   const frames: { frame: number; png: string; uploads: number; milliseconds: number }[] = [];
   try {
     for (const frame of [
-      ...(forceWebGL ? [0, 18, 30, 54, 71] : Array.from({ length: 72 }, (_, i) => i)),
+      ...(forceWebGL ? [0, 18, 30, 90, 179] : Array.from({ length: 180 }, (_, i) => i)),
       30,
       0,
     ]) {

@@ -56,7 +56,7 @@ test("registered designed Motion cards and Melt Mascot preview and open through 
     .poll(() => page.evaluate(() => window.musart!.snapshot().project.name))
     .toBe("Melt Mascot");
   const project = await page.evaluate(() => window.musart!.snapshot().project);
-  expect(project.pages[0]!.layers).toHaveLength(5);
+  expect(project.pages[0]!.layers).toHaveLength(4);
   expect(project.pages[0]!.layers[0]).toMatchObject({ kind: "vector", name: "Melt mascot" });
   await expect(page.locator('.canvas-artboard canvas[data-renderer-ready="true"]')).toBeVisible();
 });

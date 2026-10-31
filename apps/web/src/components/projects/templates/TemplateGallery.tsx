@@ -7,7 +7,7 @@ import { TEMPLATE_CATALOG } from "../../../services/projects/templates/catalog";
 import { SocialBrandIcon } from "../../assets/SocialBrandIcon";
 import { Button } from "../../ui/button";
 import { SearchInput } from "../../assets/SearchInput";
-import { ModeIcon } from "../../motion/ModeIcon";
+import { LibraryCard, LibraryCardMenu } from "../items/LibraryCard";
 import { LibraryModeFilter } from "../dashboard/LibraryModeFilter";
 import { useLibraryMode, type LibraryMode } from "../dashboard/library-mode";
 import { templatePreview } from "./preview";
@@ -136,84 +136,98 @@ export function TemplateGallery({
                     delay: reduced ? 0 : Math.min(index * 0.025, 0.15),
                   }}
                 >
-                  <Button
-                    key={template.id}
-                    variant="ghost"
-                    className="template-card"
-                    disabled={busy}
-                    aria-label={
-                      activation.inspectable
-                        ? t("libraryItem:preview", { name })
-                        : t("templates:use", { name })
+                  <LibraryCard
+                    kind="template"
+                    name={name}
+                    mode={template.mode}
+                    width={template.width}
+                    height={template.height}
+                    title={
+                      <>
+                        {" "}
+                        {favoriteIds.has(template.id) && (
+                          <Star
+                            size={12}
+                            fill="currentColor"
+                            className="library-favorite-badge"
+                            aria-label={t("libraryItem:favorites")}
+                          />
+                        )}
+                        {name}
+                      </>
                     }
-                    onClick={activation.click}
-                    onDoubleClick={activation.double}
-                  >
-                    <div
-                      className="template-artwork"
-                      data-artwork={Boolean(template.preview)}
-                      style={
-                        template.preview ? undefined : { background: templatePreview(template.id) }
-                      }
-                    >
-                      {template.preview &&
-                      template.mode === "motion" &&
-                      isMotionTemplateId(template.id) ? (
-                        <MotionTemplatePreview
-                          templateId={template.id}
-                          poster={template.preview}
-                          disabled={busy}
-                        />
-                      ) : template.preview ? (
-                        <img
-                          src={template.preview}
-                          alt=""
-                          loading="lazy"
-                          width={template.width}
-                          height={template.height}
-                        />
-                      ) : (
+                    menu={
+                      <LibraryCardMenu
+                        disabled={busy}
+                        onOpenChange={activation.cancel}
+                        actions={[
+                          { label: t("libraryItem:preview", { name }), run: activation.preview },
+                          { label: t("templates:use", { name }), run: activation.direct },
+                        ]}
+                      />
+                    }
+                    preview={
+                      <button
+                        type="button"
+                        className="project-preview-open"
+                        disabled={busy}
+                        aria-label={
+                          activation.inspectable
+                            ? t("libraryItem:preview", { name })
+                            : t("templates:use", { name })
+                        }
+                        onClick={activation.click}
+                        onDoubleClick={activation.double}
+                      >
                         <div
-                          className="template-paper"
-                          style={{
-                            aspectRatio: `${template.width} / ${template.height}`,
-                            width: template.width >= template.height ? "76%" : "auto",
-                            height: template.width >= template.height ? "auto" : "76%",
-                          }}
+                          className="template-artwork"
+                          data-artwork={Boolean(template.preview)}
+                          style={
+                            template.previewBackground
+                              ? { background: template.previewBackground }
+                              : template.preview
+                                ? undefined
+                                : { background: templatePreview(template.id) }
+                          }
                         >
-                          {["instagram", "tiktok", "youtube", "linkedin"].includes(
-                            template.brandId ?? "",
-                          ) ? (
-                            <SocialBrandIcon id={template.brandId!} size={28} />
+                          {template.preview &&
+                          template.mode === "motion" &&
+                          isMotionTemplateId(template.id) ? (
+                            <MotionTemplatePreview
+                              templateId={template.id}
+                              poster={template.preview}
+                              disabled={busy}
+                            />
+                          ) : template.preview ? (
+                            <img
+                              src={template.preview}
+                              alt=""
+                              loading="lazy"
+                              width={template.width}
+                              height={template.height}
+                            />
                           ) : (
-                            <FileImage size={28} strokeWidth={1.1} aria-hidden />
+                            <div
+                              className="template-paper"
+                              style={{
+                                aspectRatio: `${template.width} / ${template.height}`,
+                                width: template.width >= template.height ? "76%" : "auto",
+                                height: template.width >= template.height ? "auto" : "76%",
+                              }}
+                            >
+                              {["instagram", "tiktok", "youtube", "linkedin"].includes(
+                                template.brandId ?? "",
+                              ) ? (
+                                <SocialBrandIcon id={template.brandId!} size={28} />
+                              ) : (
+                                <FileImage size={28} strokeWidth={1.1} aria-hidden />
+                              )}
+                            </div>
                           )}
                         </div>
-                      )}
-                    </div>
-                    <div className="template-caption project-card-overlay">
-                      <span className="template-meta">
-                        <span className="template-title">
-                          {favoriteIds.has(template.id) && (
-                            <Star
-                              size={12}
-                              fill="currentColor"
-                              className="library-favorite-badge"
-                              aria-label={t("libraryItem:favorites")}
-                            />
-                          )}
-                          {name}
-                        </span>
-                        <span className="template-size">
-                          {template.width} × {template.height} px
-                        </span>
-                      </span>
-                      <span className="template-mode" data-mode={template.mode}>
-                        <ModeIcon mode={template.mode} size={14} />
-                        <span>{t(`templates:${template.mode}`)}</span>
-                      </span>
-                    </div>
-                  </Button>
+                      </button>
+                    }
+                  />
                   {activation.inspectable && (
                     <LibraryOpenButton
                       onOpen={activation.direct}

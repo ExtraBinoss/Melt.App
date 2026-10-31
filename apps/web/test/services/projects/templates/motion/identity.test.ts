@@ -26,7 +26,13 @@ test.each(templates)(
     };
     const prepared = await prepareMotionTemplate(template.id, {}, fetcher);
     const folder = isDesignedTemplateId(template.id) ? "designed" : "motion";
-    expect(requests[0]).toBe(`/templates/${folder}/${template.id}.json`);
+    expect(new URL(requests[0]!, "https://melt.test").pathname).toBe(
+      `/templates/${folder}/${template.id}.json`,
+    );
+    if (template.id === "morphing-type")
+      expect(new URL(requests[0]!, "https://melt.test").searchParams.get("v")).toBe(
+        "melt-lettering-2",
+      );
     expect(prepared.project.pages[0]!.motion!.mode).toBe("motion");
     expect(prepared.project.pages[0]!.width).toBe(template.width);
     expect(prepared.project.pages[0]!.height).toBe(template.height);

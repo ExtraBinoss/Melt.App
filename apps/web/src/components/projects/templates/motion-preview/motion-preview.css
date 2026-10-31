@@ -78,12 +78,13 @@
 .motion-preview-hint {
   position: absolute;
   left: 50%;
-  top: 72%;
-  transform: translate(-50%, -50%);
+  top: auto;
+  bottom: 4px;
+  transform: translateX(-50%);
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 10px;
+  padding: 4px 8px;
   border-radius: 20px;
   background: #17151ccf;
   color: #fff;
@@ -97,7 +98,7 @@
 }
 .motion-template-preview:not([data-preview-status="idle"]) .motion-preview-hint {
   opacity: 0;
-  transform: translate(-50%, calc(-50% + 3px));
+  transform: translate(-50%, 3px);
 }
 .motion-preview-control {
   position: absolute;

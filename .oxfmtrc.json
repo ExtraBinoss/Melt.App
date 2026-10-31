@@ -14,6 +14,7 @@
     "apps/web/public/templates/designed/*.json",
     "PLAN_UNIVERSEL_EDITEUR_CREATIF.md",
     "apps/web/src/ui/brand/engine/eye-fit-data.ts",
-    "apps/web/src/services/projects/templates/motion/morph-reference.json"
+    "apps/web/src/services/projects/templates/motion/morph-reference.json",
+    "apps/web/src/services/projects/templates/motion/melt-lettering.json"
   ]
 }

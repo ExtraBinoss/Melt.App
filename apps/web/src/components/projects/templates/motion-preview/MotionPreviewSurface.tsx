@@ -1,3 +1,4 @@
+import { bindVisiblePreview } from "../../../shared/preview/visible-preview";
 import { bindHoverPreview } from "../../../shared/preview/hover-preview";
 import { createBrandActivity } from "../../../../ui/brand/activity";
 import { BrandStatus } from "../../../../ui/brand/BrandStatus";
@@ -15,6 +16,7 @@ export function MotionPreviewSurface({
   startPreview,
   poster,
   disabled = false,
+  autoplay = false,
   className = "",
   children,
 }: {
@@ -25,6 +27,7 @@ export function MotionPreviewSurface({
   poster?: string;
   children?: ReactNode;
   disabled?: boolean;
+  autoplay?: boolean;
   className?: string;
 }) {
   const { t } = useTranslation("motionPreview");
@@ -89,7 +92,7 @@ export function MotionPreviewSurface({
     function start(event: Event, manual = false) {
       if (
         disabled ||
-        (!manual && (!hover.matches || reduced.matches)) ||
+        (!manual && ((!autoplay && !hover.matches) || reduced.matches)) ||
         document.hidden ||
         carousel?.hasAttribute("data-carousel-moving") ||
         (owner instanceof HTMLButtonElement && owner.disabled) ||
@@ -113,6 +116,8 @@ export function MotionPreviewSurface({
     };
     const intent = bindHoverPreview(owner, {
       enabled: () =>
+        !autoplay &&
+        hover.matches &&
         !disabled &&
         !(owner instanceof HTMLButtonElement && owner.disabled) &&
         !carousel?.hasAttribute("data-carousel-moving"),
@@ -121,16 +126,34 @@ export function MotionPreviewSurface({
         else stop();
       },
     });
+    const visible =
+      typeof IntersectionObserver === "undefined"
+        ? null
+        : bindVisiblePreview(owner, {
+            enabled: () =>
+              !disabled &&
+              !reduced.matches &&
+              (autoplay || !hover.matches) &&
+              !carousel?.hasAttribute("data-carousel-moving"),
+            priority: autoplay ? 1 : 0,
+            onChange: (active) => {
+              if (active) start(new Event("visible"), true);
+              else stop();
+            },
+          });
+    const environment = () => visible?.refresh();
+    hover.addEventListener("change", environment);
+    reduced.addEventListener("change", environment);
     // Explicit play also works without hover (touch / reduced motion); it needs the
     // same release boundaries even when the hover helper has no active target.
     const leave = () => {
-      if (preview) stop();
+      if (!autoplay && hover.matches && preview) stop();
     };
     const blur = (event: FocusEvent) => {
       if (!(event.relatedTarget instanceof Node) || !owner.contains(event.relatedTarget)) leave();
     };
     const hidden = () => {
-      if (document.hidden) leave();
+      if (document.hidden) stop();
     };
     owner.addEventListener("pointerleave", leave);
     owner.addEventListener("focusout", blur);
@@ -144,13 +167,16 @@ export function MotionPreviewSurface({
       toggle.current = () => {};
       loading.set(false);
       intent.dispose();
+      visible?.dispose();
+      hover.removeEventListener("change", environment);
+      reduced.removeEventListener("change", environment);
       owner.removeEventListener("pointerleave", leave);
       owner.removeEventListener("focusout", blur);
       window.removeEventListener("blur", leave);
       document.removeEventListener("visibilitychange", hidden);
       carousel?.removeEventListener("musart:carousel-motion", carouselMotion);
     };
-  }, [startPreview, disabled, t, loading, controlHost]);
+  }, [startPreview, disabled, t, loading, controlHost, autoplay]);
   return (
     <span ref={mount} className={`motion-template-preview ${className}`} data-preview-status="idle">
       {poster ? <img src={poster} alt="" loading="lazy" draggable={false} /> : children}
@@ -158,10 +184,12 @@ export function MotionPreviewSurface({
       <span className="motion-template-preview-loading-mark">
         <BrandStatus size={24} state="preparing" activity={loading} />
       </span>
-      <span className="motion-preview-hint" aria-hidden>
-        <Play size={12} fill="currentColor" />
-        {t("hover")}
-      </span>
+      {!autoplay && (
+        <span className="motion-preview-hint" aria-hidden>
+          <Play size={12} fill="currentColor" />
+          {t("hover")}
+        </span>
+      )}
       {controlHost &&
         createPortal(
           <button

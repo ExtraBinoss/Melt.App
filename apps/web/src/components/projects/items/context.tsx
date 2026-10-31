@@ -26,6 +26,13 @@ export function useLibraryItemActivation(item: LibraryItem, open: () => void, di
   useEffect(() => () => clearTimeout(timer.current), [item.id, item.kind, disabled]);
   return {
     cancel,
+    preview(this: void) {
+      cancel();
+      if (!disabled) {
+        if (browser) browser.inspect(item, open);
+        else open();
+      }
+    },
     inspectable: !!browser,
     click(this: void, event: MouseEvent) {
       if (disabled) return;

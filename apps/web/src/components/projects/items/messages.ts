@@ -1,6 +1,7 @@
 import { registerFeatureTranslations } from "../../../state/i18n/feature-resources";
 registerFeatureTranslations("libraryItem", {
   en: {
+    options: "Item options",
     open: "Open in Melt",
     preview: "Preview {{name}}",
     openNamed: "Open {{name}}",
@@ -19,6 +20,7 @@ registerFeatureTranslations("libraryItem", {
     template: "Template",
   },
   fr: {
+    options: "Options de l’élément",
     open: "Ouvrir dans Melt",
     preview: "Aperçu de {{name}}",
     openNamed: "Ouvrir {{name}}",

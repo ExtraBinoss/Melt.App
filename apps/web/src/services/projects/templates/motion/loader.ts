@@ -1,3 +1,4 @@
+import { MOTION_TEMPLATE_ASSET_REVISIONS } from "./asset-revisions";
 import { motionTemplateSources } from "./source-cache";
 import type { ProjectTiming } from "../../../performance/project-timing";
 import { isDesignedTemplateId } from "../designed/catalog";
@@ -192,7 +193,12 @@ async function prepareUncachedMotionTemplate(
   }
   const base = `${import.meta.env.BASE_URL}templates/motion/`;
   options.timing?.stage("Download template manifest");
-  const response = await download(`${base}${templateId}.json`, fetcher, options.signal);
+  const revision = MOTION_TEMPLATE_ASSET_REVISIONS[templateId];
+  const response = await download(
+    `${base}${templateId}.json${revision ? `?v=${revision}` : ""}`,
+    fetcher,
+    options.signal,
+  );
   const bytes = await boundedResponse(response, 8 * 1024 * 1024, options.signal);
   options.timing?.stage("Parse + validate template");
   let parsed: unknown;

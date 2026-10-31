@@ -1,0 +1,62 @@
+.library-card.template-card {
+  width: 100%;
+  border-radius: 15px;
+  background: var(--card);
+}
+.library-card-artwork {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  position: relative;
+}
+.library-card-artwork > .project-preview {
+  height: 100%;
+}
+.library-card-artwork .template-artwork {
+  height: 100%;
+}
+.library-card-caption {
+  position: relative;
+  pointer-events: none;
+  background: var(--card);
+  display: flex;
+  width: 100%;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 14px;
+}
+.library-card-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.library-card .project-card-name {
+  font-size: 13px;
+  line-height: 18px;
+  padding: 0;
+  width: 100%;
+}
+.library-card .project-options-trigger {
+  position: static;
+  color: var(--muted-foreground);
+}
+.library-card .preview-page-caption {
+  display: none;
+}
+.library-card .library-item-open {
+  top: 10px;
+  right: 10px;
+}
+.library-card .project-preview-open {
+  border: 0;
+  cursor: pointer;
+}
+
+.library-card-actions,
+.library-card-caption button,
+.library-card-caption input {
+  pointer-events: auto;
+}

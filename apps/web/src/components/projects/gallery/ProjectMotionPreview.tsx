@@ -9,6 +9,7 @@ export function ProjectMotionPreview({
   pageId,
   services,
   poster,
+  autoplay = false,
   disabled,
   children,
 }: {
@@ -16,6 +17,7 @@ export function ProjectMotionPreview({
   pageId: string;
   services: EditorServices;
   poster?: string;
+  autoplay?: boolean;
   disabled?: boolean;
   children?: ReactNode;
 }) {
@@ -44,6 +46,7 @@ export function ProjectMotionPreview({
   );
   return (
     <MotionPreviewSurface
+      autoplay={autoplay}
       startPreview={start}
       poster={poster}
       disabled={disabled}

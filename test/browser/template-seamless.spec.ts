@@ -39,9 +39,7 @@ for (const webgl of [false, true])
             maxBytes: 128 * 1024 * 1024,
           });
           const times =
-            input.id === "share-your-work"
-              ? [0, 1 / 30, 35 / 30, 1.2, 0.6]
-              : [0, 0.6, 1.2, 1.8, 2.4];
+            input.id === "share-your-work" ? [0, 1 / 30, 35 / 30, 1.2, 0.6] : [0, 0.7, 2.5, 3.1, 6];
           const frames: string[] = [];
           try {
             for (const seconds of times) {

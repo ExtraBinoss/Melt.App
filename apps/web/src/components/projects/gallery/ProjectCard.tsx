@@ -5,7 +5,7 @@ import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Ellipsis, Star } from "lucide-react";
 import type { EditorServices, ProjectSummary } from "../../../state/contracts";
-import { ModeIcon } from "../../motion/ModeIcon";
+import { LibraryCard } from "../items/LibraryCard";
 import "../dashboard/messages";
 import { ProjectPreview } from "./ProjectPreview";
 import { Input } from "../../ui/input";
@@ -99,113 +99,103 @@ export function ProjectCard({
       }}
     >
       <ContextMenuTrigger asChild disabled={disabled}>
-        <article
-          className="project-card"
-          aria-label={project.name}
-          data-active={active || undefined}
-          aria-current={active ? "true" : undefined}
+        <LibraryCard
+          kind="project"
+          name={project.name}
+          mode={mode}
+          width={previewPage?.width ?? project.width}
+          height={previewPage?.height ?? project.height}
+          active={active}
           onContextMenu={activation.cancel}
+          preview={
+            <ProjectPreview
+              project={project}
+              services={services}
+              onOpen={(event) => (event ? activation.click(event) : onOpen())}
+              onDoubleClick={activation.double}
+              previewLabel={
+                activation.inspectable
+                  ? t("libraryItem:preview", { name: project.name })
+                  : undefined
+              }
+              disabled={disabled}
+            />
+          }
+          title={
+            editing ? (
+              <Input
+                ref={nameInput}
+                autoFocus
+                disabled={saving || disabled}
+                maxLength={160}
+                aria-label={t("renameProject")}
+                defaultValue={project.name}
+                onFocus={(event) => event.currentTarget.select()}
+                onBlur={(event) => {
+                  if (cancelled.current) {
+                    cancelled.current = false;
+                    return;
+                  }
+                  void rename(event.currentTarget.value);
+                }}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") void rename(event.currentTarget.value);
+                  if (event.key === "Escape") {
+                    cancelled.current = true;
+                    setEditing(false);
+                  }
+                }}
+              />
+            ) : (
+              <button
+                type="button"
+                className="project-card-name"
+                disabled={disabled}
+                onClick={activation.click}
+                onDoubleClick={activation.double}
+                onKeyDown={(event) => {
+                  if (event.key === "F2") {
+                    event.preventDefault();
+                    begin();
+                  }
+                }}
+              >
+                {favorite && (
+                  <Star
+                    size={12}
+                    fill="currentColor"
+                    className="library-favorite-badge"
+                    aria-label={t("libraryItem:favorites")}
+                  />
+                )}
+                <span>{project.name}</span>
+              </button>
+            )
+          }
+          menu={
+            <DropdownMenu
+              onOpenChange={(open) => {
+                menuOpen.current = open;
+                if (open) activation.cancel();
+              }}
+            >
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon-xs"
+                  className="project-options-trigger"
+                  disabled={disabled}
+                  aria-label={t("projectOptions")}
+                >
+                  <Ellipsis size={15} />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" onCloseAutoFocus={restoreRenameFocus}>
+                <ProjectMenuItems actions={actions} disabled={disabled} />
+              </DropdownMenuContent>
+            </DropdownMenu>
+          }
         >
-          <ProjectPreview
-            project={project}
-            services={services}
-            onOpen={(event) => (event ? activation.click(event) : onOpen())}
-            onDoubleClick={activation.double}
-            previewLabel={
-              activation.inspectable ? t("libraryItem:preview", { name: project.name }) : undefined
-            }
-            disabled={disabled}
-          >
-            <div className="project-card-overlay project-card-caption">
-              <div className="project-card-copy">
-                <div className="project-card-meta">
-                  {editing ? (
-                    <Input
-                      ref={nameInput}
-                      autoFocus
-                      disabled={saving || disabled}
-                      maxLength={160}
-                      aria-label={t("renameProject")}
-                      defaultValue={project.name}
-                      onFocus={(event) => event.currentTarget.select()}
-                      onBlur={(event) => {
-                        if (cancelled.current) {
-                          cancelled.current = false;
-                          return;
-                        }
-                        void rename(event.currentTarget.value);
-                      }}
-                      onKeyDown={(event) => {
-                        if (event.key === "Enter") void rename(event.currentTarget.value);
-                        if (event.key === "Escape") {
-                          cancelled.current = true;
-                          setEditing(false);
-                        }
-                      }}
-                    />
-                  ) : (
-                    <button
-                      type="button"
-                      className="project-card-name"
-                      disabled={disabled}
-                      onClick={activation.click}
-                      onDoubleClick={activation.double}
-                      onKeyDown={(event) => {
-                        if (event.key === "F2") {
-                          event.preventDefault();
-                          begin();
-                        }
-                      }}
-                    >
-                      {favorite && (
-                        <Star
-                          size={12}
-                          fill="currentColor"
-                          className="library-favorite-badge"
-                          aria-label={t("libraryItem:favorites")}
-                        />
-                      )}
-                      <span>{project.name}</span>
-                    </button>
-                  )}
-
-                  <DropdownMenu
-                    onOpenChange={(open) => {
-                      menuOpen.current = open;
-                      if (open) activation.cancel();
-                    }}
-                  >
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="icon-xs"
-                        className="project-options-trigger"
-                        disabled={disabled}
-                        aria-label={t("projectOptions")}
-                      >
-                        <Ellipsis size={15} />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" onCloseAutoFocus={restoreRenameFocus}>
-                      <ProjectMenuItems actions={actions} disabled={disabled} />
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-                <div className="project-card-details">
-                  <span className="project-card-resolution">
-                    {previewPage?.width ?? project.width} × {previewPage?.height ?? project.height}{" "}
-                    px
-                  </span>
-                  <span className="project-card-mode" data-mode={mode}>
-                    <ModeIcon mode={mode} size={14} />
-                    <span>
-                      {t(mode === "motion" ? "dashboard:modeMotion" : "dashboard:modeStatic")}
-                    </span>
-                  </span>
-                </div>
-              </div>
-            </div>
-          </ProjectPreview>
           {activation.inspectable && (
             <LibraryOpenButton
               onOpen={activation.direct}
@@ -213,7 +203,7 @@ export function ProjectCard({
               label={t("openNamedProject", { name: project.name })}
             />
           )}
-        </article>
+        </LibraryCard>
       </ContextMenuTrigger>
       <ContextMenuContent onCloseAutoFocus={restoreRenameFocus}>
         <ProjectMenuItems actions={actions} disabled={disabled} context />

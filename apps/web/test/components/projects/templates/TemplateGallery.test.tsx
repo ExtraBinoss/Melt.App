@@ -30,10 +30,10 @@ test("exposes the rendered techno card and searchable canonical branded formats"
   expect(onChoose).toHaveBeenLastCalledWith("afterhours-techno");
   expect(document.querySelector('img[src="/templates/afterhours.webp"]')).not.toBeNull();
   fireEvent.change(screen.getByRole("searchbox"), { target: { value: "TikTok" } });
-  expect(screen.getAllByRole("button")).toHaveLength(1);
+  expect(document.querySelectorAll(".library-card")).toHaveLength(1);
   const tiktok = screen.getByRole("button", { name: /TikTok/ });
   expect(tiktok.querySelector("svg")).not.toBeNull();
-  expect(tiktok).toHaveTextContent("1080 × 1920 px");
+  expect(tiktok.closest("article")).toHaveTextContent("1080 × 1920 px");
   fireEvent.click(tiktok);
   expect(onChoose).toHaveBeenLastCalledWith("preset:tiktok-video");
   fireEvent.change(screen.getByRole("searchbox"), { target: { value: "not a known template" } });
@@ -61,26 +61,33 @@ test("filters real Motion projects independently from blank formats and preserve
   expect(screen.getByRole("radio", { name: "Tous" })).toHaveAttribute("aria-checked", "true");
   expect(screen.queryByText("Tous les modèles")).toBeNull();
   fireEvent.click(screen.getByRole("radio", { name: "Motion" }));
-  const cards = screen.getAllByRole("button");
+  const cards = [...document.querySelectorAll(".library-card")];
   expect(cards).toHaveLength(
     TEMPLATE_CATALOG.filter((template) => template.mode === "motion").length,
   );
   for (const name of [/Orbit Study/, /Paper Motion/, /Atlas des transitions/, /Sound Playground/])
     await waitFor(() => expect(screen.getByRole("button", { name })).toBeVisible());
-  expect(screen.getByRole("button", { name: /In Bloom/ })).toHaveTextContent("1440 × 1040 px");
-  expect(screen.getByRole("button", { name: /Laboratoire/ })).toHaveTextContent("1440 × 1200 px");
+  expect(screen.getByRole("button", { name: /In Bloom/ }).closest("article")).toHaveTextContent(
+    "1440 × 1040 px",
+  );
+  expect(screen.getByRole("button", { name: /Laboratoire/ }).closest("article")).toHaveTextContent(
+    "1440 × 1200 px",
+  );
   expect(cards.every((card) => Boolean(card.querySelector('[data-mode="motion"] svg')))).toBe(true);
   fireEvent.click(screen.getByRole("button", { name: /In Bloom/ }));
   expect(onChoose).toHaveBeenLastCalledWith("in-bloom");
   fireEvent.change(screen.getByRole("searchbox"), { target: { value: "Laboratoire" } });
-  expect(screen.getAllByRole("button")).toHaveLength(1);
+  expect(document.querySelectorAll(".library-card")).toHaveLength(1);
   fireEvent.change(screen.getByRole("searchbox"), { target: { value: "" } });
   fireEvent.click(screen.getByRole("radio", { name: "Statique" }));
   expect(screen.queryByRole("button", { name: /In Bloom/ })).toBeNull();
   await waitFor(() => expect(screen.getByRole("button", { name: /AFTERHOURS/ })).toBeVisible());
   expect(screen.getByRole("button", { name: /Colorfield/ })).toBeVisible();
   expect(
-    screen.getByRole("button", { name: /TikTok/ }).querySelector('[data-mode="static"]'),
+    screen
+      .getByRole("button", { name: /TikTok/ })
+      .closest("article")!
+      .querySelector('[data-mode="static"]'),
   ).not.toBeNull();
 });
 
@@ -124,10 +131,10 @@ test("controlled query and mode filter list-only presentation without a duplicat
   );
   expect(screen.queryByRole("searchbox")).toBeNull();
   expect(screen.queryByRole("radiogroup")).toBeNull();
-  expect(screen.getAllByRole("button")).toHaveLength(1);
+  expect(document.querySelectorAll(".library-card")).toHaveLength(1);
   expect(screen.getByRole("button", { name: /In Bloom/ })).toBeInTheDocument();
   view.rerender(<TemplateGallery onChoose={vi.fn()} query="Techno" mode="static" hideToolbar />);
-  expect(screen.getAllByRole("button")).toHaveLength(1);
+  expect(document.querySelectorAll(".library-card")).toHaveLength(1);
   expect(screen.getByRole("button", { name: /AFTERHOURS/ })).toBeInTheDocument();
 });
 

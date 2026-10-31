@@ -6,11 +6,13 @@ import { startMotionTemplatePreview, type PreviewStatus } from "./runtime";
 export function MotionTemplatePreview({
   templateId,
   poster,
+  autoplay = false,
   disabled = false,
   className,
 }: {
   templateId: MotionTemplateId;
   poster: string;
+  autoplay?: boolean;
   disabled?: boolean;
   className?: string;
 }) {
@@ -21,6 +23,7 @@ export function MotionTemplatePreview({
   );
   return (
     <MotionPreviewSurface
+      autoplay={autoplay}
       startPreview={start}
       poster={poster}
       disabled={disabled}

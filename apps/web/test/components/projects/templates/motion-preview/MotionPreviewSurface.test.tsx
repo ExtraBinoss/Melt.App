@@ -164,3 +164,99 @@ test("separate preview controls keep pause and retry out of the card activation 
   view.unmount();
   expect(release).toHaveBeenCalledTimes(2);
 });
+
+test("dialog autoplay starts without hover, hides the hint and releases when outside the viewport", () => {
+  let observe!: IntersectionObserverCallback;
+  vi.stubGlobal(
+    "IntersectionObserver",
+    class {
+      constructor(callback: IntersectionObserverCallback) {
+        observe = callback;
+      }
+      observe() {}
+      disconnect() {}
+    },
+  );
+  vi.spyOn(window, "matchMedia").mockImplementation(
+    () =>
+      ({
+        matches: false,
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+      }) as unknown as MediaQueryList,
+  );
+  const release = vi.fn(async () => undefined),
+    start = vi.fn(() => ({ release }));
+  const view = render(
+    <div className="library-item-preview" data-preview-owner>
+      <MotionPreviewSurface autoplay startPreview={start} />
+    </div>,
+  );
+  expect(view.container.querySelector(".motion-preview-hint")).toBeNull();
+  act(() =>
+    observe([{ intersectionRatio: 1 }] as IntersectionObserverEntry[], {} as IntersectionObserver),
+  );
+  expect(start).toHaveBeenCalledOnce();
+  fireEvent.pointerLeave(view.container.firstElementChild!);
+  expect(release).not.toHaveBeenCalled();
+  act(() =>
+    observe([{ intersectionRatio: 0 }] as IntersectionObserverEntry[], {} as IntersectionObserver),
+  );
+  expect(release).toHaveBeenCalledOnce();
+  view.unmount();
+  vi.unstubAllGlobals();
+});
+
+test("touch cards admit only one visible preview and hand ownership back after a dialog closes", () => {
+  const observers: IntersectionObserverCallback[] = [];
+  vi.stubGlobal(
+    "IntersectionObserver",
+    class {
+      constructor(callback: IntersectionObserverCallback) {
+        observers.push(callback);
+      }
+      observe() {}
+      disconnect() {}
+    },
+  );
+  vi.spyOn(window, "matchMedia").mockImplementation(
+    () =>
+      ({
+        matches: false,
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+      }) as unknown as MediaQueryList,
+  );
+  const release = vi.fn(async () => undefined),
+    start = vi.fn(() => ({ release }));
+  const card = render(
+    <div data-preview-owner>
+      <MotionPreviewSurface startPreview={start} />
+    </div>,
+  );
+  act(() =>
+    observers.at(-1)!(
+      [{ intersectionRatio: 1 }] as IntersectionObserverEntry[],
+      {} as IntersectionObserver,
+    ),
+  );
+  expect(start).toHaveBeenCalledOnce();
+  const dialogStart = vi.fn(() => ({ release: vi.fn(async () => undefined) }));
+  const dialog = render(
+    <div className="library-item-preview" data-preview-owner>
+      <MotionPreviewSurface autoplay startPreview={dialogStart} />
+    </div>,
+  );
+  act(() =>
+    observers.at(-1)!(
+      [{ intersectionRatio: 1 }] as IntersectionObserverEntry[],
+      {} as IntersectionObserver,
+    ),
+  );
+  expect(release).toHaveBeenCalledOnce();
+  expect(dialogStart).toHaveBeenCalledOnce();
+  dialog.unmount();
+  expect(start).toHaveBeenCalledTimes(2);
+  card.unmount();
+  vi.unstubAllGlobals();
+});

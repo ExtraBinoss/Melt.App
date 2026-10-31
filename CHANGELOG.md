@@ -8,6 +8,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 - Add a lazy SVG point editor with anchor/Bézier handles, corner/smooth/symmetric nodes, exact segment splitting, persistent corner radii, per-path ends/joins and zoom controls. Keep GPU gesture previews imperative, commit once per gesture, cancel stale edits safely and preserve undo/save compatibility.
 
+- Restore the original full-height Morph cadence with fresh Inter Variable MELT outlines and a fixed mouthless mascot on the left. Regenerate and version the real rendered poster/source, retain white card/detail backgrounds and place captions below the artwork.
+
 - Isolate Preferences and library-detail visibility in small Jotai leaves so opening/closing no longer rerenders their card grids. Preserve genuine Radix exit presence and opener focus, use shared opacity-only glass-dialog fades, and reserve settings blur reveals for tab changes. Defer optional Motion preparation and frames during real overlay transitions with cancellation and clock preservation; record bounded native timing diagnostics.
 
 - Reveal settings categories with a short blur/fade entrance and reduced-motion support. Place the compact Try snapping action beside its distance label, retaining the real sandbox. Add shared content-mask scroll fades for translucent panels, preserving their existing background/blur and scrollbar gutters instead of painting opaque edge bands.
@@ -19,6 +21,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 - Prepare cold morph geometry in cancellable cooperative batches with identical atlas bytes, preload editor/canvas modules alongside explicit template installation, and share a stable mascot loading presentation through module and GPU preparation. Dismiss the canvas overlay only after the matching project frame, with a short opacity fade and reduced-motion support; preserve real error and cancellation handling.
 
 - Make the photo collage loop seamless across wrapped occurrences and preview subframes; rename it Too Hot to Haunt. Replace the blue reference lettering with the shared violet Melt mascot and editable wordmark on white, close its vector loop, remove reference artifacts, and refresh the real rendered posters.
+
+- Share the Templates card layout with Projects, position item menus above Motion/Static labels, autoplay Motion details on opening, and admit one visible touch preview at a time with scroll/visibility cleanup and reduced-motion support.
 
 - Apply the CGATS21 CRPC6 ICC soft proof automatically to CMYK canvases, thumbnails and video output, using a demand-driven GPU lookup pass with bounded memory. Keep native CMYK export input separate to prevent double conversion; use lossless source previews and verify canvas/preview/export colors in Chromium on WebGPU and WebGL.
 

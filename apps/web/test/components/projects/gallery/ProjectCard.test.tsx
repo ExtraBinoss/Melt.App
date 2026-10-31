@@ -114,7 +114,7 @@ test("matches template captions with name, resolution and the actual mode withou
     "static",
   );
   expect(document.querySelector("time,.active-project-badge")).toBeNull();
-  expect(document.querySelector(".project-card-details")).toHaveTextContent("320 × 220 pxStatique");
+  expect(document.querySelector(".library-card-caption")).toHaveTextContent("320 × 220 pxStatique");
   view.rerender(
     <ProjectCard
       {...props}

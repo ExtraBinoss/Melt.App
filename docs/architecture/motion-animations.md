@@ -35,12 +35,20 @@ clipped at the same phase; opacity and blur return continuously rather than
 popping a card or resetting a drift. Preview sampling floors the 30 fps index,
 so the last subframe cannot round into the exclusive composition end.
 
-The durable `morphing-type` ID now presents **Melt Mascot**: the shared mascot's
-radial profile, native vector contour morphing, editable facial shapes and a Melt
-wordmark in the shared brand primary on white. Nine contour states close over
-2.4 seconds. It contains no reference-letter outlines or reference footer marks.
+The durable `morphing-type` ID now presents **Melt Mascot** on white. A fixed,
+mouthless mascot sits to the left; only its separate eyes move and blink. The
+centered violet **MELT** lettering uses Inter Variable 800 and the original
+67-pose timing and stretch envelope, reaching almost the full canvas height.
+`scripts/templates/melt-lettering.ts` constructs fresh glyph contours from the
+bundled font; it retains no reference-letter outlines or reference footer marks.
+The six-second cycle returns both lettering and eyes to their starting state.
 Both templates retain their public IDs for existing links and regenerate from
 public command builders under `scripts/templates/`.
+
+The Melt poster is encoded from the reviewed peak rendered frame. Its poster
+and manifest URLs share an explicit asset revision, so cached older artwork
+cannot remain paired with the new catalogue entry. Card captions sit below the
+artwork; the card and detail preview preserve the template's white background.
 
 `test/browser/template-seamless.spec.ts` verifies genuine WebGPU and WebGL
 frames, exact first/terminal pixel continuity, changing intermediate poses and

@@ -46,11 +46,17 @@ export function ItemPreview({ item, services }: { item: LibraryItem; services: E
     </span>
   );
   return (
-    <div className="library-item-preview" data-preview-owner tabIndex={0}>
+    <div
+      className="library-item-preview"
+      data-preview-owner
+      tabIndex={0}
+      style={template?.previewBackground ? { background: template.previewBackground } : undefined}
+    >
       {item.kind === "template" && item.mode === "motion" && isMotionTemplateId(item.id) ? (
-        <MotionTemplatePreview templateId={item.id} poster={poster ?? ""} />
+        <MotionTemplatePreview autoplay templateId={item.id} poster={poster ?? ""} />
       ) : item.kind === "project" && item.mode === "motion" && item.pageId ? (
         <ProjectMotionPreview
+          autoplay
           projectId={item.id}
           pageId={item.pageId}
           services={services}
