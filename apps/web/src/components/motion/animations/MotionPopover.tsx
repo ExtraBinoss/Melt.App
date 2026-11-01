@@ -41,6 +41,14 @@ export function MotionPopover({
   const [error, setError] = useState("");
   const open =
     !!origin && !disabled && origin.compositionId === compositionId && origin.layerId === layerId;
+  // Closed row controls rerender during selection. Resolve the current subject only
+  // for an open picker, rather than scanning its composition twice for hidden JSX.
+  const subject = open
+    ? engine
+        .getSnapshot()
+        .project.pages.find((page) => page.id === compositionId)
+        ?.layers.find((layer) => layer.id === layerId)
+    : undefined;
   function close() {
     setOrigin(null);
     onClose?.();
@@ -143,20 +151,14 @@ export function MotionPopover({
         data-canvas-control
         data-keybinding-capture
       >
-        <PresetPicker
-          engine={engine}
-          apply={apply}
-          subject={engine
-            .getSnapshot()
-            .project.pages.find((page) => page.id === compositionId)
-            ?.layers.find((layer) => layer.id === layerId)}
-          subjectKind={
-            engine
-              .getSnapshot()
-              .project.pages.find((page) => page.id === compositionId)
-              ?.layers.find((layer) => layer.id === layerId)?.kind
-          }
-        />
+        {open && (
+          <PresetPicker
+            engine={engine}
+            apply={apply}
+            subject={subject}
+            subjectKind={subject?.kind}
+          />
+        )}
         {error && <p role="alert">{t(error)}</p>}
       </PopoverContent>
     </Popover>

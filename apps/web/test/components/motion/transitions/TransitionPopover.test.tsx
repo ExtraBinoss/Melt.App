@@ -33,7 +33,7 @@ it("browses a two-column motion library without editing the document, then appli
   const dialog = screen.getByRole("dialog", { name: "Ajouter une animation" });
   expect(dialog.querySelector(".animation-preset-grid")).toHaveAttribute(
     "data-total-presets",
-    "61",
+    "63",
   );
   expect(dialog.querySelectorAll(".animation-preset-card").length).toBeLessThan(25);
   fireEvent.click(screen.getByRole("button", { name: "Déplacement" }));
