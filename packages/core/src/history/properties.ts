@@ -129,6 +129,15 @@ function effectDefinition(
   target: Extract<HistoryPropertyTarget, { owner: { kind: "effect" } }>,
 ): Definition | null {
   const { owner, property } = target;
+  if (property.startsWith("inputs.")) {
+    const key = property.slice(7);
+    if (!getEffectDefinition(owner.effectType).inputs?.some((input) => input.key === key))
+      return null;
+    return {
+      kind: "string",
+      label: { source: "effect", property, effectType: owner.effectType, scope: "input", key },
+    };
+  }
   const settings = property.startsWith("settings."),
     key = settings ? property.slice(9) : property;
   const definition = getEffectDefinition(owner.effectType);

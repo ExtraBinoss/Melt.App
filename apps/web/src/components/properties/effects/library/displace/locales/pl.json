@@ -1,0 +1,20 @@
+{
+  "name": "Przemieszczenie",
+  "library": "Biblioteka tekstur",
+  "map": "Mapa przemieszczeń",
+  "selected": "Wybrana",
+  "procedural": "Proceduralna",
+  "base": "Wbudowane",
+  "saved": "Moje tekstury",
+  "import": "Importuj obraz",
+  "delete": "Usuń {{name}}",
+  "clear": "Użyj mapy proceduralnej",
+  "loadError": "Nie można wczytać tekstur.",
+  "saveError": "Nie można zapisać lub zastosować tekstury.",
+  "stale": "Projekt się zmienił. Spróbuj ponownie.",
+  "textures": {
+    "plaster": "Tynk",
+    "stone": "Kamień",
+    "normal": "Mapa normalnych"
+  }
+}

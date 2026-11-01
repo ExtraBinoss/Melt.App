@@ -1,4 +1,6 @@
+import { hasEffectTreatment } from "../effects/shared/active";
 import {
+  effectAssetIds,
   isVideoAsset,
   isImageAsset,
   isSceneAsset,
@@ -88,7 +90,11 @@ export class TextureSources {
     );
     const active = new Set(
       visible
-        .flatMap((layer) => [layer.assetId, layer.mask?.enabled ? layer.mask.assetId : null])
+        .flatMap((layer) => [
+          layer.assetId,
+          layer.mask?.enabled ? layer.mask.assetId : null,
+          ...effectAssetIds(layer.effects.filter(hasEffectTreatment)),
+        ])
         .filter((id): id is string => !!id),
     );
     for (const id of active) {

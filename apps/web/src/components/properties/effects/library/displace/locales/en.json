@@ -1,0 +1,20 @@
+{
+  "name": "Displace",
+  "library": "Texture library",
+  "map": "Displacement map",
+  "selected": "Selected",
+  "procedural": "Procedural",
+  "base": "Built-in",
+  "saved": "My textures",
+  "import": "Import image",
+  "delete": "Delete {{name}}",
+  "clear": "Use procedural map",
+  "loadError": "Texture library could not be loaded.",
+  "saveError": "Texture could not be saved or applied.",
+  "stale": "The project changed. Please try again.",
+  "textures": {
+    "plaster": "Plaster",
+    "stone": "Stone",
+    "normal": "Normal map"
+  }
+}

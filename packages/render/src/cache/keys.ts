@@ -1,3 +1,4 @@
+import { effectAssetIds } from "@musart/core";
 import {
   createLayerGeometryIndex,
   type Asset,
@@ -115,6 +116,7 @@ export function createSourceKeys(
           assetIdentity(layer.assetId ? assets[layer.assetId] : undefined),
           layer.kind === "video" ? (options.videoStamp?.(layer.id) ?? null) : null,
           assetIdentity(layer.mask?.assetId ? assets[layer.mask.assetId] : undefined),
+          effectAssetIds(layer.effects).map((id) => [id, assetIdentity(assets[id])]),
           children,
         ]),
       );

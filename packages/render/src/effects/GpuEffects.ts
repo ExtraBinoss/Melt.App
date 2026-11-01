@@ -1,3 +1,4 @@
+import { hasEffectTreatment } from "./shared/active";
 import { compileGpuScene } from "../compositing/compile";
 import {
   ASCII_DEFAULT_CHARACTERS,
@@ -8,6 +9,9 @@ import {
   type Effect,
 } from "@musart/core";
 import {
+  DataTexture,
+  RGBAFormat,
+  UnsignedByteType,
   Mesh,
   MeshBasicNodeMaterial,
   NoBlending,
@@ -16,6 +20,7 @@ import {
   RenderTarget,
   Scene,
   type Texture,
+  type UniformNode,
   type TextureNode,
   type WebGPURenderer,
 } from "three/webgpu";
@@ -43,6 +48,10 @@ interface EffectPass {
   readonly source: TextureNode<"vec4">;
   readonly backdrop: TextureNode<"vec4">;
   readonly controls: EffectUniforms;
+  readonly images: Map<
+    string,
+    { texture: TextureNode<"vec4">; enabled: UniformNode<"float", number> }
+  >;
   readonly glyph: { characters: string; binding: GlyphAtlasBinding | null };
 }
 export interface GpuEffectStats {
@@ -67,7 +76,24 @@ export class GpuEffects {
   private renderedPasses = 0;
   private disposed = false;
 
-  constructor(private readonly renderer: WebGPURenderer) {}
+  private neutral: DataTexture | null = null;
+  constructor(
+    private readonly renderer: WebGPURenderer,
+    private readonly imageInput?: (assetId: string) => Texture,
+  ) {}
+  private neutralImage(): DataTexture {
+    if (!this.neutral) {
+      this.neutral = new DataTexture(
+        new Uint8Array([128, 128, 128, 255]),
+        1,
+        1,
+        RGBAFormat,
+        UnsignedByteType,
+      );
+      this.neutral.needsUpdate = true;
+    }
+    return this.neutral;
+  }
 
   private getGlyphAtlas = (): Texture => {
     assertTextureSize(256, 16, gpuTextureLimit(this.renderer));
@@ -90,6 +116,7 @@ export class GpuEffects {
     width: number,
     height: number,
     logical: EffectDimensions,
+    bindImages = true,
   ): EffectPass {
     const advanced =
       stage.final &&
@@ -102,7 +129,16 @@ export class GpuEffects {
         backdrop = texture(original);
       const controls = createEffectUniforms(uniformEffect, width, height, logical);
       const glyph: EffectPass["glyph"] = { characters: this.characters(effect), binding: null };
+      const images: EffectPass["images"] = new Map();
       const node = stage.builder({
+        bindImageInput: (key) => {
+          let binding = images.get(key);
+          if (!binding) {
+            binding = { texture: texture(this.neutralImage()), enabled: uniform(0) };
+            images.set(key, binding);
+          }
+          return binding;
+        },
         source,
         backdrop,
         controls,
@@ -128,8 +164,16 @@ export class GpuEffects {
             advanced,
           )
         : node;
-      pass = { material, source, backdrop, controls, glyph };
+      pass = { material, source, backdrop, controls, glyph, images };
       this.passes.set(passKey, pass);
+    }
+    for (const [key, binding] of pass.images) {
+      const assetId = effect.inputs?.[key];
+      if (assetId && bindImages && !this.imageInput)
+        throw Error("Effect image resolver is unavailable");
+      binding.texture.value =
+        assetId && bindImages ? this.imageInput!(assetId) : this.neutralImage();
+      binding.enabled.value = assetId ? 1 : 0;
     }
     pass.source.value = input;
     pass.backdrop.value = original;
@@ -186,6 +230,7 @@ export class GpuEffects {
             width,
             height,
           },
+          false,
         );
         if (this.compiled.has(pass)) continue;
         if (!this.mesh) {
@@ -227,7 +272,13 @@ export class GpuEffects {
             resolveGradientSettings(effect.settings).treatment === "ascii"),
       )
       .map((effect) => this.characters(effect));
-    return this.surfaces.projectedBytes(width, height, count) + this.atlases.projectedBytes(glyphs);
+    return (
+      this.surfaces.projectedBytes(width, height, count) +
+      this.atlases.projectedBytes(glyphs) +
+      (this.neutral || enabled.some((effect) => getEffectDefinition(effect.type).inputs?.length)
+        ? 4
+        : 0)
+    );
   }
 
   /**
@@ -254,7 +305,8 @@ export class GpuEffects {
     )
       throw new Error("Invalid logical effect dimensions.");
     const enabled = effects.filter(
-      (effect) => effect.enabled && getEffectDefinition(effect.type).source !== "geometry",
+      (effect) =>
+        hasEffectTreatment(effect) && getEffectDefinition(effect.type).source !== "geometry",
     );
     if (!enabled.length) return source;
     if (source === output.texture)
@@ -308,7 +360,7 @@ export class GpuEffects {
     return {
       passes: this.renderedPasses,
       targets: this.surfaces.targets,
-      bytes: this.surfaces.bytes + this.atlases.bytes(),
+      bytes: this.surfaces.bytes + this.atlases.bytes() + (this.neutral ? 4 : 0),
       materials: this.passes.size,
     };
   }
@@ -317,6 +369,8 @@ export class GpuEffects {
     this.disposed = true;
     this.surfaces.dispose();
     this.atlases.dispose();
+    this.neutral?.dispose();
+    this.neutral = null;
     for (const pass of this.passes.values()) pass.material.dispose();
     this.passes.clear();
     if (this.mesh) this.scene.remove(this.mesh);

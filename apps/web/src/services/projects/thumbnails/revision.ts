@@ -1,5 +1,6 @@
 import {
   assetOriginalIdentity,
+  effectAssetIds,
   isPublishedComposition,
   type Asset,
   type Composition,
@@ -55,7 +56,11 @@ export async function thumbnailRevision(
   const ids = [
     ...new Set(
       [
-        ...captured.layers.flatMap((layer) => [layer.assetId, layer.mask?.assetId]),
+        ...captured.layers.flatMap((layer) => [
+          layer.assetId,
+          layer.mask?.assetId,
+          ...effectAssetIds(layer.effects),
+        ]),
         captured.spatial?.environment.assetId,
       ].filter((id): id is string => !!id),
     ),

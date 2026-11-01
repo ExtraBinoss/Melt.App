@@ -1,3 +1,6 @@
+import { bevelNode } from "./bevel/node";
+import { displaceNode } from "./displace/node";
+import { thermalNode } from "./thermal/node";
 import type { EffectType } from "@musart/core";
 import { asciiNode } from "./ascii/node";
 import { blurNode } from "./blur/node";
@@ -37,6 +40,9 @@ import { pinkPhosphorNode } from "./pink-phosphor/node";
 export const EFFECT_NODES: Readonly<
   Record<Exclude<EffectType, "gradient" | "transition" | "morph">, EffectNodeBuilder>
 > = Object.freeze({
+  bevel: bevelNode,
+  displace: displaceNode,
+  thermal: thermalNode,
   dither: ditherNode,
   ascii: asciiNode,
   brightness: brightnessNode,

@@ -1,6 +1,6 @@
 import type { Node } from "three/webgpu";
 import { Fn, clamp, floor, fract, mix, vec2, vec4 } from "three/tsl";
-import { sampleEffect, type EffectNodeContext } from "../shared/context";
+import { sampleEffect, type EffectNodeContext } from "./context";
 /** Interpolate premultiplied texels explicitly, independent of a source's sampler policy. */
 export function samplePremultiplied(context: EffectNodeContext, position: Node<"vec2">) {
   return Fn(([position]: readonly [Node<"vec2">]) => {

@@ -1,0 +1,20 @@
+{
+  "name": "Deslocamento",
+  "library": "Biblioteca de texturas",
+  "map": "Mapa de deslocamento",
+  "selected": "Selecionada",
+  "procedural": "Procedural",
+  "base": "Incluídas",
+  "saved": "Minhas texturas",
+  "import": "Importar imagem",
+  "delete": "Excluir {{name}}",
+  "clear": "Usar mapa procedural",
+  "loadError": "Não foi possível carregar as texturas.",
+  "saveError": "Não foi possível salvar ou aplicar a textura.",
+  "stale": "O projeto mudou. Tente novamente.",
+  "textures": {
+    "plaster": "Reboco",
+    "stone": "Pedra",
+    "normal": "Mapa de normais"
+  }
+}

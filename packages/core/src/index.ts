@@ -370,3 +370,5 @@ export {
   captureSceneMotionAnimationPreset,
   extractSceneMotionAnimationPreset,
 } from "./motion/scene/animations/extract";
+
+export { effectAssetIds, validateEffectInputs } from "./effects/inputs";

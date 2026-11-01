@@ -1,7 +1,7 @@
 import type { Node } from "three/webgpu";
 import { Fn, max, uv, vec2, vec4 } from "three/tsl";
 import type { EffectNodeContext } from "../shared/context";
-import { samplePremultiplied } from "./sample";
+import { samplePremultiplied } from "../shared/premultiplied-sample";
 /** Bounded separable Gaussian, accumulated in premultiplied RGBA to avoid dark fringes. */
 export function gaussianAxis(
   context: EffectNodeContext,

@@ -61,6 +61,13 @@ export type EffectParameter =
   | ColorEffectParameter
   | TextEffectParameter;
 export interface EffectDefinition {
+  /** Amount zero leaves the source unchanged unless explicit compositing overrides it. */
+  readonly identityAtZero?: boolean;
+  readonly inputs?: readonly {
+    readonly key: string;
+    readonly kind: "image";
+    readonly labelKey: string;
+  }[];
   readonly source?: "geometry";
   readonly type: EffectType;
   readonly nameKey: string;
@@ -138,8 +145,10 @@ export function defineEffect(
   parameters: readonly EffectParameter[],
   category: EffectDefinition["category"] = "effect",
   coverage: EffectDefinition["coverage"] = "preserve",
+  options: Pick<EffectDefinition, "identityAtZero"> = {},
 ): EffectDefinition {
   return Object.freeze({
+    ...options,
     type,
     nameKey: type,
     category,

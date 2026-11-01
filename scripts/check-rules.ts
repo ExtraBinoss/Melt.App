@@ -80,6 +80,33 @@ function importsUiOrGpu(file: string, content: string): boolean {
   visit(source);
   return forbidden;
 }
+function opensDatabase(file: string, content: string): boolean {
+  const source = ts.createSourceFile(file, content, ts.ScriptTarget.Latest, true);
+  let found = false;
+  const visit = (node: ts.Node) => {
+    if (
+      ts.isImportDeclaration(node) &&
+      ts.isStringLiteralLike(node.moduleSpecifier) &&
+      node.moduleSpecifier.text === "idb" &&
+      !node.importClause?.isTypeOnly
+    ) {
+      const bindings = node.importClause?.namedBindings;
+      if (bindings && ts.isNamedImports(bindings))
+        found ||= bindings.elements.some(
+          (entry) => !entry.isTypeOnly && (entry.propertyName ?? entry.name).text === "openDB",
+        );
+    }
+    if (ts.isCallExpression(node) && ts.isPropertyAccessExpression(node.expression)) {
+      const call = node.expression;
+      found ||=
+        call.name.text === "openDB" ||
+        (call.name.text === "open" && call.expression.getText(source).endsWith("indexedDB"));
+    }
+    ts.forEachChild(node, visit);
+  };
+  visit(source);
+  return found;
+}
 function checkCriticalCoverage(
   root: string,
   sources: string[],
@@ -150,6 +177,18 @@ export function audit(root: string, coverage = false): Violation[] {
   }
   for (const file of sources.filter((file) => !isTest(file))) {
     const sourceText = readFileSync(file, "utf8");
+    const rel = relative(root, file).split(sep).join("/");
+    if (
+      rel.startsWith("apps/web/src/") &&
+      rel !== "apps/web/src/services/persistence/database.ts" &&
+      opensDatabase(file, sourceText)
+    )
+      violations.push({
+        file: rel,
+        rule: "database-gateway",
+        detail:
+          "Open IndexedDB through services/persistence/database; keep domain schemas in their stores.",
+      });
     if (/\.(?:readRenderTargetPixels(?:Async)?|readPixels|mapAsync)\s*\(/.test(sourceText)) {
       violations.push({
         file: relative(root, file),

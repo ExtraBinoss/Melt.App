@@ -1,0 +1,20 @@
+{
+  "name": "Desplazar",
+  "library": "Biblioteca de texturas",
+  "map": "Mapa de desplazamiento",
+  "selected": "Seleccionado",
+  "procedural": "Procedimental",
+  "base": "Incluidas",
+  "saved": "Mis texturas",
+  "import": "Importar imagen",
+  "delete": "Eliminar {{name}}",
+  "clear": "Usar mapa procedimental",
+  "loadError": "No se pudieron cargar las texturas.",
+  "saveError": "No se pudo guardar o aplicar la textura.",
+  "stale": "El proyecto ha cambiado. Inténtalo de nuevo.",
+  "textures": {
+    "plaster": "Yeso",
+    "stone": "Piedra",
+    "normal": "Mapa de normales"
+  }
+}

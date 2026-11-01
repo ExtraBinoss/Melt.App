@@ -1,3 +1,7 @@
+import { messages as material } from "./library/material/messages";
+import { messages as bevel } from "./library/bevel/messages";
+import { messages as displace } from "./library/displace/messages";
+import { messages as thermal } from "./library/thermal/messages";
 import { registerFeatureTranslations } from "../../../state/i18n/feature-resources";
 import { messages as ascii } from "./library/ascii/messages";
 import shadow from "./library/shadow/messages.json";
@@ -16,6 +20,9 @@ import receipt from "./library/receipt/messages.json";
 import pinkPhosphor from "./library/pink-phosphor/messages.json";
 /** UI resources stay on the web side; the core catalog only contains stable label keys. */
 export const libraryMessages = {
+  bevel,
+  displace,
+  thermal,
   ascii,
   morph,
   shadow,
@@ -40,3 +47,5 @@ for (const [type, messages] of Object.entries(libraryMessages)) {
     if (typeof resource.name === "string") (labels[language] ??= {})[type] = resource.name;
 }
 registerFeatureTranslations("translation", labels);
+
+registerFeatureTranslations("materialFx", material);

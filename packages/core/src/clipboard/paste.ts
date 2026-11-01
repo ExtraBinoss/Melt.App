@@ -200,7 +200,17 @@ export function pasteContent(
             ...(layer.mask.layerId ? { layerId: ids.get(layer.mask.layerId)! } : {}),
           }
         : null,
-      effects: layer.effects.map((effect) => ({ ...effect, id: ids.get(effect.id)! })),
+      effects: layer.effects.map((effect) => ({
+        ...effect,
+        id: ids.get(effect.id)!,
+        ...(effect.inputs
+          ? {
+              inputs: Object.fromEntries(
+                Object.entries(effect.inputs).map(([key, id]) => [key, ids.get(id)!]),
+              ),
+            }
+          : {}),
+      })),
       ...(layer.guides
         ? { guides: layer.guides.map((guide) => ({ ...guide, id: ids.get(guide.id)! })) }
         : {}),

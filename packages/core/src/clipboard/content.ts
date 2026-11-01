@@ -1,3 +1,4 @@
+import { effectAssetIds } from "../effects/inputs";
 import { assetOriginalIdentity, isOriginalMediaAsset } from "../assets/identity";
 import type { Asset, Project, SessionSnapshot } from "../document/model";
 import { createProject } from "../document/factories";
@@ -54,6 +55,7 @@ export function copyContent(
         };
   const assetIds = new Set<string>();
   for (const layer of page.layers) {
+    for (const id of effectAssetIds(layer.effects)) assetIds.add(id);
     if (layer.assetId) assetIds.add(layer.assetId);
     if (layer.mask?.assetId) assetIds.add(layer.mask.assetId);
   }

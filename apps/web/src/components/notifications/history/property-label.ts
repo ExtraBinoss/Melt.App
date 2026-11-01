@@ -54,10 +54,12 @@ const labels: Readonly<Record<string, string>> = {
 export function historyPropertyLabel(definition: HistoryPropertyDefinition, t: TFunction): string {
   const { source, property, effectType, key, scope } = definition.label;
   if (source === "effect" && effectType) {
-    const effect = getEffectDefinition(effectType),
-      parameter = effect.parameters.find(
-        (item) => item.key === key && (item.scope === "settings") === (scope === "settings"),
-      );
+    const effect = getEffectDefinition(effectType);
+    if (scope === "input")
+      return `${t(effect.nameKey, { ns: "translation" })} · ${t(effect.inputs?.find((input) => input.key === key)?.labelKey ?? "source", { ns: "historyNotice" })}`;
+    const parameter = effect.parameters.find(
+      (item) => item.key === key && (item.scope === "settings") === (scope === "settings"),
+    );
     return `${t(effect.nameKey, { ns: "translation" })} · ${
       parameter
         ? t(parameter.labelKey, { ns: "translation" })

@@ -1,3 +1,5 @@
+import { validateEffectInputs } from "../effects/inputs";
+import type { Effect } from "./model";
 import { validateSpatialSource, validateSpatialScene } from "../spatial/validation";
 import { ensure } from "../errors";
 import { FORMAT_VERSION, type Project } from "./model";
@@ -145,7 +147,10 @@ export function validateLayer(
   validateLayerLayout(value, ids);
 
   assertList(value.effects, 64);
-  for (const effect of value.effects) validateEffect(effect, ids);
+  for (const effect of value.effects) {
+    validateEffect(effect, ids);
+    validateEffectInputs(effect as Effect, assets as Record<string, Asset>);
+  }
   for (const effect of value.effects) {
     const source = effect as { type: string; shapeMorph?: unknown };
     ensure(

@@ -1,3 +1,4 @@
+import { hasEffectTreatment } from "../../effects/shared/active";
 import type { Layer } from "@musart/core";
 /** Complex paint/compositing stays on the exact isolated-surface path. */
 export function isInstancedPrimitive(layer: Layer): boolean {
@@ -8,7 +9,7 @@ export function isInstancedPrimitive(layer: Layer): boolean {
     !layer.mask?.enabled &&
     !layer.maskSource &&
     !layer.fillGradient &&
-    !layer.effects.some((effect) => effect.enabled)
+    !layer.effects.some(hasEffectTreatment)
   );
 }
 /** Only appearance contributes; editor metadata and disabled effects do not invalidate paint. */

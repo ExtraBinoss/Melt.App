@@ -1,0 +1,20 @@
+{
+  "name": "Déplacement",
+  "library": "Bibliothèque de textures",
+  "map": "Carte de déplacement",
+  "selected": "Sélectionnée",
+  "procedural": "Procédurale",
+  "base": "Intégrées",
+  "saved": "Mes textures",
+  "import": "Importer une image",
+  "delete": "Supprimer {{name}}",
+  "clear": "Utiliser la carte procédurale",
+  "loadError": "Impossible de charger les textures.",
+  "saveError": "Impossible d’enregistrer ou d’appliquer la texture.",
+  "stale": "Le projet a changé. Réessayez.",
+  "textures": {
+    "plaster": "Enduit",
+    "stone": "Pierre",
+    "normal": "Carte de normales"
+  }
+}

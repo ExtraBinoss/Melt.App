@@ -1,4 +1,5 @@
-import { openDB } from "idb";
+import type { DBSchema } from "idb";
+import { openDatabase, commitTransaction } from "../../persistence/database";
 export interface LibraryItem {
   kind: "project" | "template";
   id: string;
@@ -19,8 +20,11 @@ export function favoritesFirst<T extends { id: string }>(
 }
 const STORE = "favorites",
   LIMIT = 128;
+interface FavoriteSchema extends DBSchema {
+  favorites: { key: string; value: LibraryItem & { key: string } };
+}
 async function database() {
-  return openDB("musart-library", 1, {
+  return openDatabase<FavoriteSchema>("musart-library", 1, {
     upgrade(db) {
       db.createObjectStore(STORE, { keyPath: "key" });
     },
@@ -65,20 +69,14 @@ export async function setLibraryFavorite(item: LibraryItem, selected: boolean): 
     db = await database();
   try {
     const tx = db.transaction(STORE, "readwrite");
-    try {
+    await commitTransaction(tx, async () => {
       if (selected) {
         if (!(await tx.store.get(key)) && (await tx.store.count()) >= LIMIT)
           throw Error("The favorites list is full.");
         await tx.store.put({ ...value, key });
       } else await tx.store.delete(key);
       await tx.done;
-    } catch (error) {
-      try {
-        tx.abort();
-      } catch {}
-      await tx.done.catch(() => undefined);
-      throw error;
-    }
+    });
   } finally {
     db.close();
   }

@@ -1,3 +1,5 @@
+import type { RenderFrame } from "./render-frame";
+import { hasEffectTreatment } from "../effects/shared/active";
 import { completeGpuFrame } from "./publication";
 import { drawLayerSource, isSrgbLayerSource } from "./layer-source";
 import type { SpatialSources } from "../spatial/SpatialSources";
@@ -37,15 +39,6 @@ import {
   type GpuStats,
   type RenderOptions,
 } from "./types";
-
-interface RenderFrame {
-  readonly page: Composition;
-  readonly scale: number;
-  readonly vectorAntialias: boolean;
-  readonly keyFor: (layer: Layer) => string;
-  readonly referenceKeyFor: (layer: Layer) => string;
-  readonly geometry: ReturnType<typeof createLayerGeometryIndex>;
-}
 
 /** Retained GPU graph. Only font/image preparation awaits; all GPU submissions are synchronous. */
 export class GpuCompositor {
@@ -157,7 +150,7 @@ export class GpuCompositor {
       this.vectors ??= new VectorSources(this.renderer, this.cache);
       this.color ??= new ColorPipeline(this.renderer);
       if (!this.effects) {
-        this.effects = new EffectResources(this.renderer);
+        this.effects = new EffectResources(this.renderer, (assetId) => this.sources.image(assetId));
         this.cache.set("shared-effects", this.effects);
       }
       if (!this.primitives) {
@@ -357,7 +350,7 @@ export class GpuCompositor {
     return target;
   }
   private layer(layer: Layer, frame: RenderFrame, parentViewport?: Bounds): FrameTexture {
-    const reference = layer.effects.some((effect) => effect.enabled) || !!layer.mask?.enabled;
+    const reference = layer.effects.some(hasEffectTreatment) || !!layer.mask?.enabled;
     // Effects and masks consume the same authored reference pixels in every
     // caller. Output density changes sampling of this plane, never its content.
     if (reference && (frame.scale !== 1 || frame.vectorAntialias))

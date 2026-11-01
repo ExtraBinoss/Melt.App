@@ -8,6 +8,9 @@ import type { EffectType } from "../../src/document/model";
 describe("portable effect definitions", () => {
   it("describes every supported effect once, with the existing deterministic defaults", () => {
     expect(Object.keys(EFFECT_CATALOG)).toEqual([
+      "bevel",
+      "displace",
+      "thermal",
       "morph",
       "dither",
       "ascii",
@@ -208,6 +211,7 @@ describe("portable effect definitions", () => {
         "seed",
         "threshold",
         "strength",
+        "sourceColor",
         "contrast",
         "gamma",
         "invert",
@@ -342,6 +346,57 @@ describe("portable effect definitions", () => {
         "highColor",
         "time",
       ],
+      bevel: [
+        "amount",
+        "height",
+        "direction",
+        "size",
+        "softness",
+        "depth",
+        "azimuth",
+        "altitude",
+        "ambient",
+        "highlight",
+        "shadow",
+        "gloss",
+        "highlightColor",
+        "shadowColor",
+      ],
+      displace: [
+        "amount",
+        "strengthX",
+        "strengthY",
+        "mapScale",
+        "rotation",
+        "offsetX",
+        "offsetY",
+        "midpoint",
+        "contrast",
+        "channelX",
+        "channelY",
+        "wrap",
+        "dispersion",
+        "preserveAlpha",
+        "speed",
+        "time",
+      ],
+      thermal: [
+        "amount",
+        "palette",
+        "reverse",
+        "low",
+        "high",
+        "gain",
+        "gamma",
+        "saturation",
+        "posterize",
+        "bands",
+        "edges",
+        "grain",
+        "scanlines",
+        "speed",
+        "time",
+      ],
     };
     for (const definition of Object.values(EFFECT_CATALOG)) {
       expect(definition.parameters.map((parameter) => parameter.key)).toEqual(
@@ -349,7 +404,7 @@ describe("portable effect definitions", () => {
       );
       expect(getEffectDefinition(definition.type)).toBe(definition);
       expect(definition.coverage).toBe(
-        ["blur", "shadow"].includes(definition.type)
+        ["blur", "shadow", "displace"].includes(definition.type)
           ? "expand"
           : ["gradient", "circle", "shatter", "crt", "receipt", "transition"].includes(
                 definition.type,
@@ -359,6 +414,9 @@ describe("portable effect definitions", () => {
       );
       expect(definition.category).toBe(
         [
+          "bevel",
+          "displace",
+          "thermal",
           "dither",
           "ascii",
           "blur",

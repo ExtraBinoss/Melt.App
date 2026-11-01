@@ -1,5 +1,6 @@
 import {
   assetOriginalIdentity,
+  effectAssetIds,
   isOriginalMediaAsset,
   createLayerGeometryIndex,
   type Asset,
@@ -196,6 +197,7 @@ export class SelectionPreviewIdentity {
           id,
           layer.parentId,
           this.paint(layer),
+          effectAssetIds(layer.effects).map((assetId) => this.asset(assets[assetId])),
           this.asset(layer.assetId ? assets[layer.assetId] : undefined),
           this.asset(
             layer.mask && (layer.mask.enabled || options.includeDisabledMasks) && layer.mask.assetId

@@ -30,6 +30,18 @@ export function createEffectUniforms(
     seed: uniform(new Vector2(effect.seed % 4, Math.floor(effect.seed / 4) % 4)),
     resolution: uniform(new Vector2(width, height)),
     logicalResolution: uniform(new Vector2(logical.width, logical.height)),
+    contentOrigin: uniform(
+      new Vector2(
+        logical.content?.x ?? 0,
+        logical.height - (logical.content?.y ?? 0) - (logical.content?.height ?? logical.height),
+      ),
+    ),
+    contentResolution: uniform(
+      new Vector2(
+        logical.content?.width ?? logical.width,
+        logical.content?.height ?? logical.height,
+      ),
+    ),
     pixelFootprint: uniform(new Vector2(logical.width / width, logical.height / height)),
   };
 }
@@ -60,5 +72,13 @@ export function updateEffectUniforms(
   controls.seed.value.set(effect.seed % 4, Math.floor(effect.seed / 4) % 4);
   controls.resolution.value.set(width, height);
   controls.logicalResolution.value.set(logical.width, logical.height);
+  controls.contentOrigin.value.set(
+    logical.content?.x ?? 0,
+    logical.height - (logical.content?.y ?? 0) - (logical.content?.height ?? logical.height),
+  );
+  controls.contentResolution.value.set(
+    logical.content?.width ?? logical.width,
+    logical.content?.height ?? logical.height,
+  );
   controls.pixelFootprint.value.set(logical.width / width, logical.height / height);
 }

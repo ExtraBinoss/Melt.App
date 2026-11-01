@@ -1,4 +1,5 @@
-import { openDB, type DBSchema, type IDBPDatabase, type IDBPTransaction } from "idb";
+import { openDatabase, commitTransaction } from "../../persistence/database";
+import { type DBSchema, type IDBPDatabase, type IDBPTransaction } from "idb";
 import {
   validateMotionAnimationPreset,
   validateSceneMotionAnimationPreset,
@@ -43,7 +44,7 @@ export class MotionPresetStore {
   constructor(private readonly name = "musart-motion-presets") {}
   private async database() {
     if (this.closed) throw Error("Motion preset store is closed");
-    this.connection ??= openDB<Schema>(this.name, 1, {
+    this.connection ??= openDatabase<Schema>(this.name, 1, {
       upgrade(db) {
         db.createObjectStore("presets", { keyPath: "id" }).createIndex("updated", [
           "updatedAt",
@@ -53,7 +54,11 @@ export class MotionPresetStore {
       blocking: () => this.dispose(),
       terminated: () => this.dispose(),
     });
-    const db = await this.connection;
+    const pending = this.connection;
+    void pending.catch(() => {
+      if (this.connection === pending) this.connection = undefined;
+    });
+    const db = await pending;
     if (this.closed) {
       db.close();
       throw Error("Motion preset store is closed");
@@ -98,27 +103,20 @@ export class MotionPresetStore {
     const tx = db.transaction("presets", "readwrite");
     this.writes.add(tx);
     try {
-      const current = await tx.store.get(preset.id);
-      if ((current?.revision ?? 0) !== expectedRevision || current?.deleted)
-        throw Error("Motion preset changed in another window");
-      const record = {
-        id: preset.id,
-        revision: expectedRevision + 1,
-        updatedAt: Date.now(),
-        deleted: false,
-        preset: structuredClone(preset),
-      };
-      await tx.store.put(record);
-      await tx.done;
-      return record;
-    } catch (error) {
-      try {
-        tx.abort();
-      } catch {
-        /* Native transaction already settled. */
-      }
-      await tx.done.catch(() => undefined);
-      throw error;
+      return await commitTransaction(tx, async () => {
+        const current = await tx.store.get(preset.id);
+        if ((current?.revision ?? 0) !== expectedRevision || current?.deleted)
+          throw Error("Motion preset changed in another window");
+        const record = {
+          id: preset.id,
+          revision: expectedRevision + 1,
+          updatedAt: Date.now(),
+          deleted: false,
+          preset: structuredClone(preset),
+        };
+        await tx.store.put(record);
+        return record;
+      });
     } finally {
       this.writes.delete(tx);
     }
@@ -128,24 +126,18 @@ export class MotionPresetStore {
     const tx = db.transaction("presets", "readwrite");
     this.writes.add(tx);
     try {
-      const current = await tx.store.get(record.id);
-      if (!current || current.deleted || current.revision !== record.revision)
-        throw Error("Motion preset changed in another window");
-      await tx.store.put({
-        ...current,
-        deleted: true,
-        revision: current.revision + 1,
-        updatedAt: Date.now(),
+      return await commitTransaction(tx, async () => {
+        const current = await tx.store.get(record.id);
+        if (!current || current.deleted || current.revision !== record.revision)
+          throw Error("Motion preset changed in another window");
+        await tx.store.put({
+          ...current,
+          deleted: true,
+          revision: current.revision + 1,
+          updatedAt: Date.now(),
+        });
+        await tx.done;
       });
-      await tx.done;
-    } catch (error) {
-      try {
-        tx.abort();
-      } catch {
-        /* Native transaction already settled. */
-      }
-      await tx.done.catch(() => undefined);
-      throw error;
     } finally {
       this.writes.delete(tx);
     }

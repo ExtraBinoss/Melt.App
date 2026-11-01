@@ -62,7 +62,7 @@ function propertyValue(
 ): string {
   if (value.kind !== "scalar") return t(value.kind, { ns: "historyNotice" });
   const { property } = definition.label;
-  if (["assetId", "parentId", "layerId"].includes(property))
+  if (definition.label.scope === "input" || ["assetId", "parentId", "layerId"].includes(property))
     return t("assigned", { ns: "historyNotice" });
   if (typeof value.value === "boolean")
     return t(value.value ? "on" : "off", { ns: "historyNotice" });

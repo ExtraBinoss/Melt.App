@@ -36,3 +36,20 @@ it("keeps effect/mask/blend/group/gradient cases on their isolated exact path", 
   expect(primitivePaintKey({ ...base, name: "renamed", locked: true })).toEqual(key);
   expect(primitivePaintKey({ ...base, fill: "#ff0000" })).not.toEqual(key);
 });
+
+it("retains the exact primitive path at declared identity amounts without bypassing explicit compositing", () => {
+  const base = createLayer("ellipse");
+  for (const type of ["bevel", "displace", "thermal"] as const) {
+    const effect = createEffect(type, { amount: 0 });
+    expect(isInstancedPrimitive({ ...base, effects: [effect] })).toBe(true);
+    expect(isInstancedPrimitive({ ...base, effects: [{ ...effect, composite: "clear" }] })).toBe(
+      false,
+    );
+    expect(isInstancedPrimitive({ ...base, effects: [{ ...effect, blendMode: "multiply" }] })).toBe(
+      false,
+    );
+  }
+  expect(
+    isInstancedPrimitive({ ...base, effects: [createEffect("brightness", { amount: 0 })] }),
+  ).toBe(false);
+});

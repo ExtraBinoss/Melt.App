@@ -1,0 +1,20 @@
+{
+  "name": "置换",
+  "library": "纹理库",
+  "map": "置换贴图",
+  "selected": "已选择",
+  "procedural": "程序生成",
+  "base": "内置",
+  "saved": "我的纹理",
+  "import": "导入图像",
+  "delete": "删除 {{name}}",
+  "clear": "使用程序贴图",
+  "loadError": "无法加载纹理。",
+  "saveError": "无法保存或应用纹理。",
+  "stale": "项目已更改，请重试。",
+  "textures": {
+    "plaster": "灰泥",
+    "stone": "石材",
+    "normal": "法线贴图"
+  }
+}

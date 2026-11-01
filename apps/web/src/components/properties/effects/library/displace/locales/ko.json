@@ -1,0 +1,20 @@
+{
+  "name": "변위",
+  "library": "텍스처 라이브러리",
+  "map": "변위 맵",
+  "selected": "선택됨",
+  "procedural": "절차적",
+  "base": "기본 제공",
+  "saved": "내 텍스처",
+  "import": "이미지 가져오기",
+  "delete": "{{name}} 삭제",
+  "clear": "절차적 맵 사용",
+  "loadError": "텍스처를 불러올 수 없습니다.",
+  "saveError": "텍스처를 저장하거나 적용할 수 없습니다.",
+  "stale": "프로젝트가 변경되었습니다. 다시 시도하세요.",
+  "textures": {
+    "plaster": "회벽",
+    "stone": "돌",
+    "normal": "노멀 맵"
+  }
+}

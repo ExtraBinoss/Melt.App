@@ -12,6 +12,23 @@ function file(path: string, text = "export const x=1;\n") {
   mkdirSync(full.slice(0, full.lastIndexOf("/")), { recursive: true });
   writeFileSync(full, text);
 }
+it("requires the shared IndexedDB gateway while allowing domain schemas and type imports", () => {
+  file("apps/web/src/services/persistence/database.ts", 'import {openDB} from "idb";');
+  file("apps/web/src/services/textures/types.ts", 'import type {openDB, DBSchema} from "idb";');
+  file(
+    "apps/web/src/services/textures/store.ts",
+    'import {DatabaseConnection} from "../persistence/database";',
+  );
+  expect(audit(root)).toEqual([]);
+  file("apps/web/src/services/a.ts", 'import {openDB as custom} from "idb";');
+  file("apps/web/src/services/b.ts", 'const db = idb.openDB("unsafe");');
+  file("apps/web/src/services/c.ts", 'window.indexedDB.open("unsafe");');
+  expect(audit(root).map((entry) => entry.rule)).toEqual([
+    "database-gateway",
+    "database-gateway",
+    "database-gateway",
+  ]);
+});
 it("allows behavior tests to cover several sources and rejects tests under nested src", () => {
   file("packages/core/src/foo/bar.ts");
   file("packages/core/src/foo/baz.ts");

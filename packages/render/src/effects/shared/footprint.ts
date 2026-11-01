@@ -1,4 +1,5 @@
 import type { Effect, EffectType } from "@musart/core";
+import { displaceFootprint } from "../displace/footprint";
 import { blurFootprint } from "../blur/footprint";
 import { shadowFootprint } from "../shadow/footprint";
 interface Outset {
@@ -9,6 +10,7 @@ interface Outset {
 }
 const footprints: Partial<Record<EffectType, (effect: Effect) => Outset>> = {
   blur: blurFootprint,
+  displace: displaceFootprint,
   shadow: shadowFootprint,
 };
 /** Conservatively admit the whole stack once; all intermediate pixels remain on the GPU. */

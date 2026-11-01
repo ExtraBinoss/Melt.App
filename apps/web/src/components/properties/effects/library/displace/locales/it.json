@@ -1,0 +1,20 @@
+{
+  "name": "Spostamento",
+  "library": "Libreria texture",
+  "map": "Mappa spostamento",
+  "selected": "Selezionata",
+  "procedural": "Procedurale",
+  "base": "Incluse",
+  "saved": "Le mie texture",
+  "import": "Importa immagine",
+  "delete": "Elimina {{name}}",
+  "clear": "Usa mappa procedurale",
+  "loadError": "Impossibile caricare le texture.",
+  "saveError": "Impossibile salvare o applicare la texture.",
+  "stale": "Il progetto è cambiato. Riprova.",
+  "textures": {
+    "plaster": "Intonaco",
+    "stone": "Pietra",
+    "normal": "Mappa normali"
+  }
+}

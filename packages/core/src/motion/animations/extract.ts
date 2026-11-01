@@ -1,3 +1,4 @@
+import { validateMotionAnimationPreset } from "./validation";
 import {
   captureAnimationRecipe,
   propertyTimelineInterval,
@@ -35,13 +36,12 @@ export function captureMotionAnimationPreset(
   preset.effects = animation.effectIds.map((effectId) => {
     const source = layer.effects.find((effect) => effect.id === effectId);
     ensure(source, "NOT_FOUND", "Animation effect is missing");
-    const { id: _id, ...definition } = cloneValue(source);
+    const { id: _id, inputs: _inputs, ...definition } = cloneValue(source);
     return definition;
   });
   validateMotionAnimationPreset(preset);
   return preset;
 }
-import { validateMotionAnimationPreset } from "./validation";
 
 /** Export any authored property timeline as a self-contained, target-relative reusable recipe. */
 export function extractMotionAnimationPreset(
@@ -71,7 +71,7 @@ export function extractMotionAnimationPreset(
     } else {
       if (!slots.has(target.effectId)) {
         const original = layer.effects.find((effect) => effect.id === target.effectId)!;
-        const { id: _id, ...definition } = cloneValue(original);
+        const { id: _id, inputs: _inputs, ...definition } = cloneValue(original);
         slots.set(target.effectId, effects.length);
         effects.push(definition);
       }

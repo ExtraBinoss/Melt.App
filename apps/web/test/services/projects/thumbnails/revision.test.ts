@@ -1,5 +1,5 @@
 import { beforeEach, expect, it, vi } from "vitest";
-import { createLayer, createPage, type Asset } from "@musart/core";
+import { createEffect, createLayer, createPage, type Asset } from "@musart/core";
 import {
   clearThumbnailRevisionCache,
   thumbnailRevision,
@@ -118,4 +118,30 @@ it("captures mutable paint and original values before any original digest await"
   release();
   expect(await pending).toBe(expected);
   expect(reads).toBe(1);
+});
+
+it("invalidates saved and selected previews when a secondary effect original changes", async () => {
+  const asset: Asset = {
+    id: "map",
+    name: "map",
+    mime: "image/png",
+    width: 1,
+    height: 1,
+    dataUrl: "first",
+  };
+  const layer = createLayer("rectangle", {
+    effects: [createEffect("displace", { inputs: { map: "map" } })],
+  });
+  const page = createPage({ layers: [layer] });
+  const { SelectionPreviewIdentity } =
+    await import("../../../../src/services/projects/thumbnails/selection-identity");
+  const cache = new SelectionPreviewIdentity();
+  const first = await thumbnailRevision(page, { map: asset }),
+    selection = cache.read(page, { map: asset }, [layer.id]);
+  const renamed = { ...asset, name: "renamed" },
+    replaced = { ...asset, dataUrl: "second" };
+  expect(await thumbnailRevision(page, { map: renamed })).toBe(first);
+  expect(cache.read(page, { map: renamed }, [layer.id])).toBe(selection);
+  expect(await thumbnailRevision(page, { map: replaced })).not.toBe(first);
+  expect(cache.read(page, { map: replaced }, [layer.id])).not.toBe(selection);
 });

@@ -21,6 +21,9 @@ import type { ApplyMotionTransitionCommand } from "../motion/transitions/model";
 export const FORMAT_VERSION = 1 as const;
 export type LayerKind = "rectangle" | "ellipse" | "text" | "image" | "video" | "group" | "vector";
 export type EffectType =
+  | "bevel"
+  | "displace"
+  | "thermal"
   | "morph"
   | "dither"
   | "ascii"
@@ -59,6 +62,8 @@ export type EffectType =
 /** Effect-owned scalar settings are validated against that effect's definition. */
 export type EffectSettings = Partial<Record<string, number | boolean | string>>;
 export interface Effect {
+  /** Named immutable image assets owned by the portable project. */
+  inputs?: Readonly<Record<string, string>>;
   shapeMorph?: ShapeMorph;
   id: string;
   type: EffectType;

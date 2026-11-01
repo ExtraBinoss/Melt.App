@@ -1,3 +1,5 @@
+import { validateEffectInputs } from "./inputs";
+import type { Effect } from "../document/model";
 import { assertNumber, assertRecord } from "../document/guards";
 import { ensure } from "../errors";
 import { BLEND_CATALOG } from "../layers/blending/catalog";
@@ -10,6 +12,7 @@ import { validateShapeMorph } from "./morph/validation";
 
 /** Optional fields keep old documents valid; every supplied setting remains strictly validated. */
 export function validateEffectExtensions(value: Record<string, unknown>): void {
+  validateEffectInputs(value as unknown as Effect);
   if (value.shapeMorph !== undefined) {
     ensure(value.type === "morph", "INVALID_DOCUMENT", "Shape geometry belongs to Morph");
     validateShapeMorph(value.shapeMorph);

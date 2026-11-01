@@ -1,0 +1,73 @@
+import { AMOUNT, defineEffect, type EffectParameter } from "../definition";
+const number = (
+  key: string,
+  value: number,
+  min: number,
+  max: number,
+  step = 0.01,
+  unit = "",
+): EffectParameter => ({
+  kind: "number",
+  scope: "settings",
+  key,
+  default: value,
+  labelKey: "materialFx:parameter." + key,
+  min,
+  max,
+  step,
+  displayScale: 1,
+  unit,
+});
+const choice = (key: string, value: string, options: readonly string[]): EffectParameter => ({
+  kind: "select",
+  scope: "settings",
+  key,
+  default: value,
+  labelKey: "materialFx:parameter." + key,
+  options: options.map((value) => ({ value, labelKey: "materialFx:choice." + value })),
+});
+export const DISPLACE_DEFINITION = Object.freeze({
+  ...defineEffect(
+    "displace",
+    { time: 0 },
+    [
+      { ...AMOUNT, labelKey: "materialFx:parameter.amount" },
+      number("strengthX", 24, -1024, 1024, 0.5, "px"),
+      number("strengthY", 24, -1024, 1024, 0.5, "px"),
+      number("mapScale", 1, 0.05, 32),
+      number("rotation", 0, -360, 360, 1, "°"),
+      number("offsetX", 0, -10, 10),
+      number("offsetY", 0, -10, 10),
+      number("midpoint", 0.5, 0, 1),
+      number("contrast", 1, 0, 4),
+      choice("channelX", "red", ["red", "green", "blue", "luminance"]),
+      choice("channelY", "green", ["red", "green", "blue", "luminance"]),
+      choice("wrap", "repeat", ["repeat", "mirror", "clamp"]),
+      number("dispersion", 0, 0, 1),
+      {
+        kind: "boolean",
+        scope: "settings",
+        key: "preserveAlpha",
+        default: false,
+        labelKey: "materialFx:parameter.preserveAlpha",
+      },
+      number("speed", 0, -5, 5),
+      {
+        kind: "number",
+        key: "time",
+        labelKey: "materialFx:parameter.time",
+        min: 0,
+        max: 86400,
+        step: 0.01,
+        displayScale: 1,
+        unit: "s",
+      },
+    ],
+    "effect",
+    "expand",
+    { identityAtZero: true },
+  ),
+  inputs: Object.freeze([
+    Object.freeze({ key: "map", kind: "image" as const, labelKey: "displaceFx:map" }),
+  ]),
+});

@@ -50,6 +50,12 @@ export function captureEffects(
         getEffectParameter(effect, parameter),
       );
     }
+    for (const input of getEffectDefinition(old.type).inputs ?? [])
+      context.history.watch(
+        { owner, property: `inputs.${input.key}` },
+        () => read().inputs?.[input.key],
+        effect.inputs?.[input.key],
+      );
     if (!sameMorph(old.shapeMorph, effect.shapeMorph)) context.history.action("geometry", owner);
   }
   for (const [effectId, effect] of next)

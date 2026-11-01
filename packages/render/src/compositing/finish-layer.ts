@@ -1,3 +1,4 @@
+import { hasEffectTreatment } from "../effects/shared/active";
 import {
   multiplyMatrices,
   type Bounds,
@@ -35,9 +36,10 @@ export function finishLayerSource(
   let source = input;
   const original: Bounds = input.bounds ?? { x: 0, y: 0, width: layer.width, height: layer.height };
   let bounds: Bounds = original;
-  const enabled = layer.effects.some((effect) => effect.enabled);
+  const effects = layer.effects.filter(hasEffectTreatment);
+  const enabled = effects.length > 0;
   if (enabled) {
-    const outset = effectFootprint(layer.effects);
+    const outset = effectFootprint(effects);
     bounds = {
       x: original.x - outset.left,
       y: original.y - outset.top,
@@ -59,13 +61,19 @@ export function finishLayerSource(
     const output = context.target("effects", width, height);
     context.cache.ensureCapacity(
       "shared-effects",
-      context.effects.projectedBytes(width, height, layer.effects),
+      context.effects.projectedBytes(width, height, effects),
     );
     try {
       source = {
-        texture: context.effects.apply(source.texture, width, height, layer.effects, output, {
+        texture: context.effects.apply(source.texture, width, height, effects, output, {
           width: bounds.width,
           height: bounds.height,
+          content: {
+            x: original.x - bounds.x,
+            y: original.y - bounds.y,
+            width: original.width,
+            height: original.height,
+          },
         }),
         width,
         height,

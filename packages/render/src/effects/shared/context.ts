@@ -1,10 +1,14 @@
-import type { Node, Texture, TextureNode } from "three/webgpu";
+import type { Node, Texture, TextureNode, UniformNode } from "three/webgpu";
 import type { EffectUniforms } from "./uniforms";
 import type { GlyphAtlasBinding } from "../ascii/binding";
 
 /** GPU-only inputs. Source pixels and intermediate results never cross this boundary. */
 export interface EffectNodeContext {
   readonly source: TextureNode<"vec4">;
+  readonly bindImageInput?: (key: string) => {
+    readonly texture: TextureNode<"vec4">;
+    readonly enabled: UniformNode<"float", number>;
+  };
   readonly backdrop?: TextureNode<"vec4">;
   readonly controls: EffectUniforms;
   readonly getGlyphAtlas: () => Texture;
@@ -15,6 +19,13 @@ export type EffectNodeBuilder = (context: EffectNodeContext) => Node<"vec4">;
 export interface EffectDimensions {
   readonly width: number;
   readonly height: number;
+  /** Original content rectangle within an expanded effect transport surface, in document pixels. */
+  readonly content?: {
+    readonly x: number;
+    readonly y: number;
+    readonly width: number;
+    readonly height: number;
+  };
 }
 
 import { mix, vec2 } from "three/tsl";

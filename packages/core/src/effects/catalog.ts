@@ -1,3 +1,6 @@
+import { BEVEL_DEFINITION } from "./bevel/definition";
+import { DISPLACE_DEFINITION } from "./displace/definition";
+import { THERMAL_DEFINITION } from "./thermal/definition";
 import { ensure } from "../errors";
 import type { EffectType } from "../document/model";
 
@@ -31,6 +34,9 @@ import { MORPH_DEFINITION } from "./morph/definition";
 import { ASCII_DEFINITION } from "./ascii/definition";
 /** Portable effect metadata shared by factories, validation and client controls. */
 export const EFFECT_CATALOG: Readonly<Record<EffectType, EffectDefinition>> = Object.freeze({
+  bevel: BEVEL_DEFINITION,
+  displace: DISPLACE_DEFINITION,
+  thermal: THERMAL_DEFINITION,
   morph: MORPH_DEFINITION,
   dither: defineEffect("dither", {}, [AMOUNT, SCALE, LEVELS, COLOR, SEED]),
   ascii: ASCII_DEFINITION,

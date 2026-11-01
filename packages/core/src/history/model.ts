@@ -112,7 +112,7 @@ export type HistoryPropertyTarget =
   | Target<"project", "name">
   | Target<"composition", CompositionHistoryProperty>
   | Target<"layer", LayerHistoryProperty>
-  | Target<"effect", EffectMotionProperty | `settings.${string}`>
+  | Target<"effect", EffectMotionProperty | `settings.${string}` | `inputs.${string}`>
   | Target<"camera", CameraMotionProperty>
   | Target<"environment", EnvironmentMotionProperty | "preset" | "assetId">
   | Target<"light", LightMotionProperty>
@@ -176,7 +176,7 @@ export interface HistoryPropertyDefinition {
       | "project";
     readonly property: string;
     readonly effectType?: EffectType;
-    readonly scope?: "root" | "settings";
+    readonly scope?: "root" | "settings" | "input";
     readonly key?: string;
   };
 }

@@ -1,4 +1,5 @@
-import { openDB, type DBSchema, type IDBPDatabase, type IDBPTransaction } from "idb";
+import { openDatabase, commitTransaction } from "../persistence/database";
+import { type DBSchema, type IDBPDatabase, type IDBPTransaction } from "idb";
 import type { StoredFontFace, StoredFontFile } from "./model";
 import { FontLibraryError } from "./validation";
 
@@ -22,7 +23,7 @@ export class FontStore {
   private open(): Promise<IDBPDatabase<FontDatabaseSchema>> {
     this.assertOpen();
     if (this.opening) return this.opening;
-    const opening = openDB<FontDatabaseSchema>(this.name, 1, {
+    const opening = openDatabase<FontDatabaseSchema>(this.name, 1, {
       upgrade(db) {
         db.createObjectStore("fontFiles", { keyPath: "sha256" });
         db.createObjectStore("fontFaces", { keyPath: ["family", "weight"] }).createIndex(
@@ -77,35 +78,28 @@ export class FontStore {
     this.writes.add(transaction);
     let changed = false;
     try {
-      const originals = transaction.objectStore("fontFiles"),
-        metadata = transaction.objectStore("fontFaces");
-      if (!(await originals.get(file.sha256))) {
-        await originals.add(file);
-        changed = true;
-      }
-      for (const face of faces) {
-        const existing = await metadata.get([face.family, face.weight]);
-        if (existing && existing.sha256 !== face.sha256)
-          throw new FontLibraryError(
-            "conflict",
-            "A different font already owns this family and weight.",
-          );
-        if (!existing) {
-          await metadata.add(face);
+      return await commitTransaction(transaction, async () => {
+        const originals = transaction.objectStore("fontFiles"),
+          metadata = transaction.objectStore("fontFaces");
+        if (!(await originals.get(file.sha256))) {
+          await originals.add(file);
           changed = true;
         }
-      }
-      this.assertOpen();
-      await transaction.done;
-      return changed;
-    } catch (error) {
-      try {
-        transaction.abort();
-      } catch {
-        /* A completed native transaction cannot be aborted again. */
-      }
-      await transaction.done.catch(() => undefined);
-      throw error;
+        for (const face of faces) {
+          const existing = await metadata.get([face.family, face.weight]);
+          if (existing && existing.sha256 !== face.sha256)
+            throw new FontLibraryError(
+              "conflict",
+              "A different font already owns this family and weight.",
+            );
+          if (!existing) {
+            await metadata.add(face);
+            changed = true;
+          }
+        }
+        this.assertOpen();
+        return changed;
+      });
     } finally {
       this.writes.delete(transaction);
     }

@@ -1,4 +1,5 @@
-import { openDB, type DBSchema } from "idb";
+import { openDatabase } from "../persistence/database";
+import { type DBSchema } from "idb";
 import type { EmbeddedAsset, OriginalMediaAsset, Project } from "@musart/core";
 import type { StoredMediaHeader, StoredMediaOriginal } from "./media/model";
 import type {
@@ -85,7 +86,7 @@ export interface StudioDatabase extends DBSchema {
 
 /** One versioned connection schema; history records never enter project manifests. */
 export function openStudioDatabase(name: string) {
-  const opening = openDB<StudioDatabase>(name, 8, {
+  const opening = openDatabase<StudioDatabase>(name, 8, {
     upgrade(db, previousVersion, _newVersion, transaction) {
       if (previousVersion < 1) {
         db.createObjectStore("projects", { keyPath: "id" });

@@ -1,3 +1,4 @@
+import { EffectImageInputs } from "./inputs/EffectImageInputs";
 import "./gradient-messages";
 import "./messages";
 import "./library-messages";
@@ -114,6 +115,7 @@ export function EffectParameters({
       className="effect-controls reset-feedback"
       data-effect-parameter-count={parameters.length}
     >
+      <EffectImageInputs engine={engine} layerId={ownLayerId} effect={effect} disabled={disabled} />
       <div className="effect-controls-actions">
         <IconButton
           label={t("effectControls:resetAll")}
@@ -133,6 +135,7 @@ export function EffectParameters({
                   getEffectParameter(displayed(), parameter) !==
                   getEffectParameter(defaults, parameter),
               ) ||
+              Object.keys(displayed().inputs ?? {}).length > 0 ||
               (displayed().opacity ?? 1) !== 1 ||
               (displayed().blendMode ?? "normal") !== "normal" ||
               displayed().composite !== undefined;
@@ -140,6 +143,7 @@ export function EffectParameters({
               onChange(
                 {
                   ...definition.defaults,
+                  inputs: undefined,
                   enabled: displayed().enabled,
                   settings: defaults.settings ? { ...defaults.settings } : undefined,
                   time: defaults.time,

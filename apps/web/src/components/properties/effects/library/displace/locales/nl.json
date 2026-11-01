@@ -1,0 +1,20 @@
+{
+  "name": "Verplaatsen",
+  "library": "Textuurbibliotheek",
+  "map": "Verplaatsingskaart",
+  "selected": "Geselecteerd",
+  "procedural": "Procedureel",
+  "base": "Ingebouwd",
+  "saved": "Mijn texturen",
+  "import": "Afbeelding importeren",
+  "delete": "{{name}} verwijderen",
+  "clear": "Procedurele kaart gebruiken",
+  "loadError": "Texturen konden niet worden geladen.",
+  "saveError": "Textuur kon niet worden opgeslagen of toegepast.",
+  "stale": "Het project is gewijzigd. Probeer opnieuw.",
+  "textures": {
+    "plaster": "Pleister",
+    "stone": "Steen",
+    "normal": "Normaalkaart"
+  }
+}

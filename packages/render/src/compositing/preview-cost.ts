@@ -1,3 +1,4 @@
+import { hasEffectTreatment } from "../effects/shared/active";
 import {
   createLayerGeometryIndex,
   type Asset,
@@ -81,7 +82,7 @@ export function estimatePreviewCost(
     }
   }
   function layer(l: Layer, density: number, fixed: boolean, parent?: Bounds) {
-    const reference = l.effects.some((e) => e.enabled) || !!l.mask?.enabled;
+    const reference = l.effects.some(hasEffectTreatment) || !!l.mask?.enabled;
     if (reference) {
       density = 1;
       fixed = true;
@@ -108,7 +109,7 @@ export function estimatePreviewCost(
       }
       if (page.colorSpace === "display-p3") target(w, h, fixed);
     }
-    const effects = l.effects.filter((e) => e.enabled);
+    const effects = l.effects.filter(hasEffectTreatment);
     if (effects.length) {
       const footprint = effectFootprint(effects);
       const expanded = footprint.left || footprint.right || footprint.top || footprint.bottom;

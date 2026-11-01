@@ -1,3 +1,4 @@
+import { effectAssetIds } from "../effects/inputs";
 import type { Composition, Layer } from "../document/model";
 import { createLayerGeometryIndex, type LayerGeometryIndex } from "../layers/geometry-index";
 import { ensure } from "../errors";
@@ -89,6 +90,7 @@ function dependencyCopies(
   for (const guide of page.guides) reserved.add(guide.id);
   for (const layer of page.layers) {
     reserved.add(layer.id);
+    for (const id of effectAssetIds(layer.effects)) reserved.add(id);
     if (layer.assetId) reserved.add(layer.assetId);
     if (layer.mask?.assetId) reserved.add(layer.mask.assetId);
     for (const effect of layer.effects) reserved.add(effect.id);

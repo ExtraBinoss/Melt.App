@@ -1,0 +1,20 @@
+{
+  "name": "Versetzen",
+  "library": "Texturbibliothek",
+  "map": "Verschiebungskarte",
+  "selected": "Ausgewählt",
+  "procedural": "Prozedural",
+  "base": "Integriert",
+  "saved": "Meine Texturen",
+  "import": "Bild importieren",
+  "delete": "{{name}} löschen",
+  "clear": "Prozedurale Karte verwenden",
+  "loadError": "Texturen konnten nicht geladen werden.",
+  "saveError": "Textur konnte nicht gespeichert oder angewendet werden.",
+  "stale": "Das Projekt wurde geändert. Bitte erneut versuchen.",
+  "textures": {
+    "plaster": "Putz",
+    "stone": "Stein",
+    "normal": "Normalenkarte"
+  }
+}
