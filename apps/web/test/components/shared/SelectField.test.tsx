@@ -162,7 +162,7 @@ test("opens a real Radix listbox and reports a chosen option", async () => {
   expect(screen.getByRole("combobox", { name: "Mode" }).tagName).toBe("BUTTON");
 });
 
-test("property options use Radix item alignment without installing Floating UI ancestor tracking", async () => {
+test("property menus leave inherited body styles and scroll locks untouched", async () => {
   render(
     <SelectField
       label="Placement"
@@ -174,13 +174,15 @@ test("property options use Radix item alignment without installing Floating UI a
       onValueChange={vi.fn()}
     />,
   );
+  const inherited = document.body.outerHTML.split(">", 1)[0];
   fireEvent.pointerDown(screen.getByRole("combobox", { name: "Placement" }), {
     button: 0,
     ctrlKey: false,
     pointerType: "mouse",
   });
-  const list = await screen.findByRole("listbox");
-  expect(list.closest("[data-radix-popper-content-wrapper]")).toBeNull();
+  const list = await screen.findByRole("listbox", { name: "Placement" });
+  expect(document.body.outerHTML.split(">", 1)[0]).toBe(inherited);
+  expect(list.querySelector("style")).toBeNull();
   expect(screen.getByRole("option", { name: "One" })).toHaveAttribute("aria-selected", "true");
   fireEvent.keyDown(list, { key: "Escape" });
   expect(screen.queryByRole("listbox")).toBeNull();

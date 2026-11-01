@@ -262,3 +262,19 @@ it("rejects non-finite and impossible global percentages", () => {
   );
   expect(audit(root, true).filter((v) => v.rule === "coverage-threshold")).toHaveLength(2);
 });
+
+it("requires shared nonmodal selects while allowing infrastructure, type imports and other Radix primitives", () => {
+  file("apps/web/src/components/ui/select.tsx", 'import {Select as Primitive} from "radix-ui";');
+  file(
+    "apps/web/src/components/good.tsx",
+    'import {SelectField} from "./shared/SelectField"; import {DropdownMenu} from "radix-ui";',
+  );
+  file("apps/web/src/components/types.ts", 'import type {Select} from "../ui/select";');
+  file("apps/web/src/components/named-types.ts", 'import {type Select} from "../ui/select";');
+  expect(audit(root)).toEqual([]);
+  file("apps/web/src/components/a.tsx", 'import {Select as Alias} from "radix-ui";');
+  file("apps/web/src/components/b.tsx", 'import {Select} from "../ui/select.tsx";');
+  file("apps/web/src/components/c.tsx", 'export {Select} from "./ui/select";');
+  file("apps/web/src/components/d.tsx", 'const primitive = import("@radix-ui/react-select");');
+  expect(audit(root).map((entry) => entry.rule)).toEqual(Array(4).fill("local-select"));
+});

@@ -1,6 +1,7 @@
 import { readdirSync, readFileSync, existsSync } from "node:fs";
 import { resolve, relative, sep, extname } from "node:path";
 import ts from "typescript";
+import { importsPageLockingSelect } from "./rules/local-select";
 
 export interface Violation {
   file: string;
@@ -188,6 +189,17 @@ export function audit(root: string, coverage = false): Violation[] {
         rule: "database-gateway",
         detail:
           "Open IndexedDB through services/persistence/database; keep domain schemas in their stores.",
+      });
+    if (
+      rel.startsWith("apps/web/src/") &&
+      rel !== "apps/web/src/components/ui/select.tsx" &&
+      importsPageLockingSelect(file, sourceText)
+    )
+      violations.push({
+        file: rel,
+        rule: "local-select",
+        detail:
+          "Use shared/SelectField: local choice menus must not lock body or inject global viewport styles.",
       });
     if (/\.(?:readRenderTargetPixels(?:Async)?|readPixels|mapAsync)\s*\(/.test(sourceText)) {
       violations.push({

@@ -307,3 +307,24 @@ test("rapid Escape/reopen resets the FX viewport and draft while retaining the o
   fireEvent(popup, end);
   await waitFor(() => expect(popup).not.toBeInTheDocument());
 });
+
+test("opening effect controls focuses their surface without starting a Motion edit or pausing playback", async () => {
+  const d = fixture();
+  act(() =>
+    d.engine.execute({
+      type: "setCompositionMode",
+      mode: "motion",
+      plan: planMotionInitialization(d.engine.getSnapshot()),
+    }),
+  );
+  const transport = createMotionTransport(d.engine);
+  act(() => transport.play());
+  const before = d.engine.getSnapshot().project;
+  fireEvent.click(screen.getByRole("button", { name: "FX" }));
+  const panel = document.querySelector<HTMLElement>(".layer-attachment-popover")!;
+  await waitFor(() => expect(document.activeElement).toBe(panel));
+  expect(transport.read().playing).toBe(true);
+  expect(d.engine.getSnapshot().project).toBe(before);
+  expect(d.store.get(previewAtom)).toBeNull();
+  act(() => transport.pause());
+});

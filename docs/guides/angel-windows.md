@@ -13,6 +13,8 @@ Window trails is also a reusable library effect. Its controls cover the window c
 
 The raw 3D source is rendered once, not once per window. The effect searches windows front to back and samples source pixels only at the first covering window. Source frames, shader programs and glyph/frame atlases are reused. The effect is stateless: the same time and document produce the same result regardless of the previous seek.
 
+The reusable effect now prepares its bounded window rectangles once per pose, rather than repeating path trigonometry for each fragment. Source pixels and treatments stay on GPU textures. See [the overlay and geometry investigation](../performance/angel-overlays.md) for measurements, native checks and limitations.
+
 ## Source and attribution
 
 The replacement model is **Engel** by **noe-3d.at**, with LOD preparation by **M. K. Turkcan**, distributed in [Valdrada](https://huggingface.co/datasets/mehmetkeremturkcan/valdrada/blob/main/LICENSE.md) under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). The [source GLB](https://huggingface.co/datasets/mehmetkeremturkcan/valdrada/resolve/main/Content/models/cp33/bethesda/angel.glb) contains three LODs. Melt keeps the supplied 18,733-triangle LOD2, removes unused LODs, texture and UV data, and packs indices into 16 bits. Positions and normals are preserved; the resulting self-contained model is 586,712 bytes. Source URLs, license, authors, modifications and SHA-256 are retained in the GLB and `media/angel-source.json`. Attribution is also an editable template layer; retain the credit when redistributing the model or rendered output.

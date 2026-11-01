@@ -6,12 +6,14 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Keep local select fields nonmodal across the editor, export and performance panel: preserve Radix keyboard/focus behavior, draft cancellation, form reset and trigger width without nested body locks or per-opening viewport styles. Opening effect properties no longer starts a numeric edit or pauses playback. Enforce the shared-field boundary and add a native Angel.exe overlay regression.
+- Prepare Window trails geometry once per pose in bounded reusable uniforms and skip GPU window lookups outside their enclosing region. Preserve authored dimensions, exact seeking, source sampling and the shared 3D source; remove repeated path trigonometry from every fragment without lowering render quality.
+
 - Keep Motion/video playback running when opening effect or mask parameter popovers. Focus the editor surface before user interaction so automatic field focus cannot start an edit and pause playback; retain deliberate field gestures, keyboard navigation and Escape focus restoration.
 
 - Remove Time Warp Scan from effect authoring, search, shortcuts and rendering, including its temporal replay/cache and clock code. Retain a validation-only compatibility schema so existing projects, Motion keys and undo/history records still open without applying the retired effect.
 
 - Derive timeline animation text, selection outlines and DOM trim grips from the actual clip fill using the existing canvas grip luminance rule; keep selected, neutral and hovered blocks readable across theme and media-color changes without React updates or pixel sampling.
-
 
 - Use the shared platform modifier label in the timeline zoom tooltip: Command on Apple platforms and Ctrl on Windows/Linux, retaining the mounted tooltip during zoom changes.
 - Stabilize timeline scrollbar geometry across Animations/Keyframes switches and panel heights. Reserve the inline scrollbar gutter, bound transient canvas/row overflow to the authored content extent, and hide vertical scrolling in peek mode while preserving horizontal ruler access and expanded scrolling. Add a native Chromium regression with visible scrollbars and unchanged document state.

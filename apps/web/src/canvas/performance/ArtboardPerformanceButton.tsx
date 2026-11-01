@@ -2,13 +2,7 @@ import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from 
 import type { EnginePort } from "@musart/core";
 import { Activity, LoaderCircle, RotateCw } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../../components/ui/select";
+import { SelectField } from "../../components/shared/SelectField";
 import { CopyButton } from "../../components/ui/copy-button";
 import { InfoTooltip } from "../../components/shared/InfoTooltip";
 import {
@@ -137,23 +131,18 @@ function PerformancePanel({
       <div className="composition-performance-budget">
         <span>{t("frameBudget")}</span>
         <strong>{t("milliseconds", { value: budget })}</strong>
-        <Select value={String(target)} onValueChange={(value) => setTarget(Number(value))}>
-          <SelectTrigger className="composition-performance-target-select" aria-label={t("target")}>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent
-            data-performance-control
-            data-canvas-control
-            data-keybinding-capture
-            className="composition-performance-target-options"
-          >
-            {[24, 30, 60, 90, 120, 144, 165, 240, 360].map((fps) => (
-              <SelectItem key={fps} value={String(fps)}>
-                {t("fps", { count: fps })}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <SelectField
+          label={t("target")}
+          value={String(target)}
+          onValueChange={(value) => setTarget(Number(value))}
+          className="composition-performance-target-select"
+          contentClassName="composition-performance-target-options"
+          contentAttributes={{ "data-performance-control": true }}
+          options={[24, 30, 60, 90, 120, 144, 165, 240, 360].map((fps) => ({
+            value: String(fps),
+            label: t("fps", { count: fps }),
+          }))}
+        />
       </div>
       <ScrollShadow className="composition-performance-scroll">
         <div className="composition-performance-viewport" aria-busy={loading}>

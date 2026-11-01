@@ -1,3 +1,4 @@
+import { createWindowTrailsLayout } from "../window-trails/layout";
 import { EFFECT_COMPOSITE_MODES, type Effect } from "@musart/core";
 import { blendModeId } from "../../compositing/blends/registry";
 import { createGradientUniforms, updateGradientUniforms } from "../gradient/shared/uniforms";
@@ -12,8 +13,12 @@ export function createEffectUniforms(
   height: number,
   logical: EffectDimensions = { width, height },
 ) {
+  const parameters = createParameterUniforms(effect);
+  const windowTrails = effect.type === "window-trails" ? createWindowTrailsLayout() : null;
+  windowTrails?.update(parameters.parameters, effect.time ?? 0, logical.width, logical.height);
   return {
-    ...createParameterUniforms(effect),
+    ...parameters,
+    windowTrails,
     time: uniform(effect.time ?? 0),
     gradient: effect.type === "gradient" ? createGradientUniforms(effect) : null,
     blendMode: uniform(blendModeId(effect.blendMode ?? "normal")),
@@ -56,6 +61,12 @@ export function updateEffectUniforms(
   logical: EffectDimensions = { width, height },
 ): void {
   updateParameterUniforms(controls, effect);
+  controls.windowTrails?.update(
+    controls.parameters,
+    effect.time ?? 0,
+    logical.width,
+    logical.height,
+  );
   controls.time.value = effect.time ?? 0;
   if (controls.gradient) updateGradientUniforms(controls.gradient, effect);
   controls.blendMode.value = blendModeId(effect.blendMode ?? "normal");

@@ -10,7 +10,7 @@ import { exportReplayVideo, VideoExportError } from "../../services/animation/ex
 import { downloadBlob, safeName } from "../../services/files/download";
 import { Button } from "../ui/button";
 import { Slider } from "../ui/slider";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
+import { SelectField } from "../shared/SelectField";
 import { NumberInput } from "../shared/NumberInput";
 import { ScrollShadow } from "../shared/scroll/ScrollShadow";
 import "./messages";
@@ -255,19 +255,17 @@ export function AnimatePanel({
                 unit="×"
                 onCommit={setScale}
               />
-              <Select
+              <SelectField
+                label={t("format")}
                 value={container}
+                className="w-full"
                 onValueChange={(value) => setContainer(value as typeof container)}
-              >
-                <SelectTrigger aria-label={t("format")}>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="auto">{t("auto")}</SelectItem>
-                  <SelectItem value="mp4">MP4</SelectItem>
-                  <SelectItem value="webm">WebM</SelectItem>
-                </SelectContent>
-              </Select>
+                options={[
+                  { value: "auto", label: t("auto") },
+                  { value: "mp4", label: "MP4" },
+                  { value: "webm", label: "WebM" },
+                ]}
+              />
             </div>
             <Button
               disabled={progress !== null || preparing}
