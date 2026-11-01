@@ -21,8 +21,8 @@ import { useEngineValue } from "../../../state/session/editor";
 import { TimelineRowView } from "../rows/TimelineRowView";
 import { motionPropertyLabel } from "../rows/property-label";
 import { useTimelineRowHover } from "../rows/use-row-hover";
-import { TrackClips } from "../occurrences/TrackClips";
-import { MotionPopover } from "./MotionPopover";
+import { SimpleLayerRow } from "./SimpleLayerRow";
+import { readTimelinePage, useTimelineSource } from "../rows/timeline-source";
 import { AnimationBlock } from "./AnimationBlock";
 import { MotionSummaryBlock } from "./MotionSummaryBlock";
 import { SimpleAudioRows } from "./SimpleAudioRows";
@@ -83,7 +83,11 @@ export function SimpleTimelineRows({
   const { showHover, clearHover } = useTimelineRowHover(engine, page.id);
   const selection = useEngineValue(engine, (snapshot) => snapshot.selection);
   const selected = useMemo(() => new Set(selection), [selection]);
-  const geometry = useMemo(() => createLayerGeometryIndex(page), [page]);
+  const source = useTimelineSource(page);
+  const geometry = useMemo(() => {
+    const current = readTimelinePage(engine, source);
+    return current ? createLayerGeometryIndex(current) : undefined;
+  }, [engine, source]);
   const rows = useMemo(
     () =>
       layerRows.flatMap<Row | SimpleSceneRow>((row) => {
@@ -138,7 +142,7 @@ export function SimpleTimelineRows({
           );
         const { row, animation, track, property } = entry;
         const layer = row.layer,
-          locked = geometry.isLocked(layer.id),
+          locked = geometry?.isLocked(layer.id) ?? true,
           top = (first + offset) * rowHeight;
         const disabled = !interactive || locked;
         if (property && track) {
@@ -198,16 +202,15 @@ export function SimpleTimelineRows({
         }
         if (!animation || !track)
           return (
-            <TimelineRowView
+            <SimpleLayerRow
               key={row.key}
               row={row}
+              source={source}
               top={top}
               height={rowHeight}
               reduced={reduced}
               active={selected.has(layer.id)}
               locked={locked}
-              page={page}
-              project={engine.getSnapshot().project}
               pixelsPerSecond={scale}
               duration={duration}
               left={0}
@@ -224,36 +227,6 @@ export function SimpleTimelineRows({
               onError={onError}
               showHover={showHover}
               clearHover={clearHover}
-              labelsOnly
-              action={
-                <MotionPopover
-                  engine={engine}
-                  compositionId={page.id}
-                  layerId={layer.id}
-                  trackId={row.track?.id}
-                  transport={transport}
-                  disabled={disabled}
-                />
-              }
-              lane={
-                <TrackClips
-                  page={page}
-                  engine={engine}
-                  layerId={layer.id}
-                  name={layer.name}
-                  tracks={row.occurrences ?? []}
-                  chosenId={row.track?.id}
-                  duration={duration}
-                  scale={scale}
-                  disabled={disabled}
-                  unit={unit}
-                  gestures={gestures}
-                  drag={drag}
-                  transport={transport}
-                  onSelect={onSelect}
-                  onError={onError}
-                />
-              }
             />
           );
         const key = animation.id;

@@ -7,11 +7,12 @@ import {
 } from "@musart/core";
 import { getMotionOccurrenceSelection } from "../../../state/motion/occurrence-selection";
 import type { TimelineTransport } from "../model";
+import { readTimelinePage, useTimelineSource, type TimelineSource } from "../rows/timeline-source";
 
 /** An external presentation store owns its cache outside React render closures. */
 function createOccurrenceProjection(
   engine: EnginePort,
-  page: Composition,
+  source: TimelineSource,
   transport: TimelineTransport,
 ) {
   const selection = getMotionOccurrenceSelection(engine);
@@ -26,6 +27,8 @@ function createOccurrenceProjection(
       };
     },
     read(this: void) {
+      const page = readTimelinePage(engine, source);
+      if (!page) return previous;
       let changed: Map<string, string> | undefined;
       const time = transport.read().time;
       for (const layer of page.layers) {
@@ -49,9 +52,10 @@ export function useOccurrenceProjection(
   page: Composition,
   transport: TimelineTransport,
 ) {
-  const source = useMemo(
-    () => createOccurrenceProjection(engine, page, transport),
-    [engine, page, transport],
+  const source = useTimelineSource(page);
+  const projection = useMemo(
+    () => createOccurrenceProjection(engine, source, transport),
+    [engine, source, transport],
   );
-  return useSyncExternalStore(source.subscribe, source.read, source.read);
+  return useSyncExternalStore(projection.subscribe, projection.read, projection.read);
 }

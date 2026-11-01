@@ -5,7 +5,7 @@ import { installNativeDragProbe, assertNativeMove } from "./support/native-drag"
 import { installReadbackProbe } from "./support/readback-probe";
 
 const roots = [".musart-app", ".inspector", ".canvas-area", ".editor-canvas", ".editor-gpu-scene"];
-function fixture(count = 2) {
+function fixture(count = 2, movable = false) {
   const layers = [
     createLayer("group", { id: "reorder-group", name: "Animated group", width: 320, height: 220 }),
     ...Array.from({ length: count }, (_, index) =>
@@ -31,7 +31,7 @@ function fixture(count = 2) {
       id: `track-${layer.id}`,
       layerId: layer.id,
       start: { value: 0, rate: 1 },
-      end: null,
+      end: movable ? { value: 1, rate: 1 } : null,
       properties:
         layer.id === "reorder-0"
           ? [
@@ -40,7 +40,7 @@ function fixture(count = 2) {
                 target: { kind: "layer" as const, layerId: layer.id, property: "x" as const },
                 keyframes: [
                   { id: "x-start", time: { value: 0, rate: 1 }, value: 10 },
-                  { id: "x-end", time: { value: 2, rate: 1 }, value: 100 },
+                  { id: "x-end", time: { value: movable ? 1 : 2, rate: 1 }, value: 100 },
                 ],
               },
             ]
@@ -61,7 +61,7 @@ function fixture(count = 2) {
     ],
   });
 }
-async function load(page: Page, count = 2) {
+async function load(page: Page, count = 2, movable = false, view = "Keyframes") {
   await installReadbackProbe(page);
   await page.addInitScript(() => {
     localStorage.setItem("musart.language", "fr");
@@ -69,11 +69,14 @@ async function load(page: Page, count = 2) {
   });
   await page.goto("/?automation=1", { waitUntil: "domcontentloaded" });
   await page.waitForFunction(() => Boolean(window.musart));
-  await page.evaluate((project) => window.musart!.load(project), fixture(count));
-  await page.getByRole("button", { name: "Keyframes", exact: true }).click();
+  await page.evaluate((project) => window.musart!.load(project), fixture(count, movable));
+  await page.getByRole("button", { name: view, exact: true }).click();
   await page.getByRole("button", { name: "Épingler la timeline", exact: true }).click();
   await expect(page.locator(".motion-timeline-dock")).toHaveAttribute("data-motion-pinned", "true");
   await expect(page.locator(".motion-timeline-dock")).not.toHaveAttribute("data-motion-animating");
+  await page.evaluate(() =>
+    window.musart!.execute({ type: "updatePage", patch: { background: "#9f6382" } }),
+  );
 }
 async function counters(page: Page) {
   return page.evaluate(
@@ -152,12 +155,12 @@ test("native timeline gutter reorders through the same Layers controller and ret
   await evidence(page, "timeline-gutter-native", { browser: browser.version(), samples, quiet });
 });
 
-test("whole clip bars choose vertical stacking or horizontal time once, with one undo and clean cancel", async ({
+test("whole clip bars choose vertical stacking or horizontal time once, with one undo and clean cancel (Animations)", async ({
   page,
   browser,
 }) => {
   test.setTimeout(45_000);
-  await load(page);
+  await load(page, 2, true, "Animations");
   const source = row(page, "reorder-0").locator(".motion-track"),
     target = row(page, "reorder-1").locator(".motion-track");
   const before = await page.evaluate(() => window.musart!.snapshot());
@@ -214,7 +217,7 @@ test("vertical clip autoscroll retains the captured source and a bounded virtual
   page,
 }) => {
   test.setTimeout(45_000);
-  await load(page, 150);
+  await load(page, 150, false, "Animations");
   const source = row(page, "reorder-149").locator(".motion-track"),
     scroll = page.locator(".motion-timeline-scroll");
   const a = (await source.boundingBox())!,

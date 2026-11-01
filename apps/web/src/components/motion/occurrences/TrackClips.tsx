@@ -22,6 +22,7 @@ import type { TimelineLayerDrag } from "../layer-drag/use-timeline-layer-drag";
 import type { TimelineTransport, TimelineUnit } from "../model";
 import { TrackDurationTooltip } from "../TrackDurationTooltip";
 import { timelineTime } from "../time";
+import { readTimelinePage, type TimelineSource } from "../rows/timeline-source";
 import { requestLayerTransition } from "../transitions/requests";
 import { planOccurrencePlacement, type OccurrencePlacement } from "./placement";
 import "./occurrences.css";
@@ -29,6 +30,8 @@ import "../messages";
 
 interface Props {
   page?: Composition;
+  /** A retained row resolves canonical ownership on every interaction. */
+  source?: TimelineSource;
   engine?: EnginePort;
   layerId: string;
   name: string;
@@ -48,7 +51,8 @@ interface Props {
 export function TrackClips(props: Props) {
   const {
     engine,
-    page,
+    page: renderedPage,
+    source,
     tracks,
     layerId,
     name,
@@ -59,6 +63,16 @@ export function TrackClips(props: Props) {
     duration,
     disabled,
   } = props;
+  const currentPage = () => {
+    if (!engine) return renderedPage;
+    if (source) return readTimelinePage(engine, source);
+    const snapshot = engine.getSnapshot();
+    return snapshot.pageId === renderedPage?.id &&
+      snapshot.project.pages.find((item) => item.id === renderedPage?.id) === renderedPage
+      ? renderedPage
+      : undefined;
+  };
+  const page = renderedPage ?? (engine && source ? readTimelinePage(engine, source) : undefined);
   const { t } = useTranslation("motion");
   const [contextTime, setContextTime] = useState(transport.read().time);
   const [contextTrack, setContextTrack] = useState<string | null>(null);
@@ -95,10 +109,11 @@ export function TrackClips(props: Props) {
   }, []);
   useLayoutEffect(
     () => hide,
-    [hide, page, engine, layerId, props.chosenId, scale, duration, disabled],
+    [hide, renderedPage, source, engine, layerId, props.chosenId, scale, duration, disabled],
   );
   const publish = () => {
     const active = hover.current;
+    const page = currentPage();
     if (!active || !engine || !page || disabled) return;
     active.pending = null;
     const seconds = Math.max(0, Math.min(duration, (active.x - active.left) / scale));
@@ -122,7 +137,7 @@ export function TrackClips(props: Props) {
       active.pending = active.window.requestAnimationFrame(publish);
   };
   const beginHover = (node: HTMLDivElement, x: number) => {
-    if (!engine || !page || disabled) return;
+    if (!engine || !currentPage() || disabled) return;
     hide();
     const owner = node.ownerDocument.defaultView;
     if (!owner) return;
@@ -147,12 +162,12 @@ export function TrackClips(props: Props) {
     schedule();
   };
   const choose = (track: MotionLayerTrack) => {
-    if (!engine || !page) return;
-    if (
-      engine.getSnapshot().pageId !== page.id ||
-      engine.getSnapshot().project.pages.find((item) => item.id === page.id) !== page
-    )
-      return;
+    if (!engine) return true;
+    const page = currentPage();
+    if (!page) {
+      props.onError?.("changed");
+      return false;
+    }
     if (gestures?.readSelected().size) gestures.selectKeys([], false);
     getMotionOccurrenceSelection(engine).select(page, layerId, track.id);
     const time = transport.read().time;
@@ -161,13 +176,12 @@ export function TrackClips(props: Props) {
       compareMotionTime(time, track.end ?? page.motion!.duration) >= 0
     )
       transport.seek(track.start);
+    return true;
   };
   const commit = (plan: OccurrencePlacement) => {
-    if (!engine || !page) return;
-    if (
-      engine.getSnapshot().pageId !== page.id ||
-      engine.getSnapshot().project.pages.find((item) => item.id === page.id) !== page
-    ) {
+    if (!engine) return;
+    const page = currentPage();
+    if (!page) {
       props.onError?.("changed");
       return;
     }
@@ -202,6 +216,7 @@ export function TrackClips(props: Props) {
     const snapshot = engine?.getSnapshot(),
       origin = contextOrigin.current;
     const current =
+      !!currentPage() &&
       snapshot?.project === origin?.project &&
       snapshot?.revision === origin?.revision &&
       snapshot?.pageId === page?.id;
@@ -258,13 +273,13 @@ export function TrackClips(props: Props) {
                 onPointerDown={(event) => {
                   if (event.button !== 0) return;
                   hide();
-                  choose(track);
+                  if (!choose(track)) return;
                   if (drag) drag.pointer.begin(event, track);
                   else gestures?.beginTrack(event, track, "move");
                 }}
                 onClick={(event) => {
                   if (gestures?.consumePointerClick(event.detail)) return;
-                  choose(track);
+                  if (!choose(track)) return;
                   props.onSelect(layerId, event.shiftKey);
                 }}
               />
@@ -276,7 +291,7 @@ export function TrackClips(props: Props) {
                     aria-label={t("trimStart", { name })}
                     disabled={disabled}
                     onPointerDown={(event) => {
-                      choose(track);
+                      if (!choose(track)) return;
                       gestures.beginTrack(event, track, "trimStart");
                     }}
                   />
@@ -286,7 +301,7 @@ export function TrackClips(props: Props) {
                     aria-label={t("trimEnd", { name })}
                     disabled={disabled}
                     onPointerDown={(event) => {
-                      choose(track);
+                      if (!choose(track)) return;
                       gestures.beginTrack(event, track, "trimEnd");
                     }}
                   />
@@ -305,6 +320,10 @@ export function TrackClips(props: Props) {
             onOpenChange={(open) => {
               setContextTrack(open ? track.id : null);
               if (open) {
+                if (!currentPage()) {
+                  props.onError?.("changed");
+                  return;
+                }
                 menuGeneration.current++;
                 transitionHandoff.current = null;
                 transport.pause();
@@ -373,7 +392,7 @@ export function TrackClips(props: Props) {
                   onSelect={() => {
                     if (!menuCurrent()) return;
                     const plan = planOccurrencePlacement(
-                      page,
+                      currentPage()!,
                       layerId,
                       transport.read().time,
                       track.id,

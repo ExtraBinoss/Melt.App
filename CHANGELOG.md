@@ -6,6 +6,10 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Retain unchanged Animations timeline layer rows and occurrence projections across background metadata edits, while resolving selection, clip trimming, gap insertion and native drag against the current canonical composition and rejecting replaced sources.
+- Skip portal and presence controllers for unvisited tooltips, preserving genuine Radix first activation, accessible content, controlled opening, exit animations and explicit force mounting.
+- Verify retained timeline actions with native background-edit, reorder, finite-range movement, undo and autoscroll witnesses; align the native drag probe with Start document hydration.
+
 - Keep foreground export playback running through select entrances: reserve the UI admission gate for optional work, while retaining initial dialog admission and explicit pause/export cleanup.
 - Retain bounded plain select menus, stable option trees and imperative player clock presentation; defer optional thumbnails behind active export and Inspector work, preserving owner guards, native input, form reset and trigger width.
 - Publish Inspector owner changes after a bounded outline-first frame boundary and omit hidden keyframe control trees and frame subscriptions; retain active attachment ownership.

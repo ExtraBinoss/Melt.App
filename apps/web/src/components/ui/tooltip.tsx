@@ -20,8 +20,30 @@ function TooltipProvider({
   );
 }
 
-function Tooltip({ ...props }: React.ComponentProps<typeof TooltipPrimitive.Root>) {
-  return <TooltipPrimitive.Root data-slot="tooltip" {...props} />;
+const VisitedTooltip = React.createContext(true);
+function Tooltip({
+  open,
+  defaultOpen,
+  onOpenChange,
+  children,
+  ...props
+}: React.ComponentProps<typeof TooltipPrimitive.Root>) {
+  const [visited, setVisited] = React.useState(Boolean(open || defaultOpen));
+  if (open && !visited) setVisited(true);
+  return (
+    <TooltipPrimitive.Root
+      data-slot="tooltip"
+      {...props}
+      open={open}
+      defaultOpen={defaultOpen}
+      onOpenChange={(next) => {
+        if (next) setVisited(true);
+        onOpenChange?.(next);
+      }}
+    >
+      <VisitedTooltip value={visited}>{children}</VisitedTooltip>
+    </TooltipPrimitive.Root>
+  );
 }
 
 function TooltipTrigger({
@@ -46,11 +68,16 @@ function TooltipContent({
   className,
   sideOffset = 8,
   children,
+  forceMount,
   ...props
 }: React.ComponentProps<typeof TooltipPrimitive.Content>) {
+  const visited = React.useContext(VisitedTooltip);
+  // Unvisited help owns no portal/presence controller tree. Visited help retains Radix exit behavior.
+  if (!visited && !forceMount) return null;
   return (
-    <TooltipPrimitive.Portal>
+    <TooltipPrimitive.Portal forceMount={forceMount}>
       <TooltipPrimitive.Content
+        forceMount={forceMount}
         data-slot="tooltip-content"
         sideOffset={sideOffset}
         className={cn(

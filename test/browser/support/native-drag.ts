@@ -11,7 +11,10 @@ type ProbeWindow = Window & { __musartDragProbe?: NativeDragSample[] };
 export async function installNativeDragProbe(page: Page, mime: string, extraSurface?: string) {
   await page.evaluate(
     ({ mime, extraSurface }) => {
-      const root = document.getElementById("root");
+      // Start hydrates document; register after its delegated React listeners, as with legacy #root.
+      const root =
+        document.getElementById("root") ??
+        (document.querySelector(".musart-app") ? document : null);
       if (!root) throw Error("Missing application root");
       const extra = extraSurface ? [...document.querySelectorAll(extraSurface)] : [];
       if (extraSurface && extra.length === 0)
