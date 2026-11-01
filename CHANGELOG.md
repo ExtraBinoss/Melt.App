@@ -6,6 +6,7 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Add static GPU Ink Bleed, segmented Pixel Sort and Edge Detection with six selectable kernels, shared image/layer/export rendering, bounded scratch resources, validated parameters and translations in all twelve locales.
 - Make editor tab titles follow the project name, including rename and undo/redo, while preserving dashboard titles.
 - Keep local select fields nonmodal across the editor, export and performance panel: preserve Radix keyboard/focus behavior, draft cancellation, form reset and trigger width without nested body locks or per-opening viewport styles. Opening effect properties no longer starts a numeric edit or pauses playback. Enforce the shared-field boundary and add a native Angel.exe overlay regression.
 - Prepare Window trails geometry once per pose in bounded reusable uniforms and skip GPU window lookups outside their enclosing region. Preserve authored dimensions, exact seeking, source sampling and the shared 3D source; remove repeated path trigonometry from every fragment without lowering render quality.

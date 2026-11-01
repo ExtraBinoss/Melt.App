@@ -1,3 +1,4 @@
+import { SURFACE_PARAMETERS } from "./surface/parameters";
 import { describe, expect, it } from "vitest";
 import { EFFECT_CATALOG, getEffectDefinition } from "../../src/effects/catalog";
 import { getEffectParameter, patchEffectParameter } from "../../src/effects/parameters";
@@ -8,6 +9,9 @@ import type { EffectType } from "../../src/document/model";
 describe("portable effect definitions", () => {
   it("describes every supported effect once, with the existing deterministic defaults", () => {
     expect(Object.keys(EFFECT_CATALOG)).toEqual([
+      "ink-bleed",
+      "pixel-sort",
+      "edge-detect",
       "window-trails",
       "bevel",
       "displace",
@@ -67,6 +71,7 @@ describe("portable effect definitions", () => {
   });
   it("provides typed controls in document units and meaningful display metadata", () => {
     const expected: Record<EffectType, string[]> = {
+      ...SURFACE_PARAMETERS,
       "window-trails": [
         "amount",
         "scale",
@@ -457,16 +462,33 @@ describe("portable effect definitions", () => {
       );
       expect(getEffectDefinition(definition.type)).toBe(definition);
       expect(definition.coverage).toBe(
-        ["blur", "shadow", "displace", "window-trails", "time-warp-scan"].includes(definition.type)
+        [
+          "ink-bleed",
+          "pixel-sort",
+          "blur",
+          "shadow",
+          "displace",
+          "window-trails",
+          "time-warp-scan",
+        ].includes(definition.type)
           ? "expand"
-          : ["gradient", "circle", "shatter", "crt", "receipt", "transition"].includes(
-                definition.type,
-              )
+          : [
+                "edge-detect",
+                "gradient",
+                "circle",
+                "shatter",
+                "crt",
+                "receipt",
+                "transition",
+              ].includes(definition.type)
             ? "reduce"
             : "preserve",
       );
       expect(definition.category).toBe(
         [
+          "ink-bleed",
+          "pixel-sort",
+          "edge-detect",
           "window-trails",
           "bevel",
           "displace",

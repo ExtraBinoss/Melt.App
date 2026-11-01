@@ -1,3 +1,5 @@
+import { pixelSortStages } from "./pixel-sort/pipeline";
+import { EDGE_DETECT_STAGES } from "./edge-detect/pipeline";
 import { getEffectDefinition, type Effect } from "@musart/core";
 import { gradientStages } from "./gradient/pipeline";
 import { transitionStages } from "./transition/pipeline";
@@ -11,6 +13,8 @@ export type { EffectStage } from "./shared/stages";
 export function effectStages(effect: Effect): readonly EffectStage[] {
   const definition = getEffectDefinition(effect.type);
   if (definition.retired || definition.source === "geometry") return [];
+  if (effect.type === "pixel-sort") return pixelSortStages(effect);
+  if (effect.type === "edge-detect") return EDGE_DETECT_STAGES;
   if (effect.type === "gradient") return gradientStages(effect);
   if (effect.type === "transition") return transitionStages(effect);
   if (effect.type === "blur")

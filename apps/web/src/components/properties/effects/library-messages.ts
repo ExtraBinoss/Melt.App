@@ -1,3 +1,6 @@
+import inkBleed from "./library/ink-bleed/messages.json";
+import pixelSort from "./library/pixel-sort/messages.json";
+import edgeDetect from "./library/edge-detect/messages.json";
 import { messages as windowTrails } from "./library/window-trails/messages";
 import { messages as material } from "./library/material/messages";
 import { messages as bevel } from "./library/bevel/messages";
@@ -22,6 +25,9 @@ import receipt from "./library/receipt/messages.json";
 import pinkPhosphor from "./library/pink-phosphor/messages.json";
 /** UI resources stay on the web side; the core catalog only contains stable label keys. */
 export const libraryMessages = {
+  "ink-bleed": inkBleed,
+  "pixel-sort": pixelSort,
+  "edge-detect": edgeDetect,
   "window-trails": windowTrails,
   bevel,
   displace,

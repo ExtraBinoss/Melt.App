@@ -1,0 +1,326 @@
+{
+  "en": {
+    "name": "Edge Detection",
+    "parameter": {
+      "source": "Source",
+      "threshold": "Threshold",
+      "softness": "Softness",
+      "method": "Method",
+      "smoothing": "Smoothing",
+      "width": "Edge width",
+      "gain": "Gain",
+      "invert": "Invert",
+      "overlay": "Overlay",
+      "backgroundOpacity": "Background opacity",
+      "foregroundColor": "Edge color",
+      "backgroundColor": "Background color"
+    },
+    "choice": {
+      "luminance": "Luminance",
+      "alpha": "Alpha",
+      "scharr": "Scharr",
+      "sobel": "Sobel",
+      "prewitt": "Prewitt",
+      "roberts": "Roberts",
+      "laplacian": "Laplacian",
+      "dog": "Difference of Gaussians"
+    }
+  },
+  "fr": {
+    "name": "Détection de contours",
+    "parameter": {
+      "source": "Source",
+      "threshold": "Seuil",
+      "softness": "Douceur",
+      "method": "Méthode",
+      "smoothing": "Lissage",
+      "width": "Épaisseur des contours",
+      "gain": "Gain",
+      "invert": "Inverser",
+      "overlay": "Superposer",
+      "backgroundOpacity": "Opacité du fond",
+      "foregroundColor": "Couleur des contours",
+      "backgroundColor": "Couleur du fond"
+    },
+    "choice": {
+      "luminance": "Luminance",
+      "alpha": "Alpha",
+      "scharr": "Scharr",
+      "sobel": "Sobel",
+      "prewitt": "Prewitt",
+      "roberts": "Roberts",
+      "laplacian": "Laplacien",
+      "dog": "Différence de gaussiennes"
+    }
+  },
+  "de": {
+    "name": "Kantenerkennung",
+    "parameter": {
+      "source": "Quelle",
+      "threshold": "Schwellenwert",
+      "softness": "Weichheit",
+      "method": "Methode",
+      "smoothing": "Glättung",
+      "width": "Kantenbreite",
+      "gain": "Verstärkung",
+      "invert": "Umkehren",
+      "overlay": "Überlagern",
+      "backgroundOpacity": "Hintergrunddeckkraft",
+      "foregroundColor": "Kantenfarbe",
+      "backgroundColor": "Hintergrundfarbe"
+    },
+    "choice": {
+      "luminance": "Luminanz",
+      "alpha": "Alpha",
+      "scharr": "Scharr",
+      "sobel": "Sobel",
+      "prewitt": "Prewitt",
+      "roberts": "Roberts",
+      "laplacian": "Laplace",
+      "dog": "Differenz von Gaußfiltern"
+    }
+  },
+  "es": {
+    "name": "Detección de bordes",
+    "parameter": {
+      "source": "Origen",
+      "threshold": "Umbral",
+      "softness": "Suavidad",
+      "method": "Método",
+      "smoothing": "Suavizado",
+      "width": "Grosor del borde",
+      "gain": "Ganancia",
+      "invert": "Invertir",
+      "overlay": "Superponer",
+      "backgroundOpacity": "Opacidad del fondo",
+      "foregroundColor": "Color del borde",
+      "backgroundColor": "Color del fondo"
+    },
+    "choice": {
+      "luminance": "Luminancia",
+      "alpha": "Alfa",
+      "scharr": "Scharr",
+      "sobel": "Sobel",
+      "prewitt": "Prewitt",
+      "roberts": "Roberts",
+      "laplacian": "Laplaciano",
+      "dog": "Diferencia de gaussianas"
+    }
+  },
+  "it": {
+    "name": "Rilevamento bordi",
+    "parameter": {
+      "source": "Origine",
+      "threshold": "Soglia",
+      "softness": "Morbidezza",
+      "method": "Metodo",
+      "smoothing": "Levigatura",
+      "width": "Spessore bordi",
+      "gain": "Guadagno",
+      "invert": "Inverti",
+      "overlay": "Sovrapponi",
+      "backgroundOpacity": "Opacità sfondo",
+      "foregroundColor": "Colore bordi",
+      "backgroundColor": "Colore sfondo"
+    },
+    "choice": {
+      "luminance": "Luminanza",
+      "alpha": "Alfa",
+      "scharr": "Scharr",
+      "sobel": "Sobel",
+      "prewitt": "Prewitt",
+      "roberts": "Roberts",
+      "laplacian": "Laplaciano",
+      "dog": "Differenza di gaussiane"
+    }
+  },
+  "pt": {
+    "name": "Deteção de bordas",
+    "parameter": {
+      "source": "Origem",
+      "threshold": "Limiar",
+      "softness": "Suavidade",
+      "method": "Método",
+      "smoothing": "Suavização",
+      "width": "Espessura das bordas",
+      "gain": "Ganho",
+      "invert": "Inverter",
+      "overlay": "Sobrepor",
+      "backgroundOpacity": "Opacidade do fundo",
+      "foregroundColor": "Cor das bordas",
+      "backgroundColor": "Cor do fundo"
+    },
+    "choice": {
+      "luminance": "Luminância",
+      "alpha": "Alfa",
+      "scharr": "Scharr",
+      "sobel": "Sobel",
+      "prewitt": "Prewitt",
+      "roberts": "Roberts",
+      "laplacian": "Laplaciano",
+      "dog": "Diferença de gaussianas"
+    }
+  },
+  "nl": {
+    "name": "Randdetectie",
+    "parameter": {
+      "source": "Bron",
+      "threshold": "Drempel",
+      "softness": "Zachtheid",
+      "method": "Methode",
+      "smoothing": "Vervloeiing",
+      "width": "Randdikte",
+      "gain": "Versterking",
+      "invert": "Omkeren",
+      "overlay": "Overleggen",
+      "backgroundOpacity": "Achtergronddekking",
+      "foregroundColor": "Randkleur",
+      "backgroundColor": "Achtergrondkleur"
+    },
+    "choice": {
+      "luminance": "Luminantie",
+      "alpha": "Alfa",
+      "scharr": "Scharr",
+      "sobel": "Sobel",
+      "prewitt": "Prewitt",
+      "roberts": "Roberts",
+      "laplacian": "Laplace",
+      "dog": "Verschil van Gaussfilters"
+    }
+  },
+  "pl": {
+    "name": "Wykrywanie krawędzi",
+    "parameter": {
+      "source": "Źródło",
+      "threshold": "Próg",
+      "softness": "Miękkość",
+      "method": "Metoda",
+      "smoothing": "Wygładzanie",
+      "width": "Grubość krawędzi",
+      "gain": "Wzmocnienie",
+      "invert": "Odwróć",
+      "overlay": "Nałóż",
+      "backgroundOpacity": "Krycie tła",
+      "foregroundColor": "Kolor krawędzi",
+      "backgroundColor": "Kolor tła"
+    },
+    "choice": {
+      "luminance": "Luminancja",
+      "alpha": "Alfa",
+      "scharr": "Scharr",
+      "sobel": "Sobel",
+      "prewitt": "Prewitt",
+      "roberts": "Roberts",
+      "laplacian": "Laplasjan",
+      "dog": "Różnica rozmyć Gaussa"
+    }
+  },
+  "ja": {
+    "name": "輪郭検出",
+    "parameter": {
+      "source": "ソース",
+      "threshold": "しきい値",
+      "softness": "柔らかさ",
+      "method": "方式",
+      "smoothing": "平滑化",
+      "width": "輪郭の太さ",
+      "gain": "ゲイン",
+      "invert": "反転",
+      "overlay": "重ねる",
+      "backgroundOpacity": "背景の不透明度",
+      "foregroundColor": "輪郭色",
+      "backgroundColor": "背景色"
+    },
+    "choice": {
+      "luminance": "輝度",
+      "alpha": "アルファ",
+      "scharr": "Scharr",
+      "sobel": "Sobel",
+      "prewitt": "Prewitt",
+      "roberts": "Roberts",
+      "laplacian": "ラプラシアン",
+      "dog": "ガウス差分"
+    }
+  },
+  "ko": {
+    "name": "윤곽선 검출",
+    "parameter": {
+      "source": "소스",
+      "threshold": "임계값",
+      "softness": "부드러움",
+      "method": "방식",
+      "smoothing": "평활화",
+      "width": "윤곽선 두께",
+      "gain": "게인",
+      "invert": "반전",
+      "overlay": "오버레이",
+      "backgroundOpacity": "배경 불투명도",
+      "foregroundColor": "윤곽선 색상",
+      "backgroundColor": "배경 색상"
+    },
+    "choice": {
+      "luminance": "휘도",
+      "alpha": "알파",
+      "scharr": "Scharr",
+      "sobel": "Sobel",
+      "prewitt": "Prewitt",
+      "roberts": "Roberts",
+      "laplacian": "라플라시안",
+      "dog": "가우시안 차분"
+    }
+  },
+  "zh": {
+    "name": "边缘检测",
+    "parameter": {
+      "source": "来源",
+      "threshold": "阈值",
+      "softness": "柔和度",
+      "method": "方法",
+      "smoothing": "平滑",
+      "width": "边缘宽度",
+      "gain": "增益",
+      "invert": "反转",
+      "overlay": "叠加",
+      "backgroundOpacity": "背景不透明度",
+      "foregroundColor": "边缘颜色",
+      "backgroundColor": "背景颜色"
+    },
+    "choice": {
+      "luminance": "亮度",
+      "alpha": "透明度",
+      "scharr": "Scharr",
+      "sobel": "Sobel",
+      "prewitt": "Prewitt",
+      "roberts": "Roberts",
+      "laplacian": "拉普拉斯",
+      "dog": "高斯差分"
+    }
+  },
+  "ar": {
+    "name": "كشف الحواف",
+    "parameter": {
+      "source": "المصدر",
+      "threshold": "العتبة",
+      "softness": "النعومة",
+      "method": "الطريقة",
+      "smoothing": "التنعيم",
+      "width": "عرض الحواف",
+      "gain": "التعزيز",
+      "invert": "عكس",
+      "overlay": "تراكب",
+      "backgroundOpacity": "عتامة الخلفية",
+      "foregroundColor": "لون الحواف",
+      "backgroundColor": "لون الخلفية"
+    },
+    "choice": {
+      "luminance": "الإضاءة",
+      "alpha": "ألفا",
+      "scharr": "Scharr",
+      "sobel": "Sobel",
+      "prewitt": "Prewitt",
+      "roberts": "Roberts",
+      "laplacian": "لابلاسيان",
+      "dog": "فرق غاوسي"
+    }
+  }
+}

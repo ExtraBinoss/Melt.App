@@ -23,6 +23,9 @@ export const EFFECT_FAMILIES: readonly EffectFamily[] = [
 
 /** Presentation-only families; the portable effect/adjustment taxonomy stays authoritative. */
 export const EFFECT_FAMILY = {
+  "ink-bleed": "texture",
+  "pixel-sort": "distortion",
+  "edge-detect": "texture",
   "window-trails": "motion",
   bevel: "light",
   displace: "distortion",

@@ -1,0 +1,230 @@
+{
+  "en": {
+    "name": "Ink Bleed",
+    "parameter": {
+      "source": "Source",
+      "radius": "Spread",
+      "density": "Ink density",
+      "threshold": "Threshold",
+      "softness": "Softness",
+      "roughness": "Paper roughness",
+      "paperScale": "Paper texture scale",
+      "colorize": "Tint ink",
+      "inkColor": "Ink color",
+      "seed": "Seed"
+    },
+    "choice": {
+      "luminance": "Luminance",
+      "alpha": "Alpha"
+    }
+  },
+  "fr": {
+    "name": "Diffusion d’encre",
+    "parameter": {
+      "source": "Source",
+      "radius": "Diffusion",
+      "density": "Densité de l’encre",
+      "threshold": "Seuil",
+      "softness": "Douceur",
+      "roughness": "Rugosité du papier",
+      "paperScale": "Échelle du papier",
+      "colorize": "Teinter l’encre",
+      "inkColor": "Couleur de l’encre",
+      "seed": "Graine"
+    },
+    "choice": {
+      "luminance": "Luminance",
+      "alpha": "Alpha"
+    }
+  },
+  "de": {
+    "name": "Verlaufende Tinte",
+    "parameter": {
+      "source": "Quelle",
+      "radius": "Ausbreitung",
+      "density": "Tintendichte",
+      "threshold": "Schwellenwert",
+      "softness": "Weichheit",
+      "roughness": "Papierrauheit",
+      "paperScale": "Papierstrukturgröße",
+      "colorize": "Tinte einfärben",
+      "inkColor": "Tintenfarbe",
+      "seed": "Zufallswert"
+    },
+    "choice": {
+      "luminance": "Luminanz",
+      "alpha": "Alpha"
+    }
+  },
+  "es": {
+    "name": "Difusión de tinta",
+    "parameter": {
+      "source": "Origen",
+      "radius": "Difusión",
+      "density": "Densidad de tinta",
+      "threshold": "Umbral",
+      "softness": "Suavidad",
+      "roughness": "Rugosidad del papel",
+      "paperScale": "Escala del papel",
+      "colorize": "Teñir tinta",
+      "inkColor": "Color de tinta",
+      "seed": "Semilla"
+    },
+    "choice": {
+      "luminance": "Luminancia",
+      "alpha": "Alfa"
+    }
+  },
+  "it": {
+    "name": "Diffusione inchiostro",
+    "parameter": {
+      "source": "Origine",
+      "radius": "Diffusione",
+      "density": "Densità dell’inchiostro",
+      "threshold": "Soglia",
+      "softness": "Morbidezza",
+      "roughness": "Ruvidità della carta",
+      "paperScale": "Scala della carta",
+      "colorize": "Colora inchiostro",
+      "inkColor": "Colore inchiostro",
+      "seed": "Seme"
+    },
+    "choice": {
+      "luminance": "Luminanza",
+      "alpha": "Alfa"
+    }
+  },
+  "pt": {
+    "name": "Difusão de tinta",
+    "parameter": {
+      "source": "Origem",
+      "radius": "Difusão",
+      "density": "Densidade da tinta",
+      "threshold": "Limiar",
+      "softness": "Suavidade",
+      "roughness": "Rugosidade do papel",
+      "paperScale": "Escala do papel",
+      "colorize": "Tingir tinta",
+      "inkColor": "Cor da tinta",
+      "seed": "Semente"
+    },
+    "choice": {
+      "luminance": "Luminância",
+      "alpha": "Alfa"
+    }
+  },
+  "nl": {
+    "name": "Uitvloeiende inkt",
+    "parameter": {
+      "source": "Bron",
+      "radius": "Uitvloeiing",
+      "density": "Inktdichtheid",
+      "threshold": "Drempel",
+      "softness": "Zachtheid",
+      "roughness": "Papierruwheid",
+      "paperScale": "Papiertextuurschaal",
+      "colorize": "Inkt kleuren",
+      "inkColor": "Inktkleur",
+      "seed": "Startwaarde"
+    },
+    "choice": {
+      "luminance": "Luminantie",
+      "alpha": "Alfa"
+    }
+  },
+  "pl": {
+    "name": "Rozlewanie tuszu",
+    "parameter": {
+      "source": "Źródło",
+      "radius": "Rozlewanie",
+      "density": "Gęstość tuszu",
+      "threshold": "Próg",
+      "softness": "Miękkość",
+      "roughness": "Szorstkość papieru",
+      "paperScale": "Skala faktury papieru",
+      "colorize": "Barwienie tuszu",
+      "inkColor": "Kolor tuszu",
+      "seed": "Ziarno"
+    },
+    "choice": {
+      "luminance": "Luminancja",
+      "alpha": "Alfa"
+    }
+  },
+  "ja": {
+    "name": "インクのにじみ",
+    "parameter": {
+      "source": "ソース",
+      "radius": "にじみ幅",
+      "density": "インク濃度",
+      "threshold": "しきい値",
+      "softness": "柔らかさ",
+      "roughness": "紙の粗さ",
+      "paperScale": "紙の模様の大きさ",
+      "colorize": "インクを着色",
+      "inkColor": "インク色",
+      "seed": "シード"
+    },
+    "choice": {
+      "luminance": "輝度",
+      "alpha": "アルファ"
+    }
+  },
+  "ko": {
+    "name": "잉크 번짐",
+    "parameter": {
+      "source": "소스",
+      "radius": "번짐 범위",
+      "density": "잉크 농도",
+      "threshold": "임계값",
+      "softness": "부드러움",
+      "roughness": "종이 거칠기",
+      "paperScale": "종이 질감 크기",
+      "colorize": "잉크 착색",
+      "inkColor": "잉크 색상",
+      "seed": "시드"
+    },
+    "choice": {
+      "luminance": "휘도",
+      "alpha": "알파"
+    }
+  },
+  "zh": {
+    "name": "墨水晕染",
+    "parameter": {
+      "source": "来源",
+      "radius": "扩散范围",
+      "density": "墨水浓度",
+      "threshold": "阈值",
+      "softness": "柔和度",
+      "roughness": "纸张粗糙度",
+      "paperScale": "纸张纹理大小",
+      "colorize": "墨水着色",
+      "inkColor": "墨水颜色",
+      "seed": "随机种子"
+    },
+    "choice": {
+      "luminance": "亮度",
+      "alpha": "透明度"
+    }
+  },
+  "ar": {
+    "name": "نزف الحبر",
+    "parameter": {
+      "source": "المصدر",
+      "radius": "الانتشار",
+      "density": "كثافة الحبر",
+      "threshold": "العتبة",
+      "softness": "النعومة",
+      "roughness": "خشونة الورق",
+      "paperScale": "حجم نسيج الورق",
+      "colorize": "تلوين الحبر",
+      "inkColor": "لون الحبر",
+      "seed": "البذرة"
+    },
+    "choice": {
+      "luminance": "الإضاءة",
+      "alpha": "ألفا"
+    }
+  }
+}

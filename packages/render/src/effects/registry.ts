@@ -1,3 +1,6 @@
+import { inkBleedNode } from "./ink-bleed/node";
+import { pixelSortFinishNode } from "./pixel-sort/node";
+import { edgeDetectNode } from "./edge-detect/node";
 import { windowTrailsNode } from "./window-trails/node";
 import { bevelNode } from "./bevel/node";
 import { displaceNode } from "./displace/node";
@@ -44,6 +47,9 @@ export const EFFECT_NODES: Readonly<
     EffectNodeBuilder
   >
 > = Object.freeze({
+  "ink-bleed": inkBleedNode,
+  "pixel-sort": pixelSortFinishNode,
+  "edge-detect": edgeDetectNode,
   "window-trails": windowTrailsNode,
   bevel: bevelNode,
   displace: displaceNode,

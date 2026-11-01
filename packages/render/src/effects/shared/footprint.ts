@@ -1,3 +1,4 @@
+import { inkBleedFootprint } from "../ink-bleed/footprint";
 import type { Effect, EffectType } from "@musart/core";
 import { displaceFootprint } from "../displace/footprint";
 import { blurFootprint } from "../blur/footprint";
@@ -9,6 +10,7 @@ interface Outset {
   bottom: number;
 }
 const footprints: Partial<Record<EffectType, (effect: Effect) => Outset>> = {
+  "ink-bleed": inkBleedFootprint,
   blur: blurFootprint,
   displace: displaceFootprint,
   shadow: shadowFootprint,

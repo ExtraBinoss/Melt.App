@@ -1,0 +1,302 @@
+{
+  "en": {
+    "name": "Pixel Sort",
+    "parameter": {
+      "axis": "Direction",
+      "order": "Sort order",
+      "metric": "Sort by",
+      "window": "Segment length",
+      "cellSize": "Pixel size",
+      "offset": "Segment offset"
+    },
+    "choice": {
+      "horizontal": "Horizontal",
+      "vertical": "Vertical",
+      "ascending": "Ascending",
+      "descending": "Descending",
+      "luminance": "Luminance",
+      "red": "Red",
+      "green": "Green",
+      "blue": "Blue",
+      "8": "8",
+      "16": "16",
+      "32": "32",
+      "64": "64"
+    }
+  },
+  "fr": {
+    "name": "Tri de pixels",
+    "parameter": {
+      "axis": "Direction",
+      "order": "Ordre du tri",
+      "metric": "Trier par",
+      "window": "Longueur des segments",
+      "cellSize": "Taille des pixels",
+      "offset": "Décalage des segments"
+    },
+    "choice": {
+      "horizontal": "Horizontale",
+      "vertical": "Verticale",
+      "ascending": "Croissant",
+      "descending": "Décroissant",
+      "luminance": "Luminance",
+      "red": "Rouge",
+      "green": "Vert",
+      "blue": "Bleu",
+      "8": "8",
+      "16": "16",
+      "32": "32",
+      "64": "64"
+    }
+  },
+  "de": {
+    "name": "Pixelsortierung",
+    "parameter": {
+      "axis": "Richtung",
+      "order": "Sortierreihenfolge",
+      "metric": "Sortieren nach",
+      "window": "Segmentlänge",
+      "cellSize": "Pixelgröße",
+      "offset": "Segmentversatz"
+    },
+    "choice": {
+      "horizontal": "Horizontal",
+      "vertical": "Vertikal",
+      "ascending": "Aufsteigend",
+      "descending": "Absteigend",
+      "luminance": "Luminanz",
+      "red": "Rot",
+      "green": "Grün",
+      "blue": "Blau",
+      "8": "8",
+      "16": "16",
+      "32": "32",
+      "64": "64"
+    }
+  },
+  "es": {
+    "name": "Ordenar píxeles",
+    "parameter": {
+      "axis": "Dirección",
+      "order": "Orden",
+      "metric": "Ordenar por",
+      "window": "Longitud del segmento",
+      "cellSize": "Tamaño del píxel",
+      "offset": "Desplazamiento del segmento"
+    },
+    "choice": {
+      "horizontal": "Horizontal",
+      "vertical": "Vertical",
+      "ascending": "Ascendente",
+      "descending": "Descendente",
+      "luminance": "Luminancia",
+      "red": "Rojo",
+      "green": "Verde",
+      "blue": "Azul",
+      "8": "8",
+      "16": "16",
+      "32": "32",
+      "64": "64"
+    }
+  },
+  "it": {
+    "name": "Ordina pixel",
+    "parameter": {
+      "axis": "Direzione",
+      "order": "Ordine",
+      "metric": "Ordina per",
+      "window": "Lunghezza segmento",
+      "cellSize": "Dimensione pixel",
+      "offset": "Scostamento segmento"
+    },
+    "choice": {
+      "horizontal": "Orizzontale",
+      "vertical": "Verticale",
+      "ascending": "Crescente",
+      "descending": "Decrescente",
+      "luminance": "Luminanza",
+      "red": "Rosso",
+      "green": "Verde",
+      "blue": "Blu",
+      "8": "8",
+      "16": "16",
+      "32": "32",
+      "64": "64"
+    }
+  },
+  "pt": {
+    "name": "Ordenar píxeis",
+    "parameter": {
+      "axis": "Direção",
+      "order": "Ordem",
+      "metric": "Ordenar por",
+      "window": "Comprimento do segmento",
+      "cellSize": "Tamanho do píxel",
+      "offset": "Deslocamento do segmento"
+    },
+    "choice": {
+      "horizontal": "Horizontal",
+      "vertical": "Vertical",
+      "ascending": "Crescente",
+      "descending": "Decrescente",
+      "luminance": "Luminância",
+      "red": "Vermelho",
+      "green": "Verde",
+      "blue": "Azul",
+      "8": "8",
+      "16": "16",
+      "32": "32",
+      "64": "64"
+    }
+  },
+  "nl": {
+    "name": "Pixelsortering",
+    "parameter": {
+      "axis": "Richting",
+      "order": "Sorteervolgorde",
+      "metric": "Sorteren op",
+      "window": "Segmentlengte",
+      "cellSize": "Pixelgrootte",
+      "offset": "Segmentverschuiving"
+    },
+    "choice": {
+      "horizontal": "Horizontaal",
+      "vertical": "Verticaal",
+      "ascending": "Oplopend",
+      "descending": "Aflopend",
+      "luminance": "Luminantie",
+      "red": "Rood",
+      "green": "Groen",
+      "blue": "Blauw",
+      "8": "8",
+      "16": "16",
+      "32": "32",
+      "64": "64"
+    }
+  },
+  "pl": {
+    "name": "Sortowanie pikseli",
+    "parameter": {
+      "axis": "Kierunek",
+      "order": "Kolejność",
+      "metric": "Sortuj według",
+      "window": "Długość segmentu",
+      "cellSize": "Rozmiar piksela",
+      "offset": "Przesunięcie segmentu"
+    },
+    "choice": {
+      "horizontal": "Poziomo",
+      "vertical": "Pionowo",
+      "ascending": "Rosnąco",
+      "descending": "Malejąco",
+      "luminance": "Luminancja",
+      "red": "Czerwony",
+      "green": "Zielony",
+      "blue": "Niebieski",
+      "8": "8",
+      "16": "16",
+      "32": "32",
+      "64": "64"
+    }
+  },
+  "ja": {
+    "name": "ピクセルソート",
+    "parameter": {
+      "axis": "方向",
+      "order": "並び順",
+      "metric": "並べ替え基準",
+      "window": "区間の長さ",
+      "cellSize": "ピクセルサイズ",
+      "offset": "区間のオフセット"
+    },
+    "choice": {
+      "horizontal": "横",
+      "vertical": "縦",
+      "ascending": "昇順",
+      "descending": "降順",
+      "luminance": "輝度",
+      "red": "赤",
+      "green": "緑",
+      "blue": "青",
+      "8": "8",
+      "16": "16",
+      "32": "32",
+      "64": "64"
+    }
+  },
+  "ko": {
+    "name": "픽셀 정렬",
+    "parameter": {
+      "axis": "방향",
+      "order": "정렬 순서",
+      "metric": "정렬 기준",
+      "window": "구간 길이",
+      "cellSize": "픽셀 크기",
+      "offset": "구간 오프셋"
+    },
+    "choice": {
+      "horizontal": "가로",
+      "vertical": "세로",
+      "ascending": "오름차순",
+      "descending": "내림차순",
+      "luminance": "휘도",
+      "red": "빨강",
+      "green": "초록",
+      "blue": "파랑",
+      "8": "8",
+      "16": "16",
+      "32": "32",
+      "64": "64"
+    }
+  },
+  "zh": {
+    "name": "像素排序",
+    "parameter": {
+      "axis": "方向",
+      "order": "排序顺序",
+      "metric": "排序依据",
+      "window": "区段长度",
+      "cellSize": "像素大小",
+      "offset": "区段偏移"
+    },
+    "choice": {
+      "horizontal": "水平",
+      "vertical": "垂直",
+      "ascending": "升序",
+      "descending": "降序",
+      "luminance": "亮度",
+      "red": "红色",
+      "green": "绿色",
+      "blue": "蓝色",
+      "8": "8",
+      "16": "16",
+      "32": "32",
+      "64": "64"
+    }
+  },
+  "ar": {
+    "name": "فرز البكسلات",
+    "parameter": {
+      "axis": "الاتجاه",
+      "order": "ترتيب الفرز",
+      "metric": "الفرز حسب",
+      "window": "طول المقطع",
+      "cellSize": "حجم البكسل",
+      "offset": "إزاحة المقطع"
+    },
+    "choice": {
+      "horizontal": "أفقي",
+      "vertical": "عمودي",
+      "ascending": "تصاعدي",
+      "descending": "تنازلي",
+      "luminance": "الإضاءة",
+      "red": "أحمر",
+      "green": "أخضر",
+      "blue": "أزرق",
+      "8": "8",
+      "16": "16",
+      "32": "32",
+      "64": "64"
+    }
+  }
+}
