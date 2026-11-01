@@ -1,3 +1,4 @@
+import { useProjectTitle } from "./components/workspace/use-project-title";
 import { dashboardHref, isPlainPrimaryClick, dialogLinkKeyDown } from "./ui/navigation/activation";
 import { ExportLeaveGuard } from "./components/export/ExportLeaveGuard";
 import { guardExportNavigation, ExportLeaveCancelled } from "./services/export/leave";
@@ -71,6 +72,7 @@ export function App({ engine, services, welcome = false, routing }: AppProps) {
     () => welcome || new URLSearchParams(location.search).get("welcome") === "1",
   );
   const choosingProject = routing ? routing.view === "dashboard" : localChoosingProject;
+  useProjectTitle(projectName, !choosingProject);
   const [hasOpenedEditor, setHasOpenedEditor] = useState(!choosingProject);
   if (!choosingProject && !hasOpenedEditor) setHasOpenedEditor(true);
   const [localProjectMenu, setProjectMenu] = useState<ProjectView | null>(
