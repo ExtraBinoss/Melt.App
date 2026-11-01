@@ -11,7 +11,8 @@ import { ScrollShadow } from "../../shared/scroll/ScrollShadow";
 import { MaskProperties } from "../../properties/MaskProperties";
 import { useLayerPreview } from "../controls/use-layer-preview";
 import { Button } from "../../ui/button";
-import { activateLayerPage, resolveLayerPage, useOpenLayerPage } from "../tree/activation";
+import { activateLayerPage, resolveLayerPage } from "../tree/activation";
+import { useAttachmentPage, type AttachmentPageInput } from "./attachment-page";
 import { attachmentSelection } from "../../../state/selection/attachments";
 import { attachmentDeleteKey } from "../../../state/selection/attachment-keydown";
 import "../messages";
@@ -21,25 +22,33 @@ import { useLayerPopoverAnchor } from "./use-layer-popover-anchor";
 export function MaskPopover({
   engine,
   page,
+  pagePort,
   layer,
   run,
   children,
 }: {
   engine: EnginePort;
-  page: Composition;
   layer: Layer;
   run: (task: () => void) => void;
   children: ReactNode;
-}) {
+} & AttachmentPageInput) {
   const { t } = useTranslation();
-  const ownerKey = JSON.stringify([engine.getSnapshot().project.id, page.id, layer.id]);
+  const ownerKey = JSON.stringify([
+    engine.getSnapshot().project.id,
+    pagePort?.pageId ?? page!.id,
+    layer.id,
+  ]);
   const owner = usePopoverOwner(ownerKey);
   const { open: ownerOpen, onOpenChange: setOwnerOpen, isCurrent: isOwnerCurrent } = owner;
   const { trigger, virtualRef } = useLayerPopoverAnchor(ownerKey);
-  const currentPage = useOpenLayerPage(engine, page, ownerOpen);
+  const {
+    source: ownedPage,
+    current: currentPage,
+    capture,
+  } = useAttachmentPage(engine, page, pagePort, ownerOpen);
   const isCurrent = useCallback(
-    () => isOwnerCurrent() && resolveLayerPage(engine, page) !== null,
-    [engine, page, isOwnerCurrent],
+    () => Boolean(ownedPage && isOwnerCurrent() && resolveLayerPage(engine, ownedPage)),
+    [engine, ownedPage, isOwnerCurrent],
   );
   useLayoutEffect(() => {
     if (ownerOpen && !currentPage) setOwnerOpen(false);
@@ -54,13 +63,13 @@ export function MaskPopover({
     <Popover
       open={owner.open}
       onOpenChange={(open) => {
-        const current = resolveLayerPage(engine, page);
+        const current = open ? capture() : null;
         if (open && !current) return;
         if (!owner.onOpenChange(open)) return;
         if (open && current)
           attachmentSelection(engine).select(current, {
             kind: "mask",
-            pageId: page.id,
+            pageId: current.id,
             layerId: layer.id,
           });
       }}
@@ -69,7 +78,7 @@ export function MaskPopover({
       <PopoverTrigger ref={trigger} asChild onPointerDownCapture={owner.onTriggerPointerDown}>
         {children}
       </PopoverTrigger>
-      {owner.present && (
+      {owner.present && ownedPage && (
         <PopoverContent
           portalContainer={document.body}
           onCloseAutoFocus={owner.onCloseAutoFocus}
@@ -89,7 +98,7 @@ export function MaskPopover({
               <MaskDetails
                 key={owner.generation}
                 engine={engine}
-                page={currentPage ?? page}
+                page={currentPage ?? ownedPage}
                 layer={layer}
                 run={run}
                 isCurrent={isCurrent}

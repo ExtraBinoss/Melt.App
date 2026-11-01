@@ -1,3 +1,4 @@
+import { animationPresentation } from "../../../../src/components/motion/animations/presentation";
 import { expect, test, vi } from "vitest";
 import { act, fireEvent, screen, waitFor } from "@testing-library/react";
 import { createEffect, createProject, planMotionInitialization } from "@musart/core";
@@ -30,6 +31,7 @@ function fixture() {
 }
 test("real effect fields key their own values and retain other evaluated effect settings during drafts", () => {
   const d = fixture();
+  animationPresentation(d.engine).set({ details: true });
   const base = d.engine.getSnapshot().project.pages[0]!.layers[0]!;
   const first = base.effects[0]!,
     second = base.effects[1]!;

@@ -1,4 +1,4 @@
-import { useRef, useState, type CSSProperties } from "react";
+import { memo, useRef, useState, type CSSProperties } from "react";
 import { useTranslation } from "react-i18next";
 import { Download, Ellipsis, Pencil, Trash2 } from "lucide-react";
 import { requestCompositionExport } from "../../components/export/composition-request";
@@ -180,27 +180,37 @@ function ArtboardHeading({
   );
 }
 
-export function ArtboardHeadings({
-  workspace,
-  activeId,
-  view,
-  ...props
-}: {
-  workspace: ArtboardWorkspace;
-  activeId: string;
-  view: View;
-  engine: EnginePort;
-  onError?: (message: string) => void;
-}) {
-  const headings = layoutArtboardHeadings(workspace, view);
-  return workspace.boards.map((board) => (
-    <ArtboardHeading
-      key={board.id}
-      board={board}
-      workspace={workspace}
-      active={board.id === activeId}
-      placement={headings.find((heading) => heading.id === board.id)!}
-      {...props}
-    />
-  ));
-}
+export const ArtboardHeadings = memo(
+  function ArtboardHeadings({
+    workspace,
+    activeId,
+    view,
+    ...props
+  }: {
+    workspace: ArtboardWorkspace;
+    activeId: string;
+    view: View;
+    engine: EnginePort;
+    onError?: (message: string) => void;
+  }) {
+    const headings = layoutArtboardHeadings(workspace, view);
+    return workspace.boards.map((board) => (
+      <ArtboardHeading
+        key={board.id}
+        board={board}
+        workspace={workspace}
+        active={board.id === activeId}
+        placement={headings.find((heading) => heading.id === board.id)!}
+        {...props}
+      />
+    ));
+  },
+  (before, after) =>
+    before.workspace === after.workspace &&
+    before.activeId === after.activeId &&
+    before.engine === after.engine &&
+    before.onError === after.onError &&
+    before.view.x === after.view.x &&
+    before.view.y === after.view.y &&
+    before.view.zoom === after.view.zoom,
+);

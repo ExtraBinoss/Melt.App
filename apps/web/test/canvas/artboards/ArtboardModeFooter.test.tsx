@@ -25,6 +25,39 @@ it("selection changes retain the artboard mode controls", () => {
   expect(commits).toHaveBeenCalled();
 });
 
+it("artwork history skips mode controls and activation plans the latest edited layers", () => {
+  const d = setup(),
+    commits = vi.fn();
+  d.mount(
+    <Profiler id="mode" onRender={commits}>
+      <ArtboardModeFooter
+        engine={d.engine}
+        workspace={arrangeArtboards(d.engine.getSnapshot().project.pages)}
+        view={{ x: 0, y: 0, zoom: 1 }}
+      />
+    </Profiler>,
+  );
+  const motion = screen.getByRole("radio", { name: "Motion" });
+  commits.mockClear();
+  act(() => d.engine.execute({ type: "updateLayers", ids: [d.rectangle.id], patch: { x: 123 } }));
+  act(() => d.engine.undo());
+  act(() => d.engine.redo());
+  act(() => d.engine.execute({ type: "addLayers", layers: [createLayer("rectangle")] }));
+  expect(commits).not.toHaveBeenCalled();
+  expect(screen.getByRole("radio", { name: "Motion" })).toBe(motion);
+  fireEvent.click(motion);
+  expect(screen.getByRole("alertdialog")).toHaveTextContent("4 éléments");
+  act(() => d.engine.execute({ type: "renameProject", name: "Later revision" }));
+  const before = d.engine.getSnapshot();
+  fireEvent.click(screen.getByRole("button", { name: "Oui, activer Motion" }));
+  expect(d.engine.getSnapshot()).toBe(before);
+  expect(screen.getByRole("alert")).toHaveTextContent("La composition a changé");
+  fireEvent.click(motion);
+  fireEvent.click(screen.getByRole("button", { name: "Oui, activer Motion" }));
+  expect(d.engine.getSnapshot().project.pages[0]!.motion?.tracks).toHaveLength(4);
+  expect(d.engine.getSnapshot().project.pages[0]!.layers[0]!.x).toBe(123);
+});
+
 it("keeps compact mode icons at overview zoom and edits the active composition", () => {
   const fixture = setup();
   fixture.engine.execute({ type: "addLayers", layers: [createLayer("rectangle")] });

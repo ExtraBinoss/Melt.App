@@ -31,6 +31,11 @@ export function ColorControl({
     { t: colorMessage } = useTranslation("color");
   const [reset, setReset] = useState(0);
   const [override, setOverride] = useState<{ base: string; hex: string } | null>(null);
+  const [source, setSource] = useState({ value, identity });
+  if (source.value !== value || source.identity !== identity) {
+    setSource({ value, identity });
+    if (override) setOverride(null);
+  }
   const [available] = useState(supportsEyeDropper);
   const [pending, setPending] = useState<{ value: string; identity?: string } | null>(null);
   const [error, setError] = useState("");

@@ -1,5 +1,5 @@
 import { memo, type RefObject } from "react";
-import { ChevronRight, Eye, EyeOff, LockKeyhole, LockKeyholeOpen, ScanLine } from "lucide-react";
+import { ChevronRight, ScanLine } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import type { Composition, EnginePort, Layer, Project } from "@musart/core";
 import type { EditorServices } from "../../../state/contracts";
@@ -7,8 +7,8 @@ import type { AttachmentTarget } from "../../../state/selection/attachments";
 import type { LayerDropPosition } from "../drop-target";
 import type { LayerDropRejection } from "../drag/validation";
 import { Input } from "../../ui/input";
-import { IconButton } from "../../shared/IconButton";
 import { LayerThumbnail } from "./LayerThumbnail";
+import { LayerRowActions } from "./LayerRowActions";
 import { AttachmentCards } from "../attachments/AttachmentCards";
 import { DropCue } from "../drag/DropCue";
 import "../messages";
@@ -121,33 +121,16 @@ export const LayerRowContents = memo(function LayerRowContents({
         />
       )}
       {(drop || rejected) && <DropCue anchor={anchor} position={drop} reason={rejected} />}
-      <div
-        className="layer-actions"
-        onClick={(event) => event.stopPropagation()}
-        onDoubleClick={(event) => event.stopPropagation()}
-      >
-        <IconButton
-          disabled={parentLocked}
-          className={`layer-lock-button ${locked ? "is-locked" : ""}`}
-          label={`${parentLocked ? lockDescription : t(layer.locked ? "unlock" : "lock")} · ${layer.name}`}
-          aria-description={locked ? lockDescription : undefined}
-          onClick={onLock}
-        >
-          {locked ? <LockKeyhole size={14} /> : <LockKeyholeOpen size={12} />}
-          {locked && (
-            <span className="layer-lock-label" aria-hidden>
-              {t("layerControls:lockedState")}
-            </span>
-          )}
-        </IconButton>
-        <IconButton
-          disabled={parentLocked}
-          label={`${t(layer.visible ? "visible" : "hidden")} · ${layer.name}`}
-          onClick={onVisibility}
-        >
-          {layer.visible ? <Eye size={13} /> : <EyeOff size={13} />}
-        </IconButton>
-      </div>
+      <LayerRowActions
+        name={layer.name}
+        visible={layer.visible}
+        ownLocked={layer.locked}
+        parentLocked={parentLocked}
+        locked={locked}
+        lockDescription={lockDescription}
+        onLock={onLock}
+        onVisibility={onVisibility}
+      />
     </>
   );
 });

@@ -26,7 +26,8 @@ import { useLayerPreview } from "../controls/use-layer-preview";
 import { LockedLayerNotice } from "../../properties/locked/LockedLayerNotice";
 import { usePopoverOwner } from "./use-popover-owner";
 import { freezeEffectPreviews } from "../../../state/session/effect-preview";
-import { resolveLayerPage, useOpenLayerPage } from "../tree/activation";
+import { resolveLayerPage } from "../tree/activation";
+import { useAttachmentPage, type AttachmentPageInput } from "./attachment-page";
 import { useLayerPopoverAnchor } from "./use-layer-popover-anchor";
 import { MotionFieldProvider } from "../../properties/motion/context";
 import { MotionField } from "../../properties/motion/MotionField";
@@ -36,32 +37,36 @@ import type { MotionEditTarget } from "../../../state/session/motion-edit";
 export function EffectPopover({
   engine,
   page,
+  pagePort,
   layer,
   effectId,
   run,
   children,
 }: {
   engine: EnginePort;
-  page: Composition;
   layer: Layer;
   effectId?: string;
   run: (task: () => void) => void;
   children: ReactNode;
-}) {
+} & AttachmentPageInput) {
   const { t } = useTranslation();
   const ownerKey = JSON.stringify([
     engine.getSnapshot().project.id,
-    page.id,
+    pagePort?.pageId ?? page!.id,
     layer.id,
     effectId ?? layer.effects[0]?.id,
   ]);
   const owner = usePopoverOwner(ownerKey);
   const { open: ownerOpen, onOpenChange: setOwnerOpen, isCurrent: isOwnerCurrent } = owner;
   const { trigger, virtualRef } = useLayerPopoverAnchor(ownerKey);
-  const currentPage = useOpenLayerPage(engine, page, ownerOpen);
+  const {
+    source: ownedPage,
+    current: currentPage,
+    capture,
+  } = useAttachmentPage(engine, page, pagePort, ownerOpen);
   const isCurrent = useCallback(
-    () => isOwnerCurrent() && resolveLayerPage(engine, page) !== null,
-    [engine, page, isOwnerCurrent],
+    () => Boolean(ownedPage && isOwnerCurrent() && resolveLayerPage(engine, ownedPage)),
+    [engine, ownedPage, isOwnerCurrent],
   );
   useLayoutEffect(() => {
     if (ownerOpen && !currentPage) setOwnerOpen(false);
@@ -76,14 +81,14 @@ export function EffectPopover({
     <Popover
       open={owner.open}
       onOpenChange={(open) => {
-        const current = resolveLayerPage(engine, page);
+        const current = open ? capture() : null;
         if (open && !current) return;
         if (!owner.onOpenChange(open)) return;
         const id = effectId ?? layer.effects[0]?.id;
         if (open && id && current)
           attachmentSelection(engine).select(current, {
             kind: "effect",
-            pageId: page.id,
+            pageId: current.id,
             layerId: layer.id,
             effectId: id,
           });
@@ -93,7 +98,7 @@ export function EffectPopover({
       <PopoverTrigger ref={trigger} asChild onPointerDownCapture={owner.onTriggerPointerDown}>
         {children}
       </PopoverTrigger>
-      {owner.present && (
+      {owner.present && ownedPage && (
         <PopoverContent
           portalContainer={document.body}
           onCloseAutoFocus={owner.onCloseAutoFocus}
@@ -113,7 +118,7 @@ export function EffectPopover({
               <EffectDetails
                 key={owner.generation}
                 engine={engine}
-                page={currentPage ?? page}
+                page={currentPage ?? ownedPage}
                 layer={layer}
                 effectId={effectId}
                 run={run}

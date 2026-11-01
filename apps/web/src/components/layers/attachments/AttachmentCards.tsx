@@ -13,7 +13,9 @@ import { Button } from "../../ui/button";
 import { LayerThumbnail } from "../rows/LayerThumbnail";
 import { EffectPopover } from "./EffectPopover";
 import { MaskPopover } from "./MaskPopover";
-import { resolveLayerPage, sameLayerContainer } from "../tree/activation";
+import { sameLayerContainer } from "../tree/activation";
+import { useAttachmentPagePort, type AttachmentPagePort } from "./attachment-page";
+import { useRowAction } from "../rows/use-row-action";
 import "../messages";
 import { memo, type CSSProperties } from "react";
 /** At most two actual effect previews and one actual mask; full children remain behind the chevron. */
@@ -39,115 +41,21 @@ export const AttachmentCards = memo(
     onExpand: () => void;
     run: (action: () => void) => void;
   }) {
-    const { t } = useTranslation();
-    const effects = layer.effects.slice(-2),
-      selected =
-        target?.kind === "effect"
-          ? layer.effects.find((effect) => effect.id === target.effectId)
-          : undefined;
-    if (selected && !effects.some((effect) => effect.id === selected.id)) effects[0] = selected;
-    const more = layer.effects.length - effects.length;
+    const pagePort = useAttachmentPagePort(engine, page, layer.id);
+    const expand = useRowAction(onExpand);
     return (
-      <div
-        className="layer-attachment-cards"
-        onClick={(event) => event.stopPropagation()}
-        onDoubleClick={(event) => event.stopPropagation()}
-      >
-        {effects.map((effect, index) => {
-          const active = target?.kind === "effect" && target.effectId === effect.id,
-            select = () => {
-              const current = resolveLayerPage(engine, page);
-              if (current)
-                attachmentSelection(engine).select(current, {
-                  kind: "effect",
-                  pageId: page.id,
-                  layerId: layer.id,
-                  effectId: effect.id,
-                });
-            };
-          return (
-            <EffectPopover
-              key={index}
-              engine={engine}
-              page={page}
-              layer={layer}
-              effectId={effect.id}
-              run={run}
-            >
-              <Button
-                variant="ghost"
-                size="icon-xs"
-                className={`layer-attachment-avatar attachment-thumbnail-card ${active ? "is-selected" : ""}`}
-                style={{ "--card-order": index + 1 } as CSSProperties}
-                aria-label={`${t(getEffectDefinition(effect.type).nameKey)} · ${layer.name}`}
-                aria-pressed={active}
-                data-attachment-tooltip={t(getEffectDefinition(effect.type).nameKey)}
-                data-attachment-target="effect"
-                data-attachment-effect-id={effect.id}
-                onContextMenu={select}
-              >
-                <LayerThumbnail
-                  layer={layer}
-                  asset={layer.assetId ? assets[layer.assetId] : undefined}
-                  services={services}
-                  previewKey={previewKey}
-                  pageId={page.id}
-                  variant={{ kind: "effect", effectId: effect.id }}
-                />
-                <span className="attachment-card-kind" aria-hidden="true">
-                  fx
-                </span>
-              </Button>
-            </EffectPopover>
-          );
-        })}
-        {layer.mask && (
-          <MaskPopover engine={engine} page={page} layer={layer} run={run}>
-            <Button
-              variant="ghost"
-              size="icon-xs"
-              className={`layer-attachment-avatar attachment-thumbnail-card ${target?.kind === "mask" ? "is-selected" : ""}`}
-              style={{ "--card-order": 3 } as CSSProperties}
-              aria-label={`${t("mask")} · ${layer.name}`}
-              aria-pressed={target?.kind === "mask"}
-              data-attachment-tooltip={t("mask")}
-              data-attachment-target="mask"
-              onContextMenu={() => {
-                const current = resolveLayerPage(engine, page);
-                if (current)
-                  attachmentSelection(engine).select(current, {
-                    kind: "mask",
-                    pageId: page.id,
-                    layerId: layer.id,
-                  });
-              }}
-            >
-              <LayerThumbnail
-                layer={layer}
-                asset={layer.assetId ? assets[layer.assetId] : undefined}
-                services={services}
-                previewKey={previewKey}
-                pageId={page.id}
-                variant={{ kind: "mask" }}
-              />
-              <span className="attachment-card-kind" aria-hidden="true">
-                <ScanLine size={8} />
-              </span>
-            </Button>
-          </MaskPopover>
-        )}
-        {more > 0 && (
-          <Button
-            variant="ghost"
-            size="icon-xs"
-            className="attachment-more-count"
-            aria-label={t("layerControls:moreEffects", { count: more })}
-            onClick={onExpand}
-          >
-            +{more}
-          </Button>
-        )}
-      </div>
+      <CardContents
+        engine={engine}
+        page={target?.pageId === page.id && target.layerId === layer.id ? page : undefined}
+        pagePort={pagePort}
+        layer={layer}
+        assets={assets}
+        services={services}
+        previewKey={previewKey}
+        target={target}
+        onExpand={expand}
+        run={run}
+      />
     );
   },
   (before, after) =>
@@ -161,3 +69,140 @@ export const AttachmentCards = memo(
     before.onExpand === after.onExpand &&
     before.run === after.run,
 );
+
+/** Only the selected attachment carries a live page; unchanged closed siblings retain their leaves. */
+const CardContents = memo(function CardContents({
+  engine,
+  page,
+  pagePort,
+  layer,
+  assets,
+  services,
+  previewKey,
+  target,
+  onExpand,
+  run,
+}: {
+  engine: EnginePort;
+  page?: Composition;
+  pagePort: AttachmentPagePort;
+  layer: Layer;
+  assets: Project["assets"];
+  services?: Pick<EditorServices, "previewExport">;
+  previewKey: string;
+  target: AttachmentTarget | null;
+  onExpand: () => void;
+  run: (action: () => void) => void;
+}) {
+  const { t } = useTranslation();
+  const effects = layer.effects.slice(-2),
+    selected =
+      target?.kind === "effect"
+        ? layer.effects.find((effect) => effect.id === target.effectId)
+        : undefined;
+  if (selected && !effects.some((effect) => effect.id === selected.id)) effects[0] = selected;
+  const more = layer.effects.length - effects.length;
+  return (
+    <div
+      className="layer-attachment-cards"
+      onClick={(event) => event.stopPropagation()}
+      onDoubleClick={(event) => event.stopPropagation()}
+    >
+      {effects.map((effect, index) => {
+        const active = target?.kind === "effect" && target.effectId === effect.id,
+          select = () => {
+            const current = pagePort.read();
+            if (current)
+              attachmentSelection(engine).select(current, {
+                kind: "effect",
+                pageId: pagePort.pageId,
+                layerId: layer.id,
+                effectId: effect.id,
+              });
+          };
+        return (
+          <EffectPopover
+            key={index}
+            engine={engine}
+            page={page}
+            pagePort={pagePort}
+            layer={layer}
+            effectId={effect.id}
+            run={run}
+          >
+            <Button
+              variant="ghost"
+              size="icon-xs"
+              className={`layer-attachment-avatar attachment-thumbnail-card ${active ? "is-selected" : ""}`}
+              style={{ "--card-order": index + 1 } as CSSProperties}
+              aria-label={`${t(getEffectDefinition(effect.type).nameKey)} · ${layer.name}`}
+              aria-pressed={active}
+              data-attachment-tooltip={t(getEffectDefinition(effect.type).nameKey)}
+              data-attachment-target="effect"
+              data-attachment-effect-id={effect.id}
+              onContextMenu={select}
+            >
+              <LayerThumbnail
+                layer={layer}
+                asset={layer.assetId ? assets[layer.assetId] : undefined}
+                services={services}
+                previewKey={previewKey}
+                pageId={pagePort.pageId}
+                variant={{ kind: "effect", effectId: effect.id }}
+              />
+              <span className="attachment-card-kind" aria-hidden="true">
+                fx
+              </span>
+            </Button>
+          </EffectPopover>
+        );
+      })}
+      {layer.mask && (
+        <MaskPopover engine={engine} page={page} pagePort={pagePort} layer={layer} run={run}>
+          <Button
+            variant="ghost"
+            size="icon-xs"
+            className={`layer-attachment-avatar attachment-thumbnail-card ${target?.kind === "mask" ? "is-selected" : ""}`}
+            style={{ "--card-order": 3 } as CSSProperties}
+            aria-label={`${t("mask")} · ${layer.name}`}
+            aria-pressed={target?.kind === "mask"}
+            data-attachment-tooltip={t("mask")}
+            data-attachment-target="mask"
+            onContextMenu={() => {
+              const current = pagePort.read();
+              if (current)
+                attachmentSelection(engine).select(current, {
+                  kind: "mask",
+                  pageId: pagePort.pageId,
+                  layerId: layer.id,
+                });
+            }}
+          >
+            <LayerThumbnail
+              layer={layer}
+              asset={layer.assetId ? assets[layer.assetId] : undefined}
+              services={services}
+              previewKey={previewKey}
+              pageId={pagePort.pageId}
+              variant={{ kind: "mask" }}
+            />
+            <span className="attachment-card-kind" aria-hidden="true">
+              <ScanLine size={8} />
+            </span>
+          </Button>
+        </MaskPopover>
+      )}
+      {more > 0 && (
+        <Button
+          variant="ghost"
+          size="icon-xs"
+          className="attachment-more-count"
+          aria-label={t("layerControls:moreEffects", { count: more })}
+          onClick={onExpand}
+        >
+          +{more}
+        </Button>
+      )}
+    </div>
+  );
+});

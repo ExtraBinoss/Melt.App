@@ -8,6 +8,27 @@ import { useAttachmentSelection } from "../../../../src/state/selection/use-atta
 import type { LayerPreviewVariant } from "../../../../src/state/contracts";
 import { setup } from "../../../support/ui";
 const previews = vi.hoisted(() => ({ render: vi.fn() }));
+const popovers = vi.hoisted(() => ({ effect: vi.fn(), mask: vi.fn() }));
+vi.mock("../../../../src/components/layers/attachments/EffectPopover", async (original) => {
+  const module =
+    await original<typeof import("../../../../src/components/layers/attachments/EffectPopover")>();
+  return {
+    EffectPopover: (props: Parameters<typeof module.EffectPopover>[0]) => {
+      popovers.effect();
+      return <module.EffectPopover {...props} />;
+    },
+  };
+});
+vi.mock("../../../../src/components/layers/attachments/MaskPopover", async (original) => {
+  const module =
+    await original<typeof import("../../../../src/components/layers/attachments/MaskPopover")>();
+  return {
+    MaskPopover: (props: Parameters<typeof module.MaskPopover>[0]) => {
+      popovers.mask();
+      return <module.MaskPopover {...props} />;
+    },
+  };
+});
 vi.mock("../../../../src/components/layers/rows/LayerThumbnail", async () => {
   const { memo } = await import("react");
   return {
@@ -177,6 +198,48 @@ test("an open effect follows ruler metadata even when its closed card owner was 
   expect(d.engine.getSnapshot().project).toEqual(before.project);
 });
 
+test("closed sibling attachments skip popover rebuilds through history and open the committed current page", () => {
+  const d = retainedCards();
+  const effect = screen.getByRole("button", { name: "Dither · Rectangle bleu" });
+  const mask = screen.getByRole("button", { name: "Masque · Rectangle bleu" });
+  effect.focus();
+  popovers.effect.mockClear();
+  popovers.mask.mockClear();
+  const update = () =>
+    d.view.rerender(
+      <AttachmentCards {...d.props} page={d.engine.getSnapshot().project.pages[0]!} />,
+    );
+  act(() => d.engine.execute({ type: "updateLayers", ids: [d.text.id], patch: { x: 123 } }));
+  // An engine publication cannot donate an owner before the wrapper's layout commit.
+  fireEvent.click(effect);
+  expect(screen.queryByRole("dialog")).toBeNull();
+  update();
+  act(() => d.engine.undo());
+  update();
+  act(() => d.engine.redo());
+  update();
+  expect(popovers.effect).not.toHaveBeenCalled();
+  expect(popovers.mask).not.toHaveBeenCalled();
+  expect(document.activeElement).toBe(effect);
+  expect(screen.getByRole("button", { name: "Dither · Rectangle bleu" })).toBe(effect);
+  expect(screen.getByRole("button", { name: "Masque · Rectangle bleu" })).toBe(mask);
+  fireEvent.click(effect);
+  expect(screen.getByRole("dialog")).toBeVisible();
+  expect(attachmentSelection(d.engine).editable()).toBe(true);
+  expect(d.engine.getSnapshot().project.pages[0]!.layers[1]!.x).toBe(123);
+  // Subsequent wrapper port rebinding must not silently rebase this captured open owner.
+  act(() => d.engine.execute({ type: "updateLayers", ids: [d.text.id], patch: { x: 234 } }));
+  update();
+  expect(screen.queryByRole("dialog")).toBeNull();
+  expect(d.store.get(previewAtom)).toBeNull();
+  act(() => d.engine.load(d.engine.getSnapshot().project));
+  const replaced = d.engine.getSnapshot();
+  fireEvent.click(effect);
+  fireEvent.contextMenu(mask);
+  expect(screen.queryByRole("dialog")).toBeNull();
+  expect(d.engine.getSnapshot()).toBe(replaced);
+});
+
 test("an open mask follows ruler metadata without donating an old queued command", () => {
   const d = retainedCards();
   let pending: (() => void) | undefined;
@@ -203,4 +266,43 @@ test("an open mask follows ruler metadata without donating an old queued command
   expect(d.engine.getSnapshot().revision).toBe(before.revision + 1);
   act(() => d.engine.undo());
   expect(d.engine.getSnapshot().project).toEqual(before.project);
+});
+
+test("a live selected card follows legitimate commits but cannot donate a queued edit across history or reload", () => {
+  const d = fixture();
+  const card = document.querySelector<HTMLButtonElement>(
+    '[data-attachment-effect-id="card-effect-11"]',
+  )!;
+  fireEvent.click(card);
+  expect(screen.getByRole("dialog")).toBeVisible();
+  const amount = screen.getByLabelText("Intensité");
+  const before = d.engine.getSnapshot().revision;
+  fireEvent.focus(amount);
+  fireEvent.change(amount, { target: { value: "60" } });
+  fireEvent.blur(amount);
+  expect(d.engine.getSnapshot().revision).toBe(before + 1);
+  expect(d.engine.getSnapshot().project.pages[0]!.layers[0]!.effects[11]!.amount).toBe(0.6);
+  expect(screen.getByRole("dialog")).toBeVisible();
+  act(() => d.engine.execute({ type: "updateLayers", ids: [d.text.id], patch: { x: 123 } }));
+  expect(screen.getByRole("dialog")).toBeVisible();
+  const queued: (() => void)[] = [];
+  d.run.mockImplementation((action) => {
+    queued.push(action);
+  });
+  const live = screen.getByLabelText("Intensité");
+  fireEvent.focus(live);
+  fireEvent.change(live, { target: { value: "40" } });
+  fireEvent.blur(live);
+  expect(queued).toHaveLength(1);
+  act(() => d.engine.execute({ type: "updateLayers", ids: [d.text.id], patch: { x: 234 } }));
+  const updated = d.engine.getSnapshot();
+  act(() => queued[0]!());
+  expect(d.engine.getSnapshot()).toBe(updated);
+  expect(updated.project.pages[0]!.layers[0]!.effects[11]!.amount).toBe(0.6);
+  act(() => d.engine.load(updated.project));
+  expect(screen.queryByRole("dialog")).toBeNull();
+  expect(d.store.get(previewAtom)).toBeNull();
+  const replaced = d.engine.getSnapshot();
+  act(() => queued[0]!());
+  expect(d.engine.getSnapshot()).toBe(replaced);
 });

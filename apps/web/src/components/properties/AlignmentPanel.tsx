@@ -9,7 +9,8 @@ import {
   BetweenVerticalStart,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import type { EnginePort, Layer } from "@musart/core";
+import { memo, useCallback, useLayoutEffect, useMemo, useRef } from "react";
+import type { EnginePort, Layer, LayoutReference } from "@musart/core";
 import { IconButton } from "../shared/IconButton";
 import { ButtonGroup } from "../ui/button-group";
 import { alignmentReference } from "./alignment/reference";
@@ -23,10 +24,41 @@ export function AlignmentPanel({
   selected: readonly Layer[];
   run: (action: () => void) => void;
 }) {
-  const { t } = useTranslation();
   const relativeTo = alignmentReference(selected);
-  const ids = selected.map((layer) => layer.id);
+  const key = JSON.stringify(selected.map((layer) => layer.id));
+  const ids = useMemo(() => JSON.parse(key) as string[], [key]);
   const siblings = selected.every((layer) => layer.parentId === selected[0]?.parentId);
+  const committedRun = useRef(run);
+  useLayoutEffect(() => {
+    committedRun.current = run;
+  }, [run]);
+  const execute = useCallback((action: () => void) => committedRun.current(action), []);
+  return (
+    <AlignmentTools
+      engine={engine}
+      ids={ids}
+      relativeTo={relativeTo}
+      siblings={siblings}
+      run={execute}
+    />
+  );
+}
+
+/** Transform/color history changes no alignment labels, availability or control pixels. */
+const AlignmentTools = memo(function AlignmentTools({
+  engine,
+  ids,
+  relativeTo,
+  siblings,
+  run,
+}: {
+  engine: EnginePort;
+  ids: string[];
+  relativeTo: LayoutReference;
+  siblings: boolean;
+  run: (action: () => void) => void;
+}) {
+  const { t } = useTranslation();
   return (
     <section
       className="inspector-section alignment-section"
@@ -84,4 +116,4 @@ export function AlignmentPanel({
       </div>
     </section>
   );
-}
+});

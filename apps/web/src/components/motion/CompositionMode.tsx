@@ -21,37 +21,43 @@ import {
 } from "../ui/alert-dialog";
 import "./messages";
 import "./timeline.css";
+import { compositionModeState, type CompositionModeState } from "./composition-mode-state";
+
+type ModeOwner =
+  | { snapshot: SessionSnapshot; state?: never }
+  | { state: CompositionModeState; snapshot?: never };
 
 export function CompositionMode({
   engine,
   snapshot,
+  state,
   onMotionEnabled,
   presentation = "segmented",
   buttonLabel,
 }: {
   engine: EnginePort;
-  snapshot: SessionSnapshot;
   onMotionEnabled?: () => void;
   presentation?: "segmented" | "button";
   buttonLabel?: string;
-}) {
+} & ModeOwner) {
   const { t } = useTranslation("motion");
-  const page = snapshot.project.pages.find((item) => item.id === snapshot.pageId)!;
+  const owner = state ?? compositionModeState(snapshot);
   const [pending, setPending] = useState<MotionInitializationPlan | null>(null);
   const [error, setError] = useState("");
-  const current = page.motion?.mode ?? "static";
+  const current = owner.mode;
   function choose(value: string) {
     if (value !== "static" && value !== "motion") return;
     if (value === current) return;
     setError("");
     try {
       const live = engine.getSnapshot();
-      if (live.pageId !== page.id || live.project.id !== snapshot.project.id) {
+      if (live.pageId !== owner.pageId || live.project.id !== owner.projectId) {
         setError("changed");
         return;
       }
+      const page = live.project.pages.find((item) => item.id === live.pageId)!;
       if (value === "motion" && !page.motion) {
-        const plan = planMotionInitialization(engine.getSnapshot());
+        const plan = planMotionInitialization(live);
         if (plan.requiresConfirmation) {
           setPending(plan);
           return;

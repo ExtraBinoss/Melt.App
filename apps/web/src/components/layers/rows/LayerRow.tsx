@@ -1,6 +1,7 @@
 import { memo, useCallback, useLayoutEffect, useRef, useState } from "react";
 import { useRowPosition } from "./use-row-position";
 import { LayerRowContents } from "./LayerRowContents";
+import { useRowAction } from "./use-row-action";
 import { useTranslation } from "react-i18next";
 import {
   createLayerGeometryIndex,
@@ -131,7 +132,7 @@ export const LayerRow = memo(function LayerRow({
   const expand = useCallback(() => {
     if (!expanded) toggle();
   }, [expanded, toggle]);
-  const toggleLock = useCallback(() => {
+  const toggleLock = useRowAction(() => {
     if (!activateLayerPage(engine, page)) return;
     const origin = resolveLayerPage(engine, page);
     if (!origin) return;
@@ -139,8 +140,8 @@ export const LayerRow = memo(function LayerRow({
       if (canonical(origin))
         engine.execute({ type: "updateLayers", ids: [layer.id], patch: { locked: !layer.locked } });
     });
-  }, [engine, page, run, canonical, layer.id, layer.locked]);
-  const toggleVisibility = useCallback(() => {
+  });
+  const toggleVisibility = useRowAction(() => {
     if (!activateLayerPage(engine, page)) return;
     const origin = resolveLayerPage(engine, page);
     if (!origin) return;
@@ -152,7 +153,7 @@ export const LayerRow = memo(function LayerRow({
           patch: { visible: !layer.visible },
         });
     });
-  }, [engine, page, run, canonical, layer.id, layer.visible]);
+  });
   return (
     <div
       ref={node}

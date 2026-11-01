@@ -120,3 +120,61 @@ test("retained contents keep rename cancellation and inherited protection contro
   fireEvent.click(inherited);
   expect(props.onLock).not.toHaveBeenCalled();
 });
+
+test("unrelated layer edits and history retain controls while actions use the latest committed owner", () => {
+  const d = setup();
+  const page = d.engine.getSnapshot().project.pages[0]!;
+  const props = {
+    engine: d.engine,
+    page,
+    layer: page.layers[0]!,
+    assets: d.project.assets,
+    selected: false,
+    depth: 0,
+    expanded: false,
+    moving: false,
+    dragging: false,
+    reduced: true,
+    previewKey: "unchanged-artwork",
+    top: 0,
+    run: d.run,
+    onToggle: vi.fn(),
+    onDragEnd: vi.fn(),
+    drag: { start: vi.fn(), over: vi.fn(), overTree: vi.fn(), drop: vi.fn() },
+  };
+  renders.icon.mockClear();
+  const view = d.mount(<LayerRow {...props} />);
+  const visibility = screen.getByRole("button", { name: "Masquer le calque · Rectangle bleu" });
+  visibility.focus();
+  const update = () => {
+    const current = d.engine.getSnapshot().project.pages[0]!;
+    view.rerender(<LayerRow {...props} page={current} layer={current.layers[0]!} />);
+  };
+  act(() => d.engine.execute({ type: "updateLayers", ids: [d.text.id], patch: { x: 73 } }));
+  update();
+  act(() => d.engine.undo());
+  update();
+  act(() => d.engine.redo());
+  update();
+  expect(renders.icon).toHaveBeenCalledTimes(2);
+  expect(document.activeElement).toBe(visibility);
+  expect(screen.getByRole("button", { name: "Masquer le calque · Rectangle bleu" })).toBe(
+    visibility,
+  );
+  fireEvent.click(visibility);
+  expect(d.run).toHaveBeenCalledOnce();
+  expect(d.engine.getSnapshot().project.pages[0]!.layers[0]!.visible).toBe(false);
+  expect(d.engine.getSnapshot().project.pages[0]!.layers[1]!.x).toBe(73);
+  update();
+  expect(renders.icon).toHaveBeenCalledTimes(4);
+  act(() => d.engine.undo());
+  expect(d.engine.getSnapshot().project.pages[0]!.layers[0]!.visible).toBe(true);
+  expect(d.engine.getSnapshot().project.pages[0]!.layers[1]!.x).toBe(73);
+
+  // A replacement before React catches up cannot reuse the retained button's owner.
+  act(() => d.engine.load(d.engine.getSnapshot().project));
+  const replacement = d.engine.getSnapshot();
+  fireEvent.click(visibility);
+  expect(d.engine.getSnapshot()).toBe(replacement);
+  expect(d.run).toHaveBeenCalledOnce();
+});
