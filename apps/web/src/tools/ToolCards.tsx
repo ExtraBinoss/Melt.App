@@ -1,5 +1,6 @@
 import { ArrowUpRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { TransitionLink } from "../ui/navigation/TransitionLink";
 import { publicHref, toolPath, type ToolDefinition } from "./catalog";
 import "./messages";
 export function ToolCards({ tools }: { tools: readonly ToolDefinition[] }) {
@@ -7,11 +8,12 @@ export function ToolCards({ tools }: { tools: readonly ToolDefinition[] }) {
   return (
     <div className="tool-cards">
       {tools.map((tool) => (
-        <a
+        <TransitionLink
           key={tool.slug}
           className="tool-card"
           data-style={tool.style}
           href={publicHref(toolPath(tool))}
+          revealTarget={`[data-tool-route="${tool.style}"]`}
         >
           <div className="tool-card-image">
             <img
@@ -27,7 +29,7 @@ export function ToolCards({ tools }: { tools: readonly ToolDefinition[] }) {
             <ArrowUpRight size={18} />
             <p>{t(`styles.${tool.style}.summary`)}</p>
           </div>
-        </a>
+        </TransitionLink>
       ))}
     </div>
   );

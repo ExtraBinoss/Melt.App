@@ -2,20 +2,24 @@ import { openProjectLibrary } from "./support/project-library";
 import { expect, test } from "@playwright/test";
 import { createLayer, createPage, createProject } from "@musart/core";
 
+test.beforeEach(async ({ context, baseURL }) => {
+  await context.addCookies([{ name: "musart.language", value: "fr", url: baseURL! }]);
+});
+
 test("landing follows the app theme and its draggable showcase opens real templates", async ({
   page,
 }, info) => {
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.emulateMedia({ colorScheme: "light" });
-  await page.goto("/?automation=1&welcome=1");
+  await page.goto("/");
   const headline = page.getByRole("heading", {
     level: 1,
-    name: "Créez simplement. Animez comme un pro.",
+    name: "Créez et animez.",
   });
   await expect(headline).toBeVisible();
   await expect(page.locator(".landing-nav .landing-brand")).toBeVisible();
   await expect(page.getByRole("button", { name: "Try Melt", exact: true })).toBeVisible();
-  await expect(page.locator(".landing-video-placeholder")).toHaveCount(6);
+  await expect(page.locator("[data-video-slot]")).toHaveCount(6);
   await expect(page.locator(".landing-eyebrow")).toHaveCount(0);
   const light = await page
     .locator(".landing-page")
@@ -34,7 +38,7 @@ test("landing follows the app theme and its draggable showcase opens real templa
   await carousel.hover();
   await page.mouse.wheel(620, 0);
   await expect.poll(() => carousel.getAttribute("data-carousel-position")).not.toBe("0");
-  const before = await page.evaluate(() => window.musart!.snapshot().project.id);
+  const before = page.url();
   const bounds = await carousel.boundingBox();
   await page.mouse.move(bounds!.x + bounds!.width * 0.6, bounds!.y + bounds!.height / 2);
   await page.mouse.down();
@@ -42,19 +46,19 @@ test("landing follows the app theme and its draggable showcase opens real templa
     steps: 8,
   });
   await page.mouse.up();
-  expect(await page.evaluate(() => window.musart!.snapshot().project.id)).toBe(before);
-  const story = page.getByRole("button", { name: "Créer depuis Story Instagram", exact: true });
-  await story.focus();
-  await story.click();
+  expect(page.url()).toBe(before);
+  const template = page.getByRole("button", { name: "Créer depuis Mascotte Melt", exact: true });
+  await template.focus();
+  await page.keyboard.press("Enter");
+  await expect(page.locator(".library-item-dialog")).toBeVisible();
+  await page
+    .locator(".library-item-dialog")
+    .getByRole("button", { name: "Ouvrir dans Melt", exact: true })
+    .click();
   await expect(page.getByTestId("editor-canvas")).toBeVisible();
-  await expect
-    .poll(() =>
-      page.evaluate(() => ({
-        width: window.musart!.snapshot().project.pages[0]!.width,
-        height: window.musart!.snapshot().project.pages[0]!.height,
-      })),
-    )
-    .toEqual({ width: 1080, height: 1920 });
+  await expect(
+    page.locator('.artboard-heading[data-active="true"] .artboard-dimensions'),
+  ).toHaveText("1920 × 1080");
 });
 
 test("library keeps five decoded recent thumbnails, a real Home action and Static/Motion filters", async ({
@@ -143,9 +147,7 @@ test("library keeps five decoded recent thumbnails, a real Home action and Stati
   expect(Math.round(gutter!.x + gutter!.width)).toBe(1280);
   await page.screenshot({ path: info.outputPath("library-sidebar-motion.png") });
   await page.getByRole("button", { name: "Retour à l’accueil", exact: true }).click();
-  await expect(
-    page.getByRole("heading", { level: 1, name: "Créez simplement. Animez comme un pro." }),
-  ).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1, name: "Créez et animez." })).toBeVisible();
   await page.getByRole("button", { name: "Try Melt", exact: true }).click();
   await expect(sidebar).toBeVisible();
   await sidebar.getByRole("button", { name: "Projets", exact: true }).click();

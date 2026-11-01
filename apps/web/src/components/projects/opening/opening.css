@@ -17,7 +17,8 @@
   text-align: center;
 }
 .project-opening-content > .ui-throbber {
-  gap: 10px;
+  flex-direction: column;
+  gap: 20px;
 }
 .project-opening-content .ui-throbber-label {
   font-size: 14px;

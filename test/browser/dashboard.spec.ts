@@ -41,9 +41,7 @@ test("first launch enters the empty library; the visible techno template creates
     if (/THREE\.Clock|PCFSoftShadowMap/.test(message.text())) deprecated.push(message.text());
   });
   await page.goto("/");
-  await expect(
-    page.getByRole("heading", { level: 1, name: "Créez simplement. Animez comme un pro." }),
-  ).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1, name: "Créez et animez." })).toBeVisible();
   await page.getByRole("button", { name: "Try Melt", exact: true }).click();
   const dashboard = page.getByRole("dialog", { name: "Tableau de bord Melt", exact: true });
   await expect(dashboard).toBeVisible();

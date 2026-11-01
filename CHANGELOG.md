@@ -6,11 +6,17 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Added
 
+- Add seven lightweight, poster-first landing template recordings and the supplied timelapse and effects feature media. Bound native playback to two visible players and three retained sources, hold the timelapse endpoint for two seconds, and stop hidden or reduced-motion playback.
+- Add a looping Melt typography animation to the English README. Rename the GitHub repository and local origin to `ExtraBinoss/Melt.App` while preserving portable-format and persistence identifiers.
+
 - Add a mascot-guided editor tutorial with a separate three-photo practice project, live UI highlights, skippable dither and Pop animation tasks, real video export completion, exit confirmation and editor-only replay.
 
 - Add dedicated Timelapse and Export landing cards, with accurate history, preview, resolution and MP4/WebM audio capabilities. Refresh the landing headline and supporting copy in all twelve interface languages around simple static design and professional animation.
 
 ### Changed
+
+- Build the landing Canvas, Agent and Export previews with shared themed React controls, loaded near the viewport with real artwork fallbacks. Keep preview interfaces in English, align rounded carousel bubbles and media, simplify the localized headline and feature copy, and stabilize mobile font loading. Record private production Lighthouse results of 99 desktop and 87 mobile in `docs/performance/landing-media-2026-11-02.md`.
+- Open landing carousel templates in their associated dashboard dialogs, retain native link dragging and hover-to-resume behavior, and share pointer-origin compositor navigation across Try Melt, free tools and converter Back links.
 
 - Make tutorial actions advance from real menu state, split the effect flow into + / Add effect / Dither, type the search automatically and use standard Dither. Keep exit confirmation above the guide, align Previous with the copy, render OS-specific shortcut keys and accompany targets with a morphing SVG pointer.
 
@@ -438,6 +444,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 - Locked artwork remains inspectable on the canvas with a constant-size lock badge and no editing handles. Layer rows expose persistent protection indicators, while the inspector and effect/mask popovers identify blocking parent locks and unlock only that chain in one undoable transaction.
 
 ### Fixed
+
+- Restore the shared mascot Throbber on the project-opening surface, with its label below and a visible violet-to-gray pulse defined in the shared component stylesheet. Respect inactive and reduced-motion states.
 
 - Prevented a blank editor when switching between desktop and mobile by waiting for the resizable-panel registry before restoring a layout, preserving desktop proportions and keeping responsive changes out of saved user resizes.
 

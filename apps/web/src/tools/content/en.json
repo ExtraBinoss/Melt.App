@@ -1,4 +1,7 @@
 {
+  "back": "Back",
+  "backHome": "Back to home",
+  "backTools": "Back to free tools",
   "hubTitle": "Free creative tools. A little less ordinary.",
   "hubIntro": "Turn an image or a short video into something with character. Six effects from the Melt engine, with local processing and controls you can actually understand.",
   "titleImage": "Free {{style}} image converter",

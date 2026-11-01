@@ -1,0 +1,61 @@
+.landing-headline {
+  max-inline-size: 1120px;
+  margin: 0 auto 38px;
+  font-family: var(--font-brand-display);
+  font-size: clamp(40px, 8.4vw, 120px);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+
+.hero-chunk {
+  --hero-offset: -0.18em;
+  --hero-opacity: 1;
+  display: inline-block;
+  max-inline-size: 100%;
+  vertical-align: top;
+  animation: hero-chunk-in 560ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+
+.landing-headline > span > span:nth-child(n + 2) > .hero-chunk {
+  --hero-opacity: 0.68;
+  animation-delay: 60ms;
+}
+
+.landing-headline > span > span:nth-child(even) > .hero-chunk {
+  --hero-offset: 0.18em;
+}
+
+.landing-headline[data-paused] .hero-chunk {
+  animation-play-state: paused;
+}
+
+@keyframes hero-chunk-in {
+  from {
+    opacity: var(--hero-opacity);
+    transform: translate(var(--hero-offset), 0.09em) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (max-width: 700px) {
+  .landing-headline {
+    margin-bottom: 30px;
+  }
+
+  /* Keep the phrase's line count stable while the display font replaces its fallback. */
+  .landing-headline > span,
+  .landing-headline > span > span {
+    display: block;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-chunk {
+    animation: none;
+  }
+}

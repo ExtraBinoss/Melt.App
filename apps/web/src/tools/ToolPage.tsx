@@ -1,7 +1,9 @@
 import { useTranslation } from "react-i18next";
 import { useRestoreLocale } from "../state/i18n/use-locale";
-import { ChevronRight } from "lucide-react";
+import { ArrowLeft, ChevronRight } from "lucide-react";
 import { Faq } from "../components/site/Faq";
+import { Button } from "../components/ui/button";
+import { TransitionLink } from "../ui/navigation/TransitionLink";
 import { TOOL_PAGES, publicHref, type ToolDefinition } from "./catalog";
 import { ToolCards } from "./ToolCards";
 import { Converter } from "./converter/Converter";
@@ -19,11 +21,25 @@ export function ToolPage({ tool }: { tool: ToolDefinition }) {
     { question: t("controlsQ"), answer: t("controlsA") },
   ];
   return (
-    <div className="tools-container">
+    <div className="tools-container" data-tool-route={tool.style}>
+      <Button className="tool-back" variant="ghost" size="sm" asChild>
+        <TransitionLink
+          href={publicHref("/tools")}
+          revealTarget={'[data-tool-route="hub"]'}
+          aria-label={t("backTools")}
+        >
+          <ArrowLeft size={16} aria-hidden="true" />
+          {t("back")}
+        </TransitionLink>
+      </Button>
       <nav className="tool-breadcrumbs" aria-label={t("breadcrumbs")}>
-        <a href={publicHref("/")}>{t("home")}</a>
+        <TransitionLink href={publicHref("/")} revealTarget=".landing-page">
+          {t("home")}
+        </TransitionLink>
         <ChevronRight size={12} />
-        <a href={publicHref("/tools")}>{t("hub")}</a>
+        <TransitionLink href={publicHref("/tools")} revealTarget={'[data-tool-route="hub"]'}>
+          {t("hub")}
+        </TransitionLink>
         <ChevronRight size={12} />
         <span>{name}</span>
       </nav>

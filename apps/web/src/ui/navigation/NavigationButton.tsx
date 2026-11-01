@@ -2,7 +2,7 @@ import type { ComponentProps } from "react";
 import { Button } from "../../components/ui/button";
 import { dialogLinkKeyDown, isPlainPrimaryClick } from "./activation";
 
-/** A real href works before hydration; primary client activation keeps app routing. */
+/** Keep the native link and its media subtree stable through disabled/loading states. */
 export function NavigationButton({
   href,
   onNavigate,
@@ -15,20 +15,28 @@ export function NavigationButton({
   onNavigate?: () => void;
   onPrepare?: () => void;
 }) {
-  const prepare = { onPointerEnter: onPrepare, onFocus: onPrepare };
-  if (disabled)
-    return (
-      <Button {...props} disabled>
-        {children}
-      </Button>
-    );
   return (
-    <Button {...props} {...prepare} asChild>
+    <Button
+      {...props}
+      className={
+        disabled ? `${props.className ?? ""} pointer-events-none opacity-50` : props.className
+      }
+      onPointerEnter={disabled ? undefined : onPrepare}
+      onFocus={disabled ? undefined : onPrepare}
+      asChild
+    >
       <a
         href={href}
         role="button"
+        aria-disabled={disabled || undefined}
+        inert={disabled || undefined}
+        tabIndex={disabled ? -1 : props.tabIndex}
         onKeyDown={dialogLinkKeyDown}
         onClick={(event) => {
+          if (disabled) {
+            event.preventDefault();
+            return;
+          }
           if (onNavigate && isPlainPrimaryClick(event)) {
             event.preventDefault();
             onNavigate();

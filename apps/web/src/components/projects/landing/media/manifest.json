@@ -1,0 +1,50 @@
+{
+  "feature-timelapse": {
+    "video": "videos/landing/feature-timelapse/preview-55ed78de4cea.webm",
+    "poster": "videos/landing/feature-timelapse/poster-fbed0ad87960.webp",
+    "width": 720,
+    "height": 720
+  },
+  "morphing-type": {
+    "video": "videos/landing/morphing-type/preview-c84f0e1119f4.webm",
+    "poster": "videos/landing/morphing-type/poster-2c4c4d4dbcb2.webp",
+    "width": 1280,
+    "height": 720
+  },
+  "bloom-windows": {
+    "video": "videos/landing/bloom-windows/preview-37f8b25acba6.webm",
+    "poster": "videos/landing/bloom-windows/poster-536a5a8f0ba4.webp",
+    "width": 1280,
+    "height": 720
+  },
+  "cornell-box": {
+    "video": "videos/landing/cornell-box/preview-746eccdcd2d1.webm",
+    "poster": "videos/landing/cornell-box/poster-12cce017c2f4.webp",
+    "width": 720,
+    "height": 720
+  },
+  "angel-windows": {
+    "video": "videos/landing/angel-windows/preview-87add9372461.webm",
+    "poster": "videos/landing/angel-windows/poster-13de5acfe3f6.webp",
+    "width": 406,
+    "height": 720
+  },
+  "terminal-signal": {
+    "video": "videos/landing/terminal-signal/preview-9107e5b8b25c.webm",
+    "poster": "videos/landing/terminal-signal/poster-27f0cace708d.webp",
+    "width": 406,
+    "height": 720
+  },
+  "second-skin": {
+    "video": "videos/landing/second-skin/preview-66d3da2e2db3.webm",
+    "poster": "videos/landing/second-skin/poster-597d7bef8c03.webp",
+    "width": 406,
+    "height": 720
+  },
+  "share-your-work": {
+    "video": "videos/landing/share-your-work/preview-efa30b5641c4.webm",
+    "poster": "videos/landing/share-your-work/poster-6c3415c77f0f.webp",
+    "width": 480,
+    "height": 480
+  }
+}

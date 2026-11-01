@@ -1,3 +1,6 @@
+import { useEffect, useRef } from "react";
+import { installLandingVideos } from "./media/playback";
+import { FeatureVisual } from "./features/FeatureVisual";
 import { NavigationButton } from "../../../ui/navigation/NavigationButton";
 import { dashboardHref } from "../../../ui/navigation/activation";
 import { BrandStatus } from "../../../ui/brand/BrandStatus";
@@ -5,7 +8,7 @@ import { SiteHeader } from "../../site/SiteHeader";
 import { SiteFooter } from "../../site/SiteFooter";
 import { Faq, type FaqItem } from "../../site/Faq";
 import "../../site/messages";
-import { ArrowUpRight, Play } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "../../ui/button";
 import { HeroHeadline } from "./HeroHeadline";
@@ -14,7 +17,7 @@ import "./messages";
 import "./landing.css";
 
 const features = ["canvas", "effects", "motion", "agent", "timelapse", "export"] as const;
-/** Video slots remain placeholders until clips are supplied in public/videos. */
+/** Supplied feature clips share the same native playback budget as the showcase. */
 export function LandingPage({
   onCreate,
   onTemplate,
@@ -29,8 +32,10 @@ export function LandingPage({
   onPrepare?: () => void;
 }) {
   const { t } = useTranslation("landing");
+  const host = useRef<HTMLDivElement>(null);
+  useEffect(() => (host.current ? installLandingVideos(host.current) : undefined), []);
   return (
-    <div className="landing-page" id="top">
+    <div ref={host} className="landing-page" id="top">
       <SiteHeader landing onTry={onCreate} onPrepare={onPrepare} disabled={busy} />
       <section className="landing-intro" id="musart-intro">
         <HeroHeadline lines={[t("titleFirst"), t("titleSecond")]} />
@@ -68,12 +73,7 @@ export function LandingPage({
               <h3>{t(feature)}</h3>
               <p>{t(`${feature}Hint`)}</p>
             </div>
-            <div className="landing-video-placeholder" data-video-slot={feature}>
-              <span className="landing-video-frame">
-                <Play size={22} fill="currentColor" />
-                <span>{t("preview")}</span>
-              </span>
-            </div>
+            <FeatureVisual kind={feature} />
           </article>
         ))}
       </section>

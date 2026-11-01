@@ -1,4 +1,4 @@
-interface OpeningPoint {
+export interface OpeningPoint {
   x: number;
   y: number;
 }

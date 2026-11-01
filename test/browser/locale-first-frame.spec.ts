@@ -40,9 +40,7 @@ test("a saved locale is already present in SSR and keeps the desktop navigation 
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("/");
-  await expect(
-    page.getByRole("heading", { name: "Créez simplement. Animez comme un pro.", exact: true }),
-  ).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Créez et animez.", exact: true })).toBeVisible();
   await page.evaluate(() => document.fonts.ready);
   await expect.poll(() => painted).toEqual(["fr"]);
   const bounds = await page.evaluate(() => {
@@ -82,17 +80,13 @@ test("legacy local-storage language migrates once before visible content, withou
     }).observe({ type: "paint", buffered: true });
   });
   await page.goto("/");
-  await expect(
-    page.getByRole("heading", { name: "Créez simplement. Animez comme un pro.", exact: true }),
-  ).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Créez et animez.", exact: true })).toBeVisible();
   expect(navigations).toBe(2);
   await expect.poll(() => painted).toEqual(["fr"]);
   expect((await context.cookies()).find((cookie) => cookie.name === "musart.language")?.value).toBe(
     "fr",
   );
   await page.reload();
-  await expect(
-    page.getByRole("heading", { name: "Créez simplement. Animez comme un pro.", exact: true }),
-  ).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Créez et animez.", exact: true })).toBeVisible();
   expect(navigations).toBe(3);
 });

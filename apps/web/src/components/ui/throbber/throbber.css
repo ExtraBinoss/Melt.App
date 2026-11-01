@@ -26,6 +26,19 @@
   flex-shrink: 0;
   color: var(--brand-primary);
 }
+/* Shared loading tint also covers the initial raster while the animated SVG prepares. */
+.ui-throbber-mark {
+  animation: melt-mark-throb 1.4s ease-in-out infinite;
+}
+@keyframes melt-mark-throb {
+  0%,
+  100% {
+    filter: grayscale(0);
+  }
+  50% {
+    filter: grayscale(1);
+  }
+}
 .ui-throbber[data-variant="shimmer"] .ui-throbber-label {
   background: linear-gradient(
     110deg,

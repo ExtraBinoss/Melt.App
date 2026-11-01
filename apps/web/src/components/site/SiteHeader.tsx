@@ -1,4 +1,5 @@
 import { NavigationButton } from "../../ui/navigation/NavigationButton";
+import { TransitionLink } from "../../ui/navigation/TransitionLink";
 import { ArrowUpRight } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -42,23 +43,36 @@ export function SiteHeader({
   }, [landing]);
   return (
     <header className={`site-header ${landing ? "landing-nav" : ""}`}>
-      <a href={landing ? "#musart-intro" : publicHref("/")} className="landing-brand">
+      <TransitionLink
+        href={landing ? "#musart-intro" : publicHref("/")}
+        revealTarget=".landing-page"
+        className="landing-brand"
+      >
         <MeltMark size={30} interactive />
         {brand.name}
-      </a>
+      </TransitionLink>
       <nav aria-label={t("resources")}>
-        <a
+        <TransitionLink
           href={publicHref("/#features")}
+          revealTarget=".landing-page"
           aria-current={section === "features" ? "location" : undefined}
         >
           {t("features")}
-        </a>
-        <a href={publicHref("/#faq")} aria-current={section === "faq" ? "location" : undefined}>
+        </TransitionLink>
+        <TransitionLink
+          href={publicHref("/#faq")}
+          revealTarget=".landing-page"
+          aria-current={section === "faq" ? "location" : undefined}
+        >
           {t("faqNav")}
-        </a>
-        <a href={publicHref("/tools")} aria-current={section === "tools" ? "page" : undefined}>
+        </TransitionLink>
+        <TransitionLink
+          href={publicHref("/tools")}
+          revealTarget={'[data-tool-route="hub"]'}
+          aria-current={section === "tools" ? "page" : undefined}
+        >
           {t("tools")}
-        </a>
+        </TransitionLink>
       </nav>
       {onTry ? (
         <NavigationButton
@@ -73,10 +87,10 @@ export function SiteHeader({
         </NavigationButton>
       ) : (
         <Button className="site-try" asChild>
-          <a href={publicHref("/dashboard")}>
+          <TransitionLink href={publicHref("/dashboard")} revealTarget=".project-dashboard">
             {t("try")}
             <ArrowUpRight size={16} />
-          </a>
+          </TransitionLink>
         </Button>
       )}
     </header>

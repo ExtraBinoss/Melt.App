@@ -34,6 +34,10 @@ test("retains a native href, primary keyboard/client activation and browser modi
       Try Melt
     </NavigationButton>,
   );
-  expect(screen.getByRole("button")).toBeDisabled();
-  expect(screen.getByRole("button")).not.toHaveAttribute("href");
+  expect(screen.getByRole("button", { hidden: true })).toBe(link);
+  expect(link).toHaveAttribute("aria-disabled", "true");
+  expect(link).toHaveAttribute("inert");
+  expect(link).toHaveAttribute("href", "/dashboard");
+  fireEvent.click(link);
+  expect(navigate).toHaveBeenCalledTimes(2);
 });

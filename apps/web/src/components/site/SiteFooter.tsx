@@ -3,37 +3,52 @@ import { useTranslation } from "react-i18next";
 import { SiteLanguagePicker } from "./SiteLanguagePicker";
 import { MeltMark } from "../../ui/brand/MeltMark";
 import { brand } from "../../ui/brand/config";
+import { TransitionLink } from "../../ui/navigation/TransitionLink";
 import { TOOL_PAGES, publicHref, toolPath } from "../../tools/catalog";
 import "./messages";
 import "./site.css";
-const repository = "https://github.com/ExtraBinoss/MusArt";
+const repository = "https://github.com/ExtraBinoss/Melt.App";
 export function SiteFooter() {
   const { t } = useTranslation("site");
   return (
     <footer className="site-footer">
       <div className="site-footer-columns">
         <div className="site-footer-about">
-          <a className="landing-footer-brand" href={publicHref("/")}>
+          <TransitionLink
+            className="landing-footer-brand"
+            href={publicHref("/")}
+            revealTarget=".landing-page"
+          >
             <MeltMark size={30} interactive loading="lazy" />
             {brand.name}
-          </a>
+          </TransitionLink>
           <p>{t("footerDescription")}</p>
         </div>
         <nav aria-label={t("studio")}>
           <h3>{t("studio")}</h3>
-          <a href={publicHref("/dashboard")}>{t("templates")}</a>
+          <TransitionLink href={publicHref("/dashboard")} revealTarget=".project-dashboard">
+            {t("templates")}
+          </TransitionLink>
           <a href={publicHref("/editor")}>{t("editor")}</a>
-          <a href={publicHref("/tools")}>{t("tools")}</a>
-          <a href={publicHref("/#faq")}>{t("faqNav")}</a>
+          <TransitionLink href={publicHref("/tools")} revealTarget={'[data-tool-route="hub"]'}>
+            {t("tools")}
+          </TransitionLink>
+          <TransitionLink href={publicHref("/#faq")} revealTarget=".landing-page">
+            {t("faqNav")}
+          </TransitionLink>
         </nav>
         <nav aria-label={t("tools")}>
           <h3>{t("tools")}</h3>
           {TOOL_PAGES.map((tool) => (
-            <a key={tool.style} href={publicHref(toolPath(tool))}>
+            <TransitionLink
+              key={tool.style}
+              href={publicHref(toolPath(tool))}
+              revealTarget={`[data-tool-route="${tool.style}"]`}
+            >
               {tool.style === "ascii" || tool.style === "crt"
                 ? tool.style.toUpperCase()
                 : tool.style[0]!.toUpperCase() + tool.style.slice(1)}
-            </a>
+            </TransitionLink>
           ))}
         </nav>
         <nav aria-label={t("resources")}>

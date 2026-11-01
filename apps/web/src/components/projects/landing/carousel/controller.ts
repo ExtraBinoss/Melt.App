@@ -61,6 +61,7 @@ export function installCarouselPan(
   const finePointer = matchMedia("(hover: hover) and (pointer: fine)");
   let hovered = finePointer.matches && node.matches(":hover"),
     keyboardFocus = false,
+    pointerFocus = false,
     windowFocused = true;
   let visible = typeof IntersectionObserver === "undefined",
     quietUntil = 0;
@@ -250,13 +251,23 @@ export function installCarouselPan(
     frame = requestAnimationFrame(tick);
   }
   function down(event: PointerEvent) {
-    if (event.button !== 0 || !period) return;
+    // Native links can retain :focus-visible after a pointer press or focus after release.
+    pointerFocus = true;
+    keyboardFocus = false;
+    if (
+      event.button !== 0 ||
+      event.ctrlKey ||
+      event.metaKey ||
+      event.altKey ||
+      event.shiftKey ||
+      !period
+    )
+      return;
     if (gesture && gesture.id !== event.pointerId) {
       cancel();
       return;
     }
     cancel();
-    keyboardFocus = false;
     quiet();
     suppressClick = false;
     gesture = {
@@ -321,10 +332,21 @@ export function installCarouselPan(
       queueAuto();
     }
   }
+  function preventNativeDrag(event: DragEvent) {
+    event.preventDefault();
+  }
   function click(event: MouseEvent) {
-    if (!suppressClick) return;
+    if (
+      !suppressClick ||
+      event.button !== 0 ||
+      event.ctrlKey ||
+      event.metaKey ||
+      event.altKey ||
+      event.shiftKey ||
+      event.detail === 0
+    )
+      return;
     suppressClick = false;
-    if (event.detail === 0) return;
     event.preventDefault();
     event.stopPropagation();
   }
@@ -347,6 +369,7 @@ export function installCarouselPan(
   }
   function keyboard(event: KeyboardEvent) {
     if (!["Shift", "Control", "Alt", "Meta"].includes(event.key)) {
+      pointerFocus = false;
       keyboardFocus = true;
       pauseAuto();
       quiet();
@@ -369,9 +392,12 @@ export function installCarouselPan(
   }
   function focus(event: FocusEvent) {
     keyboardFocus =
-      !gesture && event.target instanceof Element && event.target.matches(":focus-visible");
+      !pointerFocus &&
+      !gesture &&
+      event.target instanceof Element &&
+      event.target.matches(":focus-visible");
     if (keyboardFocus) pauseAuto();
-    if (!period || gesture) return;
+    if (!period || gesture || pointerFocus) return;
     const target = event.target;
     const card = cards.find((item) => target instanceof Node && item.node.contains(target));
     if (!card) return;
@@ -391,6 +417,7 @@ export function installCarouselPan(
   function focusOut(event: FocusEvent) {
     if (event.relatedTarget instanceof Node && node.contains(event.relatedTarget)) return;
     keyboardFocus = false;
+    pointerFocus = false;
     quiet();
     queueAuto();
   }
@@ -435,7 +462,7 @@ export function installCarouselPan(
     }
   }
   const intersection =
-    automatic && typeof IntersectionObserver !== "undefined"
+    typeof IntersectionObserver !== "undefined"
       ? new IntersectionObserver((entries) => {
           if (disposed) return;
           visible = entries.some((entry) => entry.isIntersecting);
@@ -453,11 +480,13 @@ export function installCarouselPan(
   intersection?.observe(node);
   for (const card of cards) observer.observe(card.node);
   node.addEventListener("pointerdown", down);
-  node.addEventListener("pointermove", move, { passive: false });
-  node.addEventListener("pointerup", up);
+  // Keep the initial uncaptured press bounded even if it leaves the rail before dragging.
+  window.addEventListener("pointermove", move, { passive: false });
+  window.addEventListener("pointerup", up);
   node.addEventListener("pointercancel", cancelPointer);
   node.addEventListener("lostpointercapture", cancelPointer);
   node.addEventListener("click", click, true);
+  node.addEventListener("dragstart", preventNativeDrag, true);
   node.addEventListener("wheel", wheel, { passive: false });
   node.addEventListener("keydown", keyboard);
   node.addEventListener("focusin", focus);
@@ -478,11 +507,12 @@ export function installCarouselPan(
       observer.disconnect();
       intersection?.disconnect();
       node.removeEventListener("pointerdown", down);
-      node.removeEventListener("pointermove", move);
-      node.removeEventListener("pointerup", up);
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", up);
       node.removeEventListener("pointercancel", cancelPointer);
       node.removeEventListener("lostpointercapture", cancelPointer);
       node.removeEventListener("click", click, true);
+      node.removeEventListener("dragstart", preventNativeDrag, true);
       node.removeEventListener("wheel", wheel);
       node.removeEventListener("keydown", keyboard);
       node.removeEventListener("focusin", focus);

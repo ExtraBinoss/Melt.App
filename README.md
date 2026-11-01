@@ -4,21 +4,27 @@
 
 <h1 align="center">Melt</h1>
 
-<p align="center">A browser-based creative studio for posters, graphics and visual experiments.</p>
+<p align="center">A browser-based creative studio for design and motion.</p>
 
 <p align="center">
-  <a href="https://extrabinoss.github.io/MusArt/">
-    <img src="https://img.shields.io/badge/Open_Melt-A259FF?style=for-the-badge" alt="Open Melt" />
+  <a href="apps/web/public/videos/landing/morphing-type/preview-c84f0e1119f4.webm">
+    <img src="docs/media/readme/melt-typography.webp" width="960" height="540" alt="Melt mascot beside violet lettering that stretches and morphs in a six-second loop" />
   </a>
 </p>
 
-Melt brings images, typography, shapes and effects into one editable composition. Build with layers, try different treatments, and export your artwork or a timelapse of how you made it.
+<p align="center"><a href="apps/web/public/videos/landing/morphing-type/preview-c84f0e1119f4.webm">Watch the typography loop</a> · Made in Melt, with editable type and native Motion.</p>
+
+<p align="center">
+  <a href="https://melt.plinka.eu/">
+    <img src="https://img.shields.io/badge/Open_Melt-8B5CF6?style=for-the-badge" alt="Open Melt" />
+  </a>
+</p>
+
+Melt brings images, typography, shapes and effects into one editable composition. Design posters and graphics in **Static**, or switch to **Motion** to animate layers, morph typography and build loops. Export your artwork, a motion video or a timelapse of how you made it.
 
 Your projects save on your device. No account is required. Melt is free and open source, built as an independent project for the [2026 Meta Global AI Developer Hackathon](https://dev.meta.ai/events/global-hackathon).
 
 [What you can make](#available-today) · [Get started](#get-started) · [Headless mode](#headless-mode) · [Documentation](docs/README.md)
-
-The hosted editor becomes available after the first successful GitHub Pages deployment.
 
 ## Available today
 
@@ -33,12 +39,13 @@ The hosted editor becomes available after the first successful GitHub Pages depl
 | **Local projects**         | Autosave in your browser, undo and redo edits, and download a `.musart` project with its original images. Reopen it later or move it to another device.                                 |
 | **Image export**           | Export a selection or a whole artboard as PNG, JPEG or WebP, with scale options up to 4×. Download all artboards together as a ZIP.                                                     |
 | **Creation timelapses**    | Replay your recorded edits in Animate and export an MP4 or WebM video, depending on browser support.                                                                                    |
+| **Motion**                 | Animate layers with editable blocks, presets and keyframes. Morph typography, refine timing and easing, and export motion videos.                                                       |
 
-The interface is available in **English and French**, with light and dark themes and customizable keyboard shortcuts.
+The interface offers **12 languages**, with light and dark themes and customizable keyboard shortcuts. Some controls fall back to English; see [localization coverage](docs/guides/editor-localization.md).
 
 ## Get started
 
-To run Melt on your computer, install **Bun 1.4.2** and **Node.js 22.12 or newer**, then run these commands from the project folder:
+To run Melt on your computer, install **Bun 1.4.4** and **Node.js 22.12 or newer**, then run these commands from the project folder:
 
 ```sh
 bun install --frozen-lockfile
@@ -48,8 +55,8 @@ bun dev
 Open **[localhost:6100](http://localhost:6100)** in your browser.
 
 1. Choose a template, create an artboard, or open a `.musart` file from the dashboard.
-2. Drop in images, add text and shapes, then build your composition with layers, effects and masks. The **AFTERHOURS — Techno** template is an editable starting point.
-3. Use **Export** to download an image, or open **Animate** to prepare a timelapse. Download a `.musart` copy from the project-name menu to keep a portable backup.
+2. Drop in images, add text and shapes, then build your composition with layers, effects and masks. Try **Melt Mascot** for editable typography in Motion.
+3. Use **Export** to download an image or motion video, or open **Animate** to prepare a timelapse. Download a `.musart` copy from the project-name menu to keep a portable backup.
 
 Press **Ctrl/Cmd + K** to find tools and actions. Scroll to pan, **Ctrl/Cmd + scroll** to zoom around the pointer, and click the zoom percentage to return to 100%. See the [shortcut guide](docs/guides/keyboard-shortcuts.md).
 
@@ -83,9 +90,8 @@ See [Headless mode](docs/guides/headless.md) for image formats, artboard selecti
 
 ## Still to implement
 
-Keyframe animation is part of the [product direction](docs/product/vision.md). The other items are current gaps and possible next steps. None has a delivery date.
+These are current gaps and possible next steps. None has a delivery date.
 
-- [ ] Author animation with a timeline and keyframes, beyond the existing edit-history timelapse.
 - [ ] Embed custom font files in portable projects. They currently need to be installed separately in each browser.
 - [ ] Support mixed left-to-right/right-to-left paragraphs and color emoji.
 - [ ] Export editable vector/PDF files and print-ready, ICC-managed CMYK artwork. Current image exports are RGB.
@@ -114,8 +120,8 @@ Start with the [documentation index](docs/README.md) for usage guides, headless 
 Melt's source code is available under the [MIT License](LICENSE). Fonts, models, artwork and other third-party material retain their own licenses; see [credits and provenance](docs/legal/provenance.md) and [third-party notices](THIRD_PARTY_NOTICES.md).
 
 <p align="center">
-  <a href="https://extrabinoss.github.io/MusArt/">
-    <img src="https://img.shields.io/badge/Open_Melt-A259FF?style=for-the-badge" alt="Open Melt" />
+  <a href="https://melt.plinka.eu/">
+    <img src="https://img.shields.io/badge/Open_Melt-8B5CF6?style=for-the-badge" alt="Open Melt" />
   </a>
 </p>
 

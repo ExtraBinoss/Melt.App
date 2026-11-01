@@ -1,0 +1,99 @@
+{
+  "feature-timelapse": {
+    "video": "videos/landing/feature-timelapse/preview-55ed78de4cea.webm",
+    "poster": "videos/landing/feature-timelapse/poster-fbed0ad87960.webp",
+    "width": 720,
+    "height": 720,
+    "duration": 5,
+    "bytes": 466497,
+    "source": "Composition 1-timelapse (1).mp4",
+    "sourceSha256": "6459aebe24df3152c1fdc9f67f94ee7c605caac640c5ddbb5be4c56b5e8395c7",
+    "sha256": "55ed78de4ceaec7ad2d70e8036be86f6a548336154c0352c8e479bb75ba3c04c",
+    "posterSha256": "fbed0ad879608dd007b632ed96487a0e7c303134481fc398516a9f1c2a556865",
+    "posterTime": 4.5
+  },
+  "morphing-type": {
+    "video": "videos/landing/morphing-type/preview-c84f0e1119f4.webm",
+    "poster": "videos/landing/morphing-type/poster-2c4c4d4dbcb2.webp",
+    "width": 1280,
+    "height": 720,
+    "duration": 6,
+    "bytes": 140385,
+    "source": "MeltLandingPageMaskotANim.webm",
+    "sourceSha256": "68ee90935e4c52c8a71e319df12ffdaf8da62a20b6df93d4ab191b0342890664",
+    "sha256": "c84f0e1119f4178a9537fb4f64746d0501f36fc67f61ea99a88026b4216f8363",
+    "posterSha256": "2c4c4d4dbcb28b82ece129b7c1ce3c6079d784bac3803c1b2f0034280b24be42"
+  },
+  "bloom-windows": {
+    "video": "videos/landing/bloom-windows/preview-37f8b25acba6.webm",
+    "poster": "videos/landing/bloom-windows/poster-536a5a8f0ba4.webp",
+    "width": 1280,
+    "height": 720,
+    "duration": 12,
+    "bytes": 1146230,
+    "source": "Bloom Windows_LandingPage.webm",
+    "sourceSha256": "abe35754a83518de4717fa91f5ec42e7ae414872f5b7ec29b9ee6307e165cca9",
+    "sha256": "37f8b25acba6826ece81eeafb3f2bef9202616bd7acebf7f22d00b475735c615",
+    "posterSha256": "536a5a8f0ba458ea30570cdf52d2468c0facf416b583ce02ffc18094db086af1"
+  },
+  "cornell-box": {
+    "video": "videos/landing/cornell-box/preview-746eccdcd2d1.webm",
+    "poster": "videos/landing/cornell-box/poster-12cce017c2f4.webp",
+    "width": 720,
+    "height": 720,
+    "duration": 8,
+    "bytes": 228492,
+    "source": "Cornell Box_LandingPage.webm",
+    "sourceSha256": "c732a8a0e4151bc2fddb22b459670bb5e901bce714f83ba40ba7e3935f181b93",
+    "sha256": "746eccdcd2d126216239b25ea40aa1a2f385c56f83f2a62dec17f6bc0fdb235c",
+    "posterSha256": "12cce017c2f4c765bb03352596f6440a2ed5a9c9a6c1221b839757a986fa5ec1"
+  },
+  "angel-windows": {
+    "video": "videos/landing/angel-windows/preview-87add9372461.webm",
+    "poster": "videos/landing/angel-windows/poster-13de5acfe3f6.webp",
+    "width": 406,
+    "height": 720,
+    "duration": 12.8,
+    "bytes": 1007436,
+    "source": "Angel.exe_LandingPage.webm",
+    "sourceSha256": "c2bd6b92fd22fe2f017b07e9d5eb708b50d7a2a57b6c7d789c32f9cd85926031",
+    "sha256": "87add93724613291852e18db6a1b793a6e3251da1917ba01251840d78e39f4f8",
+    "posterSha256": "13de5acfe3f672f8a58c20fc8b38497d2ac50df2918f75a2bcab85587ba0d1f9"
+  },
+  "terminal-signal": {
+    "video": "videos/landing/terminal-signal/preview-9107e5b8b25c.webm",
+    "poster": "videos/landing/terminal-signal/poster-27f0cace708d.webp",
+    "width": 406,
+    "height": 720,
+    "duration": 16,
+    "bytes": 325598,
+    "source": "Terminal Signal_LandingPage.webm",
+    "sourceSha256": "0d57dbf84cc685f085d9d45100c728eeb23540fa8045903b71c46598bfabfca6",
+    "sha256": "9107e5b8b25cd7aab5cddae95de36edf989e8d62d5edb89cf6310c02289f8f0e",
+    "posterSha256": "27f0cace708db96b387dd0c202b314b8f07f2bd1c977477804213f9ffbbb7216"
+  },
+  "second-skin": {
+    "video": "videos/landing/second-skin/preview-66d3da2e2db3.webm",
+    "poster": "videos/landing/second-skin/poster-597d7bef8c03.webp",
+    "width": 406,
+    "height": 720,
+    "duration": 10,
+    "bytes": 649788,
+    "source": "Second Skin_LandingPage.webm",
+    "sourceSha256": "c0d0e0d97be5be160d909bb955c573ef4b4a0dcf8365b29ac0d0dcd459f0b47d",
+    "sha256": "66d3da2e2db3f477461f6d04af002358a9ceea8013b501713c6bc250bca1114e",
+    "posterSha256": "597d7bef8c0349b70e010fb5d712b0179d5ea0cc8cb9075cd252d62db5782237"
+  },
+  "share-your-work": {
+    "video": "videos/landing/share-your-work/preview-efa30b5641c4.webm",
+    "poster": "videos/landing/share-your-work/poster-6c3415c77f0f.webp",
+    "width": 480,
+    "height": 480,
+    "duration": 1.2,
+    "bytes": 62804,
+    "source": "Too Hot to Haunt_LandingPage.webm",
+    "sourceSha256": "0b7666f467bc4930f322718c4b74f3358fa9622eef95f152b409be1a8de04322",
+    "sha256": "efa30b5641c424f6f69377e9c42c7c846af27f53255a5c3f4fec4c9bd4ef6758",
+    "posterSha256": "6c3415c77f0f3f3d70ebc7afb1e71e61e6dbc34c5d46a439d4cb7dd9a0334a76"
+  }
+}

@@ -1,15 +1,14 @@
 import { brand } from "../../../ui/brand/config";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type CSSProperties } from "react";
 import { ArrowUpRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { LANDING_TEMPLATES } from "./catalog";
 import { MeltMark } from "../../../ui/brand/MeltMark";
-import { SocialBrandIcon } from "../../assets/SocialBrandIcon";
-import { Button } from "../../ui/button";
-import { templatePreview } from "../templates/preview";
+import { NavigationButton } from "../../../ui/navigation/NavigationButton";
+import { libraryPreviewHref } from "../items/links";
+import { LandingVideo } from "./media/LandingVideo";
 import "../templates/messages";
 import "./messages";
-import "./motion-showcase.css";
 import { installCarouselPan } from "./carousel/controller";
 
 export function ShowcaseCarousel({
@@ -47,39 +46,26 @@ export function ShowcaseCarousel({
         data-carousel
       >
         {LANDING_TEMPLATES.map((template, index) => (
-          <Button
+          <NavigationButton
             key={template.id}
             variant="ghost"
+            draggable={false}
+            style={{ "--template-aspect": template.width / template.height } as CSSProperties}
             className="landing-template-card"
             disabled={busy}
             aria-label={t("templates:use", { name: t(template.nameKey) })}
-            onClick={() => onChoose(template.id)}
+            href={libraryPreviewHref({ kind: "template", id: template.id })}
+            onNavigate={() => onChoose(template.id)}
           >
             <span className="landing-template-stage" data-tone={index % 3}>
-              {template.preview ? (
-                <img
-                  src={template.preview}
-                  alt=""
-                  loading={index < 2 ? "eager" : "lazy"}
-                  fetchPriority={index === 0 ? "high" : undefined}
-                  draggable={false}
-                  width={template.width}
-                  height={template.height}
-                />
-              ) : (
-                <span
-                  className="landing-template-paper"
-                  style={{
-                    aspectRatio: `${template.width}/${template.height}`,
-                    background: templatePreview(template.id),
-                  }}
-                >
-                  <SocialBrandIcon id={template.brandId ?? ""} size={34} />
-                  <span>
-                    {template.width} × {template.height}
-                  </span>
-                </span>
-              )}
+              <LandingVideo
+                poster={template.preview}
+                video={template.video}
+                width={template.width}
+                height={template.height}
+                eager={index < 2}
+                priority={index === 0}
+              />
               <span className="landing-template-open" aria-hidden>
                 <ArrowUpRight size={20} />
               </span>
@@ -91,7 +77,7 @@ export function ShowcaseCarousel({
                 {brand.name}
               </span>
             </span>
-          </Button>
+          </NavigationButton>
         ))}
       </div>
     </section>

@@ -1,4 +1,7 @@
 {
+  "back": "Voltar",
+  "backHome": "Voltar ao início",
+  "backTools": "Voltar às ferramentas gratuitas",
   "hubTitle": "Ferramentas criativas gratuitas. Um pouco menos comum.",
   "hubIntro": "Transforme uma imagem ou um pequeno vídeo em algo com personalidade. Seis efeitos do mecanismo Melt, com processamento local e controles que você pode realmente entender.",
   "titleImage": "Conversor gratuito de imagens {{style}}",

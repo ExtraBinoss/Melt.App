@@ -303,9 +303,7 @@ test("starts with the shared empty dashboard and mounts the editor only after ch
   });
   d.mount(<App engine={d.engine} services={d.services} welcome />);
   expect(screen.queryByTestId("canvas")).not.toBeInTheDocument();
-  expect(
-    await screen.findByRole("heading", { name: "Créez simplement. Animez comme un pro." }),
-  ).toBeVisible();
+  expect(await screen.findByRole("heading", { name: "Créez et animez." })).toBeVisible();
   fireEvent.click(screen.getAllByRole("button", { name: "Commencer à créer" })[0]!);
   expect(
     await screen.findByRole("heading", { name: "Quel projet voulez-vous créer ?" }),

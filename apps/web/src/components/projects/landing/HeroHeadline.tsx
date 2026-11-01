@@ -1,8 +1,12 @@
 import { useEffect, useRef } from "react";
+import "./headline.css";
 
-/** Two native text runs preserve shaping/wrapping without per-letter React/DOM work. */
+const cjkBoundary = /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}、。，！？]$/u;
+
+/** Short, native text runs keep Arabic shaping and CJK line breaks intact. */
 export function HeroHeadline({ lines }: { lines: readonly string[] }) {
   const element = useRef<HTMLHeadingElement>(null);
+  const chunks = lines.length > 4 ? [...lines.slice(0, 3), lines.slice(3).join(" ")] : lines;
   useEffect(() => {
     const sync = () => element.current?.toggleAttribute("data-paused", document.hidden);
     sync();
@@ -10,14 +14,15 @@ export function HeroHeadline({ lines }: { lines: readonly string[] }) {
     return () => document.removeEventListener("visibilitychange", sync);
   }, []);
   return (
-    <h1 ref={element} className="landing-headline" aria-label={lines.join(" ")}>
-      {lines.map((line, row) => (
-        <span className="hero-line-mask" key={line} aria-hidden>
-          <span className="hero-line" style={{ animationDelay: `${row * 0.14}s` }}>
-            {line}
+    <h1 ref={element} className="landing-headline" aria-label={lines.join(" ")} dir="auto">
+      <span aria-hidden>
+        {chunks.map((chunk, index) => (
+          <span key={`${index}-${chunk}`}>
+            {index > 0 && (cjkBoundary.test(chunks[index - 1] ?? "") ? <wbr /> : " ")}
+            <span className="hero-chunk">{chunk}</span>
           </span>
-        </span>
-      ))}
+        ))}
+      </span>
     </h1>
   );
 }
