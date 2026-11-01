@@ -4,6 +4,7 @@ import {
   TEMPLATE_CATALOG,
   createProjectFromTemplate,
 } from "../../../../src/services/projects/templates/catalog";
+import { DESIGNED_TEMPLATES } from "../../../../src/services/projects/templates/designed/catalog";
 import * as motion from "../../../../src/services/projects/templates/motion/loader";
 
 const ports = () => ({
@@ -15,7 +16,9 @@ const ports = () => ({
   ),
 });
 test("publishes exact canonical canvas formats and the editable artwork template", async () => {
-  expect(new Set(TEMPLATE_CATALOG.map((item) => item.id)).size).toBe(PRESETS.length + 11);
+  expect(new Set(TEMPLATE_CATALOG.map((item) => item.id)).size).toBe(
+    PRESETS.length + DESIGNED_TEMPLATES.length + 9,
+  );
   expect(Object.isFrozen(TEMPLATE_CATALOG)).toBe(true);
   const services = ports();
   for (const preset of PRESETS) {
@@ -48,6 +51,8 @@ test("routes Motion bundles to the binary-capable installation service and keeps
     "morphing-type",
     "in-bloom",
     "bloom-windows",
+    "angel-windows",
+    "cornell-box",
     "motion-stress-lab",
     "sound-playground",
     "share-your-work",

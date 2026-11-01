@@ -1,4 +1,6 @@
 {
+  "angelWindows": "Angel.exe",
+  "angelWindowsDescription": "12,8 s · Anjo 3D giratório, ambiente ASCII e janelas de efeitos",
   "bloomWindows": "Bloom Windows",
   "bloomWindowsDescription": "12 s · Floração em loop a 1080p com janelas móveis de dither, ASCII e cianotipia",
   "morphingType": "Mascote {{brandName}}",

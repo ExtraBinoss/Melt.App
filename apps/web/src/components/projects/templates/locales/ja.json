@@ -1,4 +1,6 @@
 {
+  "angelWindows": "Angel.exe",
+  "angelWindowsDescription": "12.8秒 · 回転する3Dの天使、ASCIIデスクトップとエフェクトウィンドウ",
   "bloomWindows": "Bloom Windows",
   "bloomWindowsDescription": "12秒 · 1080pの開花ループと動くディザ・ASCII・サイアノタイプのウィンドウ",
   "morphingType": "{{brandName}}マスコット",

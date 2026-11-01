@@ -1,3 +1,4 @@
+import { messages as windowTrails } from "./library/window-trails/messages";
 import { messages as material } from "./library/material/messages";
 import { messages as bevel } from "./library/bevel/messages";
 import { messages as displace } from "./library/displace/messages";
@@ -20,6 +21,7 @@ import receipt from "./library/receipt/messages.json";
 import pinkPhosphor from "./library/pink-phosphor/messages.json";
 /** UI resources stay on the web side; the core catalog only contains stable label keys. */
 export const libraryMessages = {
+  "window-trails": windowTrails,
   bevel,
   displace,
   thermal,

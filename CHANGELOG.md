@@ -260,6 +260,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Added
 
+- Add the editable 1080 × 1920 Angel.exe Motion template with a compact attributed 3D angel, an ASCII desktop, SVG window chrome and three screen-registered effect ribbons. Add the reusable deterministic Window trails TSL effect with bounded instances, interpolated authored time, paths, shadows, treatments and controls translated in twelve locales; share one native source across the windows without pixel readbacks.
+
 - Added a native GPU Drop shadow effect with editable color, opacity, blur and signed offsets, expanding source transport, mask mapping, bounded cache accounting and portable undoable settings.
 
 - Unified canvas and layer context actions, added animation-block editing/duplication/reversal/preset saving, and isolated destructive Delete actions below a separator. Clip deletion keeps its occurrence scope; animation deletion preserves its object and supports undo.

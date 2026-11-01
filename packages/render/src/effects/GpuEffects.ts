@@ -268,6 +268,7 @@ export class GpuEffects {
       .filter(
         (effect) =>
           effect.type === "ascii" ||
+          effect.type === "window-trails" ||
           (effect.type === "gradient" &&
             resolveGradientSettings(effect.settings).treatment === "ascii"),
       )

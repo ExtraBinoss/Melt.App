@@ -8,6 +8,7 @@ import type { EffectType } from "../../src/document/model";
 describe("portable effect definitions", () => {
   it("describes every supported effect once, with the existing deterministic defaults", () => {
     expect(Object.keys(EFFECT_CATALOG)).toEqual([
+      "window-trails",
       "bevel",
       "displace",
       "thermal",
@@ -65,6 +66,39 @@ describe("portable effect definitions", () => {
   });
   it("provides typed controls in document units and meaningful display metadata", () => {
     const expected: Record<EffectType, string[]> = {
+      "window-trails": [
+        "amount",
+        "scale",
+        "time",
+        "count",
+        "ribbons",
+        "entranceDelay",
+        "frameRows",
+        "asciiBackground",
+        "alternateTreatments",
+        "delay",
+        "speed",
+        "phase",
+        "centerX",
+        "centerY",
+        "radiusX",
+        "radiusY",
+        "width",
+        "height",
+        "titleHeight",
+        "border",
+        "shadow",
+        "backgroundShade",
+        "stars",
+        "fade",
+        "path",
+        "treatment",
+        "sampling",
+        "showSource",
+        "paper",
+        "ink",
+        "chrome",
+      ],
       morph: ["amount", "progress", "stagger", "inflate", "stretch", "order"],
       transition: ["amount", "style", "progress", "softness", "strength", "detail", "direction"],
       dither: ["amount", "scale", "levels", "color", "seed"],
@@ -404,7 +438,7 @@ describe("portable effect definitions", () => {
       );
       expect(getEffectDefinition(definition.type)).toBe(definition);
       expect(definition.coverage).toBe(
-        ["blur", "shadow", "displace"].includes(definition.type)
+        ["blur", "shadow", "displace", "window-trails"].includes(definition.type)
           ? "expand"
           : ["gradient", "circle", "shatter", "crt", "receipt", "transition"].includes(
                 definition.type,
@@ -414,6 +448,7 @@ describe("portable effect definitions", () => {
       );
       expect(definition.category).toBe(
         [
+          "window-trails",
           "bevel",
           "displace",
           "thermal",

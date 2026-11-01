@@ -19,6 +19,16 @@ export interface ProjectTemplate {
 }
 export const TEMPLATE_CATALOG: readonly ProjectTemplate[] = Object.freeze([
   Object.freeze({
+    id: "angel-windows",
+    nameKey: "templates:angelWindows",
+    descriptionKey: "templates:angelWindowsDescription",
+    width: 1080,
+    height: 1920,
+    mode: "motion",
+    category: "artwork",
+    preview: `${import.meta.env.BASE_URL}templates/motion/angel-windows.webp?v=1`,
+  }),
+  Object.freeze({
     id: "cornell-box",
     nameKey: "templates:cornellBox",
     descriptionKey: "templates:cornellBoxDescription",
@@ -134,6 +144,7 @@ async function openProjectTemplate(
     templateId === "morphing-type" ||
     templateId === "in-bloom" ||
     templateId === "bloom-windows" ||
+    templateId === "angel-windows" ||
     templateId === "cornell-box" ||
     templateId === "motion-stress-lab" ||
     templateId === "sound-playground" ||

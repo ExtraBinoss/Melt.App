@@ -1,4 +1,6 @@
 {
+  "angelWindows": "Angel.exe",
+  "angelWindowsDescription": "12.8 s · Rotating 3D angel, ASCII desktop and live effect windows",
   "bloomWindows": "Bloom Windows",
   "bloomWindowsDescription": "12 s · Seamless 1080p bloom with moving dither, ASCII and cyanotype windows",
   "morphingType": "Melt Mascot",

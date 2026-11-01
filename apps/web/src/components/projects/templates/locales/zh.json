@@ -1,4 +1,6 @@
 {
+  "angelWindows": "Angel.exe",
+  "angelWindowsDescription": "12.8 秒 · 旋转的 3D 天使、ASCII 桌面与实时效果窗口",
   "bloomWindows": "Bloom Windows",
   "bloomWindowsDescription": "12 秒 · 1080p 无缝开花循环，搭配移动的抖色、ASCII 和蓝晒窗口",
   "morphingType": "{{brandName}}吉祥物",

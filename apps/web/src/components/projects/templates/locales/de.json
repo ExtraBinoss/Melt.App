@@ -1,4 +1,6 @@
 {
+  "angelWindows": "Angel.exe",
+  "angelWindowsDescription": "12,8 s · Rotierender 3D-Engel, ASCII-Desktop und Effektfenster",
   "bloomWindows": "Bloom Windows",
   "bloomWindowsDescription": "12 s · Nahtlose Blüte in 1080p mit bewegten Dither-, ASCII- und Cyanotypie-Fenstern",
   "morphingType": "{{brandName}}-Maskottchen",

@@ -1,4 +1,6 @@
 {
+  "angelWindows": "Angel.exe",
+  "angelWindowsDescription": "12,8 s · Angelo 3D rotante, desktop ASCII e finestre con effetti",
   "bloomWindows": "Bloom Windows",
   "bloomWindowsDescription": "12 s · Fioritura in loop a 1080p con finestre mobili dither, ASCII e cianotipia",
   "morphingType": "Mascotte {{brandName}}",

@@ -1,4 +1,6 @@
 {
+  "angelWindows": "Angel.exe",
+  "angelWindowsDescription": "12,8 s · Obracający się anioł 3D, pulpit ASCII i okna efektów",
   "bloomWindows": "Bloom Windows",
   "bloomWindowsDescription": "12 s · Płynna pętla kwitnienia w 1080p z ruchomymi oknami ditheringu, ASCII i cyjanotypii",
   "morphingType": "Maskotka {{brandName}}",

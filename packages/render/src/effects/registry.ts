@@ -1,3 +1,4 @@
+import { windowTrailsNode } from "./window-trails/node";
 import { bevelNode } from "./bevel/node";
 import { displaceNode } from "./displace/node";
 import { thermalNode } from "./thermal/node";
@@ -40,6 +41,7 @@ import { pinkPhosphorNode } from "./pink-phosphor/node";
 export const EFFECT_NODES: Readonly<
   Record<Exclude<EffectType, "gradient" | "transition" | "morph">, EffectNodeBuilder>
 > = Object.freeze({
+  "window-trails": windowTrailsNode,
   bevel: bevelNode,
   displace: displaceNode,
   thermal: thermalNode,

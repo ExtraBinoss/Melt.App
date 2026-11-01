@@ -1,0 +1,117 @@
+import {
+  AMOUNT,
+  SCALE,
+  defineEffect,
+  type EffectParameter,
+  type NumberEffectParameter,
+} from "../definition";
+const number = (
+  key: string,
+  value: number,
+  min: number,
+  max: number,
+  step = 0.01,
+  unit = "",
+): NumberEffectParameter => ({
+  kind: "number",
+  scope: "settings",
+  key,
+  default: value,
+  min,
+  max,
+  step,
+  unit,
+  displayScale: 1,
+  labelKey: `window-trailsFx:parameter.${key}`,
+});
+const choice = (key: string, value: string, options: string[]): EffectParameter => ({
+  kind: "select",
+  scope: "settings",
+  key,
+  default: value,
+  labelKey: `window-trailsFx:parameter.${key}`,
+  options: options.map((value) => ({ value, labelKey: `window-trailsFx:choice.${value}` })),
+});
+export const WINDOW_TRAILS_PARAMETERS: readonly EffectParameter[] = [
+  AMOUNT,
+  { ...SCALE, labelKey: "window-trailsFx:parameter.scale" },
+  {
+    kind: "number",
+    key: "time",
+    min: 0,
+    max: 600,
+    step: 0.001,
+    unit: "s",
+    displayScale: 1,
+    labelKey: "window-trailsFx:parameter.time",
+  },
+  { ...number("count", 18, 1, 32, 1), integer: true },
+  { ...number("ribbons", 1, 1, 3, 1), integer: true },
+  number("entranceDelay", 1.8, 0, 10, 0.05, "s"),
+  { ...number("frameRows", 1, 1, 3, 1), integer: true },
+  {
+    kind: "boolean",
+    scope: "settings",
+    key: "asciiBackground",
+    default: false,
+    labelKey: "window-trailsFx:parameter.asciiBackground",
+  },
+  {
+    kind: "boolean",
+    scope: "settings",
+    key: "alternateTreatments",
+    default: false,
+    labelKey: "window-trailsFx:parameter.alternateTreatments",
+  },
+  number("delay", 0.045, 0, 0.5, 0.001, "s"),
+  number("speed", 0.1, -2, 2, 0.005, "Hz"),
+  number("phase", 0, -2, 2),
+  number("centerX", 0.5, -1, 2),
+  number("centerY", 0.5, -1, 2),
+  number("radiusX", 0.32, 0, 1),
+  number("radiusY", 0.23, 0, 1),
+  number("width", 360, 24, 2048, 1, "px"),
+  number("height", 320, 24, 2048, 1, "px"),
+  number("titleHeight", 27, 0, 128, 1, "px"),
+  number("border", 2, 0, 16, 0.5, "px"),
+  number("shadow", 0.2, 0, 1),
+  number("backgroundShade", 0.24, 0, 0.75),
+  number("stars", 0.2, 0, 1),
+  number("fade", 0.16, 0, 1),
+  choice("path", "figure-eight", ["figure-eight", "orbit", "sweep"]),
+  choice("treatment", "original", ["original", "invert", "wire", "xray"]),
+  choice("sampling", "screen", ["screen", "fit"]),
+  {
+    kind: "boolean",
+    scope: "settings",
+    key: "showSource",
+    default: true,
+    labelKey: "window-trailsFx:parameter.showSource",
+  },
+  ...(
+    [
+      ["paper", "#1515ff"],
+      ["ink", "#ffffff"],
+      ["chrome", "#efefff"],
+    ] as const
+  ).map(([key, value]): EffectParameter => ({
+    kind: "color",
+    scope: "settings",
+    key,
+    default: value,
+    labelKey: `window-trailsFx:parameter.${key}`,
+  })),
+];
+/** Delayed geometry follows the authored clock; the sampled pixels always belong to the current frame. */
+export const WINDOW_TRAILS_DEFINITION = Object.freeze({
+  ...defineEffect(
+    "window-trails",
+    { time: 0, scale: 12 },
+    WINDOW_TRAILS_PARAMETERS,
+    "effect",
+    "expand",
+  ),
+  inputs: Object.freeze([
+    Object.freeze({ key: "frame", kind: "image" as const, labelKey: "window-trailsFx:frame" }),
+  ]),
+});

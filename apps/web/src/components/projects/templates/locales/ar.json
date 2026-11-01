@@ -1,4 +1,6 @@
 {
+  "angelWindows": "Angel.exe",
+  "angelWindowsDescription": "12.8 ثانية · ملاك ثلاثي الأبعاد يدور وسطح مكتب ASCII ونوافذ مؤثرات",
   "bloomWindows": "Bloom Windows",
   "bloomWindowsDescription": "12 ث · تفتّح متواصل بدقة 1080p مع نوافذ Dither وASCII وCyanotype متحركة",
   "morphingType": "شخصية {{brandName}}",

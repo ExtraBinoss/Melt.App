@@ -48,6 +48,7 @@ export function validateCoverOptions(options: CoverOptions): void {
       (id) =>
         id !== "in-bloom" &&
         id !== "bloom-windows" &&
+        id !== "angel-windows" &&
         id !== "cornell-box" &&
         id !== "motion-stress-lab" &&
         id !== "sound-playground" &&
