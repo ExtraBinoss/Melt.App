@@ -1,4 +1,4 @@
-import { projectSceneTimelineRows } from "./scene/tree";
+import { useTimelineRows } from "./rows/use-timeline-rows";
 import { TimelineCollapseControl } from "./TimelineCollapseControl";
 import { SimpleTimelineRows } from "./animations/SimpleTimelineRows";
 import { AnimationViewToggle } from "./animations/AnimationViewToggle";
@@ -11,6 +11,7 @@ import {
   useReducer,
   useRef,
   useState,
+  type CSSProperties,
   type PointerEvent,
 } from "react";
 import { PanelBottom } from "lucide-react";
@@ -31,6 +32,7 @@ import { TIMELINE_ZOOM_PRESENT } from "./canvas/surface";
 import { useTimelineLayerDrag } from "./layer-drag/use-timeline-layer-drag";
 import type { TimelineTransport, TimelineUnit } from "./model";
 import { createTimelineGestures } from "./gestures";
+import { useTimelineSource } from "./rows/timeline-source";
 import { clampTimelineHeight } from "./height";
 import {
   useTimelineCollapsedRows,
@@ -97,6 +99,7 @@ export function TimelinePanel({
   const [view, setView] = useState({ left: 0, width: 900 });
   const resize = useRef<{ pointer: number; y: number; height: number } | null>(null);
   const page = snapshot.project.pages.find((item) => item.id === snapshot.pageId)!;
+  const source = useTimelineSource(page);
   const chosenOccurrences = useOccurrenceProjection(engine, page, transport);
   const actionWidth = compact ? 0 : Math.min(ACTION_WIDTH + 32, Math.max(144, view.width - 112));
   const duration = page.motion ? motionTimeToSeconds(page.motion.duration) : 2;
@@ -257,12 +260,9 @@ export function TimelinePanel({
     active,
     onError: setInteractionError,
   });
-  const rows = useMemo(
-    () => [...layerDrag.rows, ...projectSceneTimelineRows(page, collapsed, details)],
-    [layerDrag.rows, page, collapsed, details],
-  );
+  const rows = useTimelineRows(engine, source, layerDrag.rows, collapsed, details);
   const selected = useMemo(() => new Set(snapshot.selection), [snapshot.selection]);
-  const audioTracks = page.motion?.audioTracks ?? [];
+  const audioTracks = useMemo(() => page.motion?.audioTracks ?? [], [page.motion]);
   const audioError = useCallback((error: unknown) => setInteractionError(formatUiError(error)), []);
   const toggleUnit = useCallback(() => setUnit((value) => (value === "s" ? "ms" : "s")), []);
   const collapseControl = useMemo(
@@ -363,7 +363,7 @@ export function TimelinePanel({
             height: compact ? undefined : height,
             "--motion-gutter": `${GUTTER}px`,
             "--animation-actions-width": `${actionWidth}px`,
-          } as import("react").CSSProperties
+          } as CSSProperties
         }
         aria-label={t("timeline")}
         data-canvas-control
@@ -518,7 +518,8 @@ export function TimelinePanel({
               {!details ? (
                 <SimpleTimelineRows
                   engine={engine}
-                  page={page}
+                  source={source}
+                  assets={snapshot.project.assets}
                   transport={transport}
                   scale={scale}
                   gutter={GUTTER}

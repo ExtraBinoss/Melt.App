@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { motionTimeToSeconds, type EnginePort, type Composition } from "@musart/core";
+import { motionTimeToSeconds, type Asset, type EnginePort, type Composition } from "@musart/core";
 import type { TimelineTransport } from "../model";
 import { AudioRows } from "../audio/AudioRows";
 
@@ -7,6 +7,7 @@ import { AudioRows } from "../audio/AudioRows";
 export function SimpleAudioRows({
   engine,
   page,
+  assets,
   transport,
   scale,
   interactive,
@@ -17,6 +18,7 @@ export function SimpleAudioRows({
 }: {
   engine: EnginePort;
   page: Composition;
+  assets?: Record<string, Asset>;
   transport: TimelineTransport;
   scale: number;
   interactive: boolean;
@@ -32,7 +34,7 @@ export function SimpleAudioRows({
       <AudioRows
         engine={engine}
         tracks={tracks}
-        assets={engine.getSnapshot().project.assets}
+        assets={assets ?? engine.getSnapshot().project.assets}
         transport={transport}
         first={first}
         last={last}

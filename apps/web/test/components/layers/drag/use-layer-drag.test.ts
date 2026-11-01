@@ -415,3 +415,29 @@ test("native source survives React publications, surface rerenders and window fo
   other.unmount();
   d.unmount();
 });
+
+test("metadata retains native handlers but new drags capture the canonical page", () => {
+  const d = fixture();
+  const handlers = d.result.current.handlers;
+  act(() => d.engine.execute({ type: "updatePage", patch: { background: "#123456" } }));
+  const page = d.engine.getSnapshot().project.pages[0]!;
+  d.rerender({ current: page });
+  expect(d.result.current.handlers).toBe(handlers);
+  act(() => handlers.start(d.event, d.rectangle));
+  expect(d.result.current.dragging).toBe(d.rectangle.id);
+  act(() => handlers.over(d.event, d.text));
+  act(() => handlers.drop(d.event, d.text));
+  expect(d.engine.getSnapshot().project.pages[0]!.layers.map((x) => x.id)).toEqual([
+    d.text.id,
+    d.rectangle.id,
+    ...page.layers.filter((x) => x.id !== d.text.id && x.id !== d.rectangle.id).map((x) => x.id),
+  ]);
+  expect(d.engine.getSnapshot().project.pages[0]!.background).toBe("#123456");
+  act(() => d.engine.undo());
+  expect(d.engine.getSnapshot().project.pages[0]!.layers).toEqual(page.layers);
+  act(() => d.engine.load(d.engine.getSnapshot().project));
+  d.event.preventDefault = vi.fn();
+  act(() => handlers.start(d.event, d.rectangle));
+  expect(d.event.preventDefault).toHaveBeenCalled();
+  expect(d.result.current.dragging).toBeNull();
+});

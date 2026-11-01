@@ -13,6 +13,7 @@ import {
 import { Popover, PopoverAnchor, PopoverContent } from "../../ui/popover";
 import { getTransitionRequests, requestLayerTransition } from "../transitions/requests";
 import type { TimelineTransport } from "../model";
+import { readTimelinePage, type TimelineSource } from "../rows/timeline-source";
 import {
   captureAnimationPreset,
   duplicateAnimationCommand,
@@ -26,6 +27,7 @@ import { animationPresentation } from "./presentation";
 export function AnimationContextMenu({
   engine,
   page,
+  source,
   layerId,
   trackId,
   animation,
@@ -35,6 +37,7 @@ export function AnimationContextMenu({
 }: {
   engine: EnginePort;
   page: Composition;
+  source?: TimelineSource;
   layerId?: string;
   trackId?: string;
   animation: EditableAnimation;
@@ -49,11 +52,13 @@ export function AnimationContextMenu({
     point = useRef({ x: 0, y: 0 }),
     pendingSave = useRef(false),
     pendingOwnerEditor = useRef(false);
+  const currentPage = () => (source ? readTimelinePage(engine, source) : page);
   function current() {
     const snapshot = engine.getSnapshot(),
       before = origin.current;
     return (
       !!before &&
+      !!currentPage() &&
       snapshot.project === before.project &&
       snapshot.revision === before.revision &&
       snapshot.pageId === page.id
@@ -74,6 +79,10 @@ export function AnimationContextMenu({
         modal={false}
         onOpenChange={(open) => {
           if (!open) return;
+          if (!currentPage()) {
+            setError(true);
+            return;
+          }
           pendingOwnerEditor.current = false;
           transport.pause();
           engine.select(layerId ? [layerId] : []);
@@ -170,7 +179,9 @@ export function AnimationContextMenu({
           <ContextMenuItem
             onSelect={() =>
               run(() =>
-                engine.execute(duplicateAnimationCommand(page, animation, layerId, trackId)),
+                engine.execute(
+                  duplicateAnimationCommand(currentPage()!, animation, layerId, trackId),
+                ),
               )
             }
           >
@@ -235,7 +246,11 @@ export function AnimationContextMenu({
               initialOpen
               initialName={animation.preset.name}
               onSaved={() => setSave(null)}
-              create={(name, id) => captureAnimationPreset(page, animation, name, id, layerId)}
+              create={(name, id) => {
+                const owner = currentPage();
+                if (!current() || !owner) throw new Error("changed");
+                return captureAnimationPreset(owner, animation, name, id, layerId);
+              }}
             />
           </PopoverContent>
         </Popover>

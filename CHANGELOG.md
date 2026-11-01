@@ -6,6 +6,7 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Retain layer rows, native drag handlers, timeline row projections and closed export controls across background-only publications, resolving fresh canonical owners for subsequent actions. Attribute supplied paint-mode trace stalls separately to avoidable React work, debugger task capture and profiler startup.
 - Publish layer action availability with selection feedback instead of deferring the add button behind attachment presentation; retain memoized availability and live canonical action targets.
 - Isolate export and timelapse visibility at per-editor Jotai dialog owners and retain the export workspace through exit, avoiding App and form reconstruction before the fade while preserving native focus and modal cleanup.
 - Subscribe background paint independently from the Inspector, retain unchanged timeline headers and disabled compositing controls, and resolve fresh canonical scene/paint actions with cancellation, concurrent-write and undo guards. Document native Angel.exe close and Solid/Gradient timings, including remaining presentation delays.

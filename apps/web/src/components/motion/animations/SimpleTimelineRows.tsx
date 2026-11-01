@@ -3,14 +3,14 @@ import {
   simpleSceneRows,
   type SimpleSceneRow,
 } from "../scene/SimpleSceneTimelineRow";
-import { useMemo, type CSSProperties, type RefObject } from "react";
+import { memo, useMemo, type CSSProperties, type RefObject } from "react";
 import { useReducedMotion } from "motion/react";
 import { Sparkles } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import {
   createLayerGeometryIndex,
   motionTimeToSeconds,
-  type Composition,
+  type Asset,
   type EnginePort,
   type MotionAnimation,
   type MotionLayerTrack,
@@ -22,7 +22,7 @@ import { TimelineRowView } from "../rows/TimelineRowView";
 import { motionPropertyLabel } from "../rows/property-label";
 import { useTimelineRowHover } from "../rows/use-row-hover";
 import { SimpleLayerRow } from "./SimpleLayerRow";
-import { readTimelinePage, useTimelineSource } from "../rows/timeline-source";
+import { readTimelinePage, type TimelineSource } from "../rows/timeline-source";
 import { AnimationBlock } from "./AnimationBlock";
 import { MotionSummaryBlock } from "./MotionSummaryBlock";
 import { SimpleAudioRows } from "./SimpleAudioRows";
@@ -42,9 +42,10 @@ type Row = {
 };
 
 /** Same canonical layer rows and interactions as Keyframes, with editable animation children. */
-export function SimpleTimelineRows({
+export const SimpleTimelineRows = memo(function SimpleTimelineRows({
   engine,
-  page,
+  source,
+  assets,
   transport,
   scale,
   gutter,
@@ -60,7 +61,8 @@ export function SimpleTimelineRows({
   unit,
 }: {
   engine: EnginePort;
-  page: Composition;
+  source: TimelineSource;
+  assets: Record<string, Asset>;
   transport: TimelineTransport;
   scale: number;
   gutter: number;
@@ -80,10 +82,10 @@ export function SimpleTimelineRows({
     { t: common } = useTranslation();
   const presentation = useAnimationPresentation(engine),
     reduced = !!useReducedMotion();
-  const { showHover, clearHover } = useTimelineRowHover(engine, page.id);
+  const { showHover, clearHover } = useTimelineRowHover(engine, source.id);
   const selection = useEngineValue(engine, (snapshot) => snapshot.selection);
   const selected = useMemo(() => new Set(selection), [selection]);
-  const source = useTimelineSource(page);
+  const page = readTimelinePage(engine, source);
   const geometry = useMemo(() => {
     const current = readTimelinePage(engine, source);
     return current ? createLayerGeometryIndex(current) : undefined;
@@ -107,9 +109,10 @@ export function SimpleTimelineRows({
       }),
     [layerRows],
   );
-  const audioCount = page.motion?.audioTracks?.length ?? 0;
+  const audioCount = source.motion?.audioTracks?.length ?? 0;
   const { first, last } = useVirtualList(rows.length + audioCount, rowHeight, viewport, 4);
-  const duration = motionTimeToSeconds(page.motion!.duration);
+  const duration = motionTimeToSeconds(source.motion!.duration);
+  if (!page) return null;
   return (
     <div
       className="motion-simple-rows motion-row-space"
@@ -132,6 +135,7 @@ export function SimpleTimelineRows({
               height={rowHeight}
               engine={engine}
               page={page}
+              source={source}
               transport={transport}
               gestures={gestures}
               interactive={interactive}
@@ -274,6 +278,7 @@ export function SimpleTimelineRows({
                 disabled={disabled}
                 transport={transport}
                 page={page}
+                source={source}
                 trackId={track.id}
                 gestures={gestures}
               />
@@ -288,10 +293,11 @@ export function SimpleTimelineRows({
         rowHeight={rowHeight}
         engine={engine}
         page={page}
+        assets={assets}
         transport={transport}
         scale={scale}
         interactive={interactive}
       />
     </div>
   );
-}
+});

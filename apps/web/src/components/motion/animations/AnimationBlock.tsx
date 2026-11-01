@@ -11,6 +11,7 @@ import { MotionSummaryBlock } from "./MotionSummaryBlock";
 import { animationPresentation } from "./presentation";
 import type { TimelineTransport } from "../model";
 import type { TimelineGestures } from "../gestures";
+import type { TimelineSource } from "../rows/timeline-source";
 
 export function AnimationBlock({
   engine,
@@ -21,6 +22,7 @@ export function AnimationBlock({
   disabled,
   transport,
   page,
+  source,
   trackId,
   gestures,
 }: {
@@ -32,6 +34,7 @@ export function AnimationBlock({
   disabled: boolean;
   transport: TimelineTransport;
   page: Composition;
+  source?: TimelineSource;
   trackId: string;
   gestures: TimelineGestures;
 }) {
@@ -55,6 +58,7 @@ export function AnimationBlock({
         <AnimationContextMenu
           engine={engine}
           page={page}
+          source={source}
           layerId={layerId}
           trackId={trackId}
           animation={animation}

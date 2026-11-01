@@ -3,6 +3,7 @@ import {
   useEffect,
   useMemo,
   useRef,
+  useState,
   useSyncExternalStore,
   type DragEvent,
 } from "react";
@@ -11,14 +12,18 @@ import { layerDragController } from "./controller";
 import { layerDragPresentation } from "./presentation";
 import { layerDragImage } from "./drag-image";
 import { layerDragDiagnostics } from "./diagnostics";
+import { resolveLayerPage, sameLayerContainer } from "../tree/activation";
 
 const MIME = "application/x-musart-layer";
 /** Native HTML input for the same engine-scoped controller used by pointer-driven clips. */
 export function useLayerDrag(
-  page: Composition,
+  incomingPage: Composition,
   engine: EnginePort,
   run: (action: () => void) => void,
 ) {
+  const [retained, setRetained] = useState(incomingPage);
+  const page = sameLayerContainer(retained, incomingPage) ? retained : incomingPage;
+  if (retained !== page) setRetained(page);
   const owner = useRef(Symbol("native-layer-drag")).current;
   const controller = useMemo(() => layerDragController(engine), [engine]);
   const presentation = useMemo(() => layerDragPresentation(engine), [engine]);
@@ -106,7 +111,8 @@ export function useLayerDrag(
   const handlers = useMemo(
     () => ({
       start(event: DragEvent<HTMLElement>, layer: Layer, originPage = page) {
-        if (!controller.begin(owner, originPage, layer.id, run)) {
+        const canonical = resolveLayerPage(engine, originPage);
+        if (!canonical || !controller.begin(owner, canonical, layer.id, run)) {
           event.preventDefault();
           diagnostics.refuse("nativeDragstart", "sourceRejected", layer.id, event);
           return;
@@ -143,11 +149,14 @@ export function useLayerDrag(
         });
       },
       over(event: DragEvent<HTMLElement>, layer: Layer, targetPage = page) {
-        const accepted = presentation.over(event.currentTarget, layer, targetPage, {
-          x: event.clientX,
-          y: event.clientY,
-          alt: event.altKey,
-        });
+        const canonical = resolveLayerPage(engine, targetPage);
+        const accepted =
+          canonical &&
+          presentation.over(event.currentTarget, layer, canonical, {
+            x: event.clientX,
+            y: event.clientY,
+            alt: event.altKey,
+          });
         event.dataTransfer.dropEffect = accepted ? "move" : "none";
         if (accepted) event.preventDefault();
         else if (controller.read() || Array.from(event.dataTransfer.types ?? []).includes(MIME))
@@ -189,7 +198,9 @@ export function useLayerDrag(
           return;
         }
         if (!current.target && !current.rejected && layer) {
-          presentation.over(event.currentTarget, layer, targetPage ?? page, {
+          const canonical = resolveLayerPage(engine, targetPage ?? page);
+          if (!canonical) return controller.cancel();
+          presentation.over(event.currentTarget, layer, canonical, {
             x: event.clientX,
             y: event.clientY,
             alt: event.altKey,

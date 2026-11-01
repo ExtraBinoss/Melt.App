@@ -15,6 +15,7 @@ import { animationPresentation } from "../animations/presentation";
 import { animationPresetName } from "../../spatial/presentation";
 import type { TimelineGestures } from "../gestures";
 import type { TimelineTransport } from "../model";
+import type { TimelineSource } from "../rows/timeline-source";
 import { SceneTimelineRowView } from "./SceneTimelineRowView";
 import { scenePropertyLabel } from "./presentation";
 import type { SceneTimelineRow } from "./tree";
@@ -49,6 +50,7 @@ export function SimpleSceneTimelineRow({
   height,
   engine,
   page,
+  source,
   transport,
   gestures,
   interactive,
@@ -61,6 +63,7 @@ export function SimpleSceneTimelineRow({
   height: number;
   engine: EnginePort;
   page: Composition;
+  source?: TimelineSource;
   transport: TimelineTransport;
   gestures: TimelineGestures;
   interactive: boolean;
@@ -161,6 +164,7 @@ export function SimpleSceneTimelineRow({
                   <AnimationContextMenu
                     engine={engine}
                     page={page}
+                    source={source}
                     animation={animation}
                     transport={transport}
                     disabled={!interactive}
