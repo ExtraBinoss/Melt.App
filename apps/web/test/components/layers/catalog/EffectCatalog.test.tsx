@@ -70,6 +70,18 @@ test("input owns typing and arrows, Escape dismisses, and a language change keep
   });
 });
 
+test("a technique search adds the unified Blur without exposing discovery metadata in the row", () => {
+  const d = mount();
+  const search = screen.getByRole("searchbox", { name: "Rechercher un effet" });
+  fireEvent.change(search, { target: { value: "bokeh" } });
+  const item = screen.getByRole("menuitem", { name: "Flou" });
+  expect(screen.getAllByRole("menuitem")).toEqual([item]);
+  expect(item).toHaveTextContent(/^Flou$/);
+  expect(d.engine.getSnapshot().canUndo).toBe(false);
+  fireEvent.click(item);
+  expect(d.add).toHaveBeenCalledExactlyOnceWith("blur");
+});
+
 test.each([
   ["effect", "Flou", "Flou", "Blur"],
   ["adjustment", "Lumière et tonalité", "Contraste", "Brightness"],

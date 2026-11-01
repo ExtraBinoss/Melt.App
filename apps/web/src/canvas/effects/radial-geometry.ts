@@ -13,22 +13,27 @@ import {
 export type RadialHandle = "center" | "radius" | "innerRadius";
 /** Authoring geometry, independent from renderer density and viewport scale. */
 export function radialGeometry(page: Composition, layer: Layer, effect: Effect) {
-  const gizmo = getEffectDefinition(effect.type).gizmo;
+  const definition = getEffectDefinition(effect.type),
+    gizmo = definition.gizmo;
   if (!gizmo) return null;
-  const definition = getEffectDefinition(effect.type);
-  const value = (key: string) =>
-    Number(
-      getEffectParameter(
-        effect,
-        definition.parameters.find((p) => p.key === key)!,
-      ),
+  const read = (key: string) =>
+    getEffectParameter(
+      effect,
+      definition.parameters.find((p) => p.key === key)!,
     );
+  if (gizmo.enabled && read(gizmo.enabled) !== true) return null;
+  const value = (key: string) => Number(read(key));
   const unit = gizmo.radiusUnits === "relative-min" ? Math.min(layer.width, layer.height) : 1;
+  const radius = value(gizmo.radius) * unit;
   return {
     x: value(gizmo.centerX) * layer.width,
     y: value(gizmo.centerY) * layer.height,
-    radius: value(gizmo.radius) * unit,
-    innerRadius: gizmo.innerRadius ? value(gizmo.innerRadius) * unit : null,
+    radius: radius + (gizmo.feather ? value(gizmo.feather) * unit : 0),
+    innerRadius: gizmo.feather
+      ? radius
+      : gizmo.innerRadius
+        ? value(gizmo.innerRadius) * unit
+        : null,
     aspect: gizmo.aspect ? value(gizmo.aspect) : 1,
     rotation: gizmo.rotation ? value(gizmo.rotation) : 0,
     matrix: createLayerGeometryIndex(page).worldMatrix(layer.id),
@@ -68,6 +73,12 @@ export function moveRadialHandle(
     const y = dy * Math.cos(angle) - dx * Math.sin(angle);
     const distance = Math.hypot(x, y);
     const unit = gizmo.radiusUnits === "relative-min" ? Math.min(layer.width, layer.height) : 1;
+    if (gizmo.feather) {
+      // The protected radius and feather width remain independently authored.
+      if (handle === "innerRadius") set(gizmo.radius, distance / unit);
+      else set(gizmo.feather, Math.max(0, distance - geometry.innerRadius!) / unit);
+      return next;
+    }
     const key = handle === "innerRadius" ? gizmo.innerRadius : gizmo.radius;
     if (key)
       set(

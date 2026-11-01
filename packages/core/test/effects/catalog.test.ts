@@ -1,12 +1,12 @@
 import { SURFACE_PARAMETERS } from "./surface/parameters";
 import { TERMINAL_PARAMETERS } from "./terminal/parameters";
+import { BLUR_PARAMETER_KEYS } from "./blur/parameters";
 import { describe, expect, it } from "vitest";
 import { EFFECT_CATALOG, getEffectDefinition } from "../../src/effects/catalog";
 import { getEffectParameter, patchEffectParameter } from "../../src/effects/parameters";
 import { GRADIENT_DEFINITION } from "../../src/effects/gradient/definition";
 import { createEffect, createLayer } from "../../src/document/factories";
 import type { EffectType } from "../../src/document/model";
-
 describe("portable effect definitions", () => {
   it("describes every supported effect once, with the existing deterministic defaults", () => {
     expect(Object.keys(EFFECT_CATALOG)).toEqual([
@@ -149,7 +149,7 @@ describe("portable effect definitions", () => {
       brightness: ["amount"],
       contrast: ["amount"],
       grayscale: ["amount"],
-      blur: ["amount", "scale"],
+      blur: BLUR_PARAMETER_KEYS,
       shadow: ["amount", "offsetX", "offsetY", "radius", "shadowColor"],
       saturation: ["amount"],
       hue: ["amount"],

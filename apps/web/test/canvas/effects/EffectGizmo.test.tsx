@@ -8,9 +8,9 @@ import { createPreviewSource } from "../../../src/state/session/preview-source";
 import { previewAtom } from "../../../src/state/session/editor";
 import { attachmentSelection } from "../../../src/state/selection/attachments";
 
-function fixture(type: "ripple" | "flashlight" = "ripple") {
+function fixture(type: "ripple" | "flashlight" | "blur" = "ripple") {
   const d = setup(),
-    effect = createEffect(type);
+    effect = createEffect(type, type === "blur" ? { settings: { protect: true } } : {});
   d.engine.execute({ type: "updateLayers", ids: [d.rectangle.id], patch: { effects: [effect] } });
   const page = d.engine.getSnapshot().project.pages[0]!;
   attachmentSelection(d.engine).select(page, {
@@ -190,4 +190,66 @@ it("resolves overlapping screen-space handles by proximity, with center winning 
   fireEvent.pointerDown(inner, { button: 0, pointerId: 3, clientX: 50, clientY: 50 });
   expect(center).toHaveFocus();
   fireEvent.keyDown(center, { key: "Escape" });
+});
+it("previews protected and feather rings, commits once, and restores both values with undo/redo", () => {
+  const d = fixture("blur"),
+    before = d.engine.getSnapshot().project,
+    execute = vi.spyOn(d.engine, "execute"),
+    inner = d.svg.querySelector<SVGCircleElement>('[data-handle="innerRadius"]')!;
+  fireEvent.pointerDown(inner, { button: 0, pointerId: 1 });
+  fireEvent.pointerMove(d.svg, { pointerId: 1, clientX: 248, clientY: 80 });
+  expect(execute).not.toHaveBeenCalled();
+  expect(d.engine.getSnapshot().project).toBe(before);
+  expect(d.svg.querySelector('[data-ring="innerRadius"]')).toHaveAttribute("rx", "128");
+  expect(d.svg.querySelector('[data-ring="radius"]')).toHaveAttribute("rx", "176");
+  fireEvent.pointerUp(d.svg, { pointerId: 1, clientX: 248, clientY: 80 });
+  expect(execute).toHaveBeenCalledOnce();
+  const changed = d.engine.getSnapshot().project;
+  expect(changed.pages[0]!.layers[0]!.effects[0]!.settings).toMatchObject({
+    protectedRadius: 128,
+    feather: 48,
+  });
+  expect(d.store.get(previewAtom)).toBeNull();
+  act(() => d.engine.undo());
+  expect(d.engine.getSnapshot().project).toEqual(before);
+  act(() => d.engine.redo());
+  expect(d.engine.getSnapshot().project).toEqual(changed);
+  const outer = d.svg.querySelector<SVGCircleElement>('[data-handle="radius"]')!;
+  fireEvent.keyDown(outer, { key: "ArrowRight", shiftKey: true });
+  expect(d.engine.getSnapshot().project).toBe(changed);
+  expect(d.svg.querySelector('[data-ring="radius"]')).toHaveAttribute("rx", "186");
+  fireEvent.keyUp(outer, { key: "ArrowRight" });
+  expect(execute).toHaveBeenCalledTimes(2);
+  expect(d.engine.getSnapshot().project.pages[0]!.layers[0]!.effects[0]!.settings).toMatchObject({
+    protectedRadius: 128,
+    feather: 58,
+  });
+  act(() => d.engine.undo());
+  expect(d.engine.getSnapshot().project).toEqual(changed);
+});
+it("cancels feather edits and removes the handles when protection is disabled", () => {
+  const d = fixture("blur"),
+    before = d.engine.getSnapshot().project,
+    outer = d.svg.querySelector<SVGCircleElement>('[data-handle="radius"]')!;
+  fireEvent.pointerDown(outer, { button: 0, pointerId: 1 });
+  fireEvent.pointerMove(d.svg, { pointerId: 1, clientX: 296, clientY: 80 });
+  expect(d.svg.querySelector('[data-ring="radius"]')).toHaveAttribute("rx", "176");
+  fireEvent.keyDown(outer, { key: "Escape" });
+  expect(d.engine.getSnapshot().project).toBe(before);
+  expect(d.store.get(previewAtom)).toBeNull();
+  expect(d.svg.querySelector('[data-ring="radius"]')).toHaveAttribute("rx", "144");
+  fireEvent.keyDown(outer, { key: "ArrowRight" });
+  expect(d.store.get(previewAtom)).not.toBeNull();
+  act(() =>
+    d.engine.execute({
+      type: "updateLayers",
+      ids: [d.rectangle.id],
+      patch: { effects: [{ ...d.effect, settings: { ...d.effect.settings, protect: false } }] },
+    }),
+  );
+  expect(d.store.get(previewAtom)).toBeNull();
+  expect(d.container.querySelector("svg")).toBeNull();
+  act(() => d.engine.undo());
+  expect(d.container.querySelector("svg")).not.toBeNull();
+  expect(d.engine.getSnapshot().project).toEqual(before);
 });

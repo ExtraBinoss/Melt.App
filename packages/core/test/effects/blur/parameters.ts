@@ -1,0 +1,16 @@
+export const BLUR_PARAMETER_KEYS = [
+  "amount",
+  "scale",
+  "technique",
+  "angle",
+  "centerX",
+  "centerY",
+  "spinAngle",
+  "zoomStrength",
+  "apertureBlades",
+  "apertureRotation",
+  "rangeSigma",
+  "protect",
+  "protectedRadius",
+  "feather",
+];

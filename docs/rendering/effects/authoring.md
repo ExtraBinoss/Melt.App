@@ -11,6 +11,8 @@
 
 Definitions declare whether raw treatment coverage is preserved, reduced or expanded. Blur and Drop shadow explicitly expand their GPU transport bounds; [their contract](shadow-blur.md) describes margin admission, premultiplied sampling and mask mapping. Preserving builders retain the source-alpha graph directly; ink opacity and transparent cuts declare reduction and have native default/partial-cutout witnesses. Optional Porter-Duff compositing remains a separate operation.
 
+The web catalog indexes localized names, families, internal descriptions and bilingual discovery aliases, plus the values and translated labels of each selectable option. A technique such as Gaussian or Bokeh finds the single Blur entry; it does not create another portable effect type. Effects and adjustments retain separate search categories. Keep catalog descriptions in its English/French resources and aliases in `catalog/search-metadata.ts` current when adding a treatment. These descriptions contribute to search without adding text to menu rows.
+
 ### Density, seeds and time
 
 | Authoring topic     | Contract                                                                                                                                                                         |

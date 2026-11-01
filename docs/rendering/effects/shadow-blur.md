@@ -1,6 +1,6 @@
 # Soft blur and drop shadow
 
-Blur uses two bounded 17-tap Gaussian passes. `amount × scale` is its authored standard deviation in pixels. Samples interpolate premultiplied RGBA explicitly before accumulation; this keeps transparent edges soft and avoids dark fringes and different horizontal/vertical radii caused by mixed sampler policies. The finite kernel reaches 3.2 standard deviations. It is a bounded approximation, not an unbounded convolution.
+Blur defaults to two bounded 17-tap Gaussian passes. Its single portable effect also offers box, directional, spin, zoom, polygonal lens and bilateral kernels with an optional protected sharp center; [the Blur library](blur.md) documents their controls and limits. `amount × scale` is its authored standard deviation in pixels. Samples interpolate premultiplied RGBA explicitly before accumulation; this keeps transparent edges soft and avoids dark fringes and different horizontal/vertical radii caused by mixed sampler policies. The finite kernel reaches 3.2 standard deviations. It is a bounded approximation, not an unbounded convolution.
 
 The algorithm follows the separable Gaussian and premultiplied-alpha principles documented by [Three.js GaussianBlurNode](https://threejs.org/docs/pages/GaussianBlurNode.html). Melt retains its own existing shared TSL pass owner, queue, cache admission and export path; it does not introduce an independent postprocessing renderer.
 

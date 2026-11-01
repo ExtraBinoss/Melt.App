@@ -1,4 +1,5 @@
 import { EFFECT_CATALOG, type EffectType } from "@musart/core";
+import { EFFECT_SEARCH_ALIASES } from "./search-metadata";
 
 export type EffectFamily =
   | "tone"
@@ -96,7 +97,18 @@ export function effectCatalogEntries(
         family,
         label,
         search: normalizeEffectSearch(
-          `${label} ${definition.type} ${translate(`effectCatalog:family.${family}`)}`,
+          [
+            label,
+            definition.type,
+            translate(`effectCatalog:family.${family}`),
+            translate(`effectCatalog:description.${definition.type}`),
+            EFFECT_SEARCH_ALIASES[definition.type],
+            ...definition.parameters.flatMap((parameter) =>
+              parameter.kind === "select"
+                ? parameter.options.flatMap((option) => [option.value, translate(option.labelKey)])
+                : [],
+            ),
+          ].join(" "),
         ),
       };
     })

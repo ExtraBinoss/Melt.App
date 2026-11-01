@@ -17,8 +17,12 @@ it("registers matching English/French names and every owned parameter label", ()
     for (const lng of ["en", "fr"]) {
       expect(i18n.t(type, { lng })).toBe(messages[lng as "en" | "fr"].name);
       expect(i18n.t(`${type}Fx:name`, { lng })).toBe(messages[lng as "en" | "fr"].name);
-      for (const parameter of getEffectDefinition(type as EffectType).parameters)
+      for (const parameter of getEffectDefinition(type as EffectType).parameters) {
         expect(i18n.t(parameter.labelKey, { lng })).not.toBe(parameter.labelKey);
+        if (parameter.kind === "select")
+          for (const option of parameter.options)
+            expect(i18n.t(option.labelKey, { lng })).not.toBe(option.labelKey);
+      }
     }
   }
 });

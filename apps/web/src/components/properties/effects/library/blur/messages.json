@@ -1,0 +1,54 @@
+{
+  "en": {
+    "name": "Blur",
+    "parameter": {
+      "technique": "Technique",
+      "angle": "Direction angle",
+      "centerX": "Center X",
+      "centerY": "Center Y",
+      "spinAngle": "Spin angle",
+      "zoomStrength": "Zoom strength",
+      "apertureBlades": "Aperture blades",
+      "apertureRotation": "Aperture rotation",
+      "rangeSigma": "Color tolerance",
+      "protect": "Protect center",
+      "protectedRadius": "Protected radius",
+      "feather": "Protection feather"
+    },
+    "choice": {
+      "gaussian": "Gaussian",
+      "box": "Box",
+      "directional": "Directional",
+      "spin": "Spin",
+      "zoom": "Zoom",
+      "lens": "Lens (Bokeh)",
+      "bilateral": "Bilateral"
+    }
+  },
+  "fr": {
+    "name": "Flou",
+    "parameter": {
+      "technique": "Technique",
+      "angle": "Angle de direction",
+      "centerX": "Centre X",
+      "centerY": "Centre Y",
+      "spinAngle": "Angle de rotation",
+      "zoomStrength": "Intensité du zoom",
+      "apertureBlades": "Lamelles du diaphragme",
+      "apertureRotation": "Rotation du diaphragme",
+      "rangeSigma": "Tolérance des couleurs",
+      "protect": "Protéger le centre",
+      "protectedRadius": "Rayon protégé",
+      "feather": "Adoucissement de la protection"
+    },
+    "choice": {
+      "gaussian": "Gaussien",
+      "box": "Boîte (moyenne)",
+      "directional": "Directionnel",
+      "spin": "Rotation",
+      "zoom": "Zoom",
+      "lens": "Objectif (bokeh)",
+      "bilateral": "Bilatéral"
+    }
+  }
+}

@@ -13,6 +13,7 @@ import { messages as ascii } from "./library/ascii/messages";
 import shadow from "./library/shadow/messages.json";
 import morph from "./library/morph/messages.json";
 import ripple from "./library/ripple/messages.json";
+import blur from "./library/blur/messages.json";
 import shatter from "./library/shatter/messages.json";
 import noise from "./library/noise/messages.json";
 
@@ -39,6 +40,7 @@ export const libraryMessages = {
   morph,
   shadow,
   ripple,
+  blur,
   shatter,
   noise,
   flashlight,

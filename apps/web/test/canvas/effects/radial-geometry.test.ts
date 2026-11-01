@@ -58,3 +58,56 @@ it("maps rotated elliptical relative radii without effect-specific switches", ()
   expect(radialGeometry(page, layer, plain)).toBeNull();
   expect(moveRadialHandle(page, layer, plain, "radius", { x: 1, y: 1 })).toBe(plain);
 });
+it("exposes protected radius plus feather only when protection is enabled", () => {
+  const effect = createEffect("blur"),
+    layer = createLayer("image", { width: 200, height: 100, effects: [effect] }),
+    page = createPage({ layers: [layer] });
+  expect(radialGeometry(page, layer, effect)).toBeNull();
+  expect(moveRadialHandle(page, layer, effect, "center", { x: 5, y: 5 })).toBe(effect);
+  const protectedEffect = createEffect("blur", { settings: { protect: true } });
+  expect(radialGeometry(page, layer, protectedEffect)).toMatchObject({
+    x: 100,
+    y: 50,
+    radius: 144,
+    innerRadius: 96,
+  });
+});
+it("edits protected radius and feather independently through nested owner transforms", () => {
+  const effect = createEffect("blur", {
+      settings: { protect: true, protectedRadius: 40, feather: 12 },
+    }),
+    group = createLayer("group", { x: 50, y: 20, width: 400, height: 300, rotation: 25 }),
+    layer = createLayer("image", {
+      parentId: group.id,
+      width: 200,
+      height: 100,
+      rotation: 35,
+      effects: [effect],
+    }),
+    page = createPage({ layers: [group, layer] }),
+    geometry = radialGeometry(page, layer, effect)!;
+  const move = (handle: "radius" | "innerRadius", distance: number) =>
+    moveRadialHandle(
+      page,
+      layer,
+      effect,
+      handle,
+      transformPoint(geometry.matrix, { x: geometry.x + distance, y: geometry.y }),
+    );
+  // Increasing the protected radius also moves the outer ring, preserving feather width.
+  const inner = move("innerRadius", 80);
+  expect(inner.settings!.protectedRadius).toBeCloseTo(80);
+  expect(inner.settings!.feather).toBe(12);
+  expect(radialGeometry(page, layer, inner)!.radius).toBeCloseTo(92);
+  expect(radialGeometry(page, layer, inner)!.innerRadius).toBeCloseTo(80);
+  const outer = move("radius", 100);
+  expect(outer.settings!.protectedRadius).toBe(40);
+  expect(outer.settings!.feather).toBeCloseTo(60);
+  expect(move("radius", 10).settings).toMatchObject({ protectedRadius: 40, feather: 0 });
+  expect(move("radius", 10000).settings).toMatchObject({ protectedRadius: 40, feather: 2048 });
+  expect(move("innerRadius", 10000).settings).toMatchObject({
+    protectedRadius: 8192,
+    feather: 12,
+  });
+  expect(effect.settings).toMatchObject({ protectedRadius: 40, feather: 12 });
+});

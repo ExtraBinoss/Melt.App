@@ -80,10 +80,14 @@ export interface EffectDefinition {
   readonly parameters: readonly EffectParameter[];
   readonly gizmo?: {
     readonly kind: "radial";
+    /** Optional boolean parameter that controls whether the handles are available. */
+    readonly enabled?: string;
     readonly centerX: string;
     readonly centerY: string;
     readonly radius: string;
     readonly innerRadius?: string;
+    /** When present, radius is protected and the outer ring adds this feather width. */
+    readonly feather?: string;
     readonly radiusUnits?: "document" | "relative-min";
     readonly aspect?: string;
     readonly rotation?: string;
