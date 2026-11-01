@@ -6,6 +6,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Keep Motion/video playback running when opening effect or mask parameter popovers. Focus the editor surface before user interaction so automatic field focus cannot start an edit and pause playback; retain deliberate field gestures, keyboard navigation and Escape focus restoration.
+
 - Remove Time Warp Scan from effect authoring, search, shortcuts and rendering, including its temporal replay/cache and clock code. Retain a validation-only compatibility schema so existing projects, Motion keys and undo/history records still open without applying the retired effect.
 
 - Derive timeline animation text, selection outlines and DOM trim grips from the actual clip fill using the existing canvas grip luminance rule; keep selected, neutral and hovered blocks readable across theme and media-color changes without React updates or pixel sampling.

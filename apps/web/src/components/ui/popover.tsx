@@ -24,9 +24,13 @@ function PopoverContent({
   align = "center",
   sideOffset = 4,
   portalContainer,
+  initialFocus = "first-control",
+  onOpenAutoFocus,
   ...props
 }: React.ComponentProps<typeof PopoverPrimitive.Content> & {
   portalContainer?: HTMLElement;
+  /** Parameter editors can accept focus without starting their first field gesture. */
+  initialFocus?: "first-control" | "content";
 }) {
   return (
     <PopoverPrimitive.Portal container={portalContainer}>
@@ -40,6 +44,12 @@ function PopoverContent({
           className,
         )}
         {...props}
+        onOpenAutoFocus={(event) => {
+          onOpenAutoFocus?.(event);
+          if (initialFocus !== "content" || event.defaultPrevented) return;
+          event.preventDefault();
+          if (event.target instanceof HTMLElement) event.target.focus({ preventScroll: true });
+        }}
       >
         {withPresentationBoundary(children, asChild)}
       </PopoverPrimitive.Content>

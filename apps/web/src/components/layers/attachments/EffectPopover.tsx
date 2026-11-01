@@ -101,6 +101,7 @@ export function EffectPopover({
       {owner.present && ownedPage && (
         <PopoverContent
           portalContainer={document.body}
+          initialFocus="content"
           onCloseAutoFocus={owner.onCloseAutoFocus}
           side="left"
           align="start"

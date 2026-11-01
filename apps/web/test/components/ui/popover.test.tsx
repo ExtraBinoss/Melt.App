@@ -111,3 +111,21 @@ test("an explicit portal container retains genuine Radix presence and normal clo
     container.remove();
   }
 });
+
+test("content focus admits a parameter editor without starting a field until deliberate focus", async () => {
+  const start = vi.fn();
+  render(
+    <Popover>
+      <PopoverTrigger>Parameters</PopoverTrigger>
+      <PopoverContent initialFocus="content">
+        <input aria-label="Amount" onFocus={start} />
+      </PopoverContent>
+    </Popover>,
+  );
+  fireEvent.click(screen.getByRole("button", { name: "Parameters" }));
+  const panel = await screen.findByRole("dialog");
+  await waitFor(() => expect(panel).toHaveFocus());
+  expect(start).not.toHaveBeenCalled();
+  screen.getByRole("textbox", { name: "Amount" }).focus();
+  expect(start).toHaveBeenCalledOnce();
+});
