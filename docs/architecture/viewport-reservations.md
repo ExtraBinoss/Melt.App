@@ -75,3 +75,21 @@ their old screen positions through a local native translation animation. Geometr
 reads precede animation writes; interruption and unmount cancel the owned lease.
 The timeline starts its native body slide after the mounting commit, keeping a
 long mount from consuming its entrance before the first paint opportunity.
+
+## Deliberate peek entry
+
+The unpinned 32-pixel peek never expands solely because a pointer rests on it.
+Entry follows the same geometric intent rule over the ruler and transport controls;
+there are no button-specific exceptions. Moving sideways or aiming at the middle
+of the strip leaves the live controls in place. Crossing at least 20 pixels into
+the strip, or continuing a quick downward push from inside it, arms the existing
+100 ms entrance delay. A quick approach from outside alone does not arm it.
+Retreating into the shallow edge or leaving cancels the pending entrance.
+
+Pointer presses clear pending entry intent; release does not reopen it without a
+new deliberate movement. Touch taps and ruler scrubs retain their ordinary input
+ownership. Explicit toggles and native drag entry can still open the panel. Open
+panel exit grace, the handle corridor, owned portals, keyboard focus and pinning
+retain their existing behavior. Cached geometry is measured on entry/layout only;
+movement sampling and admission stay imperative without per-move layout reads or
+React state updates.

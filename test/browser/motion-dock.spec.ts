@@ -62,7 +62,7 @@ test("live peek, pin, resize grip and the compact bottom scrollbar stay coordina
   const canvas = page.locator(".workspace-panels"),
     originalHeight = (await canvas.boundingBox())!.height;
   const header = (await page.locator(".motion-ruler").boundingBox())!;
-  await page.mouse.move(header.x + 60, header.y + 10);
+  await page.mouse.move(header.x + 60, header.y + 24);
   await expect(dock).toHaveAttribute("data-motion-expanded", "true");
   await expect(dock).toHaveAttribute("data-motion-animating", "true");
   await expect(page.locator(".motion-resize .panel-divider-grip")).toHaveCSS("opacity", "0");

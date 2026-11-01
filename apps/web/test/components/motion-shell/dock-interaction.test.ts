@@ -50,8 +50,10 @@ test("a shared Layers drag retains an open dock and a native drag can reveal its
 function fixture(expanded = false, geometry = false) {
   vi.useFakeTimers();
   const root = document.createElement("section"),
-    button = document.createElement("button");
-  root.append(button);
+    button = document.createElement("button"),
+    ruler = document.createElement("div");
+  ruler.className = "motion-ruler";
+  root.append(ruler, button);
   document.body.append(root);
   const measurement = vi
     .spyOn(root, "getBoundingClientRect")
@@ -72,6 +74,7 @@ function fixture(expanded = false, geometry = false) {
   const watcher = observeDockInteraction(root, actions);
   return {
     root,
+    ruler,
     button,
     actions,
     watcher,
@@ -85,12 +88,13 @@ function fixture(expanded = false, geometry = false) {
   };
 }
 test("hover has an entrance delay, exit grace and reentry hysteresis; disposal cancels all work", () => {
-  const d = fixture();
-  fireEvent.pointerOver(d.button);
+  const d = fixture(false, true);
+  fireEvent.pointerOver(d.ruler, { clientX: 500, clientY: 525 });
   vi.advanceTimersByTime(99);
   expect(d.actions.open).not.toHaveBeenCalled();
   vi.advanceTimersByTime(1);
   expect(d.actions.open).toHaveBeenCalledOnce();
+  vi.advanceTimersByTime(200);
   fireEvent.pointerOut(d.button, { relatedTarget: document.body });
   vi.advanceTimersByTime(200);
   fireEvent.pointerOver(d.button);
@@ -118,15 +122,15 @@ test("active pointer gestures retain expansion outside the dock, including cance
   expect(d.actions.close).toHaveBeenCalledOnce();
   d.watcher.dispose();
 });
-test("header click does not move under the pointer before its release", () => {
+test("header clicks and releases leave the transport in place", () => {
   const d = fixture();
   fireEvent.pointerOver(d.button);
   fireEvent.pointerDown(d.button, { pointerId: 1 });
   vi.advanceTimersByTime(500);
   expect(d.actions.open).not.toHaveBeenCalled();
   fireEvent.pointerUp(d.button, { pointerId: 1 });
-  vi.advanceTimersByTime(100);
-  expect(d.actions.open).toHaveBeenCalledOnce();
+  vi.advanceTimersByTime(1000);
+  expect(d.actions.open).not.toHaveBeenCalled();
   d.watcher.dispose();
 });
 test("an external collapse cannot hide a captured drag or an owned editor", () => {
@@ -181,7 +185,7 @@ test("only owned portals retain the dock, recursively including portalled select
   d.watcher.dispose();
 });
 test("pin retains expansion; explicit dismissal suppresses hover until a real leave", () => {
-  const d = fixture(true);
+  const d = fixture(true, true);
   fireEvent.pointerOver(d.button);
   d.pin(true);
   fireEvent.pointerOut(d.button, { relatedTarget: document.body });
@@ -196,7 +200,7 @@ test("pin retains expansion; explicit dismissal suppresses hover until a real le
   vi.advanceTimersByTime(500);
   expect(d.actions.open).not.toHaveBeenCalled();
   fireEvent.pointerOut(d.button, { relatedTarget: document.body });
-  fireEvent.pointerOver(d.button);
+  fireEvent.pointerOver(d.ruler, { clientX: 500, clientY: 525 });
   vi.advanceTimersByTime(100);
   expect(d.actions.open).toHaveBeenCalledOnce();
   d.watcher.dispose();
@@ -300,3 +304,79 @@ test.each(["input", "portal", "drag"])(
     d.watcher.dispose();
   },
 );
+
+test("gentle entry, dwell and sideways travel keep the peek stable; crossing deeper reveals it", () => {
+  const d = fixture(false, true);
+  fireEvent.pointerMove(document.body, { clientX: 500, clientY: 480 });
+  vi.advanceTimersByTime(200);
+  fireEvent.pointerOver(d.ruler, { clientX: 500, clientY: 510 });
+  const reads = d.measurement.mock.calls.length;
+  for (let x = 500; x < 600; x += 10) {
+    vi.advanceTimersByTime(80);
+    fireEvent.pointerMove(d.ruler, { clientX: x, clientY: 510 });
+  }
+  vi.advanceTimersByTime(500);
+  expect(d.actions.open).not.toHaveBeenCalled();
+  expect(d.measurement).toHaveBeenCalledTimes(reads);
+  vi.advanceTimersByTime(100);
+  fireEvent.pointerMove(d.ruler, { clientX: 950, clientY: 519 });
+  vi.advanceTimersByTime(500);
+  expect(d.actions.open).not.toHaveBeenCalled();
+  fireEvent.pointerMove(d.ruler, { clientX: 600, clientY: 522 });
+  vi.advanceTimersByTime(99);
+  expect(d.actions.open).not.toHaveBeenCalled();
+  vi.advanceTimersByTime(1);
+  expect(d.actions.open).toHaveBeenCalledOnce();
+  d.watcher.dispose();
+  expect(vi.getTimerCount()).toBe(0);
+});
+test("a downward push reveals the dock, while retreat cancels pending entrance", () => {
+  const d = fixture(false, true);
+  fireEvent.pointerMove(document.body, { clientX: 500, clientY: 490 });
+  vi.advanceTimersByTime(16);
+  fireEvent.pointerOver(d.ruler, { clientX: 500, clientY: 509 });
+  vi.advanceTimersByTime(8);
+  fireEvent.pointerMove(d.ruler, { clientX: 500, clientY: 519 });
+  vi.advanceTimersByTime(99);
+  expect(d.actions.open).not.toHaveBeenCalled();
+  vi.advanceTimersByTime(1);
+  expect(d.actions.open).toHaveBeenCalledOnce();
+  d.watcher.dispose();
+  const cancelled = fixture(false, true);
+  fireEvent.pointerOver(cancelled.ruler, { clientX: 500, clientY: 525 });
+  vi.advanceTimersByTime(50);
+  fireEvent.pointerOver(cancelled.button, { clientX: 20, clientY: 506 });
+  vi.advanceTimersByTime(1000);
+  expect(cancelled.actions.open).not.toHaveBeenCalled();
+  cancelled.watcher.dispose();
+});
+test("aimed approaches, touch and a ruler scrub never trigger expansion", () => {
+  const d = fixture(false, true);
+  fireEvent.pointerMove(document.body, { clientX: 20, clientY: 450 });
+  vi.advanceTimersByTime(10);
+  fireEvent.pointerOver(d.button, { clientX: 20, clientY: 516 });
+  vi.advanceTimersByTime(500);
+  expect(d.actions.open).not.toHaveBeenCalled();
+  fireEvent.pointerOver(d.ruler, { clientX: 500, clientY: 525, pointerType: "touch" });
+  vi.advanceTimersByTime(500);
+  expect(d.actions.open).not.toHaveBeenCalled();
+  fireEvent.pointerOver(d.ruler, { clientX: 500, clientY: 525, pointerType: "mouse" });
+  fireEvent.pointerDown(d.ruler, { pointerId: 1 });
+  vi.advanceTimersByTime(500);
+  fireEvent.pointerUp(d.ruler, { pointerId: 1 });
+  vi.advanceTimersByTime(500);
+  expect(d.actions.open).not.toHaveBeenCalled();
+  d.watcher.dispose();
+});
+
+test("the same movement intent applies over controls without button-specific exceptions", () => {
+  const d = fixture(false, true);
+  fireEvent.pointerMove(document.body, { clientX: 20, clientY: 480 });
+  vi.advanceTimersByTime(200);
+  fireEvent.pointerOver(d.button, { clientX: 20, clientY: 508 });
+  vi.advanceTimersByTime(8);
+  fireEvent.pointerMove(d.button, { clientX: 20, clientY: 518 });
+  vi.advanceTimersByTime(100);
+  expect(d.actions.open).toHaveBeenCalledOnce();
+  d.watcher.dispose();
+});

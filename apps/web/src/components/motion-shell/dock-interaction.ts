@@ -32,13 +32,22 @@ export function observeDockInteraction(root: HTMLElement, actions: DockActions) 
     disposed = false;
   let previousExpansion = actions.expanded();
   let bounds: DOMRect | null = null;
-  let point: { x: number; y: number; at: number; speed: number } | null = null;
+  let point: {
+    x: number;
+    y: number;
+    at: number;
+    speed: number;
+    dy: number;
+    fromY: number;
+    inwardSpeed: number;
+  } | null = null;
+  let revealIntent = false;
   let nearHandle = false,
     fastExit = false;
   const panel = root.querySelector<HTMLElement>(".motion-timeline") ?? root;
   const intentEnabled = () => actions.expanded() && !actions.pinned();
   function measure() {
-    if (!intentEnabled()) return;
+    if (actions.pinned()) return;
     const next = panel.getBoundingClientRect();
     bounds = next.width > 0 && next.height > 0 ? next : null;
   }
@@ -54,7 +63,37 @@ export function observeDockInteraction(root: HTMLElement, actions: DockActions) 
             ? point.speed
             : 0
         : 0;
-    point = { x: event.clientX, y: event.clientY, at, speed };
+    const dy = point ? event.clientY - point.y : 0;
+    const inwardSpeed = point && elapsed <= 120 ? Math.max(0, dy) / Math.max(1, elapsed) : 0;
+    point = {
+      x: event.clientX,
+      y: event.clientY,
+      at,
+      speed,
+      dy,
+      fromY: point?.y ?? event.clientY,
+      inwardSpeed,
+    };
+  }
+  function entranceIntent(event: PointerEvent) {
+    const previous = revealIntent;
+    const depth = point && bounds ? point.y - bounds.top : -1;
+    // The 32px live peek stays usable. Dwelling or travelling sideways never moves its controls.
+    revealIntent = Boolean(
+      hovering &&
+      bounds &&
+      point &&
+      event.pointerType !== "touch" &&
+      !event.buttons &&
+      point.x >= bounds.left &&
+      point.x <= bounds.right &&
+      depth >= 8 &&
+      depth <= 32 &&
+      (depth >= 20 ||
+        revealIntent ||
+        (point.fromY >= bounds.top && point.dy >= 8 && point.inwardSpeed >= 0.8)),
+    );
+    return previous !== revealIntent;
   }
   function outsideIntent() {
     const beforeNear = nearHandle,
@@ -97,10 +136,11 @@ export function observeDockInteraction(root: HTMLElement, actions: DockActions) 
     clear();
     if (disposed || suppressed || held()) return;
     if (hovering) {
-      if (!actions.expanded())
+      if (!actions.expanded() && revealIntent)
         timer = setTimeout(() => {
           timer = null;
-          if (!disposed && hovering && !suppressed && !pointers.size) actions.open();
+          if (!disposed && hovering && revealIntent && !suppressed && !pointers.size)
+            actions.open();
         }, 100);
     } else if (engaged && actions.expanded())
       timer = setTimeout(
@@ -115,13 +155,13 @@ export function observeDockInteraction(root: HTMLElement, actions: DockActions) 
     const wasHovering = hovering;
     hovering = owns(event.target);
     const wasSuppressed = suppressed;
-    if (intentEnabled()) sample(event);
+    if (!actions.pinned()) sample(event);
     if (hovering && !wasHovering) {
       measure();
       nearHandle = false;
       fastExit = false;
     }
-    const intentChanged = !hovering && outsideIntent();
+    const intentChanged = actions.expanded() ? !hovering && outsideIntent() : entranceIntent(event);
     if (hovering) engaged = true;
     if (!hovering) suppressed = false;
     if (wasHovering !== hovering || intentChanged || wasSuppressed !== suppressed) reconsider();
@@ -129,6 +169,7 @@ export function observeDockInteraction(root: HTMLElement, actions: DockActions) 
   const out = (event: PointerEvent) => {
     if (!owns(event.target) || owns(event.relatedTarget)) return;
     hovering = false;
+    revealIntent = false;
     measure();
     if (intentEnabled()) sample(event);
     outsideIntent();
@@ -137,6 +178,7 @@ export function observeDockInteraction(root: HTMLElement, actions: DockActions) 
   };
   const down = (event: PointerEvent) => {
     keyboard = false;
+    if (!actions.expanded()) revealIntent = false;
     engaged = true;
     if (owns(event.target)) pointers.add(event.pointerId);
     reconsider();
@@ -180,9 +222,11 @@ export function observeDockInteraction(root: HTMLElement, actions: DockActions) 
       if (!disposed) reconsider();
     });
   const move = (event: PointerEvent) => {
-    if (!intentEnabled() || !engaged || suppressed || pointers.size) return;
+    if (actions.pinned() || suppressed || pointers.size) return;
     sample(event);
-    if (!hovering && outsideIntent()) reconsider();
+    if (!actions.expanded()) {
+      if (hovering && entranceIntent(event)) reconsider();
+    } else if (engaged && !hovering && outsideIntent()) reconsider();
   };
   const layout = () => {
     if (disposed) return;
@@ -222,6 +266,7 @@ export function observeDockInteraction(root: HTMLElement, actions: DockActions) 
     nearHandle = false;
     fastExit = false;
     point = null;
+    revealIntent = false;
     actions.idle();
     reconsider();
   };
@@ -242,6 +287,7 @@ export function observeDockInteraction(root: HTMLElement, actions: DockActions) 
         engaged = false;
       previousExpansion = expanded;
       if (!expanded || actions.pinned()) {
+        revealIntent = false;
         nearHandle = false;
         fastExit = false;
       }
@@ -250,6 +296,7 @@ export function observeDockInteraction(root: HTMLElement, actions: DockActions) 
     dismiss() {
       clear();
       suppressed = true;
+      revealIntent = false;
       nearHandle = false;
       fastExit = false;
     },
