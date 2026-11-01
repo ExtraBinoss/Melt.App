@@ -8,7 +8,7 @@ import {
   type Composition,
 } from "@musart/core";
 import { mkdir, writeFile } from "node:fs/promises";
-import { createTechnoArtboard } from "../../apps/web/src/services/projects/templates/techno";
+import { createTechnoArtboard } from "../../apps/web/src/services/projects/templates/afterhours-techno/build";
 import {
   panSample,
   storageReload,

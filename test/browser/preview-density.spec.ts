@@ -2,7 +2,7 @@ import { expect, test, type Page } from "@playwright/test";
 import { mkdir, writeFile } from "node:fs/promises";
 import { createLayer, createPage, createProject, type Composition } from "@musart/core";
 import { estimatePreviewCost } from "../../packages/render/src/compositing/preview-cost";
-import { createTechnoArtboard } from "../../apps/web/src/services/projects/templates/techno";
+import { createTechnoArtboard } from "../../apps/web/src/services/projects/templates/afterhours-techno/build";
 import {
   previewScale,
   PREVIEW_MEMORY_BYTES,

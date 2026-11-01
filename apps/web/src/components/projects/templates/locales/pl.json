@@ -2,7 +2,7 @@
   "angelWindows": "Angel.exe",
   "angelWindowsDescription": "12,8 s · Obracający się anioł 3D, pulpit ASCII i okna efektów",
   "bloomWindows": "Bloom Windows",
-  "bloomWindowsDescription": "12 s · Płynna pętla kwitnienia w 1080p z ruchomymi oknami ditheringu, ASCII i cyjanotypii",
+  "bloomWindowsDescription": "12 s · Warstwowe efekty druku, edytowalne okna i powolna orbita wokół kwiatu",
   "morphingType": "Maskotka {{brandName}}",
   "morphingTypeDescription": "6 s · Ciekawska maskotka i morfing liter {{brandNameUpper}} na pełną wysokość",
   "shareYourWork": "Zbyt gorące, by straszyć",

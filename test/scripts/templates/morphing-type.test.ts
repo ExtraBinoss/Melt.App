@@ -3,7 +3,7 @@ import { mkdtemp, readFile, rm } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { parseProject } from "../../../packages/core/src/index";
-import { generateMorphingType } from "../../../scripts/templates/morphing-type";
+import { generateMorphingType } from "../../../scripts/templates/morphing-type/generate";
 test("writes a portable project, manifest and replayable command sidecar", async () => {
   const directory = await mkdtemp(join(tmpdir(), "melt-morph-template-"));
   try {

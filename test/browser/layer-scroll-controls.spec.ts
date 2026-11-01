@@ -1,6 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import { createEffect, createLayer, createPage, createProject } from "@musart/core";
-import { createTechnoArtboard } from "../../apps/web/src/services/projects/templates/techno";
+import { createTechnoArtboard } from "../../apps/web/src/services/projects/templates/afterhours-techno/build";
 import { installReadbackProbe } from "./support/readback-probe";
 import { writeFile } from "node:fs/promises";
 

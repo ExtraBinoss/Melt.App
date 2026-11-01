@@ -13,7 +13,7 @@ import {
 import type { Project } from "@musart/core";
 import type { PathPoint } from "../../packages/path-morph/src/index";
 const manifest = JSON.parse(
-  await readFile("apps/web/public/templates/motion/morphing-type.json", "utf8"),
+  await readFile("apps/web/public/templates/motion/morphing-type/morphing-type.json", "utf8"),
 ) as { project: Project };
 const definition = manifest.project.pages[0]!.layers.flatMap((layer) => layer.effects).find(
   (effect) => effect.shapeMorph,

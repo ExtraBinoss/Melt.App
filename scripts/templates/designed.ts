@@ -16,8 +16,9 @@ export async function generateDesignedTemplates(outputDirectory: string): Promis
       [`${id}.commands.json`]: JSON.stringify({ version: 1, initial, batches }),
       [`${id}.musart`]: serializeProject(project),
     };
+    await mkdir(resolve(outputDirectory, id), { recursive: true });
     for (const [name, contents] of Object.entries(payloads)) {
-      const path = resolve(outputDirectory, name);
+      const path = resolve(outputDirectory, id, name);
       await writeFile(path, `${contents}\n`);
       paths.push(path);
     }

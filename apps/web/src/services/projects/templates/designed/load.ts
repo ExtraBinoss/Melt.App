@@ -58,7 +58,7 @@ export async function prepareDesignedTemplate(
   options.timing?.stage("Download template manifest");
   let response: Response;
   try {
-    response = await fetcher(`${import.meta.env.BASE_URL}templates/designed/${id}.json`, {
+    response = await fetcher(`${import.meta.env.BASE_URL}templates/designed/${id}/${id}.json`, {
       signal: options.signal,
     });
   } catch {

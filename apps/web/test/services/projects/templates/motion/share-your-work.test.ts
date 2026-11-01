@@ -6,7 +6,7 @@ import {
   evaluateMotion,
   type ImageAsset,
 } from "@musart/core";
-import { createShareYourWork } from "../../../../../src/services/projects/templates/motion/share-your-work";
+import { createShareYourWork } from "../../../../../src/services/projects/templates/motion/share-your-work/build";
 import { parseMotionTemplateManifest } from "../../../../../src/services/projects/templates/motion/loader";
 
 test("recreates the reference cadence with editable action blocks and deterministic public command replay", () => {

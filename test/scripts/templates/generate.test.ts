@@ -24,13 +24,15 @@ test("generates checked-in source-backed bundles and auditable reproducible publ
     expect(await Promise.all(paths.map((path) => readFile(path, "utf8")))).toEqual(first);
     for (const id of ["in-bloom", "motion-stress-lab", "sound-playground", "share-your-work"]) {
       const commands = JSON.parse(
-        await readFile(join(outputDirectory, `${id}.commands.json`), "utf8"),
+        await readFile(join(outputDirectory, id, `${id}.commands.json`), "utf8"),
       ) as { initial: Project; batches: Command[][] };
-      const expected = parseProject(await readFile(join(outputDirectory, `${id}.musart`), "utf8"));
+      const expected = parseProject(
+        await readFile(join(outputDirectory, id, `${id}.musart`), "utf8"),
+      );
       const engine = new EditorEngine(commands.initial, { now: () => commands.initial.createdAt });
       for (const batch of commands.batches) engine.transaction(batch);
       expect(engine.getSnapshot().project).toEqual(expected);
-      const bundle = JSON.parse(await readFile(join(outputDirectory, `${id}.json`), "utf8"));
+      const bundle = JSON.parse(await readFile(join(outputDirectory, id, `${id}.json`), "utf8"));
       expect(bundle.project).toEqual(expected);
       expect(bundle.originals).toHaveLength(
         id === "share-your-work" ? 0 : id === "sound-playground" ? 3 : 4,

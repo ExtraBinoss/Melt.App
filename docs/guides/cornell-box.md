@@ -25,7 +25,7 @@ and post-composite 2D effects retain the normal layer order.
 
 ## Rebuild
 
-Run `bun scripts/templates/cornell-box.ts` to regenerate the portable bundle and
+Run `bun scripts/templates/cornell-box/generate.ts` to regenerate the portable bundle and
 replayable command journal. The template contains no embedded GLB or downloaded
 model. The older procedural room builder remains a legacy fixture, not a source
 for the current template. Generated JSON, `.musart` and command batches must all
@@ -39,7 +39,7 @@ CHROME_PATH=/opt/google/chrome/chrome bun scripts/templates/render.ts \
   --url http://127.0.0.1:6100 --input apps/web/public/templates/motion \
   --output artifacts/cornell/camera-poster --template cornell-box --edge 512 --time 0
 cp artifacts/cornell/camera-poster/cornell-box.webp \
-  apps/web/public/templates/motion/cornell-box.webp
+  apps/web/public/templates/motion/cornell-box/cornell-box.webp
 ```
 
 The portable-source revision and poster query are both `4`; publish the freshly

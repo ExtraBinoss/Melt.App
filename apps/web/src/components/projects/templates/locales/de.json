@@ -2,7 +2,7 @@
   "angelWindows": "Angel.exe",
   "angelWindowsDescription": "12,8 s · Rotierender 3D-Engel, ASCII-Desktop und Effektfenster",
   "bloomWindows": "Bloom Windows",
-  "bloomWindowsDescription": "12 s · Nahtlose Blüte in 1080p mit bewegten Dither-, ASCII- und Cyanotypie-Fenstern",
+  "bloomWindowsDescription": "12 s · Überlagerte Druckeffekte, bearbeitbare Fenster und eine langsame Blumenumlaufbahn",
   "morphingType": "{{brandName}}-Maskottchen",
   "morphingTypeDescription": "6 s · Neugieriges Maskottchen und bildhohes {{brandNameUpper}}-Buchstabenmorphing",
   "shareYourWork": "Zu heiß zum Spuken",

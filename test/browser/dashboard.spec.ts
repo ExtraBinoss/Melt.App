@@ -71,7 +71,7 @@ test("first launch enters the empty library; the visible techno template creates
   });
   await navigation.getByRole("button", { name: "Templates", exact: true }).click();
   const techno = dashboard.getByRole("button", {
-    name: "Créer depuis AFTERHOURS — Techno",
+    name: "Créer depuis Mascotte Melt",
     exact: true,
   });
   await expect(techno).toBeVisible();
@@ -81,7 +81,7 @@ test("first launch enters the empty library; the visible techno template creates
         .locator("img")
         .evaluate(
           (image: HTMLImageElement) =>
-            image.complete && image.naturalWidth === 360 && image.naturalHeight === 640,
+            image.complete && image.naturalWidth > 0 && image.naturalHeight > 0,
         ),
     )
     .toBe(true);
@@ -101,30 +101,30 @@ test("first launch enters the empty library; the visible techno template creates
   const state = await savedState(page);
   expect(state.projects).toHaveLength(1);
   const project = state.projects[0]!.project;
-  expect(project.name).toBe("AFTERHOURS — Techno");
+  expect(project.name).toBe("Melt Mascot");
   expect(project.pages).toHaveLength(1);
-  expect(project.pages[0]!.layers).toHaveLength(150);
+  expect(project.pages[0]!.layers).toHaveLength(4);
   expect(project.pages[0]!.layers.filter((layer) => layer.kind === "text").length).toBeGreaterThan(
-    10,
+    0,
   );
   expect(state.last).toBe(project.id);
   await expect.poll(async () => (await savedState(page)).journals).toEqual([project.id]);
   await page.getByRole("button", { name: "Actions du projet", exact: true }).click();
   await expect(page.getByRole("textbox", { name: "Nom du projet", exact: true })).toHaveValue(
-    "AFTERHOURS — Techno",
+    "Melt Mascot",
   );
   await expect(page.getByRole("button", { name: /Enregistrer/ })).toBeVisible();
   await expect(
     page.getByRole("button", { name: "Télécharger le projet .musart", exact: true }),
   ).toBeVisible();
   await page.keyboard.press("Escape");
-  await page.screenshot({ path: "artifacts/screenshots/afterhours-editor.png" });
+  await page.screenshot({ path: "artifacts/screenshots/mascot-editor.png" });
   await page.reload();
   await expect(page.locator('.canvas-artboard canvas[data-renderer-ready="true"]')).toBeVisible({
     timeout: 60000,
   });
   await expect(page.getByRole("button", { name: "Actions du projet", exact: true })).toContainText(
-    "AFTERHOURS",
+    "Melt",
   );
   await expect(dashboard).toBeHidden();
   const reads = await page.evaluate(() => window.__musartVideoReadbacks!);

@@ -11,9 +11,9 @@ Implementation ready; ownership handed back for coordinator validation.
 
 Changed paths:
 
-- `apps/web/src/services/projects/templates/motion/cornell-box.ts`: public `scene-camera-orbit` recipe bound through `addMotionAnimation` to the actual camera owner. Three yaw poses +5° → −5° → +5° over eight seconds; parent, nine objects and lights remain stationary. Parent retains a genuine editable spatial group.
+- `apps/web/src/services/projects/templates/motion/cornell-box/build.ts`: public `scene-camera-orbit` recipe bound through `addMotionAnimation` to the actual camera owner. Three yaw poses +5° → −5° → +5° over eight seconds; parent, nine objects and lights remain stationary. Parent retains a genuine editable spatial group.
 - `apps/web/src/services/projects/templates/motion/asset-revisions.ts` and Cornell preview line in `apps/web/src/services/projects/templates/catalog.ts`: synchronized source/poster revision `4`.
-- `scripts/templates/cornell-box.ts` and `apps/web/public/templates/motion/cornell-box.{json,musart,commands.json}`: regenerated portable template and replay journal through the existing public-command generator. Geometry, fonts and assets remain unchanged. Root owns generation/copy/inspection of the actual native `cornell-box.webp` poster.
+- `scripts/templates/cornell-box/generate.ts` and `apps/web/public/templates/motion/cornell-box.{json,musart,commands.json}`: regenerated portable template and replay journal through the existing public-command generator. Geometry, fonts and assets remain unchanged. Root owns generation/copy/inspection of the actual native `cornell-box.webp` poster.
 - `test/scripts/templates/cornell-box.test.ts`: deterministic authoring and generated journal replay; real composition camera owner/shared recipe; no parent/child actions or sampled scene keys; exact yaw poses, closed endpoints, near-zero endpoint velocity, stationary layers/lights/environment, action strength and undo/redo.
 - `test/browser/support/cornell-witness.ts` and `test/browser/cornell-box.spec.ts`: real native camera/unchanged-object/light assertions, probe reuse, decoded loop pixels, production readback checks, bounded 32-frame/4-fps export plus separately retained 480-frame/60-fps case. Native near-seam uses the document's 60-fps clock; a separate fifth lossless sample matches the final encoded PTS. Every pixel threshold remains unchanged.
 - Same Cornell browser spec: provenance-backed gallery install and persistent reopen are separate serial 90-second cases sharing one real browser context. The reopened URL retains the installed project ID and explicit `automation=1`. Actual kernel/stored-project readiness precedes the unchanged 30-second native check; live and readonly IndexedDB camera actions must match. Captures include timings, project snapshots, canvas state, relevant requests/fonts/workers and browser errors. Two-second capture bounds and caught teardown failures preserve the original test error.
@@ -32,7 +32,7 @@ English changelog bullet:
 
 - Replace Cornell Box's parent turntable with a reusable composition-owned camera orbit, preserving editable stationary objects, coherent lighting and sparse seamless Motion.
 
-Checks actually run by worker: authorized CPU-only `bun scripts/templates/cornell-box.ts` generation and targeted formatting only. No tests, typecheck, lint, build, browser/GPU checks, Git operations or shared changelog edits.
+Checks actually run by worker: authorized CPU-only `bun scripts/templates/cornell-box/generate.ts` generation and targeted formatting only. No tests, typecheck, lint, build, browser/GPU checks, Git operations or shared changelog edits.
 
 Known limits and coordinator follow-ups:
 

@@ -6,11 +6,9 @@ import {
   serializeProject,
   EditorEngine,
 } from "@musart/core";
-import {
-  createOrbitStudy,
-  createPaperMotion,
-  createColorfield,
-} from "../../../../../src/services/projects/templates/designed/artwork";
+import { createOrbitStudy } from "../../../../../src/services/projects/templates/designed/orbit-study/build";
+import { createPaperMotion } from "../../../../../src/services/projects/templates/designed/paper-motion/build";
+import { createColorfield } from "../../../../../src/services/projects/templates/designed/colorfield/build";
 
 it.each([createOrbitStudy, createPaperMotion, createColorfield])(
   "replays %s through real commands with no media, UI or GPU",

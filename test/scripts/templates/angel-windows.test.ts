@@ -10,9 +10,9 @@ import {
   serializeProject,
   validateProject,
 } from "../../../packages/core/src/index";
-import { createAngelWindows } from "../../../apps/web/src/services/projects/templates/motion/angel-windows";
+import { createAngelWindows } from "../../../apps/web/src/services/projects/templates/motion/angel-windows/build";
 import { parseMotionTemplateManifest } from "../../../apps/web/src/services/projects/templates/motion/loader";
-import { prepareAngel, ANGEL_SOURCE } from "../../../scripts/templates/angel-source";
+import { prepareAngel, ANGEL_SOURCE } from "../../../scripts/templates/angel-windows/source";
 
 const root = "apps/web/public/templates/motion/angel-windows";
 test("ships an editable 1080p native template with one shared angel and replayable sparse animation", async () => {

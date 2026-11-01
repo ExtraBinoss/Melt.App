@@ -17,7 +17,7 @@ import {
 import { GpuEffects } from "../../../packages/render/src/effects/GpuEffects";
 import { GpuPasses } from "../../../packages/render/src/compositing/passes";
 import { createRenderSession } from "../../../packages/render/src/export/standalone";
-import { createTerminalSignal } from "../../../apps/web/src/services/projects/templates/motion/terminal-signal";
+import { createTerminalSignal } from "../../../apps/web/src/services/projects/templates/motion/terminal-signal/build";
 
 export async function terminalEffectWitness(forceWebGL: boolean) {
   const renderer = new WebGPURenderer({ forceWebGL, antialias: false, alpha: true });

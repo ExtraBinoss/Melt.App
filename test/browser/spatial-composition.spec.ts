@@ -10,7 +10,7 @@ import {
   createSpatialScene,
 } from "@musart/core";
 import { installReadbackProbe } from "./support/readback-probe";
-import { createCornellBox } from "../../apps/web/src/services/projects/templates/motion/cornell-box";
+import { createCornellBox } from "../../apps/web/src/services/projects/templates/motion/cornell-box/build";
 
 test("one composition shares native depth across layer ordering on both backends", async ({
   page,

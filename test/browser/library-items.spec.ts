@@ -189,7 +189,7 @@ test("Motion previews resume under a stationary cursor and the brand/search stay
   await page.locator(".library-navigation-item").filter({ hasText: "Templates" }).click();
   const template = page.locator(".template-card-entry").filter({
     has: page.getByRole("button", {
-      name: "Create from In Bloom — Motion showcase",
+      name: "Create from Bloom Windows",
       exact: true,
     }),
   });
@@ -197,7 +197,7 @@ test("Motion previews resume under a stationary cursor and the brand/search stay
   const download = new Promise<void>((resolve) => {
     release = resolve;
   });
-  await page.route("**/templates/motion/in-bloom.json", async (route) => {
+  await page.route("**/templates/motion/bloom-windows/bloom-windows.json", async (route) => {
     await download;
     await route.continue();
   });

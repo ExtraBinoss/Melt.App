@@ -9,8 +9,8 @@ import {
   SCENE_MOTION_ANIMATION_PRESETS,
   validateProject,
 } from "../../../packages/core/src/index";
-import { createCornellBox } from "../../../apps/web/src/services/projects/templates/motion/cornell-box";
-import { cornellRoomGlb } from "../../../scripts/templates/cornell/room";
+import { createCornellBox } from "../../../apps/web/src/services/projects/templates/motion/cornell-box/build";
+import { cornellRoomGlb } from "../../../scripts/templates/cornell-box/room";
 import { parseMotionTemplateManifest } from "../../../apps/web/src/services/projects/templates/motion/loader";
 const build = createCornellBox;
 test("replays separate native Cornell objects and editable chrome text with one composition camera Motion action", () => {
@@ -110,13 +110,16 @@ test("orbits the real camera with sparse A/B/A points while objects and lights s
 });
 test("the gallery contains editable native objects and legacy Cornell originals remain valid", async () => {
   const bundle = JSON.parse(
-    await readFile("apps/web/public/templates/motion/cornell-box.json", "utf8"),
+    await readFile("apps/web/public/templates/motion/cornell-box/cornell-box.json", "utf8"),
   );
   expect(parseMotionTemplateManifest(bundle, "cornell-box").originals).toEqual([]);
   expect(bundle.project.pages[0].layers).toHaveLength(10);
   expect(bundle.project).toEqual(build().project);
   const journal = JSON.parse(
-    await readFile("apps/web/public/templates/motion/cornell-box.commands.json", "utf8"),
+    await readFile(
+      "apps/web/public/templates/motion/cornell-box/cornell-box.commands.json",
+      "utf8",
+    ),
   );
   const replay = new EditorEngine(journal.initial, { now: () => journal.initial.createdAt });
   for (const batch of journal.batches) replay.transaction(batch);

@@ -80,7 +80,8 @@ export function createSearchActions(context: SearchActions) {
     },
     addTechnoArtboard: async () => {
       const project = engine.getSnapshot().project.id;
-      const { createTechnoArtboard } = await import("../../services/projects/templates/techno");
+      const { createTechnoArtboard } =
+        await import("../../services/projects/templates/afterhours-techno/build");
       if (engine.getSnapshot().project.id !== project) throw new Error(t("search:templateChanged"));
       const page = createTechnoArtboard();
       engine.execute({ type: "addPage", page });

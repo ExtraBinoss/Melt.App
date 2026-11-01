@@ -6,7 +6,7 @@ import { outlineFont } from "../../text-fixture";
 import { morphFixture } from "../../morph-fixture";
 import { inflateContours } from "../../../src/surface/morph/text-contours";
 import { fontFamilyIdentity } from "../../../src/surface/text/fonts";
-import lettering from "../../../../../apps/web/src/services/projects/templates/motion/melt-lettering.json";
+import lettering from "../../../../../apps/web/src/services/projects/templates/motion/morphing-type/lettering.json";
 test("regenerates edited text from shaped outlines while retaining matching authored targets", () => {
   const font = outlineFont(),
     layer = createLayer("text", { text: "AV", width: 300, height: 100, fontSize: 48 });
@@ -23,14 +23,14 @@ test("regenerates edited text from shaped outlines while retaining matching auth
   );
 });
 
-test("font aliases retain exact authored contours; another font/text/weight retains its 67-pose motion", () => {
+test("the bundled DynaPuff face retains authored contours; another font/text/weight retains its 67-pose motion", () => {
   validateShapeMorph(lettering);
   const font = outlineFont(),
     layer = createLayer("text", {
       text: "MELT",
-      fontFamily: "Inter",
+      fontFamily: "DynaPuff",
       fontSize: 121.5,
-      fontWeight: 800,
+      fontWeight: 700,
       width: 1500,
       height: 1080,
     });

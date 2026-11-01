@@ -10,7 +10,7 @@ import {
   EditorEngine,
 } from "@musart/core";
 import { createRenderSession, exportMotionVideo } from "@musart/render";
-import { createMorphingType } from "../../../apps/web/src/services/projects/templates/motion/morphing-type";
+import { createMorphingType } from "../../../apps/web/src/services/projects/templates/motion/morphing-type/build";
 
 export async function runMorphWitness(forceWebGL: boolean) {
   const built = createMorphingType(),

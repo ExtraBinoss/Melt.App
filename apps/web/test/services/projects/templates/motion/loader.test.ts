@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import { expect, test, vi } from "vitest";
-import { createBloomTemplate } from "../../../../../src/services/projects/templates/motion/showcase";
+import { createBloomTemplate } from "../../../../../src/services/projects/templates/motion/in-bloom/build";
 import {
   MotionTemplateError,
   openMotionTemplate,

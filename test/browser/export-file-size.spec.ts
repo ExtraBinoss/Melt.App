@@ -21,7 +21,9 @@ test("Angel.exe shows observed encoder size, exact delivered bytes and matching-
   await page.goto("/editor?automation=1");
   await page.waitForFunction(() => !!window.musart);
   await page.evaluate(async () => {
-    const manifest = await (await fetch("/templates/motion/angel-windows.json")).json();
+    const manifest = await (
+      await fetch("/templates/motion/angel-windows/angel-windows.json")
+    ).json();
     window.musart!.load(manifest.project);
   });
   await page.getByRole("button", { name: "Exporter", exact: true }).click();

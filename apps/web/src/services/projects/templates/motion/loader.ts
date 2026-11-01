@@ -184,7 +184,7 @@ async function prepareUncachedMotionTemplate(
   const preview = options.preview ? MOTION_TEMPLATE_PREVIEW_REVISIONS[templateId] : undefined;
   const revision = preview ?? MOTION_TEMPLATE_ASSET_REVISIONS[templateId];
   const response = await download(
-    `${base}${templateId}${preview ? ".preview" : ""}.json${revision ? `?v=${revision}` : ""}`,
+    `${base}${templateId}/${templateId}${preview ? ".preview" : ""}.json${revision ? `?v=${revision}` : ""}`,
     fetcher,
     options.signal,
   );

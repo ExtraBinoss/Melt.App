@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 import { createProject } from "@musart/core";
 import { mkdir, writeFile } from "node:fs/promises";
-import { createTechnoArtboard } from "../../apps/web/src/services/projects/templates/techno";
+import { createTechnoArtboard } from "../../apps/web/src/services/projects/templates/afterhours-techno/build";
 import { installReadbackProbe } from "./support/readback-probe";
 import { fitViewport } from "./support/viewport";
 

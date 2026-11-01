@@ -45,7 +45,7 @@ and export share that same deterministic, one-texture-read TSL graph.
 ## Regenerate and verify
 
 ```sh
-bun scripts/templates/terminal-signal.ts
+bun scripts/templates/terminal-signal/generate.ts
 bun scripts/templates/render.ts --url http://127.0.0.1:6100 \
   --template terminal-signal --time 6.8 --edge 960 \
   --output apps/web/public/templates/motion

@@ -14,7 +14,7 @@ interface FrameSample {
   ready: string | undefined;
 }
 const project = JSON.parse(
-  readFileSync("apps/web/public/templates/motion/morphing-type.json", "utf8"),
+  readFileSync("apps/web/public/templates/motion/morphing-type/morphing-type.json", "utf8"),
 ).project as Project;
 const moving = project.pages[0]!;
 const still = { ...moving, id: "still-real", name: "Static board", layers: [] };

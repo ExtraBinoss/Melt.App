@@ -37,7 +37,7 @@ for (const { webgl, fullRate } of [
     const folder = `artifacts/cornell/native/${fullRate ? "full-rate" : "bounded"}-${webgl ? "webgl" : "webgpu"}`;
     await mkdir(folder, { recursive: true });
     const manifest = JSON.parse(
-      await readFile("apps/web/public/templates/motion/cornell-box.json", "utf8"),
+      await readFile("apps/web/public/templates/motion/cornell-box/cornell-box.json", "utf8"),
     );
     const errors: string[] = [];
     page.on("pageerror", (error) => errors.push(error.message));

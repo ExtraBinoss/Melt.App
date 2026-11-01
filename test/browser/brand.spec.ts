@@ -107,7 +107,7 @@ test("real pending work animates only its SVG leaf, stops for reduced motion and
     release = resolve;
   });
   let intercepted = 0;
-  await page.route("**/templates/motion/in-bloom.json", async (route) => {
+  await page.route("**/templates/motion/bloom-windows/bloom-windows.json", async (route) => {
     intercepted++;
     await gate;
     await route.abort("aborted");
@@ -115,9 +115,7 @@ test("real pending work animates only its SVG leaf, stops for reduced motion and
   const beforeDocument = await page.evaluate(() => window.musart!.snapshot().project);
   // Hover the stationary rail before targeting a card: native hover pauses its automatic drift.
   await page.locator(".landing-showcase").hover();
-  await page
-    .getByRole("button", { name: "Créer depuis In Bloom — Démo Motion", exact: true })
-    .click();
+  await page.getByRole("button", { name: "Créer depuis Bloom Windows", exact: true }).click();
   await expect.poll(() => intercepted).toBeGreaterThan(0);
   const pending = page.locator(".landing-loading");
   await expect(pending).toBeVisible();

@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { createProject } from "@musart/core";
-import { createTechnoArtboard } from "../../apps/web/src/services/projects/templates/techno";
+import { createTechnoArtboard } from "../../apps/web/src/services/projects/templates/afterhours-techno/build";
 import { installReadbackProbe } from "./support/readback-probe";
 import { installSearchProfile } from "./support/search-profile";
 import { profileClock, visibleThumbnailsReady } from "./support/selection-profile";

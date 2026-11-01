@@ -11,7 +11,7 @@ import {
   getWorldMatrix,
   transformPoint,
 } from "@musart/core";
-import { createBloomWindows } from "../../../../../src/services/projects/templates/motion/bloom-windows";
+import { createBloomWindows } from "../../../../../src/services/projects/templates/motion/bloom-windows/build";
 import { parseMotionTemplateManifest } from "../../../../../src/services/projects/templates/motion/loader";
 import { templateMedia } from "../../../../support/motion-template-media";
 
@@ -47,7 +47,7 @@ test("authors a deterministic 1080p loop through replayable commands with one sh
   ).toBe(true);
 });
 
-test("uses editable Spin presets with two linear points and keeps sources registered throughout the orbit", () => {
+test("slows the upright orbit to one turn per loop and keeps every source registered", () => {
   const { project } = build();
   const program = compileMotion(project, { compositionId: project.pages[0]!.id });
   const at = (time: number) =>
@@ -61,21 +61,24 @@ test("uses editable Spin presets with two linear points and keeps sources regist
     );
   expect(project.pages[0]!.motion!.tracks.flatMap((track) => track.properties)).toHaveLength(0);
   const animations = project.pages[0]!.motion!.tracks.flatMap((track) => track.animations ?? []);
-  expect(animations).toHaveLength(13);
+  const spins = animations.filter((animation) => animation.preset.id.startsWith("rotate-spin"));
+  expect(animations).toHaveLength(16);
+  expect(spins).toHaveLength(13);
   expect(
-    animations.every(
+    spins.every(
       (animation) =>
         animation.preset.id.startsWith("rotate-spin") &&
         animation.preset.channels.length === 1 &&
         animation.preset.channels[0]!.target.kind === "layer" &&
         animation.preset.channels[0]!.target.property === "rotation" &&
         animation.preset.channels[0]!.points.length === 2 &&
+        Math.abs(Number(animation.preset.channels[0]!.points[1]!.value)) === 360 &&
         animation.preset.channels[0]!.points.every((point) => point.easing?.type === "linear"),
     ),
   ).toBe(true);
   expect(
     animations.reduce((count, animation) => count + animation.preset.channels[0]!.points.length, 0),
-  ).toBe(26);
+  ).toBe(35);
   const start = at(0);
   for (const time of Array.from({ length: 81 }, (_, index) => (index * 12) / 80)) {
     const page = at(time);
@@ -100,16 +103,59 @@ test("uses editable Spin presets with two linear points and keeps sources regist
       const m = getWorldMatrix(page, window.id);
       expect(m[0]).toBeCloseTo(1, 8);
       expect(m[1]).toBeCloseTo(0, 8);
-      if (time === 12 || time === 1.2) {
+      if (time === 12) {
         const origin = getWorldMatrix(start, window.id);
         m.forEach((v, index) => expect(v).toBeCloseTo(origin[index]!, 8));
       }
     }
   }
+  const startWindow = getWorldMatrix(start, "bw-dither-window");
+  const movingWindow = getWorldMatrix(at(1.2), "bw-dither-window");
+  expect(
+    Math.hypot(movingWindow[4]! - startWindow[4]!, movingWindow[5]! - startWindow[5]!),
+  ).toBeGreaterThan(100);
+  expect(at(3).layers.find((layer) => layer.id === "bw-orbit")!.rotation).toBeCloseTo(90);
+});
+
+test("layers native print treatments and develops each gently without changing stored points", () => {
+  const { project } = build();
+  const serialized = serializeProject(project);
+  const page = project.pages[0]!;
+  expect(
+    page.layers.find((layer) => layer.id === "bw-original")!.effects.map((effect) => effect.type),
+  ).toEqual(["saturation", "contrast", "vignette"]);
+  const program = compileMotion(project, { compositionId: page.id });
+  const at = (value: number) =>
+    applyMotionFrame(
+      program,
+      evaluateMotion(program, { value, rate: 1 }, { terminalPreview: value === 12 }),
+    );
+  for (const [id, types] of [
+    ["dither", ["dither", "cyanotype"]],
+    ["ascii", ["ascii", "grain"]],
+    ["cyanotype", ["cyanotype", "halftone"]],
+  ] as const) {
+    const windowId = `bw-${id}-window`;
+    const window = page.layers.find((layer) => layer.id === windowId)!;
+    expect(window.effects.map((effect) => effect.type)).toEqual(types);
+    const action = page.motion!.tracks.find((track) => track.layerId === windowId)!.animations![0]!;
+    expect(action.preset.channels[0]!.points.map((point) => point.at)).toEqual([0, 0.5, 1]);
+    expect(action.preset.channels[0]!.points[0]!.value).toBe(
+      action.preset.channels[0]!.points[2]!.value,
+    );
+    const effectsAt = (time: number) =>
+      at(time).layers.find((layer) => layer.id === windowId)!.effects;
+    expect(effectsAt(0)).toEqual(effectsAt(12));
+    expect(effectsAt(6)).not.toEqual(effectsAt(0));
+    expect(page.layers.find((layer) => layer.id === `bw-${id}-chrome-title`)!.parentId).toBe(
+      `bw-${id}-label-anchor`,
+    );
+  }
+  expect(serializeProject(project)).toBe(serialized);
 });
 
 test("ships a normal validated gallery bundle and command journal with one pinned local video", async () => {
-  const root = "apps/web/public/templates/motion/bloom-windows";
+  const root = "apps/web/public/templates/motion/bloom-windows/bloom-windows";
   const manifest = parseMotionTemplateManifest(
     JSON.parse(await readFile(`${root}.json`, "utf8")),
     "bloom-windows",

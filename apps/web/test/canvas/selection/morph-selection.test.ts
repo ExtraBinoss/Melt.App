@@ -15,7 +15,7 @@ import { boxSelection } from "../../../src/canvas/interaction/gestures";
 import { createLiveMarquee } from "../../../src/canvas/selection/live-marquee";
 
 const project = JSON.parse(
-  readFileSync("apps/web/public/templates/motion/morphing-type.json", "utf8"),
+  readFileSync("apps/web/public/templates/motion/morphing-type/morphing-type.json", "utf8"),
 ).project as Project;
 
 test("Melt's visible lettering is contained without enclosing its entire text frame, including its SVG neighbour", () => {

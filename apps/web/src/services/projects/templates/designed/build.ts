@@ -1,5 +1,7 @@
-import { createOrbitStudy, createPaperMotion, createColorfield } from "./artwork";
-import { createTransitionAtlas } from "./atlas";
+import { createOrbitStudy } from "./orbit-study/build";
+import { createPaperMotion } from "./paper-motion/build";
+import { createColorfield } from "./colorfield/build";
+import { createTransitionAtlas } from "./transition-atlas/build";
 import type { DesignedTemplateId } from "./catalog";
 
 const builders = {

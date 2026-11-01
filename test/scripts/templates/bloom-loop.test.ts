@@ -3,7 +3,7 @@ import { mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { ALL_FORMATS, BufferSource, EncodedPacketSink, Input } from "mediabunny";
-import { closeBloomLoop } from "../../../scripts/templates/bloom-loop";
+import { closeBloomLoop } from "../../../scripts/templates/bloom-windows/loop";
 
 test("closes the real source with identical key packet endpoints and exact natural-speed timing", async () => {
   const folder = await mkdtemp(join(tmpdir(), "melt-bloom-loop-"));

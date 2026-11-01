@@ -8,7 +8,7 @@ import {
   serializeProject,
   validateProject,
 } from "../../../packages/core/src/index";
-import { createTerminalSignal } from "../../../apps/web/src/services/projects/templates/motion/terminal-signal";
+import { createTerminalSignal } from "../../../apps/web/src/services/projects/templates/motion/terminal-signal/build";
 import { parseMotionTemplateManifest } from "../../../apps/web/src/services/projects/templates/motion/loader";
 import { TEMPLATE_CATALOG } from "../../../apps/web/src/services/projects/templates/catalog";
 
@@ -60,7 +60,7 @@ test("the portrait terminal is editable, deterministic and replayable with spars
   expect(at(12).layers.find((layer) => layer.id === "terminal-finale")!.opacity).toBe(1);
   expect(built.project).toEqual(replay.getSnapshot().project);
   const bundle = JSON.parse(
-    await readFile("apps/web/public/templates/motion/terminal-signal.json", "utf8"),
+    await readFile("apps/web/public/templates/motion/terminal-signal/terminal-signal.json", "utf8"),
   );
   expect(parseMotionTemplateManifest(bundle, "terminal-signal").project).toEqual(built.project);
   expect(TEMPLATE_CATALOG.find((item) => item.id === "terminal-signal")).toMatchObject({

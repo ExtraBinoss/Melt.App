@@ -17,7 +17,10 @@ for (const webgl of [false, true])
     );
     await page.goto(entry);
     const manifest = JSON.parse(
-      await readFile("apps/web/public/templates/motion/bloom-windows.preview.json", "utf8"),
+      await readFile(
+        "apps/web/public/templates/motion/bloom-windows/bloom-windows.preview.json",
+        "utf8",
+      ),
     );
     const result = await page.evaluate(
       async (input) => {
@@ -39,7 +42,11 @@ for (const webgl of [false, true])
         const frames = [];
         try {
           for (let step = 0; step <= 24; step++) {
-            const plan = core.evaluateMotion(program, { value: step, rate: 20 });
+            const plan = core.evaluateMotion(
+              program,
+              { value: step, rate: 2 },
+              { terminalPreview: step === 24 },
+            );
             const scene = core.applyMotionFrame(program, plan);
             const windows = scene.layers
               .filter((layer) => layer.id.endsWith("-window"))
@@ -64,7 +71,12 @@ for (const webgl of [false, true])
               ...plan,
               mediaRequests: plan.mediaRequests
                 .filter((request) => request.layerId !== "bw-original")
-                .map((request) => ({ ...request, sourceTime: { value: 0, rate: 1 } })),
+                .map((request) => ({
+                  ...request,
+                  // Terminal still rendering subtracts 1 µs to sample before an exclusive end.
+                  // Compensate while freezing this witness at the first valid source frame.
+                  sourceTime: { value: plan.terminalPreview ? 1 : 0, rate: 1_000_000 },
+                })),
             };
             const image = await session.withCanvasFrame(
               page,

@@ -4,7 +4,7 @@ import { morphContentBounds, type Project } from "@musart/core";
 import { installReadbackProbe } from "./support/readback-probe";
 
 const project = JSON.parse(
-  readFileSync("apps/web/public/templates/motion/morphing-type.json", "utf8"),
+  readFileSync("apps/web/public/templates/motion/morphing-type/morphing-type.json", "utf8"),
 ).project as Project;
 const composition = project.pages[0]!;
 // Freeze the authored initial pose: this case tests native picking, not an advancing clock.

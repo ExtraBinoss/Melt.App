@@ -71,8 +71,8 @@ test("Angel Solid/Gradient activations report input-to-controls and new-draw lat
   await page.goto("/?automation=1");
   await page.waitForFunction(() => Boolean(window.musart));
   await page.evaluate(async () => {
-    const manifest = await fetch("/templates/motion/angel-windows.json").then((response) =>
-      response.json(),
+    const manifest = await fetch("/templates/motion/angel-windows/angel-windows.json").then(
+      (response) => response.json(),
     );
     window.musart!.load(manifest.project);
   });

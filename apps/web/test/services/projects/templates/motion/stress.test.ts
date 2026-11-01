@@ -8,7 +8,7 @@ import {
   serializeProject,
   validateProject,
 } from "@musart/core";
-import { createStressTemplate } from "../../../../../src/services/projects/templates/motion/stress";
+import { createStressTemplate } from "../../../../../src/services/projects/templates/motion/motion-stress-lab/build";
 import { templateMedia } from "../../../../support/motion-template-media";
 
 test("creates the declared 50-photo/100-effect mixed-media workload, with bounded isolated rows and shared originals", () => {

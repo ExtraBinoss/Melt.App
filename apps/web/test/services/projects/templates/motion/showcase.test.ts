@@ -7,7 +7,7 @@ import {
   serializeProject,
   validateProject,
 } from "@musart/core";
-import { createBloomTemplate } from "../../../../../src/services/projects/templates/motion/showcase";
+import { createBloomTemplate } from "../../../../../src/services/projects/templates/motion/in-bloom/build";
 import { templateMedia } from "../../../../support/motion-template-media";
 
 test("builds a real editable deterministic photo/video collage using only public headless commands", () => {

@@ -29,7 +29,7 @@ test("the real Melt mascot keeps transform handles until double click, then expo
   test.setTimeout(90000);
   await start(page);
   const { project } = JSON.parse(
-    await readFile("apps/web/public/templates/motion/morphing-type.json", "utf8"),
+    await readFile("apps/web/public/templates/motion/morphing-type/morphing-type.json", "utf8"),
   ) as { project: Project };
   await page.evaluate((project) => {
     window.musart!.load(project);

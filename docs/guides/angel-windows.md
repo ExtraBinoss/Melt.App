@@ -26,10 +26,10 @@ The first low-poly candidate was replaced by this more detailed scan. Stanford L
 The pinned prepared GLB is bundled locally. No external request is needed to open the template.
 
 ```sh
-bun scripts/templates/angel-windows.ts
+bun scripts/templates/angel-windows/generate.ts
 ```
 
-To repeat source preparation, download the original linked above and pass its bytes through `prepareAngel` in `scripts/templates/angel-source.ts`, writing the result to `apps/web/public/templates/motion/media/angel-source.glb`, then regenerate the bundle. The generator emits a normal manifest, portable `.musart` and replayable command journal. The original source digest is embedded in the prepared GLB.
+To repeat source preparation, download the original linked above and pass its bytes through `prepareAngel` in `scripts/templates/angel-windows/source.ts`, writing the result to `apps/web/public/templates/motion/media/angel-source.glb`, then regenerate the bundle. The generator emits a normal manifest, portable `.musart` and replayable command journal. The original source digest is embedded in the prepared GLB.
 
 ## Verification and limits
 

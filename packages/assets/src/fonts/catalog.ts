@@ -36,4 +36,5 @@ export const FONT_CATALOG: readonly FontDefinition[] = [
   { family: "Raleway", id: "raleway", category: "sans" },
   { family: "Source Sans 3", id: "source-sans-3", category: "sans" },
   { family: "Pacifico", id: "pacifico", category: "handwriting" },
+  { family: "DynaPuff", id: "dynapuff", category: "display" },
 ];

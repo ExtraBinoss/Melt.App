@@ -122,12 +122,12 @@ test("small screens, system dark mode, reduced motion and English stay usable", 
 test("a real template download failure leaves the landing usable without saving a project", async ({
   page,
 }) => {
-  await page.route("**/templates/motion/in-bloom.json", (route) =>
+  await page.route("**/templates/motion/bloom-windows/bloom-windows.json", (route) =>
     route.fulfill({ status: 503, contentType: "application/json", body: "{}" }),
   );
   await page.goto("/");
   const template = page.getByRole("button", {
-    name: "Créer depuis In Bloom — Démo Motion",
+    name: "Créer depuis Bloom Windows",
     exact: true,
   });
   await template.click();

@@ -168,6 +168,15 @@
       "bytes": 312352,
       "sha256": "8bbcc3eb8275c388f4bcd998832f8a4b943eadbaf6a595205312774b5951aefb",
       "license": "raleway/OFL.txt"
+    },
+    {
+      "family": "DynaPuff",
+      "file": "dynapuff/font.ttf",
+      "source": "https://github.com/googlefonts/dynapuff/blob/0cc624ef50b654ffe1a30785396aaba308406132/fonts/variable/DynaPuff[wdth,wght].ttf",
+      "sourceRevision": "0cc624ef50b654ffe1a30785396aaba308406132",
+      "bytes": 212600,
+      "sha256": "c3752fc6dd8aaa46a88637f061a9a4e6ab44c02c5f0afd65528b91ae8ff6f948",
+      "license": "dynapuff/OFL.txt"
     }
   ]
 }

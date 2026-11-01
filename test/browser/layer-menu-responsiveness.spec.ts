@@ -118,7 +118,9 @@ test("Morph layer menus and effect popovers retain editor surfaces and rapid reo
   await page.goto("/?automation=1");
   await page.waitForFunction(() => Boolean(window.musart));
   await page.evaluate(async () => {
-    const { project } = await (await fetch("/templates/motion/morphing-type.json")).json();
+    const { project } = await (
+      await fetch("/templates/motion/morphing-type/morphing-type.json")
+    ).json();
     window.musart!.load(project);
   });
   const row = page.locator('.layer-row[data-layer-id="morphing-title"] .layer-name');

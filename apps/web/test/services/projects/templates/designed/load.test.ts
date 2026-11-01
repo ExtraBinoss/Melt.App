@@ -30,7 +30,7 @@ it("prepares a validated independent project and forwards the origin/abort scope
   expect(calls[0]![0].id).not.toBe(calls[1]![0].id);
   expect(calls[0]!.slice(1)).toEqual([[], options]);
   expect(d.fetcher).toHaveBeenCalledWith(
-    expect.stringContaining("templates/designed/colorfield.json"),
+    expect.stringContaining("templates/designed/colorfield/colorfield.json"),
     { signal: options.signal },
   );
 });

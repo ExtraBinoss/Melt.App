@@ -7,7 +7,7 @@ import {
   type Layer,
   type Project,
 } from "@musart/core";
-import { createTechnoArtboard } from "../../../apps/web/src/services/projects/templates/techno";
+import { createTechnoArtboard } from "../../../apps/web/src/services/projects/templates/afterhours-techno/build";
 
 /** Real editable AFTERHOURS artboards, with validated, deterministic catalogue-wide settings. */
 export function layerStressProject(layerCount: number, effectCount: number): Project {

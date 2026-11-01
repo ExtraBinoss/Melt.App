@@ -129,12 +129,7 @@ export const ACTIONS: readonly ActionDefinition[] = [
     label: "addPage",
     terms: "add page composition new artboard ajouter nouveau",
   },
-  {
-    action: "addTechnoArtboard",
-    category: "project",
-    label: "search:addTechnoArtboard",
-    terms: "techno poster affiche template preset artboard afterhours complex composition modèle",
-  },
+
   {
     action: "undo",
     category: "edit",

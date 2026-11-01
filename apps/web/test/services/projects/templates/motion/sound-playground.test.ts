@@ -6,7 +6,7 @@ import {
   validateProject,
   evaluateMotion,
 } from "@musart/core";
-import { createSoundPlayground } from "../../../../../src/services/projects/templates/motion/sound-playground";
+import { createSoundPlayground } from "../../../../../src/services/projects/templates/motion/sound-playground/build";
 import { templateMedia } from "../../../../support/motion-template-media";
 import { SFX_BANK, sfxWav, synthesizeSfx } from "../../../../../src/services/motion/audio/sfx";
 export function soundMedia() {

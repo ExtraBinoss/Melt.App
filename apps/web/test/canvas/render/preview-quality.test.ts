@@ -2,7 +2,7 @@ import { expect, it } from "vitest";
 import { createEffect, createLayer, createPage } from "@musart/core";
 import { estimatePreviewCost } from "@musart/render";
 import { previewScale, PREVIEW_MEMORY_BYTES } from "../../../src/canvas/render/preview-quality";
-import { createTechnoArtboard } from "../../../src/services/projects/templates/techno";
+import { createTechnoArtboard } from "../../../src/services/projects/templates/afterhours-techno/build";
 it("keeps SVG coverage samples inside the same preview memory budget", () => {
   const page = createPage({
       width: 1600,

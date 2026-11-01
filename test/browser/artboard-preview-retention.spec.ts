@@ -1,6 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import { createEffect, createLayer, createProject } from "@musart/core";
-import { createTechnoArtboard } from "../../apps/web/src/services/projects/templates/techno";
+import { createTechnoArtboard } from "../../apps/web/src/services/projects/templates/afterhours-techno/build";
 import { inspectImage } from "./support/image-probe";
 import { installReadbackProbe } from "./support/readback-probe";
 import { zoomViewport } from "./support/viewport";

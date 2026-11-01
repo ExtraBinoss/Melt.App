@@ -1,12 +1,12 @@
-import { generateShareYourWork } from "./share-work";
+import { generateShareYourWork } from "./share-your-work/generate";
 import { mkdir, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { parseArgs } from "node:util";
 import { serializeProject, validateProject } from "../../packages/core/src/index";
-import { createBloomTemplate } from "../../apps/web/src/services/projects/templates/motion/showcase";
+import { createBloomTemplate } from "../../apps/web/src/services/projects/templates/motion/in-bloom/build";
 import { isOriginalMediaAsset } from "../../packages/core/src/index";
-import { createSoundPlayground } from "../../apps/web/src/services/projects/templates/motion/sound-playground";
-import { createStressTemplate } from "../../apps/web/src/services/projects/templates/motion/stress";
+import { createSoundPlayground } from "../../apps/web/src/services/projects/templates/motion/sound-playground/build";
+import { createStressTemplate } from "../../apps/web/src/services/projects/templates/motion/motion-stress-lab/build";
 import type { MotionTemplateManifest } from "../../apps/web/src/services/projects/templates/motion/model";
 import { readTemplateMedia } from "./media";
 
@@ -25,7 +25,7 @@ export async function generateMotionTemplates(options: {
   const written: string[] = [];
   written.push(
     ...(await generateShareYourWork(
-      options.outputDirectory,
+      resolve(options.outputDirectory, "share-your-work"),
       resolve(options.mediaDirectory, "share-work"),
     )),
   );
@@ -52,8 +52,9 @@ export async function generateMotionTemplates(options: {
       [`${templateId}.musart`]: serializeProject(project),
       [`${templateId}.commands.json`]: JSON.stringify({ version: 1, initial, batches }),
     };
+    await mkdir(resolve(options.outputDirectory, templateId), { recursive: true });
     for (const [name, contents] of Object.entries(files)) {
-      const path = resolve(options.outputDirectory, name);
+      const path = resolve(options.outputDirectory, templateId, name);
       await writeFile(path, `${contents}\n`);
       written.push(path);
     }

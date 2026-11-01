@@ -3,7 +3,7 @@ import { beginProjectTiming } from "../../performance/project-timing";
 import { PRESETS, createProject, serializeProject } from "@musart/core";
 import type { EditorServices } from "../../../state/contracts";
 import type { TemplateLoadOptions } from "./motion/loader";
-import { DESIGNED_TEMPLATES, isDesignedTemplateId } from "./designed/catalog";
+import { isDesignedTemplateId } from "./designed/catalog";
 
 export interface ProjectTemplate {
   readonly id: string;
@@ -27,7 +27,7 @@ export const TEMPLATE_CATALOG: readonly ProjectTemplate[] = Object.freeze([
     mode: "motion",
     category: "video",
     previewBackground: "#030703",
-    preview: `${import.meta.env.BASE_URL}templates/motion/terminal-signal.webp?v=1`,
+    preview: `${import.meta.env.BASE_URL}templates/motion/terminal-signal/terminal-signal.webp?v=${MOTION_TEMPLATE_ASSET_REVISIONS["terminal-signal"]!}`,
   }),
   Object.freeze({
     id: "angel-windows",
@@ -37,7 +37,7 @@ export const TEMPLATE_CATALOG: readonly ProjectTemplate[] = Object.freeze([
     height: 1920,
     mode: "motion",
     category: "artwork",
-    preview: `${import.meta.env.BASE_URL}templates/motion/angel-windows.webp?v=1`,
+    preview: `${import.meta.env.BASE_URL}templates/motion/angel-windows/angel-windows.webp?v=${MOTION_TEMPLATE_ASSET_REVISIONS["angel-windows"]!}`,
   }),
   Object.freeze({
     id: "cornell-box",
@@ -47,7 +47,7 @@ export const TEMPLATE_CATALOG: readonly ProjectTemplate[] = Object.freeze([
     height: 1080,
     mode: "motion",
     category: "artwork",
-    preview: `${import.meta.env.BASE_URL}templates/motion/cornell-box.webp?v=4`,
+    preview: `${import.meta.env.BASE_URL}templates/motion/cornell-box/cornell-box.webp?v=${MOTION_TEMPLATE_ASSET_REVISIONS["cornell-box"]!}`,
   }),
   Object.freeze({
     id: "bloom-windows",
@@ -57,7 +57,7 @@ export const TEMPLATE_CATALOG: readonly ProjectTemplate[] = Object.freeze([
     height: 1080,
     mode: "motion",
     category: "video",
-    preview: `${import.meta.env.BASE_URL}templates/motion/bloom-windows.webp?v=7`,
+    preview: `${import.meta.env.BASE_URL}templates/motion/bloom-windows/bloom-windows.webp?v=${MOTION_TEMPLATE_ASSET_REVISIONS["bloom-windows"]!}`,
   }),
   Object.freeze({
     id: "morphing-type",
@@ -68,54 +68,9 @@ export const TEMPLATE_CATALOG: readonly ProjectTemplate[] = Object.freeze([
     height: 1080,
     mode: "motion",
     category: "artwork",
-    preview: `${import.meta.env.BASE_URL}templates/motion/morphing-type.webp?v=${MOTION_TEMPLATE_ASSET_REVISIONS["morphing-type"]!}`,
+    preview: `${import.meta.env.BASE_URL}templates/motion/morphing-type/morphing-type.webp?v=${MOTION_TEMPLATE_ASSET_REVISIONS["morphing-type"]!}`,
   }),
-  ...DESIGNED_TEMPLATES.map((template) =>
-    Object.freeze({
-      ...template,
-      preview: `${import.meta.env.BASE_URL}templates/designed/${template.id}.webp`,
-    }),
-  ),
-  Object.freeze({
-    id: "afterhours-techno",
-    nameKey: "templates:afterhours",
-    width: 1080,
-    height: 1920,
-    category: "artwork" as const,
-    mode: "static" as const,
-    descriptionKey: "templates:editable",
-    preview: `${import.meta.env.BASE_URL}templates/afterhours.webp`,
-  }),
-  Object.freeze({
-    id: "in-bloom",
-    nameKey: "templates:bloom",
-    width: 1440,
-    height: 1040,
-    category: "artwork" as const,
-    mode: "motion" as const,
-    descriptionKey: "templates:bloomDescription",
-    preview: `${import.meta.env.BASE_URL}templates/motion/in-bloom.webp`,
-  }),
-  Object.freeze({
-    id: "motion-stress-lab",
-    nameKey: "templates:stress",
-    width: 1440,
-    height: 1200,
-    category: "artwork" as const,
-    mode: "motion" as const,
-    descriptionKey: "templates:stressDescription",
-    preview: `${import.meta.env.BASE_URL}templates/motion/motion-stress-lab.webp`,
-  }),
-  Object.freeze({
-    id: "sound-playground",
-    nameKey: "templates:soundPlayground",
-    width: 1080,
-    height: 1080,
-    category: "artwork" as const,
-    mode: "motion" as const,
-    descriptionKey: "templates:soundPlaygroundDescription",
-    preview: `${import.meta.env.BASE_URL}templates/motion/sound-playground.webp`,
-  }),
+
   Object.freeze({
     id: "share-your-work",
     nameKey: "templates:shareYourWork",
@@ -124,7 +79,7 @@ export const TEMPLATE_CATALOG: readonly ProjectTemplate[] = Object.freeze([
     category: "artwork" as const,
     mode: "motion" as const,
     descriptionKey: "templates:shareYourWorkDescription",
-    preview: `${import.meta.env.BASE_URL}templates/motion/share-your-work.webp?v=haunt-loop-1`,
+    preview: `${import.meta.env.BASE_URL}templates/motion/share-your-work/share-your-work.webp?v=haunt-loop-1`,
   }),
   ...PRESETS.map((preset) =>
     Object.freeze({
@@ -167,7 +122,7 @@ async function openProjectTemplate(
     return;
   }
   if (templateId === "afterhours-techno") {
-    const { createTechnoArtboard } = await import("./techno");
+    const { createTechnoArtboard } = await import("./afterhours-techno/build");
     const project = createProject({
       id: crypto.randomUUID(),
       name: "AFTERHOURS — Techno",

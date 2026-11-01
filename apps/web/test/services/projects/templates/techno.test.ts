@@ -3,7 +3,7 @@ import { createProject, EditorEngine, validateProject } from "@musart/core";
 import {
   createTechnoArtboard,
   TECHNO_ARTBOARD_NAME,
-} from "../../../../src/services/projects/templates/techno";
+} from "../../../../src/services/projects/templates/afterhours-techno/build";
 it("creates a complex editable artboard with deterministic IDs, analytical typography and GPU effect groups", () => {
   let sequence = 0;
   const page = createTechnoArtboard(() => `techno-${sequence++}`);

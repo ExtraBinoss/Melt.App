@@ -3,7 +3,7 @@ import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { createHash } from "node:crypto";
 import { createProject } from "@musart/core";
-import { createTechnoArtboard } from "../../apps/web/src/services/projects/templates/techno";
+import { createTechnoArtboard } from "../../apps/web/src/services/projects/templates/afterhours-techno/build";
 import { installReadbackProbe } from "./support/readback-probe";
 import { installSearchProfile, searchSurfaceCounters } from "./support/search-profile";
 import { visibleThumbnailsReady, profileClock } from "./support/selection-profile";

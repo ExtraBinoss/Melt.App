@@ -28,8 +28,8 @@ test("shows the animated headline, real templates and four deliberate video slot
   fireEvent.click(screen.getAllByRole("button", { name: "Commencer à créer" })[0]!);
   fireEvent.click(screen.getByRole("button", { name: "Try Melt" }));
   expect(create).toHaveBeenCalledTimes(2);
-  fireEvent.click(screen.getByRole("button", { name: "Créer depuis AFTERHOURS — Techno" }));
-  expect(choose).toHaveBeenCalledExactlyOnceWith("afterhours-techno");
+  fireEvent.click(screen.getByRole("button", { name: "Créer depuis Mascotte Melt" }));
+  expect(choose).toHaveBeenCalledExactlyOnceWith("morphing-type");
 });
 
 test("all landing copy follows the selected interface language", async () => {

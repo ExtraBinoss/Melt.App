@@ -258,7 +258,9 @@ test("the two-column picker fits the mobile inspector and applies motion without
   await page.goto("/?automation=1");
   await page.waitForFunction(() => !!window.musart);
   await page.evaluate(async () => {
-    const manifest = await (await fetch("/templates/motion/share-your-work.json")).json();
+    const manifest = await (
+      await fetch("/templates/motion/share-your-work/share-your-work.json")
+    ).json();
     window.musart!.load(manifest.project);
     window.musart!.select([manifest.project.pages[0].layers[0].id]);
   });

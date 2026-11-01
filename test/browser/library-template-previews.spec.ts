@@ -23,9 +23,8 @@ test("registered designed Motion cards and Melt Mascot preview and open through 
     if (/templates\/.*\.json/.test(request.url())) requested.push(new URL(request.url()).pathname);
   });
   for (const [name, folder, id] of [
-    ["Orbit Study", "designed", "orbit-study"],
-    ["Paper Motion", "designed", "paper-motion"],
-    ["Transition Atlas", "designed", "transition-atlas"],
+    ["Terminal Signal", "motion", "terminal-signal"],
+    ["Cornell Box", "motion", "cornell-box"],
     ["Melt Mascot", "motion", "morphing-type"],
   ] as const) {
     const tile = page
@@ -43,7 +42,7 @@ test("registered designed Motion cards and Melt Mascot preview and open through 
         ),
       )
       .toBeGreaterThan(0);
-    expect(requested).toContain(`/templates/${folder}/${id}.json`);
+    expect(requested).toContain(`/templates/${folder}/${id}/${id}.json`);
     await page.locator(".dashboard-brand").hover();
     await expect(preview).toHaveAttribute("data-preview-status", "idle");
   }

@@ -56,9 +56,15 @@ it("loads actual local outlines, maps every catalog family and keeps legacy alia
   expect(fetch).toHaveBeenCalledWith("/fonts/inter/font.ttf", { signal: expect.any(AbortSignal) });
   const bold = await repository.acquire("Tinos", 700);
   expect(fetch).toHaveBeenCalledWith("/fonts/tinos/bold.ttf", { signal: expect.any(AbortSignal) });
+  const playful = await repository.acquire("DynaPuff", 700);
+  expect(fetch).toHaveBeenCalledWith("/fonts/dynapuff/font.ttf", {
+    signal: expect.any(AbortSignal),
+  });
+  expect(playful.font.charToGlyph("M").index).toBeGreaterThan(0);
   first.release();
   alias.release();
   bold.release();
+  playful.release();
   repository.clear();
   expect(() => first.font.shape!("A", 400)).toThrow("disposed");
   for (const face of FONT_CATALOG) {

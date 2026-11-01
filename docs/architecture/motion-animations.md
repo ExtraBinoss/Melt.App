@@ -71,9 +71,9 @@ continuous phase and keeps loop samples below the exclusive composition end.
 
 The durable `morphing-type` ID now presents **Melt Mascot** on white. A fixed,
 mouthless mascot sits to the left; only its separate eyes move and blink. The
-centered violet **MELT** lettering uses Inter Variable 800 and the original
+centered violet **MELT** lettering uses locally bundled DynaPuff 700 and the original
 67-pose timing and stretch envelope, reaching almost the full canvas height.
-`scripts/templates/melt-lettering.ts` constructs fresh glyph contours from the
+`scripts/templates/morphing-type/lettering.ts` constructs fresh glyph contours from the
 bundled font; it retains no reference-letter outlines or reference footer marks.
 The six-second cycle returns both lettering and eyes to their starting state.
 Both templates retain their public IDs for existing links and regenerate from

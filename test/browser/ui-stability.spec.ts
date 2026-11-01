@@ -1,6 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import { createLayer, createPage, createProject } from "@musart/core";
-import { createTechnoArtboard } from "../../apps/web/src/services/projects/templates/techno";
+import { createTechnoArtboard } from "../../apps/web/src/services/projects/templates/afterhours-techno/build";
 import { mkdir, writeFile } from "node:fs/promises";
 
 declare global {

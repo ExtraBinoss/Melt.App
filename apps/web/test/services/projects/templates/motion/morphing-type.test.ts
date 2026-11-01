@@ -7,7 +7,7 @@ import {
   evaluateMotion,
   applyMotionFrame,
 } from "@musart/core";
-import { createMorphingType } from "../../../../../src/services/projects/templates/motion/morphing-type";
+import { createMorphingType } from "../../../../../src/services/projects/templates/motion/morphing-type/build";
 import { brand } from "../../../../../src/ui/brand/config";
 test("authors the genuine Melt mascot with closed morph states, editable text and deterministic replay", () => {
   const built = createMorphingType(),
@@ -24,6 +24,12 @@ test("authors the genuine Melt mascot with closed morph states, editable text an
   expect(body.effects).toEqual([]);
   expect(page.layers.some((layer) => layer.id === "melt-mouth")).toBe(false);
   const word = page.layers.find((layer) => layer.id === "melt-wordmark")!;
+  expect(word).toMatchObject({ fontFamily: "DynaPuff", fontWeight: 700 });
+  expect(word.effects[0]!.shapeMorph!.sourceFont).toEqual({
+    family: word.fontFamily,
+    size: word.fontSize,
+    weight: word.fontWeight,
+  });
   expect(body.x + body.width).toBeLessThan(word.x);
   expect(word.effects[0]).toMatchObject({ type: "morph", settings: { inflate: 0.9, stretch: 3 } });
   const program = compileMotion(built.project, { compositionId: page.id });
@@ -56,5 +62,8 @@ test("authors the genuine Melt mascot with closed morph states, editable text an
     ),
   ).toBeGreaterThan(0.95);
   expect(page.motion!.tracks.flatMap((t) => t.animations ?? [])).toHaveLength(1);
+  expect(
+    page.motion!.tracks.flatMap((t) => t.animations ?? [])[0]!.preset.channels[0]!.points,
+  ).toHaveLength(4);
   expect(parseProject(serializeProject(built.project))).toEqual(built.project);
 });

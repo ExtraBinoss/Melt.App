@@ -2,7 +2,7 @@ import { expect, test, type Page } from "@playwright/test";
 import { createEffect, createLayer, createPage, createProject, type Project } from "@musart/core";
 import { createHash } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
-import { createTechnoArtboard } from "../../apps/web/src/services/projects/templates/techno";
+import { createTechnoArtboard } from "../../apps/web/src/services/projects/templates/afterhours-techno/build";
 import { projectLayerWorkspace } from "../../apps/web/src/components/layers/tree/project";
 import { visibleThumbnailsReady } from "./support/selection-profile";
 import { instrumentGpu, startEditorTrace } from "./support/editor-action-probe";

@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import type { Project } from "@musart/core";
 import { installReadbackProbe } from "./support/readback-probe";
 const project = JSON.parse(
-  readFileSync("apps/web/public/templates/motion/morphing-type.json", "utf8"),
+  readFileSync("apps/web/public/templates/motion/morphing-type/morphing-type.json", "utf8"),
 ).project as Project;
 
 test("performance footer samples the actual Motion canvas, restores its pose and stops on outside dismissal", async ({

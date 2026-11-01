@@ -14,8 +14,8 @@ test("Angel playback retains local select sizing, native choice and inspector fo
   await page.goto("/editor?automation=1");
   await page.waitForFunction(() => Boolean(window.musart));
   await page.evaluate(async () => {
-    const manifest = await fetch("/templates/motion/angel-windows.json").then((response) =>
-      response.json(),
+    const manifest = await fetch("/templates/motion/angel-windows/angel-windows.json").then(
+      (response) => response.json(),
     );
     const api = window.musart as AutomationApi;
     api.load(manifest.project);

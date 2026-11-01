@@ -10,7 +10,7 @@ import {
 } from "@musart/core";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
-import { createTechnoArtboard } from "../../apps/web/src/services/projects/templates/techno";
+import { createTechnoArtboard } from "../../apps/web/src/services/projects/templates/afterhours-techno/build";
 import { visibleThumbnailsReady } from "./support/selection-profile";
 
 import {

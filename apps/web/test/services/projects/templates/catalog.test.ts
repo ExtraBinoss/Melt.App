@@ -4,8 +4,10 @@ import {
   TEMPLATE_CATALOG,
   createProjectFromTemplate,
 } from "../../../../src/services/projects/templates/catalog";
-import { DESIGNED_TEMPLATES } from "../../../../src/services/projects/templates/designed/catalog";
+
 import * as motion from "../../../../src/services/projects/templates/motion/loader";
+
+import { ACTIONS } from "../../../../src/components/search/catalog/definitions";
 
 const ports = () => ({
   createProject: vi.fn<Parameters<typeof createProjectFromTemplate>[0]["createProject"]>(
@@ -16,9 +18,7 @@ const ports = () => ({
   ),
 });
 test("publishes exact canonical canvas formats and the editable artwork template", async () => {
-  expect(new Set(TEMPLATE_CATALOG.map((item) => item.id)).size).toBe(
-    PRESETS.length + DESIGNED_TEMPLATES.length + 10,
-  );
+  expect(new Set(TEMPLATE_CATALOG.map((item) => item.id)).size).toBe(PRESETS.length + 6);
   expect(Object.isFrozen(TEMPLATE_CATALOG)).toBe(true);
   const services = ports();
   for (const preset of PRESETS) {
@@ -50,12 +50,9 @@ test("routes Motion bundles to the binary-capable installation service and keeps
   for (const id of [
     "terminal-signal",
     "morphing-type",
-    "in-bloom",
     "bloom-windows",
     "angel-windows",
     "cornell-box",
-    "motion-stress-lab",
-    "sound-playground",
     "share-your-work",
   ]) {
     const template = TEMPLATE_CATALOG.find((item) => item.id === id)!;
@@ -116,4 +113,34 @@ test("creates fresh independent complete techno documents through the real porta
   await expect(createProjectFromTemplate(services, `preset:${PRESETS[0]!.id}`)).rejects.toThrow(
     "Storage blocked",
   );
+});
+
+test("retires the eight legacy designs from every public catalog consumer", () => {
+  expect(ACTIONS.some((action) => action.action === "addTechnoArtboard")).toBe(false);
+  const ids = TEMPLATE_CATALOG.map((template) => template.id);
+  for (const id of [
+    "orbit-study",
+    "paper-motion",
+    "colorfield",
+    "transition-atlas",
+    "afterhours-techno",
+    "in-bloom",
+    "motion-stress-lab",
+    "sound-playground",
+  ])
+    expect(ids).not.toContain(id);
+  expect(
+    TEMPLATE_CATALOG.filter((template) => template.category === "artwork" || template.preview)
+      .filter((template) => template.preview)
+      .map((template) => template.id),
+  ).toEqual([
+    "terminal-signal",
+    "angel-windows",
+    "cornell-box",
+    "bloom-windows",
+    "morphing-type",
+    "share-your-work",
+  ]);
+  for (const template of TEMPLATE_CATALOG.filter((item) => item.preview))
+    expect(template.preview).toContain(`/templates/motion/${template.id}/${template.id}.webp`);
 });

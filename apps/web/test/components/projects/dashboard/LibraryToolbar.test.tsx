@@ -23,7 +23,7 @@ test("retains the actual search input while changing sections and template modes
   view.rerender(<LibraryToolbar {...common} view="templates" query="" mode="static" />);
   expect(screen.getByRole("searchbox", { name: "Rechercher un modèle" })).toBe(input);
   expect(input).toHaveValue("");
-  expect(document.querySelector('img[src="/templates/motion/in-bloom.webp"]')).toBeNull();
+  expect(document.querySelector('img[src="/templates/motion/in-bloom/in-bloom.webp"]')).toBeNull();
   fireEvent.change(input, { target: { value: "Bloom" } });
   expect(query).toHaveBeenCalledExactlyOnceWith("Bloom");
   fireEvent.click(screen.getByRole("radio", { name: "Motion" }));

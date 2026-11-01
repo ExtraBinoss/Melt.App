@@ -21,7 +21,7 @@ for (const webgl of [false, true])
     );
     await page.goto(entry);
     const manifest = JSON.parse(
-      await readFile("apps/web/public/templates/motion/bloom-windows.json", "utf8"),
+      await readFile("apps/web/public/templates/motion/bloom-windows/bloom-windows.json", "utf8"),
     );
     const captured = await page.evaluate(
       async (input) => {

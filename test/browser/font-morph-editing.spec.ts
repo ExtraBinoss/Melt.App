@@ -25,7 +25,7 @@ async function ready(page: Page) {
   });
 }
 
-test("native font samples decode, aliases retain MELT, another font retains tall glyphs, cancellation and undo restore the exact pose", async ({
+test("native bundled DynaPuff samples decode, retain MELT, another font retains tall glyphs, cancellation and undo restore the exact pose", async ({
   page,
 }) => {
   test.setTimeout(90000);
@@ -37,7 +37,7 @@ test("native font samples decode, aliases retain MELT, another font retains tall
   await page.goto("/editor?automation=1");
   await page.waitForFunction(() => Boolean(window.musart));
   const { project } = JSON.parse(
-    await readFile("apps/web/public/templates/motion/morphing-type.json", "utf8"),
+    await readFile("apps/web/public/templates/motion/morphing-type/morphing-type.json", "utf8"),
   );
   const program = compileMotion(project, { compositionId: project.pages[0].id });
   const peak = structuredClone(
@@ -62,18 +62,27 @@ test("native font samples decode, aliases retain MELT, another font retains tall
   const original = await capture("original");
   const trigger = page.getByRole("combobox", { name: "Font", exact: true });
   const row = (name: string) => page.getByRole("option", { name, exact: true });
+  const search = page.getByRole("combobox", { name: "Search fonts", exact: true });
   await trigger.click();
-  for (const font of ["Inter", "Space Grotesk", "Arimo", "Tinos"])
+  for (const font of ["Inter", "Space Grotesk", "Arimo", "Tinos"]) {
+    await search.fill(font);
     await expect(row(font).locator("[data-font-preview-state]")).toHaveAttribute(
       "data-font-preview-state",
       "ready",
     );
+  }
   const before = await counters(page);
-  await row("Inter").hover();
-  await expect(trigger).toHaveAttribute("data-font-render-family", "Inter");
+  await search.fill("DynaPuff");
+  await expect(row("DynaPuff").locator("[data-font-preview-state]")).toHaveAttribute(
+    "data-font-preview-state",
+    "ready",
+  );
+  await row("DynaPuff").hover();
+  await expect(trigger).toHaveAttribute("data-font-render-family", "DynaPuff");
   await expect(trigger).toHaveAttribute("data-font-render-status", "ready");
-  expect(await capture("inter-alias")).toEqual(original);
+  expect(await capture("dynapuff-original")).toEqual(original);
   expect(await counters(page)).toEqual(before);
+  await search.fill("Tinos");
   await row("Tinos").hover();
   await expect(trigger).toHaveAttribute("data-font-render-family", "Tinos");
   await expect(trigger).toHaveAttribute("data-font-render-status", "ready");
@@ -85,6 +94,7 @@ test("native font samples decode, aliases retain MELT, another font retains tall
   await ready(page);
   expect(await capture("cancelled")).toEqual(original);
   await trigger.click();
+  await search.fill("Tinos");
   await row("Tinos").click();
   await expect(trigger).toHaveAttribute("data-font-render-status", "ready");
   await ready(page);

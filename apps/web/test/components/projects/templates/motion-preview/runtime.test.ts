@@ -1,6 +1,6 @@
 import { expect, test, vi } from "vitest";
 import { createPage, type Composition } from "@musart/core";
-import { createBloomTemplate } from "../../../../../src/services/projects/templates/motion/showcase";
+import { createBloomTemplate } from "../../../../../src/services/projects/templates/motion/in-bloom/build";
 import { templateMedia } from "../../../../support/motion-template-media";
 import {
   startMotionTemplatePreview,

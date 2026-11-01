@@ -1,67 +1,68 @@
 # Editable Motion templates
 
-The gallery filters Static and Motion designs. Every card creates an independent
-project through the same atomic installation service used for original-backed
-media imports. Editing a template never changes its bundled source document.
+Every gallery card installs an independent saved project through the shared
+validated installation service. Templates remain fully editable documents.
 
-| Template          | Mode         | Demonstrated capabilities                                                                                                          |
-| ----------------- | ------------ | ---------------------------------------------------------------------------------------------------------------------------------- |
-| Cornell Box       | Motion, 8 s  | Nine editable native objects, violet chrome text, shared shadows/reflections and one gentle composition camera-orbit Motion action |
-| Bloom Windows     | Motion, 12 s | Seamless 1080p flower timelapse, aligned moving dither/ASCII/cyanotype windows, labels and soft shadows                            |
-| In Bloom          | Motion, 5 s  | Original flower video, photo collage, nested groups, text, animated effects, springs and three original sound effects              |
-| Sound Playground  | Motion, 6 s  | Nine audio cues sharing three original WAVs, grouped instruments, animated shapes, GPU transitions and editable audio processing   |
-| Motion Stress Lab | Motion       | Fifty photo layers, one hundred effects, three video clips, masks, easing families and timed sound effects                         |
-| Orbit Study       | Motion, 5 s  | Authored effect time, live gradient, orbital geometry and independently eased transforms                                           |
-| Paper Motion      | Motion, 5 s  | Nested paper layers, group and child animation, spring easing and GPU entrance transitions                                         |
-| Transition Atlas  | Motion, 60 s | Thirty independent occurrences of one canonical group, per-occurrence progress/style keys and all thirty GPU operators             |
-| Colorfield        | Static       | Editable vector shapes, typography and a multistop fill gradient                                                                   |
+| Template         | Format              | Demonstrated capabilities                                                  |
+| ---------------- | ------------------- | -------------------------------------------------------------------------- |
+| Terminal Signal  | 1080 × 1920, 16 s   | Curved green terminal, editable typing, sparse Motion actions              |
+| Angel.exe        | 1080 × 1920, 12.8 s | Rotating imported 3D model, ASCII desktop and effect windows               |
+| Cornell Box      | 1080 × 1080, 8 s    | Shared native 3D scene, chrome type, shadows/reflections and camera orbit  |
+| Bloom Windows    | 1920 × 1080, 12 s   | Seamless flower timelapse with aligned dither, ASCII and cyanotype windows |
+| Melt Mascot      | 1920 × 1080, 6 s    | Editable vector mascot, moving eyes and stretched Melt lettering           |
+| Too Hot to Haunt | 480 × 480, 1.2 s    | Seamless photo collage with scale, blur and editable blocks                |
 
-## Headless authoring
+Orbit Study, Paper Motion, Colorfield, Transition Atlas, AFTERHOURS, In Bloom,
+Motion Stress Lab and Sound Playground are retired from the gallery, search and
+landing. Their existing regression workloads remain available internally; saved
+projects created from them are independent documents.
 
-`TemplateAuthor` uses only public core commands. These builders do not require
-React, a browser, storage or a renderer. The generated project and command journal
-are retained together so both the portable document and its authoring history
-can be inspected.
+## Layout and authoring
 
-```sh
-bun scripts/templates/designed.ts
-bun scripts/templates/generate.ts
+Each design has its own source directory, generator directory and public payload
+directory. For example:
+
+```text
+apps/web/src/services/projects/templates/motion/cornell-box/build.ts
+scripts/templates/cornell-box/generate.ts
+apps/web/public/templates/motion/cornell-box/
+  cornell-box.json
+  cornell-box.musart
+  cornell-box.commands.json
+  cornell-box.webp
 ```
 
-The second command also writes the original WAV sidecars used by In Bloom,
-Stress Lab and Sound Playground. The seeded TypeScript sound recipes are original MusArt material;
-their provenance is recorded in `public/templates/motion/media/SFX-LICENSE.md`.
-Existing photographs and video retain their own adjacent provenance records.
-
-The designed-template loader bounds the actual streamed download at 1 MiB,
-validates identity, dimensions, mode and the portable schema, and rejects embedded
-assets in these geometry-only designs. Original-backed Motion templates verify
-each media path, SHA-256 fingerprint and byte length before atomic installation.
-Abort and stale project-origin guards remain active throughout installation.
-
-## Real covers
-
-Covers are rendered from evaluated compositions through the actual Three.js
-render graph, then encoded with the browser's native WebP encoder. They are not
-substitute SVG artwork. For example, with the isolated editor running on port 6110:
+Run one generator with Bun, for example:
 
 ```sh
-bun scripts/templates/render.ts --url http://127.0.0.1:6110 \
-  --input apps/web/public/templates/designed \
+bun scripts/templates/cornell-box/generate.ts
+bun scripts/templates/terminal-signal/generate.ts
+```
+
+`TemplateAuthor` uses public core commands, with command batches retained beside
+the generated document. Rendering and playback do not author frame-by-frame keys.
+`generate.ts` and `designed.ts` retain reproducible legacy fixture generation;
+they also write one directory per fixture. They do not register gallery entries.
+Shared licensed originals remain under `public/templates/motion/media/` alongside
+their hashes and provenance. Media decoding uses actual video-stream metadata;
+FFprobe is required by source-backed fixture generation.
+
+The loaders bound streamed manifest bytes, validate identity/dimensions/mode and
+portable schema, verify binary original sizes and SHA-256, then install through
+`openMediaProject` atomically. Abort and stale-origin checks remain active.
+
+## Covers
+
+Generate posters from the actual evaluated Three.js render graph at a chosen
+time, then inspect the resulting image before copying it beside its template:
+
+```sh
+bun scripts/templates/render.ts --url http://127.0.0.1:6100 \
+  --input apps/web/public/templates/motion \
   --output artifacts/motion-template-covers \
-  --template orbit-study --edge 720 --time 2.4
+  --template cornell-box --edge 720 --time 2.4
 ```
 
-Inspect the generated image before copying it into the public template directory.
-The original 30 October 2026 cover cohort rendered six designs on WebGPU with instrumented
-production read counts of zero. Cache use was 3.79–25.42 MB under a 128 MiB budget.
-One bounded browser ran at a time; its 50% CPU quota and Vite's 50% quota shared one
-logical core. These cold cover captures include shader/source preparation and
-encoding; they establish visible output, not a steady-state frame budget.
-
-Sound Playground has a separate inspected 720px cover rendered through the real
-WebGPU graph, also with zero instrumented production readbacks. Its audio cues
-make it the current interaction-profiling workload. Opening a template or seeing
-a correct cover does not establish smooth playback or a 16 ms interaction budget;
-the measured findings and remaining gates are recorded in
-[the implementation progress](../research/figma_motion/progress-2026-10-30.md).
+The renderer reads `<input>/<id>/<id>.json`. Artifact output remains a flat
+capture directory. Covers establish rendered content, not smooth playback or a
+16 ms frame-time budget. Follow the shared performance protocol for timing work.

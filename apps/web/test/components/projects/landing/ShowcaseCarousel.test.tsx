@@ -37,8 +37,8 @@ test("opens real templates with one accessible card per template and no arrow co
   const d = setup(),
     choose = vi.fn();
   d.mount(<ShowcaseCarousel onChoose={choose} />);
-  fireEvent.click(screen.getByRole("button", { name: "Créer depuis In Bloom — Démo Motion" }));
-  expect(choose).toHaveBeenCalledExactlyOnceWith("in-bloom");
+  fireEvent.click(screen.getByRole("button", { name: "Créer depuis Bloom Windows" }));
+  expect(choose).toHaveBeenCalledExactlyOnceWith("bloom-windows");
   expect(screen.getAllByRole("button")).toHaveLength(6);
   expect(screen.queryByRole("button", { name: /Modèles (précédents|suivants)/ })).toBeNull();
   expect(screen.getByRole("group")).toHaveAttribute(
@@ -61,24 +61,18 @@ test("keeps one imperative pan owner through unrelated renders and releases it o
   expect(pan.dispose).toHaveBeenCalledOnce();
 });
 
-test("shares the authored Motion previews while preserving static posters and centered artwork styling", () => {
+test("uses posters on the landing without mounting interactive Three.js previews", () => {
   const d = setup();
   const view = d.mount(<ShowcaseCarousel onChoose={vi.fn()} />);
-  const previews = document.querySelectorAll<HTMLElement>(
-    ".landing-template-stage > [data-motion-preview]",
-  );
-  expect([...previews].map((preview) => preview.dataset.motionPreview)).toEqual([
-    "in-bloom",
-    "motion-stress-lab",
+  expect(document.querySelectorAll("[data-motion-preview]")).toHaveLength(0);
+  const posters = document.querySelectorAll(".landing-template-stage > img");
+  expect(posters).toHaveLength(3);
+  expect([...posters].map((image) => image.getAttribute("src"))).toEqual([
+    "/templates/motion/morphing-type/morphing-type.webp?v=dynapuff-1",
+    "/templates/motion/bloom-windows/bloom-windows.webp?v=9",
+    "/templates/motion/cornell-box/cornell-box.webp?v=4",
   ]);
-  for (const preview of previews) {
-    expect(preview).toHaveClass("landing-template-motion");
-    expect(preview).toHaveAttribute("data-preview-disabled", "false");
-  }
-  expect(
-    document.querySelector('.landing-template-stage > img[src="/templates/afterhours.webp"]'),
-  ).not.toBeNull();
   view.rerender(<ShowcaseCarousel onChoose={vi.fn()} busy />);
-  for (const preview of document.querySelectorAll("[data-motion-preview]"))
-    expect(preview).toHaveAttribute("data-preview-disabled", "true");
+  for (const button of screen.getAllByRole("button")) expect(button).toBeDisabled();
+  expect(document.querySelectorAll("[data-motion-preview]")).toHaveLength(0);
 });

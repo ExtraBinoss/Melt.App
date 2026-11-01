@@ -8,16 +8,15 @@ import { MeltLogo } from "../../../ui/brand/MeltLogo";
 import { SocialBrandIcon } from "../../assets/SocialBrandIcon";
 import { Button } from "../../ui/button";
 import { templatePreview } from "../templates/preview";
-import { MotionTemplatePreview } from "../templates/motion-preview/MotionTemplatePreview";
 import "../templates/messages";
 import "./messages";
 import "./motion-showcase.css";
 import { installCarouselPan } from "./carousel/controller";
 
 const featured = [
-  "afterhours-techno",
-  "in-bloom",
-  "motion-stress-lab",
+  "morphing-type",
+  "bloom-windows",
+  "cornell-box",
   "preset:instagram-story",
   "preset:youtube-thumbnail",
   "preset:instagram-post",
@@ -68,16 +67,7 @@ export function ShowcaseCarousel({
             onClick={() => onChoose(template.id)}
           >
             <span className="landing-template-stage" data-tone={index % 3}>
-              {template.preview &&
-              template.mode === "motion" &&
-              (template.id === "in-bloom" || template.id === "motion-stress-lab") ? (
-                <MotionTemplatePreview
-                  templateId={template.id}
-                  poster={template.preview}
-                  disabled={busy}
-                  className="landing-template-motion"
-                />
-              ) : template.preview ? (
+              {template.preview ? (
                 <img
                   src={template.preview}
                   alt=""

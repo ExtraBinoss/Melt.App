@@ -67,7 +67,7 @@ export async function renderTemplateCovers(options: CoverOptions) {
   const inputs = await Promise.all(
     options.ids.map(async (id) => {
       const manifest = JSON.parse(
-        await readFile(resolve(options.inputDirectory, `${id}.json`), "utf8"),
+        await readFile(resolve(options.inputDirectory, id, `${id}.json`), "utf8"),
       ) as CoverManifest;
       if (manifest.version !== 1 || manifest.templateId !== id)
         throw Error("Invalid generated template manifest.");
@@ -247,7 +247,7 @@ if (import.meta.main) {
         forceWebGL: values.webgl,
         ids: values.template
           ? [values.template as MotionTemplateId | DesignedTemplateId]
-          : ["in-bloom", "motion-stress-lab", "sound-playground"],
+          : ["morphing-type", "cornell-box", "terminal-signal"],
       }),
       null,
       2,

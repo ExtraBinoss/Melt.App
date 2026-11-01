@@ -21,7 +21,7 @@ for (const webgl of [false, true])
     );
     await page.goto("/__angel-windows");
     const manifest = JSON.parse(
-      await readFile("apps/web/public/templates/motion/angel-windows.json", "utf8"),
+      await readFile("apps/web/public/templates/motion/angel-windows/angel-windows.json", "utf8"),
     );
     const result = await page.evaluate(
       async (input) => {

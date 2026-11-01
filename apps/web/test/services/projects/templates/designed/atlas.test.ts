@@ -6,7 +6,7 @@ import {
   evaluateMotion,
   TRANSITION_CATALOG,
 } from "@musart/core";
-import { createTransitionAtlas } from "../../../../../src/services/projects/templates/designed/atlas";
+import { createTransitionAtlas } from "../../../../../src/services/projects/templates/designed/transition-atlas/build";
 
 it("demonstrates all thirty styles on independent occurrences of one canonical group", () => {
   const { initial, project, batches } = createTransitionAtlas();
