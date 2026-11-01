@@ -203,9 +203,12 @@
   flex: 1 1 0;
   overscroll-behavior: contain;
   scrollbar-width: thin;
+  scrollbar-gutter: stable;
 }
 .motion-timeline-content {
   position: relative;
+  /* Viewport paint and transient row poses must not enlarge the authored scroll extent. */
+  overflow: clip;
 }
 .motion-ruler-line {
   position: sticky;

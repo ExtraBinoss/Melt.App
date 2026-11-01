@@ -31,6 +31,9 @@
   box-shadow: 0 -8px 24px #0002;
 }
 /* Keep the complete live transport/ruler usable; only the body leaves the tab/accessibility order. */
+.motion-timeline-dock[data-motion-body-hidden="true"] .motion-timeline-scroll {
+  overflow-y: hidden;
+}
 .motion-timeline-dock[data-motion-body-hidden="true"]
   :is(
     .motion-row-space,
