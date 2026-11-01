@@ -1,6 +1,7 @@
 import type { Layer, VectorDefinition, VectorPart } from "@musart/core";
 import { Matrix4, ShapeGeometry, type BufferGeometry } from "three/webgpu";
 import { SVGLoader } from "three/addons/loaders/SVGLoader.js";
+import { parseVectorPaths } from "./paths";
 export interface VectorGeometryPart {
   geometry: BufferGeometry;
   part: VectorPart;
@@ -41,35 +42,30 @@ export function vectorGeometryKey(layer: Layer): string {
     ]),
   ]);
 }
-function escape(value: string): string {
-  return value.replaceAll("&", "&amp;").replaceAll('"', "&quot;").replaceAll("<", "&lt;");
-}
 export function parseVectorGeometry(layer: Layer): VectorGeometryPart[] {
   if (!layer.vector) throw new Error("Géométrie vectorielle absente.");
   const result: VectorGeometryPart[] = [];
   try {
-    for (const [partIndex, part] of vectorParts(layer.vector).entries()) {
-      const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${escape(layer.vector.viewBox)}"><path d="${escape(part.path)}" fill-rule="${part.fillRule ?? "nonzero"}"/></svg>`;
-      const parsed = new SVGLoader().parse(svg);
-      for (const path of parsed.paths) {
-        if (hasFill(layer, part)) {
-          const shapes = path.toShapes();
-          if (shapes.length)
-            result.push({ geometry: new ShapeGeometry(shapes, 24), part, partIndex, kind: "fill" });
-        }
-        if (hasStroke(layer, part)) {
-          const style = SVGLoader.getStrokeStyle(
-            strokeWidth(layer, part),
-            "#ffffff",
-            part.linejoin ?? "round",
-            part.linecap ?? "round",
-          );
-          for (const subpath of path.subPaths) {
-            const points = subpath.getPoints(48);
-            if (points.length < 2) continue;
-            const geometry = SVGLoader.pointsToStroke(points, style, 12, 0.0001);
-            if (geometry) result.push({ geometry, part, partIndex, kind: "stroke" });
-          }
+    const parts = vectorParts(layer.vector);
+    for (const { path, partIndex } of parseVectorPaths(layer.vector)) {
+      const part = parts[partIndex]!;
+      if (hasFill(layer, part)) {
+        const shapes = path.toShapes();
+        if (shapes.length)
+          result.push({ geometry: new ShapeGeometry(shapes, 24), part, partIndex, kind: "fill" });
+      }
+      if (hasStroke(layer, part)) {
+        const style = SVGLoader.getStrokeStyle(
+          strokeWidth(layer, part),
+          "#ffffff",
+          part.linejoin ?? "round",
+          part.linecap ?? "round",
+        );
+        for (const subpath of path.subPaths) {
+          const points = subpath.getPoints(48);
+          if (points.length < 2) continue;
+          const geometry = SVGLoader.pointsToStroke(points, style, 12, 0.0001);
+          if (geometry) result.push({ geometry, part, partIndex, kind: "stroke" });
         }
       }
     }

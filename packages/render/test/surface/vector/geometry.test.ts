@@ -1,6 +1,7 @@
 import { expect, it, vi } from "vitest";
 import { createLayer } from "@musart/core";
 import { SVGLoader } from "three/addons/loaders/SVGLoader.js";
+import { BufferGeometry } from "three/webgpu";
 import {
   hasFill,
   hasStroke,
@@ -67,18 +68,29 @@ it("handles stroke-only paths, widths, explicit none and empty paths", () => {
   l.vector!.parts = [{ path: "M0 0" }];
   expect(parseVectorGeometry(l)).toEqual([]);
 });
-it("disposes already-built geometry if later path parsing fails", () => {
-  const l = layer(),
-    parse = vi.spyOn(SVGLoader.prototype, "parse");
-  const original = SVGLoader.prototype.parse;
-  parse
-    .mockImplementationOnce(function (this: SVGLoader, xml: string) {
-      return original.call(this, xml);
-    })
-    .mockImplementationOnce(() => {
-      throw new Error("parse failed");
+it("disposes already-built geometry if later stroke preparation fails", () => {
+  const l = layer();
+  l.vector!.parts!.push({ path: "M0 0L10 10", fill: "none", stroke: "white" });
+  const dispose = vi.spyOn(BufferGeometry.prototype, "dispose"),
+    stroke = vi.spyOn(SVGLoader, "pointsToStroke").mockImplementationOnce(() => {
+      throw new Error("stroke failed");
     });
-  l.vector!.parts!.push({ path: "broken" });
-  expect(() => parseVectorGeometry(l)).toThrow("parse failed");
-  parse.mockRestore();
+  try {
+    expect(() => parseVectorGeometry(l)).toThrow("stroke failed");
+    expect(dispose).toHaveBeenCalledOnce();
+  } finally {
+    stroke.mockRestore();
+    dispose.mockRestore();
+  }
+});
+it("disposes completed batches when a later XML batch contains an invalid path", () => {
+  const l = layer();
+  l.vector!.parts!.push(...Array.from({ length: 255 }, () => ({ path: "" })), { path: "123" });
+  const dispose = vi.spyOn(BufferGeometry.prototype, "dispose");
+  try {
+    expect(() => parseVectorGeometry(l)).toThrow();
+    expect(dispose).toHaveBeenCalledOnce();
+  } finally {
+    dispose.mockRestore();
+  }
 });
