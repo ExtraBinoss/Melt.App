@@ -67,28 +67,47 @@ afterEach(() => {
   vi.unstubAllEnvs();
 });
 
-test.each([true, false])(
-  "frame lineage follows DEV=%s without buffered video profiling",
-  async (dev) => {
-    vi.stubEnv("DEV", dev);
-    const d = fixture();
-    const page = createPage(),
-      project = createProject({ pages: [page] });
-    const plan = evaluateMotion(compileMotion(project, { compositionId: page.id }), {
-      value: 0,
-      rate: 1,
-    });
-    try {
-      d.resources.submit(page, project.assets, presentation, plan, true);
-      await frame();
-      expect(gpu.render.mock.calls[0]![2].traceFrames).toBe(dev ? true : undefined);
-      expect(gpu.render.mock.calls[0]![2]).not.toHaveProperty("profileVideo");
-    } finally {
-      d.release();
-      await d.resources.dispose();
-    }
-  },
-);
+test("forwards the issued immutable scene owner through rendering and density resubmission", async () => {
+  const d = fixture();
+  const page = createPage({ width: 320, height: 200 });
+  const owner = { page };
+  try {
+    d.resources.submit(page, {}, presentation, undefined, false, owner);
+    await frame();
+    expect(gpu.render.mock.calls[0]![2].immutableFrame).toBe(owner);
+    d.resources.present();
+    d.resources.setDensity(0.5);
+    await frame();
+    expect(gpu.render.mock.calls.at(-1)![2].immutableFrame).toBe(owner);
+    d.resources.requestProfileFrame();
+    await frame();
+    expect(gpu.render.mock.calls.at(-1)![2].immutableFrame).toBe(owner);
+  } finally {
+    d.release();
+    await d.resources.dispose();
+  }
+});
+
+test.each([true, false])("frame lineage and video profiling follow DEV=%s", async (dev) => {
+  vi.stubEnv("DEV", dev);
+  const d = fixture();
+  const page = createPage(),
+    project = createProject({ pages: [page] });
+  const plan = evaluateMotion(compileMotion(project, { compositionId: page.id }), {
+    value: 0,
+    rate: 1,
+  });
+  try {
+    d.resources.submit(page, project.assets, presentation, plan, true);
+    await frame();
+    expect(gpu.render.mock.calls[0]![2].traceFrames).toBe(dev ? true : undefined);
+    if (dev) expect(gpu.render.mock.calls[0]![2].profileVideo).toBe(true);
+    else expect(gpu.render.mock.calls[0]![2]).not.toHaveProperty("profileVideo");
+  } finally {
+    d.release();
+    await d.resources.dispose();
+  }
+});
 
 test("slow playback finishes useful frames while bounding the queue to the latest time", async () => {
   const d = fixture(),

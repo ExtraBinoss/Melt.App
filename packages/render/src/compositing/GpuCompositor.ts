@@ -20,6 +20,7 @@ import { PrintProofPass } from "../color/proof/PrintProofPass";
 import { GpuResourceCache } from "../cache/GpuResourceCache";
 import { gpuTextureLimit } from "../cache/texture-limits";
 import { createSourceKeys } from "../cache/keys";
+import { SourceKeyCache } from "../cache/source-key-cache";
 import { sameCompositionInput } from "../cache/composition-input";
 import { finishLayerSource } from "./finish-layer";
 import { EffectResources } from "./effect-resources";
@@ -40,7 +41,6 @@ import {
   type GpuStats,
   type RenderOptions,
 } from "./types";
-
 /** Retained GPU graph. Only font/image preparation awaits; all GPU submissions are synchronous. */
 export class GpuCompositor {
   private readonly maxTextureDimension: number;
@@ -49,6 +49,7 @@ export class GpuCompositor {
   private readonly fontResolver?: FontResolver;
   private readonly texts: TextSources;
   private readonly submissions: PlaybackSubmissions;
+  private readonly sourceKeys = new SourceKeyCache();
   private effects: EffectResources | null = null;
   private passes: GpuPasses | null = null;
   private normal: NormalBatch | null = null;
@@ -85,7 +86,6 @@ export class GpuCompositor {
       spatial: GpuStats["spatial"];
     }
   >();
-
   constructor(
     private readonly renderer: WebGPURenderer,
     options: { maxBytes?: number; fontResolver?: FontResolver } = {},
@@ -97,7 +97,6 @@ export class GpuCompositor {
     this.sources = new TextureSources(this.cache, this.maxTextureDimension, renderer);
     this.texts = new TextSources(renderer, this.cache, { fontResolver: options.fontResolver });
   }
-
   /** Exact immutable-input hit inside the existing GPU LRU; no allocation, upload or readback. */
   retainedFrame(
     page: Composition,
@@ -128,7 +127,6 @@ export class GpuCompositor {
     this.cacheHits++;
     return entry.output;
   }
-
   /** A hidden display no longer pins its previous artboard against the bounded LRU. */
   releasePresentation(): void {
     this.retainedRoot = "";
@@ -234,23 +232,22 @@ export class GpuCompositor {
         throw new DOMException("Rendering deferred.", "AbortError");
       if (this.disposed) throw new Error("Le compositeur GPU est fermé.");
       // Compose synchronously and restore renderer state before yielding for publication.
+      const keyOptions = {
+        cache: this.sourceKeys,
+        immutableFrame: options.immutableFrame,
+        geometry,
+        videoStamp: (id: string) => this.sources.videoStamp(id),
+        spatialStamp: (id: string) => this.spatial?.reflectionStamp(id) ?? null,
+      };
+      const keyFor = createSourceKeys(page, assets, scale, keyOptions);
       const frame: RenderFrame = {
         page,
         scale,
         vectorAntialias: !!options.vectorAntialias,
-        keyFor: createSourceKeys(page, assets, scale, {
-          geometry,
-          videoStamp: (id) => this.sources.videoStamp(id),
-          spatialStamp: (id) => this.spatial?.reflectionStamp(id) ?? null,
-        }),
-        referenceKeyFor: createSourceKeys(page, assets, 1, {
-          geometry,
-          videoStamp: (id) => this.sources.videoStamp(id),
-          spatialStamp: (id) => this.spatial?.reflectionStamp(id) ?? null,
-        }),
+        keyFor,
+        referenceKeyFor: scale === 1 ? keyFor : createSourceKeys(page, assets, 1, keyOptions),
         geometry,
       };
-      const { keyFor } = frame;
       const rootKey = `page:${page.id}:${scale}${options.colorOutput === "source" ? ":source" : ""}${frame.vectorAntialias ? ":vector-aa" : ""}`;
       const entry = this.entry(rootKey);
       const roots = geometry.children(null);
@@ -529,6 +526,7 @@ export class GpuCompositor {
         (this.color?.passes ?? 0) +
         (effects?.passes ?? 0),
       readbacks: 0,
+      sourceDependencies: this.sourceKeys.stats(),
       profile: this.profile
         ? {
             pipeline: [...this.profile.pipeline],
@@ -576,6 +574,7 @@ export class GpuCompositor {
       for (const release of [
         () => this.spatial?.dispose(),
         () => this.cache.clear(),
+        () => this.sourceKeys.clear(),
         () => this.passes?.dispose(),
         () => this.normal?.dispose(),
         () => this.color?.dispose(),

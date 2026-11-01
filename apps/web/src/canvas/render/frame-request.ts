@@ -1,5 +1,5 @@
 import type { Asset, Composition, MotionFramePlan } from "@musart/core";
-import type { MediaSourceResolver } from "@musart/render";
+import type { MediaSourceResolver, RenderOptions } from "@musart/render";
 import type {
   CanonicalOrigin,
   PresentationTicket,
@@ -11,6 +11,7 @@ export interface PresentationInput {
   canonical: boolean;
 }
 export interface PreviewRequest {
+  immutableFrame?: RenderOptions["immutableFrame"];
   page: Composition;
   assets: Record<string, Asset>;
   revision: number;

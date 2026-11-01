@@ -6,12 +6,17 @@ import type { Texture } from "three/webgpu";
 import type { Bounds, Composition, MotionFramePlan } from "@musart/core";
 import type { MediaSourceResolver } from "../sources/media/model";
 import type { FontResolver } from "../surface/text/fonts";
+import type { ImmutableSourceFrame, SourceKeyCache } from "../cache/source-key-cache";
 export interface BackgroundGpuActivity {
   read(): boolean;
   subscribe(listener: () => void): () => void;
   ready?(): void;
 }
 export interface RenderOptions {
+  /** Explicit adapter ownership: all nested render data stays immutable for this
+   * frame's lifetime. Must reference the exact page passed to render().
+   */
+  immutableFrame?: ImmutableSourceFrame;
   /** Admission for optional GPU work; preview interactions can defer captures without React. */
   backgroundGpu?: BackgroundGpuActivity;
   scale?: number;
@@ -47,6 +52,7 @@ export interface FrameTexture {
   bounds?: Bounds;
 }
 export interface GpuStats {
+  sourceDependencies?: ReturnType<SourceKeyCache["stats"]>;
   submission?: { pending: number; peak: number; limit: number };
   text?: TextSourceStats | null;
   /** Opt-in CPU wall time, including native/queue waits; never a GPU-duration measurement. */

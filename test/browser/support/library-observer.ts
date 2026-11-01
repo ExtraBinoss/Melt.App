@@ -1,3 +1,4 @@
+import type { GpuStats } from "@musart/render";
 import type { Page } from "@playwright/test";
 import type { ImageRegion } from "./image-probe";
 import { zoomViewport } from "./viewport";
@@ -24,7 +25,7 @@ export const EDITOR_SURFACES = [
   ".editor-canvas",
   ".editor-gpu-scene",
 ];
-export interface LibraryGpuStats extends Record<string, number> {
+export interface LibraryGpuStats extends GpuStats, Record<string, unknown> {
   renders: number;
   uploads: number;
   targets: number;

@@ -44,7 +44,6 @@ import type {
   PresentationTicket,
 } from "../../state/session/canonical-presentation";
 import type { FontPresentationPublisher } from "../../state/session/font-presentation";
-
 const canvasOwners = new WeakMap<HTMLCanvasElement, PlaneResources>();
 /** Owns one display plane and a latest-only queue. GPU allocation begins at activation. */
 export class PlaneResources {
@@ -104,13 +103,11 @@ export class PlaneResources {
   private readonly maxTextureDimension: number;
   private presentationId: string | null = null;
   private presentationProjectId: string | undefined;
-  private current: {
-    page: Composition;
-    assets: Record<string, Asset>;
-    presentation?: PresentationInput;
-    motionFrame?: MotionFramePlan;
-    playback: boolean;
-  } | null = null;
+  private current:
+    | (Pick<PreviewRequest, "page" | "assets" | "motionFrame" | "playback" | "immutableFrame"> & {
+        presentation?: PresentationInput;
+      })
+    | null = null;
   private deviceLost = false;
   private stopDeviceEvents: (() => void) | null = null;
   private presenter: PresentationPublisher | undefined;
@@ -118,7 +115,6 @@ export class PlaneResources {
   private preparedTicket: PresentationTicket | undefined;
   private presentationScene: Scene | null = null;
   private stopSceneEvents: (() => void) | null = null;
-
   constructor(
     private readonly renderer: WebGPURenderer,
     private readonly fontResolver?: FontResolver,
@@ -150,12 +146,14 @@ export class PlaneResources {
       () => {
         const current = this.current;
         if (!current || this.disposed || !this.users || current.playback) return;
+        const page = { ...current.page };
         this.submit(
-          { ...current.page },
+          page,
           current.assets,
           current.presentation,
           current.motionFrame,
           false,
+          current.immutableFrame ? { page } : undefined,
         );
       },
       () => this.completed > 0 && this.presentedRevision === this.revision,
@@ -216,6 +214,7 @@ export class PlaneResources {
     presentation?: PresentationInput,
     motionFrame?: MotionFramePlan,
     playback = false,
+    immutableFrame?: PreviewRequest["immutableFrame"],
   ) {
     if (this.disposed || this.deviceLost) return;
     this.videoProxyActivity?.setBlocked(playback || presentation?.canonical === false);
@@ -225,6 +224,7 @@ export class PlaneResources {
       ...(presentation ? { presentation } : {}),
       ...(motionFrame ? { motionFrame } : {}),
       playback,
+      immutableFrame,
     };
     this.buffering.pending(playback);
     if (this.latest) this.coalesced++;
@@ -235,6 +235,7 @@ export class PlaneResources {
       revision: ++this.revision,
       scale: previewScale(page, this.density, this.maxTextureDimension, assets),
       playback,
+      immutableFrame,
       ...(fontTicket ? { fontTicket } : {}),
       ...(presentation ? { origin: presentation.origin } : {}),
       mediaResolver:
@@ -302,6 +303,7 @@ export class PlaneResources {
       current.presentation,
       current.motionFrame,
       current.playback,
+      current.immutableFrame,
     );
     return this.revision;
   }
@@ -324,6 +326,7 @@ export class PlaneResources {
         this.current.presentation,
         this.current.motionFrame,
         this.current.playback,
+        this.current.immutableFrame,
       );
   }
   private schedule() {
@@ -365,6 +368,7 @@ export class PlaneResources {
     this.activeRequest = request;
     try {
       const result = await this.compositor!.render(request.page, request.assets, {
+        ...(request.immutableFrame ? { immutableFrame: request.immutableFrame } : {}),
         scale: request.scale,
         vectorAntialias: true,
         mediaResolver: request.mediaResolver,
@@ -576,7 +580,6 @@ export class PlaneResources {
     return this.disposal;
   }
 }
-
 /** A diagnostic request uses the existing display renderer; it never allocates a second engine. */
 export function canvasProfileSource(canvas: HTMLCanvasElement) {
   const owner = canvasOwners.get(canvas);
@@ -587,7 +590,6 @@ export function canvasProfileSource(canvas: HTMLCanvasElement) {
       }
     : null;
 }
-
 /** Borrowed, canvas-scoped native 3D resources. The display plane retains ownership. */
 export function canvasSpatialSource(canvas: HTMLCanvasElement, layerId: string) {
   return canvasOwners.get(canvas)?.spatialSource(layerId) ?? null;

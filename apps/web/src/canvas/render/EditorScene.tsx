@@ -129,8 +129,9 @@ export function CompositionPlane({
       }
     };
     const update = () => {
-      const { page, assets, presentation, motionFrame, playback } = controller.read();
-      resources.submit(page, assets, presentation, motionFrame, playback);
+      const frame = controller.read();
+      const { page, assets, presentation, motionFrame, playback } = frame;
+      resources.submit(page, assets, presentation, motionFrame, playback, frame);
     };
     try {
       release = resources.activate(
