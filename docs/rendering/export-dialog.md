@@ -166,13 +166,50 @@ errors and cancelled scopes cannot reveal a different preview. Reduced motion
 skips the crossfade, and failures replace feedback with an honest error message.
 
 The footer reserves its control height and paints progress along its bottom edge,
-so job updates never resize the dialog or preview. Background behavior and the
-size caveat live in one information tooltip. Terminal jobs from earlier openings
-are hidden; a currently running job remains cancellable. Motion and Timelapse
-show an approximate decimal MB size from duration, target bitrate, enabled
-192 kb/s audio and a 2% mux allowance. VBR content can differ substantially.
+so job updates never resize the dialog or preview. The footer groups file size and its help beside the export actions. Background
+help appears beside an active job, rather than as an isolated idle icon. Mobile
+reserves two footer rows so progress and completed sizes cannot move the buttons.
+Terminal jobs from earlier openings are hidden; a currently running job remains
+cancellable.
+
+Before the first Motion export, **Target size** explicitly identifies the nominal
+bitrate calculation, including enabled audio and a 2% mux allowance. It is not a
+content measurement: VBR can produce a smaller or larger file. Timelapse uses a
+quality-based encoder and therefore has no invented 8 Mb/s initial estimate.
+During either video export, encoded packet byte counts and durations refine the
+estimate after a full two-second GOP (or the whole clip for shorter outputs).
+Audio and video rates are measured separately so asynchronous encoder output does
+not count audio twice or extrapolate it from video progress. Measured payloads do
+not receive the nominal calculation’s guessed 2% allowance; actual container
+metadata is included at finalization. The estimate still
+assumes the remaining content compresses like the encoded portion; a scene change
+can alter it. Finalization and successful delivery replace it with the actual
+Blob size, also for image/PDF/ZIP output.
+
+Completed byte measurements are session-local, with at most 32 settings per weakly
+held canonical document/replay. They can be reused for an identical captured scope;
+selection, centering, resolution, format, timing, bitrate, audio and document edits
+cannot adopt another scope's measurement. Failed, cancelled or invalid outputs do
+not enter this cache. Short preview surfaces place preparation feedback horizontally so the mascot and
+label fit without clipping. No file buffers, extra render pass, preflight encoding, pixel
+readback or IndexedDB writes are required. Job updates remain bounded by integer
+progress publications. Units use the shared decimal formatter (including French
+Mo/ko) rather than a hardcoded MB suffix.
+
+The packet metadata contract is provided by
+[Mediabunny's encoded-packet callback](https://mediabunny.dev/api/VideoEncodingConfig).
 
 Motion preview GPU admission yields to shared overlay entrances while retaining
 the running transport/audio clock. The volume trigger acquires that lease at
 pointer-down or keyboard activation. Select menus keep their width during entry,
 tracking only a live ancestor entrance and releasing their observers on close.
+
+On 2026-11-01, focused Chrome 156 checks on Linux verified the shared Motion,
+image and Timelapse footer, scope changes, dialog reopening and 390 × 844 mobile
+geometry. Service regressions cover cancelled/failed measurement handling. Angel.exe delivered a decoded
+1080 × 1920 AVC file lasting 12.8 seconds; the displayed completed size matched
+all 12,682,701 downloaded bytes. Actual GPU/WebGL/canvas/VideoFrame read probes
+remained zero. A separate native layout witness verifies preparation labels in
+76 px and 160 px preview surfaces. These are functional checks, not latency
+benchmarks. Captures and logs are in `artifacts/export-size/`. Browser checks used
+one worker, a one-core CPU quota, no swap and a 3200 MiB memory ceiling.

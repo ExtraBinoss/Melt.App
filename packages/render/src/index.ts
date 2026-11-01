@@ -1,6 +1,7 @@
 export { renderComposition, clearRenderCaches } from "./compositing/compositor";
 export type { RenderOptions } from "./compositing/compositor";
 export { exportComposition } from "./export/export";
+export { createEncodedSizeTracker } from "./export/encoded-size";
 export type { ExportOptions } from "./export/export";
 export { sourcePixels } from "./surface/sources";
 export { GpuEffects } from "./effects/GpuEffects";

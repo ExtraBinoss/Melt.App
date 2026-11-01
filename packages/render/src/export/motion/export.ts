@@ -11,6 +11,7 @@ import type { MotionVideoExportOptions, MotionVideoExportResult } from "./model"
 import { createMotionOutputTarget } from "./target";
 import { motionExportFrame, motionExportTiming } from "./timing";
 import { motionEncodedFrame, motionEncodedTiming } from "./container-time";
+import { createEncodedSizeTracker } from "../encoded-size";
 
 /** Headless browser export: one frozen program, one retained Three session, native encoding. */
 export async function exportMotionVideo(
@@ -105,6 +106,10 @@ export async function exportMotionVideo(
       signal: options.signal,
     });
     const encodedTiming = motionEncodedTiming(timing, encoding.mimeType);
+    const size = createEncodedSizeTracker(
+      timing.duration.value / timing.duration.rate,
+      mixer.hasAudio,
+    );
     options.signal?.throwIfAborted();
     target = createMotionOutputTarget({
       maxBytes: options.maxOutputBytes,
@@ -122,7 +127,11 @@ export async function exportMotionVideo(
       signal: options.signal,
     });
     if (mixer.hasAudio)
-      audio = new AudioSampleSource({ codec: encoding.audioCodec, quality: encoding.audioQuality });
+      audio = new AudioSampleSource({
+        codec: encoding.audioCodec,
+        quality: encoding.audioQuality,
+        onEncodedPacket: size.audio,
+      });
     options.signal?.addEventListener("abort", onAbort, { once: true });
     let index = 0,
       cursor = 0,
@@ -152,6 +161,7 @@ export async function exportMotionVideo(
                 quality: encoding.quality,
                 alpha: options.alpha ?? "discard",
                 keyFrameInterval: 2,
+                onEncodedPacket: size.video,
               });
               output!.addVideoTrack(video);
               if (audio) output!.addAudioTrack(audio);
@@ -203,6 +213,8 @@ export async function exportMotionVideo(
       }
       const completed =
         (index / timing.count + (audio ? cursor / mixer.samples : index / timing.count)) / 2;
+      const estimate = size.estimate();
+      if (estimate !== null) options.onSizeEstimate?.(estimate);
       options.onProgress?.({
         completedFrames: index,
         totalFrames: timing.count,

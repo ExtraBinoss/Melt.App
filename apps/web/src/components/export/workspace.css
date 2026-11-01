@@ -127,8 +127,8 @@
   font-size: 11px;
 }
 .export-dialog-footer {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
   align-items: center;
   gap: 24px;
   padding: 18px 24px;
@@ -140,6 +140,8 @@
 }
 .export-footer-actions {
   display: flex;
+  align-items: center;
+  grid-column: 3;
   gap: 8px;
   flex-shrink: 0;
 }
@@ -228,11 +230,13 @@
   }
   .export-dialog-footer {
     display: grid;
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) auto;
     gap: 12px;
     padding: 14px 18px;
   }
   .export-footer-actions {
+    grid-column: 1 / -1;
+    grid-row: 2;
     width: 100%;
     justify-content: flex-end;
     margin-left: 0;
@@ -324,6 +328,13 @@
   font-size: 12px;
   font-variant-numeric: tabular-nums;
 }
+.export-file-size {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  grid-column: 2;
+  grid-row: 1;
+}
 .export-dialog-footer .export-job {
   margin: 0;
   min-width: 0;
@@ -346,6 +357,9 @@
   .export-dialog-footer {
     grid-template-rows: 36px 36px;
   }
+}
+.export-footer-meta:empty {
+  display: none;
 }
 
 .export-label-help {

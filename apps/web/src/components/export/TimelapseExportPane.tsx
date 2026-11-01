@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import type { ReplaySpec } from "@musart/core";
 import { useTranslation } from "react-i18next";
-import { estimateVideoBytes } from "./estimate";
+import { exportSizeKey } from "../../services/export/measurements";
 import { PreviewPreparation } from "./PreviewPreparation";
 import { MediaPlayer } from "../shared/player/MediaPlayer";
 import { getExportJobs } from "../../services/export/jobs";
@@ -89,12 +89,22 @@ export function TimelapseExportPane(props: ExportPaneProps) {
       }),
     [engine, origin, jobs, onClose],
   );
-  const start = useStartExport(props, "timelapse");
+  const sizeKey = exportSizeKey(spec ?? origin.project, [
+    "timelapse",
+    page.id,
+    selection,
+    props.centerSelection ?? false,
+    duration,
+    scale,
+    fps,
+    container,
+  ]);
+  const start = useStartExport(props, "timelapse", sizeKey);
   return (
     <ExportLayout
       {...props}
       submitLabel={t("export")}
-      estimatedBytes={valid ? estimateVideoBytes(duration, 8_000_000) : null}
+      size={{ key: sizeKey }}
       disabled={!spec || !valid || busy}
       preview={
         <>
@@ -133,7 +143,7 @@ export function TimelapseExportPane(props: ExportPaneProps) {
       onSubmit={() => {
         if (!spec || !valid) return;
         const retiring = controls.current?.release();
-        start(async ({ signal, progress, beforeFrame }) => {
+        start(async ({ signal, progress, estimate, beforeFrame }) => {
           await retiring;
           signal.throwIfAborted();
           try {
@@ -145,6 +155,7 @@ export function TimelapseExportPane(props: ExportPaneProps) {
               pageId: page.id,
               signal,
               onProgress: progress,
+              onSizeEstimate: estimate,
               fontResolver: services.fonts?.resolve,
               mediaResolver: media,
               selection,
@@ -158,6 +169,7 @@ export function TimelapseExportPane(props: ExportPaneProps) {
               blob,
               `${safeName(page.name)}-timelapse.${blob.type === "video/mp4" ? "mp4" : "webm"}`,
             );
+            return { bytes: blob.size };
           } catch (failure) {
             throw failure instanceof VideoExportError
               ? new Error(t(failure.code), { cause: failure })

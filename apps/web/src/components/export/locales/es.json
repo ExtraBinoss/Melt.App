@@ -2,8 +2,12 @@
   "backgroundInfo": "Exportación en segundo plano",
   "estimatedSize": "Tamaño estimado",
   "backgroundHint": "La exportación continúa si cierras este diálogo.",
-  "estimateHint": "Tamaño estimado; el archivo final puede variar.",
+  "estimateHint": "Calculado con los datos codificados hasta ahora. El tamaño final aún puede variar.",
   "job_running": "{{percent}}%",
   "centerSelection": "Centrar la capa seleccionada",
-  "centerSelectionHint": "Conserva el tamaño de la mesa de trabajo y centra la capa seleccionada en la vista previa y la exportación. Mantiene su animación sin modificar el proyecto."
+  "centerSelectionHint": "Conserva el tamaño de la mesa de trabajo y centra la capa seleccionada en la vista previa y la exportación. Mantiene su animación sin modificar el proyecto.",
+  "targetSize": "Tamaño objetivo",
+  "fileSize": "Tamaño del archivo",
+  "targetSizeHint": "Calculado con la tasa de bits objetivo. Una tasa variable puede generar un archivo más pequeño o más grande. La estimación se actualiza durante la exportación.",
+  "measuredSizeHint": "Tamaño de la última exportación completada con estos ajustes."
 }

@@ -2,8 +2,12 @@
   "backgroundInfo": "Exportação em segundo plano",
   "estimatedSize": "Tamanho estimado",
   "backgroundHint": "A exportação continua se fechar esta janela.",
-  "estimateHint": "Tamanho estimado; o ficheiro final pode variar.",
+  "estimateHint": "Calculado a partir dos dados já codificados. O tamanho final ainda pode variar.",
   "job_running": "{{percent}}%",
   "centerSelection": "Centrar a camada selecionada",
-  "centerSelectionHint": "Mantém o tamanho da prancheta e centra a camada selecionada na pré-visualização e na exportação. Preserva a animação sem alterar o projeto."
+  "centerSelectionHint": "Mantém o tamanho da prancheta e centra a camada selecionada na pré-visualização e na exportação. Preserva a animação sem alterar o projeto.",
+  "targetSize": "Tamanho alvo",
+  "fileSize": "Tamanho do ficheiro",
+  "targetSizeHint": "Calculado a partir da taxa de bits alvo. Uma taxa variável pode gerar um ficheiro menor ou maior. A estimativa é atualizada durante a exportação.",
+  "measuredSizeHint": "Tamanho da última exportação concluída com estas definições."
 }

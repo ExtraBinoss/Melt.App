@@ -17,6 +17,7 @@ export interface VideoExportOptions {
   pageId?: string;
   signal?: AbortSignal;
   onProgress?: (fraction: number) => void;
+  onSizeEstimate?: (bytes: number) => void;
   forceWebGL?: boolean;
 }
 export class VideoExportError extends Error {
@@ -58,7 +59,7 @@ export async function exportReplayVideo(
   if (!spec.events.length) throw new VideoExportError("emptyHistory");
   abort(signal);
   const [
-    { createRenderSession },
+    { createRenderSession, createEncodedSizeTracker },
     {
       BufferTarget,
       canEncodeVideo,
@@ -84,6 +85,7 @@ export async function exportReplayVideo(
   const width = Math.max(1, Math.round(selection.page.width * scale));
   const height = Math.max(1, Math.round(selection.page.height * scale));
   const quality = new Quality("high");
+  const size = createEncodedSizeTracker(duration);
   const codecs: VideoCodec[] =
     container === "mp4" ? ["avc"] : container === "webm" ? ["vp9", "vp8"] : ["avc", "vp9", "vp8"];
   let codec: VideoCodec | undefined;
@@ -138,6 +140,7 @@ export async function exportReplayVideo(
               quality,
               alpha: "discard",
               keyFrameInterval: 2,
+              onEncodedPacket: size.video,
             });
             // frameRate metadata would snap the shortened final sample beyond duration.
             output.addVideoTrack(source);
@@ -149,6 +152,8 @@ export async function exportReplayVideo(
         },
         { scale },
       );
+      const estimate = size.estimate();
+      if (estimate !== null) options.onSizeEstimate?.(estimate);
       options.onProgress?.(((index + 1) / count) * 0.99);
     }
     abort(signal);

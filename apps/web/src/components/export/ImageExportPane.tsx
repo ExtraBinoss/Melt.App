@@ -1,5 +1,6 @@
 import { useMemo, useState, useSyncExternalStore } from "react";
 import { selectionComposition } from "@musart/core";
+import { exportSizeKey } from "../../services/export/measurements";
 import type { ManagedImageOptions } from "@musart/render";
 import { useTranslation } from "react-i18next";
 import { getExportJobs } from "../../services/export/jobs";
@@ -95,11 +96,21 @@ export function ImageExportPane(
     : 0;
   const previewWidth = options.format === "pdf" ? scope.width + 2 * bleed + margin : scope.width;
   const previewHeight = options.format === "pdf" ? scope.height + 2 * bleed + margin : scope.height;
-  const start = useStartExport(props, "image");
+  const sizeKey = exportSizeKey(origin.project, [
+    "image",
+    page.id,
+    selection,
+    props.centerSelection ?? false,
+    scale,
+    options,
+    allPages,
+  ]);
+  const start = useStartExport(props, "image", sizeKey);
   return (
     <ExportLayout
       {...props}
       submitLabel={t("imageExport")}
+      size={{ key: sizeKey }}
       disabled={busy}
       preview={
         <>
@@ -123,7 +134,7 @@ export function ImageExportPane(
         const retiring = printPreview.release();
         start(async ({ signal, progress, beforeFrame }) => {
           if (!services.exportComposition) throw new Error(t("unavailable"));
-          await services.exportComposition(
+          return services.exportComposition(
             {
               mode: "static",
               centerSelection: props.centerSelection,

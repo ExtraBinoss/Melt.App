@@ -2,8 +2,12 @@
   "backgroundInfo": "Hintergrundexport",
   "estimatedSize": "Geschätzte Größe",
   "backgroundHint": "Der Export läuft weiter, wenn du diesen Dialog schließt.",
-  "estimateHint": "Geschätzte Größe; die endgültige Datei kann abweichen.",
+  "estimateHint": "Aus den bisher codierten Daten berechnet. Die endgültige Größe kann noch abweichen.",
   "job_running": "{{percent}}%",
   "centerSelection": "Ausgewählte Ebene zentrieren",
-  "centerSelectionHint": "Behält die Größe der Zeichenfläche bei und zentriert die ausgewählte Ebene in Vorschau und Export. Die Animation bleibt erhalten, das Projekt unverändert."
+  "centerSelectionHint": "Behält die Größe der Zeichenfläche bei und zentriert die ausgewählte Ebene in Vorschau und Export. Die Animation bleibt erhalten, das Projekt unverändert.",
+  "targetSize": "Zielgröße",
+  "fileSize": "Dateigröße",
+  "targetSizeHint": "Aus der Zielbitrate berechnet. Eine variable Bitrate kann kleinere oder größere Dateien erzeugen. Die Schätzung wird beim Export aktualisiert.",
+  "measuredSizeHint": "Größe des letzten abgeschlossenen Exports mit diesen Einstellungen."
 }

@@ -28,6 +28,8 @@ export interface MotionVideoExportOptions {
   output?: WritableStream<StreamTargetChunk>;
   audio?: false | { sampleRate?: number; channels?: 1 | 2; blockFrames?: number };
   signal?: AbortSignal;
+  /** Extrapolated from actual encoded packets; absent until sufficient media is encoded. */
+  onSizeEstimate?: (bytes: number) => void;
   onProgress?: (progress: {
     completedFrames: number;
     totalFrames: number;

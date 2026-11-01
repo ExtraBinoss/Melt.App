@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { waitFor } from "@testing-library/react";
 import { createLayer, createPage, createProject, EditorEngine, recordSession } from "@musart/core";
 import { exportReplayVideo } from "../../../src/services/animation/export-video";
+import { createEncodedSizeTracker } from "../../../../../packages/render/src/export/encoded-size";
 
 const probe = vi.hoisted(() => ({
   encode: vi.fn(),
@@ -17,6 +18,7 @@ const probe = vi.hoisted(() => ({
   failRender: false,
 }));
 vi.mock("@musart/render", () => ({
+  createEncodedSizeTracker,
   createRenderSession: () => {
     probe.contexts++;
     const canvas = document.createElement("canvas");

@@ -70,7 +70,11 @@
   "zoom": "Zoom preview",
   "backgroundInfo": "Background export",
   "estimatedSize": "Estimated size",
-  "estimateHint": "Estimated size; the final file may vary.",
+  "estimateHint": "Based on the data encoded so far. The final size can still vary.",
   "centerSelection": "Center selected layer",
-  "centerSelectionHint": "Keeps the artboard size and centers the selected layer for preview and export. Preserves its animation without changing the project."
+  "centerSelectionHint": "Keeps the artboard size and centers the selected layer for preview and export. Preserves its animation without changing the project.",
+  "targetSize": "Target size",
+  "fileSize": "File size",
+  "targetSizeHint": "Based on the target bitrate. Variable bitrate can produce a smaller or larger file. The estimate updates during export.",
+  "measuredSizeHint": "Size of the last completed export with these settings."
 }

@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { formatBytes } from "../../../../src/components/projects/insights/format-bytes";
+import { formatBytes } from "../../../../src/ui/format/bytes";
 test("formats logical decimal bytes with real localized storage units and bounded invalid inputs", () => {
   expect(formatBytes(0, "en")).toContain("0");
   expect(formatBytes(-2, "fr")).toContain("0");

@@ -15,6 +15,7 @@ export type CompositionExportOptions = {
   scale: number;
   signal?: AbortSignal;
   onProgress?: (fraction: number) => void;
+  onSizeEstimate?: (bytes: number) => void;
   /** Export the frozen start snapshot while edits continue in the same project. */
   background?: boolean;
   beforeFrame?: () => Promise<void>;

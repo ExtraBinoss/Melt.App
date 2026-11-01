@@ -4,7 +4,7 @@ import {
   ContributionBreakdown,
   type BreakdownSection,
 } from "../../shared/metrics/ContributionBreakdown";
-import { formatBytes } from "./format-bytes";
+import { formatBytes } from "../../../ui/format/bytes";
 export type StorageSection = BreakdownSection;
 
 /** Storage adapts the shared linked chart/legend to local byte accounting. */

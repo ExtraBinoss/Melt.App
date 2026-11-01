@@ -70,7 +70,11 @@
   "zoom": "Agrandir l’aperçu",
   "backgroundInfo": "Export en arrière-plan",
   "estimatedSize": "Poids estimé",
-  "estimateHint": "Poids estimé ; le fichier final peut varier.",
+  "estimateHint": "Calculé à partir des données déjà encodées. Le poids final peut encore varier.",
   "centerSelection": "Centrer le calque sélectionné",
-  "centerSelectionHint": "Conserve la taille du plan de travail et centre le calque sélectionné dans l’aperçu et l’export. Préserve son animation sans modifier le projet."
+  "centerSelectionHint": "Conserve la taille du plan de travail et centre le calque sélectionné dans l’aperçu et l’export. Préserve son animation sans modifier le projet.",
+  "targetSize": "Poids cible",
+  "fileSize": "Poids du fichier",
+  "targetSizeHint": "Calculé à partir du débit cible. Le débit variable peut produire un fichier plus petit ou plus grand. L’estimation s’affine pendant l’export.",
+  "measuredSizeHint": "Poids du dernier export terminé avec ces paramètres."
 }

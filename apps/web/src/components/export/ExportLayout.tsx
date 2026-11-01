@@ -7,6 +7,8 @@ import { ScrollShadow } from "../shared/scroll/ScrollShadow";
 import { InfoTooltip } from "../shared/InfoTooltip";
 import { ExportProgress } from "./ExportProgress";
 import { useExportJob } from "./use-export-job";
+import { ExportFileSize } from "./ExportFileSize";
+import type { ExportSizeRequest } from "../../services/export/measurements";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../ui/accordion";
 
 export function ExportAdvanced({
@@ -35,7 +37,7 @@ export function ExportLayout({
   onClose,
   disabled = false,
   submitLabel,
-  estimatedBytes,
+  size,
 }: {
   engine: EnginePort;
   controls: ReactNode;
@@ -45,7 +47,7 @@ export function ExportLayout({
   onClose: () => void;
   disabled?: boolean;
   submitLabel: string;
-  estimatedBytes?: number | null;
+  size?: ExportSizeRequest;
 }) {
   const { t } = useTranslation("exportPanel");
   return (
@@ -69,7 +71,7 @@ export function ExportLayout({
         onSubmit={onSubmit}
         onClose={onClose}
         submitLabel={submitLabel}
-        estimatedBytes={estimatedBytes}
+        size={size}
       />
     </>
   );
@@ -80,37 +82,28 @@ function ExportDialogFooter({
   onSubmit,
   onClose,
   submitLabel,
-  estimatedBytes,
+  size,
 }: {
   engine: EnginePort;
   disabled: boolean;
   onSubmit: () => void;
   onClose: () => void;
   submitLabel: string;
-  estimatedBytes?: number | null;
+  size?: ExportSizeRequest;
 }) {
-  const { t, i18n } = useTranslation("exportPanel");
+  const { t } = useTranslation("exportPanel");
   const { jobs, job } = useExportJob(engine);
   const [initialSequence] = useState(() => (jobs.pending ? jobs.sequence - 1 : jobs.sequence));
   const showProgress = jobs.sequence > initialSequence;
   return (
     <footer className="export-dialog-footer">
       <div className="export-footer-meta">
-        <InfoTooltip label={t("backgroundInfo")}>
-          {t("backgroundHint")}
-          {estimatedBytes != null ? ` ${t("estimateHint")}` : ""}
-        </InfoTooltip>
-        {estimatedBytes != null && (
-          <span className="export-size-estimate" aria-label={t("estimatedSize")}>
-            ≈{" "}
-            {new Intl.NumberFormat(i18n.resolvedLanguage ?? "en", {
-              maximumFractionDigits: 1,
-            }).format(estimatedBytes / 1_000_000)}{" "}
-            MB
-          </span>
-        )}
         <ExportProgress engine={engine} afterSequence={initialSequence} compact />
+        {jobs.pending && (
+          <InfoTooltip label={t("backgroundInfo")}>{t("backgroundHint")}</InfoTooltip>
+        )}
       </div>
+      <ExportFileSize request={size} jobs={jobs} job={job} />
       <div className="export-footer-actions">
         <Button variant="outline" onClick={onClose}>
           {t((showProgress && job) || jobs.pending ? "close" : "cancel")}

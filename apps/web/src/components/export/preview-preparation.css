@@ -1,5 +1,6 @@
 .export-preview-preparation {
   position: absolute;
+  container-type: size;
   inset: 0;
   z-index: 1;
   display: grid;
@@ -26,6 +27,12 @@
 .export-preview-preparation p {
   color: var(--muted-foreground);
   font-size: 12px;
+}
+@container (max-height: 110px) {
+  .export-preview-preparation .ui-throbber {
+    flex-direction: row;
+    gap: 10px;
+  }
 }
 .export-preview-body,
 .motion-export-preview-surface {

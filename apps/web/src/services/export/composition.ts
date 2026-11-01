@@ -80,6 +80,7 @@ export function createCompositionExporter(
           fontResolver: dependencies.fontResolver,
           signal: options.signal,
           onProgress: (progress) => options.onProgress?.(progress.fraction),
+          onSizeEstimate: options.onSizeEstimate,
         });
         if (!result.blob || result.bytes < 1)
           throw new Error("The video encoder produced no file.");

@@ -1,4 +1,5 @@
 import type { EnginePort, EditorEngine } from "@musart/core";
+import { ExportMeasurements, type ExportSizeKey } from "./measurements";
 
 export type ExportKind = "image" | "motion" | "timelapse";
 export interface ExportJob {
@@ -8,16 +9,21 @@ export interface ExportJob {
   status: "running" | "cancelling" | "complete" | "cancelled" | "failed";
   percent: number;
   error?: unknown;
+  sizeKey?: ExportSizeKey;
+  estimatedBytes?: number;
+  bytes?: number;
 }
 interface ExportWork {
   signal: AbortSignal;
   progress: (fraction: number) => void;
+  estimate: (bytes: number) => void;
 }
 const sessions = new WeakMap<EnginePort, ExportJobs>();
 const active = new Set<ExportJobs>();
 
 /** A session owns one export independently of dialogs, with cancellation held through cleanup. */
 export class ExportJobs {
+  readonly measurements = new ExportMeasurements();
   constructor(private readonly engine?: EnginePort) {}
   private value: ExportJob | null = null;
   private serial = 0;
@@ -40,8 +46,8 @@ export class ExportJobs {
     for (const listener of this.listeners) listener();
   }
   start(
-    job: Pick<ExportJob, "kind" | "projectId" | "name">,
-    task: (work: ExportWork) => Promise<void>,
+    job: Pick<ExportJob, "kind" | "projectId" | "name" | "sizeKey">,
+    task: (work: ExportWork) => Promise<void | { bytes: number }>,
   ) {
     if (this.pending) return false;
     this.serial++;
@@ -61,8 +67,12 @@ export class ExportJobs {
     this.work = (async () => {
       let result: ExportJob;
       try {
-        await task({
+        let estimatedBytes: number | undefined;
+        const delivered = await task({
           signal: controller.signal,
+          estimate: (bytes) => {
+            if (Number.isFinite(bytes) && bytes > 0) estimatedBytes = Math.ceil(bytes);
+          },
           progress: (fraction) => {
             if (
               this.controller !== controller ||
@@ -71,14 +81,25 @@ export class ExportJobs {
             )
               return;
             const percent = Math.max(this.value!.percent, Math.min(99, Math.floor(fraction * 100)));
-            if (percent !== this.value!.percent) this.publish({ ...this.value!, percent });
+            if (percent !== this.value!.percent)
+              this.publish({ ...this.value!, percent, estimatedBytes });
           },
         });
         controller.signal.throwIfAborted();
-        result = { ...job, status: "complete", percent: 100 };
+        if (delivered && (!Number.isSafeInteger(delivered.bytes) || delivered.bytes <= 0))
+          throw new Error("The export produced an invalid file size.");
+        if (delivered && job.sizeKey) this.measurements.record(job.sizeKey, delivered.bytes);
+        result = {
+          ...job,
+          sizeKey: undefined,
+          status: "complete",
+          percent: 100,
+          bytes: delivered?.bytes,
+        };
       } catch (error) {
         result = {
           ...job,
+          sizeKey: undefined,
           status: controller.signal.aborted ? "cancelled" : "failed",
           percent: this.value!.percent,
           ...(controller.signal.aborted ? {} : { error }),

@@ -1,4 +1,5 @@
 import { estimateVideoBytes } from "./estimate";
+import { exportSizeKey } from "../../services/export/measurements";
 import { selectionComposition } from "@musart/core";
 import { useCallback, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { useTranslation } from "react-i18next";
@@ -30,7 +31,6 @@ export function MotionExportPane(props: ExportPaneProps) {
   const receive = useCallback((source: ReturnType<typeof createMotionPreview> | null) => {
     preview.current = source;
   }, []);
-  const start = useStartExport(props, "motion");
   const scope = useMemo(
     () =>
       selection.length
@@ -48,11 +48,24 @@ export function MotionExportPane(props: ExportPaneProps) {
     (!selection.length && motion.audioTracks?.length) ||
     scope.layers.some((layer) => layer.kind === "video"),
   );
+  const sizeKey = exportSizeKey(origin.project, [
+    "motion",
+    page.id,
+    selection,
+    props.centerSelection ?? false,
+    scale,
+    container,
+    rate.numerator,
+    rate.denominator,
+    bitrate,
+    audio,
+  ]);
+  const start = useStartExport(props, "motion", sizeKey);
   return (
     <ExportLayout
       {...props}
       submitLabel={t("exportVideo")}
-      estimatedBytes={estimateVideoBytes(duration, bitrate, audio && hasAudio)}
+      size={{ key: sizeKey, targetBytes: estimateVideoBytes(duration, bitrate, audio && hasAudio) }}
       disabled={busy}
       preview={
         <>
@@ -80,10 +93,10 @@ export function MotionExportPane(props: ExportPaneProps) {
       }
       onSubmit={() => {
         const retiring = preview.current?.dispose();
-        start(async ({ signal, progress, beforeFrame }) => {
+        start(async ({ signal, progress, estimate, beforeFrame }) => {
           signal.throwIfAborted();
           if (!services.exportComposition) throw new Error(t("unavailable"));
-          await services.exportComposition(
+          return services.exportComposition(
             {
               mode: "motion",
               centerSelection: props.centerSelection,
@@ -97,6 +110,7 @@ export function MotionExportPane(props: ExportPaneProps) {
               selection,
               signal,
               onProgress: progress,
+              onSizeEstimate: estimate,
               background: true,
               beforeFrame: async () => {
                 await retiring;

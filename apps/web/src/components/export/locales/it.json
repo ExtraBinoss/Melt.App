@@ -2,8 +2,12 @@
   "backgroundInfo": "Esportazione in background",
   "estimatedSize": "Dimensione stimata",
   "backgroundHint": "L’esportazione continua se chiudi questa finestra.",
-  "estimateHint": "Dimensione stimata; il file finale può variare.",
+  "estimateHint": "Calcolata dai dati già codificati. La dimensione finale può ancora variare.",
   "job_running": "{{percent}}%",
   "centerSelection": "Centra il livello selezionato",
-  "centerSelectionHint": "Mantiene le dimensioni della tavola e centra il livello selezionato nell’anteprima e nell’esportazione. Conserva l’animazione senza modificare il progetto."
+  "centerSelectionHint": "Mantiene le dimensioni della tavola e centra il livello selezionato nell’anteprima e nell’esportazione. Conserva l’animazione senza modificare il progetto.",
+  "targetSize": "Dimensione prevista",
+  "fileSize": "Dimensione del file",
+  "targetSizeHint": "Calcolata dal bitrate di destinazione. Il bitrate variabile può produrre file più piccoli o più grandi. La stima si aggiorna durante l’esportazione.",
+  "measuredSizeHint": "Dimensione dell’ultima esportazione completata con queste impostazioni."
 }

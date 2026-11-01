@@ -14,7 +14,7 @@ import { InfoTooltip } from "../../shared/InfoTooltip";
 import { Throbber } from "../../ui/throbber/Throbber";
 import { StorageBreakdown } from "./StorageBreakdown";
 import { HistoryDetails } from "./HistoryDetails";
-import { formatBytes } from "./format-bytes";
+import { formatBytes } from "../../../ui/format/bytes";
 export function ProjectInsightsDialog({
   project,
   services,

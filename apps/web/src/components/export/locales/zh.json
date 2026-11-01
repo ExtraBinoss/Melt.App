@@ -2,8 +2,12 @@
   "backgroundInfo": "后台导出",
   "estimatedSize": "预计大小",
   "backgroundHint": "关闭此对话框后，导出仍会继续。",
-  "estimateHint": "此为预计大小，最终文件大小可能不同。",
+  "estimateHint": "根据目前已编码的数据计算。最终大小仍可能变化。",
   "job_running": "{{percent}}%",
   "centerSelection": "居中选中的图层",
-  "centerSelectionHint": "保留画板尺寸，并在预览和导出时将选中的图层居中。不修改项目，同时保留动画。"
+  "centerSelectionHint": "保留画板尺寸，并在预览和导出时将选中的图层居中。不修改项目，同时保留动画。",
+  "targetSize": "目标大小",
+  "fileSize": "文件大小",
+  "targetSizeHint": "根据目标比特率计算。可变比特率可能使文件变小或变大。估算值会在导出过程中更新。",
+  "measuredSizeHint": "使用这些设置完成的上一次导出的大小。"
 }

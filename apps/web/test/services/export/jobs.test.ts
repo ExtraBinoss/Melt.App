@@ -1,6 +1,7 @@
 import { expect, test, vi } from "vitest";
 import { createProject, EditorEngine } from "@musart/core";
 import { ExportJobs, getExportJobs, hasActiveExports } from "../../../src/services/export/jobs";
+import { exportSizeKey } from "../../../src/services/export/measurements";
 import {
   answerExportLeave,
   confirmExportLeave,
@@ -132,4 +133,63 @@ test("late progress from a failed encoder cannot corrupt a new export", async ()
   hold.resolve();
   await Promise.resolve();
   await Promise.resolve();
+});
+
+test("publishes observed size with bounded progress updates, then records only finalized bytes", async () => {
+  const jobs = new ExportJobs(),
+    hold = deferred(),
+    document = {},
+    sizeKey = exportSizeKey(document, ["motion", "page", 1, "mp4"]);
+  const listener = vi.fn();
+  jobs.subscribe(listener);
+  jobs.start({ ...job, sizeKey }, async ({ estimate, progress }) => {
+    estimate(9_900_000);
+    progress(0.5);
+    estimate(9_950_000);
+    progress(0.501);
+    await hold.promise;
+    return { bytes: 10_000_000 };
+  });
+  expect(jobs.read()).toMatchObject({ percent: 50, estimatedBytes: 9_900_000 });
+  expect(listener).toHaveBeenCalledTimes(2);
+  expect(jobs.measurements.read(sizeKey)).toBeUndefined();
+  hold.resolve();
+  await Promise.resolve();
+  await Promise.resolve();
+  expect(jobs.read()).toMatchObject({ status: "complete", bytes: 10_000_000 });
+  expect(jobs.read()?.sizeKey).toBeUndefined();
+  expect(jobs.measurements.read(exportSizeKey(document, ["motion", "page", 1, "mp4"]))).toBe(
+    10_000_000,
+  );
+  expect(
+    jobs.measurements.read(exportSizeKey(document, ["motion", "page", 2, "mp4"])),
+  ).toBeUndefined();
+  expect(jobs.measurements.read(exportSizeKey({}, ["motion", "page", 1, "mp4"]))).toBeUndefined();
+});
+
+test("cancelled, failed and invalid output never become measured sizes; metadata cache is bounded", async () => {
+  const jobs = new ExportJobs(),
+    document = {},
+    sizeKey = exportSizeKey(document, ["motion"]),
+    hold = deferred();
+  jobs.start({ ...job, sizeKey }, async ({ estimate, progress }) => {
+    estimate(Infinity);
+    progress(0.2);
+    await hold.promise;
+    return { bytes: 400 };
+  });
+  expect(jobs.read()?.estimatedBytes).toBeUndefined();
+  jobs.cancel();
+  hold.resolve();
+  await jobs.stop();
+  expect(jobs.measurements.read(sizeKey)).toBeUndefined();
+  jobs.start({ ...job, sizeKey }, async () => ({ bytes: 0 }));
+  await Promise.resolve();
+  await Promise.resolve();
+  expect(jobs.read()?.status).toBe("failed");
+  expect(jobs.measurements.read(sizeKey)).toBeUndefined();
+  for (let index = 0; index < 33; index++)
+    jobs.measurements.record(exportSizeKey(document, [index]), index + 1);
+  expect(jobs.measurements.read(exportSizeKey(document, [0]))).toBeUndefined();
+  expect(jobs.measurements.read(exportSizeKey(document, [32]))).toBe(33);
 });
