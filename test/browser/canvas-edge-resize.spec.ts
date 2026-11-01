@@ -55,7 +55,7 @@ test("all four side handles shrink on one axis with shared rounded binary ink an
   for (const side of ["e", "w", "n", "s"]) {
     const before = await page.evaluate(() => window.musart!.snapshot().project);
     const shape = (await frame.boundingBox())!,
-      handle = (await frame.locator(`[data-handle="${side}"]`).boundingBox())!;
+      handle = (await frame.locator(`.canvas-handle[data-handle="${side}"]`).boundingBox())!;
     const horizontal = side === "e" || side === "w",
       scale = shape.width / 240;
     const delta = (side === "e" || side === "s" ? -1 : 1) * 40 * scale;

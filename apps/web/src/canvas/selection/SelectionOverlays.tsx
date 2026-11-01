@@ -6,6 +6,7 @@ import type { SceneController } from "../session/scene-controller";
 import type { ViewSource } from "../viewport/motion";
 import "./selection-presentation.css";
 import "../../components/layers/messages";
+import { SelectionEdges } from "./SelectionEdges";
 import { selectionSizeLabel } from "./size-label";
 import { sourceGeometry } from "./frame-geometry";
 import { selectionHandleInk } from "./handle-color";
@@ -115,11 +116,18 @@ export function SelectionOverlays({
   const { t } = useTranslation();
   const root = useRef<HTMLDivElement>(null);
   useLayoutEffect(() => {
-    let previous: boolean | undefined;
+    let previous: boolean | undefined,
+      previousZoom = 0;
     const paint = () => {
       const node = root.current,
         playback = Boolean(controller.read().playback);
-      if (!node || previous === playback) return;
+      if (!node) return;
+      const scale = viewSource.read().zoom;
+      if (previousZoom !== scale) {
+        node.style.setProperty("--canvas-edge-hit", `${8 / scale}px`);
+        previousZoom = scale;
+      }
+      if (previous === playback) return;
       previous = playback;
       node.dataset.playback = String(playback);
       node.inert = playback;
@@ -127,8 +135,13 @@ export function SelectionOverlays({
         handle.disabled = playback;
     };
     paint();
-    return controller.subscribe(paint);
-  }, [controller, selected]);
+    const stopScene = controller.subscribe(paint),
+      stopView = viewSource.subscribe(paint);
+    return () => {
+      stopScene();
+      stopView();
+    };
+  }, [controller, viewSource, selected]);
   // Selection-only publications retain the scene identity: mount directly on its current pose.
   const presented = controller.read().page;
   const index = sourceGeometry(controller);
@@ -180,6 +193,15 @@ export function SelectionOverlays({
                 >
                   <LockKeyhole size={16} aria-hidden="true" />
                 </span>
+              )}
+              {!locked && (
+                <SelectionEdges
+                  layerId={layer.id}
+                  name={layer.name}
+                  onHandle={(event) => {
+                    if (!controller.read().playback) onHandle(event);
+                  }}
+                />
               )}
               {!locked &&
                 (["nw", "n", "ne", "w", "e", "sw", "s", "se", "rotate"] as const).map((handle) => (

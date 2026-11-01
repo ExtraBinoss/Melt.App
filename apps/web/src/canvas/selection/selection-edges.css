@@ -1,0 +1,42 @@
+.canvas-resize-edge {
+  position: absolute;
+  display: block;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  pointer-events: auto;
+  touch-action: none;
+}
+.canvas-resize-edge:is([data-handle="n"], [data-handle="s"]) {
+  left: var(--canvas-edge-hit);
+  right: var(--canvas-edge-hit);
+  height: var(--canvas-edge-hit);
+  cursor: ns-resize;
+}
+.canvas-resize-edge:is([data-handle="e"], [data-handle="w"]) {
+  top: var(--canvas-edge-hit);
+  bottom: var(--canvas-edge-hit);
+  width: var(--canvas-edge-hit);
+  cursor: ew-resize;
+}
+.canvas-resize-edge[data-handle="n"] {
+  top: calc(var(--canvas-edge-hit) / -2);
+}
+.canvas-resize-edge[data-handle="s"] {
+  bottom: calc(var(--canvas-edge-hit) / -2);
+}
+.canvas-resize-edge[data-handle="e"] {
+  right: calc(var(--canvas-edge-hit) / -2);
+}
+.canvas-resize-edge[data-handle="w"] {
+  left: calc(var(--canvas-edge-hit) / -2);
+}
+.canvas-resize-edge:focus-visible {
+  outline: 1px solid var(--canvas-handle-color);
+  outline-offset: -3px;
+}
+.canvas-selection-overlays[data-playback="true"] .canvas-resize-edge {
+  pointer-events: none;
+}
