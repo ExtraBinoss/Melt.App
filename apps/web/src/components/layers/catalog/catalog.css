@@ -1,3 +1,18 @@
+.effect-menu-choices [data-effect-menu-category] {
+  background: transparent;
+  color: var(--popover-foreground);
+}
+.effect-menu-choices[data-input-mode="pointer"] [data-effect-menu-category]:hover,
+.effect-menu-choices[data-input-mode="pointer"]:not(:has([data-effect-menu-category]:hover))
+  [data-effect-menu-category][data-state="open"],
+.effect-menu-choices[data-input-mode="keyboard"] [data-effect-menu-category][data-highlighted],
+.effect-menu-choices[data-input-mode="keyboard"]:not(
+    :has([data-effect-menu-category][data-highlighted])
+  )
+  [data-effect-menu-category][data-state="open"] {
+  background: var(--accent);
+  color: var(--accent-foreground);
+}
 .effect-catalog-menu:has(.effect-catalog) {
   width: min(300px, calc(100vw - 24px));
   max-height: min(480px, 78vh);
@@ -29,12 +44,30 @@
   max-height: min(350px, 52vh);
   overflow-y: auto;
   overscroll-behavior: contain;
-  padding: 4px;
+  padding: 0;
+}
+.effect-catalog-virtual {
+  position: relative;
+}
+.effect-catalog-virtual [data-slot="dropdown-menu-label"],
+.effect-catalog-virtual [data-slot="dropdown-menu-item"] {
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  height: 30px;
+  min-height: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.effect-catalog-virtual [data-slot="dropdown-menu-item"] {
+  padding-block: 5px;
 }
 .effect-catalog [data-slot="dropdown-menu-label"] {
   color: var(--muted-foreground);
   font-size: 10px;
-  padding-top: 10px;
+  line-height: 18px;
+  padding-top: 6px;
 }
 .effect-catalog [data-slot="dropdown-menu-item"] {
   min-height: 30px;

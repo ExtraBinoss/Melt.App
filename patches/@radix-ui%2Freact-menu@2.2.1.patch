@@ -1,0 +1,46 @@
+diff --git a/dist/index.js b/dist/index.js
+index 16093978940f31b3c2e0947caf971b764f0ca454..d9ab925c292b23e2b6dcf13be72d2b3f80140cb2 100644
+--- a/dist/index.js
++++ b/dist/index.js
+@@ -519,11 +519,12 @@ var MenuItemImpl = /* @__PURE__ */ React.forwardRef(
+     const [isFocused, setIsFocused] = React.useState(false);
+     const [textContent, setTextContent] = React.useState("");
+     React.useEffect(() => {
++      if (textValue !== undefined) return;
+       const menuItem = ref.current;
+       if (menuItem) {
+         setTextContent((menuItem.textContent ?? "").trim());
+       }
+-    }, [itemProps.children]);
++    }, [itemProps.children, textValue]);
+     return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
+       Collection.ItemSlot,
+       {
+@@ -921,4 +922,3 @@ function whenMouse(handler) {
+   return (event) => event.pointerType === "mouse" ? handler(event) : void 0;
+ }
+ __name(whenMouse, "whenMouse");
+-//# sourceMappingURL=index.js.map
+diff --git a/dist/index.mjs b/dist/index.mjs
+index 10ac48bd44116ba4ce0f131020b7d13a3a65cb0e..d3403a9031764621254af9bff524b0e3bc893964 100644
+--- a/dist/index.mjs
++++ b/dist/index.mjs
+@@ -458,11 +458,12 @@ var MenuItemImpl = /* @__PURE__ */ React.forwardRef(
+     const [isFocused, setIsFocused] = React.useState(false);
+     const [textContent, setTextContent] = React.useState("");
+     React.useEffect(() => {
++      if (textValue !== undefined) return;
+       const menuItem = ref.current;
+       if (menuItem) {
+         setTextContent((menuItem.textContent ?? "").trim());
+       }
+-    }, [itemProps.children]);
++    }, [itemProps.children, textValue]);
+     return /* @__PURE__ */ jsx(
+       Collection.ItemSlot,
+       {
+@@ -895,4 +896,3 @@ export {
+   MenuSubTrigger as SubTrigger,
+   createMenuScope
+ };
+-//# sourceMappingURL=index.mjs.map

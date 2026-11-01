@@ -1,7 +1,7 @@
-import { useMemo, useRef, useState, type KeyboardEvent } from "react";
+import { memo, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import { useTranslation } from "react-i18next";
 import type { EffectType } from "@musart/core";
-import { DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel } from "../../ui/dropdown-menu";
+import { CatalogRows, type CatalogRowsHandle } from "./CatalogRows";
 import { SearchInput } from "../../assets/SearchInput";
 import { SelectField } from "../../shared/SelectField";
 import { ScrollShadow } from "../../shared/scroll/ScrollShadow";
@@ -18,7 +18,7 @@ import "../../motion/transitions/messages";
 import "./catalog.css";
 
 /** Shared mounted-only menu leaf. Browsing never mutates the document or previews effects. */
-export function EffectCatalog({
+export const EffectCatalog = memo(function EffectCatalog({
   category,
   onAdd,
 }: {
@@ -28,7 +28,7 @@ export function EffectCatalog({
   const { t, i18n } = useTranslation();
   const [query, setQuery] = useState("");
   const [family, setFamily] = useState<EffectFamily | "all">("all");
-  const root = useRef<HTMLDivElement>(null);
+  const list = useRef<CatalogRowsHandle>(null);
   const entries = useMemo(
     () => effectCatalogEntries(category, t, i18n.resolvedLanguage ?? i18n.language),
     [category, t, i18n.resolvedLanguage, i18n.language],
@@ -54,11 +54,11 @@ export function EffectCatalog({
     event.stopPropagation();
     if (event.key === "ArrowDown") {
       event.preventDefault();
-      root.current?.querySelector<HTMLElement>("[data-effect-catalog-item]")?.focus();
+      list.current?.focusFirst();
     }
   }
   return (
-    <div ref={root} className="effect-catalog" data-effect-category={category}>
+    <div className="effect-catalog" data-effect-category={category}>
       <div className="effect-catalog-filters">
         <SearchInput
           aria-label={t(
@@ -70,6 +70,7 @@ export function EffectCatalog({
           onKeyDown={filterKeys}
         />
         <SelectField
+          prewarm={false}
           label={t("effectCatalog:familyLabel")}
           value={family}
           options={[
@@ -80,33 +81,15 @@ export function EffectCatalog({
         />
       </div>
       <ScrollShadow className="effect-catalog-scroll" surface="var(--popover)">
-        <div className="effect-catalog-viewport">
-          {families.map((family) => {
-            const items = visible.filter((entry) => entry.family === family);
-            if (!items.length) return null;
-            const label = t(`effectCatalog:family.${family}`);
-            return (
-              <DropdownMenuGroup key={family} aria-label={label}>
-                <DropdownMenuLabel>{label}</DropdownMenuLabel>
-                {items.map((entry) => (
-                  <DropdownMenuItem
-                    key={entry.type}
-                    data-effect-catalog-item={entry.type}
-                    onSelect={() => onAdd(entry.type)}
-                  >
-                    {entry.label}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuGroup>
-            );
-          })}
-          {!visible.length && (
-            <p className="effect-catalog-empty" role="status">
-              {t(category === "effect" ? "effectCatalog:empty" : "effectCatalog:emptyAdjustment")}
-            </p>
-          )}
-        </div>
+        <CatalogRows
+          key={JSON.stringify([category, query, family])}
+          ref={list}
+          entries={visible}
+          families={families}
+          onAdd={onAdd}
+          empty={t(category === "effect" ? "effectCatalog:empty" : "effectCatalog:emptyAdjustment")}
+        />
       </ScrollShadow>
     </div>
   );
-}
+});

@@ -1,7 +1,30 @@
 import { expect, test, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { getUiPresentation } from "../../../src/state/session/ui-presentation";
 import * as Menu from "../../../src/components/ui/dropdown-menu";
+
+test.each([true, false])(
+  "native typeahead honors supplied text and retains the DOM fallback (%s)",
+  async (provided) => {
+    const select = vi.fn();
+    const label = provided ? "Alpha" : "Zebra";
+    render(
+      <Menu.DropdownMenu defaultOpen modal={false}>
+        <Menu.DropdownMenuTrigger>Actions</Menu.DropdownMenuTrigger>
+        <Menu.DropdownMenuContent>
+          <Menu.DropdownMenuItem textValue={provided ? "Zebra" : undefined} onSelect={select}>
+            {label}
+          </Menu.DropdownMenuItem>
+        </Menu.DropdownMenuContent>
+      </Menu.DropdownMenu>,
+    );
+    const item = screen.getByRole("menuitem", { name: label });
+    fireEvent.keyDown(screen.getByRole("menu"), { key: "z" });
+    await waitFor(() => expect(item).toHaveFocus());
+    fireEvent.keyDown(item, { key: "Enter" });
+    expect(select).toHaveBeenCalledOnce();
+  },
+);
 test("renders genuine menu, checkbox, radio, groups and nested actions", async () => {
   const select = vi.fn();
   render(

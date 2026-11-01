@@ -33,7 +33,9 @@ export function SelectField({
   identity,
   scrollButtons: _scrollButtons,
   contentAttributes,
+  prewarm = true,
 }: {
+  prewarm?: boolean;
   label: string;
   value: string;
   options: readonly SelectOption[];
@@ -162,7 +164,7 @@ export function SelectField({
       <FieldMenu
         id={id}
         cacheKey={owner.generation}
-        prewarm={richOptions.length === 0 && options.length <= 32}
+        prewarm={prewarm && richOptions.length === 0 && options.length <= 32}
         label={label}
         className={className}
         contentClassName={["property-select-menu", contentClassName].filter(Boolean).join(" ")}
