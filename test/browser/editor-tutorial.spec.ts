@@ -10,10 +10,31 @@ test("guided editor practice, automatic tasks, exit and editor-only replay", asy
   const guide = page.getByRole("region", { name: "Melt tutorial" });
   await expect(guide.getByRole("heading", { name: "Your canvas" })).toBeVisible({ timeout: 30000 });
   await expect(page.locator(".tutorial-highlight")).toBeVisible();
+  await expect(guide.locator("svg.melt-mascot")).toHaveCount(1);
+  await expect(guide.locator("img")).toHaveCount(0);
+  await expect
+    .poll(async () => {
+      const box = await guide.boundingBox();
+      const viewport = page.viewportSize()!;
+      return box
+        ? Math.max(
+            Math.abs(box.x + box.width / 2 - viewport.width / 2),
+            Math.abs(box.y + box.height / 2 - viewport.height / 2),
+          )
+        : 999;
+    })
+    .toBeLessThan(3);
+  expect(
+    await page.locator(".tutorial-highlight").evaluate((node) => getComputedStyle(node).boxShadow),
+  ).toContain("0.72");
   for (const title of ["Your tools", "Properties", "Layers"]) {
     await guide.getByRole("button", { name: "Next", exact: true }).click();
     await expect(guide.getByRole("heading", { name: title, exact: true })).toBeVisible();
   }
+  await guide.getByRole("button", { name: "Previous" }).click();
+  await expect(guide.getByRole("heading", { name: "Properties", exact: true })).toBeVisible();
+  await guide.getByRole("button", { name: "Next", exact: true }).click();
+  await expect(guide.getByRole("heading", { name: "Layers", exact: true })).toBeVisible();
   for (const title of [
     "Add an effect",
     "Try dither",
@@ -24,8 +45,19 @@ test("guided editor practice, automatic tasks, exit and editor-only replay", asy
     "Export",
     "Save your video",
   ]) {
-    await guide.getByRole("button", { name: "Do it for me" }).click();
+    if (title === "Make it move")
+      await page.locator('[data-effect-catalog-item="bit-dither"]').click();
+    else if (title === "Play") await page.locator('[data-preset-id="scale-pop"]').click();
+    else await guide.getByRole("button", { name: "Next", exact: true }).click();
     await expect(guide.getByRole("heading", { name: title, exact: true })).toBeVisible();
+    if (title === "Try dither")
+      await expect(page.locator('.effect-catalog[data-effect-category="effect"]')).toBeVisible();
+    if (title === "Try dither") {
+      await page.locator('.effect-catalog[data-effect-category="effect"] input').fill("dither");
+      await expect(page.locator('[data-effect-catalog-item="bit-dither"]')).toBeVisible();
+      await page.screenshot({ path: "artifacts/tutorial/dither-guide.png" });
+    }
+    if (title === "Add a pop") await expect(page.locator(".animation-picker")).toBeVisible();
   }
   await expect(page.locator(".motion-export-preview-surface")).toBeVisible();
   await expect
@@ -38,7 +70,7 @@ test("guided editor practice, automatic tasks, exit and editor-only replay", asy
     .toBeLessThan(3);
   await page.screenshot({ path: "artifacts/tutorial/export-guide.png" });
   const downloading = page.waitForEvent("download");
-  await guide.getByRole("button", { name: "Do it for me" }).click();
+  await guide.getByRole("button", { name: "Next", exact: true }).click();
   const download = await downloading;
   expect(download.suggestedFilename()).toMatch(/\.(mp4|webm)$/);
   await download.saveAs("artifacts/tutorial/practice-video.mp4");

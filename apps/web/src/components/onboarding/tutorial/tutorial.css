@@ -21,7 +21,7 @@
   left: 0;
   border: 2px solid var(--primary);
   border-radius: 10px;
-  box-shadow: 0 0 0 3px var(--background);
+  box-shadow: 0 0 0 100vmax rgb(0 0 0 / 72%);
   pointer-events: none;
 }
 .tutorial-card {
@@ -56,4 +56,8 @@
   line-height: 1.6;
   min-height: 84px;
   margin-bottom: 16px;
+}
+
+.tutorial-card footer {
+  justify-content: space-between;
 }

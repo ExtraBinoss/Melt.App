@@ -5,7 +5,7 @@ export const copy = {
   yes: "Yes, start tutorial",
   no: "No, thanks",
   next: "Next",
-  skip: "Do it for me",
+  previous: "Previous",
   exit: "Exit tutorial",
   leave: "Leave the tutorial?",
   leaveDetail:
@@ -19,7 +19,7 @@ export const steps = [
   {
     title: "Your canvas",
     text: "This is your canvas. Add images, videos, text and objects here. We have loaded three images for you.",
-    target: ".canvas-area",
+    target: ".canvas-artboard:not(.canvas-artboard-inactive)",
   },
   {
     title: "Your tools",
@@ -45,32 +45,32 @@ export const steps = [
   },
   {
     title: "Try dither",
-    text: "Choose One-bit dither. It turns your image into a pattern of dots. You can adjust its settings afterwards.",
-    target: "[role=menu]",
+    text: "In the open Effects library, search for dither, then click One-bit dither. It turns your image into a pattern of dots.",
+    target: '[data-effect-catalog-item="bit-dither"]',
     action: "dither",
   },
   {
     title: "Make it move",
     text: "Switch the artboard from Static to Motion to reveal the timeline.",
-    target: ".motion-mode",
+    target: '.motion-mode [data-segmented-value="motion"]',
     action: "motion",
   },
   {
     title: "Pin the timeline",
     text: "Pin the timeline so it stays open while you work.",
-    target: "[data-motion-pinned]",
+    target: '[data-tutorial="timeline-pin"]',
     action: "pin",
   },
   {
     title: "Add a pop",
-    text: "On the Lake layer, open Add animation, choose Scale, then Pop. This creates a short pop-in animation.",
-    target: "[data-motion-pinned]",
+    text: "Click Pop in the open animation picker. This creates a short pop-in animation.",
+    target: '[data-preset-id="scale-pop"]',
     action: "pop",
   },
   {
     title: "Play",
     text: "Press Play in the timeline to preview your animation.",
-    target: "[data-motion-pinned]",
+    target: ".motion-transport button",
     action: "play",
   },
   {
@@ -94,7 +94,7 @@ export const steps = [
   {
     title: "You're ready",
     text: "Your video is exported. Keep experimenting with this project, or create your own from Projects.",
-    target: ".canvas-area",
+    target: ".canvas-artboard:not(.canvas-artboard-inactive)",
   },
 ] as const;
 export type TutorialAction =

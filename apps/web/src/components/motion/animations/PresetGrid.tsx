@@ -132,6 +132,7 @@ export function PresetGrid({
                       type="button"
                       aria-label={animationPresetName(preset, t)}
                       data-preset-index={index}
+                      data-preset-id={preset.id}
                       onKeyDown={(event) => {
                         const delta =
                           event.key === "ArrowDown"

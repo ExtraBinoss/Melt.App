@@ -206,6 +206,7 @@ export function PresetPicker({
                 size="xs"
                 variant={category === value ? "secondary" : "ghost"}
                 aria-pressed={category === value}
+                data-animation-category={value}
                 onClick={() => {
                   setCategory(value);
                 }}

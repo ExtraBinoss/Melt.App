@@ -22,6 +22,7 @@ import { brand, MeltLogo, BrandStatus } from "@/ui/brand";
 
 <MeltLogo size={32} />                    // Decorative idle Dahlia; no RAF.
 <MeltLogo size={64} decorative={false} /> // Accessible name: Melt.
+<MeltLogo size={48} lively />            // Explicit idle animation and natural blinking.
 <span>{brand.name}</span>
 {exportPending && <BrandStatus state="preparing" size={28} />}
 ```
@@ -30,7 +31,9 @@ import { brand, MeltLogo, BrandStatus } from "@/ui/brand";
 errors and cancellation action. Mount it only during real work. Never time it to
 pretend an operation completed. `loading` morphs into the source engine's thinking
 state; `preparing` uses its orbit state. Idle uses the genuine `fleur8` Dahlia with
-its `surpris` expression. All paths come from Maskot's original engine.
+its `surpris` expression. All paths come from Maskot's original engine. The opt-in `lively` prop keeps idle
+playback active for an accompanying mascot; it stops when hidden, offscreen or
+reduced motion is requested. Ordinary idle logos continue to own no frame clock.
 
 An imperative operation can drive the same leaf without React frame updates:
 

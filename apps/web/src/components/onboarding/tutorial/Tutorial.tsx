@@ -1,3 +1,4 @@
+import { useStepSurface } from "./use-step-surface";
 import { useEffect, useRef, useState } from "react";
 import type { EnginePort } from "@musart/core";
 import type { EditorServices } from "../../../state/contracts";
@@ -6,7 +7,7 @@ import { getExportJobs } from "../../../services/export/jobs";
 import { requestCompositionExport } from "../../export/composition-request";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "../../ui/dialog";
 import { Button } from "../../ui/button";
-import { MeltMark } from "../../../ui/brand/MeltMark";
+import { MeltLogo } from "../../../ui/brand/MeltLogo";
 import { Guide } from "./Guide";
 import { copy, steps } from "./content";
 import { addDither, addPop, createPracticeProject } from "./project";
@@ -57,7 +58,9 @@ export function Tutorial({
   const [leave, setLeave] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const furthest = useRef(0);
   const practice = useRef<{ projectId: string; layerId: string } | null>(null);
+  useStepSurface(engine, index, phase === "tour" && !hidden && !leave, practice);
   const alive = useRef(true);
   useEffect(() => {
     alive.current = true;
@@ -86,10 +89,14 @@ export function Tutorial({
   }
   const advance = () => {
     setError("");
-    setIndex((value) => Math.min(steps.length - 1, value + 1));
+    setIndex((value) => {
+      const next = Math.min(steps.length - 1, value + 1);
+      furthest.current = Math.max(furthest.current, next);
+      return next;
+    });
   };
   useEffect(() => {
-    if (phase !== "tour" || hidden) return;
+    if (phase !== "tour" || hidden || index < furthest.current) return;
     const transport = createMotionTransport(engine);
     const jobs = getExportJobs(engine);
     let completed = false;
@@ -172,6 +179,7 @@ export function Tutorial({
       practice.current = await createPracticeProject(engine, services);
       if (alive.current) {
         onProjectCreated?.(practice.current.projectId);
+        furthest.current = 0;
         setIndex(0);
         setPhase("tour");
       }
@@ -184,6 +192,10 @@ export function Tutorial({
   function skip() {
     setError("");
     try {
+      if (index < furthest.current) {
+        advance();
+        return;
+      }
       const step = steps[index]!;
       if (index === steps.length - 1) {
         close();
@@ -214,6 +226,7 @@ export function Tutorial({
           break;
         case "pop":
           addPop(engine, id);
+          document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
           break;
         case "play":
           createMotionTransport(engine).play();
@@ -242,6 +255,10 @@ export function Tutorial({
           busy={busy}
           error={error}
           onSkip={skip}
+          onPrevious={() => {
+            setError("");
+            setIndex((value) => Math.max(0, value - 1));
+          }}
           onExit={() => setLeave(true)}
         />
       )}
@@ -259,7 +276,7 @@ export function Tutorial({
           showCloseButton={false}
           onInteractOutside={(event) => event.preventDefault()}
         >
-          <MeltMark size={80} />
+          <MeltLogo size={80} lively />
           <DialogTitle>{leave ? copy.leave : copy.invite}</DialogTitle>
           <DialogDescription>{leave ? copy.leaveDetail : copy.detail}</DialogDescription>
           {error && <p role="alert">{error}</p>}

@@ -14,6 +14,7 @@ export const MeltLogo = memo(function MeltLogo({
   activity,
   className = "",
   interactive = false,
+  lively = false,
   onReady,
 }: {
   size?: number;
@@ -22,6 +23,7 @@ export const MeltLogo = memo(function MeltLogo({
   activity?: BrandActivity;
   className?: string;
   interactive?: boolean;
+  lively?: boolean;
   onReady?: (ready: boolean) => void;
 }) {
   const { t } = useTranslation("brand"),
@@ -72,6 +74,9 @@ export const MeltLogo = memo(function MeltLogo({
       owner.removeEventListener("focusout", update);
     };
   }, [interactive]);
+  useLayoutEffect(() => {
+    runtime.current?.setLively(lively);
+  }, [lively]);
   useLayoutEffect(() => {
     runtime.current?.setState(state);
   }, [state]);

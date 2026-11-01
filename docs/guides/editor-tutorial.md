@@ -13,7 +13,12 @@ Replay onboarding; dashboard preferences do not.
 The browser preference `musart.editor-tutorial.v1` records dismissal or completion.
 If browser storage is unavailable, dismissal still works for the current session.
 The tutorial copy is intentionally English pending product review. Motion respects
-the system reduced-motion preference. A fast text reveal is confined to the guide.
+the system reduced-motion preference. A fast text reveal is confined to the guide. The shared SVG mascot uses opt-in
+lively idle playback for natural blinking; hidden and reduced-motion instances
+stop their animation clock. The first card is centered and the surrounding UI is
+dimmed around the active target. Previous reviews completed steps without
+repeating their commands. Next performs unfinished actions when needed. Effect
+and animation tasks open their actual editor pickers.
 
 ## Practice photographs
 

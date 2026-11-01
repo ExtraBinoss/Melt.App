@@ -12,6 +12,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Refine the editor tutorial with a dimmed spotlight, a centered first card, the live blinking SVG mascot, Previous/Next navigation and a compact close control. Open the real effect and animation pickers for their guided tasks.
+
 - Include the shared compositor background used by project-opening reveals, keeping their animation on native transform and opacity tracks.
 
 - Add native GPU text outlines and direct 2D hard-shadow controls in all twelve interface languages. Preview outline changes before commit, align property rows and switch spacing, and hide these controls in direct or inherited 3D contexts.

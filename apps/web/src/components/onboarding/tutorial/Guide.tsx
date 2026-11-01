@@ -1,8 +1,9 @@
+import { ArrowLeft, X } from "lucide-react";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { motion, useReducedMotion } from "motion/react";
 import type { EnginePort } from "@musart/core";
-import { MeltMark } from "../../../ui/brand/MeltMark";
+import { MeltLogo } from "../../../ui/brand/MeltLogo";
 import { Button } from "../../ui/button";
 import { copy, steps } from "./content";
 
@@ -13,6 +14,7 @@ export function Guide({
   error,
   onSkip,
   onExit,
+  onPrevious,
 }: {
   index: number;
   engine: EnginePort;
@@ -20,6 +22,7 @@ export function Guide({
   error: string;
   onSkip: () => void;
   onExit: () => void;
+  onPrevious: () => void;
 }) {
   const step = steps[index]!;
   const reduce = useReducedMotion();
@@ -29,6 +32,16 @@ export function Guide({
     height: window.innerHeight,
   });
   const text = useRef<HTMLParagraphElement>(null);
+  const card = useRef<HTMLElement>(null);
+  const [cardHeight, setCardHeight] = useState(280);
+  useLayoutEffect(() => {
+    const node = card.current;
+    if (!node) return;
+    const observer = new ResizeObserver(() => setCardHeight(node.getBoundingClientRect().height));
+    observer.observe(node);
+    setCardHeight(node.getBoundingClientRect().height);
+    return () => observer.disconnect();
+  }, []);
   useEffect(() => {
     if (reduce || !text.current) return;
     let count = 0;
@@ -46,7 +59,15 @@ export function Guide({
     let observed: Element | null = null;
     const measure = () => {
       frame = 0;
-      const target = document.querySelector(step.target);
+      const target =
+        document.querySelector(step.target) ??
+        ("action" in step && step.action === "dither"
+          ? document.querySelector('.effect-catalog[data-effect-category="effect"] input')
+          : null) ??
+        ("action" in step && step.action === "pop"
+          ? document.querySelector(".animation-picker")
+          : null) ??
+        document.querySelector(".canvas-artboard");
       if (target !== observed) {
         if (observed) resize.unobserve(observed);
         if (target) resize.observe(target);
@@ -80,7 +101,7 @@ export function Guide({
     };
     const resize = new ResizeObserver(schedule);
     const mutations = new MutationObserver(schedule);
-    mutations.observe(document.querySelector("main") ?? document.body, {
+    mutations.observe(document.body, {
       childList: true,
       subtree: true,
     });
@@ -98,14 +119,22 @@ export function Guide({
     };
   }, [step, engine]);
   const width = Math.min(330, viewport.width - 24);
-  const x = Math.max(
-    12,
-    Math.min(
-      viewport.width - width - 12,
-      rect.x > viewport.width / 2 ? rect.x - width - 22 : rect.x + Math.min(rect.width, 320) + 22,
-    ),
-  );
-  const y = Math.max(12, Math.min(viewport.height - 290, rect.y + 24));
+  const x =
+    index === 0
+      ? (viewport.width - width) / 2
+      : Math.max(
+          12,
+          Math.min(
+            viewport.width - width - 12,
+            rect.x > viewport.width / 2
+              ? rect.x - width - 22
+              : rect.x + Math.min(rect.width, 320) + 22,
+          ),
+        );
+  const y =
+    index === 0
+      ? Math.max(12, (viewport.height - cardHeight) / 2)
+      : Math.max(12, Math.min(viewport.height - cardHeight - 12, rect.y + 24));
   return createPortal(
     <div
       className="tutorial-overlay"
@@ -119,6 +148,7 @@ export function Guide({
         />
       )}
       <motion.aside
+        ref={card}
         role="region"
         aria-label="Melt tutorial"
         className="tutorial-card"
@@ -128,12 +158,12 @@ export function Guide({
         transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 340, damping: 32 }}
       >
         <header>
-          <MeltMark size={48} />
+          <MeltLogo size={48} lively />
           <span>
             {index + 1} / {steps.length}
           </span>
-          <Button variant="ghost" size="sm" onClick={onExit}>
-            {copy.exit}
+          <Button variant="ghost" size="icon-sm" aria-label={copy.exit} onClick={onExit}>
+            <X size={16} />
           </Button>
         </header>
         <h2>{step.title}</h2>
@@ -145,8 +175,12 @@ export function Guide({
         </p>
         {error && <p role="alert">{error}</p>}
         <footer>
+          <Button variant="ghost" disabled={busy || index === 0} onClick={onPrevious}>
+            <ArrowLeft size={14} />
+            {copy.previous}
+          </Button>
           <Button disabled={busy} onClick={onSkip}>
-            {index === steps.length - 1 ? copy.finish : "action" in step ? copy.skip : copy.next}
+            {index === steps.length - 1 ? copy.finish : copy.next}
           </Button>
         </footer>
       </motion.aside>

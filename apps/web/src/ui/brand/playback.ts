@@ -30,6 +30,7 @@ export function createBrandPlayback(
     end = 0,
     active = true,
     hovered = false,
+    lively = false,
     visible = true,
     disposed = false,
     frame: number | null = null,
@@ -47,7 +48,7 @@ export function createBrandPlayback(
       visible &&
       !page.hidden &&
       !reduced.matches &&
-      (state !== "idle" || hovered || time < end)
+      (state !== "idle" || lively || hovered || time < end)
     );
   }
   function tick(stamp: number) {
@@ -78,7 +79,7 @@ export function createBrandPlayback(
       active &&
       visible &&
       !page.hidden &&
-      (state !== "idle" || hovered || time < end)
+      (state !== "idle" || lively || hovered || time < end)
     ) {
       if (state === "working") {
         engine.setState("idle", time);
@@ -104,6 +105,12 @@ export function createBrandPlayback(
   page.addEventListener("visibilitychange", environment);
   reduced.addEventListener("change", environment);
   return {
+    setLively(next: boolean) {
+      if (disposed || next === lively) return;
+      lively = next;
+      if (next) engine.blink(time);
+      resume();
+    },
     setHovered(next: boolean) {
       if (disposed || next === hovered) return;
       hovered = next;

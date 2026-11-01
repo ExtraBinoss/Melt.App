@@ -184,3 +184,22 @@ test("working loops the genuine face through dots and back, with no frame loop u
   expect(f.callbacks.size).toBe(0);
   f.playback.dispose();
 });
+
+test("a lively idle mascot blinks with the native engine and stops when hidden or reduced", () => {
+  const f = fixture();
+  f.playback.setLively(true);
+  expect(f.callbacks.size).toBe(1);
+  f.step();
+  expect(f.surface.paint.mock.calls.length).toBeGreaterThan(1);
+  f.playback.setVisible(false);
+  expect(f.callbacks.size).toBe(0);
+  f.playback.setVisible(true);
+  expect(f.callbacks.size).toBe(1);
+  f.reduce(true);
+  expect(f.callbacks.size).toBe(0);
+  f.reduce(false);
+  expect(f.callbacks.size).toBe(1);
+  f.playback.setLively(false);
+  expect(f.callbacks.size).toBe(0);
+  f.playback.dispose();
+});
