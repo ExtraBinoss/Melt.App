@@ -9,6 +9,7 @@ import type { MotionTemplateManifest } from "../../apps/web/src/services/project
 export async function generateAngelWindows(output = "apps/web/public/templates/motion") {
   const input = await readFile(resolve(output, "media/angel-source.glb"));
   const modelBytes = input;
+  const metadata = JSON.parse(input.subarray(20, 20 + input.readUInt32LE(12)).toString("utf8"));
   const model: Asset = {
     id: "angel-original",
     name: "Engel / noe-3d.at · CC BY 4.0",
@@ -36,7 +37,7 @@ export async function generateAngelWindows(output = "apps/web/public/templates/m
     await writeFile(resolve(output, `angel-windows.${extension}`), `${data}\n`);
   await writeFile(
     resolve(output, "media/angel-source.json"),
-    `${JSON.stringify({ ...ANGEL_SOURCE, sha256: createHash("sha256").update(input).digest("hex"), bytes: input.byteLength, modifications: "Kept LOD2 geometry, removed other LODs/textures/UVs, packed 16-bit indices." }, null, 2)}\n`,
+    `${JSON.stringify({ ...ANGEL_SOURCE, sourceSha256: metadata.extras.sourceSha256, preparedSha256: createHash("sha256").update(input).digest("hex"), preparedBytes: input.byteLength, modifications: "Kept LOD2 geometry, removed other LODs/textures/UVs, packed 16-bit indices." }, null, 2)}\n`,
   );
   return manifest;
 }

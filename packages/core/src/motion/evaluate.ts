@@ -26,6 +26,8 @@ export interface MotionFrameMediaRequest {
 }
 
 export interface MotionFramePlan {
+  /** Source effects can advance even when authored property values stay identical. */
+  readonly timeDependent?: true;
   readonly compositionId: string;
   readonly mode: "static" | "motion";
   readonly time: MotionTime;
@@ -43,6 +45,11 @@ export interface MotionEvaluationOptions {
 }
 
 const issuedPlans = new WeakMap<MotionFramePlan, MotionProgram>();
+
+/** Access is runtime-only; imported/cloned plans cannot impersonate an issued program. */
+export function motionFrameProgram(plan: MotionFramePlan): MotionProgram | undefined {
+  return issuedPlans.get(plan);
+}
 
 /** Runtime plans belong to one frozen compilation, including across asynchronous adapters. */
 export function isMotionFramePlanFor(program: MotionProgram, plan: MotionFramePlan): boolean {
@@ -190,6 +197,9 @@ export function evaluateMotion(
   if (program.sceneAnimations?.length)
     evaluateAnimations(program.sceneAnimations, sampledTime, sceneValues);
   const plan: MotionFramePlan = Object.freeze({
+    ...(program.mode === "motion" && program.effectClocks?.length
+      ? { timeDependent: true as const }
+      : {}),
     compositionId: program.compositionId,
     mode: program.mode,
     time: Object.freeze(sampledTime),

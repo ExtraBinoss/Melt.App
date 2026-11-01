@@ -1,0 +1,72 @@
+import {
+  AMOUNT,
+  defineEffect,
+  type EffectParameter,
+  type NumberEffectParameter,
+} from "../definition";
+const number = (
+  key: string,
+  value: number,
+  min: number,
+  max: number,
+  step = 0.01,
+  unit = "",
+  displayScale = 1,
+): NumberEffectParameter => ({
+  kind: "number",
+  scope: "settings",
+  key,
+  default: value,
+  labelKey: `time-warp-scanFx:parameter.${key}`,
+  min,
+  max,
+  step,
+  unit,
+  displayScale,
+});
+const choice = (key: string, value: string, options: readonly string[]): EffectParameter => ({
+  kind: "select",
+  scope: "settings",
+  key,
+  default: value,
+  labelKey: `time-warp-scanFx:parameter.${key}`,
+  options: options.map((value) => ({ value, labelKey: `time-warp-scanFx:choice.${value}` })),
+});
+export const TIME_WARP_SCAN_PARAMETERS = [
+  AMOUNT,
+  choice("clock", "timeline", ["timeline", "manual"]),
+  choice("direction", "down", ["down", "up", "right", "left"]),
+  number("start", 0, 0, 86400, 0.01, "s"),
+  number("duration", 2, 0.1, 30, 0.01, "s"),
+  number("progress", 1, 0, 1, 0.01, "%", 100),
+  { ...number("samples", 60, 4, 240, 1), integer: true },
+  number("driftX", 0.12, -2, 2, 0.01, "%", 100),
+  number("driftY", 0.25, -2, 2, 0.01, "%", 100),
+  number("bend", 0, -1, 1, 0.01, "%", 100),
+  number("zoom", 0, -0.8, 3, 0.01, "%", 100),
+  choice("edge", "mirror", ["mirror", "clamp", "transparent"]),
+  number("feather", 1, 0, 32, 0.5, "px"),
+  {
+    kind: "boolean",
+    scope: "settings",
+    key: "showLine",
+    default: true,
+    labelKey: "time-warp-scanFx:parameter.showLine",
+  },
+  number("lineWidth", 2, 0.5, 16, 0.5, "px"),
+  {
+    kind: "color",
+    scope: "settings",
+    key: "lineColor",
+    default: "#00e5ff",
+    labelKey: "time-warp-scanFx:parameter.lineColor",
+  },
+] as const satisfies readonly EffectParameter[];
+export const TIME_WARP_SCAN_DEFINITION = defineEffect(
+  "time-warp-scan",
+  {},
+  TIME_WARP_SCAN_PARAMETERS,
+  "effect",
+  "expand",
+  { identityAtZero: true, temporal: "scan", clock: "composition" },
+);

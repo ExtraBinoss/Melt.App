@@ -1,0 +1,31 @@
+{
+  "name": "Time warp scan",
+  "parameter": {
+    "clock": "Clock",
+    "direction": "Direction",
+    "start": "Start",
+    "duration": "Duration",
+    "progress": "Progress",
+    "samples": "Temporal samples",
+    "driftX": "Horizontal drift",
+    "driftY": "Vertical drift",
+    "bend": "Bend",
+    "zoom": "Zoom",
+    "edge": "Edges",
+    "feather": "Feather",
+    "showLine": "Scan line",
+    "lineWidth": "Line width",
+    "lineColor": "Line color"
+  },
+  "choice": {
+    "timeline": "Timeline",
+    "manual": "Manual",
+    "down": "Down",
+    "up": "Up",
+    "right": "Right",
+    "left": "Left",
+    "mirror": "Mirror",
+    "clamp": "Clamp",
+    "transparent": "Transparent"
+  }
+}

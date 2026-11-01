@@ -1,0 +1,31 @@
+{
+  "name": "Balayage temporel",
+  "parameter": {
+    "clock": "Horloge",
+    "direction": "Direction",
+    "start": "Début",
+    "duration": "Durée",
+    "progress": "Progression",
+    "samples": "Échantillons temporels",
+    "driftX": "Dérive horizontale",
+    "driftY": "Dérive verticale",
+    "bend": "Courbure",
+    "zoom": "Zoom",
+    "edge": "Bords",
+    "feather": "Adoucissement",
+    "showLine": "Ligne de balayage",
+    "lineWidth": "Épaisseur de ligne",
+    "lineColor": "Couleur de ligne"
+  },
+  "choice": {
+    "timeline": "Timeline",
+    "manual": "Manuel",
+    "down": "Bas",
+    "up": "Haut",
+    "right": "Droite",
+    "left": "Gauche",
+    "mirror": "Miroir",
+    "clamp": "Étendre",
+    "transparent": "Transparent"
+  }
+}

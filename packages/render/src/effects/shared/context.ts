@@ -5,6 +5,13 @@ import type { GlyphAtlasBinding } from "../ascii/binding";
 /** GPU-only inputs. Source pixels and intermediate results never cross this boundary. */
 export interface EffectNodeContext {
   readonly source: TextureNode<"vec4">;
+  readonly temporal?: {
+    readonly source: TextureNode<"vec4">;
+    readonly flipY: UniformNode<"float", number>;
+    readonly enabled: UniformNode<"float", number>;
+    readonly region: UniformNode<"vec4", import("three/webgpu").Vector4>;
+    readonly phase: UniformNode<"float", number>;
+  };
   readonly bindImageInput?: (key: string) => {
     readonly texture: TextureNode<"vec4">;
     readonly enabled: UniformNode<"float", number>;
@@ -19,6 +26,7 @@ export type EffectNodeBuilder = (context: EffectNodeContext) => Node<"vec4">;
 export interface EffectDimensions {
   readonly width: number;
   readonly height: number;
+  readonly origin?: { readonly x: number; readonly y: number };
   /** Original content rectangle within an expanded effect transport surface, in document pixels. */
   readonly content?: {
     readonly x: number;

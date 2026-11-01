@@ -1,0 +1,31 @@
+{
+  "name": "时间扭曲扫描",
+  "parameter": {
+    "clock": "时间控制",
+    "direction": "方向",
+    "start": "开始",
+    "duration": "时长",
+    "progress": "进度",
+    "samples": "时间采样数",
+    "driftX": "水平偏移",
+    "driftY": "垂直偏移",
+    "bend": "弯曲",
+    "zoom": "缩放",
+    "edge": "边缘",
+    "feather": "羽化",
+    "showLine": "扫描线",
+    "lineWidth": "线宽",
+    "lineColor": "线条颜色"
+  },
+  "choice": {
+    "timeline": "时间轴",
+    "manual": "手动",
+    "down": "向下",
+    "up": "向上",
+    "right": "向右",
+    "left": "向左",
+    "mirror": "镜像",
+    "clamp": "延展",
+    "transparent": "透明"
+  }
+}

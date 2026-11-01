@@ -4,7 +4,8 @@
   "author": "noe-3d.at; LOD preparation by M. K. Turkcan",
   "license": "CC-BY-4.0",
   "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
-  "sha256": "c54f99330d1a38c166bcef1fc7524de2b62a6cb03ff51a9f2950cdabfc4a5f39",
-  "bytes": 586712,
+  "sourceSha256": "6355bebc9ec8761083d932b120df098074778d2c9b8fa60906fe789a22c8e57c",
+  "preparedSha256": "c54f99330d1a38c166bcef1fc7524de2b62a6cb03ff51a9f2950cdabfc4a5f39",
+  "preparedBytes": 586712,
   "modifications": "Kept LOD2 geometry, removed other LODs/textures/UVs, packed 16-bit indices."
 }

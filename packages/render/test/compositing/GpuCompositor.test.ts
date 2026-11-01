@@ -506,9 +506,15 @@ it("retains one authored effect reference and samples it at every requested rast
     const call = apply.mock.calls.at(-1)!;
     expect(call[1]).toBe(Math.ceil(31.25));
     expect(call[2]).toBe(Math.ceil(23.5));
-    expect(call[3]).toBe(layer.effects);
+    expect(call[3]).toEqual(layer.effects);
+    expect(call[3][0]).toBe(effect);
     expect(call[3][0]!.scale).toBe(1);
-    expect(call[5]).toEqual({ width: 31.25, height: 23.5 });
+    expect(call[5]).toEqual({
+      width: 31.25,
+      height: 23.5,
+      origin: { x: 0, y: 0 },
+      content: { x: 0, y: 0, width: 31.25, height: 23.5 },
+    });
   }
   expect(apply).toHaveBeenCalledOnce();
   expect(effect.scale).toBe(1);

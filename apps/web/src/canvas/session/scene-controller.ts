@@ -118,17 +118,22 @@ export class SceneController {
         : null,
     );
     // Property/presence changes are already represented by the materialized page. Only
-    // requested media additionally depends on the plan clock; a still needs no new GPU draw.
-    const mediaTimeChanged =
+    // requested media and clock-driven source effects also depend on the plan clock.
+    const sourceTimeChanged =
       this.cachedMotionPlan !== motionPlan &&
-      Boolean(this.cachedMotionPlan?.mediaRequests.length || motionPlan?.mediaRequests.length);
+      Boolean(
+        this.cachedMotionPlan?.mediaRequests.length ||
+        motionPlan?.mediaRequests.length ||
+        this.cachedMotionPlan?.timeDependent ||
+        motionPlan?.timeDependent,
+      );
     if (
       this.cached &&
       this.cachedProject === snapshot.project &&
       this.cachedPageId === snapshot.pageId &&
       this.cachedPreview === preview &&
       this.cachedPaintPreview === paintPreview &&
-      !mediaTimeChanged &&
+      !sourceTimeChanged &&
       (this.cachedMotion === motionFrame || sameMotionPose(this.cachedMotionPlan, motionPlan)) &&
       this.cachedMotionPlaying === motionPlaying &&
       this.cachedMotionPreviewing === motionPreviewing &&

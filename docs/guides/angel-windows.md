@@ -39,6 +39,8 @@ The user approved a similar replacement angel. This is a reconstruction of the v
 
 ### Native verification (2026-11-01)
 
+Measured feature source: `a85c2dc` (before merging the independent Time Warp Scan update). The native backend and 50-image witnesses also passed after that integration.
+
 Development server, Headless Chrome 156 on Linux x86_64, DPR 1; available WebGPU adapter Intel Xe-LPG. Checks ran serially under CPUQuota=200%, MemoryHigh=2200 MiB, MemoryMax=3000 MiB and no swap, with low process/I/O priority. This is a bounded functional cohort, not a production performance benchmark.
 
 | Check                                                             |              WebGPU |               WebGL |

@@ -1,0 +1,31 @@
+{
+  "name": "Zeitverzerrung",
+  "parameter": {
+    "clock": "Zeitsteuerung",
+    "direction": "Richtung",
+    "start": "Start",
+    "duration": "Dauer",
+    "progress": "Fortschritt",
+    "samples": "Zeitliche Abtastungen",
+    "driftX": "Horizontale Verschiebung",
+    "driftY": "Vertikale Verschiebung",
+    "bend": "Biegung",
+    "zoom": "Zoom",
+    "edge": "Ränder",
+    "feather": "Weiche Kante",
+    "showLine": "Scanlinie",
+    "lineWidth": "Linienbreite",
+    "lineColor": "Linienfarbe"
+  },
+  "choice": {
+    "timeline": "Zeitleiste",
+    "manual": "Manuell",
+    "down": "Unten",
+    "up": "Oben",
+    "right": "Rechts",
+    "left": "Links",
+    "mirror": "Spiegeln",
+    "clamp": "Begrenzen",
+    "transparent": "Transparent"
+  }
+}

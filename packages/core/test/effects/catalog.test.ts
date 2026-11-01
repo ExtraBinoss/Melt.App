@@ -12,6 +12,7 @@ describe("portable effect definitions", () => {
       "bevel",
       "displace",
       "thermal",
+      "time-warp-scan",
       "morph",
       "dither",
       "ascii",
@@ -98,6 +99,24 @@ describe("portable effect definitions", () => {
         "paper",
         "ink",
         "chrome",
+      ],
+      "time-warp-scan": [
+        "amount",
+        "clock",
+        "direction",
+        "start",
+        "duration",
+        "progress",
+        "samples",
+        "driftX",
+        "driftY",
+        "bend",
+        "zoom",
+        "edge",
+        "feather",
+        "showLine",
+        "lineWidth",
+        "lineColor",
       ],
       morph: ["amount", "progress", "stagger", "inflate", "stretch", "order"],
       transition: ["amount", "style", "progress", "softness", "strength", "detail", "direction"],
@@ -438,7 +457,7 @@ describe("portable effect definitions", () => {
       );
       expect(getEffectDefinition(definition.type)).toBe(definition);
       expect(definition.coverage).toBe(
-        ["blur", "shadow", "displace", "window-trails"].includes(definition.type)
+        ["blur", "shadow", "displace", "window-trails", "time-warp-scan"].includes(definition.type)
           ? "expand"
           : ["gradient", "circle", "shatter", "crt", "receipt", "transition"].includes(
                 definition.type,
@@ -452,6 +471,7 @@ describe("portable effect definitions", () => {
           "bevel",
           "displace",
           "thermal",
+          "time-warp-scan",
           "dither",
           "ascii",
           "blur",
