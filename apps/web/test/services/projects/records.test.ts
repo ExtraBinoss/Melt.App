@@ -111,7 +111,8 @@ it("derives mixed Static/Motion metadata without inspecting layers or original a
         throw new Error("Layer bodies must not be read for listing");
       },
     });
-  const summary = projectSummary({ id: project.id, project });
+  const summary = projectSummary({ id: project.id, project, tags: ["feature:motion"] });
+  expect(summary.tags).toEqual(["feature:motion"]);
   expect(summary.mode).toBe("motion");
   expect(summary.pages.map((page) => ({ id: page.id, mode: page.mode }))).toEqual([
     { id: "still", mode: "static" },
@@ -120,6 +121,16 @@ it("derives mixed Static/Motion metadata without inspecting layers or original a
   expect(summary).not.toHaveProperty("assets");
   expect(summary.pages[1]).not.toHaveProperty("motion");
   expect(summary.pages[1]).not.toHaveProperty("layers");
+});
+
+it("derives legacy content tags from already-loaded page metadata without opening media", () => {
+  const project = createProject({ pages: [createPage({ layers: [createLayer("image")] })] });
+  Object.defineProperty(project, "assets", {
+    get: () => {
+      throw new Error("No original reads");
+    },
+  });
+  expect(projectSummary({ id: project.id, project }).tags).toEqual(["layer:image"]);
 });
 
 it("defaults legacy artboards to Static and honors a retained timeline switched back to Static", () => {

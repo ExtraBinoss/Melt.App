@@ -1,4 +1,4 @@
-import { projectNameCandidate } from "@musart/core";
+import { projectNameCandidate, projectContentTags } from "@musart/core";
 import type { IDBPDatabase } from "idb";
 import type { AssetMetadata, StoredProject, StudioDatabase } from "../database";
 import { logicalBytes } from "../logical-bytes";
@@ -30,6 +30,7 @@ export async function persistProjectWrite(
   mediaOriginals: readonly StoredMediaOriginal[] = [],
 ): Promise<ProjectWriteResult> {
   validateProjectWrite(frame);
+  const tags = projectContentTags(frame.document);
   const id = frame.document.id;
   const tx = db.transaction(PROJECT_WRITE_STORES, "readwrite"),
     done = tx.done;
@@ -141,6 +142,7 @@ export async function persistProjectWrite(
         name = projectNameCandidate(frame.document.name, increment);
     }
     const record: StoredProject = {
+      tags,
       id,
       storageVersion: 2,
       assetsRevision: revision,

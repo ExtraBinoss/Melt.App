@@ -1,0 +1,34 @@
+{
+  "used": "Ce qui est utilisé",
+  "project": "Votre projet enregistré, prêt à être retravaillé.",
+  "more": "+{{count}}",
+  "layer": {
+    "rectangle": "Rectangles",
+    "ellipse": "Ellipses",
+    "text": "Texte",
+    "image": "Images",
+    "video": "Vidéo",
+    "group": "Groupes",
+    "vector": "Formes vectorielles"
+  },
+  "feature": {
+    "3d": "3D",
+    "motion": "Motion",
+    "audio": "Audio",
+    "masks": "Masques",
+    "gradients": "Dégradés",
+    "morph": "Morphing vectoriel",
+    "blank": "Canvas vierge"
+  },
+  "description": {
+    "second-skin": "Une danse en format portrait qui alterne couleurs thermiques, contours précis et typographie entièrement éditable.",
+    "terminal-signal": "Un terminal vert affiche et fait défiler un message derrière un écran CRT incurvé. Personnalisez le texte, le rythme et le traitement de l’écran.",
+    "angel-windows": "Un ange 3D en rotation dans un bureau rétro, entouré de fenêtres à effets en cascade et de typographie éditable.",
+    "cornell-box": "Une pièce 3D en boucle, avec murs rouges et verts, lettres chromées et ombres portées. Explorez son éclairage, ses matériaux et son orbite de caméra.",
+    "bloom-windows": "Une fleur s’épanouit derrière des fenêtres de bureau en mouvement, mêlant ASCII, cyanotype et textures d’impression.",
+    "morphing-type": "La mascotte Melt s’étire en lettres géantes grâce à des formes vectorielles éditables et un morphing continu.",
+    "share-your-work": "Une pile de cartes photo et de texte en boucle fluide, avec ombres douces et apparition floutée. Remplacez les photos pour créer votre version.",
+    "blank": "Un canvas vierge de {{width}} × {{height}} pour {{name}}. Composez votre mise en page avec des images, du texte et des formes."
+  },
+  "failed": "Le contenu du projet n’a pas pu être chargé."
+}

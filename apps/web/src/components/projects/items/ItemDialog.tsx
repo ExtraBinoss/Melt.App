@@ -10,6 +10,10 @@ import { Button } from "../../ui/button";
 import { MeltLogo } from "../../../ui/brand/MeltLogo";
 import { ItemPreview } from "./ItemPreview";
 import { useLibraryFavorites } from "./favorites-context";
+import { TEMPLATE_CATALOG } from "../../../services/projects/templates/catalog";
+import { ContentTags } from "./contents/ContentTags";
+import { useItemTags } from "./contents/use-item-tags";
+import "../templates/messages";
 
 export interface LibrarySelection {
   item: LibraryItem;
@@ -28,6 +32,11 @@ export function ItemDialog({
 }) {
   const { t } = useTranslation("libraryItem");
   const selected = useAtomValue(selection);
+  const template =
+    selected?.item.kind === "template"
+      ? TEMPLATE_CATALOG.find((entry) => entry.id === selected.item.id)
+      : undefined;
+  const { tags, failed: contentsFailed } = useItemTags(selected?.item, services);
   const favorites = useLibraryFavorites()!;
   const [dismissed, setDismissed] = useState<LibrarySelection | null>(null);
   const [failed, setFailed] = useState<LibrarySelection | null>(null);
@@ -53,9 +62,26 @@ export function ItemDialog({
           }}
         >
           <div className="library-item-info">
-            <DialogTitle className="library-item-name">{selected.item.name}</DialogTitle>
+            <DialogTitle className="library-item-name">
+              {template ? t(template.nameKey) : selected.item.name}
+            </DialogTitle>
             <span className="library-item-kind">{t(selected.item.kind)}</span>
-            <DialogDescription>{t("hint")}</DialogDescription>
+            <DialogDescription>
+              {template
+                ? t(template.descriptionKey, {
+                    name: t(template.nameKey),
+                    width: template.width,
+                    height: template.height,
+                  })
+                : t(selected.item.kind === "project" ? "libraryContents:project" : "template")}
+            </DialogDescription>
+            {!!tags?.length && (
+              <section className="library-item-contents">
+                <h3>{t("libraryContents:used")}</h3>
+                <ContentTags tags={tags} />
+              </section>
+            )}
+            {contentsFailed && <p role="alert">{t("libraryContents:failed")}</p>}
             <div className="library-item-author">
               <MeltLogo
                 size={38}

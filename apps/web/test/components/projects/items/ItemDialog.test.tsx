@@ -1,4 +1,4 @@
-import { act, fireEvent, screen } from "@testing-library/react";
+import { act, fireEvent, screen, waitFor } from "@testing-library/react";
 import { atom } from "jotai";
 import { expect, test, vi } from "vitest";
 import { setup } from "../../../support/ui";
@@ -14,8 +14,8 @@ const mocks = vi.hoisted(() => ({
   start: vi.fn(),
 }));
 vi.mock("../../../../src/bootstrap/preload", () => ({ preloadEditor: mocks.preload }));
-vi.mock("../../../../src/components/projects/templates/motion-preview/runtime", () => ({
-  startMotionTemplatePreview: () => {
+vi.mock("../../../../src/components/projects/templates/motion-preview/deferred-preview", () => ({
+  startDeferredPreview: () => {
     mocks.start();
     return {
       release: async () => {
@@ -56,9 +56,14 @@ test("opening a library item releases autoplay immediately and prepares code on 
       </FavoritesOutletContext>,
     );
     const button = await screen.findByRole("button", { name: "Ouvrir dans Melt" });
+    expect(screen.getByRole("dialog")).toHaveAccessibleDescription(/Une fleur/);
+    expect(screen.queryByText(/Double.cliquez/)).toBeNull();
+    expect(
+      screen.getByRole("dialog").querySelector('[data-content-tag="effect:ascii"]'),
+    ).not.toBeNull();
     fireEvent.pointerEnter(button);
     expect(mocks.preload).toHaveBeenCalled();
-    expect(mocks.start).toHaveBeenCalled();
+    await waitFor(() => expect(mocks.start).toHaveBeenCalled());
     await act(async () => {
       fireEvent.click(button);
     });
@@ -67,4 +72,32 @@ test("opening a library item releases autoplay immediately and prepares code on 
   } finally {
     globalThis.IntersectionObserver = observer;
   }
+});
+
+test("saved projects share detected tags in their detail dialog without rereading originals", async () => {
+  const d = setup();
+  const selection = atom<LibrarySelection | null>({
+    item: {
+      kind: "project",
+      id: "saved",
+      name: "My art",
+      mode: "static",
+      tags: ["effect:blur", "layer:image"],
+    },
+    open: vi.fn(),
+    returnFocus: null,
+  });
+  d.mount(
+    <FavoritesOutletContext
+      value={{ items: [], saving: false, error: false, refresh: vi.fn(), toggle: vi.fn() }}
+    >
+      <ItemDialog selection={selection} services={d.services} busy={false} />
+    </FavoritesOutletContext>,
+  );
+  const dialog = await screen.findByRole("dialog", { name: "My art" });
+  expect(dialog).toHaveAccessibleDescription("Votre projet enregistré, prêt à être retravaillé.");
+  expect(dialog.querySelector('[data-content-tag="effect:blur"]')).toHaveTextContent("Flou");
+  expect(dialog.querySelector('[data-content-tag="layer:image"]')).toHaveTextContent("Images");
+  expect(d.services.listProjectPage).not.toHaveBeenCalled();
+  expect(d.services.openProject).not.toHaveBeenCalled();
 });

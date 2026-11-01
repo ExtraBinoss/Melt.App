@@ -1,5 +1,5 @@
 import type { ProjectTiming } from "../services/performance/project-timing";
-import type { Composition, EnginePort, Project } from "@musart/core";
+import type { Composition, EnginePort, Project, ProjectContentTag } from "@musart/core";
 import type { MediaOriginalInput } from "../services/projects/media/model";
 import type { FontLibraryPort } from "../services/fonts/model";
 import type { PixelSelectionPort } from "../services/selection/wand/model";
@@ -7,6 +7,7 @@ import type { PixelSelectionPort } from "../services/selection/wand/model";
 export type ProjectMode = "static" | "motion";
 
 export interface ProjectSummary {
+  tags?: readonly ProjectContentTag[];
   id: string;
   name: string;
   updatedAt: string;

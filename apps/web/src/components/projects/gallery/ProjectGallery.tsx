@@ -23,7 +23,6 @@ export function ProjectGallery({
   onTask,
   onOpen,
   onCreate,
-  showCreateAction = true,
   busy: dashboardBusy = false,
   query: externalQuery,
   hideSearch = false,
@@ -36,7 +35,6 @@ export function ProjectGallery({
   onTask: TaskRunner;
   onOpen: () => void;
   onCreate: () => void;
-  showCreateAction?: boolean;
   busy?: boolean;
   query?: string;
   hideSearch?: boolean;
@@ -218,12 +216,10 @@ export function ProjectGallery({
         <div className="empty-projects">
           <FolderOpen size={28} strokeWidth={1.2} />
           <p>{t("noProjects")}</p>
-          {showCreateAction && (
-            <Button onClick={onCreate}>
-              <Plus size={15} />
-              {t("newProject")}
-            </Button>
-          )}
+          <Button size="lg" className="empty-project-create" disabled={disabled} onClick={onCreate}>
+            <Plus size={19} />
+            {t("newProject")}
+          </Button>
         </div>
       ) : (
         <>

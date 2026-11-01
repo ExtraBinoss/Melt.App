@@ -1,5 +1,6 @@
 import { defineConfig } from "vitest/config";
 import react from "@vitejs/plugin-react";
+import { templateContentsPlugin } from "./scripts/vite/template-contents.ts";
 import { fileURLToPath, URL } from "node:url";
 const extensions = "{ts,tsx,mts,cts,js,jsx,mjs,cjs}";
 const core = [`packages/core/test/**/*.test.${extensions}`];
@@ -13,7 +14,7 @@ const platform = [
   "apps/web/test/services/{serialization/fragments/task-yield,serialization/hashing/client,files/download,selection/wand/client}.test.ts",
 ];
 export default defineConfig({
-  plugins: [react()],
+  plugins: [templateContentsPlugin(), react()],
   resolve: { alias: { "@": fileURLToPath(new URL("./apps/web/src", import.meta.url)) } },
   test: {
     globals: true,

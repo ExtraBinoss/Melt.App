@@ -1,0 +1,34 @@
+{
+  "used": "Wat zit erin",
+  "project": "Je opgeslagen project, klaar om verder te bewerken.",
+  "more": "+{{count}}",
+  "layer": {
+    "rectangle": "Rechthoeken",
+    "ellipse": "Ellipsen",
+    "text": "Tekst",
+    "image": "Afbeeldingen",
+    "video": "Video",
+    "group": "Groepen",
+    "vector": "Vectorvormen"
+  },
+  "feature": {
+    "3d": "3D",
+    "motion": "Beweging",
+    "audio": "Audio",
+    "masks": "Maskers",
+    "gradients": "Kleurverlopen",
+    "morph": "Vectormorphing",
+    "blank": "Leeg canvas"
+  },
+  "description": {
+    "second-skin": "Een verticale dansstudie met thermische kleuren, scherpe contouren en bewerkbare typografie.",
+    "terminal-signal": "Een groene terminal typt en scrolt een bericht achter gebogen CRT-glas. Pas de tekst, timing en schermstijl aan.",
+    "angel-windows": "Een draaiende 3D-engel op een retrobureaublad, omringd door trapsgewijze effectvensters en bewerkbare typografie.",
+    "cornell-box": "Een 3D-kamer in een lus met rode en groene muren, chromen letters en slagschaduwen. Verken licht, materialen en de camerabaan.",
+    "bloom-windows": "Een bloeiende bloem achter bewegende bureaubladvensters met ASCII, cyanotypie en druktexturen.",
+    "morphing-type": "De Melt-mascotte verandert met bewerkbare vectorvormen en vloeiende morphing in reusachtige letters.",
+    "share-your-work": "Een naadloze stapel fotokaarten en krachtige tekst, met zachte schaduwen en een onscherpe entree. Vervang de foto's door je eigen beelden.",
+    "blank": "Een leeg canvas van {{width}} × {{height}} voor {{name}}. Maak je eigen ontwerp met afbeeldingen, tekst en vormen."
+  },
+  "failed": "De projectinhoud kon niet worden geladen."
+}

@@ -1,6 +1,9 @@
 import type { DBSchema } from "idb";
+import type { ProjectContentTag } from "@musart/core";
 import { openDatabase, commitTransaction } from "../../persistence/database";
 export interface LibraryItem {
+  /** Transient display metadata; persisted favorites retain IDs only. */
+  tags?: readonly ProjectContentTag[];
   kind: "project" | "template";
   id: string;
   name: string;

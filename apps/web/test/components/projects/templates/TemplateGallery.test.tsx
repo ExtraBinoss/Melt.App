@@ -2,7 +2,8 @@ import { MOTION_TEMPLATE_ASSET_REVISIONS } from "../../../../src/services/projec
 import { TEMPLATE_CATALOG } from "../../../../src/services/projects/templates/catalog";
 import { LIBRARY_MODE_KEY } from "../../../../src/components/projects/dashboard/library-mode";
 import { beforeEach, expect, test, vi } from "vitest";
-import { fireEvent, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, screen, waitFor } from "@testing-library/react";
+import { i18n } from "../../../../src/state/i18n";
 import { TemplateGallery } from "../../../../src/components/projects/templates/TemplateGallery";
 import { setup } from "../../../support/ui";
 vi.mock(
@@ -135,3 +136,26 @@ test("controlled query and mode filter list-only presentation without a duplicat
 });
 
 beforeEach(() => localStorage.removeItem(LIBRARY_MODE_KEY));
+
+test("cards show localized descriptions and search the automatically detected effects", async () => {
+  setup().mount(<TemplateGallery onChoose={vi.fn()} />);
+  const cards = [...document.querySelectorAll(".library-card")];
+  expect(cards).toHaveLength(TEMPLATE_CATALOG.length);
+  for (const card of cards) {
+    expect(card.querySelector(".library-card-description")).toHaveTextContent(/\S/);
+    expect(card.querySelector(".library-content-tags")).not.toBeNull();
+  }
+  fireEvent.change(screen.getByRole("searchbox"), { target: { value: "Flou" } });
+  expect(screen.getAllByRole("article")).toHaveLength(1);
+  expect(screen.getByRole("article")).toHaveTextContent("Too Hot to Haunt");
+  await act(async () => {
+    await i18n.changeLanguage("en");
+  });
+  fireEvent.change(screen.getByRole("searchbox"), { target: { value: "blur" } });
+  expect(screen.getByRole("article")).toHaveTextContent("soft shadows and a blur entrance");
+  fireEvent.change(screen.getByRole("searchbox"), { target: { value: "TikTok" } });
+  expect(screen.getByRole("article")).toHaveTextContent("An empty 1080 × 1920 canvas");
+  expect(
+    screen.getByRole("article").querySelector('[data-content-tag="feature:blank"]'),
+  ).toHaveTextContent("Blank canvas");
+});

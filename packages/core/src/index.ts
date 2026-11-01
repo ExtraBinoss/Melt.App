@@ -1,4 +1,6 @@
 export { projectNameCandidate } from "./document/naming";
+export { projectContentTags } from "./document/contents";
+export type { ProjectContentTag } from "./document/contents";
 export { validateAssetDescription } from "./assets/validation";
 export type { MorphPoint, MorphContour, MorphShapeFrame, ShapeMorph } from "./effects/morph/model";
 export { morphContentBounds } from "./effects/morph/bounds";

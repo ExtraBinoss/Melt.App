@@ -360,7 +360,6 @@ function ProjectDashboard({
                                 if (scope.current.alive) onClose();
                               }}
                               onCreate={custom}
-                              showCreateAction={false}
                               query={queries.projects}
                               hideSearch
                               mode={libraryMode}

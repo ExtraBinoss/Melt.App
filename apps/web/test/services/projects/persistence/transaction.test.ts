@@ -17,6 +17,7 @@ it("writes originals, manifest, live accounting and preferences atomically, with
     expect(await d.db.get("preferences", "last-project")).toBe(d.project.id);
     const record = (await d.db.get("projects", d.project.id))!;
     expect(record.thumbnailRenderVersion).toBe(THUMBNAIL_RENDER_VERSION);
+    expect(record.tags).toEqual(["layer:image"]);
     expect(record.bytes!.manifest).toBe(manifestBytes(record));
     const next = prepareProjectWrite(
       { ...d.project, name: "Changed" },
@@ -90,6 +91,7 @@ it("rejects stale asset bases before writing and applies changed/deleted origina
     );
     expect(await d.db.count("assets")).toBe(0);
     expect((await d.db.get("projects", d.project.id))!.bytes!.assets).toBe(0);
+    expect((await d.db.get("projects", d.project.id))!.tags).toEqual(["feature:blank"]);
   } finally {
     d.db.close();
   }

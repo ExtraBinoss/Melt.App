@@ -1,0 +1,34 @@
+{
+  "used": "Enthaltene Werkzeuge",
+  "project": "Dein gespeichertes Projekt, bereit zur weiteren Bearbeitung.",
+  "more": "+{{count}}",
+  "layer": {
+    "rectangle": "Rechtecke",
+    "ellipse": "Ellipsen",
+    "text": "Text",
+    "image": "Bilder",
+    "video": "Video",
+    "group": "Gruppen",
+    "vector": "Vektorformen"
+  },
+  "feature": {
+    "3d": "3D",
+    "motion": "Bewegung",
+    "audio": "Audio",
+    "masks": "Masken",
+    "gradients": "Farbverläufe",
+    "morph": "Vektormorphing",
+    "blank": "Leere Arbeitsfläche"
+  },
+  "description": {
+    "second-skin": "Eine Tanzstudie im Hochformat mit Wärmebildfarben, klaren Konturen und frei bearbeitbarer Typografie.",
+    "terminal-signal": "Ein grünes Terminal tippt und scrollt eine Nachricht hinter gewölbtem CRT-Glas. Text, Timing und Bildschirmstil lassen sich anpassen.",
+    "angel-windows": "Ein rotierender 3D-Engel auf einem Retro-Desktop, umrahmt von kaskadierenden Effektfenstern und bearbeitbarer Typografie.",
+    "cornell-box": "Ein 3D-Raum in Endlosschleife mit roten und grünen Wänden, Chromschrift und Schatten. Erkunde Licht, Materialien und Kamerafahrt.",
+    "bloom-windows": "Eine aufblühende Blume hinter bewegten Desktopfenstern mit ASCII, Cyanotypie und Drucktexturen.",
+    "morphing-type": "Das Melt-Maskottchen verwandelt sich mit bearbeitbaren Vektorformen und kontinuierlichem Morphing in übergroße Buchstaben.",
+    "share-your-work": "Ein nahtloser Stapel aus Fotokarten und kräftiger Schrift mit weichen Schatten und unscharfem Einstieg. Ersetze die Fotos durch deine eigenen.",
+    "blank": "Eine leere {{width}} × {{height}} große Arbeitsfläche für {{name}}. Gestalte dein Layout mit Bildern, Text und Formen."
+  },
+  "failed": "Der Projektinhalt konnte nicht geladen werden."
+}

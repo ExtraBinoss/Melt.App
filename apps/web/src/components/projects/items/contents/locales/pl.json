@@ -1,0 +1,34 @@
+{
+  "used": "Co zawiera",
+  "project": "Twój zapisany projekt, gotowy do dalszej edycji.",
+  "more": "+{{count}}",
+  "layer": {
+    "rectangle": "Prostokąty",
+    "ellipse": "Elipsy",
+    "text": "Tekst",
+    "image": "Obrazy",
+    "video": "Wideo",
+    "group": "Grupy",
+    "vector": "Kształty wektorowe"
+  },
+  "feature": {
+    "3d": "3D",
+    "motion": "Ruch",
+    "audio": "Dźwięk",
+    "masks": "Maski",
+    "gradients": "Gradienty",
+    "morph": "Morfing wektorowy",
+    "blank": "Puste płótno"
+  },
+  "description": {
+    "second-skin": "Pionowe studium tańca łączące kolory termiczne, wyraźne kontury i edytowalną typografię.",
+    "terminal-signal": "Zielony terminal pisze i przewija wiadomość za zakrzywionym szkłem CRT. Dostosuj tekst, tempo i wygląd ekranu.",
+    "angel-windows": "Obracający się anioł 3D na pulpicie retro, otoczony kaskadowymi oknami efektów i edytowalną typografią.",
+    "cornell-box": "Zapętlony pokój 3D z czerwonymi i zielonymi ścianami, chromowanymi literami i cieniami. Odkryj oświetlenie, materiały i orbitę kamery.",
+    "bloom-windows": "Rozkwitający kwiat za ruchomymi oknami pulpitu, łączący ASCII, cyjanotypię i tekstury druku.",
+    "morphing-type": "Maskotka Melt zmienia się w ogromne litery dzięki edytowalnym kształtom wektorowym i płynnemu morfingowi.",
+    "share-your-work": "Zapętlony stos kart ze zdjęciami i wyrazistego tekstu, z miękkimi cieniami i rozmytym wejściem. Zastąp zdjęcia własnymi.",
+    "blank": "Puste płótno {{width}} × {{height}} dla {{name}}. Zbuduj własny układ z obrazów, tekstu i kształtów."
+  },
+  "failed": "Nie udało się wczytać zawartości projektu."
+}

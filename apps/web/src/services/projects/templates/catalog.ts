@@ -16,13 +16,13 @@ export interface ProjectTemplate {
   readonly previewBackground?: string;
   readonly category: "artwork" | "social" | "video" | "print" | "screen";
   readonly mode: "static" | "motion";
-  readonly descriptionKey?: string;
+  readonly descriptionKey: string;
 }
 export const TEMPLATE_CATALOG: readonly ProjectTemplate[] = Object.freeze([
   Object.freeze({
     id: "second-skin",
     nameKey: "templates:secondSkin",
-    descriptionKey: "templates:secondSkinDescription",
+    descriptionKey: "libraryContents:description.second-skin",
     width: 1080,
     height: 1920,
     mode: "motion",
@@ -33,7 +33,7 @@ export const TEMPLATE_CATALOG: readonly ProjectTemplate[] = Object.freeze([
   Object.freeze({
     id: "terminal-signal",
     nameKey: "templates:terminalSignal",
-    descriptionKey: "templates:terminalSignalDescription",
+    descriptionKey: "libraryContents:description.terminal-signal",
     width: 1080,
     height: 1920,
     mode: "motion",
@@ -44,7 +44,7 @@ export const TEMPLATE_CATALOG: readonly ProjectTemplate[] = Object.freeze([
   Object.freeze({
     id: "angel-windows",
     nameKey: "templates:angelWindows",
-    descriptionKey: "templates:angelWindowsDescription",
+    descriptionKey: "libraryContents:description.angel-windows",
     width: 1080,
     height: 1920,
     mode: "motion",
@@ -54,7 +54,7 @@ export const TEMPLATE_CATALOG: readonly ProjectTemplate[] = Object.freeze([
   Object.freeze({
     id: "cornell-box",
     nameKey: "templates:cornellBox",
-    descriptionKey: "templates:cornellBoxDescription",
+    descriptionKey: "libraryContents:description.cornell-box",
     width: 1080,
     height: 1080,
     mode: "motion",
@@ -64,7 +64,7 @@ export const TEMPLATE_CATALOG: readonly ProjectTemplate[] = Object.freeze([
   Object.freeze({
     id: "bloom-windows",
     nameKey: "templates:bloomWindows",
-    descriptionKey: "templates:bloomWindowsDescription",
+    descriptionKey: "libraryContents:description.bloom-windows",
     width: 1920,
     height: 1080,
     mode: "motion",
@@ -75,7 +75,7 @@ export const TEMPLATE_CATALOG: readonly ProjectTemplate[] = Object.freeze([
     id: "morphing-type",
     previewBackground: "#ffffff",
     nameKey: "templates:morphingType",
-    descriptionKey: "templates:morphingTypeDescription",
+    descriptionKey: "libraryContents:description.morphing-type",
     width: 1920,
     height: 1080,
     mode: "motion",
@@ -90,7 +90,7 @@ export const TEMPLATE_CATALOG: readonly ProjectTemplate[] = Object.freeze([
     height: 480,
     category: "artwork" as const,
     mode: "motion" as const,
-    descriptionKey: "templates:shareYourWorkDescription",
+    descriptionKey: "libraryContents:description.share-your-work",
     preview: `${import.meta.env.BASE_URL}templates/motion/share-your-work/share-your-work.webp?v=haunt-loop-1`,
   }),
   ...PRESETS.map((preset) =>
@@ -102,6 +102,7 @@ export const TEMPLATE_CATALOG: readonly ProjectTemplate[] = Object.freeze([
       brandId: preset.brandId,
       category: preset.category,
       mode: "static" as const,
+      descriptionKey: "libraryContents:description.blank",
     }),
   ),
 ]);

@@ -4,6 +4,7 @@ import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import { fileURLToPath, URL } from "node:url";
 import { fiberTimerCompatibility } from "./scripts/vite/fiber-timer.ts";
+import { templateContentsPlugin } from "./scripts/vite/template-contents.ts";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 const fiberThreeAdapter = fileURLToPath(
   new URL("./apps/web/src/canvas/render/fiber-three.ts", import.meta.url),
@@ -12,6 +13,7 @@ export default defineConfig({
   base: process.env.MUSART_BASE_PATH ?? "/",
   root: "apps/web",
   plugins: [
+    templateContentsPlugin(),
     fiberTimerCompatibility(fiberThreeAdapter),
     tanstackStart({
       start: { entry: "start.ts" },

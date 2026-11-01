@@ -18,6 +18,8 @@ import { favoritesFirst } from "../../../services/projects/library/favorites";
 import { isMotionTemplateId } from "../../../services/projects/templates/motion/identity";
 import "../items/messages";
 import { MotionTemplatePreview } from "./motion-preview/MotionTemplatePreview";
+import { ContentTags, contentTagLabel } from "../items/contents/ContentTags";
+import { templateContentTags } from "../../../services/projects/templates/contents";
 import "./messages";
 import "./templates.css";
 
@@ -56,7 +58,7 @@ export function TemplateGallery({
   );
   const templates = favoritesFirst(
     modeTemplates.filter((template) =>
-      `${t(template.nameKey)} ${t(`templates:${template.mode}`)} ${template.brandId ?? ""} ${template.width} ${template.height}`
+      `${t(template.nameKey)} ${t(`templates:${template.mode}`)} ${t(template.descriptionKey, { name: t(template.nameKey), width: template.width, height: template.height })} ${(templateContentTags(template.id) ?? []).map((tag) => contentTagLabel(tag, t)).join(" ")} ${template.brandId ?? ""} ${template.width} ${template.height}`
         .toLocaleLowerCase()
         .includes(term),
     ),
@@ -233,7 +235,18 @@ export function TemplateGallery({
                         </div>
                       </Trigger>
                     }
-                  />
+                  >
+                    <div className="library-card-details">
+                      <p className="library-card-description">
+                        {t(template.descriptionKey, {
+                          name,
+                          width: template.width,
+                          height: template.height,
+                        })}
+                      </p>
+                      <ContentTags tags={templateContentTags(template.id)} limit={3} />
+                    </div>
+                  </LibraryCard>
                   {activation.inspectable && (
                     <LibraryOpenButton
                       onOpen={activation.direct}

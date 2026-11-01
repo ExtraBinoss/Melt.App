@@ -1,0 +1,34 @@
+{
+  "used": "O que é utilizado",
+  "project": "O seu projeto guardado, pronto para continuar a editar.",
+  "more": "+{{count}}",
+  "layer": {
+    "rectangle": "Retângulos",
+    "ellipse": "Elipses",
+    "text": "Texto",
+    "image": "Imagens",
+    "video": "Vídeo",
+    "group": "Grupos",
+    "vector": "Formas vetoriais"
+  },
+  "feature": {
+    "3d": "3D",
+    "motion": "Movimento",
+    "audio": "Áudio",
+    "masks": "Máscaras",
+    "gradients": "Gradientes",
+    "morph": "Morphing vetorial",
+    "blank": "Tela vazia"
+  },
+  "description": {
+    "second-skin": "Um estudo de dança vertical que alterna cores térmicas, contornos nítidos e tipografia editável.",
+    "terminal-signal": "Um terminal verde escreve e desloca uma mensagem por trás de um vidro CRT curvo. Personalize o texto, o ritmo e o estilo do ecrã.",
+    "angel-windows": "Um anjo 3D em rotação num ambiente de trabalho retro, rodeado por janelas de efeitos em cascata e tipografia editável.",
+    "cornell-box": "Uma sala 3D em ciclo com paredes vermelhas e verdes, letras cromadas e sombras. Explore a iluminação, os materiais e a órbita da câmara.",
+    "bloom-windows": "Uma flor desabrocha atrás de janelas em movimento, misturando ASCII, cianotipia e texturas de impressão.",
+    "morphing-type": "A mascote Melt transforma-se em letras gigantes através de formas vetoriais editáveis e de um morphing contínuo.",
+    "share-your-work": "Uma pilha contínua de cartões fotográficos e texto marcante, com sombras suaves e uma entrada desfocada. Substitua as fotografias pelas suas.",
+    "blank": "Uma tela vazia de {{width}} × {{height}} para {{name}}. Crie o seu layout com imagens, texto e formas."
+  },
+  "failed": "Não foi possível carregar o conteúdo do projeto."
+}

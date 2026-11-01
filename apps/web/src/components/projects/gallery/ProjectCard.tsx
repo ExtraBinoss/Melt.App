@@ -14,6 +14,7 @@ import { Button } from "../../ui/button";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent } from "../../ui/dropdown-menu";
 import { ContextMenu, ContextMenuTrigger, ContextMenuContent } from "../../ui/context-menu";
 import { ProjectMenuItems } from "./ProjectMenuItems";
+import { ContentTags } from "../items/contents/ContentTags";
 export function ProjectCard({
   project,
   services,
@@ -51,6 +52,7 @@ export function ProjectCard({
       preview: project.thumbnail,
       width: previewPage?.width,
       height: previewPage?.height,
+      tags: project.tags,
     },
     onOpen,
     disabled,
@@ -204,6 +206,11 @@ export function ProjectCard({
             </DropdownMenu>
           }
         >
+          {project.tags && (
+            <div className="library-card-details">
+              <ContentTags tags={project.tags} limit={3} />
+            </div>
+          )}
           {activation.inspectable && (
             <LibraryOpenButton
               onOpen={activation.direct}

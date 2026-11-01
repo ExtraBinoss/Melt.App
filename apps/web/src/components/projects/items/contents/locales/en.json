@@ -1,0 +1,34 @@
+{
+  "used": "What's inside",
+  "project": "Your saved project, ready to continue editing.",
+  "more": "+{{count}}",
+  "layer": {
+    "rectangle": "Rectangles",
+    "ellipse": "Ellipses",
+    "text": "Text",
+    "image": "Images",
+    "video": "Video",
+    "group": "Groups",
+    "vector": "Vector shapes"
+  },
+  "feature": {
+    "3d": "3D",
+    "motion": "Motion",
+    "audio": "Audio",
+    "masks": "Masks",
+    "gradients": "Gradients",
+    "morph": "Vector morphing",
+    "blank": "Blank canvas"
+  },
+  "description": {
+    "second-skin": "A portrait dance study that moves between thermal color, sharp contours and bold, editable typography.",
+    "terminal-signal": "A green terminal types and scrolls a message behind curved CRT glass. Customize the text, timing and screen treatment.",
+    "angel-windows": "A rotating 3D angel inside a retro desktop, framed by cascading effect windows and editable typography.",
+    "cornell-box": "A looping 3D room with red and green walls, chrome lettering and cast shadows. Explore its lighting, materials and camera orbit.",
+    "bloom-windows": "A blooming flower seen through moving desktop windows, mixing ASCII, cyanotype and print textures.",
+    "morphing-type": "The Melt mascot stretches into oversized lettering through editable vector shapes and a continuous morph.",
+    "share-your-work": "A seamless stack of photo cards and bold type, with soft shadows and a blur entrance. Replace the photos to make it yours.",
+    "blank": "An empty {{width}} × {{height}} canvas for {{name}}. Build your own layout with images, text and shapes."
+  },
+  "failed": "The project contents could not be loaded."
+}

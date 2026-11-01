@@ -1,4 +1,5 @@
 import type { ProjectSummary } from "../../state/contracts";
+import { projectContentTags } from "@musart/core";
 import type { StoredProject, StoredThumbnail, ThumbnailInfo } from "./database";
 import { logicalBytes } from "./logical-bytes";
 export function thumbnailInfo(record: StoredThumbnail): ThumbnailInfo {
@@ -36,6 +37,7 @@ export function projectSummary(record: StoredProject): ProjectSummary {
     id: project.id,
     name: project.name,
     updatedAt: project.updatedAt,
+    tags: record.tags ?? projectContentTags(project),
     mode: project.pages.some((page) => page.motion?.mode === "motion") ? "motion" : "static",
     width: project.pages[0]!.width,
     height: project.pages[0]!.height,

@@ -1,0 +1,34 @@
+{
+  "used": "Qué contiene",
+  "project": "Tu proyecto guardado, listo para seguir editándolo.",
+  "more": "+{{count}}",
+  "layer": {
+    "rectangle": "Rectángulos",
+    "ellipse": "Elipses",
+    "text": "Texto",
+    "image": "Imágenes",
+    "video": "Vídeo",
+    "group": "Grupos",
+    "vector": "Formas vectoriales"
+  },
+  "feature": {
+    "3d": "3D",
+    "motion": "Movimiento",
+    "audio": "Audio",
+    "masks": "Máscaras",
+    "gradients": "Degradados",
+    "morph": "Morphing vectorial",
+    "blank": "Lienzo vacío"
+  },
+  "description": {
+    "second-skin": "Un estudio de danza vertical que alterna colores térmicos, contornos definidos y tipografía editable.",
+    "terminal-signal": "Un terminal verde escribe y desplaza un mensaje tras un cristal CRT curvo. Personaliza el texto, el ritmo y el estilo de pantalla.",
+    "angel-windows": "Un ángel 3D giratorio en un escritorio retro, rodeado de ventanas de efectos en cascada y tipografía editable.",
+    "cornell-box": "Una habitación 3D en bucle con paredes rojas y verdes, letras cromadas y sombras. Explora la iluminación, los materiales y la órbita de cámara.",
+    "bloom-windows": "Una flor se abre tras ventanas de escritorio en movimiento, mezclando ASCII, cianotipia y texturas de impresión.",
+    "morphing-type": "La mascota de Melt se transforma en letras gigantes mediante formas vectoriales editables y un morphing continuo.",
+    "share-your-work": "Una pila continua de tarjetas fotográficas y tipografía contundente, con sombras suaves y una entrada desenfocada. Sustituye las fotos por las tuyas.",
+    "blank": "Un lienzo vacío de {{width}} × {{height}} para {{name}}. Crea tu diseño con imágenes, texto y formas."
+  },
+  "failed": "No se ha podido cargar el contenido del proyecto."
+}

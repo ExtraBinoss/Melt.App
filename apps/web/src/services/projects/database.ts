@@ -1,6 +1,6 @@
 import { openDatabase } from "../persistence/database";
 import { type DBSchema } from "idb";
-import type { EmbeddedAsset, OriginalMediaAsset, Project } from "@musart/core";
+import type { EmbeddedAsset, OriginalMediaAsset, Project, ProjectContentTag } from "@musart/core";
 import type { StoredMediaHeader, StoredMediaOriginal } from "./media/model";
 import type {
   HistoryMetadata,
@@ -21,6 +21,7 @@ export interface ProjectBytes {
 import type { StoredThumbnail, ThumbnailInfo } from "./thumbnails/model";
 export type { StoredThumbnail, ThumbnailInfo } from "./thumbnails/model";
 interface LegacyProject {
+  tags?: readonly ProjectContentTag[];
   id: string;
   project: Project;
   storageVersion?: 1;
@@ -31,6 +32,7 @@ interface LegacyProject {
   thumbnailInfo?: ThumbnailInfo[];
 }
 interface StoredManifest {
+  tags?: readonly ProjectContentTag[];
   id: string;
   project: ProjectManifest;
   storageVersion: 2;

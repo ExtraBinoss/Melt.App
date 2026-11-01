@@ -1,0 +1,34 @@
+{
+  "used": "Cosa contiene",
+  "project": "Il tuo progetto salvato, pronto per essere modificato.",
+  "more": "+{{count}}",
+  "layer": {
+    "rectangle": "Rettangoli",
+    "ellipse": "Ellissi",
+    "text": "Testo",
+    "image": "Immagini",
+    "video": "Video",
+    "group": "Gruppi",
+    "vector": "Forme vettoriali"
+  },
+  "feature": {
+    "3d": "3D",
+    "motion": "Movimento",
+    "audio": "Audio",
+    "masks": "Maschere",
+    "gradients": "Sfumature",
+    "morph": "Morphing vettoriale",
+    "blank": "Tela vuota"
+  },
+  "description": {
+    "second-skin": "Uno studio di danza verticale che alterna colori termici, contorni netti e tipografia modificabile.",
+    "terminal-signal": "Un terminale verde scrive e fa scorrere un messaggio dietro un vetro CRT curvo. Personalizza testo, tempi e stile dello schermo.",
+    "angel-windows": "Un angelo 3D in rotazione su un desktop rétro, circondato da finestre con effetti a cascata e tipografia modificabile.",
+    "cornell-box": "Una stanza 3D in loop con pareti rosse e verdi, lettere cromate e ombre. Esplora illuminazione, materiali e orbita della camera.",
+    "bloom-windows": "Un fiore sboccia dietro finestre del desktop in movimento, mescolando ASCII, cianotipia e texture di stampa.",
+    "morphing-type": "La mascotte Melt si trasforma in lettere giganti attraverso forme vettoriali modificabili e un morphing continuo.",
+    "share-your-work": "Una pila continua di fotografie e testo deciso, con ombre morbide e un ingresso sfocato. Sostituisci le foto per creare la tua versione.",
+    "blank": "Una tela vuota di {{width}} × {{height}} per {{name}}. Crea il tuo layout con immagini, testo e forme."
+  },
+  "failed": "Impossibile caricare il contenuto del progetto."
+}

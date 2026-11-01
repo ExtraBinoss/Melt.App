@@ -48,6 +48,7 @@ export function useLinkedPreview(
             (project.pages.some((entry) => entry.mode === "motion") ? "motion" : "static"),
           pageId: page?.id,
           preview: project.thumbnail,
+          tags: project.tags,
           width: page?.width ?? project.width,
           height: page?.height ?? project.height,
         };
