@@ -38,7 +38,7 @@ export function KeyframeMarker({
   interactive?: boolean;
   onSelectOwner?: (additive: boolean) => void;
 }) {
-  const { t } = useTranslation("motion");
+  const { t, i18n } = useTranslation("motion");
   const remove = useRef<(() => void) | null>(null);
   const [deleteCount, setDeleteCount] = useState(1);
   function prepareDelete() {
@@ -109,15 +109,27 @@ export function KeyframeMarker({
             </ContextMenuTrigger>
           </TooltipTrigger>
           <TooltipContent side="top">
-            <span>{name}</span>
-            {" · "}
-            <span
-              data-motion-key-tooltip={marker.key.id}
-              data-time-unit={unit}
-              className="inline-block min-w-[7ch] tabular-nums"
-            >
-              {formatTimelineTime(marker.key.time, unit)} {unit}
-            </span>
+            <div>
+              <span>{name}</span>
+              {" · "}
+              <span
+                data-motion-key-tooltip={marker.key.id}
+                data-time-unit={unit}
+                className="inline-block min-w-[7ch] tabular-nums"
+              >
+                {formatTimelineTime(marker.key.time, unit)} {unit}
+              </span>
+              <div data-motion-key-value={marker.key.id}>
+                {t("keyValue", {
+                  value:
+                    typeof marker.key.value === "number"
+                      ? marker.key.value.toLocaleString(i18n.resolvedLanguage, {
+                          maximumFractionDigits: 20,
+                        })
+                      : String(marker.key.value),
+                })}
+              </div>
+            </div>
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>

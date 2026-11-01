@@ -8,5 +8,6 @@
   "yes": "Ja, Bewegung aktivieren",
   "no": "Nein, statisch lassen",
   "changed": "Die Komposition hat sich geändert. Bitte versuche es erneut.",
-  "failed": "Diese Änderung konnte nicht angewendet werden."
+  "failed": "Diese Änderung konnte nicht angewendet werden.",
+  "keyValue": "Wert: {{value}}"
 }

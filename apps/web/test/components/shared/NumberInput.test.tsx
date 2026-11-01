@@ -1,8 +1,11 @@
-import "../../../src/state/i18n";
+import { i18n } from "../../../src/state/i18n";
 import { useState, Profiler } from "react";
 import { expect, test, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { NumberInput } from "../../../src/components/shared/NumberInput";
+beforeEach(async () => {
+  await i18n.changeLanguage("fr");
+});
 test("commits valid numbers once, clamps ranges and preserves invalid drafts until blur", () => {
   const onCommit = vi.fn();
   function Host() {
@@ -351,4 +354,11 @@ test("reset respects disabled and reduced-motion preferences without React anima
   view.rerender(<NumberInput label="Reduced" value={30} disabled onCommit={commit} />);
   fireEvent.doubleClick(screen.getByRole("button", { name: "Ajuster Reduced" }));
   expect(commit).toHaveBeenCalledOnce();
+});
+
+test("omits an empty unit without reserving a trailing cell", () => {
+  const view = render(<NumberInput label="Gamma" value={1} unit="" onCommit={vi.fn()} />);
+  expect(view.container.querySelector(".number-unit")).toBeNull();
+  view.rerender(<NumberInput label="Size" value={10} unit="px" onCommit={vi.fn()} />);
+  expect(view.container.querySelector(".number-unit")).toHaveTextContent("px");
 });

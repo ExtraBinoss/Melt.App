@@ -358,9 +358,11 @@ function DesktopNumberInput({
           }
         }}
       />
-      <span className="number-unit" aria-hidden>
-        {unit ?? "—"}
-      </span>
+      {unit && (
+        <span className="number-unit" aria-hidden>
+          {unit}
+        </span>
+      )}
     </div>
   );
 }

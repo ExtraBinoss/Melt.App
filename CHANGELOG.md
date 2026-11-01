@@ -6,6 +6,7 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Crossfade decoded layer thumbnails while retaining previous pixels until replacement, bound and release transitional image URLs, align effect keyframe diamonds with their controls, remove empty numeric unit cells, and show each keyframe value on a separate translated tooltip line.
 - Profile cached text shaping, contour generation, atlas preparation, shader compilation, uniform updates, draw submission and morph complexity in the composition Performance report and development playback logs. GPU timestamp timings remain separate from host elapsed times.
 - Avoid a per-frame GPU completion fence for ordered graphics-only playback, eliminating the dominant Firefox WebGPU stall with a bounded eight-frame submission window while preserving conservative video publication and native video-frame ownership fences.
 - Add the dependency-free `@musart/path-morph` package: exact pruned correspondence, reusable interpolation buffers and cooperative shared-trajectory simplification. Morph atlases retain every authored pose, remove only redundant trajectories, pack straight edges into one texel and use a specialized analytical GPU line path.

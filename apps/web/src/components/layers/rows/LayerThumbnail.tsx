@@ -1,4 +1,4 @@
-import { memo, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, memo, useEffect, useMemo, useRef, useState } from "react";
 import { Image, Type, Shapes, Folder, Square, Circle, Clapperboard, Box } from "lucide-react";
 import { isImageAsset, type Layer, type Asset } from "@musart/core";
 import { scheduleLayerThumbnail } from "./thumbnail-idle";
@@ -16,6 +16,8 @@ const icons = {
 const revealed = new WeakSet<Blob>();
 interface PreviewValue {
   key: string;
+  owner: string;
+  loaded?: boolean;
   url: string;
   blob: Blob;
   exporter: EditorServices["previewExport"];
@@ -39,6 +41,20 @@ export const LayerThumbnail = memo(function LayerThumbnail({
   const node = useRef<HTMLSpanElement>(null);
   const [value, setValue] = useState<PreviewValue | null>(null);
   const owned = useRef<PreviewValue | null>(null);
+  const [previous, setPrevious] = useState<PreviewValue | null>(null);
+  const retiring = useRef<PreviewValue | null>(null);
+  const urls = useRef(new Set<string>());
+  const fadeTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const release = useCallback((url: string) => {
+    if (urls.current.delete(url)) URL.revokeObjectURL(url);
+  }, []);
+  function finishFade() {
+    clearTimeout(fadeTimer.current);
+    const before = retiring.current;
+    retiring.current = null;
+    if (before) release(before.url);
+    setPrevious(null);
+  }
   const kind = variant?.kind,
     effectId = variant?.kind === "effect" ? variant.effectId : undefined;
   const requestVariant = useMemo<LayerPreviewVariant | undefined>(
@@ -62,11 +78,15 @@ export const LayerThumbnail = memo(function LayerThumbnail({
   // The virtual window already bounds ownership. Keep a decoded image while its
   // row crosses the observer margin, rather than revoking and decoding it again.
   useEffect(() => {
+    const ownedUrls = urls.current;
     return () => {
-      if (owned.current) URL.revokeObjectURL(owned.current.url);
+      clearTimeout(fadeTimer.current);
+      for (const url of ownedUrls) URL.revokeObjectURL(url);
+      ownedUrls.clear();
       owned.current = null;
+      retiring.current = null;
     };
-  }, [key, previewExport]);
+  }, [observerKey, previewExport]);
   useEffect(() => {
     if (!visible || !previewExport) return;
     if (owned.current?.key === key && owned.current.exporter === previewExport) return;
@@ -90,12 +110,19 @@ export const LayerThumbnail = memo(function LayerThumbnail({
       ).then(
         (result) => {
           if (!active || controller.signal.aborted) return;
+          const before = owned.current?.loaded ? owned.current : retiring.current;
+          clearTimeout(fadeTimer.current);
+          for (const url of urls.current) if (url !== before?.url) release(url);
+          retiring.current = before;
+          setPrevious(before);
           const next = {
             key,
+            owner: observerKey,
             url: URL.createObjectURL(result.blob),
             blob: result.blob,
             exporter: previewExport,
           };
+          urls.current.add(next.url);
           owned.current = next;
           setValue(next);
         },
@@ -109,10 +136,10 @@ export const LayerThumbnail = memo(function LayerThumbnail({
       cancelIdle();
       controller.abort();
     };
-  }, [visible, previewExport, layer.id, key, pageId, requestVariant]);
+  }, [visible, previewExport, layer.id, key, pageId, requestVariant, observerKey, release]);
   const Icon = layer.spatial?.enabled ? Box : icons[layer.kind];
   const source =
-    value?.key === key && value.exporter === previewExport
+    value?.owner === observerKey && value.exporter === previewExport
       ? value.url
       : !services?.previewExport && !requestVariant
         ? asset && isImageAsset(asset)
@@ -126,26 +153,65 @@ export const LayerThumbnail = memo(function LayerThumbnail({
       data-thumbnail-layer-id={layer.id}
       data-thumbnail-variant={requestVariant?.kind ?? "layer"}
       data-thumbnail-effect-id={effectId}
-      data-preview-ready={Boolean(source)}
+      data-preview-ready={Boolean(source && (!previewExport || value?.key === key))}
     >
       <Icon size={14} aria-hidden="true" style={source ? { display: "none" } : undefined} />
+      {previous?.owner === observerKey && previous.exporter === previewExport && (
+        <img
+          key={previous.url}
+          src={previous.url}
+          alt=""
+          aria-hidden="true"
+          draggable={false}
+          data-thumbnail-previous
+        />
+      )}
       {source && (
         <img
           key={source}
           src={source}
           alt=""
           draggable={false}
+          onError={() => {
+            if (owned.current?.url !== source) return;
+            release(source);
+            owned.current = retiring.current;
+            retiring.current = null;
+            setValue(owned.current);
+            setPrevious(null);
+          }}
           onLoad={(event) => {
             const image = event.currentTarget;
             if (
               !image.isConnected ||
-              node.current?.querySelector("img") !== image ||
+              node.current?.querySelector("img:not([data-thumbnail-previous])") !== image ||
               image.getAttribute("src") !== source
             )
               return;
-            if (value?.key === key && !revealed.has(value.blob)) {
+            image.dataset.thumbnailLoaded = "true";
+            if (owned.current?.url === source) owned.current.loaded = true;
+            const before = retiring.current;
+            const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+            if (
+              value?.owner === observerKey &&
+              !reduced &&
+              ((before && before.blob !== value.blob) || !revealed.has(value.blob))
+            ) {
               revealed.add(value.blob);
               image.dataset.thumbnailReveal = "true";
+            }
+            if (before) {
+              const old = node.current?.querySelector<HTMLImageElement>(
+                "[data-thumbnail-previous]",
+              );
+              if (old && !reduced && before.blob !== value?.blob) {
+                delete old.dataset.thumbnailReveal;
+                old.dataset.thumbnailExit = "true";
+              }
+              fadeTimer.current = setTimeout(
+                finishFade,
+                reduced || before.blob === value?.blob ? 0 : 150,
+              );
             }
           }}
         />

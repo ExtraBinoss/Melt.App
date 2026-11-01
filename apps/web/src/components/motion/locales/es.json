@@ -8,5 +8,6 @@
   "yes": "Sí, activar animación",
   "no": "No, mantener estático",
   "changed": "La composición ha cambiado. Vuelve a intentarlo.",
-  "failed": "No se pudo aplicar este cambio."
+  "failed": "No se pudo aplicar este cambio.",
+  "keyValue": "Valor: {{value}}"
 }

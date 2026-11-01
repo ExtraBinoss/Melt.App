@@ -358,3 +358,44 @@ test("requests genuine page-scoped effect/mask variants and rejects a late forei
   view.unmount();
   expect(URL.revokeObjectURL).toHaveBeenCalledWith("blob:thumb-1");
 });
+
+test("retains decoded pixels during replacement, crossfades after load and releases retired URLs", async () => {
+  const layer = createLayer("ellipse");
+  let resolve!: (value: { blob: Blob; width: number; height: number }) => void;
+  const first = { blob: new Blob(["first"]), width: 96, height: 96 };
+  const previewExport = vi
+    .fn()
+    .mockResolvedValueOnce(first)
+    .mockImplementationOnce(
+      () =>
+        new Promise((done) => {
+          resolve = done;
+        }),
+    );
+  const services = { previewExport };
+  const view = render(<LayerThumbnail layer={layer} services={services} previewKey="one" />);
+  const old = await screen.findByRole("presentation");
+  fireEvent.load(old);
+  view.rerender(<LayerThumbnail layer={layer} services={services} previewKey="two" />);
+  await waitFor(() => expect(previewExport).toHaveBeenCalledTimes(2));
+  expect(screen.getByRole("presentation")).toBe(old);
+  expect(URL.revokeObjectURL).not.toHaveBeenCalled();
+  await act(async () => resolve({ blob: new Blob(["second"]), width: 96, height: 96 }));
+  const next = screen.getByRole("presentation");
+  expect(next).not.toBe(old);
+  expect(view.container.querySelector("[data-thumbnail-previous]")).toHaveAttribute(
+    "src",
+    "blob:thumb-1",
+  );
+  expect(URL.revokeObjectURL).not.toHaveBeenCalled();
+  fireEvent.load(next);
+  expect(next).toHaveAttribute("data-thumbnail-reveal", "true");
+  expect(view.container.querySelector("[data-thumbnail-previous]")).toHaveAttribute(
+    "data-thumbnail-exit",
+    "true",
+  );
+  await waitFor(() => expect(view.container.querySelector("[data-thumbnail-previous]")).toBeNull());
+  expect(URL.revokeObjectURL).toHaveBeenCalledWith("blob:thumb-1");
+  view.unmount();
+  expect(URL.revokeObjectURL).toHaveBeenCalledWith("blob:thumb-2");
+});

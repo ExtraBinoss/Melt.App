@@ -114,7 +114,12 @@ test("keyframe hover waits 500ms and dragging previews the composition before on
   await key.hover();
   await page.waitForTimeout(250);
   await expect(page.getByRole("tooltip")).toHaveCount(0);
-  await expect(page.getByRole("tooltip")).toHaveText("Position X · 2000 ms");
+  await expect(
+    page.locator('[data-slot="tooltip-content"] [data-motion-key-tooltip="end"]'),
+  ).toHaveText("2000 ms");
+  await expect(
+    page.locator('[data-slot="tooltip-content"] [data-motion-key-value="end"]'),
+  ).toHaveText("Valeur : 480");
   const revision = await page.evaluate(() => window.musart!.snapshot().revision),
     bounds = (await key.boundingBox())!;
   const connector = page.locator("button.motion-easing-segment");
@@ -130,7 +135,12 @@ test("keyframe hover waits 500ms and dragging previews the composition before on
   });
   await expect.poll(x).toBeCloseTo(240, 2);
   await expect(page.locator(".motion-gesture-feedback")).toHaveText("2.500 s");
-  await expect(page.getByRole("tooltip")).toHaveText("Position X · 2500 ms");
+  await expect(
+    page.locator('[data-slot="tooltip-content"] [data-motion-key-tooltip="end"]'),
+  ).toHaveText("2500 ms");
+  await expect(
+    page.locator('[data-slot="tooltip-content"] [data-motion-key-value="end"]'),
+  ).toHaveText("Valeur : 480");
   await expect(
     page.getByRole("spinbutton", { name: "Temps de l’image clé", exact: true }),
   ).toHaveValue("2500");

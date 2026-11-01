@@ -34,6 +34,8 @@ it("shows a themed time tooltip only after 500ms and cancels its timer on leavin
     expect(screen.queryByRole("tooltip")).not.toBeInTheDocument();
     await act(() => vi.advanceTimersByTimeAsync(1));
     expect(screen.getByRole("tooltip")).toHaveTextContent("500 ms");
+    expect(document.querySelector("[data-motion-key-value=key]")).toHaveTextContent("Valeur : 42");
+    expect(document.querySelector("[data-motion-key-value=key]")?.tagName).toBe("DIV");
     expect(document.querySelector('[data-slot="tooltip-content"]')).toHaveClass("themed-tooltip");
     fireEvent.pointerLeave(key);
     await act(() => vi.advanceTimersByTimeAsync(10));

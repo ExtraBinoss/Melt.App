@@ -8,5 +8,6 @@
   "yes": "Sim, ativar animação",
   "no": "Não, manter estático",
   "changed": "A composição foi alterada. Tenta novamente.",
-  "failed": "Não foi possível aplicar esta alteração."
+  "failed": "Não foi possível aplicar esta alteração.",
+  "keyValue": "Valor: {{value}}"
 }

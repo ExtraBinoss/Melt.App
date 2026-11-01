@@ -96,5 +96,6 @@
   "color": "Color",
   "seed": "Seed",
   "composite": "Composite",
-  "time": "Time"
+  "time": "Time",
+  "keyValue": "Value: {{value}}"
 }
