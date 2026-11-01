@@ -2,14 +2,7 @@ import { useRef, useState, type ReactElement } from "react";
 import { createPortal } from "react-dom";
 import { Copy, Pencil, Play, Pause, RotateCcw, Save, Sparkles, Trash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import {
-  addMotionTime,
-  captureMotionAnimationPreset,
-  type Composition,
-  type EnginePort,
-  type MotionAnimation,
-  type SessionSnapshot,
-} from "@musart/core";
+import { type Composition, type EnginePort, type SessionSnapshot } from "@musart/core";
 import {
   ContextMenu,
   ContextMenuContent,
@@ -20,6 +13,12 @@ import {
 import { Popover, PopoverAnchor, PopoverContent } from "../../ui/popover";
 import { getTransitionRequests, requestLayerTransition } from "../transitions/requests";
 import type { TimelineTransport } from "../model";
+import {
+  captureAnimationPreset,
+  duplicateAnimationCommand,
+  reverseAnimationPreset,
+  type EditableAnimation,
+} from "./authoring";
 import { SavePreset } from "./SavePreset";
 import { animationPresentation } from "./presentation";
 
@@ -36,9 +35,9 @@ export function AnimationContextMenu({
 }: {
   engine: EnginePort;
   page: Composition;
-  layerId: string;
-  trackId: string;
-  animation: MotionAnimation;
+  layerId?: string;
+  trackId?: string;
+  animation: EditableAnimation;
   transport: TimelineTransport;
   disabled: boolean;
   children: ReactElement;
@@ -48,7 +47,8 @@ export function AnimationContextMenu({
     [error, setError] = useState(false);
   const origin = useRef<SessionSnapshot | null>(null),
     point = useRef({ x: 0, y: 0 }),
-    pendingSave = useRef(false);
+    pendingSave = useRef(false),
+    pendingOwnerEditor = useRef(false);
   function current() {
     const snapshot = engine.getSnapshot(),
       before = origin.current;
@@ -74,8 +74,9 @@ export function AnimationContextMenu({
         modal={false}
         onOpenChange={(open) => {
           if (!open) return;
+          pendingOwnerEditor.current = false;
           transport.pause();
-          engine.select([layerId]);
+          engine.select(layerId ? [layerId] : []);
           animationPresentation(engine).set({ selected: animation.id });
           origin.current = engine.getSnapshot();
         }}
@@ -97,29 +98,44 @@ export function AnimationContextMenu({
               pendingSave.current = false;
               event.preventDefault();
               if (current()) setSave({ ...point.current });
+            } else if (pendingOwnerEditor.current) {
+              pendingOwnerEditor.current = false;
+              if (current()) {
+                event.preventDefault();
+                animationPresentation(engine).requestEditor(animation.id);
+              }
             } else if (getTransitionRequests(engine).read()) event.preventDefault();
           }}
         >
           <ContextMenuItem
             onSelect={() =>
-              run(() => animationPresentation(engine).set({ selected: animation.id }))
+              run(() => {
+                animationPresentation(engine).set({ selected: animation.id });
+                if ("owner" in animation) pendingOwnerEditor.current = true;
+              })
             }
           >
             <Pencil size={14} />
             {t("editing")}
           </ContextMenuItem>
-          <ContextMenuItem
-            onSelect={() =>
-              run(() => {
-                void requestLayerTransition(engine, page.id, layerId, point.current, trackId).catch(
-                  () => setError(true),
-                );
-              })
-            }
-          >
-            <Sparkles size={14} />
-            {t("add")}
-          </ContextMenuItem>
+          {layerId && (
+            <ContextMenuItem
+              onSelect={() =>
+                run(() => {
+                  void requestLayerTransition(
+                    engine,
+                    page.id,
+                    layerId,
+                    point.current,
+                    trackId,
+                  ).catch(() => setError(true));
+                })
+              }
+            >
+              <Sparkles size={14} />
+              {t("add")}
+            </ContextMenuItem>
+          )}
           <ContextMenuSeparator />
           <ContextMenuItem
             onSelect={() =>
@@ -142,15 +158,7 @@ export function AnimationContextMenu({
                   type: "updateMotionAnimation",
                   animationId: animation.id,
                   patch: {
-                    preset: {
-                      ...animation.preset,
-                      channels: animation.preset.channels.map((channel) => ({
-                        ...channel,
-                        points: channel.points
-                          .map((point) => ({ ...point, at: 1 - point.at }))
-                          .reverse(),
-                      })),
-                    },
+                    preset: reverseAnimationPreset(animation.preset),
                   },
                 }),
               )
@@ -162,22 +170,7 @@ export function AnimationContextMenu({
           <ContextMenuItem
             onSelect={() =>
               run(() =>
-                engine.execute({
-                  type: "addMotionAnimation",
-                  trackId,
-                  preset: captureMotionAnimationPreset(
-                    page,
-                    layerId,
-                    animation,
-                    animation.preset.name,
-                    animation.preset.id,
-                    { bakeStrength: false },
-                  ),
-                  start: addMotionTime(animation.start, animation.duration),
-                  duration: animation.duration,
-                  strength: animation.strength,
-                  enabled: animation.enabled,
-                }),
+                engine.execute(duplicateAnimationCommand(page, animation, layerId, trackId)),
               )
             }
           >
@@ -242,9 +235,7 @@ export function AnimationContextMenu({
               initialOpen
               initialName={animation.preset.name}
               onSaved={() => setSave(null)}
-              create={(name, id) =>
-                captureMotionAnimationPreset(page, layerId, animation, name, id)
-              }
+              create={(name, id) => captureAnimationPreset(page, animation, name, id, layerId)}
             />
           </PopoverContent>
         </Popover>

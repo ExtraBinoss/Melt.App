@@ -1,8 +1,12 @@
+import {
+  captureAnimationRecipe,
+  propertyTimelineInterval,
+  normalizedPropertyPoints,
+} from "./preset-utils";
 import type { Composition } from "../../document/model";
 import { cloneValue } from "../../document/immutable";
 import { ensure } from "../../errors";
 import type { MotionLayerTrack } from "../model";
-import { motionTimeToSeconds } from "../time";
 import { readMotionValue } from "../properties/registry";
 import type { MotionAnimation, MotionAnimationPreset, AnimationChannel } from "./model";
 import { animationTarget } from "./targets";
@@ -16,33 +20,24 @@ export function captureMotionAnimationPreset(
   id: string,
   options: { bakeStrength?: boolean } = {},
 ): MotionAnimationPreset {
-  const preset = cloneValue(animation.preset);
-  preset.id = id;
-  preset.name = name;
-  if (options.bakeStrength !== false)
-    preset.duration = Math.max(1, Math.round(motionTimeToSeconds(animation.duration) * 1000));
   const layer = page.layers.find((layer) => layer.id === layerId);
   ensure(layer, "NOT_FOUND", "Animation subject is missing");
+  const preset = captureAnimationRecipe(
+    animation,
+    name,
+    id,
+    (channel) => ({
+      value: readMotionValue(page, animationTarget(layerId, animation, channel.target)),
+      multiplier: channel.unit ? layer[channel.unit] : 1,
+    }),
+    options,
+  );
   preset.effects = animation.effectIds.map((effectId) => {
     const source = layer.effects.find((effect) => effect.id === effectId);
     ensure(source, "NOT_FOUND", "Animation effect is missing");
     const { id: _id, ...definition } = cloneValue(source);
     return definition;
   });
-  for (const channel of preset.channels) {
-    const base = readMotionValue(page, animationTarget(layerId, animation, channel.target));
-    for (const point of channel.points) {
-      if (typeof point.value !== "number" || typeof base !== "number") continue;
-      const neutral =
-        channel.operation === "add"
-          ? 0
-          : channel.operation === "multiply"
-            ? 1
-            : base / (channel.unit ? layer[channel.unit] : 1);
-      if (options.bakeStrength !== false)
-        point.value = neutral + (point.value - neutral) * animation.strength;
-    }
-  }
   validateMotionAnimationPreset(preset);
   return preset;
 }
@@ -58,19 +53,7 @@ export function extractMotionAnimationPreset(
   const layer = page.layers.find((layer) => layer.id === track.layerId);
   ensure(layer, "NOT_FOUND", "Animation subject is missing");
   const properties = track.properties.filter((property) => property.keyframes.length >= 2);
-  ensure(
-    properties.length > 0,
-    "INVALID_COMMAND",
-    "Select a timeline containing at least two keyframes",
-  );
-  const first = Math.min(
-    ...properties.map((property) => motionTimeToSeconds(property.keyframes[0]!.time)),
-  );
-  const last = Math.max(
-    ...properties.map((property) =>
-      motionTimeToSeconds(property.keyframes[property.keyframes.length - 1]!.time),
-    ),
-  );
+  const { first, last } = propertyTimelineInterval(properties);
   const slots = new Map<string, number>();
   const effects: MotionAnimationPreset["effects"] = [];
   const channels: AnimationChannel[] = properties.map((property) => {
@@ -98,20 +81,15 @@ export function extractMotionAnimationPreset(
         property: target.property,
       } as AnimationChannel["target"];
     }
-    const points = property.keyframes.map((key) => ({
-      at: (motionTimeToSeconds(key.time) - first) / (last - first),
-      value:
-        typeof key.value === "number" && typeof baseline === "number"
-          ? operation === "add"
-            ? (key.value - baseline) / (unit ? layer[unit] : 1)
-            : operation === "multiply"
-              ? key.value / baseline
-              : key.value
-          : key.value,
-      ...(key.easing ? { easing: cloneValue(key.easing) } : {}),
-    }));
-    if (points[0]!.at > 0) points.unshift({ ...points[0]!, at: 0 });
-    if (points[points.length - 1]!.at < 1) points.push({ ...points[points.length - 1]!, at: 1 });
+    const points = normalizedPropertyPoints(property.keyframes, first, last, (value) =>
+      typeof value === "number" && typeof baseline === "number"
+        ? operation === "add"
+          ? (value - baseline) / (unit ? layer[unit] : 1)
+          : operation === "multiply"
+            ? value / baseline
+            : value
+        : value,
+    );
     return { target: destination, operation, ...(unit ? { unit } : {}), points };
   });
   const preset: MotionAnimationPreset = {

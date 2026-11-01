@@ -25,6 +25,6 @@ export async function generateCornellBox(output = "apps/web/public/templates/mot
 if (import.meta.main) {
   const result = await generateCornellBox();
   console.log(
-    `Cornell Box: ${result.project.pages[0]!.layers.length} native 3D layers, 8-second loop.`,
+    `Cornell Box: ${result.project.pages[0]!.layers.length} editable layers, 8-second camera orbit.`,
   );
 }

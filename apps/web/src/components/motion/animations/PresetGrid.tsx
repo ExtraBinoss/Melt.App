@@ -2,8 +2,12 @@ import { animationPresetName } from "../../spatial/presentation";
 import { MaterialSwatch } from "../../spatial/MaterialPicker";
 import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import { Trash2 } from "lucide-react";
-import type { EnginePort, MotionAnimationPreset } from "@musart/core";
+import { Camera, Sun, Lightbulb, Trash2 } from "lucide-react";
+import type { EnginePort } from "@musart/core";
+import {
+  isSceneMotionPreset,
+  type StoredMotionPreset,
+} from "../../../services/motion/animations/presets";
 import { bindHoverPreview } from "../../shared/preview/hover-preview";
 import { ScrollShadow } from "../../shared/scroll/ScrollShadow";
 import { useVirtualList } from "../../shared/scroll/use-virtual-list";
@@ -23,8 +27,8 @@ export function PresetGrid({
   children,
 }: {
   engine: EnginePort;
-  entries: readonly MotionAnimationPreset[];
-  apply: (preset: MotionAnimationPreset) => void;
+  entries: readonly StoredMotionPreset[];
+  apply: (preset: StoredMotionPreset) => void;
   remove?: (id: string) => void;
   busy: boolean;
   empty: string;
@@ -70,7 +74,9 @@ export function PresetGrid({
     return () => intent.dispose();
   }, [entries]);
   const visible = entries.slice(first * 2, last * 2);
-  const hovered = hover && visible.find((preset) => preset.id === hover.id);
+  const hoveredCandidate = hover && visible.find((preset) => preset.id === hover.id);
+  const hovered =
+    hoveredCandidate && !isSceneMotionPreset(hoveredCandidate) ? hoveredCandidate : undefined;
   useLayoutEffect(() => {
     if (pendingFocus.current === null) return;
     const button = viewport.current?.querySelector<HTMLButtonElement>(
@@ -148,7 +154,15 @@ export function PresetGrid({
                       onClick={() => apply({ ...preset, name: animationPresetName(preset, t) })}
                     >
                       <span className="animation-card-image">
-                        {preset.id.startsWith("spatial-") ? (
+                        {isSceneMotionPreset(preset) ? (
+                          preset.channels[0]?.target.kind === "camera" ? (
+                            <Camera size={32} />
+                          ) : preset.channels[0]?.target.kind === "environment" ? (
+                            <Sun size={32} />
+                          ) : (
+                            <Lightbulb size={32} />
+                          )
+                        ) : preset.id.startsWith("spatial-") ? (
                           <MaterialSwatch index={0} />
                         ) : preset.category === "typography" ? (
                           <span className="animation-card-type">MORPH</span>

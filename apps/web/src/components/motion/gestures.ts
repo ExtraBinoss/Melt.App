@@ -7,9 +7,7 @@ import {
   subtractMotionTime,
   clampMotionTrackMove,
   planMotionTrackMove,
-  type MotionTrackMovePlan,
   type Command,
-  type Composition,
   type EnginePort,
   type MotionKeyframe,
   type MotionLayerTrack,
@@ -18,6 +16,7 @@ import {
 import type { TimelineTransport } from "./model";
 import { timelineTime } from "./time";
 import type { TimelineRow } from "./tree";
+import { sceneTimelineProperties } from "./scene/properties";
 import { createTimelineMarquee } from "./selection/marquee";
 import { createDragAutoScroll } from "../shared/scroll/drag-auto-scroll";
 import { createTimelineLinkPreview } from "./link-preview";
@@ -34,39 +33,9 @@ import {
   timelineGestureBounds,
 } from "./gestures/occurrences";
 import { nearestTimelineSnap, timelineSnapReferences } from "./gestures/snapping";
-import { isTimelineGestureCurrent, type TimelineGestureOrigin } from "./gestures/origin";
+import { isTimelineGestureCurrent } from "./gestures/origin";
 export type { TimelinePointerInput, TimelinePointerMove } from "./gestures/input";
-type TrackAction = "move" | "trimStart" | "trimEnd";
-interface Gesture extends TimelineGestureOrigin {
-  node: HTMLElement;
-  pointer: number;
-  x: number;
-  scroll: number;
-  page: Composition;
-  originalLayers: string[];
-  originalKeys: ReadonlySet<string>;
-  action: TrackAction | "keys";
-  track?: MotionLayerTrack;
-  keyIds: string[];
-  layerIds: ReadonlySet<string>;
-  trackIds: ReadonlySet<string>;
-  limits: Pick<MotionTrackMovePlan, "minimum" | "maximum">;
-  movePlan?: MotionTrackMovePlan;
-  boundary: "start" | "end" | null;
-  anchor: MotionTime;
-  delta: MotionTime;
-  snapped: MotionTime | null;
-  references: { seconds: number; time: MotionTime }[];
-  touched: Set<HTMLElement>;
-  dirty: boolean;
-  rejected: boolean;
-  stopEngine: () => void;
-  scrollLoop: ReturnType<typeof createDragAutoScroll> | null;
-  point: { x: number; y: number; shift: boolean };
-  preview: ReturnType<NonNullable<TimelineTransport["beginKeyframePreview"]>>;
-  tooltip?: ReturnType<typeof createTimelineTooltipPreview>;
-  links?: ReturnType<typeof createTimelineLinkPreview>;
-}
+import type { Gesture, TrackAction } from "./gestures/model";
 
 /** Pointer publication is DOM-only. Commands run once, after ownership is rechecked. */
 export function createTimelineGestures(options: {
@@ -288,7 +257,7 @@ export function createTimelineGestures(options: {
     input: TimelinePointerInput,
     data: {
       action: Gesture["action"];
-      layerId: string;
+      layerId?: string;
       track?: MotionLayerTrack;
       keyIds?: string[];
       anchor: MotionTime;
@@ -310,7 +279,10 @@ export function createTimelineGestures(options: {
       return;
     }
     const layer = page.layers.find((item) => item.id === data.layerId);
-    if (!layer || layer.locked || getAncestors(page, layer.id).some((parent) => parent.locked)) {
+    if (
+      data.layerId &&
+      (!layer || layer.locked || getAncestors(page, layer.id).some((parent) => parent.locked))
+    ) {
       options.onError("locked");
       return;
     }
@@ -363,15 +335,21 @@ export function createTimelineGestures(options: {
       }
     }
     const originalLayers = [...(input.originalLayers ?? snapshot.selection)];
-    engine.select(
-      input.shiftKey ? [...new Set([...snapshot.selection, data.layerId])] : [data.layerId],
-    );
+    if (data.layerId)
+      engine.select(
+        input.shiftKey ? [...new Set([...snapshot.selection, data.layerId])] : [data.layerId],
+      );
+    else if (!input.shiftKey) engine.select([]);
     const movePlan =
       data.action === "move" && data.track ? planMotionTrackMove(page, data.track.id) : undefined;
     const targets =
       data.action === "move"
-        ? occurrenceMoveTargets(page, data.layerId, data.track?.id, movePlan)
-        : { layerIds: new Set([data.layerId]), keyIds: [], trackIds: new Set<string>() };
+        ? occurrenceMoveTargets(page, data.layerId!, data.track?.id, movePlan)
+        : {
+            layerIds: new Set(data.layerId ? [data.layerId] : []),
+            keyIds: [],
+            trackIds: new Set<string>(),
+          };
     const { layerIds } = targets;
     const movingKeys = new Set(data.keyIds ?? targets.keyIds);
     if (data.action === "move")
@@ -491,13 +469,19 @@ export function createTimelineGestures(options: {
     },
     updateOrigin(projectId: string, revision: number) {
       origin = { projectId, revision };
-      const existing = new Set(
-        currentPage()?.motion?.tracks.flatMap((track) =>
+      const page = currentPage();
+      const existing = new Set([
+        ...(page?.motion?.tracks.flatMap((track) =>
           projectMotionProperties(track).flatMap((property) =>
             property.keyframes.map((key) => key.id),
           ),
-        ) ?? [],
-      );
+        ) ?? []),
+        ...(page
+          ? sceneTimelineProperties(page).flatMap((property) =>
+              property.keyframes.map((key) => key.id),
+            )
+          : []),
+      ]);
       const kept = new Set([...selected].filter((id) => existing.has(id)));
       if (kept.size !== selected.size) setSelection(kept);
     },
@@ -541,7 +525,7 @@ export function createTimelineGestures(options: {
     },
     beginKey(
       event: ReactPointerEvent<HTMLElement>,
-      layerId: string,
+      layerId: string | undefined,
       key: MotionKeyframe,
       group?: readonly string[],
     ) {

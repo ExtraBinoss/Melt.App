@@ -3,6 +3,11 @@ import { Sparkles } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import {
   ANIMATION_CATEGORIES,
+  SCENE_MOTION_ANIMATION_PRESETS,
+  canApplySceneMotionAnimationPreset,
+  type Composition,
+  type SceneAnimationOwner,
+  type SceneMotionAnimationPreset,
   MOTION_ANIMATION_PRESETS,
   type Layer,
   type EnginePort,
@@ -10,6 +15,7 @@ import {
 } from "@musart/core";
 import {
   MotionPresetStore,
+  isSceneMotionPreset,
   type SavedMotionPreset,
 } from "../../../services/motion/animations/presets";
 import { SegmentedTabs } from "../../shared/segmented/SegmentedTabs";
@@ -42,12 +48,18 @@ export function PresetPicker({
   apply,
   subjectKind = "image",
   subject,
+  scene,
 }: {
   engine: EnginePort;
   subjectKind?: string;
   subject?: Layer;
-  apply: (preset: MotionAnimationPreset) => void;
-}) {
+} & (
+  | { scene?: undefined; apply: (preset: MotionAnimationPreset) => void }
+  | {
+      scene: { page: Composition; owner: SceneAnimationOwner };
+      apply: (preset: SceneMotionAnimationPreset) => void;
+    }
+)) {
   const { t } = useTranslation("animations");
   const loadMore = useRef<HTMLButtonElement>(null);
   const [source, setSource] = useState("library");
@@ -80,20 +92,29 @@ export function PresetPicker({
       owner.dispose();
     };
   }, [source]);
+  const library = scene ? SCENE_MOTION_ANIMATION_PRESETS : MOTION_ANIMATION_PRESETS;
+  const supports = useCallback(
+    (preset: MotionAnimationPreset | SceneMotionAnimationPreset) =>
+      scene
+        ? isSceneMotionPreset(preset) &&
+          canApplySceneMotionAnimationPreset(scene.page, scene.owner, preset)
+        : !isSceneMotionPreset(preset) && compatible(preset, subjectKind, subject),
+    [scene, subjectKind, subject],
+  );
+  const available = useMemo(
+    () => (source === "library" ? library : saved.map((record) => record.preset)).filter(supports),
+    [source, library, saved, supports],
+  );
   const entries = useMemo(
     () =>
-      (source === "library"
-        ? MOTION_ANIMATION_PRESETS
-        : saved.map((record) => record.preset)
-      ).filter(
+      available.filter(
         (preset) =>
-          compatible(preset, subjectKind, subject) &&
           (category === "all" || preset.category === category) &&
           `${preset.name} ${t(`category.${preset.category}`)}`
             .toLocaleLowerCase()
             .includes(query.toLocaleLowerCase()),
       ),
-    [source, saved, category, query, t, subjectKind, subject],
+    [available, category, query, t],
   );
   async function more() {
     if (!before || !store || busy) return;
@@ -138,12 +159,7 @@ export function PresetPicker({
         </strong>
         <span>
           {t("count", {
-            count:
-              source === "library"
-                ? MOTION_ANIMATION_PRESETS.filter((preset) =>
-                    compatible(preset, subjectKind, subject),
-                  ).length
-                : saved.length,
+            count: source === "library" ? library.filter(supports).length : saved.length,
           })}
         </span>
       </header>
@@ -164,7 +180,10 @@ export function PresetPicker({
       <div className="animation-search">
         <SearchInput
           aria-label={t("search")}
-          hints={MOTION_ANIMATION_PRESETS.slice(0, 6).map((preset) => ({ label: preset.name }))}
+          hints={library
+            .filter(supports)
+            .slice(0, 6)
+            .map((preset) => ({ label: preset.name }))}
           value={query}
           onChange={(event) => setQuery(event.target.value)}
         />
@@ -176,8 +195,10 @@ export function PresetPicker({
       >
         <div className="animation-categories">
           {["all", ...ANIMATION_CATEGORIES]
-            .filter(
-              (value) => value !== "typography" || subjectKind === "text" || source === "mine",
+            .filter((value) =>
+              scene
+                ? value === "all" || available.some((preset) => preset.category === value)
+                : value !== "typography" || subjectKind === "text" || source === "mine",
             )
             .map((value) => (
               <Button
@@ -198,7 +219,10 @@ export function PresetPicker({
         key={`${source}:${category}:${query}`}
         engine={engine}
         entries={entries}
-        apply={apply}
+        apply={(preset) => {
+          if (scene && isSceneMotionPreset(preset)) apply(preset);
+          else if (!scene && !isSceneMotionPreset(preset)) apply(preset);
+        }}
         busy={busy}
         onError={previewError}
         empty={t(source === "mine" && !saved.length ? "emptyLibrary" : "noResults")}

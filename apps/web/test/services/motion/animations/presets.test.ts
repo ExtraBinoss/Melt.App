@@ -1,7 +1,7 @@
 import "fake-indexeddb/auto";
 import { afterEach, describe, expect, it } from "vitest";
 import { deleteDB } from "idb";
-import { MOTION_ANIMATION_PRESETS } from "@musart/core";
+import { MOTION_ANIMATION_PRESETS, SCENE_MOTION_ANIMATION_PRESETS } from "@musart/core";
 import { MotionPresetStore } from "../../../../src/services/motion/animations/presets";
 const stores: MotionPresetStore[] = [],
   names = new Set<string>();
@@ -60,4 +60,22 @@ describe("global personal animation presets", () => {
     owner.dispose();
     await expect(owner.save(preset())).rejects.toThrow("closed");
   });
+});
+
+it("stores scene recipes alongside layer recipes with the same revision and deletion protection", async () => {
+  const first = store(),
+    second = store(first.name);
+  const scene = {
+    ...structuredClone(SCENE_MOTION_ANIMATION_PRESETS[0]!),
+    id: crypto.randomUUID(),
+    name: "My camera",
+  };
+  const record = await first.store.save(scene);
+  await first.store.save(preset());
+  const loaded = (await second.store.list()).items.find((item) => item.id === record.id)!;
+  expect(loaded.preset).toEqual(scene);
+  expect(JSON.stringify(loaded.preset)).not.toMatch(/compositionId|lightId|layerId/);
+  await second.store.delete(loaded);
+  await expect(first.store.save(scene, record.revision)).rejects.toThrow("changed");
+  expect((await first.store.list()).items.some((item) => item.id === scene.id)).toBe(false);
 });

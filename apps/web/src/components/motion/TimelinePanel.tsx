@@ -1,3 +1,4 @@
+import { projectSceneTimelineRows } from "./scene/tree";
 import { TimelineCollapseControl } from "./TimelineCollapseControl";
 import { SimpleTimelineRows } from "./animations/SimpleTimelineRows";
 import { AnimationViewToggle } from "./animations/AnimationViewToggle";
@@ -39,7 +40,6 @@ import {
 import "./messages";
 import "./timeline.css";
 import "./timeline-compact.css";
-
 const ACTION_WIDTH = 252;
 export function TimelinePanel({
   engine,
@@ -152,7 +152,6 @@ export function TimelinePanel({
         publishedLeft.current = left;
         setView((value) => ({ ...value, left }));
       }
-      // Descendant layout effects prepare the model first; present after applying its anchor.
       node.dispatchEvent(new Event(TIMELINE_ZOOM_PRESENT));
     }
   }, [scale, width, view.width, GUTTER]);
@@ -258,7 +257,10 @@ export function TimelinePanel({
     active,
     onError: setInteractionError,
   });
-  const rows = layerDrag.rows;
+  const rows = useMemo(
+    () => [...layerDrag.rows, ...projectSceneTimelineRows(page, collapsed, details)],
+    [layerDrag.rows, page, collapsed, details],
+  );
   const selected = useMemo(() => new Set(snapshot.selection), [snapshot.selection]);
   const audioTracks = page.motion?.audioTracks ?? [];
   const audioError = useCallback((error: unknown) => setInteractionError(formatUiError(error)), []);

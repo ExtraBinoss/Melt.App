@@ -1,13 +1,7 @@
 import { useRef, useState, type ComponentProps } from "react";
 import { Copy, Ellipsis, RotateCcw, Save, Trash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import {
-  addMotionTime,
-  captureMotionAnimationPreset,
-  type Composition,
-  type EnginePort,
-  type MotionAnimation,
-} from "@musart/core";
+import { type Composition, type EnginePort } from "@musart/core";
 import { Button } from "../../ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../../ui/tooltip";
 import {
@@ -16,6 +10,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../../ui/dropdown-menu";
+import {
+  captureAnimationPreset,
+  duplicateAnimationCommand,
+  reverseAnimationPreset,
+  type EditableAnimation,
+} from "./authoring";
 import { SavePreset } from "./SavePreset";
 
 function Action({ label, children, ...props }: ComponentProps<typeof Button> & { label: string }) {
@@ -41,9 +41,9 @@ export function AnimationActions({
 }: {
   engine: EnginePort;
   page: Composition;
-  layerId: string;
-  trackId: string;
-  animation: MotionAnimation;
+  layerId?: string;
+  trackId?: string;
+  animation: EditableAnimation;
   run: (action: () => void) => void;
   disabled: boolean;
 }) {
@@ -58,24 +58,7 @@ export function AnimationActions({
           label={t("duplicate")}
           disabled={disabled}
           onClick={() =>
-            run(() =>
-              engine.execute({
-                type: "addMotionAnimation",
-                trackId,
-                preset: captureMotionAnimationPreset(
-                  page,
-                  layerId,
-                  animation,
-                  animation.preset.name,
-                  animation.preset.id,
-                  { bakeStrength: false },
-                ),
-                start: addMotionTime(animation.start, animation.duration),
-                duration: animation.duration,
-                strength: animation.strength,
-                enabled: animation.enabled,
-              }),
-            )
+            run(() => engine.execute(duplicateAnimationCommand(page, animation, layerId, trackId)))
           }
         >
           <Copy size={12} />
@@ -113,15 +96,7 @@ export function AnimationActions({
                     type: "updateMotionAnimation",
                     animationId: animation.id,
                     patch: {
-                      preset: {
-                        ...animation.preset,
-                        channels: animation.preset.channels.map((channel) => ({
-                          ...channel,
-                          points: channel.points
-                            .map((point) => ({ ...point, at: 1 - point.at }))
-                            .reverse(),
-                        })),
-                      },
+                      preset: reverseAnimationPreset(animation.preset),
                     },
                   }),
                 )
@@ -164,7 +139,7 @@ export function AnimationActions({
               setSaving(false);
               setSaved(true);
             }}
-            create={(name, id) => captureMotionAnimationPreset(page, layerId, animation, name, id)}
+            create={(name, id) => captureAnimationPreset(page, animation, name, id, layerId)}
           />
         </div>
       )}

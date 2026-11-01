@@ -1,5 +1,5 @@
 import { useRef, type ComponentProps } from "react";
-import type { TimelineRow } from "../tree";
+import type { LayerTimelineRow } from "../tree";
 import { useRowPosition } from "../../layers/rows/use-row-position";
 import { DropCue } from "../../layers/drag/DropCue";
 import type { TimelineLayerDrag } from "./use-timeline-layer-drag";
@@ -18,7 +18,7 @@ export function TimelineLayerRow({
   drag,
   ...props
 }: Omit<ComponentProps<"div">, "ref"> & {
-  row: TimelineRow;
+  row: LayerTimelineRow;
   top: number;
   height: number;
   reduced: boolean;

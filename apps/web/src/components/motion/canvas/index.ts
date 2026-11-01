@@ -1,6 +1,6 @@
 import { motionTimeToSeconds, resolveLayerMotionProperty } from "@musart/core";
 import type { MotionKeyframe, MotionLayerTrack } from "@musart/core";
-import type { TimelineRow } from "../tree";
+import { isTimelinePropertyRow, type TimelineRow } from "../tree";
 import { createTimelineIntervalIndex } from "./intervals";
 
 export interface CanvasIndexedKey {
@@ -23,9 +23,11 @@ const cache = new WeakMap<readonly TimelineRow[], TimelineCanvasIndex>();
 const MAX_ROWS = 64;
 
 function prepareTracks(row: TimelineRow) {
-  const tracks = [...(row.occurrences ?? (row.track ? [row.track] : []))].sort(
-    (a, b) => motionTimeToSeconds(a.start) - motionTimeToSeconds(b.start),
-  );
+  const tracks = [
+    ...(row.kind === "layer" || row.kind === "property"
+      ? (row.occurrences ?? (row.track ? [row.track] : []))
+      : []),
+  ].sort((a, b) => motionTimeToSeconds(a.start) - motionTimeToSeconds(b.start));
   return {
     tracks,
     byId: new Map(tracks.map((track) => [track.id, track])),
@@ -63,18 +65,19 @@ export function indexTimelineCanvas(rows: readonly TimelineRow[]): TimelineCanva
         get tracksById() {
           return trackIndex().byId;
         },
-        keys:
-          row.kind === "property"
-            ? row.property.keyframes.map((key, index) => ({
-                key,
-                index,
-                time: motionTimeToSeconds(key.time),
-              }))
-            : [],
+        keys: isTimelinePropertyRow(row)
+          ? row.property.keyframes.map((key, index) => ({
+              key,
+              index,
+              time: motionTimeToSeconds(key.time),
+            }))
+          : [],
         continuous:
-          row.kind === "property" &&
-          resolveLayerMotionProperty(row.layer, row.property.target)?.interpolation ===
-            "continuous",
+          row.kind === "sceneProperty"
+            ? row.continuous
+            : row.kind === "property" &&
+              resolveLayerMotionProperty(row.layer, row.property.target)?.interpolation ===
+                "continuous",
         queryTracks: (start, end) => trackIndex().query(start, end),
       };
       recent.set(at, indexed);

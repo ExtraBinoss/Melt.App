@@ -4,17 +4,17 @@ The gallery filters Static and Motion designs. Every card creates an independent
 project through the same atomic installation service used for original-backed
 media imports. Editing a template never changes its bundled source document.
 
-| Template          | Mode         | Demonstrated capabilities                                                                                                                      |
-| ----------------- | ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| Cornell Box       | Motion, 8 s  | Nine editable native objects in one shared 3D scene, violet chrome text, cross-object shadows/reflections and one looping parent Motion action |
-| Bloom Windows     | Motion, 12 s | Seamless 1080p flower timelapse, aligned moving dither/ASCII/cyanotype windows, labels and soft shadows                                        |
-| In Bloom          | Motion, 5 s  | Original flower video, photo collage, nested groups, text, animated effects, springs and three original sound effects                          |
-| Sound Playground  | Motion, 6 s  | Nine audio cues sharing three original WAVs, grouped instruments, animated shapes, GPU transitions and editable audio processing               |
-| Motion Stress Lab | Motion       | Fifty photo layers, one hundred effects, three video clips, masks, easing families and timed sound effects                                     |
-| Orbit Study       | Motion, 5 s  | Authored effect time, live gradient, orbital geometry and independently eased transforms                                                       |
-| Paper Motion      | Motion, 5 s  | Nested paper layers, group and child animation, spring easing and GPU entrance transitions                                                     |
-| Transition Atlas  | Motion, 60 s | Thirty independent occurrences of one canonical group, per-occurrence progress/style keys and all thirty GPU operators                         |
-| Colorfield        | Static       | Editable vector shapes, typography and a multistop fill gradient                                                                               |
+| Template          | Mode         | Demonstrated capabilities                                                                                                          |
+| ----------------- | ------------ | ---------------------------------------------------------------------------------------------------------------------------------- |
+| Cornell Box       | Motion, 8 s  | Nine editable native objects, violet chrome text, shared shadows/reflections and one gentle composition camera-orbit Motion action |
+| Bloom Windows     | Motion, 12 s | Seamless 1080p flower timelapse, aligned moving dither/ASCII/cyanotype windows, labels and soft shadows                            |
+| In Bloom          | Motion, 5 s  | Original flower video, photo collage, nested groups, text, animated effects, springs and three original sound effects              |
+| Sound Playground  | Motion, 6 s  | Nine audio cues sharing three original WAVs, grouped instruments, animated shapes, GPU transitions and editable audio processing   |
+| Motion Stress Lab | Motion       | Fifty photo layers, one hundred effects, three video clips, masks, easing families and timed sound effects                         |
+| Orbit Study       | Motion, 5 s  | Authored effect time, live gradient, orbital geometry and independently eased transforms                                           |
+| Paper Motion      | Motion, 5 s  | Nested paper layers, group and child animation, spring easing and GPU entrance transitions                                         |
+| Transition Atlas  | Motion, 60 s | Thirty independent occurrences of one canonical group, per-occurrence progress/style keys and all thirty GPU operators             |
+| Colorfield        | Static       | Editable vector shapes, typography and a multistop fill gradient                                                                   |
 
 ## Headless authoring
 

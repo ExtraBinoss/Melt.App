@@ -201,5 +201,13 @@
     "high": "Hoog"
   },
   "reflectionsHint": "Weerspiegelt nabije 3D-objecten. Updates pauzeren tijdens het bewerken. 2D-effecten en maskers worden daarna toegepast.",
-  "removeKeyframe": "Keyframe verwijderen · {{property}}"
+  "removeKeyframe": "Keyframe verwijderen · {{property}}",
+  "sceneAnimationNames": {
+    "camera-orbit": "Camera omloop",
+    "camera-push": "Camera vooruit",
+    "light-pulse": "Lichtpuls",
+    "environment-turn": "Omgeving draaien"
+  },
+  "projection": "Projectie",
+  "lightType": "Lichttype"
 }

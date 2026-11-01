@@ -201,5 +201,13 @@
     "high": "높음"
   },
   "reflectionsHint": "주변 3D 오브젝트를 반사합니다. 편집 중에는 업데이트를 일시 중지합니다. 2D 효과와 마스크는 나중에 적용됩니다.",
-  "removeKeyframe": "키프레임 제거 · {{property}}"
+  "removeKeyframe": "키프레임 제거 · {{property}}",
+  "sceneAnimationNames": {
+    "camera-orbit": "카메라 회전",
+    "camera-push": "카메라 전진",
+    "light-pulse": "조명 맥동",
+    "environment-turn": "환경 회전"
+  },
+  "projection": "투영 방식",
+  "lightType": "조명 유형"
 }

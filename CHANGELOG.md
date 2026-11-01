@@ -6,6 +6,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Add reusable camera, environment and per-light Motion actions with genuine timeline rows, editable points/easing, personal presets and shared preview/export sampling. Keep gesture previews imperative, preserve keyboard focus after edits, and reject stale owner navigation. Replace Cornell Box’s parent turntable with a real seamless camera orbit and publish matching portable assets and a newly rendered poster.
+
 - Make certified scalar and compatible 3D pose/material transactions validate only touched domains, preserve unchanged page/resource identities across batches, and reuse complete durable ID indexes while retaining atomic validation, history and conservative structural fallbacks.
 - Preserve complete centered 2D affine transforms, including nonuniform scale, shear and reflection, through ungrouping and reparenting; keep native rendering, masks, picking, snapping, portable documents and undo aligned.
 - Scope native opaque depth to layer and group opacity so fractional layers reveal rear objects while faded groups preserve internal occlusion, selection holdouts and shared shadows.

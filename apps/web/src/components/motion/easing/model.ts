@@ -1,4 +1,5 @@
 import {
+  animationPropertyId,
   projectMotionProperties,
   projectAnimationProperties,
   compareMotionTime,
@@ -12,7 +13,9 @@ import {
   type MotionEasingPreset,
   type MotionKeyframe,
   type MotionPropertyTrack,
+  type SceneMotionPropertyTrack,
 } from "@musart/core";
+import { sceneTimelineProperties } from "../scene/properties";
 
 export function sameEasing(left: MotionEasing | undefined, right: MotionEasing): boolean {
   const a = left ?? { type: "linear" };
@@ -72,8 +75,8 @@ export interface EasingOrigin {
   projectId: string;
   pageId: string;
   revision: number;
-  trackId: string;
-  property: MotionPropertyTrack;
+  trackId?: string;
+  property: MotionPropertyTrack | SceneMotionPropertyTrack;
   key: MotionKeyframe;
 }
 
@@ -88,7 +91,9 @@ export function captureEasingOrigin(
   const track = page?.motion?.tracks.find((track) =>
     projectMotionProperties(track).some((property) => property.id === propertyId),
   );
-  const property = track && projectMotionProperties(track).find((item) => item.id === propertyId);
+  const property =
+    (track && projectMotionProperties(track).find((item) => item.id === propertyId)) ??
+    (page && sceneTimelineProperties(page).find((item) => item.id === propertyId));
   const key = property?.keyframes.find((item) => item.id === keyId);
   if (snapshot.pageId !== pageId || page?.motion?.mode !== "motion" || !property || !key)
     throw new EngineError("INVALID_COMMAND", "Easing target is unavailable.");
@@ -96,7 +101,7 @@ export function captureEasingOrigin(
     projectId: snapshot.project.id,
     pageId,
     revision: snapshot.revision,
-    trackId: track!.id,
+    trackId: track?.id,
     property,
     key,
   };
@@ -120,9 +125,9 @@ export function commitEasing(
   if (sameEasing(origin.key.easing, easing)) return "unchanged";
   const page = engine.getSnapshot().project.pages.find((page) => page.id === origin.pageId)!;
   const track = page.motion!.tracks.find((track) => track.id === origin.trackId)!;
-  const source = projectAnimationProperties(track).find(
-    (entry) => entry.property.id === origin.property.id,
-  );
+  const source =
+    track &&
+    projectAnimationProperties(track).find((entry) => entry.property.id === origin.property.id);
   if (source) {
     const preset = structuredClone(source.animation.preset);
     const index = source.property.keyframes.findIndex((key) => key.id === origin.key.id);
@@ -132,15 +137,32 @@ export function commitEasing(
     ]);
     return "committed";
   }
-  engine.transaction([
-    {
-      type: "upsertMotionKeyframe",
-      trackId: origin.trackId,
-      target: origin.property.target,
-      time: origin.key.time,
-      value: origin.key.value,
-      easing,
-    },
-  ]);
+  if (!track) {
+    const animation = page.motion?.sceneAnimations?.find((animation) =>
+      animation.preset.channels.some(
+        (_, index) => animationPropertyId(animation.id, index) === origin.property.id,
+      ),
+    );
+    if (animation) {
+      const preset = structuredClone(animation.preset);
+      const channel = preset.channels.findIndex(
+        (_, index) => animationPropertyId(animation.id, index) === origin.property.id,
+      );
+      const point = origin.property.keyframes.findIndex((key) => key.id === origin.key.id);
+      preset.channels[channel]!.points[point]!.easing = { ...easing };
+      engine.transaction([
+        { type: "updateMotionAnimation", animationId: animation.id, patch: { preset } },
+      ]);
+      return "committed";
+    }
+  }
+  const { target } = origin.property;
+  const fields = { time: origin.key.time, value: origin.key.value, easing };
+  if (target.kind === "camera" || target.kind === "environment" || target.kind === "light")
+    engine.transaction([{ type: "upsertMotionKeyframe", target, ...fields }]);
+  else
+    engine.transaction([
+      { type: "upsertMotionKeyframe", trackId: origin.trackId!, target, ...fields },
+    ]);
   return "committed";
 }

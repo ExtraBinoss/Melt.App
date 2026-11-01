@@ -9,6 +9,7 @@ import {
   type MotionEasingPreset,
   type MotionKeyframe,
   type MotionPropertyTrack,
+  type SceneMotionPropertyTrack,
 } from "@musart/core";
 import { Popover, PopoverContent, PopoverTrigger } from "../../ui/popover";
 import { Button } from "../../ui/button";
@@ -100,7 +101,7 @@ export function EasingPopover({
 }: {
   engine: EnginePort;
   compositionId: string;
-  property: MotionPropertyTrack;
+  property: MotionPropertyTrack | SceneMotionPropertyTrack;
   destination: MotionKeyframe;
   children: ReactElement;
 }) {

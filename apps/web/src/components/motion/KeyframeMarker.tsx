@@ -24,24 +24,28 @@ export function KeyframeMarker({
   transport,
   gestures,
   onSelect,
+  onSelectOwner,
   interactive = true,
 }: {
   marker: ReturnType<typeof projectKeyMarkers>[number];
   name: string;
   propertyId: string;
-  layerId: string;
+  layerId?: string;
   unit: TimelineUnit;
   transport: TimelineTransport;
   gestures?: TimelineGestures;
   onSelect: (id: string, additive: boolean) => void;
   interactive?: boolean;
+  onSelectOwner?: (additive: boolean) => void;
 }) {
   const { t } = useTranslation("motion");
   const remove = useRef<(() => void) | null>(null);
   const [deleteCount, setDeleteCount] = useState(1);
   function prepareDelete() {
     return gestures && interactive
-      ? captureKeyframeDelete(gestures, marker.key.id, () => onSelect(layerId, false))
+      ? captureKeyframeDelete(gestures, marker.key.id, () =>
+          layerId ? onSelect(layerId, false) : onSelectOwner?.(false),
+        )
       : null;
   }
   const selected = gestures?.readSelected().has(marker.key.id) ?? false;
@@ -80,7 +84,8 @@ export function KeyframeMarker({
                   if (gestures?.consumePointerClick(event.detail)) return;
                   if (!gestures || event.detail === 0) {
                     gestures?.selectKey(marker.key.id, event.shiftKey);
-                    onSelect(layerId, event.shiftKey);
+                    if (layerId) onSelect(layerId, event.shiftKey);
+                    else onSelectOwner?.(event.shiftKey);
                   }
                   if (event.detail === 0) {
                     transport.pause();

@@ -184,17 +184,18 @@ export function evaluateMotion(
       }
     }
   }
+  const sceneValues: SceneMotionFrameValue[] = (program.sceneProperties ?? []).map((property) =>
+    Object.freeze({ target: property.target, value: propertyValue(property, sampledTime) }),
+  );
+  if (program.sceneAnimations?.length)
+    evaluateAnimations(program.sceneAnimations, sampledTime, sceneValues);
   const plan: MotionFramePlan = Object.freeze({
     compositionId: program.compositionId,
     mode: program.mode,
     time: Object.freeze(sampledTime),
     terminalPreview,
     values: Object.freeze(values),
-    sceneValues: Object.freeze(
-      (program.sceneProperties ?? []).map((property) =>
-        Object.freeze({ target: property.target, value: propertyValue(property, sampledTime) }),
-      ),
-    ),
+    sceneValues: Object.freeze(sceneValues),
     activeLayerIds: Object.freeze(activeLayerIds),
     mediaRequests: Object.freeze(mediaRequests),
   });

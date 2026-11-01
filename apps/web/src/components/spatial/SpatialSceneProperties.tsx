@@ -1,3 +1,5 @@
+import { useSceneMotionNavigation } from "./use-scene-motion-navigation";
+import { SceneAnimations } from "../motion/scene/SceneAnimations";
 import { SceneMotionValue } from "./SceneMotionValue";
 import { SceneMotionField } from "./SceneMotionField";
 import { InfoTooltip } from "../shared/InfoTooltip";
@@ -41,6 +43,7 @@ export function SpatialSceneProperties({
   const { t } = useTranslation("spatial");
   const settings = useMemo(() => page.spatial ?? createSpatialScene(), [page]);
   const edit = useScenePreview(engine, page, run, settings);
+  const navigation = useSceneMotionNavigation(engine);
   const input = useRef<HTMLInputElement>(null);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
@@ -217,6 +220,11 @@ export function SpatialSceneProperties({
           />
         </SceneMotionField>
       </div>
+      <SceneAnimations
+        engine={engine}
+        page={page}
+        owner={{ kind: "environment", compositionId: page.id }}
+      />
       <div className="spatial-title">
         <span>{t("reflections")}</span>
         <InfoTooltip label={t("reflections")}>{t("reflectionsHint")}</InfoTooltip>
@@ -299,7 +307,9 @@ export function SpatialSceneProperties({
       {settings.lights.map((light, index) => (
         <div className="spatial-light-row" key={light.id}>
           <Popover
+            open={navigation.light === light.id}
             onOpenChange={(open) => {
+              navigation.setLight(open ? light.id : null);
               if (!open) edit.cancel();
             }}
           >
@@ -318,6 +328,11 @@ export function SpatialSceneProperties({
                 onCommit={(value, property) => changeLight(value, true, property)}
                 onCancel={edit.cancel}
                 onStart={edit.begin}
+              />
+              <SceneAnimations
+                engine={engine}
+                page={page}
+                owner={{ kind: "light", compositionId: page.id, lightId: light.id }}
               />
             </PopoverContent>
           </Popover>
@@ -347,7 +362,13 @@ export function SpatialSceneProperties({
           onCheckedChange={(shadows) => edit.commit({ ...settings, shadows })}
         />
       </label>
-      <Accordion type="single" collapsible className="spatial-accordion">
+      <Accordion
+        type="single"
+        collapsible
+        className="spatial-accordion"
+        value={navigation.camera}
+        onValueChange={navigation.setCamera}
+      >
         <AccordionItem value="camera">
           <AccordionTrigger>{t("camera")}</AccordionTrigger>
           <AccordionContent>
@@ -355,7 +376,7 @@ export function SpatialSceneProperties({
               <SceneMotionField
                 engine={engine}
                 target={{ kind: "camera", compositionId: page.id, property: "projection" }}
-                label={t("camera")}
+                label={t("projection")}
               >
                 <SceneMotionValue
                   engine={engine}
@@ -364,7 +385,7 @@ export function SpatialSceneProperties({
                 >
                   {(value) => (
                     <SelectField
-                      label={t("camera")}
+                      label={t("projection")}
                       identity={page}
                       value={value as string}
                       options={["perspective", "orthographic"].map((value) => ({
@@ -387,6 +408,11 @@ export function SpatialSceneProperties({
                 {cameraField("distance", 0.2, 100, 0.1)}
                 {camera.projection === "perspective" && cameraField("fov", 5, 120)}
               </div>
+              <SceneAnimations
+                engine={engine}
+                page={page}
+                owner={{ kind: "camera", compositionId: page.id }}
+              />
               <Button
                 variant="ghost"
                 onClick={() => changeCamera(createSpatialScene().camera, true)}

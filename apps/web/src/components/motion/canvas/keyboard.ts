@@ -1,3 +1,4 @@
+import { isTimelinePropertyRow } from "../tree";
 import { motionTimeToSeconds, type MotionKeyframe } from "@musart/core";
 import type { TimelineCanvasHost } from "./host";
 import type { TimelineCanvasHit } from "./model";
@@ -21,15 +22,19 @@ export function timelineKeyboardTarget(
   const model = host.readModel();
   let rowIndex = current?.rowIndex ?? -1;
   let key: MotionKeyframe | undefined;
-  if (current?.kind === "key" && model.rows[rowIndex]?.kind === "property") {
+  if (
+    current?.kind === "key" &&
+    model.rows[rowIndex] &&
+    isTimelinePropertyRow(model.rows[rowIndex]!)
+  ) {
     const row = model.rows[rowIndex];
-    if (row.kind === "property")
+    if (isTimelinePropertyRow(row))
       key = row.property.keyframes[indexFor(row.property.keyframes, current.keyId)];
   }
   const seconds = key ? motionTimeToSeconds(key.time) : 0;
   if ((direction === "left" || direction === "right") && key) {
     const row = model.rows[rowIndex];
-    if (row?.kind === "property") {
+    if (row && isTimelinePropertyRow(row)) {
       const at = indexFor(row.property.keyframes, key.id);
       key =
         row.property.keyframes[
@@ -44,7 +49,7 @@ export function timelineKeyboardTarget(
     if (rowIndex < 0) rowIndex = step > 0 ? -1 : model.rows.length;
     for (let index = rowIndex + step; index >= 0 && index < model.rows.length; index += step) {
       const row = model.rows[index];
-      if (row.kind !== "property" || !row.property.keyframes.length) continue;
+      if (!isTimelinePropertyRow(row) || !row.property.keyframes.length) continue;
       let low = 0,
         high = row.property.keyframes.length;
       while (low < high) {
@@ -59,7 +64,14 @@ export function timelineKeyboardTarget(
   }
   const row = model.rows[rowIndex],
     viewport = host.viewport.current;
-  if (!key || !viewport || row?.kind !== "property" || !row.track) return null;
+  if (
+    !key ||
+    !viewport ||
+    !row ||
+    !isTimelinePropertyRow(row) ||
+    (row.kind === "property" && !row.track)
+  )
+    return null;
   const x = motionTimeToSeconds(key.time) * model.scale,
     y = rowIndex * model.rowHeight;
   const width = Math.max(1, viewport.clientWidth - model.gutter),
@@ -75,8 +87,7 @@ export function timelineKeyboardTarget(
     kind: "key",
     rowKey: row.key,
     rowIndex,
-    layerId: row.layer.id,
-    trackId: row.track.id,
+    ...(row.kind === "property" ? { layerId: row.layer.id, trackId: row.track?.id } : {}),
     propertyId: row.property.id,
     keyId: key.id,
     firstKeyIndex: index,

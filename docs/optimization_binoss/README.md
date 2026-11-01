@@ -23,3 +23,15 @@ See [the validation plan](validation-plan.md) and [actual results](validation-re
 Ignored logs and captures are stored in `artifacts/optimization-binoss/` and the
 native witness directories. Existing unrelated workstation work is preserved.
 Development-server timing is not presented as production interaction latency.
+
+## Scene Motion follow-up
+
+The original seven tasks are archived. The requested scene Motion integration is validated:
+
+- [08: shared scene actions](validated/08-scene-motion-actions/task-idea.md) — core Motion/preset/key semantics.
+- [09: scene timeline](validated/09-scene-timeline/task-idea.md) — genuine owner rows and shared native editing gestures.
+- [10: Cornell camera](validated/10-cornell-camera/task-idea.md) — a real camera orbit, portable journal and native poster.
+
+The coordinator remains the sole validation owner; heavy checks are serial.
+
+See [scene Motion validation](scene-motion-validation.md) for actual checks, focus fixes, native export and gallery evidence, and explicit limits.

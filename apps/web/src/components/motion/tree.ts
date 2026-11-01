@@ -10,7 +10,7 @@ import {
   type MotionPropertyTrack,
 } from "@musart/core";
 
-export type TimelineRow = {
+export type LayerTimelineRow = {
   key: string;
   layer: Layer;
   depth: number;
@@ -22,13 +22,21 @@ export type TimelineRow = {
   | { kind: "property"; property: MotionPropertyTrack }
 );
 
+export type TimelineRow = LayerTimelineRow | import("./scene/tree").SceneTimelineRow;
+
+export function isTimelinePropertyRow(
+  row: TimelineRow,
+): row is Extract<TimelineRow, { kind: "property" | "sceneProperty" }> {
+  return row.kind === "property" || row.kind === "sceneProperty";
+}
+
 /** Canonical foreground-first hierarchy, indexed once for each authored revision. */
 export function projectTimelineRows(
   page: Composition,
   collapsed: ReadonlySet<string>,
   chosen?: ReadonlyMap<string, string>,
   details = true,
-): TimelineRow[] {
+): LayerTimelineRow[] {
   const children = new Map<string | null, Layer[]>();
   for (const layer of page.layers) {
     const siblings = children.get(layer.parentId) ?? [];
@@ -36,7 +44,7 @@ export function projectTimelineRows(
     children.set(layer.parentId, siblings);
   }
   const pending = (children.get(null) ?? []).map((layer) => ({ layer, depth: 0 }));
-  const rows: TimelineRow[] = [];
+  const rows: LayerTimelineRow[] = [];
   while (pending.length) {
     const { layer, depth } = pending.pop()!;
     const occurrences = listLayerMotionOccurrences(page, layer.id);

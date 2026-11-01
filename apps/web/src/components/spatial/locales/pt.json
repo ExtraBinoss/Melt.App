@@ -201,5 +201,13 @@
     "high": "Alta"
   },
   "reflectionsHint": "Reflete objetos 3D próximos. As atualizações pausam durante a edição. Os efeitos 2D e as máscaras são aplicados depois.",
-  "removeKeyframe": "Remover quadro-chave · {{property}}"
+  "removeKeyframe": "Remover quadro-chave · {{property}}",
+  "sceneAnimationNames": {
+    "camera-orbit": "Órbita da câmara",
+    "camera-push": "Avanço da câmara",
+    "light-pulse": "Pulso de luz",
+    "environment-turn": "Rotação do ambiente"
+  },
+  "projection": "Projeção",
+  "lightType": "Tipo de luz"
 }

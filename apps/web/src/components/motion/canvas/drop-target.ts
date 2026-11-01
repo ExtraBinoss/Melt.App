@@ -108,6 +108,10 @@ export function installTimelineCanvasDropTarget(options: {
       hide();
       return;
     }
+    if (row.kind !== "layer" && row.kind !== "property") {
+      hide();
+      return;
+    }
     proxy.dataset.layerDropId = row.layer.id;
     proxy.dataset.layerDropPageId = compositionId;
     proxy.dataset.layerDropKind = row.kind;

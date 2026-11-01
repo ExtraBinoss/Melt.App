@@ -201,5 +201,13 @@
     "high": "Hoch"
   },
   "reflectionsHint": "Spiegelt benachbarte 3D-Objekte. Aktualisierungen pausieren beim Bearbeiten. 2D-Effekte und Masken werden anschließend angewendet.",
-  "removeKeyframe": "Schlüsselbild entfernen · {{property}}"
+  "removeKeyframe": "Schlüsselbild entfernen · {{property}}",
+  "sceneAnimationNames": {
+    "camera-orbit": "Kamera umkreisen",
+    "camera-push": "Kamera vorwärts",
+    "light-pulse": "Lichtpuls",
+    "environment-turn": "Umgebung drehen"
+  },
+  "projection": "Projektion",
+  "lightType": "Lichttyp"
 }

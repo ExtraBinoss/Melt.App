@@ -1,3 +1,4 @@
+import { sceneTimelineProperties } from "../scene/properties";
 import {
   projectMotionProperties,
   motionTimeToSeconds,
@@ -21,11 +22,13 @@ export function timelineSnapReferences(
       seconds: motionTimeToSeconds(page.motion.duration),
       time: page.motion.duration,
     });
-  for (const track of page.motion?.tracks ?? [])
-    for (const property of projectMotionProperties(track))
-      for (const key of property.keyframes)
-        if (!movingKeys.has(key.id))
-          references.push({ seconds: motionTimeToSeconds(key.time), time: key.time });
+  for (const property of [
+    ...(page.motion?.tracks.flatMap(projectMotionProperties) ?? []),
+    ...sceneTimelineProperties(page),
+  ])
+    for (const key of property.keyframes)
+      if (!movingKeys.has(key.id))
+        references.push({ seconds: motionTimeToSeconds(key.time), time: key.time });
   return references.sort((a, b) => a.seconds - b.seconds);
 }
 

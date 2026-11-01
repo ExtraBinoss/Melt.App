@@ -6,6 +6,8 @@ import type {
   AnimationChannel as Channel,
   MotionAnimation,
   MotionAnimationPreset,
+  AnimationTarget,
+  SceneAnimationTarget,
 } from "@musart/core";
 import { NumberInput } from "../../shared/NumberInput";
 import { InfoTooltip } from "../../shared/InfoTooltip";
@@ -22,10 +24,12 @@ export function AnimationChannel({
   index,
   edit,
 }: {
-  animation: MotionAnimation;
-  channel: Channel;
+  animation: MotionAnimation<AnimationTarget | SceneAnimationTarget>;
+  channel: Channel<AnimationTarget | SceneAnimationTarget>;
   index: number;
-  edit: (change: (preset: MotionAnimationPreset) => void) => void;
+  edit: (
+    change: (preset: MotionAnimationPreset<AnimationTarget | SceneAnimationTarget>) => void,
+  ) => void;
 }) {
   const { t } = useTranslation(["animations", "motion"]);
   const reduced = !!useReducedMotion();

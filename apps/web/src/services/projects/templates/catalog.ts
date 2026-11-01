@@ -26,7 +26,7 @@ export const TEMPLATE_CATALOG: readonly ProjectTemplate[] = Object.freeze([
     height: 1080,
     mode: "motion",
     category: "artwork",
-    preview: `${import.meta.env.BASE_URL}templates/motion/cornell-box.webp?v=3`,
+    preview: `${import.meta.env.BASE_URL}templates/motion/cornell-box.webp?v=4`,
   }),
   Object.freeze({
     id: "bloom-windows",

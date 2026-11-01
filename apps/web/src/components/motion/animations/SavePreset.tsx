@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import type { MotionAnimationPreset } from "@musart/core";
+import type { StoredMotionPreset } from "../../../services/motion/animations/presets";
 import { MotionPresetStore } from "../../../services/motion/animations/presets";
 import { Button } from "../../ui/button";
 import { Input } from "../../ui/input";
@@ -14,7 +14,7 @@ export function SavePreset({
   onSaved,
   onCancel,
 }: {
-  create: (name: string, id: string) => MotionAnimationPreset;
+  create: (name: string, id: string) => StoredMotionPreset;
   label?: string;
   initialOpen?: boolean;
   initialName?: string;

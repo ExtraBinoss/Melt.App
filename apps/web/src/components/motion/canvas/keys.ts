@@ -1,3 +1,4 @@
+import { isTimelinePropertyRow } from "../tree";
 import { motionTimeToSeconds } from "@musart/core";
 import type { CanvasIndexedKey, CanvasIndexedRow } from "./index";
 import { timelineLowerBound } from "./intervals";
@@ -40,9 +41,11 @@ export function projectCanvasKeys(
   viewport: TimelineCanvasViewport,
 ): (TimelineCanvasKey | TimelineCanvasEasing)[] {
   const { row, keys } = indexed;
-  if (row.kind !== "property" || !row.track || !keys.length) return [];
+  if (!isTimelinePropertyRow(row) || !keys.length) return [];
   const draft = model.draft;
   const layerMoving =
+    row.kind === "property" &&
+    !!row.track &&
     draft?.action === "move" &&
     (draft.trackIds
       ? draft.trackIds.has(row.track.id)
@@ -71,8 +74,7 @@ export function projectCanvasKeys(
   const common = {
     rowKey: row.key,
     rowIndex,
-    layerId: row.layer.id,
-    trackId: row.track.id,
+    ...(row.kind === "property" ? { layerId: row.layer.id, trackId: row.track?.id } : {}),
     propertyId: row.property.id,
   };
   const buckets = new Map<number, TimelineCanvasKey>();

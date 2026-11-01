@@ -19,6 +19,33 @@ Presets instantiate independent effects with document IDs. Core commands validat
 
 `scaleX` and `scaleY` are optional positive layer transforms, defaulting to one, around the existing center pivot. They are independent of source width/height, so text, groups and children scale through the same transform. Core geometry, mask matrices, primitive instancing, normal/special blends and root/child cache signatures use these transforms. Scaling does not invalidate an unchanged source texture.
 
+## Composition-owned scene actions
+
+Camera, environment and durable lights are first-class Motion owners. Optional
+`CompositionMotion.sceneAnimations` stores ordinary declarative action instances
+with a typed owner; existing `sceneProperties` retains directly authored keys.
+Scene recipes share the generic preset/channel/instance contract, interpolation,
+composition, point identities, retiming, easing and command machinery with layer
+actions. They never manufacture layers or serialize a duplicate set of derived
+keys. Imported values and owner references validate atomically, light deletion
+prunes its actions, and composition duplication remaps owner and action identities.
+
+Animations and Keyframes expose Camera, Environment and one row per authored
+light on the shared timeline surface. Scene actions use the same block/key
+gestures, cancellation and single-transaction undo. Explicit Edit reveals the
+existing owner controls; a drag does not open an editor popup. Camera orbit/push,
+light pulse and environment rotation recipes are filtered by the owner's actual
+capabilities. Personal scene presets use the existing global UUID/revision/
+tombstone store and carry no source composition or light IDs.
+
+Direct keys evaluate first; actions compose afterward in authored order using
+explicit add/multiply/replace operations, matching layer actions. Replacement
+actions intentionally win over base keys. Their values and curves are edited
+through action Details or their derived timeline points, without implicit
+contribution inversion in Inspector fields. Preview and export sample the same
+program. Cornell Box demonstrates one sparse eight-second camera orbit while
+its objects and lights remain stationary.
+
 ## Library and previews
 
 The catalogue contains 61 general recipes (31 property combinations and 30 native GPU reveal/style operators), plus three Typography recipes for editable text. All use the same validated animation channels and renderer. Typography adds source-owned contour morphing, per-letter timing and generated inflation/stretch, with authored vector states for precise designs; see [native contour morphing](../rendering/text-morph.md). Templates and browser previews do not implement an alternative animation engine.

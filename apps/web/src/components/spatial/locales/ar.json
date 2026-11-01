@@ -201,5 +201,13 @@
     "high": "عالية"
   },
   "reflectionsHint": "تعكس العناصر ثلاثية الأبعاد القريبة. تتوقف التحديثات أثناء التحرير. تُطبّق التأثيرات ثنائية الأبعاد والأقنعة لاحقًا.",
-  "removeKeyframe": "إزالة الإطار الرئيسي · {{property}}"
+  "removeKeyframe": "إزالة الإطار الرئيسي · {{property}}",
+  "sceneAnimationNames": {
+    "camera-orbit": "دوران الكاميرا",
+    "camera-push": "تقدم الكاميرا",
+    "light-pulse": "نبض الضوء",
+    "environment-turn": "دوران البيئة"
+  },
+  "projection": "الإسقاط",
+  "lightType": "نوع الضوء"
 }

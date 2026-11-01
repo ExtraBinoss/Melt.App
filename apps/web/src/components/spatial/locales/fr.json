@@ -201,5 +201,13 @@
     "high": "Élevée"
   },
   "reflectionsHint": "Reflète les objets 3D voisins. Les mises à jour attendent la fin des manipulations. Les effets 2D et les masques sont appliqués ensuite.",
-  "removeKeyframe": "Supprimer l’image clé · {{property}}"
+  "removeKeyframe": "Supprimer l’image clé · {{property}}",
+  "sceneAnimationNames": {
+    "camera-orbit": "Orbite caméra",
+    "camera-push": "Avancée caméra",
+    "light-pulse": "Pulsation lumineuse",
+    "environment-turn": "Rotation environnement"
+  },
+  "projection": "Projection",
+  "lightType": "Type de lumière"
 }

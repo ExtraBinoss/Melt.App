@@ -1,12 +1,35 @@
 import { openDB, type DBSchema, type IDBPDatabase, type IDBPTransaction } from "idb";
-import { validateMotionAnimationPreset, type MotionAnimationPreset } from "@musart/core";
+import {
+  validateMotionAnimationPreset,
+  validateSceneMotionAnimationPreset,
+  type MotionAnimationPreset,
+  type SceneMotionAnimationPreset,
+} from "@musart/core";
+export type StoredMotionPreset = MotionAnimationPreset | SceneMotionAnimationPreset;
+export function isSceneMotionPreset(
+  preset: StoredMotionPreset,
+): preset is SceneMotionAnimationPreset {
+  return preset.channels.some(
+    (channel) =>
+      channel.target.kind === "camera" ||
+      channel.target.kind === "environment" ||
+      channel.target.kind === "light",
+  );
+}
+function validateStoredPreset(preset: StoredMotionPreset) {
+  try {
+    validateMotionAnimationPreset(preset);
+  } catch {
+    validateSceneMotionAnimationPreset(preset);
+  }
+}
 
 export interface SavedMotionPreset {
   id: string;
   revision: number;
   updatedAt: number;
   deleted: boolean;
-  preset: MotionAnimationPreset;
+  preset: StoredMotionPreset;
 }
 interface Schema extends DBSchema {
   presets: { key: string; value: SavedMotionPreset; indexes: { updated: [number, string] } };
@@ -59,7 +82,7 @@ export class MotionPresetStore {
       )
         throw Error("Invalid saved motion preset");
       if (!cursor.value.deleted) {
-        validateMotionAnimationPreset(cursor.value.preset);
+        validateStoredPreset(cursor.value.preset);
         items.push(cursor.value);
       }
       const last = cursor.key;
@@ -69,8 +92,8 @@ export class MotionPresetStore {
     }
     return { items, before: null };
   }
-  async save(preset: MotionAnimationPreset, expectedRevision = 0): Promise<SavedMotionPreset> {
-    validateMotionAnimationPreset(preset);
+  async save(preset: StoredMotionPreset, expectedRevision = 0): Promise<SavedMotionPreset> {
+    validateStoredPreset(preset);
     const db = await this.database();
     const tx = db.transaction("presets", "readwrite");
     this.writes.add(tx);

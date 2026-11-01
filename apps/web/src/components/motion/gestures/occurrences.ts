@@ -1,3 +1,4 @@
+import { sceneTimelineProperties } from "../scene/properties";
 import {
   projectMotionProperties,
   getDescendants,
@@ -50,10 +51,11 @@ export function timelineGestureBounds(
       ? { minimum: subtractMotionTime(zero, track.start), maximum: subtractMotionTime(span, tick) }
       : { minimum: subtractMotionTime(tick, span), maximum: subtractMotionTime(duration, end) };
   }
-  const times = page.motion!.tracks.flatMap((item) =>
-    projectMotionProperties(item).flatMap((property) =>
-      property.keyframes.filter((key) => keyIds.has(key.id)).map((key) => key.time),
-    ),
+  const times = [
+    ...page.motion!.tracks.flatMap(projectMotionProperties),
+    ...sceneTimelineProperties(page),
+  ].flatMap((property) =>
+    property.keyframes.filter((key) => keyIds.has(key.id)).map((key) => key.time),
   );
   let first = times[0] ?? zero,
     last = first;

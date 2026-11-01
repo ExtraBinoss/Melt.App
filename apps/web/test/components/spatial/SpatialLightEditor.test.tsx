@@ -55,24 +55,24 @@ it("shows controls for the sampled light type without rerendering the authoring 
       <Host />
     </TooltipProvider>,
   );
-  const label = (key: "angle" | "softness" | "lights") => i18n.t(`spatial:${key}`);
+  const label = (key: "angle" | "softness" | "lightType") => i18n.t(`spatial:${key}`);
   const targetX = i18n.t("spatial:targetAxis", { axis: "X" });
   try {
     const renders = rootRender.mock.calls.length;
-    expect(screen.getByRole("combobox", { name: label("lights") })).toHaveTextContent(
+    expect(screen.getByRole("combobox", { name: label("lightType") })).toHaveTextContent(
       i18n.t("spatial:lightTypes.directional"),
     );
     expect(screen.getByRole("textbox", { name: targetX })).toBeInTheDocument();
     expect(screen.queryByRole("textbox", { name: label("angle") })).not.toBeInTheDocument();
     act(() => transport.seek({ value: 1, rate: 1 }));
-    expect(screen.getByRole("combobox", { name: label("lights") })).toHaveTextContent(
+    expect(screen.getByRole("combobox", { name: label("lightType") })).toHaveTextContent(
       i18n.t("spatial:lightTypes.spot"),
     );
     expect(screen.getByRole("textbox", { name: label("angle") })).toHaveValue("45");
     expect(screen.getByRole("textbox", { name: label("softness") })).toHaveValue("0.5");
     expect(screen.getByRole("textbox", { name: targetX })).toBeInTheDocument();
     act(() => transport.seek({ value: 2, rate: 1 }));
-    expect(screen.getByRole("combobox", { name: label("lights") })).toHaveTextContent(
+    expect(screen.getByRole("combobox", { name: label("lightType") })).toHaveTextContent(
       i18n.t("spatial:lightTypes.point"),
     );
     expect(screen.queryByRole("textbox", { name: targetX })).not.toBeInTheDocument();

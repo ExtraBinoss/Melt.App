@@ -1,11 +1,10 @@
 import {
   planMotionInitialization,
-  createMotionEasingPreset,
+  SCENE_MOTION_ANIMATION_PRESETS,
   createSpatialLayer,
   createSpatialLight,
   createSpatialScene,
   spatialMaterial,
-  type MotionAnimationPreset,
   type Layer,
   type SpatialLayer,
 } from "@musart/core";
@@ -13,11 +12,11 @@ import { brand } from "../../../../ui/brand/config";
 import { TemplateAuthor, seconds } from "./author";
 
 export const CORNELL_DURATION = 8;
-/** Separate engine-native objects share depth, shadows, probes and one animated parent. */
+/** Separate engine-native objects share depth, shadows, probes and one editable parent. */
 export function createCornellBox() {
   const a = new TemplateAuthor("cornell-box", "Cornell Box", 1080, 1080);
   const scene = createSpatialScene();
-  scene.camera = { projection: "perspective", yaw: 0, pitch: 0, distance: 3.15, fov: 40 };
+  scene.camera = { projection: "perspective", yaw: 5, pitch: 0, distance: 3.15, fov: 40 };
   scene.environment.intensity = 0.32;
   scene.shadows = true;
   const key = {
@@ -156,7 +155,7 @@ export function createCornellBox() {
     {
       type: "updateLayers",
       ids: [rig],
-      patch: { spatial: { ...group.spatial!, pivot: [0, 0, 0], rotationY: -5 } },
+      patch: { spatial: { ...group.spatial!, pivot: [0, 0, 0], rotationY: 0 } },
     },
   ]);
   const plan = planMotionInitialization(a.engine.getSnapshot(), seconds(CORNELL_DURATION), {
@@ -164,30 +163,13 @@ export function createCornellBox() {
     denominator: 1,
   });
   a.commit([{ type: "setCompositionMode", mode: "motion", plan, confirmed: true }]);
-  const turntable: MotionAnimationPreset = {
-    version: 1,
-    id: "cornell-turntable",
-    name: "3D · Turntable",
-    category: "rotate",
-    duration: CORNELL_DURATION * 1000,
-    effects: [],
-    channels: [
-      {
-        target: { kind: "layer", property: "spatial.rotationY" },
-        operation: "replace",
-        points: [
-          { at: 0, value: -5 },
-          { at: 0.5, value: 5, easing: createMotionEasingPreset("easeInOut") },
-          { at: 1, value: -5, easing: createMotionEasingPreset("easeInOut") },
-        ],
-      },
-    ],
-  };
+  const orbit = SCENE_MOTION_ANIMATION_PRESETS.find((preset) => preset.id === "scene-camera-orbit");
+  if (!orbit) throw Error("Missing reusable camera orbit preset");
   a.commit([
     {
       type: "addMotionAnimation",
-      trackId: a.track(rig),
-      preset: turntable,
+      owner: { kind: "camera", compositionId: a.engine.getSnapshot().project.pages[0]!.id },
+      preset: orbit,
       start: seconds(0),
       duration: seconds(CORNELL_DURATION),
     },

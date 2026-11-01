@@ -1,3 +1,8 @@
+import {
+  SimpleSceneTimelineRow,
+  simpleSceneRows,
+  type SimpleSceneRow,
+} from "../scene/SimpleSceneTimelineRow";
 import { useMemo, type CSSProperties, type RefObject } from "react";
 import { useReducedMotion } from "motion/react";
 import { Sparkles } from "lucide-react";
@@ -81,7 +86,8 @@ export function SimpleTimelineRows({
   const geometry = useMemo(() => createLayerGeometryIndex(page), [page]);
   const rows = useMemo(
     () =>
-      layerRows.flatMap<Row>((row) => {
+      layerRows.flatMap<Row | SimpleSceneRow>((row) => {
+        if (row.kind === "scene") return simpleSceneRows(row);
         if (row.kind !== "layer") return [];
         return [
           { row },
@@ -112,7 +118,25 @@ export function SimpleTimelineRows({
       }
       aria-label={t("title")}
     >
-      {rows.slice(first, last).map(({ row, animation, track, property }, offset) => {
+      {rows.slice(first, last).map((entry, offset) => {
+        if ("sceneRow" in entry)
+          return (
+            <SimpleSceneTimelineRow
+              key={entry.animation?.id ?? entry.property?.id ?? entry.sceneRow.key}
+              entry={entry}
+              top={(first + offset) * rowHeight}
+              height={rowHeight}
+              engine={engine}
+              page={page}
+              transport={transport}
+              gestures={gestures}
+              interactive={interactive}
+              onToggle={onToggle}
+              scale={scale}
+              selected={presentation.selected}
+            />
+          );
+        const { row, animation, track, property } = entry;
         const layer = row.layer,
           locked = geometry.isLocked(layer.id),
           top = (first + offset) * rowHeight;

@@ -1,54 +1,21 @@
+import { validateAnimationPresetHeader, validateAnimationChannelPoints } from "./validation-shared";
+export { ANIMATION_CATEGORIES } from "./validation-shared";
 import { createSpatialLayer } from "../../spatial/defaults";
 import { assertList, assertNumber, assertRecord, assertUniqueId } from "../../document/guards";
 import { createLayer } from "../../document/factories";
 import { validateEffect } from "../../document/validation";
 import { ensure } from "../../errors";
 import type { Layer } from "../../document/model";
-import { validateMotionEasing } from "../easing";
-import { resolveLayerMotionProperty, validateMotionValue } from "../properties/registry";
+import { resolveLayerMotionProperty } from "../properties/registry";
 import { validateMotionTime } from "../time";
 import type { MotionAnimation, MotionAnimationPreset } from "./model";
 import { animationTarget } from "./targets";
-
-export const ANIMATION_CATEGORIES = [
-  "typography",
-  "move",
-  "scale",
-  "rotate",
-  "blur",
-  "attention",
-  "reveal",
-  "stylize",
-  "custom",
-] as const;
 
 /** Validate portable recipes before storage, import, compilation or application. No executable data. */
 export function validateMotionAnimationPreset(
   value: unknown,
 ): asserts value is MotionAnimationPreset {
-  assertRecord(value);
-  ensure(
-    value.version === 1 &&
-      typeof value.id === "string" &&
-      value.id.length > 0 &&
-      value.id.length <= 200,
-    "INVALID_DOCUMENT",
-    "Invalid animation preset identity",
-  );
-  ensure(
-    typeof value.name === "string" && value.name.trim().length > 0 && value.name.length <= 100,
-    "INVALID_DOCUMENT",
-    "Invalid animation name",
-  );
-  ensure(
-    ANIMATION_CATEGORIES.some((category) => category === value.category),
-    "INVALID_DOCUMENT",
-    "Unknown animation category",
-  );
-  assertNumber(value.duration, 1, 3600000);
-  assertList(value.effects, 32);
-  assertList(value.channels, 64);
-  ensure(value.channels.length > 0, "INVALID_DOCUMENT", "Animation has no channels");
+  validateAnimationPresetHeader(value);
   const effects = value.effects.map((effect, index) => {
     assertRecord(effect);
     ensure(!("id" in effect), "INVALID_DOCUMENT", "Preset effect identities must be local");
@@ -115,31 +82,7 @@ export function validateMotionAnimationPreset(
     const address = JSON.stringify(target);
     ensure(!addresses.has(address), "INVALID_DOCUMENT", "Duplicate animation channel");
     addresses.add(address);
-    assertList(channel.points, 256);
-    ensure(channel.points.length >= 2, "INVALID_DOCUMENT", "Animation needs at least two points");
-    let previous = -1;
-    for (const point of channel.points) {
-      assertRecord(point);
-      assertNumber(point.at, 0, 1);
-      ensure(point.at > previous, "INVALID_DOCUMENT", "Unordered animation points");
-      previous = point.at;
-      if (channel.operation === "replace" && !channel.unit)
-        validateMotionValue(resolved, point.value);
-      else {
-        ensure(
-          resolved.kind === "number" || resolved.kind === "integer",
-          "INVALID_DOCUMENT",
-          "Relative animation requires numbers",
-        );
-        assertNumber(point.value, -1000000, 1000000);
-      }
-      if (point.easing !== undefined) validateMotionEasing(point.easing);
-    }
-    ensure(
-      typed.points[0]!.at === 0 && typed.points[typed.points.length - 1]!.at === 1,
-      "INVALID_DOCUMENT",
-      "Animation endpoints must span zero to one",
-    );
+    validateAnimationChannelPoints(channel, resolved);
   }
 }
 

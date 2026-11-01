@@ -331,3 +331,26 @@ export type {
   EnvironmentMotionProperty,
   LightMotionProperty,
 } from "./motion/scene/model";
+export type {
+  SceneAnimationOwner,
+  SceneAnimationTarget,
+  SceneMotionAnimationPreset,
+  SceneMotionAnimation,
+} from "./motion/scene/animations/model";
+export {
+  sceneAnimationOwner,
+  sceneAnimationOwnerKey,
+  sceneAnimationTarget,
+  canApplySceneMotionAnimationPreset,
+} from "./motion/scene/animations/targets";
+export { SCENE_MOTION_ANIMATION_PRESETS } from "./motion/scene/animations/catalog";
+export {
+  projectSceneMotionProperties,
+  projectSceneMotionAnimations,
+  projectSceneAnimationProperties,
+} from "./motion/scene/animations/keyframes";
+export { validateSceneMotionAnimationPreset } from "./motion/scene/animations/validation";
+export {
+  captureSceneMotionAnimationPreset,
+  extractSceneMotionAnimationPreset,
+} from "./motion/scene/animations/extract";

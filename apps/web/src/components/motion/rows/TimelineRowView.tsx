@@ -20,7 +20,7 @@ import {
   type Project,
 } from "@musart/core";
 import type { TimelineTransport, TimelineUnit } from "../model";
-import { projectEasingSegments, projectKeyMarkers, type TimelineRow } from "../tree";
+import { projectEasingSegments, projectKeyMarkers, type LayerTimelineRow } from "../tree";
 import { EasingPopover } from "../easing/EasingPopover";
 import { formatTimelineTime } from "../time";
 import type { TimelineGestures } from "../gestures";
@@ -35,7 +35,7 @@ import type { TimelineLayerDrag } from "../layer-drag/use-timeline-layer-drag";
 import "../messages";
 
 export interface TimelineRowViewProps {
-  row: TimelineRow;
+  row: LayerTimelineRow;
   top: number;
   height: number;
   reduced: boolean;

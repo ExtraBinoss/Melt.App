@@ -1,3 +1,4 @@
+import type { SceneAnimationOwner, SceneMotionAnimationPreset } from "../scene/animations/model";
 import type { Effect, Layer } from "../../document/model";
 import type { MotionEasing } from "../easing";
 import type { LayerMotionProperty, EffectMotionProperty, MotionValue } from "../properties/model";
@@ -23,26 +24,26 @@ export interface AnimationPoint {
   value: MotionValue;
   easing?: MotionEasing;
 }
-export interface AnimationChannel {
-  target: AnimationTarget;
+export interface AnimationChannel<Target = AnimationTarget> {
+  target: Target;
   operation: "add" | "multiply" | "replace";
   /** Relative distances adapt to the target, including the shared preview image. */
   unit?: "width" | "height";
   points: AnimationPoint[];
 }
-export interface MotionAnimationPreset {
+export interface MotionAnimationPreset<Target = AnimationTarget> {
   version: 1;
   id: string;
   name: string;
   category: AnimationCategory;
   duration: number;
-  channels: AnimationChannel[];
+  channels: AnimationChannel<Target>[];
   effects: Omit<Effect, "id">[];
 }
 /** Self-contained, declarative instances. Channels have exactly one authoritative owner. */
-export interface MotionAnimation {
+export interface MotionAnimation<Target = AnimationTarget> {
   id: string;
-  preset: MotionAnimationPreset;
+  preset: MotionAnimationPreset<Target>;
   start: MotionTime;
   duration: MotionTime;
   strength: number;
@@ -50,6 +51,15 @@ export interface MotionAnimation {
   effectIds: string[];
 }
 export type MotionAnimationCommand =
+  | {
+      type: "addMotionAnimation";
+      owner: SceneAnimationOwner;
+      preset: SceneMotionAnimationPreset;
+      start: MotionTime;
+      duration?: MotionTime;
+      strength?: number;
+      enabled?: boolean;
+    }
   | {
       type: "addMotionAnimation";
       trackId: string;
@@ -62,9 +72,9 @@ export type MotionAnimationCommand =
   | {
       type: "updateMotionAnimation";
       animationId: string;
-      patch: Partial<
-        Pick<MotionAnimation, "start" | "duration" | "strength" | "enabled" | "preset">
-      >;
+      patch: Partial<Pick<MotionAnimation, "start" | "duration" | "strength" | "enabled">> & {
+        preset?: MotionAnimationPreset | SceneMotionAnimationPreset;
+      };
     }
   | { type: "deleteMotionAnimation"; animationId: string };
 export type AnimationSubject = Pick<Layer, "id" | "width" | "height">;

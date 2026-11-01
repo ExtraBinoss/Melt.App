@@ -87,8 +87,8 @@ export type TimelineCanvasHit =
   | VisualCanvasHit
   | (TimelineCanvasHitBase & {
       readonly kind: "key";
-      readonly layerId: string;
-      readonly trackId: string;
+      readonly layerId?: string;
+      readonly trackId?: string;
       readonly propertyId: string;
       readonly keyId: string;
       /** A dense bucket is represented by indices rather than copying arbitrarily many IDs. */
@@ -97,8 +97,8 @@ export type TimelineCanvasHit =
     })
   | (TimelineCanvasHitBase & {
       readonly kind: "easing";
-      readonly layerId: string;
-      readonly trackId: string;
+      readonly layerId?: string;
+      readonly trackId?: string;
       readonly propertyId: string;
       readonly keyId: string;
       readonly previousKeyId: string;

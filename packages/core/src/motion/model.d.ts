@@ -1,3 +1,4 @@
+import type { SceneMotionAnimation } from "./scene/animations/model";
 import type { SceneMotionPropertyTarget, SceneMotionPropertyTrack } from "./scene/model";
 import type { MotionAnimation, MotionAnimationCommand } from "./animations/model";
 import type { MotionTime, MotionFrameRate } from "./time";
@@ -43,6 +44,7 @@ export interface CompositionMotion {
   tracks: MotionLayerTrack[];
   /** Composition-owned channels; absent in legacy portable documents. */
   sceneProperties?: SceneMotionPropertyTrack[];
+  sceneAnimations?: SceneMotionAnimation[];
   /** Independent sound clips do not create visual layers or GPU resources. */
   audioTracks?: MotionAudioTrack[];
 }

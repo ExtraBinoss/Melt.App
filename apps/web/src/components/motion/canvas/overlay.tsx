@@ -110,12 +110,12 @@ export function CanvasTimelineOverlay(props: CanvasTimelineOverlayProps) {
         '[data-slot="popover-content"][data-state="open"],[data-slot="context-menu-content"][data-state="open"]',
       );
     const paintHover = (next: TimelineCanvasHit | null) => {
-      if (next && "layerId" in next && layer !== next.layerId) {
+      if (next && "layerId" in next && !!next.layerId && layer !== next.layerId) {
         const releasePrevious = clearHover;
         layer = next.layerId;
         clearHover = hover.show(compositionId, layer);
         releasePrevious?.();
-      } else if (!next || !("layerId" in next)) {
+      } else if (!next || !("layerId" in next) || !next.layerId) {
         clearHover?.();
         clearHover = null;
         layer = "";
@@ -337,6 +337,7 @@ export function CanvasTimelineOverlay(props: CanvasTimelineOverlayProps) {
         ];
       if (!row || event.clientX < bounds.left + model.gutter) return;
       const label =
+        (row.kind === "layer" || row.kind === "property") &&
         proxy?.dataset.layerDropId === row.layer.id
           ? proxy
           : viewport.querySelector<HTMLElement>(
@@ -344,6 +345,11 @@ export function CanvasTimelineOverlay(props: CanvasTimelineOverlayProps) {
             );
       if (!label) return;
       const input = timelineLayerDragEvent(event, label);
+      if (row.kind === "scene" || row.kind === "sceneProperty") {
+        event.preventDefault();
+        if (event.dataTransfer) event.dataTransfer.dropEffect = "none";
+        return;
+      }
       if (row.kind !== "layer") props.drag.rejectProperty(input, row.layer.id);
       else if (event.type === "drop") props.drag.native.drop(input, row.layer);
       else props.drag.native.over(input, row.layer);
@@ -356,6 +362,12 @@ export function CanvasTimelineOverlay(props: CanvasTimelineOverlayProps) {
         changed &&
         rendered?.kind.startsWith("audio") &&
         !!classifyAudioMixChange(original, current);
+      const returnFocus =
+        changed &&
+        !retainMix &&
+        current.project.id === original.project.id &&
+        current.pageId === original.pageId &&
+        !!target.current?.contains(document.activeElement);
       original = current;
       if (changed) {
         cancelAdmission();
@@ -365,6 +377,7 @@ export function CanvasTimelineOverlay(props: CanvasTimelineOverlayProps) {
         held = false;
         promoted = null;
         publish(null, true);
+        if (returnFocus && root.isConnected) root.focus({ preventScroll: true });
       }
     });
     root.addEventListener("pointermove", move);

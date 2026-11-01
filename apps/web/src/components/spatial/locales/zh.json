@@ -201,5 +201,13 @@
     "high": "高"
   },
   "reflectionsHint": "反射附近的3D对象。编辑时暂停更新。二维效果和蒙版在之后应用。",
-  "removeKeyframe": "移除关键帧 · {{property}}"
+  "removeKeyframe": "移除关键帧 · {{property}}",
+  "sceneAnimationNames": {
+    "camera-orbit": "相机环绕",
+    "camera-push": "相机推进",
+    "light-pulse": "灯光脉冲",
+    "environment-turn": "环境旋转"
+  },
+  "projection": "投影方式",
+  "lightType": "灯光类型"
 }

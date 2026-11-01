@@ -39,6 +39,7 @@ export function projectCanvasClips(
   viewport: TimelineCanvasViewport,
 ) {
   const { row, tracks } = indexed;
+  if (row.kind !== "layer") return { clips: [], gaps: [] };
   const start = viewport.left / model.scale,
     end = (viewport.left + viewport.width) / model.scale,
     margin = 9 / model.scale;

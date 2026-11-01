@@ -22,12 +22,13 @@ export function MotionSummaryBlock({
   enabled = true,
   onSelect,
   onDetails,
+  onActivate,
   onDelete,
   animationId,
   wrap,
 }: {
   engine: EnginePort;
-  layerId: string;
+  layerId?: string;
   label: string;
   keys: readonly MotionKeyframe[];
   gestures: TimelineGestures;
@@ -39,6 +40,7 @@ export function MotionSummaryBlock({
   wrap?(this: void, control: ReactElement): ReactNode;
   onSelect(this: void): void;
   onDetails(this: void): void;
+  onActivate?(this: void): void;
   onDelete?(this: void): void;
 }) {
   const ref = useRef<HTMLButtonElement>(null);
@@ -51,12 +53,13 @@ export function MotionSummaryBlock({
   const start = motionTimeToSeconds(first.time),
     duration = motionTimeToSeconds(last.time) - start;
   const choose = () => {
-    engine.select([layerId]);
+    engine.select(layerId ? [layerId] : []);
     gestures.selectKeys(
       keys.map((key) => key.id),
       false,
     );
     onSelect();
+    onActivate?.();
   };
   const control = (
     <button
@@ -89,7 +92,10 @@ export function MotionSummaryBlock({
       onClick={(event) => {
         if (gestures.consumePointerClick(event.detail)) return;
         if (!event.detail) choose();
-        else onSelect();
+        else {
+          onSelect();
+          onActivate?.();
+        }
       }}
       onDoubleClick={onDetails}
       onKeyDown={(event) => {

@@ -1,3 +1,4 @@
+import { SceneTimelineRowView } from "./scene/SceneTimelineRowView";
 import { useMemo } from "react";
 import { useReducedMotion } from "motion/react";
 import { createLayerGeometryIndex, type EnginePort } from "@musart/core";
@@ -65,39 +66,57 @@ export function TimelineRows({
   const snapshot = engine?.getSnapshot();
   const page = dragPage ?? snapshot?.project.pages.find((item) => item.id === compositionId);
   const keySelection = gestures?.readSelected();
-  const visible = drag
-    ? drag.window(first, last)
-    : rows.slice(first, last).map((entry, offset) => ({ entry, at: first + offset }));
-  return visible.map(({ entry: row, at }) => (
-    <TimelineRowView
-      key={row.key}
-      row={row}
-      top={at * rowHeight}
-      height={rowHeight}
-      reduced={reduced}
-      active={selected.has(row.layer.id)}
-      locked={!!geometry?.isLocked(row.layer.id) || row.layer.locked}
-      page={page}
-      project={snapshot?.project}
-      pixelsPerSecond={pixelsPerSecond}
-      duration={duration}
-      left={left}
-      width={width}
-      unit={unit}
-      transport={transport}
-      onToggle={onToggle}
-      onSelect={onSelect}
-      gestures={gestures}
-      engine={engine}
-      compositionId={compositionId}
-      onError={onError}
-      onZoomRange={onZoomRange}
-      interactive={interactive}
-      drag={drag}
-      labelsOnly={labelsOnly}
-      keySelection={!labelsOnly && row.kind === "property" ? keySelection : undefined}
-      showHover={showHover}
-      clearHover={clearHover}
-    />
-  ));
+  const visible = rows.slice(first, last).map((entry, offset) => ({ entry, at: first + offset }));
+  if (drag?.moving)
+    for (const entry of drag.window(first, last))
+      if (!visible.some((item) => item.entry.key === entry.entry.key)) visible.push(entry);
+  return visible.map(({ entry: row, at }) =>
+    row.kind === "scene" || row.kind === "sceneProperty" ? (
+      <SceneTimelineRowView
+        key={row.key}
+        row={row}
+        top={at * rowHeight}
+        height={rowHeight}
+        engine={engine!}
+        page={page!}
+        transport={transport}
+        gestures={gestures!}
+        interactive={interactive}
+        onToggle={onToggle}
+        scale={pixelsPerSecond}
+        labelsOnly={labelsOnly}
+      />
+    ) : (
+      <TimelineRowView
+        key={row.key}
+        row={row}
+        top={at * rowHeight}
+        height={rowHeight}
+        reduced={reduced}
+        active={selected.has(row.layer.id)}
+        locked={!!geometry?.isLocked(row.layer.id) || row.layer.locked}
+        page={page}
+        project={snapshot?.project}
+        pixelsPerSecond={pixelsPerSecond}
+        duration={duration}
+        left={left}
+        width={width}
+        unit={unit}
+        transport={transport}
+        onToggle={onToggle}
+        onSelect={onSelect}
+        gestures={gestures}
+        engine={engine}
+        compositionId={compositionId}
+        onError={onError}
+        onZoomRange={onZoomRange}
+        interactive={interactive}
+        drag={drag}
+        labelsOnly={labelsOnly}
+        keySelection={!labelsOnly && row.kind === "property" ? keySelection : undefined}
+        showHover={showHover}
+        clearHover={clearHover}
+      />
+    ),
+  );
 }

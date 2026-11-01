@@ -201,5 +201,13 @@
     "high": "高"
   },
   "reflectionsHint": "近くの3Dオブジェクトを反射します。編集中は更新を停止します。2Dエフェクトとマスクは後から適用されます。",
-  "removeKeyframe": "キーフレームを削除 · {{property}}"
+  "removeKeyframe": "キーフレームを削除 · {{property}}",
+  "sceneAnimationNames": {
+    "camera-orbit": "カメラ周回",
+    "camera-push": "カメラ前進",
+    "light-pulse": "ライトの点滅",
+    "environment-turn": "環境の回転"
+  },
+  "projection": "投影方式",
+  "lightType": "ライトの種類"
 }

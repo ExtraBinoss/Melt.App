@@ -1,3 +1,4 @@
+import { compileSceneAnimation } from "./scene/animations/compile";
 import { captureSceneMotionKeyMove } from "./scene/keyframes";
 import { compileSceneMotion } from "./scene/compile";
 import { captureAnimationPointMove } from "./animations/keyframes";
@@ -25,9 +26,22 @@ export function createMotionKeyframePreview(
     "INVALID_COMMAND",
     "Invalid keyframe selection",
   );
+  // Timing previews retain channel topology/order. Capture each enabled instance's sampler slice once.
+  let sceneOffset = 0;
+  const sceneSamplers = (program.composition.motion?.sceneAnimations ?? [])
+    .filter((animation) => animation.enabled)
+    .map((animation) => {
+      const channels = (program.sceneAnimations ?? []).slice(
+        sceneOffset,
+        sceneOffset + animation.preset.channels.length,
+      );
+      sceneOffset += animation.preset.channels.length;
+      return { id: animation.id, channels };
+    });
   const animationMove = captureAnimationPointMove(program.composition, ids);
-  for (const { track } of animationMove.entries)
-    assertEditable(program.composition, getLayer(program.composition, track.layerId));
+  for (const entry of animationMove.entries)
+    if (entry.kind === "layer")
+      assertEditable(program.composition, getLayer(program.composition, entry.track.layerId));
   const sceneMove = captureSceneMotionKeyMove(program.composition, ids);
   const found = new Set<string>([...animationMove.found, ...sceneMove.found]);
   const tracks = new Map(program.composition.motion?.tracks.map((track) => [track.id, track]));
@@ -57,6 +71,7 @@ export function createMotionKeyframePreview(
     try {
       validateMotionTime(delta);
       animationMove.sample(delta);
+      animationMove.sampleScene(delta);
       sceneMove.sample(delta);
       for (const { moving, fixed } of constraints) {
         if (
@@ -86,6 +101,7 @@ export function createMotionKeyframePreview(
     validateMotionTime(delta);
     if (delta.value === 0) return program;
     const animationDrafts = animationMove.sample(delta);
+    const sceneAnimationDrafts = animationMove.sampleScene(delta);
     const sceneDrafts = sceneMove.sample(delta);
     const authored = new Map<string, MotionPropertyTrack>();
     const layers = program.layers.map((layer, layerIndex) => {
@@ -141,6 +157,13 @@ export function createMotionKeyframePreview(
       ...program.composition,
       motion: {
         ...motion,
+        ...(motion.sceneAnimations
+          ? {
+              sceneAnimations: motion.sceneAnimations.map(
+                (animation) => sceneAnimationDrafts.get(animation.id) ?? animation,
+              ),
+            }
+          : {}),
         ...(motion.sceneProperties
           ? {
               sceneProperties: motion.sceneProperties.map(
@@ -176,6 +199,14 @@ export function createMotionKeyframePreview(
     return Object.freeze({
       ...program,
       composition,
+      ...(sceneAnimationDrafts.size
+        ? {
+            sceneAnimations: sceneSamplers.flatMap(({ id, channels }) => {
+              const draft = sceneAnimationDrafts.get(id);
+              return draft ? compileSceneAnimation(composition, draft) : channels;
+            }),
+          }
+        : {}),
       ...(sceneDrafts.size ? { sceneProperties: compileSceneMotion(composition) } : {}),
       layers: Object.freeze(
         layers.map((layer) => {

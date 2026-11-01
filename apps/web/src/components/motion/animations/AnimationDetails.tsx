@@ -2,7 +2,14 @@ import { AnimatedCollapsibleContent } from "../../shared/disclosure/AnimatedColl
 import { useState, type ReactNode } from "react";
 import { ChevronRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import type { EnginePort, MotionAnimation, MotionAnimationPreset } from "@musart/core";
+import type {
+  EnginePort,
+  MotionAnimation,
+  MotionAnimationPreset,
+  SceneMotionAnimation,
+  AnimationTarget,
+  SceneAnimationTarget,
+} from "@musart/core";
 import { AnimationChannel } from "./AnimationChannel";
 import { InfoTooltip } from "../../shared/InfoTooltip";
 import { Collapsible, CollapsibleTrigger } from "../../ui/collapsible";
@@ -14,10 +21,12 @@ export function AnimationDetails({
   run,
 }: {
   engine: EnginePort;
-  animation: MotionAnimation;
+  animation: MotionAnimation | SceneMotionAnimation;
   run: (action: () => void) => void;
 }) {
-  function edit(change: (preset: MotionAnimationPreset) => void) {
+  function edit(
+    change: (preset: MotionAnimationPreset<AnimationTarget | SceneAnimationTarget>) => void,
+  ) {
     run(() => {
       const preset = structuredClone(animation.preset);
       change(preset);
@@ -32,7 +41,7 @@ export function AnimationDetails({
     <div className="animation-details">
       {animation.preset.channels.map((channel, index) => (
         <AnimationChannel
-          key={`${channel.target.kind}:${channel.target.kind === "layer" ? "" : channel.target.slot}:${channel.target.property}`}
+          key={`${channel.target.kind}:${channel.target.kind === "effect" || channel.target.kind === "effectSetting" ? channel.target.slot : ""}:${channel.target.property}`}
           animation={animation}
           channel={channel}
           index={index}
@@ -49,17 +58,26 @@ export function AnimationDetailsDisclosure({
   run,
   disabled,
   actions,
+  open: controlledOpen,
+  onOpenChange,
 }: {
   engine: EnginePort;
-  animation: MotionAnimation;
+  animation: MotionAnimation | SceneMotionAnimation;
   run: (action: () => void) => void;
   disabled: boolean;
   actions?: ReactNode;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }) {
   const { t } = useTranslation("animations");
-  const [open, setOpen] = useState(false);
+  const [localOpen, setOpen] = useState(false);
+  const open = controlledOpen ?? localOpen;
   return (
-    <Collapsible className="animation-details-disclosure" open={open} onOpenChange={setOpen}>
+    <Collapsible
+      className="animation-details-disclosure"
+      open={open}
+      onOpenChange={onOpenChange ?? setOpen}
+    >
       <div className="animation-instance-footer">
         <div className="animation-details-label">
           <CollapsibleTrigger asChild>

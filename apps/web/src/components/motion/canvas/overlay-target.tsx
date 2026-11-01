@@ -1,3 +1,4 @@
+import { SceneCanvasTarget } from "../scene/SceneCanvasTarget";
 import { spatialPropertyLabel } from "../../spatial/presentation";
 import { motionTimeToSeconds, getEffectDefinition } from "@musart/core";
 import { Spline } from "lucide-react";
@@ -24,6 +25,9 @@ export function CanvasTimelineTarget(props: CanvasTimelineTargetProps) {
       : model.rows.findIndex((row) => row.key === hit.rowKey);
   const row = model.rows[rowIndex];
   if (!row || row.key !== hit.rowKey) return null;
+  if (row.kind === "scene") return null;
+  if (row.kind === "sceneProperty")
+    return <SceneCanvasTarget {...props} row={row} rowIndex={rowIndex} />;
   const page = props.engine
     .getSnapshot()
     .project.pages.find((page) => page.id === props.compositionId);

@@ -1,3 +1,4 @@
+import { validateSceneMotionAnimations } from "./scene/animations/validation";
 import { validateSceneMotionProperties } from "./scene/validation";
 import { validateMotionAnimations } from "./animations/validation";
 import type { Composition } from "../document/model";
@@ -44,7 +45,10 @@ export function validateCompositionMotion(
   assertList(motion.tracks, 10000);
   const layerIds = new Set(page.layers.map((layer) => layer.id));
   const tracked = new Set<string>();
-  let keys = validateSceneMotionProperties(page, motion.sceneProperties, ids);
+  let keys =
+    validateSceneMotionProperties(page, motion.sceneProperties, ids) +
+    validateSceneMotionAnimations(page, motion.sceneAnimations, ids);
+  ensure(keys <= 100000, "INVALID_DOCUMENT", "Too many Motion animation points");
   const intervals = new Map<string, { start: MotionTime; end: MotionTime }[]>();
   for (const track of motion.tracks) {
     assertRecord(track);

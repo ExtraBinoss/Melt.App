@@ -16,6 +16,7 @@ function reservedIds(project: Project): Set<string> {
       for (const key of property.keyframes) result.add(key.id);
     }
     for (const track of page.motion?.audioTracks ?? []) result.add(track.id);
+    for (const animation of page.motion?.sceneAnimations ?? []) result.add(animation.id);
     for (const track of page.motion?.tracks ?? []) {
       result.add(track.id);
       for (const animation of track.animations ?? []) result.add(animation.id);
@@ -84,6 +85,7 @@ export function pasteContent(
     for (const key of property.keyframes) ids.set(key.id, allocate());
   }
   for (const track of page.motion?.audioTracks ?? []) ids.set(track.id, allocate());
+  for (const animation of page.motion?.sceneAnimations ?? []) ids.set(animation.id, allocate());
   for (const track of page.motion?.tracks ?? []) {
     ids.set(track.id, allocate());
     for (const animation of track.animations ?? []) ids.set(animation.id, allocate());
@@ -120,6 +122,21 @@ export function pasteContent(
       ? {
           motion: {
             ...page.motion,
+            ...(page.motion.sceneAnimations
+              ? {
+                  sceneAnimations: page.motion.sceneAnimations.map((animation) => ({
+                    ...animation,
+                    id: ids.get(animation.id)!,
+                    owner: {
+                      ...animation.owner,
+                      compositionId: ids.get(page.id)!,
+                      ...(animation.owner.kind === "light"
+                        ? { lightId: ids.get(animation.owner.lightId)! }
+                        : {}),
+                    },
+                  })),
+                }
+              : {}),
             ...(page.motion.sceneProperties
               ? {
                   sceneProperties: page.motion.sceneProperties.map((property) => ({

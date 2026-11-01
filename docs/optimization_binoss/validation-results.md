@@ -62,3 +62,7 @@ they do not yet have dedicated composition rows in the layer timeline.
 Environment asset/preset swaps and scene action blocks are not newly animatable.
 Legacy static alpha light colors still import/round-trip; new light-color keys
 require RGB. Exact scope and evidence remain in each archived checklist.
+
+## Superseding scene Motion integration
+
+The scene timeline/action limitation recorded for the original seven-task batch is resolved by tasks 08–10. See [the follow-up evidence](scene-motion-validation.md); the original measurements remain historical.

@@ -201,5 +201,13 @@
     "high": "High"
   },
   "reflectionsHint": "Reflects nearby 3D objects. Updates pause during editing. 2D effects and masks are applied afterward.",
-  "removeKeyframe": "Remove keyframe · {{property}}"
+  "removeKeyframe": "Remove keyframe · {{property}}",
+  "sceneAnimationNames": {
+    "camera-orbit": "Camera orbit",
+    "camera-push": "Camera push",
+    "light-pulse": "Light pulse",
+    "environment-turn": "Environment turn"
+  },
+  "projection": "Projection",
+  "lightType": "Light type"
 }

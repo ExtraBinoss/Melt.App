@@ -1,10 +1,10 @@
 import { motionTimeToSeconds, type MotionKeyframe } from "@musart/core";
-import type { TimelineRow } from "../tree";
+import { isTimelinePropertyRow, type TimelineRow } from "../tree";
 
 interface Entry {
   row: number;
   propertyId: string;
-  layerId: string;
+  layerId?: string;
   keys: readonly MotionKeyframe[];
 }
 export interface KeyRange extends Entry {
@@ -27,11 +27,11 @@ function keyBound(keys: readonly MotionKeyframe[], seconds: number, inclusive: b
 export function createTimelineSelectionIndex(rows: readonly TimelineRow[], rowHeight: number) {
   const entries: Entry[] = [];
   rows.forEach((row, index) => {
-    if (row.kind === "property")
+    if (isTimelinePropertyRow(row))
       entries.push({
         row: index,
         propertyId: row.property.id,
-        layerId: row.layer.id,
+        layerId: row.kind === "property" ? row.layer.id : undefined,
         keys: row.property.keyframes,
       });
   });

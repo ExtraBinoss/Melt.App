@@ -14,6 +14,8 @@ export function animationPresetName(
   preset: Pick<MotionAnimationPreset, "id" | "name">,
   t: TFunction,
 ): string {
+  if (/^scene-(camera-orbit|camera-push|light-pulse|environment-turn)$/.test(preset.id))
+    return t(`sceneAnimationNames.${preset.id.slice(6)}`, { ns: "spatial" });
   return /^spatial-(spin|turn|tumble|rock|float|grow|extrude)$/.test(preset.id)
     ? t(`animationNames.${preset.id.slice(8)}`, { ns: "spatial" })
     : preset.name;

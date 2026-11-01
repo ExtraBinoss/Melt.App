@@ -8,6 +8,7 @@ import {
   type EnginePort,
   type SceneMotionPropertyTarget,
 } from "@musart/core";
+import { hasSceneMotionKeys } from "../motion/scene/properties";
 import { animationPresentation } from "../motion/animations/presentation";
 import { createMotionTransport } from "../../services/motion/transport";
 import { addSceneMotionKey, removeSceneMotionKey } from "./scene-motion-edit";
@@ -52,7 +53,7 @@ export function SceneMotionField({
       if (slot.current) slot.current.hidden = hidden;
       if (button.current) {
         button.current.disabled = !descriptor;
-        button.current.dataset.animated = String(Boolean(property?.keyframes.length));
+        button.current.dataset.animated = String(hasSceneMotionKeys(page, target));
         button.current.dataset.current = String(current);
         button.current.setAttribute("aria-pressed", String(current));
         button.current.setAttribute(

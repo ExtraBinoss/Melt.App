@@ -1,3 +1,5 @@
+import { captureAnimationPointMove, animationPointTime } from "./animations/keyframes";
+import { moveMotionKeyframes, deleteMotionKeyframes } from "./track-commands";
 import { upsertSceneMotionKeyframe } from "./scene/commands";
 import { ensure } from "../errors";
 import type { CommandHandler } from "../session/context";
@@ -194,12 +196,25 @@ export const upsertMotionKeyframe: CommandHandler<"upsertMotionKeyframe"> = (
   return { pageId };
 };
 
-export const moveMotionKeyframe: CommandHandler<"moveMotionKeyframe"> = (
-  { page, pageId },
-  command,
-) => {
-  const { property, index } = findKey(page, command.keyframeId);
+export const moveMotionKeyframe: CommandHandler<"moveMotionKeyframe"> = (context, command) => {
+  const { page, pageId } = context;
   validateMotionTime(command.time);
+  const selected = captureAnimationPointMove(page, new Set([command.keyframeId]));
+  const entry = selected.entries[0];
+  if (entry) {
+    const channel = entry.selected.findIndex((points) => points.some(Boolean));
+    const point = entry.selected[channel]!.findIndex(Boolean);
+    const before = animationPointTime(
+      entry.animation,
+      entry.animation.preset.channels[channel]!.points[point]!.at,
+    );
+    return moveMotionKeyframes(context, {
+      type: "moveMotionKeyframes",
+      keyframeIds: [command.keyframeId],
+      delta: subtractMotionTime(command.time, before),
+    });
+  }
+  const { property, index } = findKey(page, command.keyframeId);
   ensure(
     (page.motion!.version === 2 || command.time.value >= 0) &&
       !property.keyframes.some(
@@ -213,10 +228,13 @@ export const moveMotionKeyframe: CommandHandler<"moveMotionKeyframe"> = (
   return { pageId };
 };
 
-export const deleteMotionKeyframe: CommandHandler<"deleteMotionKeyframe"> = (
-  { page, pageId },
-  command,
-) => {
+export const deleteMotionKeyframe: CommandHandler<"deleteMotionKeyframe"> = (context, command) => {
+  const { page, pageId } = context;
+  if (captureAnimationPointMove(page, new Set([command.keyframeId])).found.size)
+    return deleteMotionKeyframes(context, {
+      type: "deleteMotionKeyframes",
+      keyframeIds: [command.keyframeId],
+    });
   const { property, index } = findKey(page, command.keyframeId);
   property.keyframes.splice(index, 1);
   return { pageId };

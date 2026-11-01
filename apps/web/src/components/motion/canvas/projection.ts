@@ -95,7 +95,9 @@ export function projectTimelineCanvas(
         key: row.key,
         index: at,
         y: at * model.rowHeight - viewport.top,
-        selected: model.selectedLayerIds.has(row.layer.id),
+        selected:
+          (row.kind === "layer" || row.kind === "property") &&
+          model.selectedLayerIds.has(row.layer.id),
         items: projected?.clips ?? projectCanvasKeys(indexed, at, model, viewport),
         gaps: projected?.gaps ?? [],
       });

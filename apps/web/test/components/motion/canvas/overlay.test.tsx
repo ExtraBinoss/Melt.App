@@ -352,3 +352,36 @@ it("native scroll updates overlay pose without remeasuring viewport width", () =
   expect(view.container.firstElementChild).toHaveStyle({ transform: "translate(-180px, -48px)" });
   view.unmount();
 });
+
+it("returns retired focused controls to the timeline after an edit without stealing external or replaced-project focus", () => {
+  const d = overlayFixture();
+  d.root.tabIndex = 0;
+  const focus = vi.spyOn(d.root, "focus");
+  const view = render(<CanvasTimelineOverlay {...d.props} />, { container: d.root });
+  const admit = () => {
+    fireEvent.pointerMove(d.root, { buttons: 0, clientX: 30, clientY: 12 });
+    dwell();
+    const button = d.root.querySelector("button")!;
+    button.focus();
+    return button;
+  };
+  const first = admit();
+  act(() => d.engine.execute({ type: "updatePage", patch: { background: "#112233" } }));
+  expect(first.isConnected).toBe(false);
+  expect(document.activeElement).toBe(d.root);
+  expect(focus).toHaveBeenLastCalledWith({ preventScroll: true });
+  admit();
+  const external = document.createElement("input");
+  document.body.append(external);
+  external.focus();
+  focus.mockClear();
+  act(() => d.engine.execute({ type: "updatePage", patch: { background: "#334455" } }));
+  expect(document.activeElement).toBe(external);
+  expect(focus).not.toHaveBeenCalled();
+  admit();
+  focus.mockClear();
+  act(() => d.engine.load({ ...d.engine.getSnapshot().project, id: "replacement-project" }));
+  expect(focus).not.toHaveBeenCalled();
+  view.unmount();
+  external.remove();
+});

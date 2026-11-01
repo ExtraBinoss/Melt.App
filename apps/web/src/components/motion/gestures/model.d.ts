@@ -1,0 +1,37 @@
+import type { Composition, MotionLayerTrack, MotionTime, MotionTrackMovePlan } from "@musart/core";
+import type { TimelineTransport } from "../model";
+import type { TimelineGestureOrigin } from "./origin";
+import type { createDragAutoScroll } from "../../shared/scroll/drag-auto-scroll";
+import type { createTimelineTooltipPreview } from "./tooltip";
+import type { createTimelineLinkPreview } from "../link-preview";
+export type TrackAction = "move" | "trimStart" | "trimEnd";
+export interface Gesture extends TimelineGestureOrigin {
+  node: HTMLElement;
+  pointer: number;
+  x: number;
+  scroll: number;
+  page: Composition;
+  originalLayers: string[];
+  originalKeys: ReadonlySet<string>;
+  action: TrackAction | "keys";
+  track?: MotionLayerTrack;
+  keyIds: string[];
+  layerIds: ReadonlySet<string>;
+  trackIds: ReadonlySet<string>;
+  limits: Pick<MotionTrackMovePlan, "minimum" | "maximum">;
+  movePlan?: MotionTrackMovePlan;
+  boundary: "start" | "end" | null;
+  anchor: MotionTime;
+  delta: MotionTime;
+  snapped: MotionTime | null;
+  references: { seconds: number; time: MotionTime }[];
+  touched: Set<HTMLElement>;
+  dirty: boolean;
+  rejected: boolean;
+  stopEngine: () => void;
+  scrollLoop: ReturnType<typeof createDragAutoScroll> | null;
+  point: { x: number; y: number; shift: boolean };
+  preview: ReturnType<NonNullable<TimelineTransport["beginKeyframePreview"]>>;
+  tooltip?: ReturnType<typeof createTimelineTooltipPreview>;
+  links?: ReturnType<typeof createTimelineLinkPreview>;
+}

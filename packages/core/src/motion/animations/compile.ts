@@ -2,21 +2,64 @@ import type { Composition } from "../../document/model";
 import { ensure } from "../../errors";
 import { compileMotionInterpolator } from "../interpolation";
 import { resolveMotionProperty } from "../properties/registry";
-import type { MotionPropertyDescriptor, MotionValue } from "../properties/model";
+import type { MotionPropertySchema, MotionPropertyTarget, MotionValue } from "../properties/model";
+import type { SceneMotionPropertyTarget } from "../scene/model";
 import { addMotionTime, motionTimeProgress, type MotionTime } from "../time";
 import type { MotionLayerTrack } from "../model";
-import type { MotionFrameValue } from "../evaluate";
+import type { AnimationChannel, MotionAnimation } from "./model";
 import { animationAddress, animationTarget } from "./targets";
-
-export interface CompiledAnimationChannel {
-  descriptor: MotionPropertyDescriptor;
+export type AnimationPropertyTarget = MotionPropertyTarget | SceneMotionPropertyTarget;
+export type AnimationPropertyDescriptor<Target = MotionPropertyTarget> = MotionPropertySchema & {
+  readonly target: Target;
+  readonly value: MotionValue;
+};
+export interface CompiledAnimationChannel<
+  Target extends AnimationPropertyTarget = MotionPropertyTarget,
+> {
+  descriptor: AnimationPropertyDescriptor<Target>;
   address: string;
   operation: "add" | "multiply" | "replace";
   strength: number;
   sample(time: MotionTime): MotionValue;
 }
-
-/** Retained samplers use the existing interpolation/easing implementation for preview and export. */
+/** One sampler for layer and composition-owned recipes, using the ordinary easing engine. */
+export function compileAnimationChannel<Target extends AnimationPropertyTarget>(
+  animation: Pick<MotionAnimation<unknown>, "start" | "duration" | "strength">,
+  channel: AnimationChannel<unknown>,
+  descriptor: AnimationPropertyDescriptor<Target>,
+  multiplier = 1,
+): CompiledAnimationChannel<Target> {
+  const points = channel.points.map((point) => ({
+    ...point,
+    value: typeof point.value === "number" ? point.value * multiplier : point.value,
+  }));
+  const interpolation =
+    descriptor.kind === "number" || descriptor.kind === "integer"
+      ? { ...descriptor, kind: "number" as const, min: -1e12, max: 1e12 }
+      : descriptor;
+  const segments = points
+    .slice(1)
+    .map((point, index) =>
+      compileMotionInterpolator(interpolation, points[index]!.value, point.value, point.easing),
+    );
+  const end = addMotionTime(animation.start, animation.duration);
+  return {
+    descriptor,
+    address: animationAddress(descriptor.target),
+    operation: channel.operation,
+    strength: animation.strength,
+    sample(time) {
+      const progress = motionTimeProgress(time, animation.start, end);
+      if (progress <= 0) return points[0]!.value;
+      if (progress >= 1) return points[points.length - 1]!.value;
+      let index = 1;
+      while (index < points.length - 1 && points[index]!.at < progress) index++;
+      const left = points[index - 1]!,
+        right = points[index]!;
+      return segments[index - 1]!((progress - left.at) / (right.at - left.at));
+    },
+  };
+}
 export function compileAnimations(
   page: Composition,
   track: MotionLayerTrack,
@@ -26,54 +69,25 @@ export function compileAnimations(
     .filter((animation) => animation.enabled)
     .flatMap((animation) =>
       animation.preset.channels.map((channel) => {
-        const target = animationTarget(layer.id, animation, channel.target);
-        const descriptor = resolveMotionProperty(page, target);
+        const descriptor = resolveMotionProperty(
+          page,
+          animationTarget(layer.id, animation, channel.target),
+        );
         ensure(descriptor, "INVALID_DOCUMENT", "Animation target is missing");
-        const multiplier = channel.unit ? layer[channel.unit] : 1;
-        const points = channel.points.map((point) => ({
-          ...point,
-          value: typeof point.value === "number" ? point.value * multiplier : point.value,
-        }));
-        const interpolation =
-          descriptor.kind === "number" || descriptor.kind === "integer"
-            ? { ...descriptor, kind: "number" as const, min: -1e12, max: 1e12 }
-            : descriptor;
-        const segments = points
-          .slice(1)
-          .map((point, index) =>
-            compileMotionInterpolator(
-              interpolation,
-              points[index]!.value,
-              point.value,
-              point.easing,
-            ),
-          );
-        const end = addMotionTime(animation.start, animation.duration);
-        return {
+        return compileAnimationChannel(
+          animation,
+          channel,
           descriptor,
-          address: animationAddress(target),
-          operation: channel.operation,
-          strength: animation.strength,
-          sample(time: MotionTime) {
-            const progress = motionTimeProgress(time, animation.start, end);
-            if (progress <= 0) return points[0]!.value;
-            if (progress >= 1) return points[points.length - 1]!.value;
-            let index = 1;
-            while (index < points.length - 1 && points[index]!.at < progress) index++;
-            const left = points[index - 1]!,
-              right = points[index]!;
-            return segments[index - 1]!((progress - left.at) / (right.at - left.at));
-          },
-        };
+          channel.unit ? layer[channel.unit] : 1,
+        );
       }),
     );
 }
-
 /** Actions compose in authored order after ordinary keyframes; add/multiply are explicit. */
-export function evaluateAnimations(
-  channels: readonly CompiledAnimationChannel[],
+export function evaluateAnimations<Target extends AnimationPropertyTarget>(
+  channels: readonly CompiledAnimationChannel<Target>[],
   time: MotionTime,
-  values: MotionFrameValue[],
+  values: { readonly target: Target; readonly value: MotionValue }[],
   firstValue = 0,
 ): void {
   const indexes = new Map(

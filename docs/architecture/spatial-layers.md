@@ -94,8 +94,11 @@ interpolation, undo and frame sampling as preview and video export. Inspector
 diamonds and Auto-key author scene channels; numeric playback presentation is
 imperative, and discrete controls subscribe at their leaves. Deleting a light
 prunes its channels atomically; composition duplication remaps all scene/light/key
-identities. Scene channels do not yet have dedicated rows in the layer timeline;
-environment asset/preset changes remain structural, without keyframe support.
+identities. Camera, Environment and per-light timeline rows expose direct keys
+and reusable Motion action channels with shared editing gestures and easing.
+Scene actions store typed owners in optional `sceneAnimations`; camera/light/
+environment values use the same preview/export sampler as layer actions.
+Environment asset/preset changes remain structural, without keyframe support.
 
 Engine-owned analytic lights use Three's renderer-local light-node extension
 API to refresh color, intensity and point/spot parameters per render. Exact
