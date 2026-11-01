@@ -1,3 +1,4 @@
+import { mediaCornerControls, mediaCornerNode } from "../surface/media-corners";
 import { compileGpuScene } from "./compile";
 import type { Bounds, Layer } from "@musart/core";
 import { sourcePlacement } from "./group-viewport";
@@ -55,6 +56,8 @@ export class GpuPasses {
   private readonly maskMaterial = material();
   private readonly blend = blendControls();
   private readonly blendMaterial = material();
+  private readonly corners = mediaCornerControls();
+  private readonly cornerMaterial = material();
   private readonly shape = shapeControls();
   private readonly shapeMaterial = material();
   constructor(private readonly renderer: WebGPURenderer) {
@@ -65,6 +68,8 @@ export class GpuPasses {
     this.maskMaterial.name = "melt:mask";
     this.blendMaterial.name = "melt:composition";
     this.shapeMaterial.name = "melt:shapes";
+    this.cornerMaterial.name = "melt:media-corners";
+    this.cornerMaterial.fragmentNode = mediaCornerNode(this.corners);
     this.clearMaterial.fragmentNode = this.clearColor;
     this.copyMaterial.fragmentNode = copyNode(this.copy);
     this.maskMaterial.fragmentNode = maskNode(this.mask);
@@ -78,11 +83,13 @@ export class GpuPasses {
       this.maskMaterial,
       this.blendMaterial,
       this.shapeMaterial,
+      this.cornerMaterial,
     ];
     if (materials.every((material) => this.compiled.has(material))) return;
     const previous = this.mesh.material;
     const bindings = [
       this.copy.source,
+      this.corners.source,
       this.mask.source,
       this.mask.mask,
       this.blend.source,
@@ -102,7 +109,11 @@ export class GpuPasses {
       input.texture.generateMipmaps = target.texture.generateMipmaps;
       return input;
     });
-    this.copy.source.value = this.mask.source.value = this.blend.source.value = inputs[0]!.texture;
+    this.corners.source.value =
+      this.copy.source.value =
+      this.mask.source.value =
+      this.blend.source.value =
+        inputs[0]!.texture;
     this.blend.backdrop.value = inputs[1]!.texture;
     this.mask.mask.value = inputs[2]!.texture;
     try {
@@ -200,6 +211,15 @@ export class GpuPasses {
     );
     this.draw(this.maskMaterial, target);
   }
+  mediaCornersTo(source: FrameTexture, layer: Layer, scale: number, target: RenderTarget): void {
+    if (source.texture === target.texture)
+      throw Error("Media corners cannot sample their output target.");
+    this.corners.source.value = source.texture;
+    this.corners.flipY.value = textureFlip(source.texture);
+    this.corners.size.value.set(layer.width * scale, layer.height * scale);
+    this.corners.radius.value = Math.min(layer.radius, layer.width / 2, layer.height / 2) * scale;
+    this.draw(this.cornerMaterial, target);
+  }
   shapeTo(layer: Layer, scale: number, target: RenderTarget): void {
     updateShape(this.shape, layer, scale);
     this.draw(this.shapeMaterial, target);
@@ -235,6 +255,7 @@ export class GpuPasses {
       this.maskMaterial,
       this.blendMaterial,
       this.shapeMaterial,
+      this.cornerMaterial,
     ])
       mat.dispose();
     this.scene.clear();

@@ -6,6 +6,7 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Add editable, Motion-ready corner radii to image and video layers. Clip their native GPU sources before effects so bevels and shadows follow the curve in preview and export; retain zero-radius source reuse, bounded GPU accounting and one-entry undo/cancellation.
 - Require deliberate inward pointer movement to reveal the unpinned Motion timeline, keeping gentle ruler/transport approaches, sideways travel, clicks and scrubs stationary. Share the same intent rule across the strip, cancel abandoned entry and retain explicit toggle, drag, focus, portal and pin ownership.
 - Crossfade decoded layer thumbnails while retaining previous pixels until replacement, bound and release transitional image URLs, align effect keyframe diamonds with their controls, remove empty numeric unit cells, and show each keyframe value on a separate translated tooltip line.
 - Profile cached text shaping, contour generation, atlas preparation, shader compilation, uniform updates, draw submission and morph complexity in the composition Performance report and development playback logs. GPU timestamp timings remain separate from host elapsed times.

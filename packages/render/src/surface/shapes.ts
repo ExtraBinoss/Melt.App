@@ -1,3 +1,4 @@
+import { roundedRectangleDistance } from "./rounded-rectangle";
 import type { Layer } from "@musart/core";
 import { Vector2, Vector4, type Node } from "three/webgpu";
 import { abs, length, max, min, mix, smoothstep, uniform, uv, vec4 } from "three/tsl";
@@ -34,11 +35,8 @@ export interface ShapeInputs {
 }
 export function shapeNode(controls: ShapeInputs) {
   const half = controls.size.mul(0.5);
-  const p = abs(uv().sub(0.5).mul(controls.size));
-  const q = p.sub(half).add(controls.radius);
-  const rect = length(max(q, 0))
-    .add(min(max(q.x, q.y), 0))
-    .sub(controls.radius);
+  const p = uv().sub(0.5).mul(controls.size);
+  const rect = roundedRectangleDistance(p, half, controls.radius);
   const circle = length(p.div(half)).sub(1).mul(min(half.x, half.y));
   const distance = mix(rect, circle, controls.ellipse);
   const fillAlpha = smoothstep(0.5, -0.5, distance).mul(controls.fill.a);

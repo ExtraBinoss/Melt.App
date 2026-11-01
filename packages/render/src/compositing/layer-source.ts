@@ -42,13 +42,18 @@ export function drawLayerSource(layer: Layer, context: SourceContext): FrameText
     context.spatial!.render(layer, target);
     return { texture: target.texture, width: w, height: h, premultiplied: true, bounds };
   }
-  if (layer.kind === "image" || layer.kind === "video")
-    return {
+  if (layer.kind === "image" || layer.kind === "video") {
+    const source: FrameTexture = {
       texture: context.sources.image(layer.assetId, layer.kind === "video" ? layer.id : undefined),
       width,
       height,
       premultiplied: false,
     };
+    if (layer.radius <= 0) return source;
+    const target = context.target("media-corners");
+    context.passes.mediaCornersTo(source, layer, scale, target);
+    return { ...source, texture: target.texture };
+  }
   if (layer.kind === "text") {
     const target = context.target("text");
     context.passes.clear(target);

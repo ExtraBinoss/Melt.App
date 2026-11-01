@@ -45,6 +45,7 @@ const schemas: Readonly<Record<LayerMotionProperty, MotionPropertySchema>> = Obj
   "fillGradient.angle": number(-360000, 360000),
   "fillGradient.kind": choice(["linear", "radial"]),
 });
+const roundedKinds: ReadonlySet<Layer["kind"]> = new Set(["rectangle", "image", "video"]);
 const textProperties: ReadonlySet<string> = new Set([
   "text",
   "fontFamily",
@@ -84,7 +85,7 @@ export function layerMotionSchema(
   )
     return null;
   if (textProperties.has(property) && layer.kind !== "text") return null;
-  if (property === "radius" && layer.kind !== "rectangle") return null;
+  if (property === "radius" && !roundedKinds.has(layer.kind)) return null;
   if (
     (property === "fillGradient.angle" || property === "fillGradient.kind") &&
     !layer.fillGradient

@@ -107,6 +107,7 @@ export function estimatePreviewCost(
         originalBytes += asset.width * asset.height * 4 * (l.kind === "video" ? 4 : 1);
         maxDimension = Math.max(maxDimension, asset.width, asset.height);
       }
+      if (l.radius > 0) target(w, h, fixed);
       if (page.colorSpace === "display-p3") target(w, h, fixed);
     }
     const effects = l.effects.filter(hasEffectTreatment);

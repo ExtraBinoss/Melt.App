@@ -172,3 +172,14 @@ it("shares the same layer target when a painted layer also supplies a mask at th
     estimatePreviewCost({ ...page, layers: [{ ...source, maskSource: true }, owner] }, 2).bytes,
   );
 });
+
+it("admits the media clipping surface only when image/video corners are rounded", () => {
+  for (const kind of ["image", "video"] as const) {
+    const layer = createLayer(kind, { width: 40, height: 30 });
+    const square = createPage({ width: 100, height: 100, layers: [layer] });
+    const rounded = { ...square, layers: [{ ...layer, radius: 12 }] };
+    expect(estimatePreviewCost(rounded, 2).bytes - estimatePreviewCost(square, 2).bytes).toBe(
+      80 * 60 * 4,
+    );
+  }
+});

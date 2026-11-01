@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import {
   createLayerGeometryIndex,
+  resolveLayerMotionProperty,
   isImageAsset,
   isVideoAsset,
   type Composition,
@@ -358,7 +359,11 @@ export const Inspector = memo(
                         {field("width", t("width"), 1, 32768)}
                         {field("height", t("height"), 1, 32768)}
                         {field("rotation", t("rotation"), -360, 360, "°")}
-                        {layer.kind === "rectangle" &&
+                        {resolveLayerMotionProperty(layer, {
+                          kind: "layer",
+                          layerId: layer.id,
+                          property: "radius",
+                        }) &&
                           !layer.spatial?.enabled &&
                           field("radius", t("cornerRadius"), 0, 4096)}
                       </div>
