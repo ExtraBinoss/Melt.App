@@ -32,9 +32,10 @@ import { useSetAtom } from "jotai";
 import { useRenderMetrics } from "../../state/session/render-metrics";
 import { previewAtom } from "../../state/session/editor";
 import { ScrollShadow } from "../shared/scroll/ScrollShadow";
-import { RetainedPaint, usePaintOwner } from "./gradient/retained-paint";
+import { RetainedPaint } from "./gradient/retained-paint";
+import { BackgroundPaintControls } from "./gradient/BackgroundPaintControls";
 import { MotionColorControl } from "./motion/MotionColorControl";
-import { BackgroundGradientControl, GradientControl } from "./gradient/GradientControl";
+import { GradientControl } from "./gradient/GradientControl";
 import { TextProperties } from "./TextProperties";
 import { AlignmentPanel } from "./AlignmentPanel";
 import { SpacingPanel } from "./SpacingPanel";
@@ -69,7 +70,6 @@ export const Inspector = memo(
     const setPreview = useSetAtom(previewAtom);
     const [aspectLocked, setAspectLocked] = useState(true);
     const layer = selected.length === 1 ? selected[0] : undefined;
-    const paintOwner = usePaintOwner(engine, page.id);
     const geometry = createLayerGeometryIndex(page);
     const locked = selected.some((item) => geometry.isLocked(item.id));
     const resolvePage = useCallback(() => resolveInspectorPage(engine, page), [engine, page]);
@@ -295,46 +295,32 @@ export const Inspector = memo(
                       cancel={cancel}
                     />
                   )}
-                  {!useLayerColor && (
-                    <BackgroundGradientControl
-                      key={`gradient:${paintOwner}`}
+                  {!useLayerColor ? (
+                    <BackgroundPaintControls
                       page={page}
                       engine={engine}
-                      preview={pagePreview}
-                      patch={pagePatch}
+                      run={runCurrent}
+                      current={current}
                       cancel={cancel}
                     />
+                  ) : (
+                    <RetainedPaint
+                      visible={layer.kind !== "text" || !layer.fillGradient}
+                      retain={false}
+                    >
+                      <MotionColorControl
+                        engine={engine}
+                        target={{ kind: "layer", layerId: layer.id, property: "fill" }}
+                        label={t("fill")}
+                        disabled={locked}
+                        identity={layer.id}
+                        value={layer.fill}
+                        onPreview={(fill) => preview(fillPatch(fill))}
+                        onCommit={(fill) => patch(fillPatch(fill))}
+                        onCancel={cancel}
+                      />
+                    </RetainedPaint>
                   )}
-                  <RetainedPaint
-                    key={useLayerColor ? "layer" : `solid:${paintOwner}`}
-                    retain={!useLayerColor}
-                    visible={Boolean(
-                      (useLayerColor && (layer?.kind !== "text" || !layer.fillGradient)) ||
-                      (!useLayerColor && !page.backgroundGradient),
-                    )}
-                  >
-                    <MotionColorControl
-                      engine={useLayerColor ? engine : undefined}
-                      target={
-                        useLayerColor
-                          ? { kind: "layer", layerId: layer.id, property: "fill" }
-                          : undefined
-                      }
-                      label={t("fill")}
-                      disabled={!!useLayerColor && locked}
-                      identity={useLayerColor ? layer.id : `page:${page.id}`}
-                      value={useLayerColor ? layer.fill : page.background}
-                      onPreview={(fill) => {
-                        if (useLayerColor) preview(fillPatch(fill));
-                        else pagePreview({ background: fill });
-                      }}
-                      onCommit={(fill) => {
-                        if (useLayerColor) patch(fillPatch(fill));
-                        else pagePatch({ background: fill });
-                      }}
-                      onCancel={cancel}
-                    />
-                  </RetainedPaint>
                   {layer?.kind === "vector" && !!layer.vector?.parts?.length && (
                     <label
                       className="switch-row original-vector-colors"

@@ -6,7 +6,7 @@ import { freezeEffectPreviews } from "../../state/session/effect-preview";
 import { createMotionTransport } from "../../services/motion/transport";
 import { SegmentedTabs } from "../shared/segmented/SegmentedTabs";
 import "./workspace.css";
-import { useLayoutEffect, useMemo, useState, useSyncExternalStore } from "react";
+import { memo, useLayoutEffect, useMemo, useState, useSyncExternalStore } from "react";
 import type { EnginePort } from "@musart/core";
 import { useTranslation } from "react-i18next";
 import type { EditorServices } from "../../state/contracts";
@@ -19,7 +19,7 @@ import { MotionExportPane } from "./MotionExportPane";
 import { TimelapseExportPane } from "./TimelapseExportPane";
 
 const empty: readonly string[] = Object.freeze([]);
-export function ExportWorkspace({
+export const ExportWorkspace = memo(function ExportWorkspace({
   engine,
   services,
   initialCompositionId,
@@ -167,4 +167,4 @@ export function ExportWorkspace({
   ) : (
     <ImageExportPane key={page.id} {...props} allPages={allPages} onAllPagesChange={setAllPages} />
   );
-}
+});

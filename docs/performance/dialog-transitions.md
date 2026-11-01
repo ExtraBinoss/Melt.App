@@ -30,3 +30,23 @@ Test-only module probes count component **function executions**, not React commi
 The earlier closing samples contain no content exit animation. Corrected samples retain distinct `dialog-surface-out` start/end events and visible intermediate-opacity frames before removal. The native regression records pointer-to-second-exit-RAF opportunities and verifies focus restoration, unchanged library executions, a real Motion canvas appearing after the entrance, genuine snapping controls and reduced motion. Callback/RAF observations are presentation opportunities, not physical display timestamps.
 
 Cold modal setup still costs about 150 ms in this constrained development sample. Native modal focus/accessibility and body locking are preserved. Artwork single-click still waits for the existing 280 ms double-click decision; keyboard and explicit preview actions do not. Document loading, first GPU compilation and unrelated renderer throughput are separate workloads.
+
+## Export close and background paint follow-up (2026-11-01)
+
+The Angel.exe export close profile showed the entire App and export form rebuilding before the exit could start. Export and timelapse visibility now belong to a per-App Jotai atom observed only by their dialog owner. The export workspace retains stable props through closing. Native checks verify that opening, closing and reopening do not execute App again, while Radix still animates, restores focus and releases its modal lock.
+
+Solid/Gradient publications also rebuilt unrelated Inspector and timeline controls. Background paint now has a narrowly subscribed leaf. The retained Inspector resolves compatible background/ruler metadata to the live canonical page; queued paint writes still reject intervening edits, loads and replaced artwork. Spatial controls retain fresh action ownership. Timeline duration controls consume only displayed inputs and capture a fresh revision when a gesture starts. Disabled compositing controls share a stable empty selection rather than invalidating their owner on every background edit.
+
+Chrome for Testing 156.0.8078.4, Linux, Intel Xe-LPG WebGPU, 1600 × 1000 at DPR 1, Vite development mode: three native export closes were measured before and after with the same two-core CPU quota, bounded memory, one browser and a 1 ms CPU profiler. These are local diagnostic samples, not production percentile claims.
+
+| Pointer to presentation opportunity | Before     | After      |
+| ----------------------------------- | ---------- | ---------- |
+| First observed closed state         | 143–220 ms | 65–113 ms  |
+| First observed fading frame         | 189–257 ms | 93–153 ms  |
+| Content removal                     | 407–459 ms | 320–355 ms |
+
+Content removal includes the intentional exit transition and is not the close-handler cost. App and export-workspace work disappear from the close attribution; remaining work includes graphics submission and compositing. The final native overlay regression also checks actual playback progress, keyboard access, width, pointer release filtering and focus restoration.
+
+The final Solid/Gradient witness on the same two-core development setup, without the CPU profiler, measured six pointer-to-control presentation opportunities at 161, 78, 113, 130, 140 and 102 ms, and corresponding new canvas draws at 213, 89, 155, 159, 192 and 147 ms. This removes identified React rebuilds but does **not** establish instantaneous switching or a consistent 60 fps interaction. A separate four-core diagnostic is not used as a before/after comparison. Raw profiles, cgroup accounting and native observations remain in ignored `artifacts/close-followup/`.
+
+Focused regressions cover unchanged Inspector/header execution counts, exact single-command undo, current scene/dimension actions, cancellation, stale queued paints and stale duration drafts. They complement native timings; unchanged React counters alone do not prove responsiveness.

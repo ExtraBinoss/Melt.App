@@ -82,7 +82,7 @@ export function BackgroundGradientControl({
   patch,
   cancel,
 }: {
-  page: Composition;
+  page: Pick<Composition, "id" | "background" | "backgroundGradient">;
   engine?: EnginePort;
   preview: (patch: Partial<Composition>) => void;
   patch: (patch: Partial<Composition>) => void;

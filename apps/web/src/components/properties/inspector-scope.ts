@@ -1,18 +1,19 @@
 import { isPublishedComposition, type Composition, type EnginePort } from "@musart/core";
 
-/** Only ruler visibility belongs to an independent consumer inside an unchanged Inspector. */
+/** Background paint and ruler visibility have independent live consumers in the Inspector. */
 export function sameInspectorPage(a: Composition, b: Composition): boolean {
   if (a === b) return true;
   if (!isPublishedComposition(a) || !isPublishedComposition(b) || a.layers !== b.layers)
     return false;
-  const fields = Object.keys(a).filter((key) => key !== "rulers") as (keyof Composition)[];
+  const local = new Set(["rulers", "background", "backgroundGradient"]);
+  const fields = Object.keys(a).filter((key) => !local.has(key)) as (keyof Composition)[];
   return (
-    fields.length === Object.keys(b).filter((key) => key !== "rulers").length &&
+    fields.length === Object.keys(b).filter((key) => !local.has(key)).length &&
     fields.every((key) => Object.hasOwn(b, key) && Object.is(a[key], b[key]))
   );
 }
 
-/** Resolve the authoritative page; a replacement, load or any other page edit is stale. */
+/** Resolve the authoritative page; artwork/settings replacements and loads remain stale. */
 export function resolveInspectorPage(engine: EnginePort, page: Composition): Composition | null {
   const snapshot = engine.getSnapshot();
   if (snapshot.pageId !== page.id) return null;

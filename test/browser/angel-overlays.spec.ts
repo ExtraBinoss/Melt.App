@@ -21,8 +21,12 @@ test("Angel playback retains local select sizing, native choice and inspector fo
     api.load(manifest.project);
   });
   await page.locator('canvas[data-renderer-ready="true"]').waitFor();
+  const shell = page.locator(".musart-app");
+  const shellRenders = await shell.getAttribute("data-react-renders");
+  expect(Number(shellRenders)).toBeGreaterThan(0);
   await page.getByRole("button", { name: "Export", exact: true }).click();
   await page.locator('.motion-export-preview-surface[data-preview-ready="true"]').waitFor();
+  await expect(shell).toHaveAttribute("data-react-renders", shellRenders!);
   const player = page.locator(".export-dialog .media-player");
   const seek = player.getByRole("slider", { name: "Preview time" });
   await player.getByRole("button", { name: "Pause preview", exact: true }).click();
@@ -123,6 +127,8 @@ test("Angel playback retains local select sizing, native choice and inspector fo
   await locks.evaluate(({ observer }) => observer.disconnect());
   await locks.dispose();
   await page.locator('.export-dialog [data-slot="dialog-close"]').click();
+  await expect(page.locator(".export-dialog")).toHaveCount(0);
+  await expect(shell).toHaveAttribute("data-react-renders", shellRenders!);
   await page.getByRole("button", { name: "Play", exact: true }).click();
   await page.getByRole("button", { name: "fx Window trails", exact: true }).click();
   const inspector = page.locator('.layer-attachment-popover[data-state="open"]');

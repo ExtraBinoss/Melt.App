@@ -1,3 +1,5 @@
+import { useEngineValue } from "../../state/session/editor";
+import { resolveInspectorPage } from "../properties/inspector-scope";
 import { useSceneMotionNavigation } from "./use-scene-motion-navigation";
 import { SceneAnimations } from "../motion/scene/SceneAnimations";
 import { SceneMotionValue } from "./SceneMotionValue";
@@ -36,13 +38,15 @@ const ScenePage = createContext<Composition | null>(null);
 
 export function SpatialSceneProperties({
   engine,
-  page,
+  page: originPage,
   run,
 }: {
   engine: EnginePort;
   page: Composition;
   run: (task: () => void) => void;
 }) {
+  // Rebind only the lightweight owner; unchanged settings retain the expensive view.
+  const page = useEngineValue(engine, () => resolveInspectorPage(engine, originPage) ?? originPage);
   const settings = useMemo(() => page.spatial ?? createSpatialScene(), [page.spatial]);
   const binding = useCurrentSceneEdit(engine, page, run, settings);
   const assetName = settings.environment.assetId

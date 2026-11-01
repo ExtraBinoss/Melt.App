@@ -18,6 +18,8 @@ import { SelectField } from "../../shared/SelectField";
 import { useRenderMetrics } from "../../../state/session/render-metrics";
 import "../messages";
 
+const EMPTY_LAYERS: readonly Layer[] = Object.freeze([]);
+
 export const LayerCompositing = memo(function LayerCompositing({
   engine,
   page,
@@ -34,7 +36,7 @@ export const LayerCompositing = memo(function LayerCompositing({
   const { t } = useTranslation();
   const edit = useLayerPreview(engine, page, selection, run, true);
   const state = layerSelection(page, selection),
-    selected = state.selected;
+    selected = state.selected.length ? state.selected : EMPTY_LAYERS;
   const disabled = !state.editable;
   const opacity = selected[0]?.opacity ?? 1,
     blend = selected[0]?.blendMode ?? "normal";

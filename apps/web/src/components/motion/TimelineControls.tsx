@@ -109,6 +109,7 @@ function Duration({
         aria-invalid={error !== null}
         disabled={!active}
         onFocus={() => {
+          // The retained header may predate unrelated edits; bind each new gesture live.
           const current = engine.getSnapshot();
           origin.current = {
             projectId: current.project.id,
@@ -142,6 +143,16 @@ function Duration({
   );
 }
 
+interface Props {
+  engine: EnginePort;
+  snapshot: ControlSnapshot;
+  transport: TimelineTransport;
+  unit: TimelineUnit;
+  onUnit: () => void;
+  collapseControl?: ReactNode;
+  active?: boolean;
+}
+
 export const TimelineControls = memo(function TimelineControls({
   engine,
   snapshot,
@@ -150,15 +161,7 @@ export const TimelineControls = memo(function TimelineControls({
   onUnit,
   collapseControl,
   active = true,
-}: {
-  engine: EnginePort;
-  snapshot: ControlSnapshot;
-  transport: TimelineTransport;
-  unit: TimelineUnit;
-  onUnit: () => void;
-  collapseControl?: ReactNode;
-  active?: boolean;
-}) {
+}: Props) {
   const { t } = useTranslation("motion");
   const { details } = useAnimationPresentation(engine);
   const [state, setState] = useState(() => {
@@ -245,4 +248,22 @@ export const TimelineControls = memo(function TimelineControls({
       {collapseControl}
     </div>
   );
-});
+}, sameControls);
+
+/** The header displays duration, while new gestures capture the exact live revision on focus. */
+function sameControls(previous: Props, next: Props): boolean {
+  const before = previous.snapshot,
+    after = next.snapshot;
+  return (
+    previous.engine === next.engine &&
+    previous.transport === next.transport &&
+    previous.unit === next.unit &&
+    previous.onUnit === next.onUnit &&
+    previous.collapseControl === next.collapseControl &&
+    previous.active === next.active &&
+    before.project.id === after.project.id &&
+    before.pageId === after.pageId &&
+    before.project.pages.find((page) => page.id === before.pageId)?.motion?.duration ===
+      after.project.pages.find((page) => page.id === after.pageId)?.motion?.duration
+  );
+}

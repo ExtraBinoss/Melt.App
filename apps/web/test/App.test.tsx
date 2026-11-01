@@ -76,9 +76,11 @@ test("opening an effect on an unselected layer leaves the app shell untouched", 
     fireEvent.keyDown(screen.getByRole("dialog", { name: "Effets · Rectangle bleu" }), {
       key: "Escape",
     });
-    expect(await screen.findByRole("region", { name: "Propriétés" })).toHaveAttribute(
-      "data-selected-layer-id",
-      d.rectangle.id,
+    await waitFor(() =>
+      expect(screen.getByRole("region", { name: "Propriétés" })).toHaveAttribute(
+        "data-selected-layer-id",
+        d.rectangle.id,
+      ),
     );
   } finally {
     history.replaceState(null, "", locationBefore);
@@ -128,7 +130,7 @@ test("assembles the pinned inspector, layers, project menu, export and import ac
   expect(d.engine.getSnapshot().project.name).toBe("Collection");
   fireEvent.keyDown(document, { key: "Escape" });
   fireEvent.click(screen.getByText("Rectangle bleu"));
-  const input = screen.getByLabelText("X");
+  const input = await screen.findByLabelText("X");
   fireEvent.change(input, { target: { value: "99" } });
   fireEvent.blur(input);
   expect(d.engine.getSnapshot().project.pages[0]!.layers[0]!.x).toBe(99);
@@ -317,4 +319,30 @@ test("routed library navigation retains the mounted editor and browser Back hide
   view.rerender(<App engine={d.engine} services={d.services} routing={routing} />);
   await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
   expect(screen.getByTestId("canvas")).toBe(canvas);
+});
+
+test("export visibility updates its local owner without rebuilding App on open, close or reopen", async () => {
+  const previous = location.href;
+  history.replaceState(null, "", "?automation=1");
+  try {
+    const d = setup();
+    d.mount(<App engine={d.engine} services={d.services} />);
+    await screen.findByTestId("canvas");
+    const root = document.querySelector(".musart-app")!;
+    const before = root.getAttribute("data-react-renders");
+    expect(Number(before)).toBeGreaterThan(0);
+    const trigger = screen.getByRole("button", { name: "Exporter" });
+    for (let index = 0; index < 2; index++) {
+      fireEvent.click(trigger);
+      const dialog = await screen.findByRole("dialog", { name: "Exporter la composition" });
+      expect(root).toHaveAttribute("data-react-renders", before);
+      fireEvent.click(await within(dialog).findByRole("button", { name: "Annuler" }));
+      await waitFor(() =>
+        expect(screen.queryByRole("dialog", { name: "Exporter la composition" })).toBeNull(),
+      );
+      expect(root).toHaveAttribute("data-react-renders", before);
+    }
+  } finally {
+    history.replaceState(null, "", previous);
+  }
 });

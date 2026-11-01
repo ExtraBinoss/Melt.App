@@ -6,6 +6,7 @@ import { setup } from "../../../support/ui";
 import { choose } from "../../../support/select";
 import { i18n } from "../../../../src/state/i18n";
 import { planMotionInitialization } from "@musart/core";
+import { animationPresentation } from "../../../../src/components/motion/animations/presentation";
 import { createMotionTransport } from "../../../../src/services/motion/transport";
 import { motionPropertyTrack } from "../../../../src/state/session/motion-edit";
 function fixture(selection: "none" | "single" | "mixed") {
@@ -51,6 +52,7 @@ test("a mixed selection keys every selected owner and an absolute opacity edit h
       plan: planMotionInitialization(d.engine.getSnapshot()),
     }),
   );
+  act(() => animationPresentation(d.engine).set({ details: true }));
   fireEvent.click(screen.getByRole("button", { name: "Ajouter une image clé · Opacité" }));
   act(() => createMotionTransport(d.engine).seek({ value: 1, rate: 1 }));
   const field = screen.getByRole("textbox", { name: "Opacité" }),
@@ -254,4 +256,21 @@ test("changing selection closes its old blend editor and a late option cannot ed
   act(() => d.engine.undo());
   expect(d.engine.getSnapshot().project).toEqual(original);
   expect(d.engine.getSnapshot().canUndo).toBe(false);
+});
+
+test("empty layer controls keep their cached menu owner through background edits and retire it on selection", async () => {
+  const d = fixture("none");
+  await act(async () => {});
+  const option = document.querySelector('[role="listbox"][aria-label="Fusion"] [role="option"]');
+  expect(option).not.toBeNull();
+  act(() => d.engine.execute({ type: "updatePage", patch: { background: "#123456" } }));
+  expect(option!.isConnected).toBe(true);
+  expect(document.querySelector('[role="listbox"][aria-label="Fusion"] [role="option"]')).toBe(
+    option,
+  );
+  act(() => d.engine.select([d.rectangle.id]));
+  expect(screen.getByRole("combobox", { name: "Fusion" })).toBeEnabled();
+  const before = d.engine.getSnapshot().project;
+  fireEvent.click(option!);
+  expect(d.engine.getSnapshot().project).toBe(before);
 });

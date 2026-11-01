@@ -6,6 +6,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Isolate export and timelapse visibility at per-editor Jotai dialog owners and retain the export workspace through exit, avoiding App and form reconstruction before the fade while preserving native focus and modal cleanup.
+- Subscribe background paint independently from the Inspector, retain unchanged timeline headers and disabled compositing controls, and resolve fresh canonical scene/paint actions with cancellation, concurrent-write and undo guards. Document native Angel.exe close and Solid/Gradient timings, including remaining presentation delays.
 - Anchor the Motion timeline's right fade to the outer panel edge in both timeline modes, and suppress it once the composition end is visible even when empty trailing layout space can still scroll. Preserve native scrollbar geometry and wheel access.
 - Align right scroll fades with the actual content edge when native scrollbars overlay the viewport, removing the exposed strip in the Motion timeline while preserving reserved scrollbar gutters and native scrolling.
 - Retain unchanged Animations timeline layer rows and occurrence projections across background metadata edits, while resolving selection, clip trimming, gap insertion and native drag against the current canonical composition and rejecting replaced sources.

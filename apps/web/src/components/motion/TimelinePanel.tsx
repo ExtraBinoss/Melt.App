@@ -265,13 +265,16 @@ export function TimelinePanel({
   const audioTracks = page.motion?.audioTracks ?? [];
   const audioError = useCallback((error: unknown) => setInteractionError(formatUiError(error)), []);
   const toggleUnit = useCallback(() => setUnit((value) => (value === "s" ? "ms" : "s")), []);
-  const collapseControl = (
-    <TimelineCollapseControl
-      active={active}
-      collapsed={collapsed}
-      layers={page.layers}
-      onChange={setCollapsed}
-    />
+  const collapseControl = useMemo(
+    () => (
+      <TimelineCollapseControl
+        active={active}
+        collapsed={collapsed}
+        layers={page.layers}
+        onChange={setCollapsed}
+      />
+    ),
+    [active, collapsed, page.layers, setCollapsed],
   );
   useEffect(() => {
     const node = viewport.current;
@@ -323,14 +326,10 @@ export function TimelinePanel({
     if (event.currentTarget.hasPointerCapture(event.pointerId))
       event.currentTarget.releasePointerCapture(event.pointerId);
   }
-  const controlSnapshot = useMemo(
-    () => ({ project: snapshot.project, pageId: snapshot.pageId, revision: snapshot.revision }),
-    [snapshot.project, snapshot.pageId, snapshot.revision],
-  );
   const controls = (
     <TimelineControls
       engine={engine}
-      snapshot={controlSnapshot}
+      snapshot={snapshot}
       transport={transport}
       active={active}
       unit={unit}

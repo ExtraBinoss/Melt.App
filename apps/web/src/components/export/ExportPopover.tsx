@@ -1,5 +1,5 @@
 import { preservePlayerTimeEdit } from "../shared/player/PlayerTimeField";
-import { lazy, Suspense, useRef } from "react";
+import { lazy, Suspense, useRef, useCallback } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
 import { Throbber } from "../ui/throbber/Throbber";
 const ExportWorkspace = lazy(() =>
@@ -19,6 +19,8 @@ import "./export.css";
 export function ExportPopover(props: ExportPopoverProps) {
   const { t } = useTranslation();
   const surface = useRef<HTMLDivElement>(null);
+  const { onOpenChange } = props;
+  const close = useCallback(() => onOpenChange(false), [onOpenChange]);
   if (!props.engine) return <LegacyExportPopover {...props} />;
   return (
     <Dialog open={props.open} onOpenChange={props.onOpenChange}>
@@ -50,7 +52,7 @@ export function ExportPopover(props: ExportPopoverProps) {
             engine={props.engine}
             services={props.services}
             initialCompositionId={props.initialCompositionId}
-            onClose={() => props.onOpenChange(false)}
+            onClose={close}
           />
         </Suspense>
       </DialogContent>

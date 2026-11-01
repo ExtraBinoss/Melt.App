@@ -12,7 +12,7 @@ function fixture() {
   return { engine, page: engine.getSnapshot().project.pages[0]! };
 }
 
-test("only published ruler metadata retains an unchanged Inspector scope and resolves canonically", () => {
+test("published ruler and background metadata retain an unchanged Inspector scope and resolve canonically", () => {
   const { engine, page } = fixture();
   expect(sameInspectorPage(page, page)).toBe(true);
   engine.execute({ type: "updatePage", patch: { rulers: true } });
@@ -22,6 +22,21 @@ test("only published ruler metadata retains an unchanged Inspector scope and res
   expect(resolveInspectorPage(engine, page)).toBe(current);
   expect(sameInspectorPage(page, { ...current })).toBe(false);
   expect(sameInspectorPage({ ...page }, current)).toBe(false);
+  engine.execute({ type: "updatePage", patch: { background: "#123456" } });
+  engine.execute({
+    type: "updatePage",
+    patch: {
+      backgroundGradient: {
+        kind: "linear",
+        angle: 0,
+        stops: [
+          { offset: 0, color: "#123456" },
+          { offset: 1, color: "#ffffff" },
+        ],
+      },
+    },
+  });
+  expect(resolveInspectorPage(engine, page)).toBe(engine.getSnapshot().project.pages[0]);
 });
 
 test.each(["name", "width", "guide", "layer", "load", "page"] as const)(

@@ -3,7 +3,8 @@ import { dashboardHref, isPlainPrimaryClick, dialogLinkKeyDown } from "./ui/navi
 import { ExportLeaveGuard } from "./components/export/ExportLeaveGuard";
 import { guardExportNavigation, ExportLeaveCancelled } from "./services/export/leave";
 import { lazy, Suspense, useCallback, useMemo, useRef, useState } from "react";
-import { useStore } from "jotai";
+import { atom, useStore } from "jotai";
+import { EditorDialogVisibility } from "./components/workspace/EditorDialogVisibility";
 import { useRenderMetrics } from "./state/session/render-metrics";
 import { MeltLogo } from "./ui/brand/MeltLogo";
 import { useTranslation } from "react-i18next";
@@ -91,8 +92,7 @@ export function App({ engine, services, welcome = false, routing }: AppProps) {
     if (view === "projects" || view === "newProject") guardExportNavigation(show);
     else show();
   };
-  const [exportMenu, setExportMenu] = useState(false);
-  const [timelapseMenu, setTimelapseMenu] = useState(false);
+  const [dialogs] = useState(() => atom({ exportOpen: false, timelapseOpen: false }));
   const motionTransport = useMemo(() => createMotionTransport(engine), [engine]);
   const [notice, setNotice] = useState<EditorNoticeValue | null>(null);
   const [processing, setProcessing] = useState(false);
@@ -160,16 +160,20 @@ export function App({ engine, services, welcome = false, routing }: AppProps) {
   const showExport = useCallback(
     (open: boolean) => {
       if (open) freezeEffectPreviews(engine);
-      setExportMenu(open);
+      store.set(dialogs, (current) =>
+        current.exportOpen === open ? current : { ...current, exportOpen: open },
+      );
     },
-    [engine],
+    [engine, store, dialogs],
   );
   const showTimelapse = useCallback(
     (open: boolean) => {
       if (open) motionTransport.pause();
-      setTimelapseMenu(open);
+      store.set(dialogs, (current) =>
+        current.timelapseOpen === open ? current : { ...current, timelapseOpen: open },
+      );
     },
-    [motionTransport],
+    [motionTransport, store, dialogs],
   );
   useShortcuts(engine, services, onTask, !choosingProject);
   return (
@@ -269,16 +273,18 @@ export function App({ engine, services, welcome = false, routing }: AppProps) {
                           className="sidebar"
                         >
                           <Suspense fallback={null}>
-                            <EditorSidebar
-                              engine={engine}
-                              services={services}
-                              run={run}
-                              onTask={onTask}
-                              exportOpen={exportMenu}
-                              onExportOpenChange={showExport}
-                              timelapseOpen={timelapseMenu}
-                              onTimelapseOpenChange={showTimelapse}
-                            />
+                            <EditorDialogVisibility state={dialogs}>
+                              <EditorSidebar
+                                engine={engine}
+                                services={services}
+                                run={run}
+                                onTask={onTask}
+                                exportOpen={false}
+                                onExportOpenChange={showExport}
+                                timelapseOpen={false}
+                                onTimelapseOpenChange={showTimelapse}
+                              />
+                            </EditorDialogVisibility>
                           </Suspense>
                         </ResizablePanel>
                       </>
@@ -286,34 +292,36 @@ export function App({ engine, services, welcome = false, routing }: AppProps) {
                   </ProjectPanelGroup>
                   {mobile ? (
                     <Suspense fallback={null}>
-                      <MobileEditor
-                        engine={engine}
-                        services={services}
-                        run={run}
-                        onTask={onTask}
-                        exportOpen={exportMenu}
-                        onExportOpenChange={showExport}
-                        timelapseOpen={timelapseMenu}
-                        onTimelapseOpenChange={showTimelapse}
-                        tools={
-                          <>
-                            <Suspense fallback={null}>
-                              <Toolbar
-                                engine={engine}
-                                services={services}
-                                onTask={onTask}
-                                onProjects={showProjectMenu}
-                                onExport={() => showExport(true)}
-                                onPanelMode={(mode) => {
-                                  if (mode === "animate") showTimelapse(true);
-                                }}
-                                onImport={onImport}
-                              />
-                            </Suspense>
-                            <ToolSettings services={services} onTask={onTask} />
-                          </>
-                        }
-                      />
+                      <EditorDialogVisibility state={dialogs}>
+                        <MobileEditor
+                          engine={engine}
+                          services={services}
+                          run={run}
+                          onTask={onTask}
+                          exportOpen={false}
+                          onExportOpenChange={showExport}
+                          timelapseOpen={false}
+                          onTimelapseOpenChange={showTimelapse}
+                          tools={
+                            <>
+                              <Suspense fallback={null}>
+                                <Toolbar
+                                  engine={engine}
+                                  services={services}
+                                  onTask={onTask}
+                                  onProjects={showProjectMenu}
+                                  onExport={() => showExport(true)}
+                                  onPanelMode={(mode) => {
+                                    if (mode === "animate") showTimelapse(true);
+                                  }}
+                                  onImport={onImport}
+                                />
+                              </Suspense>
+                              <ToolSettings services={services} onTask={onTask} />
+                            </>
+                          }
+                        />
+                      </EditorDialogVisibility>
                     </Suspense>
                   ) : (
                     <Suspense fallback={null}>
