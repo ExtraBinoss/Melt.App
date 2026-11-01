@@ -1,8 +1,12 @@
-import { expect, test, vi } from "vitest";
+import { beforeEach, expect, test, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { MotionTemplatePreview } from "../../../../../src/components/projects/templates/motion-preview/MotionTemplatePreview";
 import { startMotionTemplatePreview } from "../../../../../src/components/projects/templates/motion-preview/runtime";
-import "../../../../../src/state/i18n";
+import { i18n } from "../../../../../src/state/i18n";
+
+beforeEach(async () => {
+  await i18n.changeLanguage("fr");
+});
 
 vi.mock("../../../../../src/components/projects/templates/motion-preview/runtime", () => ({
   startMotionTemplatePreview: vi.fn(() => ({ release: vi.fn(async () => undefined) })),
@@ -129,4 +133,22 @@ test("pointer gestures stop rendering and their focus event cannot restart GPU w
   fireEvent.pointerLeave(button);
   fireEvent.pointerEnter(button);
   expect(startMotionTemplatePreview).toHaveBeenCalledTimes(before + 2);
+});
+
+test("replacing a poster revision retires the old live preview and displays the new image", () => {
+  media();
+  const view = render(
+    <button>
+      <MotionTemplatePreview templateId="bloom-windows" poster="/bloom.webp?v=old" />
+    </button>,
+  );
+  fireEvent.pointerEnter(screen.getByRole("button"));
+  const release = vi.mocked(startMotionTemplatePreview).mock.results.at(-1)!.value.release;
+  view.rerender(
+    <button>
+      <MotionTemplatePreview templateId="bloom-windows" poster="/bloom.webp?v=new" />
+    </button>,
+  );
+  expect(release).toHaveBeenCalledOnce();
+  expect(document.querySelector("img")).toHaveAttribute("src", "/bloom.webp?v=new");
 });

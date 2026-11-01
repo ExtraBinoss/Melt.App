@@ -93,3 +93,18 @@ test("compilation retains its private immutable geometry copy until exact source
   expect(cache.compile(edited, edited.pages[0]!.id)).not.toBe(first);
   expect(project.pages[0]).not.toBe(first.composition);
 });
+
+test("a new bundled revision cannot reuse an older prepared source", async () => {
+  const cache = new PreviewSourceCache();
+  const oldSource = { project: createProject({ name: "Old bundled artwork" }), originals: [] };
+  const newSource = { project: createProject({ name: "New bundled artwork" }), originals: [] };
+  const prepare = vi.fn(async () => newSource);
+  await cache.template("bloom-windows", signal(), async () => oldSource, "preview", "old");
+  expect(await cache.template("bloom-windows", signal(), prepare, "preview", "new")).toBe(
+    newSource,
+  );
+  expect(await cache.template("bloom-windows", signal(), prepare, "preview", "new")).toBe(
+    newSource,
+  );
+  expect(prepare).toHaveBeenCalledOnce();
+});

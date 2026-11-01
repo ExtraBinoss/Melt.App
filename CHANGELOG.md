@@ -6,6 +6,7 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Version retained template sources as well as their downloads, retire active preview owners when their poster revision changes, and invalidate the final Bloom Windows and Melt Mascot posters using their rendered content hashes.
 - Restore normal themed switches inside effect popovers by removing their white-background override. Add radial-handle help after 500 ms in all twelve application languages, enlarge invisible pointer targets while retaining compact knobs and preserve grab offsets, popup ownership, keyboard access and single-entry undo.
 - Keep applied-effect popover geometry stable while deferred controls mount, avoiding collision repositioning, and retain trailing padding when long parameter lists scroll to their end.
 - Refresh Bloom Windows with a slower twelve-second orbit, layered pink/green/blue print treatments and sparse editable Motion development. Bundle licensed DynaPuff 700 locally for the Melt Mascot wordmark, regenerate native glyph contours and preserve its inflate loop without runtime font-CDN dependencies. Keep landing showcase cards as posters without interactive Three.js previews.

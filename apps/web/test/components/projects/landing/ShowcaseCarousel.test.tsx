@@ -1,3 +1,4 @@
+import { MOTION_TEMPLATE_ASSET_REVISIONS } from "../../../../src/services/projects/templates/motion/asset-revisions";
 import { beforeEach, expect, test, vi } from "vitest";
 import { fireEvent, screen } from "@testing-library/react";
 import { ShowcaseCarousel } from "../../../../src/components/projects/landing/ShowcaseCarousel";
@@ -68,8 +69,8 @@ test("uses posters on the landing without mounting interactive Three.js previews
   const posters = document.querySelectorAll(".landing-template-stage > img");
   expect(posters).toHaveLength(3);
   expect([...posters].map((image) => image.getAttribute("src"))).toEqual([
-    "/templates/motion/morphing-type/morphing-type.webp?v=dynapuff-1",
-    "/templates/motion/bloom-windows/bloom-windows.webp?v=9",
+    `/templates/motion/morphing-type/morphing-type.webp?v=${MOTION_TEMPLATE_ASSET_REVISIONS["morphing-type"]}`,
+    `/templates/motion/bloom-windows/bloom-windows.webp?v=${MOTION_TEMPLATE_ASSET_REVISIONS["bloom-windows"]}`,
     "/templates/motion/cornell-box/cornell-box.webp?v=4",
   ]);
   view.rerender(<ShowcaseCarousel onChoose={vi.fn()} busy />);

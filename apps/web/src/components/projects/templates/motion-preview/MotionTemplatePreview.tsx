@@ -23,6 +23,7 @@ export function MotionTemplatePreview({
   );
   return (
     <MotionPreviewSurface
+      key={`${templateId}:${poster}`}
       autoplay={autoplay}
       startPreview={start}
       poster={poster}

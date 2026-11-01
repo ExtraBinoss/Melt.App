@@ -1,3 +1,4 @@
+import { MOTION_TEMPLATE_ASSET_REVISIONS } from "../../../../src/services/projects/templates/motion/asset-revisions";
 import { TEMPLATE_CATALOG } from "../../../../src/services/projects/templates/catalog";
 import { LIBRARY_MODE_KEY } from "../../../../src/components/projects/dashboard/library-mode";
 import { beforeEach, expect, test, vi } from "vitest";
@@ -110,7 +111,7 @@ test("wires live previews only for authored Motion cards and disables their inte
   );
   expect(document.querySelector('[data-motion-preview="bloom-windows"] img')).toHaveAttribute(
     "src",
-    "/templates/motion/bloom-windows/bloom-windows.webp?v=9",
+    `/templates/motion/bloom-windows/bloom-windows.webp?v=${MOTION_TEMPLATE_ASSET_REVISIONS["bloom-windows"]}`,
   );
   fireEvent.click(screen.getByRole("button", { name: /Créer depuis Bloom Windows/ }));
   expect(choose).toHaveBeenCalledExactlyOnceWith("bloom-windows");

@@ -1,3 +1,4 @@
+import { MOTION_TEMPLATE_ASSET_REVISIONS } from "../../../../../src/services/projects/templates/motion/asset-revisions";
 import { expect, test, vi } from "vitest";
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
@@ -30,7 +31,9 @@ test.each(templates)(
       `/templates/${folder}/${template.id}/${template.id}.json`,
     );
     if (template.id === "morphing-type")
-      expect(new URL(requests[0]!, "https://melt.test").searchParams.get("v")).toBe("dynapuff-1");
+      expect(new URL(requests[0]!, "https://melt.test").searchParams.get("v")).toBe(
+        MOTION_TEMPLATE_ASSET_REVISIONS["morphing-type"],
+      );
     expect(prepared.project.pages[0]!.motion!.mode).toBe("motion");
     expect(prepared.project.pages[0]!.width).toBe(template.width);
     expect(prepared.project.pages[0]!.height).toBe(template.height);

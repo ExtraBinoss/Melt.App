@@ -233,6 +233,9 @@ export async function prepareMotionTemplate(
     signal,
     () => prepareUncachedMotionTemplate(templateId, options, fetcher),
     options.preview && MOTION_TEMPLATE_PREVIEW_REVISIONS[templateId] ? "preview" : "full",
+    (options.preview ? MOTION_TEMPLATE_PREVIEW_REVISIONS[templateId] : undefined) ??
+      MOTION_TEMPLATE_ASSET_REVISIONS[templateId] ??
+      "",
   );
 }
 
