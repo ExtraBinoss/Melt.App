@@ -1,5 +1,4 @@
 import { windowTrailsNode } from "./window-trails/node";
-import { timeWarpScanNode } from "./time-warp-scan/node";
 import { bevelNode } from "./bevel/node";
 import { displaceNode } from "./displace/node";
 import { thermalNode } from "./thermal/node";
@@ -40,13 +39,15 @@ import { receiptNode } from "./receipt/node";
 import { pinkPhosphorNode } from "./pink-phosphor/node";
 /** Renderer implementation registry. Metadata/defaults live in the pure core catalogue. */
 export const EFFECT_NODES: Readonly<
-  Record<Exclude<EffectType, "gradient" | "transition" | "morph">, EffectNodeBuilder>
+  Record<
+    Exclude<EffectType, "gradient" | "transition" | "morph" | "time-warp-scan">,
+    EffectNodeBuilder
+  >
 > = Object.freeze({
   "window-trails": windowTrailsNode,
   bevel: bevelNode,
   displace: displaceNode,
   thermal: thermalNode,
-  "time-warp-scan": timeWarpScanNode,
   dither: ditherNode,
   ascii: asciiNode,
   brightness: brightnessNode,

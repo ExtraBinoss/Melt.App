@@ -512,7 +512,6 @@ it("retains one authored effect reference and samples it at every requested rast
     expect(call[5]).toEqual({
       width: 31.25,
       height: 23.5,
-      origin: { x: 0, y: 0 },
       content: { x: 0, y: 0, width: 31.25, height: 23.5 },
     });
   }

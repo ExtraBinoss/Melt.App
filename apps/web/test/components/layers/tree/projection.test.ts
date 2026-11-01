@@ -41,3 +41,18 @@ test("iteratively projects ten thousand siblings and deep hierarchies without re
   );
   expect(projectLayerTree(chain, new Set(), new Set()).at(-1)?.depth).toBe(999);
 });
+
+test("retired effects retain document identities without becoming tree rows", () => {
+  const layer = createLayer("rectangle", {
+    id: "legacy",
+    effects: [
+      createEffect("time-warp-scan", { id: "retired" }),
+      createEffect("thermal", { id: "active" }),
+    ],
+  });
+  const entries = projectLayerTree([layer], new Set(), new Set([layer.id]));
+  expect(entries.filter((entry) => entry.kind === "effect").map((entry) => entry.effectId)).toEqual(
+    ["active"],
+  );
+  expect(layer.effects).toHaveLength(2);
+});

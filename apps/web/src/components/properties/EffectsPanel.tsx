@@ -59,9 +59,12 @@ export function EffectsPanel({
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      {layer.effects.length === 0 && <p className="muted-description">{t("noEffects")}</p>}
+      {!layer.effects.some((effect) => !getEffectDefinition(effect.type).retired) && (
+        <p className="muted-description">{t("noEffects")}</p>
+      )}
       {layer.effects.map((effect, index) => {
         const definition = getEffectDefinition(effect.type);
+        if (definition.retired) return null;
         return (
           <div
             className={`effect-card ${!effect.enabled ? "effect-disabled" : ""}`}

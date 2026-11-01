@@ -81,7 +81,9 @@ export function effectCatalogEntries(
 ): readonly CatalogEntry[] {
   const collator = new Intl.Collator(language, { sensitivity: "base", numeric: true });
   return Object.values(EFFECT_CATALOG)
-    .filter((definition) => definition.category === category && !definition.source)
+    .filter(
+      (definition) => definition.category === category && !definition.source && !definition.retired,
+    )
     .map((definition) => {
       const family = EFFECT_FAMILY[definition.type],
         label = translate(definition.nameKey);

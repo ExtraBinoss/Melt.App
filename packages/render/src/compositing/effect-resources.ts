@@ -1,7 +1,7 @@
 import type { Effect } from "@musart/core";
 import type { RenderTarget, Texture, WebGPURenderer } from "three/webgpu";
 import type { GpuResource } from "../cache/GpuResourceCache";
-import { GpuEffects, type TemporalEffectInputs } from "../effects/GpuEffects";
+import { GpuEffects } from "../effects/GpuEffects";
 import type { EffectDimensions } from "../effects/shared/context";
 
 /** Registers the shared operator's scratch/atlas in the same hard GPU allocation budget. */
@@ -20,9 +20,8 @@ export class EffectResources implements GpuResource {
     effects: readonly Effect[],
     output: RenderTarget,
     logical?: EffectDimensions,
-    temporal?: TemporalEffectInputs,
   ): Texture {
-    return this.operator.apply(source, width, height, effects, output, logical, temporal);
+    return this.operator.apply(source, width, height, effects, output, logical);
   }
   prepare(
     effects: readonly Effect[],

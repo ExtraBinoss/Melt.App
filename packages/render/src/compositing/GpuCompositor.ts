@@ -1,5 +1,3 @@
-import { prepareLayerEffects } from "./prepare-effects";
-import { TemporalSources } from "../effects/time-warp-scan/history";
 import { compositionPaintKey } from "../cache/composition-key";
 import { PlaybackSubmissions } from "../cache/playback-submissions";
 import type { RenderFrame } from "./render-frame";
@@ -9,7 +7,6 @@ import { drawLayerSource, isSrgbLayerSource } from "./layer-source";
 import type { SpatialSources } from "../spatial/SpatialSources";
 import {
   createLayerGeometryIndex,
-  getEffectDefinition,
   isPublishedComposition,
   isPublishedAssets,
   type Asset,
@@ -55,7 +52,6 @@ export class GpuCompositor {
   private readonly submissions: PlaybackSubmissions;
   private readonly sourceKeys = new SourceKeyCache();
   private effects: EffectResources | null = null;
-  private temporal: TemporalSources | null = null;
   private passes: GpuPasses | null = null;
   private normal: NormalBatch | null = null;
   private primitives: PrimitiveBatch | null = null;
@@ -120,14 +116,6 @@ export class GpuCompositor {
       !entry.output ||
       !input ||
       !sameCompositionInput(input.page.deref(), page) ||
-      (input.motionFrame !== motionFrame &&
-        Boolean(
-          page.layers.some((layer) =>
-            layer.effects.some(
-              (effect) => hasEffectTreatment(effect) && getEffectDefinition(effect.type).temporal,
-            ),
-          ),
-        )) ||
       input.assets.deref() !== assets ||
       (input.motionFrame !== motionFrame &&
         Boolean(input.motionFrame?.mediaRequests.length || motionFrame?.mediaRequests.length)) ||
@@ -195,7 +183,28 @@ export class GpuCompositor {
         await proof.prepare(preparationTarget, canPrepare);
       }
       await this.passes.prepare(preparationTarget, canPrepare);
-      await prepareLayerEffects(page, this.effects, this.cache, preparationTarget, canPrepare);
+      for (const layer of page.layers) {
+        if (!layer.effects.length) continue;
+        // Future opacity/enabled keys reuse these materials; only actual drawing applies pixels.
+        const preparedEffects = layer.effects.map((effect) =>
+          effect.enabled ? effect : { ...effect, enabled: true },
+        );
+        this.cache.ensureCapacity(
+          "shared-effects",
+          this.effects.projectedBytes(1, 1, preparedEffects),
+        );
+        try {
+          await this.effects.prepare(
+            layer.effects,
+            preparationTarget,
+            layer.width,
+            layer.height,
+            canPrepare,
+          );
+        } finally {
+          this.cache.synchronize("shared-effects");
+        }
+      }
       await this.normal.prepare(page.layers, preparationTarget, canPrepare);
       this.sample("pipeline", pipelineStarted, options.profileVideo);
       const sourceStarted = options.profileVideo ? performance.now() : 0;
@@ -219,8 +228,6 @@ export class GpuCompositor {
         if (options.profileVideo && this.profile)
           this.profile.sources[this.profile.sources.length - 1]! += performance.now() - started;
       }
-      this.temporal ??= new TemporalSources(this.renderer, this.cache);
-      const temporal = await this.temporal.prepare(page, assets, options);
       const composeStarted = options.profileVideo ? performance.now() : 0;
       if (options.canRender && !options.canRender())
         throw new DOMException("Rendering deferred.", "AbortError");
@@ -241,14 +248,7 @@ export class GpuCompositor {
         keyFor,
         referenceKeyFor: scale === 1 ? keyFor : createSourceKeys(page, assets, 1, keyOptions),
         geometry,
-        temporal,
       };
-      if (options.sourceLayerId) {
-        const owner = geometry.get(options.sourceLayerId);
-        if (geometry.isVisible(owner.id)) return this.layer(owner, frame);
-        this.passes.clear(preparationTarget);
-        return { texture: preparationTarget.texture, width: 1, height: 1, premultiplied: true };
-      }
       const rootKey = `page:${page.id}:${scale}${options.colorOutput === "source" ? ":source" : ""}${frame.vectorAntialias ? ":vector-aa" : ""}`;
       const entry = this.entry(rootKey);
       const roots = geometry.children(null);
@@ -392,7 +392,6 @@ export class GpuCompositor {
         target: (role, w, h, mipmapped) => this.target(entry, key, role, w, h, mipmapped),
         passes: this.passes!,
         effects: this.effects!,
-        temporal: frame.temporal,
         cache: this.cache,
         image: (id) => this.sources.image(id),
         maskSource: (maskLayer) => this.layer(maskLayer, frame),
@@ -512,9 +511,7 @@ export class GpuCompositor {
         (this.spatial?.passes ?? 0) +
         this.texts.passes +
         (this.color?.passes ?? 0) +
-        (effects?.passes ?? 0) +
-        (this.temporal?.stats().passes ?? 0),
-      temporal: this.temporal?.stats(),
+        (effects?.passes ?? 0),
       readbacks: 0,
       sourceDependencies: this.sourceKeys.stats(),
       profile: this.profile
@@ -554,11 +551,7 @@ export class GpuCompositor {
     this.disposed = true;
     this.disposal = this.queue.then(async () => {
       const failures: unknown[] = [];
-      for (const settle of [
-        () => this.sources.dispose(),
-        () => this.submissions.dispose(),
-        () => this.temporal?.dispose(),
-      ]) {
+      for (const settle of [() => this.sources.dispose(), () => this.submissions.dispose()]) {
         try {
           await settle();
         } catch (error) {

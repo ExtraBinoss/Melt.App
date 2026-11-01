@@ -13,10 +13,6 @@ export interface BackgroundGpuActivity {
   ready?(): void;
 }
 export interface RenderOptions {
-  /** Internal source-local captures share the ordinary preparation/effect graph. */
-  sourceLayerId?: string;
-  temporalDepth?: number;
-  temporalBudget?: { remaining: number };
   /** Explicit adapter ownership: all nested render data stays immutable for this
    * frame's lifetime. Must reference the exact page passed to render().
    */
@@ -56,7 +52,6 @@ export interface FrameTexture {
   bounds?: Bounds;
 }
 export interface GpuStats {
-  temporal?: { captures: number; cacheHits: number; passes: number };
   sourceDependencies?: ReturnType<SourceKeyCache["stats"]>;
   submission?: { pending: number; peak: number; limit: number };
   text?: TextSourceStats | null;

@@ -6,9 +6,10 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Remove Time Warp Scan from effect authoring, search, shortcuts and rendering, including its temporal replay/cache and clock code. Retain a validation-only compatibility schema so existing projects, Motion keys and undo/history records still open without applying the retired effect.
+
 - Derive timeline animation text, selection outlines and DOM trim grips from the actual clip fill using the existing canvas grip luminance rule; keep selected, neutral and hovered blocks readable across theme and media-color changes without React updates or pixel sampling.
 
-- Add the GPU Time Warp Scan effect for videos, images, groups and 3D sources, with deterministic Motion sampling, an analytical still-image scan, four directions, editable/keyframeable controls, twelve localized resources and bounded cancellable source replay shared by preview/export.
 
 - Use the shared platform modifier label in the timeline zoom tooltip: Command on Apple platforms and Ctrl on Windows/Linux, retaining the mounted tooltip during zoom changes.
 - Stabilize timeline scrollbar geometry across Animations/Keyframes switches and panel heights. Reserve the inline scrollbar gutter, bound transient canvas/row overflow to the authored content extent, and hide vertical scrolling in peek mode while preserving horizontal ruler access and expanded scrolling. Add a native Chromium regression with visible scrollbars and unchanged document state.

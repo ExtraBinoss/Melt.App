@@ -16,7 +16,7 @@ export function createStressTemplate(media: MotionTemplateMedia): BuiltMotionTem
     throw Error("Motion stress lab requires three original photographs.");
   const a = new TemplateAuthor("motion-stress-lab", "Motion stress lab", 1440, 1200);
   const types = (Object.keys(EFFECT_CATALOG) as EffectType[]).filter(
-    (type) => !EFFECT_CATALOG[type].source,
+    (type) => !EFFECT_CATALOG[type].source && !EFFECT_CATALOG[type].retired,
   );
   const layers = [
     a.layer("rectangle", "stress-paper", "Ink paper", {

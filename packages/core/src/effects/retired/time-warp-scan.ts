@@ -1,3 +1,4 @@
+// Validation-only schema for saved projects/history. No renderer or authoring UI.
 import {
   AMOUNT,
   defineEffect,
@@ -68,5 +69,5 @@ export const TIME_WARP_SCAN_DEFINITION = defineEffect(
   TIME_WARP_SCAN_PARAMETERS,
   "effect",
   "expand",
-  { identityAtZero: true, temporal: "scan", clock: "composition" },
+  { identityAtZero: true, retired: true },
 );

@@ -1,5 +1,5 @@
 import { WINDOW_TRAILS_DEFINITION } from "./window-trails/definition";
-import { TIME_WARP_SCAN_DEFINITION } from "./time-warp-scan/definition";
+import { TIME_WARP_SCAN_DEFINITION } from "./retired/time-warp-scan";
 import { BEVEL_DEFINITION } from "./bevel/definition";
 import { DISPLACE_DEFINITION } from "./displace/definition";
 import { THERMAL_DEFINITION } from "./thermal/definition";

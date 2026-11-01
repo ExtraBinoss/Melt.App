@@ -1,4 +1,4 @@
-import type { Layer } from "@musart/core";
+import { getEffectDefinition, type Layer } from "@musart/core";
 export type LayerTreeEntry = { key: string; layer: Layer; depth: number } & (
   | { kind: "layer"; expanded: boolean }
   | { kind: "effect"; effectId: string }
@@ -27,7 +27,9 @@ export function projectLayerTree(
         : attachments.has(layer.id);
     output.push({ kind: "layer", key: layer.id, layer, depth, expanded });
     if (!expanded) continue;
-    for (const effect of layer.effects)
+    for (const effect of layer.effects.filter(
+      (effect) => !getEffectDefinition(effect.type).retired,
+    ))
       output.push({
         kind: "effect",
         key: `${layer.id}:fx:${effect.id}`,

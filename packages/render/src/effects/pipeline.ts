@@ -9,7 +9,8 @@ export type { EffectStage } from "./shared/stages";
 
 /** The same stage resolver owns compile warming, allocation accounting and actual rendering. */
 export function effectStages(effect: Effect): readonly EffectStage[] {
-  if (getEffectDefinition(effect.type).source === "geometry") return [];
+  const definition = getEffectDefinition(effect.type);
+  if (definition.retired || definition.source === "geometry") return [];
   if (effect.type === "gradient") return gradientStages(effect);
   if (effect.type === "transition") return transitionStages(effect);
   if (effect.type === "blur")

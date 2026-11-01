@@ -192,7 +192,10 @@ const EffectDetails = memo(function EffectDetails({
       <div className="layer-effect-details">
         <LockedLayerNotice engine={engine} page={page} layers={[layer]} run={runCurrent} />
         {layer.effects
-          .filter((effect) => !effectId || effect.id === effectId)
+          .filter(
+            (effect) =>
+              !getEffectDefinition(effect.type).retired && (!effectId || effect.id === effectId),
+          )
           .map((effect) => (
             <section
               key={effect.id}

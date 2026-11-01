@@ -95,13 +95,16 @@ const CardContents = memo(function CardContents({
   run: (action: () => void) => void;
 }) {
   const { t } = useTranslation();
-  const effects = layer.effects.slice(-2),
+  const visibleEffects = layer.effects.filter(
+    (effect) => !getEffectDefinition(effect.type).retired,
+  );
+  const effects = visibleEffects.slice(-2),
     selected =
       target?.kind === "effect"
-        ? layer.effects.find((effect) => effect.id === target.effectId)
+        ? visibleEffects.find((effect) => effect.id === target.effectId)
         : undefined;
   if (selected && !effects.some((effect) => effect.id === selected.id)) effects[0] = selected;
-  const more = layer.effects.length - effects.length;
+  const more = visibleEffects.length - effects.length;
   return (
     <div
       className="layer-attachment-cards"

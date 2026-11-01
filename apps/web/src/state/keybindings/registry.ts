@@ -47,7 +47,7 @@ export const BINDING_COMMANDS: readonly BindingCommand[] = Object.freeze([
     };
   }),
   ...Object.values(EFFECT_CATALOG)
-    .filter((effect) => !effect.source)
+    .filter((effect) => !effect.source && !effect.retired)
     .map((effect): BindingCommand => ({
       id: `effect:${effect.type}`,
       label: effect.nameKey,

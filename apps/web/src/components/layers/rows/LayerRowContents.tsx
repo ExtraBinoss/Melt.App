@@ -1,7 +1,13 @@
 import { memo, type RefObject } from "react";
 import { ChevronRight, ScanLine } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import type { Composition, EnginePort, Layer, Project } from "@musart/core";
+import {
+  getEffectDefinition,
+  type Composition,
+  type EnginePort,
+  type Layer,
+  type Project,
+} from "@musart/core";
 import type { EditorServices } from "../../../state/contracts";
 import type { AttachmentTarget } from "../../../state/selection/attachments";
 import type { LayerDropPosition } from "../drop-target";
@@ -62,7 +68,10 @@ export const LayerRowContents = memo(function LayerRowContents({
   onVisibility: () => void;
 }) {
   const { t } = useTranslation();
-  const expandable = layer.kind === "group" || !!layer.effects.length || !!layer.mask;
+  const expandable =
+    layer.kind === "group" ||
+    layer.effects.some((effect) => !getEffectDefinition(effect.type).retired) ||
+    !!layer.mask;
   return (
     <>
       {expandable && (

@@ -12,7 +12,11 @@ import type { BindingSnapshot, CommandId } from "../../../state/keybindings/mode
 export const SEARCH_COMMAND_IDS: readonly string[] = Object.freeze([
   ...ACTIONS.map((item) => `action:${item.action}`),
   ...Object.keys(EFFECT_CATALOG)
-    .filter((type) => !EFFECT_CATALOG[type as keyof typeof EFFECT_CATALOG].source)
+    .filter(
+      (type) =>
+        !EFFECT_CATALOG[type as keyof typeof EFFECT_CATALOG].source &&
+        !EFFECT_CATALOG[type as keyof typeof EFFECT_CATALOG].retired,
+    )
     .map((type) => `effect:${type}`),
 ]);
 
@@ -49,7 +53,7 @@ export function createSearchCommandItems(
     target: { kind: "action", action: item.action },
   }));
   const effects: SearchItem[] = Object.values(EFFECT_CATALOG)
-    .filter((effect) => !effect.source)
+    .filter((effect) => !effect.source && !effect.retired)
     .map((effect) => ({
       id: `effect:${effect.type}`,
       label: t(effect.nameKey),

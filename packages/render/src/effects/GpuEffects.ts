@@ -7,11 +7,9 @@ import {
   resolveEffectSettings,
   resolveGradientSettings,
   type Effect,
-  type Bounds,
 } from "@musart/core";
 import {
   DataTexture,
-  Vector4,
   RGBAFormat,
   UnsignedByteType,
   Mesh,
@@ -32,7 +30,7 @@ import type { GlyphAtlasBinding } from "./ascii/binding";
 import { assertTextureSize, gpuTextureLimit } from "../cache/texture-limits";
 import { effectStages, type EffectStage } from "./pipeline";
 import { compositeEffect } from "./shared/compositing/node";
-import { sampleEffect, type EffectDimensions, type EffectNodeContext } from "./shared/context";
+import { sampleEffect, type EffectDimensions } from "./shared/context";
 import { createEffectUniforms, updateEffectUniforms, type EffectUniforms } from "./shared/uniforms";
 import { EffectTargetPool } from "./shared/target-pool";
 
@@ -45,15 +43,7 @@ function effectPassKey(effect: Effect, stage: EffectStage): string {
     stage.final && Boolean(effect.composite || (effect.blendMode && effect.blendMode !== "normal"));
   return stage.key + (advanced ? ":composite" : "");
 }
-export interface TemporalEffectInput {
-  readonly texture?: Texture;
-  readonly phase: number;
-  readonly bounds?: Bounds;
-  readonly content?: Bounds;
-}
-export type TemporalEffectInputs = ReadonlyMap<string, TemporalEffectInput>;
 interface EffectPass {
-  readonly temporal?: NonNullable<EffectNodeContext["temporal"]>;
   readonly material: MeshBasicNodeMaterial;
   readonly source: TextureNode<"vec4">;
   readonly backdrop: TextureNode<"vec4">;
@@ -127,7 +117,6 @@ export class GpuEffects {
     height: number,
     logical: EffectDimensions,
     bindImages = true,
-    temporalInput?: TemporalEffectInput,
   ): EffectPass {
     const advanced =
       stage.final &&
@@ -141,17 +130,7 @@ export class GpuEffects {
       const controls = createEffectUniforms(uniformEffect, width, height, logical);
       const glyph: EffectPass["glyph"] = { characters: this.characters(effect), binding: null };
       const images: EffectPass["images"] = new Map();
-      const temporal = getEffectDefinition(effect.type).temporal
-        ? {
-            source: texture(this.neutralImage()),
-            flipY: uniform(1),
-            enabled: uniform(0),
-            region: uniform(new Vector4(0, 0, 1, 1)),
-            phase: uniform(1),
-          }
-        : undefined;
       const node = stage.builder({
-        temporal,
         bindImageInput: (key) => {
           let binding = images.get(key);
           if (!binding) {
@@ -185,7 +164,7 @@ export class GpuEffects {
             advanced,
           )
         : node;
-      pass = { material, source, backdrop, controls, glyph, images, temporal };
+      pass = { material, source, backdrop, controls, glyph, images };
       this.passes.set(passKey, pass);
     }
     for (const [key, binding] of pass.images) {
@@ -196,32 +175,11 @@ export class GpuEffects {
         assetId && bindImages ? this.imageInput!(assetId) : this.neutralImage();
       binding.enabled.value = assetId ? 1 : 0;
     }
-    if (pass.temporal) {
-      pass.temporal.source.value = temporalInput?.texture ?? this.neutralImage();
-      pass.temporal.flipY.value = temporalInput?.texture?.isRenderTargetTexture ? 1 : 0;
-      pass.temporal.enabled.value = temporalInput?.texture ? 1 : 0;
-      pass.temporal.phase.value =
-        temporalInput?.phase ?? Number(resolveEffectSettings(effect).progress);
-    }
     pass.source.value = input;
     pass.backdrop.value = original;
     pass.controls.sourceFlipY.value = input.isRenderTargetTexture ? 1 : 0;
     pass.controls.backdropFlipY.value = original.isRenderTargetTexture ? 1 : 0;
-    const origin = logical.origin ?? { x: 0, y: 0 };
-    const content = temporalInput?.content;
-    const effectLogical = content
-      ? { ...logical, content: { ...content, x: content.x - origin.x, y: content.y - origin.y } }
-      : logical;
-    updateEffectUniforms(pass.controls, uniformEffect, width, height, effectLogical);
-    if (pass.temporal) {
-      const bounds = temporalInput?.bounds;
-      pass.temporal.region.value.set(
-        bounds ? (origin.x - bounds.x) / bounds.width : 0,
-        bounds ? 1 - (origin.y - bounds.y + logical.height) / bounds.height : 0,
-        bounds ? logical.width / bounds.width : 1,
-        bounds ? logical.height / bounds.height : 1,
-      );
-    }
+    updateEffectUniforms(pass.controls, uniformEffect, width, height, logical);
     pass.glyph.characters = this.characters(effect);
     if (pass.glyph.binding) {
       pass.glyph.binding.texture.value = this.glyphTexture(pass.glyph.characters);
@@ -318,12 +276,7 @@ export class GpuEffects {
     return (
       this.surfaces.projectedBytes(width, height, count) +
       this.atlases.projectedBytes(glyphs) +
-      (this.neutral ||
-      enabled.some(
-        (effect) =>
-          getEffectDefinition(effect.type).inputs?.length ||
-          getEffectDefinition(effect.type).temporal,
-      )
+      (this.neutral || enabled.some((effect) => getEffectDefinition(effect.type).inputs?.length)
         ? 4
         : 0)
     );
@@ -341,7 +294,6 @@ export class GpuEffects {
     effects: readonly Effect[],
     output: RenderTarget,
     logical: EffectDimensions = { width, height },
-    temporal?: TemporalEffectInputs,
   ): Texture {
     if (this.disposed) throw new Error("L’opérateur d’effets a été fermé.");
     if (!Number.isInteger(width) || !Number.isInteger(height) || width < 1 || height < 1)
@@ -393,17 +345,7 @@ export class GpuEffects {
         for (const stage of block.stages) {
           const target = (total - index++) % 2 === 1 ? output : scratch!;
           this.draw(
-            this.getPass(
-              block.effect,
-              stage,
-              input,
-              original,
-              width,
-              height,
-              logical,
-              true,
-              temporal?.get(block.effect.id),
-            ),
+            this.getPass(block.effect, stage, input, original, width, height, logical),
             target,
           );
           input = target.texture;

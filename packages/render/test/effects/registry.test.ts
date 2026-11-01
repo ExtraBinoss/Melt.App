@@ -11,7 +11,8 @@ describe("effect implementation registry", () => {
           (type) =>
             type !== "gradient" &&
             type !== "transition" &&
-            !EFFECT_CATALOG[type as keyof typeof EFFECT_CATALOG].source,
+            !EFFECT_CATALOG[type as keyof typeof EFFECT_CATALOG].source &&
+            !EFFECT_CATALOG[type as keyof typeof EFFECT_CATALOG].retired,
         )
         .sort(),
     );

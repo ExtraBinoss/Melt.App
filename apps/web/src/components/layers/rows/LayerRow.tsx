@@ -5,6 +5,7 @@ import { useRowAction } from "./use-row-action";
 import { useTranslation } from "react-i18next";
 import {
   createLayerGeometryIndex,
+  getEffectDefinition,
   type Composition,
   type EnginePort,
   type Layer,
@@ -87,7 +88,10 @@ export const LayerRow = memo(function LayerRow({
   const lockDescription = lockedParent
     ? t("layerControls:lockedByParent", { name: lockedParent.name })
     : t("layerControls:lockedState");
-  const expandable = layer.kind === "group" || !!layer.effects.length || !!layer.mask;
+  const expandable =
+    layer.kind === "group" ||
+    layer.effects.some((effect) => !getEffectDefinition(effect.type).retired) ||
+    !!layer.mask;
   const canonical = useCallback(
     (origin: Composition) => {
       const snapshot = engine.getSnapshot();
