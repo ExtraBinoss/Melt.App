@@ -148,6 +148,9 @@ export function NewProjectForm({
           <Label htmlFor={`${id}-colors`}>{t("exportPanel:colorMode")}</Label>
           <SelectField
             id={`${id}-colors`}
+            className="creation-color-trigger"
+            contentClassName="creation-color-menu"
+            disabled={disabled}
             label={t("exportPanel:colorMode")}
             value={colorSpace}
             options={[

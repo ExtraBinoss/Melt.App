@@ -24,7 +24,7 @@ import { Button } from "../ui/button";
 import { LibrarySidebar } from "./dashboard/LibrarySidebar";
 import { MobileLibraryNavigation } from "./dashboard/MobileLibraryNavigation";
 import { MeltLogo } from "../../ui/brand/MeltLogo";
-import { NewProjectForm } from "./creation/NewProjectForm";
+import { CreationDialogHost, StandaloneProjectCreation } from "./creation/ProjectCreationDialog";
 import { ProjectGallery } from "./gallery/ProjectGallery";
 import { TemplateGallery } from "./templates/TemplateGallery";
 import { createProjectFromTemplate } from "../../services/projects/templates/catalog";
@@ -55,6 +55,8 @@ export function ProjectDialog(props: ProjectDialogProps) {
       onClose={props.onClose}
       initialSection={props.initialView === "settingsEditor" ? "editor" : "general"}
     />
+  ) : props.initialView === "newProject" && !props.welcome ? (
+    <StandaloneProjectCreation {...props} />
   ) : (
     <ProjectDashboard {...props} />
   );
@@ -91,7 +93,8 @@ function ProjectDashboard({
   const [queries, setQueries] = useState({ projects: "", templates: "" });
   const [libraryMode, setLibraryMode] = useLibraryMode();
   const [projectHints, setProjectHints] = useState<ProjectSummary[]>([]);
-  const [creating, setCreating] = useState(initialView === "newProject");
+  const [creation] = useState(() => atom(initialView === "newProject"));
+  const creationTrigger = useRef<HTMLElement | null>(null);
   const [busy, setBusy] = useState(false);
   const [templateLoading, setTemplateLoading] = useState(false);
   const BrandTrigger = busy ? "button" : "a";
@@ -134,7 +137,11 @@ function ProjectDashboard({
     });
   }
   function custom() {
-    if (!scope.current.pending && scope.current.alive) setCreating(true);
+    if (!scope.current.pending && scope.current.alive) {
+      creationTrigger.current =
+        document.activeElement instanceof HTMLElement ? document.activeElement : null;
+      preferenceStore.set(creation, true);
+    }
   }
   function home() {
     if (!scope.current.pending && scope.current.alive) {
@@ -150,7 +157,7 @@ function ProjectDashboard({
     )
       return;
     setView(value);
-    setCreating(false);
+    preferenceStore.set(creation, false);
   }
   function chooseTemplate(id: string) {
     if (scope.current.pending || !scope.current.alive) return;
@@ -179,38 +186,6 @@ function ProjectDashboard({
       }
     });
   }
-  const creationDialog = creating && (
-    <Dialog
-      open
-      onOpenChange={(open) => {
-        if (!open && !busy) {
-          if (initialView === "newProject" && !welcome) onClose();
-          else setCreating(false);
-        }
-      }}
-    >
-      <DialogContent
-        className="creation-dialog"
-        showCloseButton={!busy}
-        onEscapeKeyDown={(event) => {
-          if (busy) event.preventDefault();
-        }}
-        onInteractOutside={(event) => {
-          if (busy) event.preventDefault();
-        }}
-      >
-        <DialogHeader>
-          <DialogTitle>{t("creation:title")}</DialogTitle>
-          <DialogDescription>{t("creation:hint")}</DialogDescription>
-        </DialogHeader>
-        <NewProjectForm
-          disabled={busy}
-          onCreate={(options) => complete(() => services.createProject(options))}
-        />
-      </DialogContent>
-    </Dialog>
-  );
-  if (initialView === "newProject" && !welcome) return creationDialog;
   if (landing)
     return (
       <LandingPage
@@ -241,7 +216,13 @@ function ProjectDashboard({
       <Dialog
         open
         onOpenChange={(open) => {
-          if (!open && !welcome && !busy && !preferenceStore.get(preferences) && !creating)
+          if (
+            !open &&
+            !welcome &&
+            !busy &&
+            !preferenceStore.get(preferences) &&
+            !preferenceStore.get(creation)
+          )
             onClose();
         }}
       >
@@ -249,11 +230,21 @@ function ProjectDashboard({
           closeLabel={t("close")}
           showCloseButton={!welcome && !busy}
           onEscapeKeyDown={(event) => {
-            if (welcome || busy || preferenceStore.get(preferences) || creating)
+            if (
+              welcome ||
+              busy ||
+              preferenceStore.get(preferences) ||
+              preferenceStore.get(creation)
+            )
               event.preventDefault();
           }}
           onInteractOutside={(event) => {
-            if (welcome || busy || preferenceStore.get(preferences) || creating)
+            if (
+              welcome ||
+              busy ||
+              preferenceStore.get(preferences) ||
+              preferenceStore.get(creation)
+            )
               event.preventDefault();
           }}
           data-welcome={welcome || undefined}
@@ -345,6 +336,7 @@ function ProjectDashboard({
                       />
                     </div>
                     <LibraryToolbar
+                      services={services}
                       view={view}
                       query={queries[view]}
                       onQueryChange={(query) =>
@@ -405,7 +397,12 @@ function ProjectDashboard({
               />
             )}
           </div>
-          {creationDialog}
+          <CreationDialogHost
+            state={creation}
+            trigger={creationTrigger}
+            busy={busy}
+            onCreate={(options) => complete(() => services.createProject(options))}
+          />
           <PreferencesHost state={preferences} />
           <input
             ref={fileRef}

@@ -91,6 +91,31 @@
   font-size: 14px;
   border-radius: 10px;
 }
+.creation-color-trigger[data-slot="select-trigger"] {
+  width: 100%;
+  min-width: 0;
+  height: 42px;
+  padding-block: 4px;
+  border-radius: 10px;
+  font-size: 14px;
+  white-space: normal;
+}
+.creation-color-trigger [data-slot="select-value"] {
+  display: block;
+  min-width: 0;
+  overflow: visible;
+  -webkit-line-clamp: unset;
+  white-space: normal;
+  text-align: start;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+.creation-color-menu [data-slot="select-item"] > span:last-child {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+  overflow-wrap: anywhere;
+}
 .creation-dimensions {
   display: grid;
   grid-template-columns: 1fr 1fr;

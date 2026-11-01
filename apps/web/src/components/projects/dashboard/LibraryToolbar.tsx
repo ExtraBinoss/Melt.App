@@ -1,11 +1,12 @@
 import { useTranslation } from "react-i18next";
-import type { ProjectSummary } from "../../../state/contracts";
+import type { EditorServices, ProjectSummary } from "../../../state/contracts";
 import { TEMPLATE_CATALOG } from "../../../services/projects/templates/catalog";
 import { SearchInput } from "../../assets/SearchInput";
 import { SocialBrandIcon } from "../../assets/SocialBrandIcon";
 import { MeltLogo } from "../../../ui/brand/MeltLogo";
 import { LibraryModeFilter } from "./LibraryModeFilter";
 import { projectLibraryMode, type LibraryMode } from "./library-mode";
+import { ProjectSearchPreview } from "../gallery/ProjectSearchPreview";
 import "./messages";
 import "../templates/messages";
 
@@ -17,6 +18,7 @@ export function LibraryToolbar({
   mode,
   onModeChange,
   projects,
+  services,
   disabled,
 }: {
   view: "projects" | "templates";
@@ -25,6 +27,7 @@ export function LibraryToolbar({
   mode: LibraryMode;
   onModeChange: (mode: LibraryMode) => void;
   projects: readonly ProjectSummary[];
+  services: EditorServices;
   disabled: boolean;
 }) {
   const { t } = useTranslation();
@@ -35,11 +38,7 @@ export function LibraryToolbar({
           .slice(0, 6)
           .map((project) => ({
             label: project.name,
-            preview: project.thumbnail ? (
-              <img src={project.thumbnail} alt="" />
-            ) : (
-              <MeltLogo size={20} />
-            ),
+            preview: <ProjectSearchPreview project={project} services={services} />,
           }))
       : TEMPLATE_CATALOG.filter((item) => mode === "all" || item.mode === mode)
           .slice(0, 6)

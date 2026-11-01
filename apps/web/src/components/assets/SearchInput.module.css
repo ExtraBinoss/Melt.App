@@ -2,6 +2,8 @@
   position: relative;
   display: flex;
   align-items: center;
+  width: 100%;
+  min-width: 0;
 }
 .control > svg {
   position: absolute;
@@ -10,7 +12,12 @@
   pointer-events: none;
 }
 .control input {
+  min-width: 0;
   padding-left: 32px;
+  padding-right: 12px;
+  text-overflow: ellipsis;
+}
+.control[data-search-has-previews="true"] input {
   padding-right: 36px;
 }
 .searchButton {
@@ -42,6 +49,13 @@
 .previews svg {
   width: 20px;
   height: 20px;
+}
+.previews img {
+  display: block;
+  width: 20px;
+  height: 20px;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
 }
 
 .previews[data-searching="true"] {

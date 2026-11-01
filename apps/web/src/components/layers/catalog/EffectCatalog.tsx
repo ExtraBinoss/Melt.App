@@ -1,9 +1,8 @@
 import { useMemo, useRef, useState, type KeyboardEvent } from "react";
 import { useTranslation } from "react-i18next";
 import type { EffectType } from "@musart/core";
-import { Search } from "lucide-react";
 import { DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel } from "../../ui/dropdown-menu";
-import { Input } from "../../ui/input";
+import { SearchInput } from "../../assets/SearchInput";
 import { SelectField } from "../../shared/SelectField";
 import { ScrollShadow } from "../../shared/scroll/ScrollShadow";
 import {
@@ -38,7 +37,18 @@ export function EffectCatalog({
     entries.some((entry) => entry.family === family),
   );
   const visible = filterEffectCatalog(entries, query, family);
+  const hints = useMemo(
+    () =>
+      entries
+        .filter((entry) => family === "all" || entry.family === family)
+        .map((entry) => ({ label: entry.label })),
+    [entries, family],
+  );
   function filterKeys(event: KeyboardEvent) {
+    if (event.nativeEvent.isComposing || event.keyCode === 229) {
+      event.stopPropagation();
+      return;
+    }
     // Keep typing inside the filter instead of Radix menu typeahead. Escape still closes the menu.
     if (event.key === "Escape") return;
     event.stopPropagation();
@@ -50,20 +60,15 @@ export function EffectCatalog({
   return (
     <div ref={root} className="effect-catalog" data-effect-category={category}>
       <div className="effect-catalog-filters">
-        <div className="effect-catalog-search">
-          <Search size={14} aria-hidden />
-          <Input
-            aria-label={t(
-              category === "effect" ? "effectCatalog:search" : "effectCatalog:searchAdjustment",
-            )}
-            placeholder={t(
-              category === "effect" ? "effectCatalog:search" : "effectCatalog:searchAdjustment",
-            )}
-            value={query}
-            onChange={(event) => setQuery(event.currentTarget.value)}
-            onKeyDown={filterKeys}
-          />
-        </div>
+        <SearchInput
+          aria-label={t(
+            category === "effect" ? "effectCatalog:search" : "effectCatalog:searchAdjustment",
+          )}
+          hints={hints}
+          value={query}
+          onChange={(event) => setQuery(event.currentTarget.value)}
+          onKeyDown={filterKeys}
+        />
         <SelectField
           label={t("effectCatalog:familyLabel")}
           value={family}

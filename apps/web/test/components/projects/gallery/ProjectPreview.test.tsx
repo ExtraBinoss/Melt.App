@@ -5,6 +5,7 @@ import {
   ProjectPreview,
   HOVER_PREVIEW_INTERVAL,
 } from "../../../../src/components/projects/gallery/ProjectPreview";
+import { ProjectPreviewPlaceholder } from "../../../../src/components/projects/items/ProjectPreviewPlaceholder";
 import { projectSummary } from "../../../support/projects";
 import { setup } from "../../../support/ui";
 let reduced = false;
@@ -38,6 +39,63 @@ function lease(): ProjectThumbnailLease {
     release: vi.fn(),
   };
 }
+test("uses delayed decorative branded feedback and retires it when the actual thumbnail arrives", async () => {
+  vi.useFakeTimers();
+  const d = setup();
+  let resolve!: (value: ProjectThumbnailLease) => void;
+  vi.mocked(d.services.loadProjectThumbnails).mockImplementationOnce(
+    () => new Promise((done) => (resolve = done)),
+  );
+  const view = d.mount(
+    <ProjectPreview project={projectSummary()} services={d.services} onOpen={() => undefined} />,
+  );
+  const loading = view.container.querySelector(".ui-throbber")!;
+  expect(loading).toHaveAttribute("data-variant", "shimmer");
+  expect(loading).toHaveAttribute("aria-hidden", "true");
+  expect(loading).toHaveAttribute("data-visible", "false");
+  await act(async () => {
+    vi.advanceTimersByTime(160);
+  });
+  expect(loading).toHaveAttribute("data-visible", "true");
+  expect(loading.querySelector("svg")).not.toBeNull();
+  expect(screen.getByRole("button", { name: "Ouvrir Study" })).toBeEnabled();
+  const held = lease();
+  await act(async () => resolve(held));
+  expect(screen.getByRole("img", { name: "Page one" })).toHaveAttribute("src", "blob:page-one");
+  expect(loading).toHaveAttribute("data-active", "false");
+  expect(loading).toHaveAttribute("data-visible", "false");
+  expect(held.release).not.toHaveBeenCalled();
+  view.unmount();
+  expect(held.release).toHaveBeenCalledOnce();
+});
+test("hands pending motion feedback to native preparation and leaves settled placeholders idle", async () => {
+  vi.useFakeTimers();
+  const d = setup();
+  const placeholder = (pending: boolean) => (
+    <span className="motion-project-preview" data-preview-status="idle">
+      <ProjectPreviewPlaceholder pending={pending} idleFallback label="Préparation de l’aperçu…" />
+    </span>
+  );
+  const view = d.mount(placeholder(true));
+  await act(async () => {
+    vi.advanceTimersByTime(160);
+  });
+  const surface = view.container.querySelector(".motion-project-preview")!;
+  const loading = view.container.querySelector(".ui-throbber")!;
+  expect(loading).toHaveAttribute("data-active", "true");
+  await act(async () => {
+    surface.setAttribute("data-preview-status", "loading");
+  });
+  expect(loading).toHaveAttribute("data-active", "false");
+  await act(async () => {
+    surface.setAttribute("data-preview-status", "idle");
+  });
+  expect(loading).toHaveAttribute("data-active", "true");
+  view.rerender(placeholder(false));
+  expect(view.container.querySelector(".ui-throbber")).toBeNull();
+  expect(view.container.querySelector("svg")).not.toBeNull();
+  view.unmount();
+});
 test("cycles only on hover, exposes no manual carousel controls and releases replaced URLs", async () => {
   const d = setup(),
     open = vi.fn(),

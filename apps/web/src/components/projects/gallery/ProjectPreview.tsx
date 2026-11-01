@@ -1,14 +1,15 @@
 import { dialogLinkKeyDown } from "../../../ui/navigation/activation";
-import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useRef, useState, type MouseEvent, type ReactNode } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { useTranslation } from "react-i18next";
-import { LoaderCircle, RefreshCw } from "lucide-react";
+import { RefreshCw } from "lucide-react";
 import type {
   EditorServices,
   ProjectSummary,
   ProjectThumbnailLease,
 } from "../../../state/contracts";
 import { ProjectMotionPreview } from "./ProjectMotionPreview";
+import { ProjectPreviewPlaceholder } from "../items/ProjectPreviewPlaceholder";
 import { IconButton } from "../../shared/IconButton";
 import "../dashboard/messages";
 
@@ -27,7 +28,7 @@ export function ProjectPreview({
 }: {
   project: ProjectSummary;
   services: EditorServices;
-  onOpen: (event?: import("react").MouseEvent) => void;
+  onOpen: (event?: MouseEvent) => void;
   href?: string;
   onDoubleClick?: () => void;
   previewLabel?: string;
@@ -140,6 +141,8 @@ export function ProjectPreview({
   const prefetched = items?.find(
     (item) => item.pageId === next?.id && item.pageId !== page?.id,
   )?.url;
+  const failed = resource?.failed === true && resource.key === key;
+  const pending = visible && !disabled && resource?.key !== key;
   useEffect(() => {
     ready.current = Boolean(image && prefetched);
   }, [image, prefetched]);
@@ -201,27 +204,24 @@ export function ProjectPreview({
                 poster={image}
                 disabled={disabled || !visible}
               >
-                <span className="preview-pending">
-                  <LoaderCircle size={19} />
-                  <span>{t("previewPreparing")}</span>
-                </span>
+                <ProjectPreviewPlaceholder
+                  pending={pending}
+                  failed={failed}
+                  idleFallback={visible}
+                  label={t(failed ? "previewUnavailable" : "previewPreparing")}
+                />
               </ProjectMotionPreview>
             ) : (
               <>
-                {image ? (
-                  <img src={image} alt={page?.name ?? project.name} draggable={false} />
-                ) : (
-                  <span className="preview-pending">
-                    <LoaderCircle size={19} className={resource?.failed ? "" : "animate-spin"} />
-                    <span>
-                      {t(
-                        resource?.failed && resource.key === key
-                          ? "previewUnavailable"
-                          : "previewPreparing",
-                      )}
-                    </span>
-                  </span>
+                {image && (
+                  <img key={image} src={image} alt={page?.name ?? project.name} draggable={false} />
                 )}
+                <ProjectPreviewPlaceholder
+                  pending={pending && !image}
+                  failed={!image && failed}
+                  idleFallback={visible && !image}
+                  label={t(!image && failed ? "previewUnavailable" : "previewPreparing")}
+                />
               </>
             )}
           </div>

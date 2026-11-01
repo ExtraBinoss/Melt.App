@@ -31,6 +31,7 @@ export function SearchInput({
   const { t } = useTranslation();
   const searchPrefix = prefix ?? t("common.search");
   const reduced = useReducedMotion();
+  const hasPreviews = hints.slice(0, 6).some((hint) => hint.preview);
   const labels = JSON.stringify(hints.slice(0, 6).map((hint) => hint.label));
   useEffect(() => {
     const element = input.current;
@@ -121,7 +122,7 @@ export function SearchInput({
     return () => document.removeEventListener("keydown", keydown);
   }, [captureTyping]);
   return (
-    <div className={styles.control}>
+    <div className={styles.control} data-search-has-previews={hasPreviews}>
       {searchButton ? (
         <button
           type="button"
@@ -141,7 +142,7 @@ export function SearchInput({
         autoFocus={autoFocus}
         placeholder={`${searchPrefix}…`}
       />
-      {hints.some((hint) => hint.preview) && (
+      {hasPreviews && (
         <span
           ref={previews}
           className={styles.previews}

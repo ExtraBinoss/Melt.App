@@ -91,6 +91,9 @@ test("creates a CMYK-targeted canvas explicitly while sRGB remains the default",
   expect(screen.getByRole("combobox", { name: "Couleurs de sortie du canvas" })).toHaveTextContent(
     "sRGB",
   );
+  expect(screen.getByRole("combobox", { name: "Couleurs de sortie du canvas" })).toHaveClass(
+    "creation-color-trigger",
+  );
   await choose("Couleurs de sortie du canvas", "CMJN · papier couché standard");
   fireEvent.click(screen.getByRole("button", { name: "Créer" }));
   expect(create).toHaveBeenCalledWith(

@@ -2,6 +2,7 @@ import { expect, test, vi } from "vitest";
 import { fireEvent, screen } from "@testing-library/react";
 import { LibraryToolbar } from "../../../../src/components/projects/dashboard/LibraryToolbar";
 import { setup } from "../../../support/ui";
+import { TEMPLATE_CATALOG } from "../../../../src/services/projects/templates/catalog";
 import { projectSummary } from "../../../support/projects";
 
 test("retains the actual search input while changing sections and template modes", () => {
@@ -9,6 +10,7 @@ test("retains the actual search input while changing sections and template modes
     query = vi.fn(),
     mode = vi.fn();
   const common = {
+    services: d.services,
     onQueryChange: query,
     onModeChange: mode,
     projects: [projectSummary()],
@@ -28,13 +30,18 @@ test("retains the actual search input while changing sections and template modes
   expect(mode).toHaveBeenCalledExactlyOnceWith("motion");
   view.rerender(<LibraryToolbar {...common} view="templates" query="" mode="motion" />);
   expect(screen.getByRole("searchbox")).toBe(input);
-  expect(document.querySelector('img[src="/templates/motion/in-bloom.webp"]')).not.toBeNull();
+  const preview = TEMPLATE_CATALOG.filter((item) => item.mode === "motion")
+    .slice(0, 6)
+    .find((item) => item.preview)?.preview;
+  expect(preview).toBeTruthy();
+  expect(document.querySelector(`img[src="${preview}"]`)).not.toBeNull();
   expect(screen.getByRole("radio", { name: "Motion" })).toBeChecked();
 });
 test("disables the retained search and mode controls during a real operation", () => {
   const d = setup();
   d.mount(
     <LibraryToolbar
+      services={d.services}
       view="templates"
       query=""
       onQueryChange={vi.fn()}

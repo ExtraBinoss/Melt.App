@@ -6,6 +6,7 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Unify effect and adjustment search with the shared typewriter input, full-width text and optional thumbnail spacing. Read stored project thumbnails for library search hints, isolate project creation from gallery updates, fit CMYK controls, and reuse branded preview loading with themed playback buttons.
 - Avoid preparing motion picker subjects and preset children while their popovers are closed. Resolve the current subject once on opening, retaining disabled state, stale-origin guards, undo and keyboard focus behavior; profile real selection separately from geometric microbenchmarks.
 - Batch multipart SVG parsing in bounded transient documents while retaining Three SVGLoader, Earcut, authored curves and stroke geometry. Verify identical buffers and native WebGPU/WebGL pixels, zero production readbacks and interleaved preparation benchmarks; keep single-path limitations explicit.
 - Add shared spatial candidate indexing with Flatbush and bounded immutable edits for exact canvas picking and marquee selection. Reuse presented geometry across canvas, layer and timeline hover, bypass repeated verified-cache integrity scans, preserve selection/history ownership and benchmark 500, 1,000 and 10,000 records against linear, Flatbush and RBush paths.

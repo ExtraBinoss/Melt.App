@@ -63,6 +63,7 @@
   will-change: transform;
 }
 .project-preview-slide {
+  position: relative;
   flex: 0 0 100%;
   width: 100%;
   height: 100%;
@@ -76,6 +77,36 @@
   object-fit: contain;
   pointer-events: none;
   user-select: none;
+  animation: project-preview-reveal 220ms ease-out;
+}
+.project-preview-placeholder {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+.project-preview-placeholder > .ui-throbber {
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px;
+  text-align: center;
+}
+.motion-project-preview:not([data-preview-status="idle"]) > .project-preview-placeholder {
+  visibility: hidden;
+}
+@keyframes project-preview-reveal {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .project-preview-slide > img {
+    animation: none;
+  }
 }
 .project-preview-prefetch {
   position: absolute;

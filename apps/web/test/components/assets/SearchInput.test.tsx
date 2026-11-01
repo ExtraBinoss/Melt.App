@@ -1,6 +1,6 @@
 import { afterEach, expect, test, vi } from "vitest";
 import { act, fireEvent, render, screen } from "@testing-library/react";
-import "../../../src/state/i18n";
+import { i18n } from "../../../src/state/i18n";
 import { SearchInput } from "../../../src/components/assets/SearchInput";
 let reduced = false;
 vi.mock("motion/react", () => ({ useReducedMotion: () => reduced }));
@@ -55,9 +55,15 @@ test("respects reduced motion and focuses the stable search field when category 
     <SearchInput aria-label="Search" autoFocus focusKey="shapes" hints={[{ label: "Stars" }]} />,
   );
   expect(screen.getByLabelText("Search")).toHaveFocus();
-  expect(screen.getByLabelText("Search")).toHaveAttribute("placeholder", "Rechercher Stars…");
+  expect(screen.getByLabelText("Search")).toHaveAttribute(
+    "placeholder",
+    `${i18n.t("common.search")} Stars…`,
+  );
   view.rerender(<SearchInput aria-label="Search" autoFocus focusKey="icons" hints={[]} />);
-  expect(screen.getByLabelText("Search")).toHaveAttribute("placeholder", "Rechercher…");
+  expect(screen.getByLabelText("Search")).toHaveAttribute(
+    "placeholder",
+    `${i18n.t("common.search")}…`,
+  );
 });
 test("captures plain typing from the active palette while preserving inputs and unrelated modals", async () => {
   const change = vi.fn();
@@ -152,4 +158,22 @@ test("retains the current preview through erasing and crossfades mounted slots o
   expect(next).toHaveAttribute("data-active", "true");
   view.unmount();
   expect(vi.getTimerCount()).toBe(0);
+});
+
+test("reserves trailing space only for visible hint previews on the shared input", () => {
+  const view = render(
+    <SearchInput aria-label="Search" hints={[{ label: "A very long effect name" }]} />,
+  );
+  const input = screen.getByRole("searchbox");
+  expect(input.parentElement).toHaveAttribute("data-search-has-previews", "false");
+  expect(document.querySelector("[data-search-previews]")).toBeNull();
+  view.rerender(
+    <SearchInput
+      aria-label="Search"
+      hints={[{ label: "Project", preview: <img alt="" src="/preview.webp" /> }]}
+    />,
+  );
+  expect(screen.getByRole("searchbox")).toBe(input);
+  expect(input.parentElement).toHaveAttribute("data-search-has-previews", "true");
+  expect(document.querySelector("[data-search-previews]")).not.toBeNull();
 });

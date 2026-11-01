@@ -5,6 +5,7 @@ import { Plus, LoaderCircle, FolderOpen } from "lucide-react";
 import type { EditorServices, ProjectLibraryPage, ProjectSummary } from "../../../state/contracts";
 import type { TaskRunner } from "../ProjectDialog";
 import { SearchInput } from "../../assets/SearchInput";
+import { ProjectSearchPreview } from "./ProjectSearchPreview";
 import { Throbber } from "../../ui/throbber/Throbber";
 import { MeltLogo } from "../../../ui/brand/MeltLogo";
 import "../dashboard/messages";
@@ -183,11 +184,7 @@ export function ProjectGallery({
               hints={
                 loaded?.projects.slice(0, 6).map((project) => ({
                   label: project.name,
-                  preview: project.thumbnail ? (
-                    <img src={project.thumbnail} alt="" />
-                  ) : (
-                    <MeltLogo size={20} />
-                  ),
+                  preview: <ProjectSearchPreview project={project} services={services} />,
                 })) ?? [{ label: t("dashboard:projects"), preview: <MeltLogo size={20} /> }]
               }
               value={query}
