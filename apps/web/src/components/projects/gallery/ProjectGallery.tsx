@@ -13,6 +13,7 @@ import { Button } from "../../ui/button";
 import { LibraryModeFilter } from "../dashboard/LibraryModeFilter";
 import { useLibraryMode, projectLibraryMode, type LibraryMode } from "../dashboard/library-mode";
 import { ProjectCard } from "./ProjectCard";
+import { beginProjectOpening } from "../opening/controller";
 import { ProjectActionDialog } from "../actions/ProjectActionDialog";
 import { ProjectInsightsDialog } from "../insights/ProjectInsightsDialog";
 import { useLibraryFavorites } from "../items/LibraryBrowser";
@@ -29,6 +30,7 @@ export function ProjectGallery({
   mode: externalMode,
   onQueryChange,
   onProjectsLoaded,
+  onPrepareEditor,
 }: {
   services: EditorServices;
   activeProjectId?: string;
@@ -41,6 +43,7 @@ export function ProjectGallery({
   mode?: LibraryMode;
   onQueryChange?: (query: string) => void;
   onProjectsLoaded?: (projects: ProjectSummary[]) => void;
+  onPrepareEditor?: () => Promise<void>;
 }) {
   const { t } = useTranslation();
   const reduced = useReducedMotion();
@@ -247,11 +250,20 @@ export function ProjectGallery({
                   active={project.id === activeProjectId}
                   disabled={disabled}
                   onOpen={() => {
-                    void mutate(() => services.openProject(project.id), undefined, false).then(
-                      (ok) => {
-                        if (ok && scope.current.alive) onOpen();
+                    if (scope.current.pending || !scope.current.alive || dashboardBusy) return;
+                    const opening = beginProjectOpening();
+                    void mutate(
+                      async () => {
+                        await opening.painted();
+                        await Promise.all([onPrepareEditor?.(), services.openProject(project.id)]);
                       },
-                    );
+                      undefined,
+                      false,
+                    ).then((ok) => {
+                      if (ok) opening.installed();
+                      else opening.close();
+                      if (ok && scope.current.alive) onOpen();
+                    });
                   }}
                   onRename={(name) =>
                     mutate(() => services.renameProject(project.id, name), t("projectRenamed"))

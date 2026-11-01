@@ -99,7 +99,7 @@ export function LibrarySidebar({
           </div>
         ) : projects === null ? (
           <div className="library-sidebar-status">
-            <Throbber active size={24} variant="shimmer" label={t("loading")} />
+            <Throbber active size={24} variant="shimmer" label={t("loading")} delayMs={0} />
           </div>
         ) : !projects.length ? (
           <p className="library-sidebar-status">{t("empty")}</p>

@@ -1,0 +1,37 @@
+.project-opening-surface {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  color: var(--foreground);
+  contain: layout paint;
+  pointer-events: auto;
+}
+.project-opening-content {
+  display: grid;
+  justify-items: center;
+  gap: 20px;
+  padding: 24px;
+  text-align: center;
+}
+.project-opening-content > .ui-throbber {
+  gap: 10px;
+}
+.project-opening-content .ui-throbber-label {
+  font-size: 14px;
+}
+
+.project-opening-circle {
+  position: absolute;
+  z-index: 0;
+  border-radius: 50%;
+  background: var(--background);
+  will-change: transform;
+  pointer-events: none;
+}
+.project-opening-body {
+  position: relative;
+  z-index: 1;
+}

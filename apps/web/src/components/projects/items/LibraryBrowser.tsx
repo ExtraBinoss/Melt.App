@@ -1,6 +1,6 @@
 import { useLinkedPreview } from "./use-linked-preview";
 import type { LibraryPreviewRequest } from "./links";
-import { useCallback, useMemo, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
 import { atom, useSetAtom } from "jotai";
 import { ItemDialog, type LibrarySelection } from "./ItemDialog";
 import { ArrowUpRight } from "lucide-react";
@@ -14,6 +14,7 @@ import { FavoritesOutletContext } from "./favorites-context";
 export { useLibraryFavorites } from "./favorites-context";
 import "./messages";
 import "./items.css";
+import { captureOpeningOrigin } from "../opening/origin";
 export function LibraryOpenButton({
   onOpen,
   label,
@@ -56,6 +57,7 @@ export function LibraryBrowser({
   busy: boolean;
 }) {
   const { t } = useTranslation("libraryItem");
+  useEffect(() => captureOpeningOrigin(document), []);
   const favorites = useFavorites();
   const [selection] = useState(() => atom<LibrarySelection | null>(null));
   const select = useSetAtom(selection);

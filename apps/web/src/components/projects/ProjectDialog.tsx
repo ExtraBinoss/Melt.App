@@ -34,6 +34,7 @@ const ProjectGallery = lazy(() =>
 );
 import { TemplateGallery } from "./templates/TemplateGallery";
 import { createProjectFromTemplate } from "../../services/projects/templates/catalog";
+import { beginProjectOpening, currentProjectOpening } from "./opening/controller";
 import type { TemplateLoadOptions } from "../../services/projects/templates/motion/loader";
 import { isMotionTemplateId } from "../../services/projects/templates/motion/identity";
 const LandingPage = lazy(() =>
@@ -139,7 +140,16 @@ function ProjectDashboard({
       if (current.pending || !current.alive) return false;
       current.pending = true;
       setBusy(true);
+      const opening = currentProjectOpening();
+      if (opening) await opening.painted();
+      if (!current.alive) {
+        opening?.close();
+        current.pending = false;
+        return false;
+      }
       const ok = await onTask(task, success);
+      if (ok) opening?.installed();
+      else opening?.close();
       current.pending = false;
       if (!current.alive) return false;
       setBusy(false);
@@ -148,6 +158,9 @@ function ProjectDashboard({
     [onTask],
   );
   function complete(task: () => void | Promise<void>) {
+    if (scope.current.pending || !scope.current.alive) return;
+    const request = templateRequest.current;
+    beginProjectOpening(request ? () => request.abort() : undefined);
     void perform(task).then((ok) => {
       if (ok && scope.current.alive) onClose();
     });
@@ -306,7 +319,11 @@ function ProjectDashboard({
               view={view}
               busy={busy}
               onViewChange={changeView}
-              onChooseRecent={(id) => complete(() => services.openProject(id))}
+              onChooseRecent={(id) =>
+                complete(async () => {
+                  await Promise.all([onPrepareEditor?.(), services.openProject(id)]);
+                })
+              }
               onPreferences={() => preferenceStore.set(preferences, true)}
             />
           </div>
@@ -391,6 +408,7 @@ function ProjectDashboard({
                                   if (scope.current.alive) onClose();
                                 }}
                                 onCreate={custom}
+                                onPrepareEditor={onPrepareEditor}
                                 query={queries.projects}
                                 hideSearch
                                 mode={libraryMode}

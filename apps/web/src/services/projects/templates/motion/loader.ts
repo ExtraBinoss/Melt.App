@@ -8,7 +8,7 @@ import type { ProjectTiming } from "../../../performance/project-timing";
 import { isDesignedTemplateId } from "../designed/catalog";
 import { prepareDesignedTemplate } from "../designed/load";
 import { isMotionTemplateId } from "./identity";
-import { isOriginalMediaAsset, parseProject, type Project } from "@musart/core";
+import { isOriginalMediaAsset, validateProject, type Project } from "@musart/core";
 import type { EditorServices } from "../../../../state/contracts";
 import { i18n } from "../../../../state/i18n";
 import type { MediaOriginalInput } from "../../media/model";
@@ -110,7 +110,10 @@ export function parseMotionTemplateManifest(
       manifest.originals.length > 16
     )
       throw Error();
-    const project = parseProject(JSON.stringify(manifest.project));
+    // The bounded response has already been parsed. Validate it directly rather
+    // than serializing and parsing the complete document a second time.
+    validateProject(manifest.project);
+    const project = manifest.project;
     if (project.pages.length !== 1 || project.pages[0]!.motion?.mode !== "motion") throw Error();
     const media = Object.values(project.assets).filter(isOriginalMediaAsset);
     const seen = new Set<string>();

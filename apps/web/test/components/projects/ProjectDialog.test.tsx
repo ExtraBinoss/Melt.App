@@ -5,6 +5,15 @@ import { ProjectDialog } from "../../../src/components/projects/ProjectDialog";
 import { setup } from "../../support/ui";
 import { projectSummary } from "../../support/projects";
 import * as templates from "../../../src/services/projects/templates/catalog";
+// Presentation timing is verified by the opening controller and native browser cases.
+vi.mock("../../../src/components/projects/opening/controller", () => ({
+  beginProjectOpening: vi.fn(() => ({
+    painted: () => Promise.resolve(),
+    installed() {},
+    close() {},
+  })),
+  currentProjectOpening: () => undefined,
+}));
 test("editor creation Escape closes without mounting the library or editing the document", async () => {
   const d = setup(),
     close = vi.fn();
@@ -284,7 +293,7 @@ test("a pending gallery open cannot race a second open or import, and cannot clo
   fireEvent.change(screen.getByLabelText("Importer .musart", { selector: "input" }), {
     target: { files: [new File(["{}"], "other.musart")] },
   });
-  expect(d.services.openProject).toHaveBeenCalledExactlyOnceWith("project-a");
+  await waitFor(() => expect(d.services.openProject).toHaveBeenCalledExactlyOnceWith("project-a"));
   expect(d.services.openPortable).not.toHaveBeenCalled();
   view.unmount();
   await act(async () => finish());
@@ -311,9 +320,7 @@ test("welcome opens the landing page and enters the library without creating a d
   const d = setup(),
     close = vi.fn();
   d.mount(<ProjectDialog welcome services={d.services} onClose={close} onTask={d.onTask} />);
-  expect(
-    await screen.findByRole("heading", { name: "Créez simplement. Animez comme un pro." }),
-  ).toBeVisible();
+  expect(await screen.findByRole("heading", { name: "Créez et animez." })).toBeVisible();
   expect(d.services.listProjectPage).not.toHaveBeenCalled();
   fireEvent.click(screen.getAllByRole("button", { name: "Commencer à créer" })[0]!);
   await screen.findByRole("dialog", { name: "Tableau de bord Melt" });
@@ -368,9 +375,7 @@ test("the library brand returns to landing without modifying the open document",
   d.mount(<ProjectDialog services={d.services} onClose={vi.fn()} onTask={d.onTask} />);
   await screen.findByText("Aucun projet enregistré.");
   fireEvent.click(screen.getByRole("button", { name: "Accueil Melt" }));
-  expect(
-    await screen.findByRole("heading", { name: "Créez simplement. Animez comme un pro." }),
-  ).toBeVisible();
+  expect(await screen.findByRole("heading", { name: "Créez et animez." })).toBeVisible();
   expect(d.services.createProject).not.toHaveBeenCalled();
   fireEvent.click(screen.getByRole("button", { name: "Try Melt" }));
   expect(screen.getByRole("dialog", { name: "Tableau de bord Melt" })).toBeVisible();

@@ -27,7 +27,7 @@ test("pending recent-project metadata uses the shared throbber and retires it af
   );
   d.mount(<LibrarySidebar {...props(d)} />);
   expect(
-    document.querySelector('.library-sidebar-status .ui-throbber[data-active="true"]'),
+    document.querySelector('.library-sidebar-status .ui-throbber[data-visible="true"]'),
   ).not.toBeNull();
   expect(screen.queryByText("Vos prochains projets apparaîtront ici.")).toBeNull();
   await act(async () => done({ projects: [], before: null }));
