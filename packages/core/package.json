@@ -5,7 +5,8 @@
   "license": "MIT",
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./presets": "./src/layout/default-presets.ts"
   },
   "dependencies": {
     "@musart/path-morph": "workspace:*",

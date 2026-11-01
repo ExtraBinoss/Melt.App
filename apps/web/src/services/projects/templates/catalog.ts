@@ -1,6 +1,6 @@
 import { MOTION_TEMPLATE_ASSET_REVISIONS } from "./motion/asset-revisions";
 import { beginProjectTiming } from "../../performance/project-timing";
-import { PRESETS, createProject, serializeProject } from "@musart/core";
+import { PRESETS } from "@musart/core/presets";
 import type { EditorServices } from "../../../state/contracts";
 import type { TemplateLoadOptions } from "./motion/loader";
 import { isMotionTemplateId } from "./motion/identity";
@@ -124,6 +124,7 @@ async function openProjectTemplate(
     return;
   }
   if (templateId === "afterhours-techno") {
+    const { createProject, serializeProject } = await import("@musart/core");
     const { createTechnoArtboard } = await import("./afterhours-techno/build");
     const project = createProject({
       id: crypto.randomUUID(),

@@ -29,7 +29,7 @@ test("lists at most five recent durable IDs and delegates navigation/open withou
   await screen.findByRole("button", { name: "Ouvrir le projet récent Recent 0" });
   expect(d.services.listProjectPage).toHaveBeenCalledExactlyOnceWith({ limit: 5 });
   expect(screen.getAllByRole("button", { name: /Ouvrir le projet récent/ })).toHaveLength(5);
-  expect(screen.getByRole("button", { name: /Communauté · Bientôt/ })).toBeDisabled();
+  expect(screen.getByRole("button", { name: /Communauté Bientôt/ })).toBeDisabled();
   expect(screen.getByRole("button", { name: "Projets" })).toHaveAttribute("aria-current", "page");
   fireEvent.click(screen.getByRole("button", { name: "Templates" }));
   expect(p.onViewChange).toHaveBeenCalledExactlyOnceWith("templates");

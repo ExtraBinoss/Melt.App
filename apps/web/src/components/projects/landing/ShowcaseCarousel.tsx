@@ -72,6 +72,7 @@ export function ShowcaseCarousel({
                   src={template.preview}
                   alt=""
                   loading={index < 2 ? "eager" : "lazy"}
+                  fetchPriority={index === 0 ? "high" : undefined}
                   draggable={false}
                   width={template.width}
                   height={template.height}

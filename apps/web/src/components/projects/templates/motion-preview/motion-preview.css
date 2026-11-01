@@ -8,7 +8,8 @@
 }
 .motion-template-preview > img,
 .motion-template-preview-canvas,
-.motion-template-preview-canvas > canvas {
+.motion-template-preview-canvas > canvas,
+.motion-template-preview-canvas > video {
   display: block;
   width: 100%;
   height: 100%;
@@ -20,7 +21,8 @@
   opacity: 0;
   pointer-events: none;
 }
-.motion-template-preview[data-preview-status="playing"] .motion-template-preview-canvas {
+.motion-template-preview:is([data-preview-status="playing"], [data-preview-status="paused"])
+  .motion-template-preview-canvas {
   opacity: 1;
 }
 .motion-template-preview-status {

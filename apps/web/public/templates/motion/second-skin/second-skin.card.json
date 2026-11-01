@@ -1,0 +1,9 @@
+{
+  "templateId": "second-skin",
+  "sourceRevision": "79f224ff4f88",
+  "manifestSha256": "b16eb596d24a7a223d0a5728448e7f7505f5fcacb431e82eb7bc0368501098c6",
+  "sha256": "28370abb033b8771a5042c249e9bb20384e3a9dfc28e04a3f795b4f147aec181",
+  "bytes": 352205,
+  "fps": 25,
+  "edge": 480
+}

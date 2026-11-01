@@ -1,5 +1,6 @@
 /* The library is a destination. Its sidebar collapses into tabs on phones. */
 .project-dashboard[data-slot="dialog-content"] {
+  --muted-foreground: color-mix(in srgb, var(--foreground) 72%, var(--background));
   inset: 0;
   transform: none;
   translate: none;

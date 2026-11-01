@@ -81,15 +81,9 @@ export function LibrarySidebar({
           <FolderOpen size={17} strokeWidth={1.6} />
           <span>{t("projects")}</span>
         </button>
-        <button
-          type="button"
-          className="library-navigation-item library-community"
-          aria-label={`${t("community")} · ${t("soon")}`}
-          disabled
-        >
+        <button type="button" className="library-navigation-item library-community" disabled>
           <Users size={17} strokeWidth={1.6} />
-          <span>{t("community")}</span>
-          <small>{t("soon")}</small>
+          <span>{t("community")}</span> <small>{t("soon")}</small>
         </button>
       </nav>
       <div className="library-sidebar-divider" />

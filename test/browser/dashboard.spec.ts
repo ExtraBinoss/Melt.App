@@ -54,7 +54,7 @@ test("first launch enters the empty library; the visible techno template creates
     "page",
   );
   await expect(
-    navigation.getByRole("button", { name: "Communauté · Bientôt", exact: true }),
+    navigation.getByRole("button", { name: "Communauté Bientôt", exact: true }),
   ).toBeDisabled();
   await expect(
     dashboard.getByRole("heading", { name: "Quel projet voulez-vous créer ?", exact: true }),

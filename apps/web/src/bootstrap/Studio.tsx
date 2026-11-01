@@ -1,4 +1,4 @@
-import { preloadEditor, scheduleStudioPreload } from "./preload";
+import { preloadEditor } from "./preload";
 import { createRenderActivity } from "../services/session/render-activity";
 import { MeltLogo } from "../ui/brand/MeltLogo";
 import { StudioPreparation } from "./StudioPreparation";
@@ -83,15 +83,6 @@ export function Studio({ routing }: { routing?: StudioRouting } = {}) {
       .openProject(routing.projectId)
       .catch((failure: unknown) => setError(formatUiError(failure)));
   }, [runtime, routing?.projectId]);
-  useEffect(() => {
-    if (!runtime || editorOpened || routing?.view !== "dashboard") return;
-    return scheduleStudioPreload(
-      prepareEditor,
-      window,
-      2000,
-      () => !document.querySelector('[data-preview-status="playing"]'),
-    );
-  }, [runtime, editorOpened, routing?.view]);
   return (
     <>
       {runtime && !editorOpened && routing ? (

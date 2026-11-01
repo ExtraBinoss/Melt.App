@@ -59,6 +59,39 @@ export async function generateSecondSkin(output = "apps/web/public/templates/mot
     ["commands.json", JSON.stringify({ version: 1, initial, batches })],
   ])
     await writeFile(resolve(output, `second-skin.${extension}`), contents + "\n");
+  // Cards decode a small untreated derivative; opening/exporting still installs the original.
+  const file = "second-skin-preview.mp4";
+  const previewBytes = await readFile(resolve(output, "media", file));
+  const previewDigest = createHash("sha256").update(previewBytes).digest("hex");
+  const previewVideo: VideoAsset = {
+    ...video,
+    ...(await inspectTemplateVideo(resolve(output, "media", file))),
+    originalId: `second-skin-preview-${previewDigest}`,
+    contentRevision: `sha256:${previewDigest}`,
+    byteLength: previewBytes.byteLength,
+  };
+  if (
+    previewVideo.width !== 270 ||
+    previewVideo.height !== 480 ||
+    previewVideo.duration.value / previewVideo.duration.rate !== 10 ||
+    previewBytes.byteLength > 400_000
+  )
+    throw Error("Second Skin preview must be a bounded 270 × 480 ten-second derivative.");
+  const preview: MotionTemplateManifest = {
+    ...manifest,
+    project: { ...project, assets: { [video.id]: previewVideo } },
+    originals: [
+      {
+        originalId: previewVideo.originalId,
+        contentRevision: previewVideo.contentRevision,
+        file: `second-skin/media/${file}`,
+        byteLength: previewVideo.byteLength,
+        mime: video.mime,
+      },
+    ],
+  };
+  validateProject(preview.project);
+  await writeFile(resolve(output, "second-skin.preview.json"), JSON.stringify(preview) + "\n");
   return manifest;
 }
 if (import.meta.main)

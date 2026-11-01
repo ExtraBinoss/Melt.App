@@ -2,6 +2,10 @@ import { expect, test } from "vitest";
 import { readFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
 import {
+  MOTION_TEMPLATE_ASSET_REVISIONS,
+  MOTION_TEMPLATE_CARD_CLIPS,
+} from "../../../../../src/services/projects/templates/motion/asset-revisions";
+import {
   EditorEngine,
   compileMotion,
   evaluateMotion,
@@ -75,6 +79,32 @@ test("ships replayable validated data, a verified owned media original and rejec
   expect(parseProject(await readFile(`${root}/second-skin.musart`, "utf8"))).toEqual(
     manifest.project,
   );
+  const preview = parseMotionTemplateManifest(
+    JSON.parse(await readFile(`${root}/second-skin.preview.json`, "utf8")),
+    "second-skin",
+  );
+  expect(preview.project.pages).toEqual(manifest.project.pages);
+  const derivative = preview.originals[0]!;
+  expect(derivative.originalId).not.toBe(original.originalId);
+  expect(derivative.byteLength).toBeLessThan(original.byteLength / 10);
+  const previewBytes = await readFile("apps/web/public/templates/motion/" + derivative.file);
+  expect(previewBytes.byteLength).toBe(derivative.byteLength);
+  expect("sha256:" + createHash("sha256").update(previewBytes).digest("hex")).toBe(
+    derivative.contentRevision,
+  );
+  expect(preview.project.assets["skin-video"]).toMatchObject({ width: 270, height: 480 });
+  const card = JSON.parse(await readFile(`${root}/second-skin.card.json`, "utf8"));
+  expect(card.sourceRevision).toBe(MOTION_TEMPLATE_ASSET_REVISIONS["second-skin"]);
+  expect(card.sourceRevision).toBe(MOTION_TEMPLATE_CARD_CLIPS["second-skin"]!.sourceRevision);
+  expect(card.manifestSha256).toBe(
+    createHash("sha256")
+      .update(await readFile(`${root}/second-skin.json`))
+      .digest("hex"),
+  );
+  const clip = await readFile(`${root}/second-skin.card.mp4`);
+  expect(clip.byteLength).toBe(card.bytes);
+  expect(createHash("sha256").update(clip).digest("hex")).toBe(card.sha256);
+  expect(card.sha256.startsWith(MOTION_TEMPLATE_CARD_CLIPS["second-skin"]!.revision)).toBe(true);
   const journal = JSON.parse(await readFile(`${root}/second-skin.commands.json`, "utf8"));
   const engine = new EditorEngine(journal.initial, { now: () => journal.initial.createdAt });
   for (const batch of journal.batches) engine.transaction(batch);

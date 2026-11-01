@@ -92,7 +92,7 @@ test("library keeps five decoded recent thumbnails, a real Home action and Stati
   const sidebar = page.locator(".library-sidebar");
   await expect(sidebar).toBeVisible();
   await expect(
-    sidebar.getByRole("button", { name: "Communauté · Bientôt", exact: true }),
+    sidebar.getByRole("button", { name: "Communauté Bientôt", exact: true }),
   ).toBeDisabled();
   await expect(sidebar.locator(".library-recent-project")).toHaveCount(5);
   await expect

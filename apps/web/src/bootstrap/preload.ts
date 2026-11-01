@@ -32,33 +32,3 @@ export function preloadStudio(): Promise<unknown> {
   });
   return studio;
 }
-/** Use landing-page idle time, with explicit cancellation and data-saving preferences. */
-export function scheduleStudioPreload(
-  prepare: () => Promise<unknown> = preloadStudio,
-  surface: Window = window,
-  delayMs = 0,
-  enabled: () => boolean = () => true,
-): () => void {
-  const connection = (surface.navigator as Navigator & { connection?: { saveData?: boolean } })
-    .connection;
-  if (connection?.saveData || surface.document.hidden) return () => {};
-  let cancelled = false,
-    timer: number | undefined,
-    idle: number | undefined;
-  const run = () => {
-    if (!cancelled && !surface.document.hidden && enabled()) void prepare().catch(() => {});
-  };
-  const queue = () => {
-    if (cancelled) return;
-    if (typeof surface.requestIdleCallback === "function")
-      idle = surface.requestIdleCallback(run, { timeout: 2500 });
-    else timer = surface.setTimeout(run, 800);
-  };
-  if (delayMs > 0) timer = surface.setTimeout(queue, delayMs);
-  else queue();
-  return () => {
-    cancelled = true;
-    if (timer !== undefined) surface.clearTimeout(timer);
-    if (idle !== undefined) surface.cancelIdleCallback(idle);
-  };
-}
