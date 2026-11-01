@@ -6,6 +6,7 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Add Second Skin, a fully editable portrait dancer loop with native Thermal and Scharr contour Motion treatments, sparse typography actions, a real GPU poster and a pinned licensed local video. Support validated media originals inside each template’s own folder while retaining shared legacy originals, and register Motion template error translations before reporting failures.
 - Version retained template sources as well as their downloads, retire active preview owners when their poster revision changes, and invalidate the final Bloom Windows and Melt Mascot posters using their rendered content hashes.
 - Restore normal themed switches inside effect popovers by removing their white-background override. Add radial-handle help after 500 ms in all twelve application languages, enlarge invisible pointer targets while retaining compact knobs and preserve grab offsets, popup ownership, keyboard access and single-entry undo.
 - Keep applied-effect popover geometry stable while deferred controls mount, avoiding collision repositioning, and retain trailing padding when long parameter lists scroll to their end.

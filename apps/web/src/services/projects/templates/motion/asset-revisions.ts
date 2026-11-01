@@ -2,6 +2,7 @@ import type { MotionTemplateId } from "./model";
 /** Change poster and portable source together so a new visual cannot play an older cached document. */
 export const MOTION_TEMPLATE_ASSET_REVISIONS: Readonly<Partial<Record<MotionTemplateId, string>>> =
   Object.freeze({
+    "second-skin": "79f224ff4f88",
     "terminal-signal": "1",
     "angel-windows": "1",
     "cornell-box": "4",

@@ -5,6 +5,7 @@ validated installation service. Templates remain fully editable documents.
 
 | Template         | Format              | Demonstrated capabilities                                                  |
 | ---------------- | ------------------- | -------------------------------------------------------------------------- |
+| Second Skin | 1080 × 1920, 10 s | One shared dancer original, Thermal/Scharr contour transformations and sparse native typography Motion |
 | Terminal Signal  | 1080 × 1920, 16 s   | Curved green terminal, editable typing, sparse Motion actions              |
 | Angel.exe        | 1080 × 1920, 12.8 s | Rotating imported 3D model, ASCII desktop and effect windows               |
 | Cornell Box      | 1080 × 1080, 8 s    | Shared native 3D scene, chrome type, shadows/reflections and camera orbit  |

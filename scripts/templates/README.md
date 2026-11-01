@@ -3,6 +3,7 @@
 Each current template owns its generator and specific preparation helpers:
 
 ```sh
+bun scripts/templates/second-skin/generate.ts
 bun scripts/templates/terminal-signal/generate.ts
 bun scripts/templates/angel-windows/generate.ts
 bun scripts/templates/cornell-box/generate.ts

@@ -4,6 +4,7 @@ import type { Project } from "@musart/core";
 import { installReadbackProbe } from "./support/readback-probe";
 
 const retained = [
+  "Second Skin",
   "Terminal Signal",
   "Angel.exe",
   "Cornell Box",
@@ -50,7 +51,7 @@ test("curated gallery loads per-template posters, omits retired designs and pers
       gallery.getByRole("button", { name: new RegExp(`Créer depuis ${name}`) }),
     ).toHaveCount(0);
   const posters = gallery.locator('.template-grid img[src*="/templates/"]');
-  await expect(posters).toHaveCount(6);
+  await expect(posters).toHaveCount(7);
   await expect
     .poll(() =>
       posters.evaluateAll((images) =>

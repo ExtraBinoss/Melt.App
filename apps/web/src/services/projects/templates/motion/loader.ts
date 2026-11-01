@@ -1,3 +1,4 @@
+import { isTemplateOriginalPath } from "./paths";
 import {
   MOTION_TEMPLATE_ASSET_REVISIONS,
   MOTION_TEMPLATE_PREVIEW_REVISIONS,
@@ -13,7 +14,8 @@ import { i18n } from "../../../../state/i18n";
 import type { MediaOriginalInput } from "../../media/model";
 import type { MotionTemplateId, MotionTemplateManifest } from "./model";
 
-import { messages as resources } from "./messages";
+import "./messages";
+import type { messages as resources } from "./messages";
 
 export class MotionTemplateError extends Error {
   constructor(readonly code: keyof typeof resources.en) {
@@ -115,9 +117,7 @@ export function parseMotionTemplateManifest(
     for (const original of manifest.originals) {
       if (
         !original ||
-        typeof original.file !== "string" ||
-        !/^media\/[a-zA-Z0-9][a-zA-Z0-9.-]*\.(?:mp4|wav)$/.test(original.file) ||
-        original.file.includes("..") ||
+        !isTemplateOriginalPath(id, original.file) ||
         !Number.isSafeInteger(original.byteLength) ||
         original.byteLength <= 0 ||
         original.byteLength > 8 * 1024 * 1024 ||

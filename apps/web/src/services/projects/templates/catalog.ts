@@ -3,6 +3,7 @@ import { beginProjectTiming } from "../../performance/project-timing";
 import { PRESETS, createProject, serializeProject } from "@musart/core";
 import type { EditorServices } from "../../../state/contracts";
 import type { TemplateLoadOptions } from "./motion/loader";
+import { isMotionTemplateId } from "./motion/identity";
 import { isDesignedTemplateId } from "./designed/catalog";
 
 export interface ProjectTemplate {
@@ -18,6 +19,17 @@ export interface ProjectTemplate {
   readonly descriptionKey?: string;
 }
 export const TEMPLATE_CATALOG: readonly ProjectTemplate[] = Object.freeze([
+  Object.freeze({
+    id: "second-skin",
+    nameKey: "templates:secondSkin",
+    descriptionKey: "templates:secondSkinDescription",
+    width: 1080,
+    height: 1920,
+    mode: "motion",
+    category: "artwork",
+    previewBackground: "#08090b",
+    preview: `${import.meta.env.BASE_URL}templates/motion/second-skin/second-skin.webp?v=${MOTION_TEMPLATE_ASSET_REVISIONS["second-skin"]!}`,
+  }),
   Object.freeze({
     id: "terminal-signal",
     nameKey: "templates:terminalSignal",
@@ -106,17 +118,7 @@ async function openProjectTemplate(
     await openDesignedTemplate(services, templateId, options);
     return;
   }
-  if (
-    templateId === "terminal-signal" ||
-    templateId === "morphing-type" ||
-    templateId === "in-bloom" ||
-    templateId === "bloom-windows" ||
-    templateId === "angel-windows" ||
-    templateId === "cornell-box" ||
-    templateId === "motion-stress-lab" ||
-    templateId === "sound-playground" ||
-    templateId === "share-your-work"
-  ) {
+  if (isMotionTemplateId(templateId)) {
     const { openMotionTemplate } = await import("./motion/loader");
     await openMotionTemplate(services, templateId, options);
     return;

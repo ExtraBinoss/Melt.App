@@ -18,7 +18,7 @@ const ports = () => ({
   ),
 });
 test("publishes exact canonical canvas formats and the editable artwork template", async () => {
-  expect(new Set(TEMPLATE_CATALOG.map((item) => item.id)).size).toBe(PRESETS.length + 6);
+  expect(new Set(TEMPLATE_CATALOG.map((item) => item.id)).size).toBe(PRESETS.length + 7);
   expect(Object.isFrozen(TEMPLATE_CATALOG)).toBe(true);
   const services = ports();
   for (const preset of PRESETS) {
@@ -48,6 +48,7 @@ test("routes Motion bundles to the binary-capable installation service and keeps
   const signal = new AbortController().signal;
   const expectedOrigin = { projectId: "origin", pageId: "composition", revision: 3 };
   for (const id of [
+    "second-skin",
     "terminal-signal",
     "morphing-type",
     "bloom-windows",
@@ -134,6 +135,7 @@ test("retires the eight legacy designs from every public catalog consumer", () =
       .filter((template) => template.preview)
       .map((template) => template.id),
   ).toEqual([
+    "second-skin",
     "terminal-signal",
     "angel-windows",
     "cornell-box",

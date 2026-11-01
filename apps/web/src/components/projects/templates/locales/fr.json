@@ -36,5 +36,7 @@
   "cornellBox": "Cornell Box",
   "cornellBoxDescription": "Une étude 3D en boucle avec un texte chromé, des murs colorés et des ombres portées.",
   "terminalSignal": "Terminal Signal",
-  "terminalSignalDescription": "16 s · Terminal vert, frappe éditable, texte défilant et écran CRT incurvé · 9:16"
+  "terminalSignalDescription": "16 s · Terminal vert, frappe éditable, texte défilant et écran CRT incurvé · 9:16",
+  "secondSkin": "Second Skin",
+  "secondSkinDescription": "10 s · Danse, traitements thermiques et contours, typographie éditable"
 }

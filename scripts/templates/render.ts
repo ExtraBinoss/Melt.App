@@ -1,3 +1,4 @@
+import { isTemplateOriginalPath } from "../../apps/web/src/services/projects/templates/motion/paths";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { parseArgs } from "node:util";
@@ -46,6 +47,7 @@ export function validateCoverOptions(options: CoverOptions): void {
     new Set(options.ids).size !== options.ids.length ||
     options.ids.some(
       (id) =>
+        id !== "second-skin" &&
         id !== "terminal-signal" &&
         id !== "in-bloom" &&
         id !== "bloom-windows" &&
@@ -72,6 +74,14 @@ export async function renderTemplateCovers(options: CoverOptions) {
       if (manifest.version !== 1 || manifest.templateId !== id)
         throw Error("Invalid generated template manifest.");
       validateProject(manifest.project);
+      for (const original of manifest.originals ?? [])
+        if (
+          !isTemplateOriginalPath(id, original.file) ||
+          (original.file.endsWith(".mp4")
+            ? original.mime !== "video/mp4"
+            : original.mime !== "audio/wav")
+        )
+          throw Error("Unsafe original path.");
       return manifest;
     }),
   );
@@ -110,14 +120,6 @@ export async function renderTemplateCovers(options: CoverOptions) {
           )) as typeof import("../../packages/render/src/index");
           const originals = new Map<string, { revision: string; blob: Blob }>();
           for (const original of input.manifest.originals ?? []) {
-            if (
-              !/^media\/[a-zA-Z0-9][a-zA-Z0-9.-]*\.(mp4|wav)$/.test(original.file) ||
-              original.file.includes("..") ||
-              (original.file.endsWith(".mp4")
-                ? original.mime !== "video/mp4"
-                : original.mime !== "audio/wav")
-            )
-              throw Error("Unsafe original path.");
             const response = await fetch(
               new URL(`templates/motion/${original.file}`, input.baseUrl),
             );

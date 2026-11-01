@@ -1,6 +1,6 @@
 # Project template ownership
 
-The public `TEMPLATE_CATALOG` contains six curated artwork templates and the
+The public `TEMPLATE_CATALOG` contains seven curated artwork templates and the
 canonical blank canvas formats. Search, the dashboard, project dialogs and landing
 cards consume that catalog. Retired designs are absent from it.
 
