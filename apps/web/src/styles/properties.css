@@ -375,6 +375,12 @@
   gap: 6px;
   margin-top: 10px;
 }
+.motion-property-field.position-visibility {
+  margin-block: 12px 14px;
+}
+.position-visibility + .image-scale {
+  margin-top: 0;
+}
 .guide-actions {
   display: flex;
   gap: 6px;

@@ -387,6 +387,7 @@ export const Inspector = memo(
                           field("radius", t("cornerRadius"), 0, 4096)}
                       </div>
                       <MotionField
+                        className="position-visibility"
                         engine={engine}
                         target={{ kind: "layer", layerId: layer.id, property: "visible" }}
                         label={t("motionProperties:visibility")}

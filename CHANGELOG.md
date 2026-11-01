@@ -6,6 +6,7 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Add space above and below Inspector visibility controls, retain normal image-scale spacing and document the supplied native click trace and accelerated-rendering checks.
 - Retain unchanged layer actions, closed effect/mask controls, alignment tools, artboard controls, Motion diamonds and numeric input leaves across history publications. Keep authoritative values, fresh guarded actions, focus, cancellation, ruler-only metadata compatibility and mobile slider ranges; release shared observations when their final consumer unmounts. Retain unchanged solid color controls and keep the actual palette synchronized through color undo/redo and native sampling.
 - Register the guide feature resources when its controls load, restoring translated guide actions and labels in the Inspector.
 - Allow dragging all four selection borders alongside the visible resize handles, with zoom-sized hit areas, existing resize constraints and one cancelable history transaction. Keep visible points available for keyboard access.
