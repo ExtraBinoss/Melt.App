@@ -6,6 +6,7 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Align right scroll fades with the actual content edge when native scrollbars overlay the viewport, removing the exposed strip in the Motion timeline while preserving reserved scrollbar gutters and native scrolling.
 - Retain unchanged Animations timeline layer rows and occurrence projections across background metadata edits, while resolving selection, clip trimming, gap insertion and native drag against the current canonical composition and rejecting replaced sources.
 - Skip portal and presence controllers for unvisited tooltips, preserving genuine Radix first activation, accessible content, controlled opening, exit animations and explicit force mounting.
 - Verify retained timeline actions with native background-edit, reorder, finite-range movement, undo and autoscroll witnesses; align the native drag probe with Start document hydration.

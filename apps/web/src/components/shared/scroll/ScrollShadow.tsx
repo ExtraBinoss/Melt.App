@@ -62,9 +62,10 @@ export function ScrollShadow({
         left = viewport.scrollLeft;
       maximumTop = Math.max(0, viewport.scrollHeight - height);
       maximumLeft = Math.max(0, scrollWidth - width);
-      // Overlay scrollbars occupy no layout gutter. Keep the shared six-pixel bar clear too.
+      // Keep the shared bottom bar clear. Side fades follow the actual native gutter:
+      // overlay scrollbars reserve no space, so their content must fade to the outer edge.
       const bottom = Math.max(viewport.offsetHeight - height, maximumLeft > 1 ? 6 : 0),
-        right = Math.max(viewport.offsetWidth - width, maximumTop > 1 ? 6 : 0);
+        right = Math.max(0, viewport.offsetWidth - width);
       if (bottom !== bottomGutter) {
         bottomGutter = bottom;
         wrapper.style.setProperty("--scroll-shadow-scrollbar-bottom", `${bottom}px`);

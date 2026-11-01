@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { mkdir } from "node:fs/promises";
 import { fixture, prepare } from "./support/motion-canvas";
 
 test.use({ launchOptions: { ignoreDefaultArgs: ["--hide-scrollbars"] } });
@@ -55,4 +56,57 @@ test("timeline modes keep native scrollbar geometry stable and peek hides vertic
   });
   expect(await viewport.evaluate((node) => node.scrollTop)).toBeGreaterThan(0);
   expect(await page.evaluate(() => window.musart!.snapshot().project)).toEqual(before);
+});
+
+test("right timeline fade reaches the content edge with reserved and overlay scrollbar geometry", async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    localStorage.setItem("musart.language", "fr");
+    localStorage.setItem("musart.theme", "light");
+    localStorage.setItem("musart.onboarding.v1", JSON.stringify({ version: 1, completed: true }));
+  });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await prepare(page, fixture(12));
+  await page.evaluate(() => window.musart!.select(["card"]));
+  await page.getByRole("slider", { name: "Zoom de la timeline", exact: true }).focus();
+  await page.keyboard.press("End");
+  const viewport = page.locator(".motion-timeline-scroll"),
+    shadow = page.locator(".motion-scroll-shadow");
+  const readEdge = () =>
+    viewport.evaluate((node) => {
+      const end = node.parentElement!.querySelector<HTMLElement>(".scroll-shadow-inline-end")!;
+      return {
+        gap:
+          node.getBoundingClientRect().left +
+          node.clientLeft +
+          node.clientWidth -
+          end.getBoundingClientRect().right,
+        gutter: node.offsetWidth - node.clientWidth,
+      };
+    });
+  await expect(shadow).toHaveAttribute("data-overflow-right", "");
+  await expect.poll(async () => Math.abs((await readEdge()).gap)).toBeLessThan(0.5);
+  expect((await readEdge()).gutter).toBeGreaterThan(0);
+  // No reserved gutter, as with overlay scrollbars: authored pixels reach the outer edge.
+  await viewport.evaluate((node) => {
+    node.style.scrollbarGutter = "auto";
+    node.style.scrollbarWidth = "none";
+  });
+  await expect.poll(async () => (await readEdge()).gutter).toBe(0);
+  await expect.poll(async () => Math.abs((await readEdge()).gap)).toBeLessThan(0.5);
+  await expect(shadow.locator(":scope > .scroll-shadow-inline-end")).toHaveCSS(
+    "pointer-events",
+    "none",
+  );
+  await mkdir("artifacts/scroll-shadow-edge", { recursive: true });
+  await shadow.screenshot({ path: "artifacts/scroll-shadow-edge/after-overlay.png" });
+  const bounds = (await viewport.boundingBox())!;
+  await page.mouse.move(bounds.x + bounds.width - 20, bounds.y + 80);
+  await page.mouse.wheel(600, 0);
+  await expect.poll(() => viewport.evaluate((node) => node.scrollLeft)).toBeGreaterThan(0);
+  await viewport.evaluate((node) => {
+    node.scrollLeft = node.scrollWidth;
+  });
+  await expect(shadow).not.toHaveAttribute("data-overflow-right");
 });

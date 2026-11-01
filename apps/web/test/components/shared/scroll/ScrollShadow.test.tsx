@@ -95,7 +95,7 @@ test("scroll boundaries update shadows imperatively, preserve the viewport, and 
   expect(disconnect).toHaveBeenCalled();
 });
 
-test("keeps fades above scrollbars and caches layout measurements between resize notifications", () => {
+test("respects native gutters, reaches overlay scrollbar edges and caches layout measurements", () => {
   let resize!: ResizeObserverCallback;
   vi.stubGlobal(
     "ResizeObserver",
@@ -139,7 +139,7 @@ test("keeps fades above scrollbars and caches layout measurements between resize
   });
   act(() => resize([], {} as ResizeObserver));
   expect(root.style.getPropertyValue("--scroll-shadow-scrollbar-bottom")).toBe("6px");
-  expect(root.style.getPropertyValue("--scroll-shadow-scrollbar-right")).toBe("6px");
+  expect(root.style.getPropertyValue("--scroll-shadow-scrollbar-right")).toBe("0px");
   view.unmount();
 });
 test("changing the viewport type rebinds observation to the new element", () => {
@@ -304,7 +304,7 @@ test("axis changes clear retired flags, preserve vertical defaults and remeasure
   expect(root).toHaveAttribute("data-overflow-right");
   expect(root).not.toHaveAttribute("data-overflow-top");
   expect(root).not.toHaveAttribute("data-overflow-bottom");
-  expect(root.style.getPropertyValue("--scroll-shadow-scrollbar-right")).toBe("6px");
+  expect(root.style.getPropertyValue("--scroll-shadow-scrollbar-right")).toBe("0px");
   expect(root.style.getPropertyValue("--scroll-shadow-scrollbar-bottom")).toBe("6px");
   Object.defineProperties(viewport, { scrollWidth: { value: 200 }, scrollHeight: { value: 100 } });
   fireEvent.scroll(viewport, { target: { scrollLeft: 0, scrollTop: 0 } });
