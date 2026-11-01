@@ -16,13 +16,18 @@
   stroke: #a7f3d0;
 }
 .effect-gizmo-handle {
-  fill: #17232d;
-  stroke: #a8deff;
+  fill: transparent;
+  stroke: none;
   pointer-events: all;
   cursor: crosshair;
   touch-action: none;
   outline: none;
 }
-.effect-gizmo-handle:focus-visible {
+.effect-gizmo-knob {
+  fill: #17232d;
+  stroke: #a8deff;
+  pointer-events: none;
+}
+.effect-gizmo-handle:focus-visible + .effect-gizmo-knob {
   fill: #2b72b8;
 }

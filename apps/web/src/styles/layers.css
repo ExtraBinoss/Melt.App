@@ -404,9 +404,6 @@
   padding: 0;
   border: 0;
 }
-.layer-attachment-popover [data-slot="switch"][data-state="checked"] {
-  background: var(--foreground);
-}
 .layer-row:focus-visible {
   outline: 1px solid color-mix(in srgb, var(--foreground) 40%, transparent);
 }

@@ -1,0 +1,12 @@
+{
+  "center": "效果中心",
+  "radius": "效果半径",
+  "innerRadius": "保护区域半径",
+  "feather": "羽化边界",
+  "hint": "拖动中心或半径 · 按 Escape 取消",
+  "centerHelp": "拖动以移动效果中心。",
+  "radiusHelp": "拖动以调整效果的作用范围。",
+  "innerRadiusHelp": "拖动以调整保护区域的大小。",
+  "featherHelp": "拖动以调整清晰区域与模糊区域之间的过渡。",
+  "keyboardHelp": "方向键：1 px · Shift：10 px · Escape：取消。"
+}

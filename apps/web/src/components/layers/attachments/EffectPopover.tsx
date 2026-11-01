@@ -109,6 +109,15 @@ export function EffectPopover({
           align="start"
           className="floating-panel layer-attachment-popover"
           aria-label={`${t("effects")} · ${layer.name}`}
+          onInteractOutside={(event) => {
+            const target = event.detail.originalEvent.target;
+            const id =
+              target instanceof Element
+                ? target.closest<SVGSVGElement>(".effect-gizmo")?.dataset.effectGizmoId
+                : undefined;
+            if (id && (effectId ? id === effectId : layer.effects.some((item) => item.id === id)))
+              event.preventDefault();
+          }}
           onKeyDown={(event) => {
             if (isCurrent() && attachmentDeleteKey(event.nativeEvent, engine, runCurrent)) {
               event.preventDefault();

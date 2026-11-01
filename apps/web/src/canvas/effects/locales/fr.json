@@ -2,5 +2,11 @@
   "center": "Centre de l’effet",
   "radius": "Rayon de l’effet",
   "innerRadius": "Rayon protégé",
-  "hint": "Déplacez le centre ou le rayon · Échap pour annuler"
+  "feather": "Contour d’adoucissement",
+  "hint": "Déplacez le centre ou le rayon · Échap pour annuler",
+  "centerHelp": "Glissez pour déplacer le centre de l’effet.",
+  "radiusHelp": "Glissez pour régler la portée de l’effet.",
+  "innerRadiusHelp": "Glissez pour redimensionner la zone protégée.",
+  "featherHelp": "Glissez pour régler la transition entre les zones nette et floue.",
+  "keyboardHelp": "Flèches : 1 px · Maj : 10 px · Échap : annuler."
 }

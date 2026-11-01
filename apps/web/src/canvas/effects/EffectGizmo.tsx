@@ -10,6 +10,7 @@ import {
 import { useTranslation } from "react-i18next";
 import {
   transformPoint,
+  getEffectDefinition,
   type Composition,
   type Layer,
   type EnginePort,
@@ -17,6 +18,8 @@ import {
 } from "@musart/core";
 import { attachmentSelection } from "../../state/selection/attachments";
 import { useLayerPreview } from "../../components/layers/controls/use-layer-preview";
+import { TooltipProvider } from "../../components/ui/tooltip";
+import { HandleTooltip } from "./HandleTooltip";
 import type { SceneController } from "../session/scene-controller";
 import type { ViewSource } from "../viewport/motion";
 import { moveRadialHandle, radialGeometry, type RadialHandle } from "./radial-geometry";
@@ -25,6 +28,7 @@ import "./gizmo.css";
 
 interface Gesture {
   pointerId?: number;
+  grabOffset?: { x: number; y: number };
   keys: Set<string>;
   handle: RadialHandle;
   page: Composition;
@@ -173,11 +177,17 @@ function RadialGizmo({
         ellipse.setAttribute("rx", String((radius ?? 0) * geometry.aspect));
         ellipse.setAttribute("ry", String(radius ?? 0));
         ellipse.setAttribute("stroke-width", String(1 / scale));
-        const button = svg.querySelector<SVGCircleElement>(`[data-handle="${handle}"]`)!;
-        button.style.display = radius === null ? "none" : "";
-        button.setAttribute("cx", String((radius ?? 0) * geometry.aspect));
+        const anchor = svg.querySelector<SVGGElement>(`[data-handle-anchor="${handle}"]`)!;
+        anchor.style.display = radius === null ? "none" : "";
+        for (const button of anchor.querySelectorAll("circle")) {
+          button.style.display = radius === null ? "none" : "";
+          button.setAttribute("cx", String((radius ?? 0) * geometry.aspect));
+        }
       }
       for (const button of svg.querySelectorAll<SVGCircleElement>("[data-handle]")) {
+        button.setAttribute("r", String(14 / scale));
+      }
+      for (const button of svg.querySelectorAll<SVGCircleElement>("[data-handle-visual]")) {
         button.setAttribute("r", String(6 / scale));
         button.setAttribute("stroke-width", String(1.5 / scale));
       }
@@ -203,13 +213,11 @@ function RadialGizmo({
   function update(event: PointerEvent<SVGSVGElement>) {
     const gesture = held.current;
     if (!gesture || gesture.pointerId !== event.pointerId) return;
-    const next = moveRadialHandle(
-      gesture.page,
-      gesture.layer,
-      gesture.effect,
-      gesture.handle,
-      point(event, gesture.page),
-    );
+    const pointer = point(event, gesture.page);
+    const next = moveRadialHandle(gesture.page, gesture.layer, gesture.effect, gesture.handle, {
+      x: pointer.x - (gesture.grabOffset?.x ?? 0),
+      y: pointer.y - (gesture.grabOffset?.y ?? 0),
+    });
     const updated = { ...gesture, next };
     held.current = updated;
     publish(updated);
@@ -252,6 +260,7 @@ function RadialGizmo({
   }
   function nearestHandle(event: PointerEvent<SVGCircleElement>) {
     let nearest = event.currentTarget,
+      bounds = nearest.getBoundingClientRect(),
       distance = Infinity;
     // Small protected radii can overlap the center's fixed screen-size hit area.
     // Resolve by screen-space distance instead of SVG painting order. Center wins
@@ -267,88 +276,121 @@ function RadialGizmo({
       );
       if (next < distance) {
         nearest = button;
+        bounds = rect;
         distance = next;
       }
     }
-    return nearest;
+    return { button: nearest, bounds };
   }
+  const feather = getEffectDefinition(effect.type).gizmo?.feather;
   return (
-    <svg
-      ref={root}
-      className="effect-gizmo"
-      aria-label={t("effectGizmo:hint")}
-      onPointerMove={(event) => {
-        if (held.current) {
+    <TooltipProvider delayDuration={500} skipDelayDuration={0}>
+      <svg
+        ref={root}
+        className="effect-gizmo"
+        data-effect-gizmo-id={effect.id}
+        aria-label={t("effectGizmo:hint")}
+        onPointerMove={(event) => {
+          if (held.current) {
+            event.stopPropagation();
+            update(event);
+          }
+        }}
+        onPointerUp={(event) => {
+          const gesture = held.current;
+          if (!gesture || gesture.pointerId !== event.pointerId) return;
           event.stopPropagation();
           update(event);
-        }
-      }}
-      onPointerUp={(event) => {
-        const gesture = held.current;
-        if (!gesture || gesture.pointerId !== event.pointerId) return;
-        event.stopPropagation();
-        update(event);
-        finish();
-      }}
-      onPointerCancel={(event) => {
-        if (held.current?.pointerId === event.pointerId) cancel();
-      }}
-      onLostPointerCapture={(event) => {
-        if (held.current?.pointerId === event.pointerId) cancel();
-      }}
-      onKeyUp={(event) => {
-        const gesture = held.current;
-        if (!gesture || gesture.pointerId !== undefined || !gesture.keys.has(event.key)) return;
-        const keys = new Set(gesture.keys);
-        keys.delete(event.key);
-        held.current = { ...gesture, keys };
-        event.preventDefault();
-        event.stopPropagation();
-        if (keys.size === 0) finish();
-      }}
-      onKeyDown={(event) => {
-        if (event.key === "Escape") {
+          finish();
+        }}
+        onPointerCancel={(event) => {
+          if (held.current?.pointerId === event.pointerId) cancel();
+        }}
+        onLostPointerCapture={(event) => {
+          if (held.current?.pointerId === event.pointerId) cancel();
+        }}
+        onKeyUp={(event) => {
+          const gesture = held.current;
+          if (!gesture || gesture.pointerId !== undefined || !gesture.keys.has(event.key)) return;
+          const keys = new Set(gesture.keys);
+          keys.delete(event.key);
+          held.current = { ...gesture, keys };
           event.preventDefault();
           event.stopPropagation();
-          cancel();
-        }
-      }}
-    >
-      <g className="effect-gizmo-owner">
-        <g className="effect-gizmo-area">
-          <ellipse data-ring="radius" className="effect-gizmo-ring" />
-          <ellipse data-ring="innerRadius" className="effect-gizmo-ring effect-gizmo-inner" />
-          {(["radius", "innerRadius", "center"] as const).map((handle) => (
-            <circle
-              key={handle}
-              data-handle={handle}
-              data-canvas-control
-              role="button"
-              tabIndex={0}
-              aria-label={t(`effectGizmo:${handle}`)}
-              className="effect-gizmo-handle"
-              onKeyDown={(event) => {
-                if (nudge(handle, event.key, event.shiftKey)) {
-                  event.preventDefault();
-                  event.stopPropagation();
-                }
-              }}
-              onBlur={() => {
-                if (held.current && held.current.pointerId === undefined) finish();
-              }}
-              onPointerDown={(event) => {
-                if (event.button !== 0 || held.current || controller.read().playback) return;
-                event.preventDefault();
-                event.stopPropagation();
-                const button = nearestHandle(event);
-                button.focus();
-                if (begin(button.dataset.handle as RadialHandle, event.pointerId))
-                  root.current!.setPointerCapture(event.pointerId);
-              }}
-            />
-          ))}
+          if (keys.size === 0) finish();
+        }}
+        onKeyDown={(event) => {
+          if (event.key === "Escape") {
+            event.preventDefault();
+            event.stopPropagation();
+            cancel();
+          }
+        }}
+      >
+        <g className="effect-gizmo-owner">
+          <g className="effect-gizmo-area">
+            <ellipse data-ring="radius" className="effect-gizmo-ring" />
+            <ellipse data-ring="innerRadius" className="effect-gizmo-ring effect-gizmo-inner" />
+            {(["radius", "innerRadius", "center"] as const).map((handle) => {
+              const help = handle === "radius" && feather ? "feather" : handle;
+              return (
+                <HandleTooltip
+                  key={handle}
+                  handle={handle}
+                  hint={`${t(`effectGizmo:${help}Help`)} ${t("effectGizmo:keyboardHelp")}`}
+                >
+                  <circle
+                    data-handle={handle}
+                    data-canvas-control
+                    role="button"
+                    tabIndex={0}
+                    aria-label={t(`effectGizmo:${help}`)}
+                    aria-description={t(`effectGizmo:${help}Help`)}
+                    className="effect-gizmo-handle"
+                    onKeyDown={(event) => {
+                      if (nudge(handle, event.key, event.shiftKey)) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                      }
+                    }}
+                    onBlur={() => {
+                      if (held.current && held.current.pointerId === undefined) finish();
+                    }}
+                    onPointerDown={(event) => {
+                      if (event.button !== 0 || held.current || controller.read().playback) return;
+                      event.preventDefault();
+                      event.stopPropagation();
+                      const { button, bounds } = nearestHandle(event);
+                      const surface = root.current!.getBoundingClientRect();
+                      button.focus();
+                      const gesture = begin(button.dataset.handle as RadialHandle, event.pointerId);
+                      if (gesture) {
+                        if (bounds.width && bounds.height)
+                          gesture.grabOffset = {
+                            x:
+                              ((event.clientX - bounds.left - bounds.width / 2) *
+                                gesture.page.width) /
+                              surface.width,
+                            y:
+                              ((event.clientY - bounds.top - bounds.height / 2) *
+                                gesture.page.height) /
+                              surface.height,
+                          };
+                        root.current!.setPointerCapture(event.pointerId);
+                      }
+                    }}
+                  />
+                  <circle
+                    data-handle-visual={handle}
+                    className="effect-gizmo-knob"
+                    aria-hidden="true"
+                  />
+                </HandleTooltip>
+              );
+            })}
+          </g>
         </g>
-      </g>
-    </svg>
+      </svg>
+    </TooltipProvider>
   );
 }

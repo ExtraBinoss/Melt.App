@@ -1,0 +1,12 @@
+{
+  "center": "Centro do efeito",
+  "radius": "Raio do efeito",
+  "innerRadius": "Raio protegido",
+  "feather": "Limite de suavização",
+  "hint": "Arraste o centro ou o raio · Esc para cancelar",
+  "centerHelp": "Arraste para mover o centro do efeito.",
+  "radiusHelp": "Arraste para ajustar o alcance do efeito.",
+  "innerRadiusHelp": "Arraste para redimensionar a área protegida.",
+  "featherHelp": "Arraste para ajustar a transição entre as áreas nítida e desfocada.",
+  "keyboardHelp": "Setas: 1 px · Shift: 10 px · Esc: cancelar."
+}

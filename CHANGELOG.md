@@ -6,6 +6,7 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Restore normal themed switches inside effect popovers by removing their white-background override. Add radial-handle help after 500 ms in all twelve application languages, enlarge invisible pointer targets while retaining compact knobs and preserve grab offsets, popup ownership, keyboard access and single-entry undo.
 - Keep applied-effect popover geometry stable while deferred controls mount, avoiding collision repositioning, and retain trailing padding when long parameter lists scroll to their end.
 - Refresh Bloom Windows with a slower twelve-second orbit, layered pink/green/blue print treatments and sparse editable Motion development. Bundle licensed DynaPuff 700 locally for the Melt Mascot wordmark, regenerate native glyph contours and preserve its inflate loop without runtime font-CDN dependencies. Keep landing showcase cards as posters without interactive Three.js previews.
 - Retire Orbit Study, Paper Motion, Colorfield, Transition Atlas, AFTERHOURS, In Bloom, Motion Stress Lab and Sound Playground from the public template catalog and landing. Group each template’s builders, generators, portable bundles and posters into its own directory, update validated loading and native gallery regressions, and preserve internal regression fixtures and existing saved projects.

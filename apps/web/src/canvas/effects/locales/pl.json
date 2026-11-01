@@ -1,0 +1,12 @@
+{
+  "center": "Środek efektu",
+  "radius": "Promień efektu",
+  "innerRadius": "Chroniony promień",
+  "feather": "Granica przejścia",
+  "hint": "Przeciągnij środek lub promień · Escape anuluje",
+  "centerHelp": "Przeciągnij, aby przesunąć środek efektu.",
+  "radiusHelp": "Przeciągnij, aby dostosować zasięg efektu.",
+  "innerRadiusHelp": "Przeciągnij, aby zmienić rozmiar chronionego obszaru.",
+  "featherHelp": "Przeciągnij, aby dostosować przejście między ostrym a rozmytym obszarem.",
+  "keyboardHelp": "Strzałki: 1 px · Shift: 10 px · Escape: anuluj."
+}

@@ -2,5 +2,11 @@
   "center": "Effect center",
   "radius": "Effect radius",
   "innerRadius": "Protected radius",
-  "hint": "Drag the center or radius · Escape to cancel"
+  "feather": "Feather boundary",
+  "hint": "Drag the center or radius · Escape to cancel",
+  "centerHelp": "Drag to move the effect center.",
+  "radiusHelp": "Drag to adjust how far the effect reaches.",
+  "innerRadiusHelp": "Drag to resize the protected area.",
+  "featherHelp": "Drag to adjust the transition between the sharp and blurred areas.",
+  "keyboardHelp": "Arrow keys: 1 px · Shift: 10 px · Escape: cancel."
 }

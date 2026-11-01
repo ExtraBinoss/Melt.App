@@ -1,0 +1,12 @@
+{
+  "center": "Centro del efecto",
+  "radius": "Radio del efecto",
+  "innerRadius": "Radio protegido",
+  "feather": "Borde de transición",
+  "hint": "Arrastra el centro o el radio · Esc para cancelar",
+  "centerHelp": "Arrastra para mover el centro del efecto.",
+  "radiusHelp": "Arrastra para ajustar el alcance del efecto.",
+  "innerRadiusHelp": "Arrastra para cambiar el tamaño del área protegida.",
+  "featherHelp": "Arrastra para ajustar la transición entre las áreas nítida y desenfocada.",
+  "keyboardHelp": "Flechas: 1 px · Mayús: 10 px · Esc: cancelar."
+}

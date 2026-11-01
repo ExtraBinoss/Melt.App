@@ -1,0 +1,12 @@
+{
+  "center": "エフェクトの中心",
+  "radius": "エフェクトの半径",
+  "innerRadius": "保護領域の半径",
+  "feather": "ぼかしの境界",
+  "hint": "中心または半径をドラッグ · Escape でキャンセル",
+  "centerHelp": "ドラッグしてエフェクトの中心を移動します。",
+  "radiusHelp": "ドラッグしてエフェクトの範囲を調整します。",
+  "innerRadiusHelp": "ドラッグして保護領域の大きさを変更します。",
+  "featherHelp": "ドラッグして鮮明な領域とぼけた領域の間の変化を調整します。",
+  "keyboardHelp": "矢印キー: 1 px · Shift: 10 px · Escape: キャンセル。"
+}

@@ -84,9 +84,38 @@ it("paints live geometry without a document commit, commits once, and undoes the
   act(() => d.engine.undo());
   expect(d.engine.getSnapshot().project).toEqual(before);
   act(() => d.setZoom(2));
-  expect(handle).toHaveAttribute("r", "3");
+  expect(handle).toHaveAttribute("r", "7");
+  expect(d.svg.querySelector('[data-handle-visual="center"]')).toHaveAttribute("r", "3");
   d.unmount();
   expect(d.listeners.size).toBe(0);
+});
+it("keeps the pointer's grab offset inside the larger target without jumping on click", () => {
+  const d = fixture(),
+    center = d.svg.querySelector<SVGCircleElement>('[data-handle="center"]')!;
+  vi.spyOn(center, "getBoundingClientRect").mockReturnValue({
+    x: 106,
+    y: 66,
+    left: 106,
+    top: 66,
+    right: 134,
+    bottom: 94,
+    width: 28,
+    height: 28,
+    toJSON() {},
+  });
+  const initial = d.engine.getSnapshot().project;
+  fireEvent.pointerDown(center, { button: 0, pointerId: 1, clientX: 130, clientY: 80 });
+  fireEvent.pointerUp(d.svg, { pointerId: 1, clientX: 130, clientY: 80 });
+  expect(d.engine.getSnapshot().project).toEqual(initial);
+  fireEvent.pointerDown(center, { button: 0, pointerId: 2, clientX: 130, clientY: 80 });
+  fireEvent.pointerMove(d.svg, { pointerId: 2, clientX: 150, clientY: 80 });
+  expect(d.engine.getSnapshot().project).toEqual(initial);
+  fireEvent.pointerUp(d.svg, { pointerId: 2, clientX: 150, clientY: 80 });
+  expect(
+    d.engine.getSnapshot().project.pages[0]!.layers[0]!.effects[0]!.settings!.centerX,
+  ).toBeCloseTo(0.6);
+  act(() => d.engine.undo());
+  expect(d.engine.getSnapshot().project).toEqual(initial);
 });
 it("restores on Escape, handles keyboard geometry and relative ellipses", () => {
   const d = fixture("flashlight"),
@@ -172,7 +201,7 @@ it("resolves overlapping screen-space handles by proximity, with center winning 
   vi.spyOn(center, "getBoundingClientRect").mockReturnValue(bounds(50));
   const innerBounds = vi.spyOn(inner, "getBoundingClientRect").mockReturnValue(bounds(55.5));
   vi.spyOn(radius, "getBoundingClientRect").mockReturnValue(bounds(90));
-  expect(center).toBe(d.svg.querySelector(".effect-gizmo-area")!.lastElementChild);
+  expect(center.parentElement).toBe(d.svg.querySelector(".effect-gizmo-area")!.lastElementChild);
   // A painted inner handle may receive the DOM event over the center.
   fireEvent.pointerDown(inner, { button: 0, pointerId: 1, clientX: 50, clientY: 50 });
   expect(center).toHaveFocus();
