@@ -1,3 +1,4 @@
+import terminal from "./library/terminal/messages.json";
 import inkBleed from "./library/ink-bleed/messages.json";
 import pixelSort from "./library/pixel-sort/messages.json";
 import edgeDetect from "./library/edge-detect/messages.json";
@@ -25,6 +26,7 @@ import receipt from "./library/receipt/messages.json";
 import pinkPhosphor from "./library/pink-phosphor/messages.json";
 /** UI resources stay on the web side; the core catalog only contains stable label keys. */
 export const libraryMessages = {
+  terminal,
   "ink-bleed": inkBleed,
   "pixel-sort": pixelSort,
   "edge-detect": edgeDetect,

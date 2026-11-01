@@ -2,6 +2,7 @@ import type { DESIGNED_TEMPLATES } from "../designed/catalog";
 import type { Command, ImageAsset, Project, VideoAsset, AudioAsset } from "@musart/core";
 
 export type MotionTemplateId =
+  | "terminal-signal"
   | Extract<(typeof DESIGNED_TEMPLATES)[number], { mode: "motion" }>["id"]
   | "morphing-type"
   | "in-bloom"

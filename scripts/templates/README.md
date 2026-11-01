@@ -1,5 +1,10 @@
 # Motion templates
 
+Generate **Terminal Signal**, the editable 9:16 green terminal animation, with
+`bun scripts/templates/terminal-signal.ts`. Its native typing effect, sparse
+Motion actions and regeneration workflow are documented in
+[Terminal Signal](../../docs/guides/terminal-signal.md).
+
 Generate the native 3D **Cornell Box** study with `bun scripts/templates/cornell-box.ts`.
 See [Cornell Box](../../docs/guides/cornell-box.md) for original geometry, minimal
 Motion actions and native poster/export verification.

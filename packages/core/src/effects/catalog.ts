@@ -1,3 +1,4 @@
+import { TERMINAL_DEFINITION } from "./terminal/definition";
 import { INK_BLEED_DEFINITION } from "./ink-bleed/definition";
 import { PIXEL_SORT_DEFINITION } from "./pixel-sort/definition";
 import { EDGE_DETECT_DEFINITION } from "./edge-detect/definition";
@@ -39,6 +40,7 @@ import { MORPH_DEFINITION } from "./morph/definition";
 import { ASCII_DEFINITION } from "./ascii/definition";
 /** Portable effect metadata shared by factories, validation and client controls. */
 export const EFFECT_CATALOG: Readonly<Record<EffectType, EffectDefinition>> = Object.freeze({
+  terminal: TERMINAL_DEFINITION,
   "ink-bleed": INK_BLEED_DEFINITION,
   "pixel-sort": PIXEL_SORT_DEFINITION,
   "edge-detect": EDGE_DETECT_DEFINITION,

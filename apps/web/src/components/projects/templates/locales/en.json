@@ -34,5 +34,7 @@
   "opening": "Preparing template…",
   "cancel": "Cancel",
   "cornellBox": "Cornell Box",
-  "cornellBoxDescription": "A looping 3D study with chrome type, colored walls and cast shadows."
+  "cornellBoxDescription": "A looping 3D study with chrome type, colored walls and cast shadows.",
+  "terminalSignal": "Terminal Signal",
+  "terminalSignalDescription": "16 s · Neon terminal, editable typing, scrolling text and curved CRT glass · 9:16"
 }

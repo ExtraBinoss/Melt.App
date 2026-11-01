@@ -1,4 +1,5 @@
 import { SURFACE_PARAMETERS } from "./surface/parameters";
+import { TERMINAL_PARAMETERS } from "./terminal/parameters";
 import { describe, expect, it } from "vitest";
 import { EFFECT_CATALOG, getEffectDefinition } from "../../src/effects/catalog";
 import { getEffectParameter, patchEffectParameter } from "../../src/effects/parameters";
@@ -9,6 +10,7 @@ import type { EffectType } from "../../src/document/model";
 describe("portable effect definitions", () => {
   it("describes every supported effect once, with the existing deterministic defaults", () => {
     expect(Object.keys(EFFECT_CATALOG)).toEqual([
+      "terminal",
       "ink-bleed",
       "pixel-sort",
       "edge-detect",
@@ -71,6 +73,7 @@ describe("portable effect definitions", () => {
   });
   it("provides typed controls in document units and meaningful display metadata", () => {
     const expected: Record<EffectType, string[]> = {
+      terminal: TERMINAL_PARAMETERS,
       ...SURFACE_PARAMETERS,
       "window-trails": [
         "amount",
@@ -463,6 +466,7 @@ describe("portable effect definitions", () => {
       expect(getEffectDefinition(definition.type)).toBe(definition);
       expect(definition.coverage).toBe(
         [
+          "terminal",
           "ink-bleed",
           "pixel-sort",
           "blur",
@@ -486,6 +490,7 @@ describe("portable effect definitions", () => {
       );
       expect(definition.category).toBe(
         [
+          "terminal",
           "ink-bleed",
           "pixel-sort",
           "edge-detect",

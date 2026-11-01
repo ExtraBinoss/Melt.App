@@ -34,5 +34,7 @@
   "opening": "Préparation du modèle…",
   "cancel": "Annuler",
   "cornellBox": "Cornell Box",
-  "cornellBoxDescription": "Une étude 3D en boucle avec un texte chromé, des murs colorés et des ombres portées."
+  "cornellBoxDescription": "Une étude 3D en boucle avec un texte chromé, des murs colorés et des ombres portées.",
+  "terminalSignal": "Terminal Signal",
+  "terminalSignalDescription": "16 s · Terminal vert, frappe éditable, texte défilant et écran CRT incurvé · 9:16"
 }

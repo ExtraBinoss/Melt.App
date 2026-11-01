@@ -21,6 +21,7 @@ import type { ApplyMotionTransitionCommand } from "../motion/transitions/model";
 export const FORMAT_VERSION = 1 as const;
 export type LayerKind = "rectangle" | "ellipse" | "text" | "image" | "video" | "group" | "vector";
 export type EffectType =
+  | "terminal"
   | "ink-bleed"
   | "pixel-sort"
   | "edge-detect"

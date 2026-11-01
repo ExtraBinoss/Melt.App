@@ -19,6 +19,17 @@ export interface ProjectTemplate {
 }
 export const TEMPLATE_CATALOG: readonly ProjectTemplate[] = Object.freeze([
   Object.freeze({
+    id: "terminal-signal",
+    nameKey: "templates:terminalSignal",
+    descriptionKey: "templates:terminalSignalDescription",
+    width: 1080,
+    height: 1920,
+    mode: "motion",
+    category: "video",
+    previewBackground: "#030703",
+    preview: `${import.meta.env.BASE_URL}templates/motion/terminal-signal.webp?v=1`,
+  }),
+  Object.freeze({
     id: "angel-windows",
     nameKey: "templates:angelWindows",
     descriptionKey: "templates:angelWindowsDescription",
@@ -141,6 +152,7 @@ async function openProjectTemplate(
     return;
   }
   if (
+    templateId === "terminal-signal" ||
     templateId === "morphing-type" ||
     templateId === "in-bloom" ||
     templateId === "bloom-windows" ||

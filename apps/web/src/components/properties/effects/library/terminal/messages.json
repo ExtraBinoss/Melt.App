@@ -1,0 +1,38 @@
+{
+  "en": {
+    "name": "Terminal",
+    "parameter": {
+      "progress": "Typing progress",
+      "columns": "Columns",
+      "rows": "Rows",
+      "cursor": "Cursor",
+      "cursorColor": "Cursor color",
+      "blinkRate": "Blink rate",
+      "time": "Time"
+    },
+    "choice": {
+      "none": "None",
+      "block": "Block",
+      "underline": "Underline",
+      "line": "Line highlight"
+    }
+  },
+  "fr": {
+    "name": "Terminal",
+    "parameter": {
+      "progress": "Progression de frappe",
+      "columns": "Colonnes",
+      "rows": "Lignes",
+      "cursor": "Curseur",
+      "cursorColor": "Couleur du curseur",
+      "blinkRate": "Clignotement",
+      "time": "Temps"
+    },
+    "choice": {
+      "none": "Aucun",
+      "block": "Bloc",
+      "underline": "Soulignement",
+      "line": "Surlignage de ligne"
+    }
+  }
+}

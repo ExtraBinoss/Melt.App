@@ -46,6 +46,7 @@ export function validateCoverOptions(options: CoverOptions): void {
     new Set(options.ids).size !== options.ids.length ||
     options.ids.some(
       (id) =>
+        id !== "terminal-signal" &&
         id !== "in-bloom" &&
         id !== "bloom-windows" &&
         id !== "angel-windows" &&

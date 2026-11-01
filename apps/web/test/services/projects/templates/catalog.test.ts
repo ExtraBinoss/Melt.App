@@ -17,7 +17,7 @@ const ports = () => ({
 });
 test("publishes exact canonical canvas formats and the editable artwork template", async () => {
   expect(new Set(TEMPLATE_CATALOG.map((item) => item.id)).size).toBe(
-    PRESETS.length + DESIGNED_TEMPLATES.length + 9,
+    PRESETS.length + DESIGNED_TEMPLATES.length + 10,
   );
   expect(Object.isFrozen(TEMPLATE_CATALOG)).toBe(true);
   const services = ports();
@@ -48,6 +48,7 @@ test("routes Motion bundles to the binary-capable installation service and keeps
   const signal = new AbortController().signal;
   const expectedOrigin = { projectId: "origin", pageId: "composition", revision: 3 };
   for (const id of [
+    "terminal-signal",
     "morphing-type",
     "in-bloom",
     "bloom-windows",

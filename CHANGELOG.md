@@ -6,6 +6,7 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Add the editable 1080 × 1920 Terminal Signal Motion template with green curved-screen typography, a native grid, scrolling transcript and staggered closing lines. Introduce a reusable GPU Terminal effect with cell-based progress, four cursor modes and explicit blink time; retain sparse two-point typing actions, portable command replay, native WebGPU/WebGL rendering and zero production pixel readbacks.
 - Share immutable editing scopes across Inspector, selected compositing and open effect/mask controls; retain unrelated toolbar/pinned actions through history updates, keep grouping availability authoritative, and guard lazy texture pickers against disabled, replaced or canceled owners while preserving Radix exit content.
 - Retain layer rows, native drag handlers, timeline row projections and closed export controls across background-only publications, resolving fresh canonical owners for subsequent actions. Attribute supplied paint-mode trace stalls separately to avoidable React work, debugger task capture and profiler startup.
 - Publish layer action availability with selection feedback instead of deferring the add button behind attachment presentation; retain memoized availability and live canonical action targets.

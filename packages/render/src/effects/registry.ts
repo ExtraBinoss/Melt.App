@@ -1,3 +1,4 @@
+import { terminalNode } from "./terminal/node";
 import { inkBleedNode } from "./ink-bleed/node";
 import { pixelSortFinishNode } from "./pixel-sort/node";
 import { edgeDetectNode } from "./edge-detect/node";
@@ -47,6 +48,7 @@ export const EFFECT_NODES: Readonly<
     EffectNodeBuilder
   >
 > = Object.freeze({
+  terminal: terminalNode,
   "ink-bleed": inkBleedNode,
   "pixel-sort": pixelSortFinishNode,
   "edge-detect": edgeDetectNode,

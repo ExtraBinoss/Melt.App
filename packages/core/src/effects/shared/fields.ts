@@ -1,4 +1,4 @@
-import type { EffectParameter } from "../definition";
+import type { EffectParameter, NumberEffectParameter } from "../definition";
 export function effectFields(namespace: string) {
   const label = (key: string) => `${namespace}:parameter.${key}`;
   return {
@@ -9,7 +9,7 @@ export function effectFields(namespace: string) {
       max: number,
       step = 0.01,
       unit = "",
-    ): EffectParameter => ({
+    ): NumberEffectParameter => ({
       kind: "number",
       scope: "settings",
       key,
