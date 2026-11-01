@@ -1,5 +1,6 @@
 import { expect, it } from "vitest";
 import {
+  formatClipDuration,
   formatTimelineTime,
   parseTimelineTime,
   timelineTicks,
@@ -30,4 +31,13 @@ it("keeps ruler marks bounded and legible at very different temporal zooms", () 
   }
   for (const scale of [0, -1, Infinity, NaN]) expect(timelineTicks(0, 100, scale)).toEqual([]);
   expect(timelineTicks(0, 0, 100)).toEqual([]);
+});
+
+it("rounds clip duration feedback to one decimal millisecond without changing editable precision", () => {
+  const time = { value: 1, rate: 3 };
+  expect(formatClipDuration(time, "ms")).toBe("333.3");
+  expect(formatClipDuration(time, "s")).toBe("0.333");
+  expect(formatClipDuration({ value: 2, rate: 1 }, "ms")).toBe("2000");
+  expect(formatTimelineTime(time, "ms")).toBe("333.333");
+  expect(time).toEqual({ value: 1, rate: 3 });
 });

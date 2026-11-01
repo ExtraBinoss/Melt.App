@@ -6,7 +6,7 @@ import {
   type MotionLayerTrack,
 } from "@musart/core";
 import { createLiveNumberMotion } from "../../shared/live-number";
-import { formatTimelineTime } from "../time";
+import { formatClipDuration, formatTimelineTime } from "../time";
 import type { TimelineUnit } from "../model";
 
 /** Keep the visible tooltip and Radix's accessible copy on the same exact transient time. */
@@ -61,7 +61,7 @@ export function createClipDurationTooltipPreview(node: HTMLElement) {
       unit: (target.dataset.timeUnit === "s" ? "s" : "ms") as TimelineUnit,
     };
     targets.set(target, value);
-    if (latest) value.motion.set(`${formatTimelineTime(latest, value.unit)} ${value.unit}`);
+    if (latest) value.motion.set(`${formatClipDuration(latest, value.unit)} ${value.unit}`);
   }
   for (const target of node.ownerDocument.querySelectorAll<HTMLElement>(selector)) admit(target);
   const observer = new MutationObserver((records) => {
@@ -80,7 +80,7 @@ export function createClipDurationTooltipPreview(node: HTMLElement) {
       if (disposed) return;
       latest = time;
       for (const { motion, unit } of targets.values())
-        motion.set(`${formatTimelineTime(time, unit)} ${unit}`);
+        motion.set(`${formatClipDuration(time, unit)} ${unit}`);
     },
     dispose() {
       if (disposed) return;

@@ -6,8 +6,8 @@
   height: 12px;
   width: 3px;
   border-radius: 999px;
-  background: var(--foreground);
-  opacity: 0.5;
+  background: var(--motion-trim-ink, var(--foreground));
+  opacity: 0.8;
   transition: opacity 120ms ease-out;
 }
 .motion-row:not(.is-selected):is(:hover, :focus-within, [data-motion-hovered="true"])
@@ -17,7 +17,18 @@
 }
 .motion-row:is(:hover, :focus-within, [data-motion-hovered="true"]) .motion-trim-handle::after,
 .motion-trim-handle:hover::after {
-  opacity: 0.85;
+  opacity: 1;
+}
+.motion-row.is-selected {
+  --motion-trim-ink: var(--motion-accent-foreground);
+}
+.motion-row.is-selected[data-layer-kind="audio"] {
+  --motion-trim-ink: #000000;
+}
+@supports (color: contrast-color(red)) {
+  .motion-row.is-selected {
+    --motion-trim-ink: contrast-color(var(--motion-track-color));
+  }
 }
 .motion-trim-handle:focus-visible::after {
   opacity: 1;

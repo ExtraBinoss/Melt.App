@@ -94,3 +94,41 @@ it("keeps live connectors while the small interpolation glyph is faded out", () 
   expect(hidden.moveTo).toHaveBeenCalledWith(5, 36);
   expect(hidden.lineTo).toHaveBeenCalledWith(95, 36);
 });
+
+it.each([
+  ["#ffffff", "#000000"],
+  ["#111111", "#ffffff"],
+  ["#8b5cf6", "#000000"],
+  ["#16a34a", "#000000"],
+])("uses opaque contrasting rounded trim grips on %s tracks", (color, ink) => {
+  const d = canvasFixture(),
+    context = canvasContext();
+  const grips: { color: string; alpha: number }[] = [];
+  let grip = false;
+  context.beginPath.mockImplementation(() => {
+    grip = false;
+  });
+  context.roundRect.mockImplementation((_x, _y, width) => {
+    grip = width === 3;
+  });
+  context.fill.mockImplementation(() => {
+    if (grip) grips.push({ color: context.fillStyle, alpha: context.globalAlpha });
+  });
+  const scene = projectTimelineCanvas(
+    {
+      ...d.model,
+      selectedLayerIds: new Set(["hero"]),
+      selectedAudioTrackIds: new Set(["sound"]),
+      audioTracks: [d.audio],
+    },
+    { left: 0, top: 0, width: 400, height: 96 },
+  );
+  paintTimelineCanvas(context as unknown as CanvasRenderingContext2D, scene, {
+    ...palette,
+    image: color,
+    audio: color,
+  });
+  expect(grips).toHaveLength(6);
+  expect(grips.every((grip) => grip.color === ink && grip.alpha === 1)).toBe(true);
+  expect(context.roundRect).toHaveBeenCalledWith(3, 6, 3, 12, 1.5);
+});

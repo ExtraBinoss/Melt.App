@@ -1,3 +1,4 @@
+import { Color } from "three";
 import { waveformPoints, type TimelineWaveformPaths } from "./waveform-paths";
 import type {
   TimelineCanvasClip,
@@ -6,6 +7,21 @@ import type {
   TimelineCanvasRect,
   TimelineCanvasScene,
 } from "./model";
+
+const trimInks = new WeakMap<TimelineCanvasPalette, Map<string, string>>();
+/** Resolve authored UI colors once per palette, without sampling canvas pixels. */
+function trimInk(palette: TimelineCanvasPalette, color: string) {
+  let inks = trimInks.get(palette);
+  if (!inks) trimInks.set(palette, (inks = new Map()));
+  let ink = inks.get(color);
+  if (!ink) {
+    const rgb = new Color(color);
+    const luminance = rgb.r * 0.2126 + rgb.g * 0.7152 + rgb.b * 0.0722;
+    ink = 1.05 / (luminance + 0.05) > (luminance + 0.05) / 0.05 ? "#ffffff" : "#000000";
+    inks.set(color, ink);
+  }
+  return ink;
+}
 
 function sameHit(a: TimelineCanvasHit | null, b: TimelineCanvasHit) {
   if (!a || a.rowKey !== b.rowKey) return false;
@@ -99,13 +115,15 @@ function clip(
     waveform(ctx, item, scene.viewport.width, waveforms);
   }
   if (hover || item.selected) {
-    ctx.globalAlpha *= 0.55;
-    ctx.fillStyle = palette.foreground;
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = item.selected ? trimInk(palette, color) : palette.foreground;
     for (const trim of item.trims) {
       const left = trim.kind === "trimStart" || trim.kind === "audioTrimStart";
-      const x = left ? item.bounds.x + 3 : item.bounds.x + item.bounds.width - 4;
-      if (x >= 0 && x <= scene.viewport.width)
-        ctx.fillRect(x, bounds.y + 5, 1, Math.max(1, bounds.height - 10));
+      const x = left ? item.bounds.x + 3 : item.bounds.x + item.bounds.width - 6;
+      if (x >= 0 && x <= scene.viewport.width) {
+        rounded(ctx, { x, y: bounds.y + 3, width: 3, height: Math.max(1, bounds.height - 6) }, 1.5);
+        ctx.fill();
+      }
     }
   }
   ctx.restore();

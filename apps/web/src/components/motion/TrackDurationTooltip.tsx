@@ -11,7 +11,7 @@ import { useTranslation } from "react-i18next";
 import { subtractMotionTime, type MotionTime } from "@musart/core";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 import type { TimelineUnit } from "./model";
-import { formatTimelineTime } from "./time";
+import { formatClipDuration } from "./time";
 
 /** One local render at gesture entry/exit; the live duration itself is painted imperatively. */
 export const TrackDurationTooltip = forwardRef<
@@ -140,7 +140,7 @@ export const TrackDurationTooltip = forwardRef<
             {" · "}
           </span>
           <span data-motion-clip-tooltip={trackId} data-time-unit={unit} className="tabular-nums">
-            {formatTimelineTime(subtractMotionTime(end, start), unit)} {unit}
+            {formatClipDuration(subtractMotionTime(end, start), unit)} {unit}
           </span>
         </TooltipContent>
       </Tooltip>

@@ -1,7 +1,7 @@
 import { afterEach, expect, test, vi } from "vitest";
 import { bindSelectSizing } from "../../../../src/components/ui/select/sizing";
 afterEach(() => vi.unstubAllGlobals());
-test("tracks a moving dialog only during its entrance and retires sizing work on close", () => {
+test("tracks a moving dialog only during its entrance and retires sizing work on close", async () => {
   const pending = new Map<number, FrameRequestCallback>();
   let sequence = 0,
     width = 200,
@@ -48,6 +48,12 @@ test("tracks a moving dialog only during its entrance and retires sizing work on
   animation.playState = "finished";
   paint();
   expect(wrapper.style.width).toBe("240px");
+  expect(pending.size).toBe(0);
+  wrapper.style.width = "260px";
+  wrapper.style.left = "120px";
+  await Promise.resolve();
+  expect(wrapper.style.width).toBe("240px");
+  expect(wrapper.style.left).toBe("100px");
   expect(pending.size).toBe(0);
   window.dispatchEvent(new Event("resize"));
   expect(pending.size).toBe(1);

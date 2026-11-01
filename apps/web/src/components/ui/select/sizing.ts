@@ -23,6 +23,17 @@ export function bindSelectSizing(
   const write = (style: CSSStyleDeclaration, key: string, value: string) => {
     if (style.getPropertyValue(key) !== value) style.setProperty(key, value);
   };
+  function place() {
+    // Radix can rewrite its wrapper during layout. Restore cached bounds before paint,
+    // without a second geometry read or an incorrectly sized intermediate frame.
+    placement.disconnect();
+    write(wrapper!.style, "width", `${placedWidth}px`);
+    write(wrapper!.style, "min-width", `${placedWidth}px`);
+    write(wrapper!.style, "max-width", `${placedWidth}px`);
+    write(wrapper!.style, "left", `${placedLeft}px`);
+    write(wrapper!.style, "right", "auto");
+    placement.observe(wrapper!, { attributes: true, attributeFilter: ["style"] });
+  }
   function sync() {
     if (!live || !trigger.isConnected) return;
     // Read once before writing; keep invalidation within this open menu.
@@ -38,12 +49,7 @@ export function bindSelectSizing(
     write(content.style, "--select-trigger-width", `${width}px`);
     if (position === "item-aligned") {
       // Radix otherwise adds the selected text's inset to the wrapper's minimum width.
-      write(wrapper!.style, "width", `${width}px`);
-      write(wrapper!.style, "min-width", `${width}px`);
-      write(wrapper!.style, "max-width", `${width}px`);
-      write(wrapper!.style, "left", `${left}px`);
-      write(wrapper!.style, "right", "auto");
-      placement.observe(wrapper!, { attributes: true, attributeFilter: ["style"] });
+      place();
     }
   }
   function schedule() {
@@ -70,7 +76,7 @@ export function bindSelectSizing(
       !same("left", placedLeft) ||
       wrapper.style.right !== "auto"
     )
-      schedule();
+      place();
   });
   if (position === "item-aligned")
     placement.observe(wrapper, { attributes: true, attributeFilter: ["style"] });

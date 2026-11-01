@@ -75,6 +75,9 @@ it("discovers cold-down portals asynchronously, publishes the latest exact durat
   await Promise.resolve();
   expect(ms).toHaveTextContent("12345 ms");
   expect(seconds).toHaveTextContent("12.345 s");
+  preview.set({ value: 5, rate: 3 });
+  expect(ms).toHaveTextContent("1666.7 ms");
+  expect(seconds).toHaveTextContent("1.667 s");
   for (let value = 0; value < 20; value++) preview.set({ value, rate: 3 });
   expect(query).toHaveBeenCalledOnce();
   preview.dispose();

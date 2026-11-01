@@ -13,6 +13,12 @@ export function formatTimelineTime(time: MotionTime, unit: TimelineUnit): string
   return String(Number(value.toFixed(unit === "ms" ? 3 : 6)));
 }
 
+/** Compact gesture feedback; authored times and editable fields retain their precision. */
+export function formatClipDuration(time: MotionTime, unit: TimelineUnit): string {
+  const value = motionTimeToSeconds(time) * (unit === "ms" ? 1000 : 1);
+  return String(Number(value.toFixed(unit === "ms" ? 1 : 3)));
+}
+
 export function parseTimelineTime(text: string, unit: TimelineUnit): MotionTime | null {
   if (!text.trim()) return null;
   const seconds = Number(text) / (unit === "ms" ? 1000 : 1);
