@@ -256,13 +256,8 @@ test("editor Export split action stays aligned and the shared export player moni
   await expect(page.locator(".motion-audio-row:not(.motion-canvas-active-overlay)")).toHaveCount(1);
   await page.evaluate(() => window.musart!.select([]));
   const before = await page.evaluate(() => JSON.stringify(window.musart!.snapshot().project));
-  const primary = page.locator(".inspector-header .export-trigger"),
-    options = page.locator(".inspector-header .export-options");
-  const a = (await primary.boundingBox())!,
-    b = (await options.boundingBox())!;
-  expect(Math.abs(a.y - b.y)).toBeLessThan(1);
-  expect(Math.abs(a.height - b.height)).toBeLessThan(1);
-  expect(Math.abs(a.x + a.width + 1 - b.x)).toBeLessThan(2);
+  const primary = page.locator(".inspector-header .export-trigger");
+  await expect(page.locator(".inspector-header .export-options")).toHaveCount(0);
   await primary.click();
   const dialog = page.getByRole("dialog");
   await expect(dialog.locator(".motion-export-preview-surface canvas")).toBeVisible();

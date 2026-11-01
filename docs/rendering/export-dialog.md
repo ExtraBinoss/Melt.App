@@ -5,7 +5,8 @@ the scrolling left column, a preview/player in the right column and a fixed
 footer. Extra encoder controls are collapsed under **Advanced**. PDF controls
 are collapsed under **Print**. The ordinary export path is two clicks: open,
 then export. Switching output type uses one direct segmented choice, so that
-path also takes three clicks. The Timelapse dropdown path is three. Opening export pauses editor
+path also takes three clicks. The editor has one full Export button; Timelapse
+is selected in the dialog's output group. Opening export pauses editor
 playback; closing does not resume it.
 
 The captured artboard ID is independent of the active editing page. A selected
@@ -35,6 +36,9 @@ Cancel remains pending until actual encoder/renderer cleanup finishes. Another
 export cannot start during cleanup. Progress is monotonic, capped at 99% until
 the encoding, finalization and delivery promise succeeds; no partial file is
 downloaded. Failures retain their actual cause for the export status surface.
+History, preview and export failures display a red alert with a copy button for
+the original message, stack and bounded cause chain. Export failures also log
+their kind and project identity with the actual error in the browser console.
 Runtime disposal drains/cancels the task before retiring fonts and storage.
 
 Project switching and route navigation share one confirmation. **Stay in

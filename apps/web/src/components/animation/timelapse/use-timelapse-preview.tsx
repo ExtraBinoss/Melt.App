@@ -1,6 +1,11 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { evaluateReplay, type ReplaySpec } from "@musart/core";
-import type { createRenderSession, FontResolver, MediaSourceResolver } from "@musart/render";
+import { evaluateReplay, type Composition, type ReplaySpec } from "@musart/core";
+import type {
+  createRenderSession,
+  selectionFrameScope,
+  FontResolver,
+  MediaSourceResolver,
+} from "@musart/render";
 import {
   createReplayTiming,
   replayFrame,
@@ -34,6 +39,7 @@ export function useTimelapsePreview(
   const durationRef = useRef(duration);
   const [playing, setPlaying] = useState(false);
   const [status, setStatus] = useState<"preparing" | "ready" | "failed">("preparing");
+  const [error, setError] = useState<unknown>(null);
   useLayoutEffect(() => {
     durationRef.current = duration;
     controls.current?.pause();
@@ -43,7 +49,8 @@ export function useTimelapsePreview(
     if (!spec || !active) return;
     let stopped = false;
     let renderer: ReturnType<typeof createRenderSession> | undefined;
-    let crop: ReturnType<typeof import("@musart/render").selectionFrameScope> | undefined;
+    let crop: ReturnType<typeof selectionFrameScope> | undefined;
+    let finalPage: Composition | undefined;
     let requested: number | null = null;
     let draining = false;
     let frame = 0;
@@ -74,9 +81,9 @@ export function useTimelapsePreview(
             mediaResolver,
           });
         }
-        const final = evaluateReplay(spec!, spec!.duration).pages.find(
+        const final = (finalPage ??= evaluateReplay(spec!, spec!.duration).pages.find(
           (page) => page.id === pageId,
-        );
+        ));
         if (!final) throw new Error("Replay page is missing.");
         if (!crop)
           crop = selection?.length
@@ -110,9 +117,11 @@ export function useTimelapsePreview(
             { scale: Math.min(1, 480 / Math.max(crop.page.width, crop.page.height)) },
           );
         }
-      } catch {
+      } catch (failure) {
         if (!stopped) {
+          console.error("[Melt timelapse preview failed]", { pageId }, failure);
           pause();
+          setError(failure);
           setStatus("failed");
         }
       } finally {
@@ -163,6 +172,7 @@ export function useTimelapsePreview(
     void Promise.resolve().then(() => {
       if (stopped) return;
       setStatus("preparing");
+      setError(null);
       setPlaying(false);
       seek(0);
     });
@@ -180,5 +190,5 @@ export function useTimelapsePreview(
     autoPlay,
     centerSelection,
   ]);
-  return { viewport, slider, clock, status, playing, controls };
+  return { viewport, slider, clock, status, error, playing, controls };
 }

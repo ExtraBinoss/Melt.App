@@ -62,6 +62,7 @@ test("cancellation stays pending through encoder cleanup, rejects duplicate work
   expect(hasActiveExports()).toBe(false);
 });
 test("real failures remain available after the dialog closes and a retry starts a new operation", async () => {
+  const log = vi.spyOn(console, "error").mockImplementation(() => {});
   const jobs = new ExportJobs(),
     error = new Error("Encoder unavailable");
   jobs.start(job, async () => {
@@ -70,6 +71,7 @@ test("real failures remain available after the dialog closes and a retry starts 
   await Promise.resolve();
   await Promise.resolve();
   expect(jobs.read()).toMatchObject({ status: "failed", error });
+  expect(log).toHaveBeenCalledWith("[Melt export failed]", job, error);
   expect(jobs.start(job, async () => {})).toBe(true);
   await Promise.resolve();
   await Promise.resolve();

@@ -3,6 +3,7 @@ import type { ReplaySpec } from "@musart/core";
 import { useTranslation } from "react-i18next";
 import { exportSizeKey } from "../../services/export/measurements";
 import { PreviewPreparation } from "./PreviewPreparation";
+import { ExportFailure } from "./ExportFailure";
 import { MediaPlayer } from "../shared/player/MediaPlayer";
 import { getExportJobs } from "../../services/export/jobs";
 import { getAnimationSession } from "../../services/animation/session";
@@ -24,6 +25,7 @@ export function TimelapseExportPane(props: ExportPaneProps) {
     { t: common } = useTranslation("exportPanel");
   const [spec, setSpec] = useState<ReplaySpec | null>(null),
     [error, setError] = useState("");
+  const [historyFailure, setHistoryFailure] = useState<unknown>(null);
   const [durationText, setDuration] = useState("10"),
     [scale, setScale] = useState(1),
     [fps, setFps] = useState(30);
@@ -40,7 +42,14 @@ export function TimelapseExportPane(props: ExportPaneProps) {
     () => services.mediaResolverFor?.(origin.project.id),
     [services, origin.project.id],
   );
-  const { viewport, slider, controls, status, playing } = useTimelapsePreview(
+  const {
+    viewport,
+    slider,
+    controls,
+    status,
+    playing,
+    error: previewFailure,
+  } = useTimelapsePreview(
     spec,
     page.id,
     valid ? duration : 10,
@@ -68,8 +77,12 @@ export function TimelapseExportPane(props: ExportPaneProps) {
           }
           setSpec(replay);
         },
-        () => {
-          if (!controller.signal.aborted) setError("historyFailed");
+        (failure: unknown) => {
+          if (!controller.signal.aborted) {
+            console.error("[Melt timelapse history failed]", failure);
+            setHistoryFailure(failure);
+            setError("historyFailed");
+          }
         },
       );
     return () => controller.abort();
@@ -138,6 +151,11 @@ export function TimelapseExportPane(props: ExportPaneProps) {
             <strong>{page.name}</strong>
             <span>{common("timelapse")} · sRGB</span>
           </div>
+          <ExportFailure
+            error={historyFailure ?? previewFailure ?? (error ? t(error) : null)}
+            message={t(error || "previewFailed")}
+            context={`Timelapse preview · ${origin.project.id} · ${page.id}`}
+          />
         </>
       }
       onSubmit={() => {

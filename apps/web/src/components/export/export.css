@@ -15,8 +15,13 @@
   inset: auto;
   min-width: 0;
   margin: 0;
+}
+.dashboard-create-group .export-trigger {
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
+}
+.export-actions:not(.dashboard-create-group) .export-trigger {
+  width: 100%;
 }
 .export-actions .export-options {
   width: 26px;

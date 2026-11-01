@@ -37,7 +37,8 @@ export async function pruneHistory(tx: HistoryWrite, meta: HistoryMetadata, spar
       : null;
   while (cursor) {
     const old = cursor.value.event;
-    base.state = old.after ?? applyReplayDelta(base.state, old.delta);
+    base.state =
+      old.after ?? applyReplayDelta(base.state, old.delta, { legacyObjectRemovals: true });
     base.at = old.at;
     base.pageId = old.pageId;
     cursor = await cursor.continue();

@@ -85,7 +85,8 @@ export function diffReplayState(before: ReplayState, after: ReplayState): Replay
     }
     if (object(a) && object(b)) {
       for (const key of Object.keys(a))
-        if (b[key] === undefined) output.push({ op: "remove", path: [...path, key] });
+        if (a[key] !== undefined && b[key] === undefined)
+          output.push({ op: "remove", path: [...path, key] });
       for (const [key, value] of Object.entries(b))
         if (value !== undefined && !Object.is(a[key], value)) walk(a[key], value, [...path, key]);
       return;
@@ -118,6 +119,7 @@ function change(
   op: "set" | "insert" | "remove",
   value: unknown,
   owned: WeakSet<object>,
+  legacyObjectRemovals: boolean,
 ): unknown {
   if (path.length === 0) {
     ensure(op === "set", "INVALID_DOCUMENT", "Cannot insert/remove the replay root");
@@ -141,7 +143,14 @@ function change(
   owned.add(next);
   if (rest.length) {
     const child = (root as Record<string | number, unknown>)[key];
-    (next as Record<string | number, unknown>)[key] = change(child, rest, op, value, owned);
+    (next as Record<string | number, unknown>)[key] = change(
+      child,
+      rest,
+      op,
+      value,
+      owned,
+      legacyObjectRemovals,
+    );
     return next;
   }
   if (Array.isArray(next)) {
@@ -157,7 +166,11 @@ function change(
     else if (op === "remove") next.splice(key, 1);
     else next[key] = cloneValue(value);
   } else if (op === "remove") {
-    ensure(Object.hasOwn(next, key), "INVALID_DOCUMENT", "Replay path is missing");
+    ensure(
+      legacyObjectRemovals || Object.hasOwn(next, key),
+      "INVALID_DOCUMENT",
+      "Replay path is missing",
+    );
     delete next[key];
   } else {
     ensure(op === "set", "INVALID_DOCUMENT", "Object insertion requires set");
@@ -165,14 +178,20 @@ function change(
   }
   return next;
 }
-export function applyReplayDelta(state: ReplayState, delta: readonly ReplayDelta[]): ReplayState {
+export function applyReplayDelta(
+  state: ReplayState,
+  delta: readonly ReplayDelta[],
+  // Version-1 recordings could redundantly delete an undefined object field. Reading those
+  // journals treats only absent leaf-object removals as no-ops; parents, arrays and moves stay strict.
+  options: { legacyObjectRemovals?: boolean } = {},
+): ReplayState {
   let result: unknown = state;
   const owned = new WeakSet<object>();
   for (const operation of delta) {
     if (operation.op === "move") {
       const value = at(result, operation.from);
-      result = change(result, operation.from, "remove", undefined, owned);
-      result = change(result, operation.path, "insert", value, owned);
+      result = change(result, operation.from, "remove", undefined, owned, false);
+      result = change(result, operation.path, "insert", value, owned, false);
     } else
       result = change(
         result,
@@ -180,6 +199,7 @@ export function applyReplayDelta(state: ReplayState, delta: readonly ReplayDelta
         operation.op,
         "value" in operation ? operation.value : undefined,
         owned,
+        options.legacyObjectRemovals ?? false,
       );
   }
   return result as ReplayState;

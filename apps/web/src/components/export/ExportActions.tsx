@@ -1,19 +1,6 @@
-import { lazy, memo, Suspense, useCallback, useEffect, useRef, useState } from "react";
-import { ChevronDown, Clapperboard } from "lucide-react";
+import { memo, useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { EnginePort } from "@musart/core";
-import { Button } from "../ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
-const TimelapseDialog = lazy(() =>
-  import("../animation/timelapse/TimelapseDialog").then((module) => ({
-    default: module.TimelapseDialog,
-  })),
-);
 import { ExportPopover } from "./ExportPopover";
 import type { ExportPopoverProps } from "./model";
 import "../animation/timelapse/messages";
@@ -34,15 +21,17 @@ export const ExportActions = memo(
   }) {
     const { t } = useTranslation("timelapse");
     const { onOpenChange } = props;
-    const trigger = useRef<HTMLButtonElement>(null);
     const [requested, setRequested] = useState<string | undefined>();
     const changeOpen = useCallback(
       (open: boolean) => {
         if (open) createMotionTransport(engine).pause();
-        else setRequested(undefined);
+        else {
+          setRequested(undefined);
+          onTimelapseOpenChange(false);
+        }
         onOpenChange(open);
       },
-      [engine, onOpenChange],
+      [engine, onOpenChange, onTimelapseOpenChange],
     );
     useEffect(
       () =>
@@ -53,53 +42,16 @@ export const ExportActions = memo(
         }),
       [engine, changeOpen],
     );
-    const closeTimelapse = useCallback(() => onTimelapseOpenChange(false), [onTimelapseOpenChange]);
     return (
       <div className="export-actions" role="group" aria-label={t("exportActions")}>
         <ExportPopover
           {...props}
           engine={engine}
+          open={props.open || timelapseOpen}
+          initialKind={timelapseOpen ? "timelapse" : props.initialKind}
           initialCompositionId={requested}
           onOpenChange={changeOpen}
         />
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              ref={trigger}
-              size="icon-sm"
-              className="export-options"
-              aria-label={t("exportOptions")}
-            >
-              <ChevronDown size={13} />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent
-            align="end"
-            onCloseAutoFocus={(event) => {
-              if (timelapseOpen) event.preventDefault();
-            }}
-          >
-            <DropdownMenuItem
-              onSelect={() => {
-                props.onOpenChange(false);
-                onTimelapseOpenChange(true);
-              }}
-            >
-              <Clapperboard size={15} />
-              {t("menu")}
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-        {timelapseOpen && (
-          <Suspense fallback={null}>
-            <TimelapseDialog
-              engine={engine}
-              services={props.services}
-              returnFocus={trigger}
-              onClose={closeTimelapse}
-            />
-          </Suspense>
-        )}
       </div>
     );
   },
@@ -113,6 +65,7 @@ export const ExportActions = memo(
     before.timelapseOpen === after.timelapseOpen &&
     before.onTimelapseOpenChange === after.onTimelapseOpenChange &&
     before.initialCompositionId === after.initialCompositionId &&
+    before.initialKind === after.initialKind &&
     before.onPendingChange === after.onPendingChange &&
     before.onTask === after.onTask,
 );

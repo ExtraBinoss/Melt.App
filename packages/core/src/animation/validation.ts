@@ -141,7 +141,7 @@ export function validateReplaySpec(value: unknown): asserts value is ReplaySpec 
         ensure(Object.hasOwn(operation, "value"), "INVALID_DOCUMENT", "Missing replay value");
     }
     const typed = event as unknown as ReplaySpec["events"][number];
-    state = typed.after ?? applyReplayDelta(state, typed.delta);
+    state = typed.after ?? applyReplayDelta(state, typed.delta, { legacyObjectRemovals: true });
     if (typed.after) validateProject(projectFromReplayState(state, pool));
   }
   validateProject(projectFromReplayState(state, pool));

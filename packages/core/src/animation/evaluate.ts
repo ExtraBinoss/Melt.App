@@ -23,7 +23,9 @@ function compile(spec: ReplaySpec): Compiled {
     checkpoints = new Map<number, ReplayState>([[-1, initial]]);
   let state = initial;
   for (const [index, event] of spec.events.entries()) {
-    state = event.after ? cloneValue(event.after) : applyReplayDelta(state, event.delta);
+    state = event.after
+      ? cloneValue(event.after)
+      : applyReplayDelta(state, event.delta, { legacyObjectRemovals: true });
     if (event.after || (index + 1) % 250 === 0) checkpoints.set(index, state);
   }
   const result = {
@@ -50,7 +52,9 @@ function stateAt(spec: ReplaySpec, cache: Compiled, index: number): ReplayState 
       }
   for (let cursor = start + 1; cursor <= index; cursor++) {
     const event = spec.events[cursor]!;
-    state = event.after ? cloneValue(event.after) : applyReplayDelta(state, event.delta);
+    state = event.after
+      ? cloneValue(event.after)
+      : applyReplayDelta(state, event.delta, { legacyObjectRemovals: true });
   }
   cache.lastIndex = index;
   cache.lastState = state;

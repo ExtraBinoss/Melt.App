@@ -11,6 +11,7 @@ import {
 } from "@musart/core";
 import { useTimelapsePreview } from "../../../../src/components/animation/timelapse/use-timelapse-preview";
 import { Slider } from "../../../../src/components/ui/slider";
+import * as core from "@musart/core";
 
 const gpu = vi.hoisted(() => ({
   dispose: vi.fn(),
@@ -51,14 +52,14 @@ let player: ReturnType<typeof useTimelapsePreview>;
 let renders = 0;
 function Harness({ spec, duration = 1 }: { spec: ReplaySpec; duration?: number }) {
   renders++;
-  const { viewport, slider, clock, controls, status, playing } = useTimelapsePreview(
+  const { viewport, slider, clock, controls, status, error, playing } = useTimelapsePreview(
     spec,
     "page",
     duration,
     true,
   );
   useLayoutEffect(() => {
-    player = { viewport, slider, clock, controls, status, playing };
+    player = { viewport, slider, clock, controls, status, error, playing };
   });
   return (
     <>
@@ -80,6 +81,7 @@ beforeEach(() => {
 });
 
 test("uses the export sample mapper, retains one GPU context and updates preview position imperatively", async () => {
+  const evaluate = vi.spyOn(core, "evaluateReplay");
   const spec = replay();
   const view = render(<Harness spec={spec} />);
   await screen.findByText("ready");
@@ -88,6 +90,7 @@ test("uses the export sample mapper, retains one GPU context and updates preview
   act(() => player.controls.current?.seek(1));
   await waitFor(() => expect(screen.getByTestId("surface").dataset.historyTime).toBe("1000"));
   expect(gpu.frames.at(-1)).toMatchObject({ layers: [{ x: 16 }] });
+  expect(evaluate.mock.calls.filter(([, time]) => time === spec.duration)).toHaveLength(2);
   expect(renders).toBe(before);
   expect(screen.getByRole("status")).toHaveTextContent("1.0 / 1 s");
   expect(screen.getByRole("slider")).toHaveAttribute("aria-valuenow", "1");
@@ -127,10 +130,17 @@ test("schedules playback without per-frame React state and cancels the clock on 
 });
 
 test("reports GPU and missing-page failures instead of claiming preview readiness", async () => {
+  const log = vi.spyOn(console, "error").mockImplementation(() => {});
   gpu.fail = true;
   const view = render(<Harness spec={replay()} />);
   await screen.findByText("failed");
   expect(screen.queryByText("ready")).toBeNull();
+  expect(player.error).toBeInstanceOf(Error);
+  expect(log).toHaveBeenCalledWith(
+    "[Melt timelapse preview failed]",
+    { pageId: "page" },
+    player.error,
+  );
   view.unmount();
   gpu.fail = false;
   const spec = replay();

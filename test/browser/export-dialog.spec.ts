@@ -262,9 +262,9 @@ test("motion and timelapse deliver decoded selected videos from the same setting
     await window.musart!.flush();
   });
   const before = await page.evaluate(() => JSON.stringify(window.musart!.snapshot().project));
-  await page.getByRole("button", { name: "Options d’export", exact: true }).click();
-  await page.getByRole("menuitem", { name: "Exporter un timelapse…", exact: true }).click();
-  dialog = page.getByRole("dialog", { name: "Timelapse", exact: true });
+  await page.getByRole("button", { name: "Exporter", exact: true }).click();
+  dialog = page.getByRole("dialog", { name: "Exporter la composition", exact: true });
+  await dialog.getByRole("radio", { name: "Timelapse", exact: true }).click();
   await expect(dialog.locator(".export-workspace")).toBeVisible();
   await expect(dialog.locator(".motion-export-preview-surface canvas")).toBeVisible();
   await expect(

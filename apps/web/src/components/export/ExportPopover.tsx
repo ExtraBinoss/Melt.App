@@ -52,6 +52,7 @@ export function ExportPopover(props: ExportPopoverProps) {
             engine={props.engine}
             services={props.services}
             initialCompositionId={props.initialCompositionId}
+            initialKind={props.initialKind}
             onClose={close}
           />
         </Suspense>

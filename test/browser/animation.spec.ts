@@ -134,9 +134,9 @@ test("automatic history becomes a real encoded video with changing frames and ze
   expect(history).toMatchObject({ ready: true, error: false, pending: 0 });
   expect(history.events).toBeGreaterThanOrEqual(3);
   const before = await page.evaluate(() => window.musart!.snapshot());
-  await page.getByRole("button", { name: "Options d’export", exact: true }).click();
-  await page.getByRole("menuitem", { name: "Exporter un timelapse…", exact: true }).click();
-  const dialog = page.getByRole("dialog", { name: "Timelapse", exact: true });
+  await page.getByRole("button", { name: "Exporter", exact: true }).click();
+  const dialog = page.getByRole("dialog", { name: "Exporter la composition", exact: true });
+  await dialog.getByRole("radio", { name: "Timelapse", exact: true }).click();
   await expect(dialog).toBeVisible();
   await expect(page.getByRole("tab", { name: "Animation", exact: true })).toHaveCount(0);
   const exportButton = dialog.getByRole("button", { name: "Exporter la vidéo", exact: true });
@@ -193,7 +193,7 @@ test("automatic history becomes a real encoded video with changing frames and ze
     await expect(dialog.getByText("Votre timelapse est prêt.", { exact: true })).toBeVisible();
     await dialog.getByRole("button", { name: "Annuler", exact: true }).click();
     await expect(dialog).toHaveCount(0);
-    await expect(page.getByRole("button", { name: "Options d’export", exact: true })).toBeFocused();
+    await expect(page.getByRole("button", { name: "Exporter", exact: true })).toBeFocused();
   } finally {
     await inspector.close();
   }

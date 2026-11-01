@@ -97,6 +97,12 @@ export class ExportJobs {
           bytes: delivered?.bytes,
         };
       } catch (error) {
+        if (!controller.signal.aborted)
+          console.error(
+            "[Melt export failed]",
+            { kind: job.kind, projectId: job.projectId, name: job.name },
+            error,
+          );
         result = {
           ...job,
           sizeKey: undefined,

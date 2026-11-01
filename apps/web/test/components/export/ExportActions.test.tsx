@@ -8,14 +8,7 @@ vi.mock("../../../src/components/export/MotionExportPreview", () => ({
   MotionExportPreview: () => <div />,
 }));
 
-vi.mock("../../../src/components/animation/timelapse/TimelapseDialog", () => ({
-  TimelapseDialog: ({ onClose }: { onClose: () => void }) => (
-    <div role="dialog" aria-label="Timelapse">
-      <button onClick={onClose}>Close Timelapse</button>
-    </div>
-  ),
-}));
-test("keeps normal image export independent and opens Timelapse from the small dropdown", async () => {
+test("uses one full Export button and selects Timelapse inside the shared output group", async () => {
   const d = setup();
   function Harness() {
     const [open, setOpen] = useState(false);
@@ -35,20 +28,15 @@ test("keeps normal image export independent and opens Timelapse from the small d
     );
   }
   d.mount(<Harness />);
+  expect(screen.queryByRole("button", { name: "Options d’export" })).toBeNull();
   fireEvent.click(screen.getByRole("button", { name: "Exporter" }));
   expect(screen.getByRole("dialog", { name: "Exporter la composition" })).toBeVisible();
-  fireEvent.click(await screen.findByRole("button", { name: "Annuler" }));
-  fireEvent.pointerDown(screen.getByRole("button", { name: "Options d’export" }), {
-    button: 0,
-    ctrlKey: false,
-    pointerType: "mouse",
-  });
-  fireEvent.click(await screen.findByRole("menuitem", { name: "Exporter un timelapse…" }));
-  expect(await screen.findByRole("dialog", { name: "Timelapse" })).toBeVisible();
-  expect(screen.queryByRole("dialog", { name: "Exporter la composition" })).toBeNull();
+  fireEvent.click(await screen.findByRole("radio", { name: "Timelapse" }));
+  expect(screen.getByRole("dialog", { name: "Exporter la composition" })).toBeVisible();
+  expect(screen.getByRole("radio", { name: "Timelapse" })).toBeChecked();
   expect(d.services.exportImage).not.toHaveBeenCalled();
-  fireEvent.click(screen.getByText("Close Timelapse"));
-  expect(screen.queryByRole("dialog", { name: "Timelapse" })).toBeNull();
+  fireEvent.click(await screen.findByRole("button", { name: "Annuler" }));
+  expect(screen.queryByRole("dialog", { name: "Exporter la composition" })).toBeNull();
 });
 
 test("opening the common exporter pauses only the editor's presentation and never resumes or seeks on close", async () => {
