@@ -1,3 +1,4 @@
+import { compositionPaintKey } from "../cache/composition-key";
 import { PlaybackSubmissions } from "../cache/playback-submissions";
 import type { RenderFrame } from "./render-frame";
 import { hasEffectTreatment } from "../effects/shared/active";
@@ -29,7 +30,7 @@ import { TextureSources } from "../surface/TextureSources";
 import { TextSources } from "../surface/text/source";
 import type { FontResolver } from "../surface/text/fonts";
 import { PrimitiveBatch } from "./primitives/batch";
-import { isInstancedPrimitive, primitivePaintKey } from "./primitives/eligibility";
+import { isInstancedPrimitive } from "./primitives/eligibility";
 import { NormalBatch } from "./normal-batch";
 import { GpuPasses } from "./passes";
 import { LayerTargets } from "./targets";
@@ -251,25 +252,7 @@ export class GpuCompositor {
       const rootKey = `page:${page.id}:${scale}${options.colorOutput === "source" ? ":source" : ""}${frame.vectorAntialias ? ":vector-aa" : ""}`;
       const entry = this.entry(rootKey);
       const roots = geometry.children(null);
-      const signature = JSON.stringify([
-        page.width,
-        page.height,
-        page.background,
-        page.colorSpace ?? "srgb",
-        roots.map((layer) => [
-          layer.id,
-          layer.x,
-          layer.y,
-          layer.rotation,
-          layer.scaleX ?? 1,
-          layer.scaleY ?? 1,
-          layer.affine ?? null,
-          layer.opacity,
-          layer.visible,
-          layer.blendMode,
-          isInstancedPrimitive(layer) ? primitivePaintKey(layer) : keyFor(layer),
-        ]),
-      ]);
+      const signature = compositionPaintKey(page, roots, keyFor);
       if (entry.signature === signature && entry.output) {
         this.cacheHits++;
         this.frames++;
@@ -437,7 +420,11 @@ export class GpuCompositor {
     const pixelWidth = window?.pixelWidth ?? rasterExtent(width, scale);
     const pixelHeight = window?.pixelHeight ?? rasterExtent(height, scale);
     let target = this.target(entry, key, "children-a", pixelWidth, pixelHeight);
-    this.passes!.clear(target, background);
+    this.passes!.clear(
+      target,
+      background,
+      parentId === null ? frame.page.backgroundGradient : undefined,
+    );
     const layers = window?.empty ? [] : geometry.children(parentId);
     let batch: { layer: Layer; source: FrameTexture }[] = [],
       primitiveRun: Layer[] = [];

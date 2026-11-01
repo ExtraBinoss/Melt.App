@@ -106,6 +106,7 @@ export function insertArtboard(
     width: source.width,
     height: source.height,
     background: source.background,
+    backgroundGradient: source.backgroundGradient,
     ...(source.colorSpace ? { colorSpace: source.colorSpace } : {}),
     canvasPosition: { x: candidate.x + origin.x, y: candidate.y + origin.y },
   });

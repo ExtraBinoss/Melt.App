@@ -25,6 +25,7 @@ export function thumbnailPaintMetadata({ page, sources }: ThumbnailHashJob) {
     width: page.width,
     height: page.height,
     background: page.background,
+    backgroundGradient: page.backgroundGradient,
     colorSpace: page.colorSpace ?? "srgb",
     layers,
     sources,

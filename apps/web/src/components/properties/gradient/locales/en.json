@@ -15,5 +15,16 @@
   "stopOpacity": "Stop {{number}} opacity",
   "add": "Add color stop",
   "removeStop": "Remove stop {{number}}",
-  "preview": "Gradient preview"
+  "preview": "Gradient preview",
+  "presets": "Presets",
+  "random": "Random gradient",
+  "base": "Built-in",
+  "saved": "Saved",
+  "name": "Gradient name",
+  "save": "Save gradient",
+  "remove": "Delete {{name}}",
+  "empty": "No saved gradients",
+  "loadError": "Could not load gradients.",
+  "saveError": "Could not save this change.",
+  "preset": "Gradient {{number}}"
 }

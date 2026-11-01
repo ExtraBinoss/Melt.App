@@ -15,5 +15,16 @@
   "stopOpacity": "Opacité du point {{number}}",
   "add": "Ajouter un point de couleur",
   "removeStop": "Supprimer le point {{number}}",
-  "preview": "Aperçu du dégradé"
+  "preview": "Aperçu du dégradé",
+  "presets": "Préréglages",
+  "random": "Dégradé aléatoire",
+  "base": "Intégrés",
+  "saved": "Enregistrés",
+  "name": "Nom du dégradé",
+  "save": "Enregistrer le dégradé",
+  "remove": "Supprimer {{name}}",
+  "empty": "Aucun dégradé enregistré",
+  "loadError": "Impossible de charger les dégradés.",
+  "saveError": "Impossible d’enregistrer cette modification.",
+  "preset": "Dégradé {{number}}"
 }

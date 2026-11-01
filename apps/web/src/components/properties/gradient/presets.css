@@ -1,0 +1,107 @@
+.gradient-library-actions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.gradient-library-actions > [data-slot="popover-trigger"] {
+  flex: 1;
+  justify-content: flex-start;
+}
+.gradient-library {
+  width: min(300px, calc(100vw - 24px));
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  contain: layout style;
+}
+.gradient-library-save {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.gradient-library-save input {
+  min-width: 0;
+  height: 30px;
+  font-size: 12px;
+}
+.gradient-library-scroll {
+  max-height: min(360px, 55dvh);
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: 2px;
+}
+.gradient-library-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+.gradient-library-entry {
+  position: relative;
+  min-width: 0;
+}
+.gradient-library-preset {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  border: 0;
+  outline: 2px solid transparent;
+  outline-offset: -2px;
+  background-origin: border-box;
+  background-clip: border-box;
+  border-radius: 10px;
+  padding: 0;
+  cursor: pointer;
+  transition: outline-color 120ms ease;
+  box-shadow: none;
+}
+.gradient-library-preset:hover {
+  outline-color: color-mix(in srgb, var(--foreground) 35%, transparent);
+}
+.gradient-library-preset:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+.gradient-library-delete {
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  padding: 0;
+  position: absolute;
+  right: 2px;
+  bottom: 2px;
+  background: var(--popover);
+  border-radius: 6px;
+  opacity: 0;
+}
+.gradient-library-entry:hover .gradient-library-delete,
+.gradient-library-entry:focus-within .gradient-library-delete {
+  opacity: 1;
+}
+.gradient-library-error {
+  color: var(--destructive);
+  font-size: 12px;
+  margin: 0;
+}
+.gradient-library-empty {
+  color: var(--muted-foreground);
+  font-size: 12px;
+  margin: 12px 0;
+}
+@media (hover: none) {
+  .gradient-library-delete {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gradient-library-preset {
+    transition: none;
+  }
+}
+
+.gradient-library-preset[aria-pressed="true"] {
+  outline-color: var(--primary);
+}
+.gradient-library > .gradient-library-shadow {
+  margin-top: -8px;
+}

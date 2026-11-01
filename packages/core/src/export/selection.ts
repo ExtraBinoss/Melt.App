@@ -177,8 +177,9 @@ export function selectionComposition(
   const centered = options.centerInArtboard === true && selected.size === 1;
   const offsetX = centered ? (minX + maxX - page.width) / 2 : left;
   const offsetY = centered ? (minY + maxY - page.height) / 2 : top;
+  const { backgroundGradient: _backgroundGradient, ...backgroundless } = page;
   return {
-    ...page,
+    ...backgroundless,
     ...(spatialSelection ? { spatial: reframeSpatialScene(page, offsetX, offsetY) } : {}),
     name: roots.length === 1 ? geometry.get(roots[0]!).name : page.name,
     width: centered ? page.width : Math.max(1, right - left),

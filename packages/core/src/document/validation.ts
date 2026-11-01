@@ -208,6 +208,7 @@ export function validatePageMetadata(page: Record<string, unknown>): void {
   assertNumber(page.width, 1, 16384);
   assertNumber(page.height, 1, 16384);
   assertColor(page.background);
+  if (page.backgroundGradient !== undefined) validateFillGradient(page.backgroundGradient);
   validatePageLayout(page);
 }
 

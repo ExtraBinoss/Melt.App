@@ -74,6 +74,7 @@ export function createSearchActions(context: SearchActions) {
           width: page.width,
           height: page.height,
           background: page.background,
+          backgroundGradient: page.backgroundGradient,
         }),
       });
     },

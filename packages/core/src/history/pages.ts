@@ -29,6 +29,22 @@ export const updatePage: HistoryHandlers["updatePage"] = (context, command) => {
     () => page,
     { ...page, ...command.patch },
   );
+  if (Object.hasOwn(command.patch, "backgroundGradient")) {
+    const count = Math.max(
+      page.backgroundGradient?.stops.length ?? 0,
+      command.patch.backgroundGradient?.stops.length ?? 0,
+    );
+    const paintFields: CompositionHistoryProperty[] = [
+      "backgroundGradient.kind",
+      "backgroundGradient.angle",
+    ];
+    for (let i = 0; i < count; i++)
+      paintFields.push(
+        `backgroundGradient.stops.${i}.color`,
+        `backgroundGradient.stops.${i}.offset`,
+      );
+    watchFields(context, owner, paintFields, () => page, { ...page, ...command.patch });
+  }
   if (Object.hasOwn(command.patch, "spatial"))
     captureScene({ ...context, page }, () => page.spatial, command.patch.spatial);
   if (Object.hasOwn(command.patch, "guides"))

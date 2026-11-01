@@ -1,6 +1,6 @@
 import { mediaCornerControls, mediaCornerNode } from "../surface/media-corners";
 import { compileGpuScene } from "./compile";
-import type { Bounds, Layer } from "@musart/core";
+import type { Bounds, FillGradient, Layer } from "@musart/core";
 import { sourcePlacement } from "./group-viewport";
 import { invertMatrix, layerTransform } from "@musart/core";
 import {
@@ -16,7 +16,8 @@ import {
   type Texture,
   type WebGPURenderer,
 } from "three/webgpu";
-import { uniform } from "three/tsl";
+import { uniform, uv, vec2, vec4 } from "three/tsl";
+import { paintControls, paintNode, updatePaintControls } from "../surface/paint";
 import {
   blendControls,
   blendNode,
@@ -26,8 +27,8 @@ import {
   maskNode,
 } from "./nodes/composite";
 import { blendModeId } from "./blends/registry";
-import { textureFlip } from "./nodes/uv";
 import { parseColor } from "./nodes/color";
+import { textureFlip } from "./nodes/uv";
 import { shapeControls, shapeNode, updateShape } from "../surface/shapes";
 import type { MaskMapping } from "./mask-binding";
 import type { FrameTexture } from "./types";
@@ -49,6 +50,8 @@ export class GpuPasses {
   private readonly geometry = new PlaneGeometry(2, 2);
   private readonly mesh = new Mesh(this.geometry, material());
   private readonly clearColor = uniform(new Vector4(0, 0, 0, 0));
+  private readonly backgroundPaint = paintControls();
+  private readonly backgroundMaterial = material();
   private readonly clearMaterial = material();
   private readonly copy = copyControls();
   private readonly copyMaterial = material();
@@ -70,6 +73,12 @@ export class GpuPasses {
     this.shapeMaterial.name = "melt:shapes";
     this.cornerMaterial.name = "melt:media-corners";
     this.cornerMaterial.fragmentNode = mediaCornerNode(this.corners);
+    const background = paintNode(
+      this.backgroundPaint,
+      vec2(uv().x, uv().y.oneMinus()).mul(this.backgroundPaint.size),
+    );
+    this.backgroundMaterial.name = "melt:background-gradient";
+    this.backgroundMaterial.fragmentNode = vec4(background.rgb.mul(background.a), background.a);
     this.clearMaterial.fragmentNode = this.clearColor;
     this.copyMaterial.fragmentNode = copyNode(this.copy);
     this.maskMaterial.fragmentNode = maskNode(this.mask);
@@ -84,6 +93,7 @@ export class GpuPasses {
       this.blendMaterial,
       this.shapeMaterial,
       this.cornerMaterial,
+      this.backgroundMaterial,
     ];
     if (materials.every((material) => this.compiled.has(material))) return;
     const previous = this.mesh.material;
@@ -151,13 +161,18 @@ export class GpuPasses {
       this.renderer.autoClear = auto;
     }
   }
-  clear(target: RenderTarget, color = "transparent"): void {
-    const rgba = parseColor(color);
-    rgba.x *= rgba.w;
-    rgba.y *= rgba.w;
-    rgba.z *= rgba.w;
-    this.clearColor.value.copy(rgba);
-    this.draw(this.clearMaterial, target);
+  clear(target: RenderTarget, color = "transparent", gradient?: FillGradient): void {
+    if (gradient) {
+      updatePaintControls(this.backgroundPaint, color, target.width, target.height, gradient);
+      this.draw(this.backgroundMaterial, target);
+    } else {
+      const rgba = parseColor(color);
+      rgba.x *= rgba.w;
+      rgba.y *= rgba.w;
+      rgba.z *= rgba.w;
+      this.clearColor.value.copy(rgba);
+      this.draw(this.clearMaterial, target);
+    }
   }
   copyTo(
     source: FrameTexture,
@@ -256,6 +271,7 @@ export class GpuPasses {
       this.blendMaterial,
       this.shapeMaterial,
       this.cornerMaterial,
+      this.backgroundMaterial,
     ])
       mat.dispose();
     this.scene.clear();

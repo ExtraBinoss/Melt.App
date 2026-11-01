@@ -101,7 +101,7 @@ it("prepares reusable pass materials asynchronously without drawing or retaining
     target = new RenderTarget(1, 1);
   await passes.prepare(target);
   const count = fake.compileAsync.mock.calls.length;
-  expect(count).toBe(6);
+  expect(count).toBe(7);
   expect(fake.render).not.toHaveBeenCalled();
   await passes.prepare(target);
   expect(fake.compileAsync).toHaveBeenCalledTimes(count);
@@ -138,7 +138,7 @@ it("compiles independent logical samplers with distinct valid owned textures and
     targetDispose = vi.spyOn(target, "dispose"),
     targetTextureDispose = vi.spyOn(target.texture, "dispose");
   await passes.prepare(target);
-  expect(seen.map((textures) => textures.size)).toEqual([0, 1, 2, 2, 0, 1]);
+  expect(seen.map((textures) => textures.size)).toEqual([0, 1, 2, 2, 0, 1, 0]);
   expect(owned.size).toBe(3);
   expect(new Set([...owned.keys()].map((texture) => texture.uuid)).size).toBe(3);
   for (const dispose of owned.values()) expect(dispose).toHaveBeenCalledOnce();
@@ -146,7 +146,7 @@ it("compiles independent logical samplers with distinct valid owned textures and
   expect(targetDispose).not.toHaveBeenCalled();
   expect(targetTextureDispose).not.toHaveBeenCalled();
   await passes.prepare(target);
-  expect(fake.compileAsync).toHaveBeenCalledTimes(6);
+  expect(fake.compileAsync).toHaveBeenCalledTimes(7);
   expect(owned.size).toBe(3);
   passes.copyTo({ texture: external, width: 32, height: 24, premultiplied: false }, target);
   const last = fake.render.mock.calls.at(-1)![0] as Scene,

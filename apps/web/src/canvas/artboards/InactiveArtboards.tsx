@@ -1,3 +1,4 @@
+import { gradientPreview } from "../../components/properties/gradient/paint";
 import {
   useLayoutEffect,
   useReducer,
@@ -72,9 +73,7 @@ export function InactiveArtboards({
   }, [engine, projectId, workspace, loadVersion]);
   const [broken, setBroken] = useState<ReadonlySet<string>>(() => new Set());
   const boards = workspace.boards;
-  const backgrounds = new Map(
-    engine.getSnapshot().project.pages.map((page) => [page.id, page.background]),
-  );
+  const backgrounds = new Map(engine.getSnapshot().project.pages.map((page) => [page.id, page]));
   const previews = useArtboardPreviews(
     viewport,
     projectId,
@@ -98,7 +97,10 @@ export function InactiveArtboards({
         style={
           {
             ...artboardStyle(board, workspace, view),
-            "--artboard-background": backgrounds.get(board.id) ?? "transparent",
+            "--artboard-background": backgrounds.get(board.id)?.background ?? "transparent",
+            "--artboard-paint": backgrounds.get(board.id)?.backgroundGradient
+              ? gradientPreview(backgrounds.get(board.id)!.backgroundGradient!)
+              : undefined,
           } as CSSProperties
         }
         role={active ? undefined : "button"}

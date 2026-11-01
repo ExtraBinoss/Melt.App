@@ -145,6 +145,8 @@ export interface Composition {
   width: number;
   height: number;
   background: string;
+  /** Optional portable paint over the preserved solid background color. */
+  backgroundGradient?: FillGradient;
   layers: Layer[];
   guides: Guide[];
   margins?: Insets;

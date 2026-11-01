@@ -68,6 +68,9 @@ export type CompositionHistoryProperty =
   | "width"
   | "height"
   | "background"
+  | "backgroundGradient.kind"
+  | "backgroundGradient.angle"
+  | `backgroundGradient.stops.${number}.${"color" | "offset"}`
   | "rulers"
   | "colorSpace"
   | `margins.${"top" | "right" | "bottom" | "left"}`

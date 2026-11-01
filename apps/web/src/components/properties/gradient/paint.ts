@@ -69,3 +69,25 @@ export function withHexColor(color: string, value: string): string | null {
     return normalized;
   return withOpacity(normalized, stopColorFields(color).opacity);
 }
+
+/** CSS previews use the same top-left coordinates and span as native GPU paint. */
+export function gradientPreview(paint: FillGradient): string {
+  const stops = paint.stops.map((stop) => `${stop.color} ${stop.offset * 100}%`).join(", ");
+  return paint.kind === "radial"
+    ? `radial-gradient(ellipse farthest-side at center, ${stops})`
+    : `linear-gradient(${paint.angle + 90}deg, ${stops})`;
+}
+
+/** Compare authored paint, independently of object-key order or equivalent hex notation. */
+export function sameGradient(a: FillGradient, b: FillGradient): boolean {
+  return (
+    a.kind === b.kind &&
+    (a.angle - b.angle) % 360 === 0 &&
+    a.stops.length === b.stops.length &&
+    a.stops.every(
+      (stop, index) =>
+        stop.offset === b.stops[index]!.offset &&
+        normalizeHex(stop.color) === normalizeHex(b.stops[index]!.color),
+    )
+  );
+}

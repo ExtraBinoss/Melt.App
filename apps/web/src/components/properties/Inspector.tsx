@@ -32,8 +32,9 @@ import { useSetAtom } from "jotai";
 import { useRenderMetrics } from "../../state/session/render-metrics";
 import { previewAtom } from "../../state/session/editor";
 import { ScrollShadow } from "../shared/scroll/ScrollShadow";
+import { RetainedPaint, usePaintOwner } from "./gradient/retained-paint";
 import { MotionColorControl } from "./motion/MotionColorControl";
-import { GradientControl } from "./gradient/GradientControl";
+import { BackgroundGradientControl, GradientControl } from "./gradient/GradientControl";
 import { TextProperties } from "./TextProperties";
 import { AlignmentPanel } from "./AlignmentPanel";
 import { SpacingPanel } from "./SpacingPanel";
@@ -68,6 +69,7 @@ export const Inspector = memo(
     const setPreview = useSetAtom(previewAtom);
     const [aspectLocked, setAspectLocked] = useState(true);
     const layer = selected.length === 1 ? selected[0] : undefined;
+    const paintOwner = usePaintOwner(engine, page.id);
     const geometry = createLayerGeometryIndex(page);
     const locked = selected.some((item) => geometry.isLocked(item.id));
     const resolvePage = useCallback(() => resolveInspectorPage(engine, page), [engine, page]);
@@ -293,7 +295,24 @@ export const Inspector = memo(
                       cancel={cancel}
                     />
                   )}
-                  {(layer?.kind !== "text" || !layer.fillGradient) && (
+                  {!useLayerColor && (
+                    <BackgroundGradientControl
+                      key={`gradient:${paintOwner}`}
+                      page={page}
+                      engine={engine}
+                      preview={pagePreview}
+                      patch={pagePatch}
+                      cancel={cancel}
+                    />
+                  )}
+                  <RetainedPaint
+                    key={useLayerColor ? "layer" : `solid:${paintOwner}`}
+                    retain={!useLayerColor}
+                    visible={Boolean(
+                      (useLayerColor && (layer?.kind !== "text" || !layer.fillGradient)) ||
+                      (!useLayerColor && !page.backgroundGradient),
+                    )}
+                  >
                     <MotionColorControl
                       engine={useLayerColor ? engine : undefined}
                       target={
@@ -315,7 +334,7 @@ export const Inspector = memo(
                       }}
                       onCancel={cancel}
                     />
-                  )}
+                  </RetainedPaint>
                   {layer?.kind === "vector" && !!layer.vector?.parts?.length && (
                     <label
                       className="switch-row original-vector-colors"

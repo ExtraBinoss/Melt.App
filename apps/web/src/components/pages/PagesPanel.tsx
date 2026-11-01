@@ -72,6 +72,7 @@ export function PagesPanel({
                 width: page.width,
                 height: page.height,
                 background: page.background,
+                backgroundGradient: page.backgroundGradient,
               }),
             }),
           )

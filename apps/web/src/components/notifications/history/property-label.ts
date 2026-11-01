@@ -53,6 +53,15 @@ const labels: Readonly<Record<string, string>> = {
 /** Only retained schema metadata is needed; deleted/inactive owners remain nameable. */
 export function historyPropertyLabel(definition: HistoryPropertyDefinition, t: TFunction): string {
   const { source, property, effectType, key, scope } = definition.label;
+  if (property.startsWith("backgroundGradient.")) {
+    const stop = /^backgroundGradient\.stops\.(\d+)\.(color|offset)$/.exec(property);
+    const label = stop
+      ? t(stop[2] === "color" ? "gradient:stopColor" : "gradient:stopPosition", {
+          number: Number(stop[1]) + 1,
+        })
+      : t(property.endsWith("angle") ? "gradient:angle" : "gradient:gradientType");
+    return `${t("translation:background")} · ${label}`;
+  }
   if (source === "effect" && effectType) {
     const effect = getEffectDefinition(effectType);
     if (scope === "input")

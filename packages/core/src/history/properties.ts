@@ -42,6 +42,7 @@ const degrees = new Set([
   "fov",
   "angle",
   "fillGradient.angle",
+  "backgroundGradient.angle",
   "spatial.rotationX",
   "spatial.rotationY",
   "spatial.rotationZ",
@@ -82,6 +83,7 @@ const text = new Set([
   "preset",
 ]);
 const choices: Readonly<Record<string, readonly string[]>> = {
+  "backgroundGradient.kind": ["linear", "radial"],
   colorSpace: ["srgb", "display-p3", "cmyk", "cmyk-proof"],
   "reflections.mode": ["scene", "environment"],
   "reflections.quality": ["draft", "balanced", "high"],
@@ -226,7 +228,9 @@ export function getHistoryPropertyDefinition(target: HistoryPropertyTarget): Def
     ].includes(property);
     result = {
       kind:
-        property === "background" || property === "color"
+        property === "background" ||
+        property === "color" ||
+        /^backgroundGradient\.stops\.\d+\.color$/.test(property)
           ? "color"
           : booleans.has(property)
             ? "boolean"
@@ -250,11 +254,15 @@ export function getHistoryPropertyDefinition(target: HistoryPropertyTarget): Def
         ? { unit: "s" }
         : property === "volume" || property === "strength" || property === "reverb.mix"
           ? { displayScale: 100, unit: "%" }
-          : ["width", "height", "position"].includes(property) ||
-              property.startsWith("margins.") ||
-              property.startsWith("canvasPosition.")
-            ? { unit: "px" }
-            : {}),
+          : /^backgroundGradient\.stops\.\d+\.offset$/.test(property)
+            ? { displayScale: 100, unit: "%" }
+            : property === "backgroundGradient.angle"
+              ? { unit: "°" }
+              : ["width", "height", "position"].includes(property) ||
+                  property.startsWith("margins.") ||
+                  property.startsWith("canvasPosition.")
+                ? { unit: "px" }
+                : {}),
     };
   }
   return result ? freezeValue(result) : null;

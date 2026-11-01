@@ -9,15 +9,20 @@
 }
 .canvas-artboard.canvas-artboard-backdrop {
   background-image:
-    linear-gradient(
-      var(--artboard-background, transparent),
-      var(--artboard-background, transparent)
+    var(
+      --artboard-paint,
+      linear-gradient(
+        var(--artboard-background, transparent),
+        var(--artboard-background, transparent)
+      )
     ),
     repeating-conic-gradient(
       color-mix(in srgb, var(--workspace) 92%, var(--foreground)) 0% 25%,
       color-mix(in srgb, var(--workspace) 97%, var(--foreground)) 0% 50%
     );
-  background-size: 16px 16px;
+  background-size:
+    100% 100%,
+    16px 16px;
 }
 .canvas-artboard.canvas-artboard-editor {
   background: transparent;

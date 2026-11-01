@@ -16,7 +16,8 @@ function choiceLabel(value: string, definition: HistoryPropertyDefinition, t: TF
   const explicit = definition.choiceLabels?.find((option) => option.value === value);
   if (explicit) return t(explicit.labelKey, { ns: "translation" });
   const { source, property } = definition.label;
-  if (property === "fillGradient.kind") return t(value, { ns: "gradient" });
+  if (property === "fillGradient.kind" || property === "backgroundGradient.kind")
+    return t(value, { ns: "gradient" });
   if (property === "textAlign") {
     const keys: Readonly<Record<string, string>> = {
       left: "alignLeft",

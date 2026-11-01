@@ -36,6 +36,7 @@ const pageFields = new Set([
   "width",
   "height",
   "background",
+  "backgroundGradient",
   "margins",
   "rulers",
   "colorSpace",
