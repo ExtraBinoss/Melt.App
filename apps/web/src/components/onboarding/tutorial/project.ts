@@ -55,11 +55,11 @@ export function addDither(engine: EnginePort, layerId: string) {
   const layer = snapshot.project.pages
     .find((page) => page.id === snapshot.pageId)!
     .layers.find((layer) => layer.id === layerId)!;
-  if (layer.effects.some((effect) => effect.type === "bit-dither")) return;
+  if (layer.effects.some((effect) => effect.type === "dither")) return;
   engine.execute({
     type: "updateLayers",
     ids: [layerId],
-    patch: { effects: [...layer.effects, createEffect("bit-dither")] },
+    patch: { effects: [...layer.effects, createEffect("dither")] },
   });
 }
 export function addPop(engine: EnginePort, layerId: string) {

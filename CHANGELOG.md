@@ -12,6 +12,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Make tutorial actions advance from real menu state, split the effect flow into + / Add effect / Dither, type the search automatically and use standard Dither. Keep exit confirmation above the guide, align Previous with the copy, render OS-specific shortcut keys and accompany targets with a morphing SVG pointer.
+
 - Refine the editor tutorial with a dimmed spotlight, a centered first card, the live blinking SVG mascot, Previous/Next navigation and a compact close control. Open the real effect and animation pickers for their guided tasks.
 
 - Include the shared compositor background used by project-opening reveals, keeping their animation on native transform and opacity tracks.

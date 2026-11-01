@@ -61,3 +61,14 @@
 .tutorial-card footer {
   justify-content: space-between;
 }
+
+.tutorial-previous {
+  padding-inline: 0;
+}
+.tutorial-pointer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  overflow: visible;
+}

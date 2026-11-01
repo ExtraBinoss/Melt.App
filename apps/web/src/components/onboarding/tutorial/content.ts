@@ -23,7 +23,7 @@ export const steps = [
   },
   {
     title: "Your tools",
-    text: "Use the toolbar to select, move, draw and add content. You can also pan with your trackpad and zoom around the pointer with Ctrl or Cmd + wheel.",
+    text: "Use the toolbar to select, move, draw and add content. You can also pan with your trackpad and zoom around the pointer with {zoom}.",
     target: ".toolbar",
   },
   {
@@ -38,15 +38,21 @@ export const steps = [
     action: "select",
   },
   {
-    title: "Add an effect",
-    text: "At the top of Layers, click +, then Effects to open the effect library.",
+    title: "Open the effect menu",
+    text: "Click + at the top of Layers. The guide will follow you into the effect menu.",
     target: ".layer-create-actions",
     action: "effectMenu",
   },
   {
-    title: "Try dither",
-    text: "In the open Effects library, search for dither, then click One-bit dither. It turns your image into a pattern of dots.",
-    target: '[data-effect-catalog-item="bit-dither"]',
+    title: "Add an effect",
+    text: "Click Add effect in this menu to open the effect library.",
+    target: '[data-effect-menu-category="effect"]',
+    action: "effectCategory",
+  },
+  {
+    title: "Try Dither",
+    text: "The search is ready. Click Dither to turn the image into a pattern of dots.",
+    target: '[data-effect-catalog-item="dither"]',
     action: "dither",
   },
   {
@@ -100,6 +106,7 @@ export const steps = [
 export type TutorialAction =
   | "select"
   | "effectMenu"
+  | "effectCategory"
   | "dither"
   | "motion"
   | "pin"

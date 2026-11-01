@@ -26,7 +26,7 @@ function click(selector: string) {
   const element = document.querySelector<HTMLButtonElement>(selector);
   if (!element || element.disabled)
     throw new Error("This control is not ready yet. Please try again.");
-  if (element.getAttribute("aria-haspopup") === "menu") {
+  if (element.tagName === "BUTTON" && element.getAttribute("aria-haspopup") === "menu") {
     element.dispatchEvent(
       new PointerEvent("pointerdown", {
         bubbles: true,
@@ -96,7 +96,7 @@ export function Tutorial({
     });
   };
   useEffect(() => {
-    if (phase !== "tour" || hidden || index < furthest.current) return;
+    if (phase !== "tour" || hidden || leave || index < furthest.current) return;
     const transport = createMotionTransport(engine);
     const jobs = getExportJobs(engine);
     let completed = false;
@@ -125,30 +125,34 @@ export function Tutorial({
         action === "select"
           ? snapshot.selection.includes(practice.current.layerId)
           : action === "effectMenu"
-            ? !!document.querySelector("[role=menu]")
-            : action === "dither"
-              ? layer?.effects.some((effect) => effect.type === "bit-dither")
-              : action === "motion"
-                ? page.motion?.mode === "motion"
-                : action === "pin"
-                  ? !!document.querySelector('[data-motion-pinned="true"]')
-                  : action === "pop"
-                    ? page.motion?.tracks.some(
-                        (track) =>
-                          track.layerId === layer?.id &&
-                          track.animations?.some(
-                            (animation) => animation.preset.id === "scale-pop",
-                          ),
-                      )
-                    : action === "play"
-                      ? transport.read().playing
-                      : action === "export"
-                        ? !!document.querySelector(".export-dialog")
-                        : action === "video"
-                          ? !!document.querySelector(".motion-export-preview-surface")
-                          : action === "render"
-                            ? jobs.read()?.kind === "motion" && jobs.read()?.status === "complete"
-                            : false;
+            ? document
+                .querySelector('.layer-create-actions button[aria-haspopup="menu"]')
+                ?.getAttribute("data-state") === "open"
+            : action === "effectCategory"
+              ? !!document.querySelector('.effect-catalog[data-effect-category="effect"]')
+              : action === "dither"
+                ? layer?.effects.some((effect) => effect.type === "dither")
+                : action === "motion"
+                  ? page.motion?.mode === "motion"
+                  : action === "pin"
+                    ? !!document.querySelector('[data-motion-pinned="true"]')
+                    : action === "pop"
+                      ? page.motion?.tracks.some(
+                          (track) =>
+                            track.layerId === layer?.id &&
+                            track.animations?.some(
+                              (animation) => animation.preset.id === "scale-pop",
+                            ),
+                        )
+                      : action === "play"
+                        ? transport.read().playing
+                        : action === "export"
+                          ? !!document.querySelector(".export-dialog")
+                          : action === "video"
+                            ? !!document.querySelector(".motion-export-preview-surface")
+                            : action === "render"
+                              ? jobs.read()?.kind === "motion" && jobs.read()?.status === "complete"
+                              : false;
       if (done) {
         completed = true;
         advance();
@@ -162,7 +166,7 @@ export function Tutorial({
       childList: true,
       subtree: true,
       attributes: true,
-      attributeFilter: ["data-motion-pinned"],
+      attributeFilter: ["data-motion-pinned", "data-state"],
     });
     check();
     return () => {
@@ -171,7 +175,7 @@ export function Tutorial({
       stopJobs();
       observer.disconnect();
     };
-  }, [engine, hidden, index, phase]);
+  }, [engine, hidden, index, phase, leave]);
   async function start() {
     setBusy(true);
     setError("");
@@ -213,6 +217,10 @@ export function Tutorial({
         case "effectMenu":
           click('.layer-create-actions button[aria-haspopup="menu"]');
           break;
+        case "effectCategory":
+          // The next surface opens the library even if clicking Next dismissed its parent menu.
+          advance();
+          break;
         case "dither":
           addDither(engine, id);
           document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
@@ -248,7 +256,7 @@ export function Tutorial({
   if (hidden || phase === "closed") return null;
   return (
     <>
-      {phase === "tour" && (
+      {phase === "tour" && !leave && (
         <Guide
           index={index}
           engine={engine}

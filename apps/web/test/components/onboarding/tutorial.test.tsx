@@ -17,6 +17,10 @@ test("tutorial helpers use real undoable document commands and sparse Pop contro
   expect(
     engine.getSnapshot().project.pages[0]!.layers.find((layer) => layer.id === image.id)!.effects,
   ).toHaveLength(1);
+  expect(
+    engine.getSnapshot().project.pages[0]!.layers.find((layer) => layer.id === image.id)!
+      .effects[0]!.type,
+  ).toBe("dither");
   engine.undo();
   expect(
     engine.getSnapshot().project.pages[0]!.layers.find((layer) => layer.id === image.id)!.effects,

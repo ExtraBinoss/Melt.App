@@ -32,3 +32,9 @@ Unsplash photographs. No third-party image requests are needed during the tutori
 The source image identifiers are also retained in the original images.unsplash.com
 URLs: `photo-1464822759023-fed622ff2c3b`, `photo-1470770841072-f978cf4d019e`,
 and `photo-1441974231531-c6227db76b6e` (640px, quality 75).
+
+The effect lesson follows three real controls: +, Add effect, then standard Dither.
+Menu state and document changes advance the lesson automatically. The effect
+search is typed on entry, and a morphing SVG pointer accompanies the spotlight.
+Shortcut hints use shared Kbd components and the current OS modifier. Exit
+confirmation temporarily hides the guide so the modal remains reachable.
