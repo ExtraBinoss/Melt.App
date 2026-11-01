@@ -49,6 +49,14 @@ export class TimelineHoverSource {
     const previous = this.target;
     const projectId = snapshot.project.id;
     const token = Symbol("timeline-hover");
+    if (
+      previous?.projectId === projectId &&
+      previous.compositionId === compositionId &&
+      previous.layerId === layerId
+    ) {
+      this.token = token;
+      return () => this.clear(token);
+    }
     this.token = token;
     this.target = Object.freeze({ projectId, compositionId, layerId });
     this.stop?.();
@@ -66,13 +74,13 @@ export class TimelineHoverSource {
         !createLayerGeometryIndex(active).byId.has(layerId) ||
         (!summarized && current.project !== project && !current.canUndo && !current.canRedo)
       ) {
-        this.clear(token);
+        if (this.token) this.clear(this.token);
       } else project = current.project;
     });
     this.stopSummary = null;
     if (summarized)
       this.stopSummary = (this.engine as SummaryEngine).subscribeCommitInfo((event) => {
-        if (event.kind === "load") this.clear(token);
+        if (event.kind === "load" && this.token) this.clear(this.token);
       });
     if (
       !previous ||

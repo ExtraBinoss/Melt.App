@@ -7,6 +7,7 @@ import {
   type Command,
   type Composition,
   type Layer,
+  type LayerGeometryIndex,
 } from "@musart/core";
 import { selectionContentBounds } from "../selection/content-bounds";
 import type { Point } from "../viewport/view";
@@ -176,32 +177,29 @@ export function boxSelection(
   from: Point,
   to: Point,
   mode: "contain" | "intersect" = "contain",
+  index: LayerGeometryIndex = createLayerGeometryIndex(page),
 ): string[] {
   const x = Math.min(from.x, to.x);
   const y = Math.min(from.y, to.y);
   const right = Math.max(from.x, to.x);
   const bottom = Math.max(from.y, to.y);
-  const index = createLayerGeometryIndex(page),
-    included = new Set<string>(),
-    pending = [null as string | null];
-  while (pending.length)
-    for (const layer of index.children(pending.pop()!)) {
-      if (!layer.visible || layer.opacity <= 0 || layer.locked || layer.maskSource) continue;
+  return index
+    .queryBounds({ x, y, width: right - x, height: bottom - y })
+    .filter((layer) => {
+      if (!index.isVisible(layer.id) || index.isLocked(layer.id) || index.isMaskSource(layer.id))
+        return false;
       const bounds = selectionContentBounds(index, layer);
-      const selected =
-        mode === "intersect"
-          ? bounds.x < right &&
+      return mode === "intersect"
+        ? bounds.x < right &&
             bounds.y < bottom &&
             bounds.x + bounds.width > x &&
             bounds.y + bounds.height > y
-          : bounds.x >= x &&
+        : bounds.x >= x &&
             bounds.y >= y &&
             bounds.x + bounds.width <= right &&
             bounds.y + bounds.height <= bottom;
-      if (selected) included.add(layer.id);
-      if (layer.kind === "group") pending.push(layer.id);
-    }
-  return page.layers.filter((layer) => included.has(layer.id)).map((layer) => layer.id);
+    })
+    .map((layer) => layer.id);
 }
 
 export function applyPreview(page: Composition, patches: LayerPatch[]): Composition {

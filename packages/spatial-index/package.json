@@ -1,0 +1,17 @@
+{
+  "name": "@musart/spatial-index",
+  "version": "0.2.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "flatbush": "4.7.0"
+  },
+  "devDependencies": {
+    "@types/rbush": "4.0.0",
+    "rbush": "4.0.1"
+  }
+}

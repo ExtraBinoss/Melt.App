@@ -120,6 +120,7 @@ async function prepare(page: Page, evidence: Evidence) {
   await page.addInitScript(() => {
     localStorage.setItem("musart.onboarding.v1", JSON.stringify({ version: 1, completed: true }));
     localStorage.setItem("musart.theme", "dark");
+    localStorage.setItem("musart.language", "fr");
   });
   await page.goto("/?automation=1", { waitUntil: "domcontentloaded" });
   await page.waitForFunction(() => Boolean(window.musart));
@@ -128,6 +129,8 @@ async function prepare(page: Page, evidence: Evidence) {
     timeout: 20000,
   });
   evidence.stage = "seek";
+  const timeline = page.getByRole("button", { name: "Timeline", exact: true });
+  if (await timeline.isVisible()) await timeline.click();
   await seek(page, "10000");
   const view = await page.evaluate(() => {
     window.musart!.select([]);

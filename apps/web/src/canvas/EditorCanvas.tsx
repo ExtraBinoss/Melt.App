@@ -56,6 +56,8 @@ import {
 import "./artboards/artboards.css";
 import { QuickAdd } from "./quick-add/QuickAdd";
 import { CanvasSelection } from "./selection/CanvasSelection";
+import { useCanvasHover } from "./selection/use-canvas-hover";
+import { sourceGeometry, sourcePagePoint } from "./selection/frame-geometry";
 import { canvasHit } from "./selection/hit";
 import { editablePresentedLayer, pickMotionPlayback } from "./selection/presented-pick";
 import { useMarquee } from "./selection/use-marquee";
@@ -126,6 +128,8 @@ export function EditorCanvas({
   const containMarquee = useAtomValue(marqueeContainAtom);
   const [space, setSpace] = useState(false);
   const [dragOver, setDragOver] = useState(false);
+  const hoverEnabled = tool === "pointer" && !space;
+  useCanvasHover(viewport, engine, controller, pageViewSource, hoverEnabled, gesture);
   const wand = useWand({ port: services?.pixelSelection, store, tool, onError });
   const cancelWand = wand.cancel;
   const pixelSelection = services?.pixelSelection;
@@ -166,12 +170,7 @@ export function EditorCanvas({
   );
   useCanvasPresentation({ controller, workspace, motion, viewport, beforePaint });
   function pagePoint(event: { clientX: number; clientY: number }): Point {
-    return clientToPage(
-      { x: event.clientX, y: event.clientY },
-      viewport.current!.getBoundingClientRect(),
-      pageViewSource.read(),
-      controller.read().page,
-    );
+    return sourcePagePoint(controller, viewport.current!, pageViewSource, event);
   }
   function capture(event: ReactPointerEvent) {
     viewport.current?.focus({ preventScroll: true });
@@ -293,7 +292,7 @@ export function EditorCanvas({
       return;
     }
     const currentPage = controller.read().page;
-    const picked = canvasHit(currentPage, point, tool === "pointer"),
+    const picked = canvasHit(currentPage, point, tool === "pointer", sourceGeometry(controller)),
       hit = picked?.layer;
     if (tool === "wand" || tool === "segment") {
       if (hit?.kind === "image") {

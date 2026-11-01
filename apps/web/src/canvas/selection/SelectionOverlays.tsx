@@ -1,12 +1,13 @@
 import { useLayoutEffect, useRef, type CSSProperties, type PointerEvent } from "react";
 import { useTranslation } from "react-i18next";
-import { createLayerGeometryIndex, type Composition, type Layer } from "@musart/core";
+import { type Composition, type Layer } from "@musart/core";
 import { LockKeyhole } from "lucide-react";
 import type { SceneController } from "../session/scene-controller";
 import type { ViewSource } from "../viewport/motion";
 import "./selection-presentation.css";
 import "../../components/layers/messages";
 import { selectionSizeLabel } from "./size-label";
+import { sourceGeometry } from "./frame-geometry";
 import { selectionHandleInk } from "./handle-color";
 
 interface Props {
@@ -46,7 +47,7 @@ function CollectiveFrame({
       const element = frame.current;
       if (!element) return;
       if (previous !== current.page) {
-        const index = createLayerGeometryIndex(current.page);
+        const index = sourceGeometry(controller);
         const bounds = index.collectiveBounds(
           selected
             .filter(
@@ -130,7 +131,7 @@ export function SelectionOverlays({
   }, [controller, selected]);
   // Selection-only publications retain the scene identity: mount directly on its current pose.
   const presented = controller.read().page;
-  const index = createLayerGeometryIndex(presented);
+  const index = sourceGeometry(controller);
   return (
     <div
       ref={root}

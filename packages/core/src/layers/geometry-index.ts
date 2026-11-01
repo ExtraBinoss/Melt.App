@@ -1,3 +1,4 @@
+import { GeometryQuery } from "./geometry-query";
 import type { Composition, Layer } from "../document/model";
 import { ensure } from "../errors";
 import { SpatialGeometry } from "../spatial/geometry";
@@ -14,15 +15,27 @@ import {
 
 const empty: readonly Layer[] = Object.freeze([]);
 const indexes = new WeakMap<Composition, LayerGeometryIndex>();
+// Weak, bounded hints accelerate immutable revisions without retaining project/history graphs.
+const recent = new Map<string, WeakRef<LayerGeometryIndex>>();
+interface HitOptions {
+  includeLocked?: boolean;
+  contentBounds?: (layer: Layer) => Readonly<Bounds> | null;
+  spatialHit?: (layer: Layer) => boolean;
+}
 
 /** One reusable index per immutable composition; mutable command drafts are never cached. */
 export function createLayerGeometryIndex(page: Composition): LayerGeometryIndex {
-  if (!Object.isFrozen(page) || !Object.isFrozen(page.layers)) return new LayerGeometryIndex(page);
+  // Cache entries were verified before insertion. Frozen containers cannot thaw,
+  // so a warm lookup need not repeat integrity checks over the layer array.
   const cached = indexes.get(page);
   if (cached) return cached;
+  if (!Object.isFrozen(page) || !Object.isFrozen(page.layers)) return new LayerGeometryIndex(page);
   if (!page.layers.every((layer) => Object.isFrozen(layer))) return new LayerGeometryIndex(page);
-  const index = new LayerGeometryIndex(page);
+  const index = new LayerGeometryIndex(page, recent.get(page.id)?.deref()?.query);
   indexes.set(page, index);
+  recent.delete(page.id);
+  recent.set(page.id, new WeakRef(index));
+  if (recent.size > 8) recent.delete(recent.keys().next().value!);
   return index;
 }
 
@@ -45,26 +58,36 @@ function readonlyLayers(layers: Map<string, Layer>): ReadonlyMap<string, Layer> 
 
 export class LayerGeometryIndex {
   readonly byId: ReadonlyMap<string, Layer>;
+  readonly spatialLayers: readonly Layer[];
   readonly #lookup: Map<string, Layer>;
+  private positions: Map<string, number> | null = null;
+  private hitQueries = 0;
   private readonly childLists = new Map<string | null, readonly Layer[]>();
   private readonly matrices = new Map<string, Matrix>();
   private readonly localInverses = new Map<string, Matrix>();
   private readonly bounds = new Map<string, Readonly<Bounds>>();
   private readonly flags = new Map<string, { locked: boolean; visible: boolean }>();
   private spatial: SpatialGeometry | null = null;
-  constructor(private readonly page: Composition) {
+  query: GeometryQuery | undefined;
+  constructor(
+    private readonly page: Composition,
+    private previousQuery?: GeometryQuery,
+  ) {
     const byId = new Map<string, Layer>();
     this.#lookup = byId;
     const children = new Map<string | null, Layer[]>();
+    const spatialLayers: Layer[] = [];
     for (const layer of page.layers) {
       ensure(!byId.has(layer.id), "INVALID_HIERARCHY", "Duplicate geometry ID");
       byId.set(layer.id, layer);
+      if (layer.spatial?.enabled) spatialLayers.push(layer);
       const siblings = children.get(layer.parentId) ?? [];
       siblings.push(layer);
       children.set(layer.parentId, siblings);
     }
     for (const [parent, siblings] of children) this.childLists.set(parent, Object.freeze(siblings));
     this.byId = readonlyLayers(byId);
+    this.spatialLayers = Object.freeze(spatialLayers);
     for (const layer of page.layers)
       if (layer.parentId) {
         const parent = byId.get(layer.parentId);
@@ -74,6 +97,25 @@ export class LayerGeometryIndex {
           "Geometry parent is missing or is not a group",
         );
       }
+  }
+  documentOrder(id: string): number {
+    this.positions ??= new Map(this.page.layers.map((layer, at) => [layer.id, at]));
+    return this.positions.get(id)!;
+  }
+  /** Known IDs use lookup and stable ordering, without scanning every document layer. */
+  orderedLayers(ids: Iterable<string>): Layer[] {
+    const result: Layer[] = [];
+    const seen = new Set<string>();
+    for (const id of ids) {
+      const layer = this.#lookup.get(id);
+      if (layer && !seen.has(id)) {
+        result.push(layer);
+        seen.add(id);
+      }
+    }
+    if (result.length > this.page.layers.length / 2)
+      return this.page.layers.filter((layer) => seen.has(layer.id));
+    return result.sort((a, b) => this.documentOrder(a.id) - this.documentOrder(b.id));
   }
   get(id: string): Layer {
     const layer = this.#lookup.get(id);
@@ -182,6 +224,14 @@ export class LayerGeometryIndex {
     this.bounds.set(id, bounds);
     return bounds;
   }
+  /** Inclusive broad-phase candidates in document order; consumers keep their exact predicate. */
+  queryBounds(bounds: Bounds, ordered = true): Layer[] {
+    if (!this.query) {
+      this.query = new GeometryQuery(this.page, this, this.previousQuery);
+      this.previousQuery = undefined;
+    }
+    return this.query.search(bounds, this, ordered);
+  }
   /** One union allocation; missing IDs are skipped for transient selections of removed layers. */
   collectiveBounds(ids: Iterable<string>): Readonly<Bounds> | null {
     let left = Infinity,
@@ -210,15 +260,59 @@ export class LayerGeometryIndex {
       : null;
   }
   /** Parent-local traversal rejects cheap bounds before allocating any world geometry. */
-  hitTest(
+  hitTest(point: Point, options: HitOptions = {}): Layer | null {
+    // One-off evaluated poses should pay only the original exact scan. Build the
+    // broad phase after reuse establishes an opportunity to amortize preparation.
+    if (!this.query && this.hitQueries++ === 0)
+      return this.hitTestCandidates(point, options) ?? null;
+    // Preserve the original O(1) foreground/all-overlap hit. This probe executes
+    // the exact same narrow phase, and an exhausted budget never grants a hit.
+    const foreground = this.hitTestCandidates(point, options, undefined, 8);
+    if (foreground !== undefined) return foreground;
+    const candidates = this.queryBounds({ x: point.x, y: point.y, width: 0, height: 0 }, false);
+    // A renderer's triangle result is authoritative even when an imported/native source
+    // has a conservative projection different from its prepared resource geometry.
+    if (options.spatialHit)
+      for (const layer of this.spatialLayers)
+        if (
+          layer.spatial?.enabled &&
+          layer.kind !== "group" &&
+          options.spatialHit(layer) &&
+          !candidates.includes(layer)
+        )
+          candidates.push(layer);
+    if (!candidates.length) return null;
+    let childLists: Map<string | null, Layer[]> | null = null;
+    // Dense overlap already has an efficient topmost-first traversal. Avoid sorting or
+    // rebuilding every sibling list when the broad phase cannot reject most records.
+    if (candidates.length < this.page.layers.length / 2) {
+      childLists = new Map();
+      const included = new Set<string>();
+      for (const candidate of candidates) {
+        let layer: Layer | undefined = candidate;
+        while (layer && !included.has(layer.id)) {
+          included.add(layer.id);
+          const siblings = childLists.get(layer.parentId) ?? [];
+          siblings.push(layer);
+          childLists.set(layer.parentId, siblings);
+          layer = layer.parentId ? this.#lookup.get(layer.parentId) : undefined;
+        }
+      }
+      for (const siblings of childLists.values())
+        siblings.sort((a, b) => this.documentOrder(a.id) - this.documentOrder(b.id));
+    }
+    const childrenOf = (id: string | null): readonly Layer[] =>
+      childLists ? (childLists.get(id) ?? empty) : this.children(id);
+    return this.hitTestCandidates(point, options, childrenOf) ?? null;
+  }
+  private hitTestCandidates(
     point: Point,
-    options: {
-      includeLocked?: boolean;
-      contentBounds?: (layer: Layer) => Readonly<Bounds> | null;
-      spatialHit?: (layer: Layer) => boolean;
-    } = {},
-  ): Layer | null {
-    const roots = this.children(null);
+    options: HitOptions,
+    childrenOf: (id: string | null) => readonly Layer[] = (id) => this.children(id),
+    budget = Infinity,
+  ): Layer | null | undefined {
+    let visited = 0;
+    const roots = childrenOf(null);
     const stack: { children: readonly Layer[]; at: number; point: Point; fallback?: Layer }[] = [
       { children: roots, at: roots.length - 1, point },
     ];
@@ -229,6 +323,7 @@ export class LayerGeometryIndex {
         if (frame.fallback) return frame.fallback;
         continue;
       }
+      if (visited++ >= budget) return undefined;
       const layer = frame.children[frame.at--]!;
       if (
         layer.maskSource ||
@@ -252,7 +347,7 @@ export class LayerGeometryIndex {
         )
           continue;
         if (layer.kind !== "group") return layer;
-        const children = this.children(layer.id);
+        const children = childrenOf(layer.id);
         stack.push({ children, at: children.length - 1, point: frame.point, fallback: layer });
         continue;
       }
@@ -301,7 +396,7 @@ export class LayerGeometryIndex {
       )
         continue;
       if (layer.kind !== "group") return layer;
-      const children = this.children(layer.id);
+      const children = childrenOf(layer.id);
       stack.push({ children, at: children.length - 1, point: local, fallback: layer });
     }
     return null;

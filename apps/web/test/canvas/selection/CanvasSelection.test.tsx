@@ -4,6 +4,7 @@ import { CanvasSelection } from "../../../src/canvas/selection/CanvasSelection";
 import { SceneController } from "../../../src/canvas/session/scene-controller";
 import { EMPTY_PREVIEW_SOURCE } from "../../../src/state/session/preview-source";
 import { setup } from "../../support/ui";
+import { createLayerGeometryIndex, createSpatialLayer } from "@musart/core";
 import { createTimelineHoverSource } from "../../../src/state/motion/hover";
 import { createMotionTransport } from "../../../src/services/motion/transport";
 
@@ -274,4 +275,26 @@ test("Play hover remains imperative and stale lease cleanup cannot hide its repl
   clear();
   expect(subscriptions.size).toBe(0);
   expect(d.hover.read()).toBeNull();
+});
+
+test("known-ID spatial hover outlines share projected bounds without issuing point queries", () => {
+  const d = hoverFixture();
+  d.engine.execute({
+    type: "updateLayers",
+    ids: [d.rectangle.id],
+    patch: { spatial: createSpatialLayer("sphere") },
+  });
+  const page = d.controller.read().page,
+    geometry = createLayerGeometryIndex(page);
+  const query = vi.spyOn(geometry, "queryBounds");
+  const bounds = geometry.worldBounds(d.rectangle.id);
+  const mount = d.mount(<d.Host />);
+  const clear = d.hover.show(page.id, d.rectangle.id);
+  const outline = document.querySelector<HTMLElement>(".canvas-timeline-hover")!;
+  expect(outline.style.width).toBe(`${bounds.width}px`);
+  expect(outline.style.height).toBe(`${bounds.height}px`);
+  expect(outline.style.transform).toBe(`matrix(1,0,0,1,${bounds.x},${bounds.y})`);
+  expect(query).not.toHaveBeenCalled();
+  clear();
+  mount.unmount();
 });

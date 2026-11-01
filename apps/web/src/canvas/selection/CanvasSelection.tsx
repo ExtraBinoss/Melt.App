@@ -10,6 +10,7 @@ import { GuideOverlay } from "../guides/GuideOverlay";
 import { SelectionOverlays } from "./SelectionOverlays";
 import { SelectionPlane } from "./SelectionPlane";
 import { createTimelineHoverSource } from "../../state/motion/hover";
+import { sourceGeometry } from "./frame-geometry";
 import { paintSelectionHandleInk } from "./handle-color";
 
 /** Only selection decorations subscribe to selected IDs; the retained canvas stays untouched. */
@@ -39,9 +40,8 @@ export const CanvasSelection = memo(function CanvasSelection({
   const selection = useEngineValue(engine, (snapshot) => snapshot.selection);
   const view = viewSource.read();
   const selected = useMemo(() => {
-    const ids = new Set(selection);
-    // Keep an evaluated-visible layer's frame available even when its base visibility is off.
-    return page.layers.filter((layer) => ids.has(layer.id));
+    // Keep evaluated-visible frames even when their base visibility is off.
+    return createLayerGeometryIndex(page).orderedLayers(selection);
   }, [page, selection]);
   return (
     <>
@@ -97,6 +97,8 @@ function TimelineHoverOutline({
       previousPlayback: boolean | undefined,
       previousSelection: readonly string[] | null = null;
     let selected = new Set<string>();
+    const handles =
+      element.current?.querySelectorAll<HTMLElement>(".canvas-timeline-hover-handle") ?? [];
     const paint = () => {
       const node = element.current,
         target = hover.read(),
@@ -131,9 +133,9 @@ function TimelineHoverOutline({
         delete node.dataset.layerId;
         return;
       }
-      const index = createLayerGeometryIndex(frame.page);
+      const index = sourceGeometry(controller);
       const layer = index.byId.get(target.layerId);
-      const visible = layer && index.isVisible(layer.id) && !layer.maskSource;
+      const visible = layer && index.isVisible(layer.id) && !index.isMaskSource(layer.id);
       node.style.display = visible ? "" : "none";
       if (!visible || !layer) {
         delete node.dataset.layerId;
@@ -143,15 +145,16 @@ function TimelineHoverOutline({
       node.dataset.layerKind = layer.kind;
       node.dataset.playback = String(Boolean(frame.playback));
       paintSelectionHandleInk(node, layer, frame.page);
+      const bounds = layer.spatial?.enabled ? index.worldBounds(layer.id) : null;
+      const matrix = bounds ? [1, 0, 0, 1, bounds.x, bounds.y] : index.worldMatrix(layer.id);
       Object.assign(node.style, {
-        width: `${layer.width}px`,
-        height: `${layer.height}px`,
+        width: `${bounds?.width ?? layer.width}px`,
+        height: `${bounds?.height ?? layer.height}px`,
         borderWidth: `${1 / scale}px`,
-        transform: `matrix(${index.worldMatrix(layer.id).join(",")})`,
+        transform: `matrix(${matrix.join(",")})`,
         opacity: frame.playback ? ".2" : "1",
       });
-      for (const handle of node.querySelectorAll<HTMLElement>(".canvas-timeline-hover-handle"))
-        handle.style.transform = `scale(${1 / scale})`;
+      for (const handle of handles) handle.style.transform = `scale(${1 / scale})`;
     };
     paint();
     const stopHover = hover.subscribe(paint),

@@ -112,33 +112,7 @@ export function getWorldBounds(page: Composition, layerId: string): Bounds {
   return { x, y, width: Math.max(...xs) - x, height: Math.max(...ys) - y };
 }
 export function hitTest(page: Composition, point: Point): Layer | null {
-  if (page.layers.some((layer) => layer.spatial?.enabled))
-    return createLayerGeometryIndex(page).hitTest(point);
-  function visit(parentId: string | null, matrix: Matrix): Layer | null {
-    const children = page.layers.filter((layer) => layer.parentId === parentId);
-    for (let index = children.length - 1; index >= 0; index -= 1) {
-      const layer = children[index];
-      if (!layer || layer.maskSource || !layer.visible || layer.locked || layer.opacity === 0)
-        continue;
-      const world = multiplyMatrices(matrix, layerTransform(layer));
-      const local = transformPoint(invertMatrix(world), point);
-      if (local.x < 0 || local.y < 0 || local.x > layer.width || local.y > layer.height) continue;
-      if (
-        layer.kind === "ellipse" &&
-        ((local.x - layer.width / 2) / (layer.width / 2)) ** 2 +
-          ((local.y - layer.height / 2) / (layer.height / 2)) ** 2 >
-          1
-      )
-        continue;
-      if (layer.kind === "group") {
-        const hit = visit(layer.id, world);
-        if (hit) return hit;
-      }
-      return layer;
-    }
-    return null;
-  }
-  return visit(null, IDENTITY);
+  return createLayerGeometryIndex(page).hitTest(point);
 }
 export function snap(value: number, targets: readonly number[], threshold = 6): number {
   let result = value;

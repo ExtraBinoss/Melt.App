@@ -1,4 +1,4 @@
-import type { EnginePort, Composition } from "@musart/core";
+import type { EnginePort, Composition, LayerGeometryIndex } from "@musart/core";
 import { boxSelection } from "../interaction/gestures";
 import { captureGestureOrigin, isGestureOriginCurrent } from "../interaction/gesture-origin";
 import { attachmentSelection } from "../../state/selection/attachments";
@@ -15,7 +15,12 @@ interface Clock {
 }
 
 /** At most one selection publication per frame; release flushes, cancellation restores its own draft. */
-export function createLiveMarquee(engine: EnginePort, clock: Clock, readPage?: () => Composition) {
+export function createLiveMarquee(
+  engine: EnginePort,
+  clock: Clock,
+  readPage?: () => Composition,
+  readGeometry?: () => LayerGeometryIndex,
+) {
   let session: {
     origin: ReturnType<typeof captureGestureOrigin>;
     initial: readonly string[];
@@ -45,6 +50,7 @@ export function createLiveMarquee(engine: EnginePort, clock: Clock, readPage?: (
       request.from,
       request.to,
       request.scope.intersect ? "intersect" : "contain",
+      page === presented ? readGeometry?.() : undefined,
     );
     attachmentSelection(engine).clear();
     const ids = request.scope.additive ? [...new Set([...current.initial, ...selected])] : selected;

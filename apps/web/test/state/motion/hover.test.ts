@@ -78,3 +78,18 @@ test("unrelated edits keep the hovered identity, stale/foreign targets are refus
   clear();
   expect(observations).toBe(0);
 });
+
+test("repeated same-ID producers renew ownership without replacing geometry target or engine observers", () => {
+  const d = fixture(),
+    subscribe = vi.spyOn(d.engine, "subscribe");
+  const first = d.hover.show("first", "a"),
+    target = d.hover.read();
+  const second = d.hover.show("first", "a");
+  expect(d.hover.read()).toBe(target);
+  expect(subscribe).toHaveBeenCalledTimes(1);
+  first();
+  expect(d.hover.read()).toBe(target);
+  d.engine.execute({ type: "deleteLayers", ids: ["a"] });
+  expect(d.hover.read()).toBeNull();
+  second();
+});

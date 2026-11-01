@@ -3,12 +3,13 @@ import { createMotionTransport } from "../../services/motion/transport";
 import { attachmentSelection } from "../../state/selection/attachments";
 import { clickSelection } from "../interaction/gestures";
 import type { SceneFrame } from "../session/scene-controller";
+import { frameGeometry } from "./frame-geometry";
 import { canvasHit } from "./hit";
 
 /** Handles start from the displayed pose, while their canonical origin still owns the commit. */
 export function editablePresentedLayer(frame: SceneFrame, id: string | undefined) {
   if (frame.playback || !id) return null;
-  const geometry = createLayerGeometryIndex(frame.page),
+  const geometry = frameGeometry(frame),
     layer = geometry.byId.get(id);
   return layer && !layer.maskSource && geometry.isVisible(id) && !geometry.isLocked(id)
     ? layer
@@ -34,7 +35,7 @@ export function pickMotionPlayback(
     point.y > page.height
   )
     return;
-  const hit = canvasHit(page, point, true)?.layer;
+  const hit = canvasHit(page, point, true, frameGeometry(frame))?.layer;
   const canonical = snapshot.project.pages.find((item) => item.id === snapshot.pageId)!;
   if (hit && !createLayerGeometryIndex(canonical).byId.has(hit.id)) return;
   const additive = event.shiftKey || event.ctrlKey || event.metaKey;

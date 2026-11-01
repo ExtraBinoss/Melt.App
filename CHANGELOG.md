@@ -6,6 +6,7 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Add shared spatial candidate indexing with Flatbush and bounded immutable edits for exact canvas picking and marquee selection. Reuse presented geometry across canvas, layer and timeline hover, bypass repeated verified-cache integrity scans, preserve selection/history ownership and benchmark 500, 1,000 and 10,000 records against linear, Flatbush and RBush paths.
 - Retain bounded source dependency vectors across immutable render frames, Motion poses and gesture previews. Reuse canonical source signatures when pixels are unchanged while preserving masks, hierarchy, assets, density and media invalidation; expose cache diagnostics and document measured benefits and structural/bulk-edit costs.
 - Add editable, Motion-ready corner radii to image and video layers. Clip their native GPU sources before effects so bevels and shadows follow the curve in preview and export; retain zero-radius source reuse, bounded GPU accounting and one-entry undo/cancellation.
 - Require deliberate inward pointer movement to reveal the unpinned Motion timeline, keeping gentle ruler/transport approaches, sideways travel, clicks and scrubs stationary. Share the same intent rule across the strip, cancel abandoned entry and retain explicit toggle, drag, focus, portal and pin ownership.

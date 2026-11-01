@@ -1,13 +1,22 @@
-import { createLayerGeometryIndex, morphContentBounds, type Composition } from "@musart/core";
+import {
+  createLayerGeometryIndex,
+  morphContentBounds,
+  type Composition,
+  type LayerGeometryIndex,
+} from "@musart/core";
 import type { Point } from "../viewport/view";
 import { pickSpatialLayer } from "@musart/render/spatial";
 import { canvasNativeRenderer, canvasSpatialSource } from "../render/plane-resources";
 
 /** Pointer selection can explain a locked foreground without granting an editing gesture. */
-export function canvasHit(page: Composition, point: Point, includeLocked = false) {
-  const index = createLayerGeometryIndex(page);
+export function canvasHit(
+  page: Composition,
+  point: Point,
+  includeLocked = false,
+  index: LayerGeometryIndex = createLayerGeometryIndex(page),
+) {
   const canvas =
-    typeof document === "undefined"
+    !index.spatialLayers.length || typeof document === "undefined"
       ? null
       : document.querySelector<HTMLCanvasElement>(".editor-gpu-scene canvas[data-page-id]");
   const renderer =
@@ -22,6 +31,7 @@ export function canvasHit(page: Composition, point: Point, includeLocked = false
           (id) => canvasSpatialSource(canvas, id),
           renderer.coordinateSystem,
           includeLocked,
+          index,
         )
       : undefined;
   const layer = index.hitTest(point, {

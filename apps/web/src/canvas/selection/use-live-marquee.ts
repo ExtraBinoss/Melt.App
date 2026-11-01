@@ -1,5 +1,6 @@
 import { useEffect, useMemo } from "react";
 import type { Composition, EnginePort } from "@musart/core";
+import { sourceGeometry } from "./frame-geometry";
 import { createLiveMarquee } from "./live-marquee";
 
 /** The visible pose owns marquee geometry; this mounted canvas owns its scheduled draft. */
@@ -13,6 +14,7 @@ export function useLiveMarquee(engine: EnginePort, source: { read(): { page: Com
           cancel: (handle) => cancelAnimationFrame(handle),
         },
         () => source.read().page,
+        () => sourceGeometry(source),
       ),
     [engine, source],
   );

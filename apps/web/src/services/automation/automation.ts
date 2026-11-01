@@ -5,6 +5,15 @@ import { getAnimationSession, type AnimationState } from "../animation/session";
 import type { HistoryPage } from "../history/model";
 import { readDataUrl } from "../assets/imports";
 export interface AutomationApi {
+  /** Small session metadata, without cloning documents/assets during interaction measurements. */
+  session(): {
+    projectId: string;
+    pageId: string;
+    revision: number;
+    selection: string[];
+    canUndo: boolean;
+    canRedo: boolean;
+  };
   snapshot(): ReturnType<EnginePort["getSnapshot"]>;
   execute(command: Command): void;
   transaction(commands: Command[]): void;
@@ -34,6 +43,17 @@ declare global {
 /** Opt-in local test/CLI port; it exposes the same validated commands as the editor. */
 export function attachAutomation(engine: EnginePort, services: EditorServices) {
   const api: AutomationApi = {
+    session: () => {
+      const state = engine.getSnapshot();
+      return {
+        projectId: state.project.id,
+        pageId: state.pageId,
+        revision: state.revision,
+        selection: [...state.selection],
+        canUndo: state.canUndo,
+        canRedo: state.canRedo,
+      };
+    },
     snapshot: () => structuredClone(engine.getSnapshot()),
     execute: engine.execute,
     transaction: engine.transaction,

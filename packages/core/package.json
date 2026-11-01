@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@musart/path-morph": "workspace:*",
+    "@musart/spatial-index": "workspace:*",
     "svg-pathdata": "9.0.0"
   }
 }

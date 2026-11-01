@@ -20,6 +20,15 @@ describe("opt-in headless automation port", () => {
     api.execute({ type: "addLayers", layers: [layer] });
     api.select([layer.id]);
     expect(api.snapshot().selection).toEqual([layer.id]);
+    const metadata = api.session();
+    expect(metadata).toMatchObject({
+      projectId: engine.getSnapshot().project.id,
+      pageId: engine.getSnapshot().pageId,
+      selection: [layer.id],
+      revision: engine.getSnapshot().revision,
+    });
+    metadata.selection.length = 0;
+    expect(engine.getSnapshot().selection).toEqual([layer.id]);
     const copy = api.snapshot();
     copy.project.name = "Tamper";
     expect(engine.getSnapshot().project.name).not.toBe("Tamper");
