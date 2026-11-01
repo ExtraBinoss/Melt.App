@@ -98,7 +98,9 @@ it("keeps live connectors while the small interpolation glyph is faded out", () 
 it.each([
   ["#ffffff", "#000000"],
   ["#111111", "#ffffff"],
-  ["#8b5cf6", "#000000"],
+  ["#8b5cf6", "#ffffff"],
+  ["#7c3aed", "#ffffff"],
+  ["#c4b5fd", "#000000"],
   ["#16a34a", "#000000"],
 ])("uses opaque contrasting rounded trim grips on %s tracks", (color, ink) => {
   const d = canvasFixture(),

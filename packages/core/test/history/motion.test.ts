@@ -234,3 +234,32 @@ it("retains audio volume, mute, processing and trim values, and keeps undo/redo 
     after: scalar(1),
   });
 });
+
+it("retains the effective composition end for trim undo while preserving the implicit document bound", () => {
+  const d = fixture();
+  d.engine.execute({ type: "setCompositionMode", mode: "motion" });
+  const motion = d.page().motion!,
+    track = motion.tracks[0]!;
+  expect(track.end).toBeNull();
+  const trimmedEnd = { value: motion.duration.value, rate: motion.duration.rate * 2 };
+  d.engine.execute({
+    type: "setMotionTrackRange",
+    trackId: track.id,
+    start: track.start,
+    end: trimmedEnd,
+  });
+  expect(d.properties()).toEqual([
+    expect.objectContaining({
+      target: expect.objectContaining({ property: "end" }),
+      before: scalar(motion.duration.value / motion.duration.rate),
+      after: scalar(trimmedEnd.value / trimmedEnd.rate),
+    }),
+  ]);
+  const description = d.description();
+  d.engine.undo();
+  expect(d.page().motion!.tracks[0]!.end).toBeNull();
+  expect(d.description()).toBe(description);
+  d.engine.redo();
+  expect(d.page().motion!.tracks[0]!.end).toEqual(trimmedEnd);
+  expect(d.description()).toBe(description);
+});

@@ -34,8 +34,14 @@ export const setMotionDuration: HistoryHandlers["setMotionDuration"] = (context,
     { duration: command.duration },
   );
 };
+/** A null end follows the composition duration; retain that effective value in notices. */
+function trackRange(context: HistoryContext, trackId: string) {
+  const motion = context.page.motion;
+  const track = motion?.tracks.find((track) => track.id === trackId);
+  return track ? { start: track.start, end: track.end ?? motion!.duration } : undefined;
+}
 export const setMotionTrackRange: HistoryHandlers["setMotionTrackRange"] = (context, command) => {
-  const read = () => context.page.motion?.tracks.find((track) => track.id === command.trackId);
+  const read = () => trackRange(context, command.trackId);
   watchFields(
     context,
     motionOwner(context.page, "occurrence", { trackId: command.trackId }),
@@ -56,7 +62,7 @@ export const setMotionMedia: HistoryHandlers["setMotionMedia"] = (context, comma
   );
 };
 export const moveMotionTrack: HistoryHandlers["moveMotionTrack"] = (context, command) => {
-  const read = () => context.page.motion?.tracks.find((track) => track.id === command.trackId);
+  const read = () => trackRange(context, command.trackId);
   const old = read();
   if (old)
     watchFields(

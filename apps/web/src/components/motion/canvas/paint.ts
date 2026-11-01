@@ -17,7 +17,9 @@ function trimInk(palette: TimelineCanvasPalette, color: string) {
   if (!ink) {
     const rgb = new Color(color);
     const luminance = rgb.r * 0.2126 + rgb.g * 0.7152 + rgb.b * 0.0722;
-    ink = 1.05 / (luminance + 0.05) > (luminance + 0.05) / 0.05 ? "#ffffff" : "#000000";
+    // Prefer light grips on darker/saturated fills, retaining at least 3.5:1 contrast.
+    // Choosing the mathematically greatest ratio makes Melt's violet grips black.
+    ink = luminance <= 0.25 ? "#ffffff" : "#000000";
     inks.set(color, ink);
   }
   return ink;

@@ -25,11 +25,6 @@
 .motion-row.is-selected[data-layer-kind="audio"] {
   --motion-trim-ink: #000000;
 }
-@supports (color: contrast-color(red)) {
-  .motion-row.is-selected {
-    --motion-trim-ink: contrast-color(var(--motion-track-color));
-  }
-}
 .motion-trim-handle:focus-visible::after {
   opacity: 1;
 }
