@@ -11,12 +11,12 @@ On first launch, the shared Projects/Templates dashboard owns an empty draft tha
 
 ## Storage and access
 
-| History topic    | Contract                                                                                                                                                    |
-| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Schema history   | The journal uses four independent stores introduced in schema 3, checkpoint indexing from schema 4 and independent page thumbnails from schema 5.           |
-| Current schema   | The current database schema is 6: an optional unique compound index on `[projectId, operationId]` supports retry acknowledgments without a parallel ledger. |
-| Upgrade behavior | The upgrade creates the native index without a JavaScript event scan; legacy events lacking operation IDs remain unchanged and unindexed.                   |
-| Legacy epoch     | Existing metadata receives one durable epoch lazily when initialized.                                                                                       |
+| History topic    | Contract                                                                                                                                                                         |
+| ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Schema history   | The journal uses four independent stores introduced in schema 3, checkpoint indexing from schema 4 and independent page thumbnails from schema 5.                                |
+| Current schema   | The current database schema is 8. Schema 6 introduced the optional unique `[projectId, operationId]` retry index; schemas 7 and 8 added media originals and project-name lookup. |
+| Upgrade behavior | The upgrade creates the native index without a JavaScript event scan; legacy events lacking operation IDs remain unchanged and unindexed.                                        |
+| Legacy epoch     | Existing metadata receives one durable epoch lazily when initialized.                                                                                                            |
 
 | Store           | Contents                                                          | Normal access                    |
 | --------------- | ----------------------------------------------------------------- | -------------------------------- |
@@ -25,7 +25,7 @@ On first launch, the shared Projects/Templates dashboard owns an empty draft tha
 | `journalEvents` | Ordered deltas, action summaries, occasional checkpoints          | Pages of at most 100             |
 | `journalAssets` | One immutable original per asset ID                               | Import and replay preparation    |
 
-Project loading and project autosave do not scan historical entries. Original image bytes never enter a command delta or checkpoint. Command summaries identify actions; playback applies the authoritative deltas, avoiding duplicate inserted-layer geometry in command payloads. Checkpoints omit redundant deltas.
+Project manifests, library metadata and project autosave do not scan historical entries. Opening an editor restores its short Undo/Redo stack from a consistent, paginated journal read: the reducer retains at most 100 past and 100 future metadata frames and reads only missing originals referenced by those frames. It validates the saved endpoint before one engine publication. Disabled recording with divergent edits yields no invented stack; corrupt retained history is reported while the validated saved document remains accessible. Original image bytes never enter a command delta or checkpoint. Command summaries identify actions; playback applies the authoritative deltas, avoiding duplicate inserted-layer geometry in command payloads. Checkpoints omit redundant deltas.
 
 Replay diffing indexes stable identities once for bulk property changes. Moving one item within an otherwise unchanged ID order is recognized by a linear scan and stored as one move, followed by any field edits at their final indices. General permutations and insertions/removals retain the full diff path; arbitrary reorderings are not claimed to have linear cost. Applying a replay batch copies each changed container once and leaves its source state untouched.
 
@@ -48,7 +48,7 @@ When detailed observers are present, their command payload is detached before ha
 
 ### Undo/redo descriptions
 
-The short engine undo stack owns each transaction’s immutable semantic description together with its existing snapshot. `CommandCommitInfo.history` carries that same description for commit, undo and redo, so an observer mounted later can still name the actual restored property. Selection and page navigation cannot replace the description. Load clears the stacks; failed, cancelled and stale prepared transactions publish no description.
+The short engine undo stack owns each transaction’s immutable semantic description together with its existing snapshot. `CommandCommitInfo.history` carries that same description for commit, undo and redo, so an observer mounted later can still name the actual restored property. Selection and page navigation cannot replace the description. A plain load clears the stacks; an editor reopen can supply validated restored past/future frames atomically. Durable records predate semantic descriptions, so restored entries use the generic edit description. Failed, cancelled and stale prepared transactions publish no description.
 
 Domain collectors capture command-addressed scalar values before and after mutation, using durable owner/property identities and validated property definitions. They do not diff the whole project or retain SVG paths, original assets, full commands or GPU resources. Repeated writes in a transaction retain the first before value and final after value. Descriptions hold at most 64 changes; display strings hold at most 120 Unicode code points with an explicit truncation flag. Omitted changes use a truthful overflow flag rather than an invented count.
 

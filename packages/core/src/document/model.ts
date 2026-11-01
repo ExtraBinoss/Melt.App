@@ -8,6 +8,7 @@ import type { FillGradient } from "../paint/gradient";
 import type { EffectCompositeMode } from "../effects/compositing";
 import type { Asset } from "../assets/model";
 import type { PreparedEngineTransaction } from "../session/reservation";
+import type { RestoredHistory } from "../session/restored-history";
 export type {
   Asset,
   ImageAsset,
@@ -229,7 +230,7 @@ export interface EnginePort {
   setPage: (id: string) => void;
   undo: () => void;
   redo: () => void;
-  load: (project: Project) => void;
+  load: (project: Project, history?: RestoredHistory) => void;
   transaction: (commands: Command[]) => void;
   reserveTransaction?: (
     commands: Command[],

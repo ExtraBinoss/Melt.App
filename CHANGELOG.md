@@ -10,6 +10,7 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Restore the retained Undo/Redo stack when reopening saved projects or starting the editor, preserving redo cursors and branch behavior within the existing engine horizon. Reconstruct paginated journal metadata before one validated load; report unusable history while keeping the saved document accessible.
 - Reduce landing rendering work with two naturally wrapping headline animation runs, native server-rendered FAQ disclosures and offscreen section containment. Reuse the initialized client translation instance, retain isolated server locales, and prioritize the first showcase image and shared display font without downloading the editor or Three.js on idle landing pages. Record the private Chrome/Lighthouse desktop 100 and mobile 82 results, remaining mobile LCP cost, and native regression evidence in `docs/performance/landing-copy-2026-11-01.md`.
 
 - Keep SlimSAM inference in a dedicated single-threaded WASM worker so the editor GPU stays available. Enlarge only the best mask, release temporary tensors, encode PNGs in the worker, retain one image embedding, show the shared throbber, and support cancellation without committing stale masks. Record bounded real-model responsiveness and the remaining cold-encoding cost in `docs/guides/object-selection.md`.

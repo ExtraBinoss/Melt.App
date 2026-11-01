@@ -14,6 +14,7 @@ import { ThumbnailActivity } from "../projects/thumbnails/activity";
 import { freezeEffectPreviews } from "../../state/session/effect-preview";
 import { MotionAudioSession } from "../motion/audio/session";
 import { createRenderActivity } from "./render-activity";
+import { loadRestoredProject, readRestoredHistory } from "./restored-history";
 export interface RuntimeOptions {
   store?: ProjectStore;
   project?: Project;
@@ -78,6 +79,16 @@ export async function createRuntime(
       })
     : { ...createDemoProject(), id: crypto.randomUUID() };
   const engine = new EditorEngine(project, { now: () => new Date().toISOString() });
+  if (restored) {
+    try {
+      const history = await readRestoredHistory(store.history, project, options.signal);
+      options.signal?.throwIfAborted();
+      if (history) loadRestoredProject(engine, project, history);
+    } catch (error) {
+      await store.close();
+      throw error;
+    }
+  }
   if (!welcome && !restored) {
     try {
       const installed = await store.create(project);

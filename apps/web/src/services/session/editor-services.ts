@@ -43,6 +43,7 @@ import type { FontLibraryPort } from "../fonts/model";
 import { isEditingShortcutTarget } from "../../state/keybindings/matching";
 import { isMusArtClipboardText } from "../clipboard/controller";
 import { freezeEffectPreviews } from "../../state/session/effect-preview";
+import { loadRestoredProject, readRestoredHistory } from "./restored-history";
 export interface ServiceDependencies {
   fonts?: FontLibraryPort;
   confirmMotion?: (plan: MotionInitializationPlan) => Promise<boolean>;
@@ -192,10 +193,16 @@ export function createEditorServices(
         timing?.stage("Wait for previous project saves");
         await switchReady();
         timing?.stage("Read + validate saved project");
+        const origin = engine.getSnapshot();
         const project = await store.load(id, { remember: true });
+        const history = await readRestoredHistory(store.history, project);
+        if (await store.isDeleted(id)) throw new DeletedProjectError(id);
+        const current = engine.getSnapshot();
+        if (current.project !== origin.project || current.revision !== origin.revision)
+          throw new StaleProjectWriteError(origin.project.id);
         timing?.identify(project.name);
         timing?.stage("Publish document");
-        engine.load(project);
+        loadRestoredProject(engine, project, history);
         timing?.waitForFrame(engine.getSnapshot());
       } catch (error) {
         timing?.finish("failed", error);
@@ -220,8 +227,11 @@ export function createEditorServices(
         const projects = await store.list();
         if (projects[0]) {
           const replacement = await store.load(projects[0].id);
+          const history = await readRestoredHistory(store.history, replacement);
+          if (engine.getSnapshot().project.id !== id) return;
           await saveCurrent(replacement);
-          engine.load(replacement);
+          if (engine.getSnapshot().project.id !== id) return;
+          loadRestoredProject(engine, replacement, history);
         } else
           await create({ name: "Sans titre", width: 1080, height: 1080, background: "#ffffff" });
       }

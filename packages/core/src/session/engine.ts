@@ -16,6 +16,7 @@ import type { PreparedEngineTransaction } from "./reservation";
 import { HistoryCollector, historyContexts } from "../history/collector";
 import { captureHistoryCommand } from "../history/registry";
 import type { HistoryDescription } from "../history/model";
+import { ENGINE_HISTORY_LIMIT, type RestoredHistory } from "./restored-history";
 
 function collectExplicitIds(value: unknown, occupied: Set<string>): void {
   if (Array.isArray(value)) {
@@ -108,7 +109,7 @@ export class EditorEngine implements EnginePort {
   constructor(project: Project = createProject(), options: EngineOptions = {}) {
     const copy = clone(project);
     validateProject(copy);
-    this.historyLimit = options.historyLimit ?? 100;
+    this.historyLimit = options.historyLimit ?? ENGINE_HISTORY_LIMIT;
     ensure(
       Number.isInteger(this.historyLimit) && this.historyLimit >= 1 && this.historyLimit <= 100,
       "INVALID_COMMAND",
@@ -404,24 +405,57 @@ export class EditorEngine implements EnginePort {
       next.description,
     );
   };
-  load = (project: Project): void => {
+  load = (project: Project, history?: RestoredHistory): void => {
     this.assertUnlocked();
     const copy = clone(project);
     validateProject(copy);
+    const restore = (frames: RestoredHistory["past"]): HistoryEntry[] =>
+      frames.slice(-this.historyLimit).map((frame) => {
+        const restored = clone(frame.project);
+        validateProject(restored);
+        ensure(
+          restored.id === copy.id && restored.pages.some((page) => page.id === frame.pageId),
+          "INVALID_DOCUMENT",
+          "Invalid restored history frame.",
+        );
+        const restoredIds = collectProjectIds(restored);
+        this.identityIndexes.set(restored, restoredIds);
+        reserveProjectIds(restored, restoredIds);
+        return {
+          snapshot: freeze({
+            project: restored,
+            pageId: frame.pageId,
+            selection: [],
+            revision: 0,
+            canUndo: false,
+            canRedo: false,
+          }),
+          // Legacy durable journals retain action summaries, not scalar descriptions.
+          description: freeze({ changes: [], additionalChanges: true }),
+        };
+      });
+    const past = history ? restore(history.past) : [],
+      future = history ? restore(history.future) : [],
+      pageId = history?.pageId ?? copy.pages[0]!.id;
+    ensure(
+      copy.pages.some((page) => page.id === pageId),
+      "INVALID_DOCUMENT",
+      "History page is missing.",
+    );
     const ids = collectProjectIds(copy);
     this.identityIndexes.set(copy, ids);
     reserveProjectIds(copy, ids);
-    this.past = [];
-    this.future = [];
+    this.past = past;
+    this.future = future;
     this.sequence = 0;
     this.publish(
       {
         project: copy,
-        pageId: copy.pages[0]!.id,
+        pageId,
         selection: [],
         revision: this.snapshot.revision + 1,
-        canUndo: false,
-        canRedo: false,
+        canUndo: past.length > 0,
+        canRedo: future.length > 0,
       },
       "load",
     );

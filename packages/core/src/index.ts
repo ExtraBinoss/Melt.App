@@ -42,6 +42,8 @@ export {
 } from "./document/factories";
 export { EditorEngine } from "./session/engine";
 export type { EngineOptions } from "./session/engine";
+export { createHistoryRestoration } from "./session/restored-history";
+export type { RestoredHistory } from "./session/restored-history";
 export { EngineError } from "./errors";
 export { assertMotionHierarchyChange } from "./motion/hierarchy";
 export type { EngineErrorCode } from "./errors";

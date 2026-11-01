@@ -27,6 +27,7 @@ import { appendInTransaction } from "./append";
 import { initializeHistory } from "./initialization";
 import { writeHistory } from "./transactions";
 import { assertProjectWritable } from "../projects/lifecycle";
+import { restoreProjectHistory } from "./restore";
 import {
   appendOperationInTransaction,
   assertHistoryControlOperation,
@@ -60,6 +61,9 @@ export class HistoryStore {
   }
   async info(projectId: string) {
     return (await this.database()).get("journalMeta", projectId);
+  }
+  async restore(project: Project, signal?: AbortSignal) {
+    return restoreProjectHistory(await this.database(), project, signal);
   }
   async ensure(project: Project, pageId: string): Promise<HistoryMetadata> {
     const fingerprint = await this.fingerprint(stateFromProject(project));
