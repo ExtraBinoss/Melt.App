@@ -6,6 +6,7 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Register the guide feature resources when its controls load, restoring translated guide actions and labels in the Inspector.
 - Allow dragging all four selection borders alongside the visible resize handles, with zoom-sized hit areas, existing resize constraints and one cancelable history transaction. Keep visible points available for keyboard access.
 - Keep certified paint-preview frames until a real canvas draw before reusing their surface, retire them on commit/cancel/source changes, and remove delayed color-thumb transitions and duplicate compatibility-event geometry reads. Preserve precise native commits, keyboard access and one-entry undo; retain native draw, pixel and React diagnostics.
 - Add portable linear/radial composition backgrounds and a shared fifty-preset gradient library with CSS thumbnails, temporary hover/focus previews, random generation with up to eight stops and named cross-project IndexedDB saving through the shared transaction gateway. Keep preset selection and neutral hover borders, full-width controls, translated labels, native GPU preview/export parity and isolated layer transparency. Retain only visited background paint controls with owner-scoped React Activity, dispose active drafts and portals on hiding, and prevent duplicate pane keys and same-ID load reuse. Reuse unchanged background stop controls across layer and effect edits through shared imperative paint invalidation.

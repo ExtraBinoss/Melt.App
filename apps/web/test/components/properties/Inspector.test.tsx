@@ -8,6 +8,7 @@ import { motionPropertyTrack } from "../../../src/state/session/motion-edit";
 import { Inspector } from "../../../src/components/properties/Inspector";
 import { previewAtom, useEngine } from "../../../src/state/session/editor";
 import { setup } from "../../support/ui";
+import { animationPresentation } from "../../../src/components/motion/animations/presentation";
 async function chooseFont(font: string) {
   fireEvent.click(screen.getByRole("combobox", { name: "Police" }));
   fireEvent.change(screen.getByRole("combobox", { name: "Rechercher une police" }), {
@@ -50,6 +51,7 @@ test("authors transform keys through the real inspector and keeps Static base ed
   history.replaceState(null, "", "?automation=1");
   try {
     const d = renderInspector();
+    act(() => animationPresentation(d.engine).set({ details: true }));
     act(() =>
       d.engine.execute({
         type: "setCompositionMode",
@@ -354,8 +356,9 @@ test("previews image dimensions with aspect lock and exposes honest working-colo
     width: 150,
     height: 50,
   });
-  await choose("Mode colorimétrique", "Simulation CMJN (RGB)");
-  expect(screen.getByText(/Sans profil ICC/)).toBeVisible();
+  await choose("Mode colorimétrique", "CMJN · papier couché standard");
+  expect(d.engine.getSnapshot().project.pages[0]!.colorSpace).toBe("cmyk");
+  expect(screen.getByText(/CGATS21 CRPC6/)).toBeVisible();
   await choose("Mode colorimétrique", "Display P3");
   expect(screen.getByText(/exports sont convertis en sRGB/)).toBeVisible();
 });
