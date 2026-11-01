@@ -1,0 +1,31 @@
+{
+  "name": "Barrido temporal",
+  "parameter": {
+    "clock": "Reloj",
+    "direction": "Dirección",
+    "start": "Inicio",
+    "duration": "Duración",
+    "progress": "Progreso",
+    "samples": "Muestras temporales",
+    "driftX": "Desplazamiento horizontal",
+    "driftY": "Desplazamiento vertical",
+    "bend": "Curvatura",
+    "zoom": "Zoom",
+    "edge": "Bordes",
+    "feather": "Suavizado",
+    "showLine": "Línea de barrido",
+    "lineWidth": "Grosor de línea",
+    "lineColor": "Color de línea"
+  },
+  "choice": {
+    "timeline": "Línea de tiempo",
+    "manual": "Manual",
+    "down": "Abajo",
+    "up": "Arriba",
+    "right": "Derecha",
+    "left": "Izquierda",
+    "mirror": "Espejo",
+    "clamp": "Extender",
+    "transparent": "Transparente"
+  }
+}

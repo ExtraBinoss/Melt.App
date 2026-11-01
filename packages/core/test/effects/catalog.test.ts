@@ -11,6 +11,7 @@ describe("portable effect definitions", () => {
       "bevel",
       "displace",
       "thermal",
+      "time-warp-scan",
       "morph",
       "dither",
       "ascii",
@@ -65,6 +66,24 @@ describe("portable effect definitions", () => {
   });
   it("provides typed controls in document units and meaningful display metadata", () => {
     const expected: Record<EffectType, string[]> = {
+      "time-warp-scan": [
+        "amount",
+        "clock",
+        "direction",
+        "start",
+        "duration",
+        "progress",
+        "samples",
+        "driftX",
+        "driftY",
+        "bend",
+        "zoom",
+        "edge",
+        "feather",
+        "showLine",
+        "lineWidth",
+        "lineColor",
+      ],
       morph: ["amount", "progress", "stagger", "inflate", "stretch", "order"],
       transition: ["amount", "style", "progress", "softness", "strength", "detail", "direction"],
       dither: ["amount", "scale", "levels", "color", "seed"],
@@ -404,7 +423,7 @@ describe("portable effect definitions", () => {
       );
       expect(getEffectDefinition(definition.type)).toBe(definition);
       expect(definition.coverage).toBe(
-        ["blur", "shadow", "displace"].includes(definition.type)
+        ["blur", "shadow", "displace", "time-warp-scan"].includes(definition.type)
           ? "expand"
           : ["gradient", "circle", "shatter", "crt", "receipt", "transition"].includes(
                 definition.type,
@@ -417,6 +436,7 @@ describe("portable effect definitions", () => {
           "bevel",
           "displace",
           "thermal",
+          "time-warp-scan",
           "dither",
           "ascii",
           "blur",

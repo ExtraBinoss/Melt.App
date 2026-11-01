@@ -1,3 +1,4 @@
+import { getEffectDefinition } from "../effects/catalog";
 import { compileSceneAnimations } from "./scene/animations/compile";
 import type { SceneMotionPropertyTarget } from "./scene/model";
 import { compileSceneMotion } from "./scene/compile";
@@ -45,6 +46,10 @@ export interface CompiledMotionLayer {
 }
 
 export interface MotionProgram {
+  readonly effectClocks?: readonly {
+    readonly layerId: string;
+    readonly effectIds: readonly string[];
+  }[];
   readonly compositionId: string;
   /** Certified engine pages are shared; external authored compositions are privately copied. */
   readonly composition: Composition;
@@ -120,7 +125,14 @@ export function compileMotion(
           };
         })
       : [];
+  const effectClocks = page.layers.flatMap((layer) => {
+    const effectIds = layer.effects
+      .filter((effect) => getEffectDefinition(effect.type).clock === "composition")
+      .map((effect) => effect.id);
+    return effectIds.length ? [{ layerId: layer.id, effectIds }] : [];
+  });
   const program = freezeValue({
+    ...(effectClocks.length ? { effectClocks } : {}),
     compositionId: page.id,
     composition: page,
     mode,

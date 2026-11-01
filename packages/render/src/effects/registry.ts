@@ -1,3 +1,4 @@
+import { timeWarpScanNode } from "./time-warp-scan/node";
 import { bevelNode } from "./bevel/node";
 import { displaceNode } from "./displace/node";
 import { thermalNode } from "./thermal/node";
@@ -43,6 +44,7 @@ export const EFFECT_NODES: Readonly<
   bevel: bevelNode,
   displace: displaceNode,
   thermal: thermalNode,
+  "time-warp-scan": timeWarpScanNode,
   dither: ditherNode,
   ascii: asciiNode,
   brightness: brightnessNode,

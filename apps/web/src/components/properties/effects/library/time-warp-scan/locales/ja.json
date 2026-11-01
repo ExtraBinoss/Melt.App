@@ -1,0 +1,31 @@
+{
+  "name": "タイムワープスキャン",
+  "parameter": {
+    "clock": "時間制御",
+    "direction": "方向",
+    "start": "開始",
+    "duration": "長さ",
+    "progress": "進行度",
+    "samples": "時間サンプル数",
+    "driftX": "水平移動",
+    "driftY": "垂直移動",
+    "bend": "曲げ",
+    "zoom": "ズーム",
+    "edge": "端の処理",
+    "feather": "ぼかし",
+    "showLine": "スキャン線",
+    "lineWidth": "線の幅",
+    "lineColor": "線の色"
+  },
+  "choice": {
+    "timeline": "タイムライン",
+    "manual": "手動",
+    "down": "下",
+    "up": "上",
+    "right": "右",
+    "left": "左",
+    "mirror": "ミラー",
+    "clamp": "延長",
+    "transparent": "透明"
+  }
+}

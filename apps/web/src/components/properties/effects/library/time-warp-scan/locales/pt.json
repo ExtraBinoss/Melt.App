@@ -1,0 +1,31 @@
+{
+  "name": "Varredura temporal",
+  "parameter": {
+    "clock": "Relógio",
+    "direction": "Direção",
+    "start": "Início",
+    "duration": "Duração",
+    "progress": "Progresso",
+    "samples": "Amostras temporais",
+    "driftX": "Deslocamento horizontal",
+    "driftY": "Deslocamento vertical",
+    "bend": "Curvatura",
+    "zoom": "Zoom",
+    "edge": "Bordas",
+    "feather": "Suavização",
+    "showLine": "Linha de varredura",
+    "lineWidth": "Espessura da linha",
+    "lineColor": "Cor da linha"
+  },
+  "choice": {
+    "timeline": "Linha do tempo",
+    "manual": "Manual",
+    "down": "Baixo",
+    "up": "Cima",
+    "right": "Direita",
+    "left": "Esquerda",
+    "mirror": "Espelhar",
+    "clamp": "Estender",
+    "transparent": "Transparente"
+  }
+}

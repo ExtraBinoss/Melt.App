@@ -1,0 +1,31 @@
+{
+  "name": "Skanowanie czasu",
+  "parameter": {
+    "clock": "Zegar",
+    "direction": "Kierunek",
+    "start": "Początek",
+    "duration": "Czas trwania",
+    "progress": "Postęp",
+    "samples": "Próbki czasowe",
+    "driftX": "Przesunięcie poziome",
+    "driftY": "Przesunięcie pionowe",
+    "bend": "Wygięcie",
+    "zoom": "Powiększenie",
+    "edge": "Krawędzie",
+    "feather": "Zmiękczenie",
+    "showLine": "Linia skanowania",
+    "lineWidth": "Szerokość linii",
+    "lineColor": "Kolor linii"
+  },
+  "choice": {
+    "timeline": "Oś czasu",
+    "manual": "Ręcznie",
+    "down": "W dół",
+    "up": "W górę",
+    "right": "W prawo",
+    "left": "W lewo",
+    "mirror": "Odbicie",
+    "clamp": "Rozciągnij",
+    "transparent": "Przezroczyste"
+  }
+}

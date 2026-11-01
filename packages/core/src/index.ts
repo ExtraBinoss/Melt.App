@@ -235,7 +235,7 @@ export type {
   MotionFrameMediaRequest,
   MotionEvaluationOptions,
 } from "./motion/evaluate";
-export { applyMotionFrame } from "./motion/frame";
+export { applyMotionFrame, resampleMotionFrame, motionFrameComposition } from "./motion/frame";
 export { isMotionTime, validateMotionTime } from "./motion/time";
 export { createLayerGeometryIndex, LayerGeometryIndex } from "./layers/geometry-index";
 export { copyContent, parseClipboard, MAX_CLIPBOARD_CHARACTERS } from "./clipboard/content";

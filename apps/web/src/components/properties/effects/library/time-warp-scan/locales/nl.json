@@ -1,0 +1,31 @@
+{
+  "name": "Tijdscan",
+  "parameter": {
+    "clock": "Klok",
+    "direction": "Richting",
+    "start": "Begin",
+    "duration": "Duur",
+    "progress": "Voortgang",
+    "samples": "Tijdmonsters",
+    "driftX": "Horizontale verschuiving",
+    "driftY": "Verticale verschuiving",
+    "bend": "Buiging",
+    "zoom": "Zoom",
+    "edge": "Randen",
+    "feather": "Zachte rand",
+    "showLine": "Scanlijn",
+    "lineWidth": "Lijnbreedte",
+    "lineColor": "Lijnkleur"
+  },
+  "choice": {
+    "timeline": "Tijdlijn",
+    "manual": "Handmatig",
+    "down": "Omlaag",
+    "up": "Omhoog",
+    "right": "Rechts",
+    "left": "Links",
+    "mirror": "Spiegelen",
+    "clamp": "Begrenzen",
+    "transparent": "Transparant"
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "name": "타임 워프 스캔",
+  "parameter": {
+    "clock": "시간 제어",
+    "direction": "방향",
+    "start": "시작",
+    "duration": "길이",
+    "progress": "진행률",
+    "samples": "시간 샘플 수",
+    "driftX": "가로 이동",
+    "driftY": "세로 이동",
+    "bend": "굽힘",
+    "zoom": "확대",
+    "edge": "가장자리",
+    "feather": "부드럽게",
+    "showLine": "스캔 선",
+    "lineWidth": "선 두께",
+    "lineColor": "선 색상"
+  },
+  "choice": {
+    "timeline": "타임라인",
+    "manual": "수동",
+    "down": "아래",
+    "up": "위",
+    "right": "오른쪽",
+    "left": "왼쪽",
+    "mirror": "미러",
+    "clamp": "확장",
+    "transparent": "투명"
+  }
+}

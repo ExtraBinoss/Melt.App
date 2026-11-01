@@ -1,3 +1,4 @@
+import type { TemporalEffectInputs } from "../effects/GpuEffects";
 import { hasEffectTreatment } from "../effects/shared/active";
 import {
   multiplyMatrices,
@@ -15,6 +16,7 @@ import type { GpuPasses } from "./passes";
 import { rasterExtent, type FrameTexture } from "./types";
 
 interface Context {
+  temporal?: TemporalEffectInputs;
   target(role: string, width: number, height: number, mipmapped?: boolean): RenderTarget;
   passes: GpuPasses;
   effects: EffectResources;
@@ -46,9 +48,28 @@ export function finishLayerSource(
       width: original.width + outset.left + outset.right,
       height: original.height + outset.top + outset.bottom,
     };
+    for (const effect of effects) {
+      const history = context.temporal?.get(effect.id)?.bounds;
+      if (history) {
+        const x = Math.min(bounds.x, history.x),
+          y = Math.min(bounds.y, history.y);
+        bounds = {
+          x,
+          y,
+          width: Math.max(bounds.x + bounds.width, history.x + history.width) - x,
+          height: Math.max(bounds.y + bounds.height, history.y + history.height) - y,
+        };
+      }
+    }
     const width = rasterExtent(bounds.width, scale),
       height = rasterExtent(bounds.height, scale);
-    if (source.premultiplied || outset.left || outset.top || outset.right || outset.bottom) {
+    if (
+      source.premultiplied ||
+      bounds.x !== original.x ||
+      bounds.y !== original.y ||
+      bounds.width !== original.width ||
+      bounds.height !== original.height
+    ) {
       const straight = context.target("straight", width, height);
       context.passes.copyTo(source, straight, source.premultiplied, false, {
         x: (bounds.x - original.x) / original.width,
@@ -65,16 +86,25 @@ export function finishLayerSource(
     );
     try {
       source = {
-        texture: context.effects.apply(source.texture, width, height, effects, output, {
-          width: bounds.width,
-          height: bounds.height,
-          content: {
-            x: original.x - bounds.x,
-            y: original.y - bounds.y,
-            width: original.width,
-            height: original.height,
+        texture: context.effects.apply(
+          source.texture,
+          width,
+          height,
+          effects,
+          output,
+          {
+            width: bounds.width,
+            height: bounds.height,
+            origin: { x: bounds.x, y: bounds.y },
+            content: {
+              x: original.x - bounds.x,
+              y: original.y - bounds.y,
+              width: original.width,
+              height: original.height,
+            },
           },
-        }),
+          context.temporal,
+        ),
         width,
         height,
         premultiplied: false,

@@ -1,6 +1,7 @@
 import { messages as material } from "./library/material/messages";
 import { messages as bevel } from "./library/bevel/messages";
 import { messages as displace } from "./library/displace/messages";
+import { messages as timeWarpScan } from "./library/time-warp-scan/messages";
 import { messages as thermal } from "./library/thermal/messages";
 import { registerFeatureTranslations } from "../../../state/i18n/feature-resources";
 import { messages as ascii } from "./library/ascii/messages";
@@ -23,6 +24,7 @@ export const libraryMessages = {
   bevel,
   displace,
   thermal,
+  "time-warp-scan": timeWarpScan,
   ascii,
   morph,
   shadow,

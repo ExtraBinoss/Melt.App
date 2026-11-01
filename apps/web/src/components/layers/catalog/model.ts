@@ -26,6 +26,7 @@ export const EFFECT_FAMILY = {
   bevel: "light",
   displace: "distortion",
   thermal: "color",
+  "time-warp-scan": "motion",
   morph: "motion",
   dither: "texture",
   ascii: "texture",

@@ -1,0 +1,31 @@
+{
+  "name": "المسح الزمني",
+  "parameter": {
+    "clock": "الساعة",
+    "direction": "الاتجاه",
+    "start": "البداية",
+    "duration": "المدة",
+    "progress": "التقدم",
+    "samples": "العينات الزمنية",
+    "driftX": "الإزاحة الأفقية",
+    "driftY": "الإزاحة الرأسية",
+    "bend": "الانحناء",
+    "zoom": "التكبير",
+    "edge": "الحواف",
+    "feather": "التنعيم",
+    "showLine": "خط المسح",
+    "lineWidth": "عرض الخط",
+    "lineColor": "لون الخط"
+  },
+  "choice": {
+    "timeline": "المخطط الزمني",
+    "manual": "يدوي",
+    "down": "أسفل",
+    "up": "أعلى",
+    "right": "يمين",
+    "left": "يسار",
+    "mirror": "انعكاس",
+    "clamp": "تمديد",
+    "transparent": "شفاف"
+  }
+}

@@ -1,6 +1,6 @@
 import { describe, expect, test, vi } from "vitest";
 import { createStore } from "jotai";
-import { createLayer, createPage, createProject, EditorEngine } from "@musart/core";
+import { createLayer, createPage, createProject, createEffect, EditorEngine } from "@musart/core";
 import { SceneController } from "../../../src/canvas/session/scene-controller";
 import { createPreviewSource } from "../../../src/state/session/preview-source";
 import { previewAtom } from "../../../src/state/session/editor";
@@ -282,4 +282,26 @@ test("labels stable playback frames as transient rather than useful canonical pr
   expect(frame.presentation?.canonical).toBe(false);
   playback.set(null);
   expect(d.controller.read().presentation?.canonical).toBe(true);
+});
+
+test("clock-driven image effects keep publishing without authored property keys", () => {
+  const d = fixture();
+  d.engine.execute({
+    type: "updateLayers",
+    ids: [d.layer.id],
+    patch: { effects: [createEffect("time-warp-scan", { id: "scan" })] },
+  });
+  d.engine.execute({ type: "setCompositionMode", mode: "motion" });
+  const motion = createMotionTransport(d.engine),
+    changed = vi.fn(),
+    stop = d.controller.subscribe(changed);
+  const before = d.controller.read();
+  motion.seek({ value: 1, rate: 2 });
+  const after = d.controller.read();
+  expect(after).not.toBe(before);
+  expect(after.page.layers[0]!.effects[0]!.time).toBe(0.5);
+  expect(after.motionFrame?.timeDependent).toBe(true);
+  expect(changed).toHaveBeenCalledOnce();
+  stop();
+  motion.dispose();
 });

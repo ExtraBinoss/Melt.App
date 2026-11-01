@@ -61,6 +61,9 @@ export type EffectParameter =
   | ColorEffectParameter
   | TextEffectParameter;
 export interface EffectDefinition {
+  /** Runtime sampling metadata, never GPU state or captured frames. */
+  readonly temporal?: "scan";
+  readonly clock?: "composition";
   /** Amount zero leaves the source unchanged unless explicit compositing overrides it. */
   readonly identityAtZero?: boolean;
   readonly inputs?: readonly {
@@ -145,7 +148,7 @@ export function defineEffect(
   parameters: readonly EffectParameter[],
   category: EffectDefinition["category"] = "effect",
   coverage: EffectDefinition["coverage"] = "preserve",
-  options: Pick<EffectDefinition, "identityAtZero"> = {},
+  options: Pick<EffectDefinition, "identityAtZero" | "temporal" | "clock"> = {},
 ): EffectDefinition {
   return Object.freeze({
     ...options,

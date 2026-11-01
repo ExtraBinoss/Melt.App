@@ -6,6 +6,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Add the GPU Time Warp Scan effect for videos, images, groups and 3D sources, with deterministic Motion sampling, an analytical still-image scan, four directions, editable/keyframeable controls, twelve localized resources and bounded cancellable source replay shared by preview/export.
+
 - Use the shared platform modifier label in the timeline zoom tooltip: Command on Apple platforms and Ctrl on Windows/Linux, retaining the mounted tooltip during zoom changes.
 - Stabilize timeline scrollbar geometry across Animations/Keyframes switches and panel heights. Reserve the inline scrollbar gutter, bound transient canvas/row overflow to the authored content extent, and hide vertical scrolling in peek mode while preserving horizontal ruler access and expanded scrolling. Add a native Chromium regression with visible scrollbars and unchanged document state.
 - Prefer white timeline trim grips on Melt violet and darker saturated tracks while retaining at least 3.5:1 contrast; use dark grips on light fills and keep the DOM fallback consistent with the canvas treatment. Retain composition-derived clip ends in trim and move history notices while preserving implicit document bounds through undo/redo.

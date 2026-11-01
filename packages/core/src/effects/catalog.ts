@@ -1,3 +1,4 @@
+import { TIME_WARP_SCAN_DEFINITION } from "./time-warp-scan/definition";
 import { BEVEL_DEFINITION } from "./bevel/definition";
 import { DISPLACE_DEFINITION } from "./displace/definition";
 import { THERMAL_DEFINITION } from "./thermal/definition";
@@ -37,6 +38,7 @@ export const EFFECT_CATALOG: Readonly<Record<EffectType, EffectDefinition>> = Ob
   bevel: BEVEL_DEFINITION,
   displace: DISPLACE_DEFINITION,
   thermal: THERMAL_DEFINITION,
+  "time-warp-scan": TIME_WARP_SCAN_DEFINITION,
   morph: MORPH_DEFINITION,
   dither: defineEffect("dither", {}, [AMOUNT, SCALE, LEVELS, COLOR, SEED]),
   ascii: ASCII_DEFINITION,

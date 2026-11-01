@@ -1,0 +1,31 @@
+{
+  "name": "Scansione temporale",
+  "parameter": {
+    "clock": "Orologio",
+    "direction": "Direzione",
+    "start": "Inizio",
+    "duration": "Durata",
+    "progress": "Avanzamento",
+    "samples": "Campioni temporali",
+    "driftX": "Deriva orizzontale",
+    "driftY": "Deriva verticale",
+    "bend": "Curvatura",
+    "zoom": "Zoom",
+    "edge": "Bordi",
+    "feather": "Sfumatura",
+    "showLine": "Linea di scansione",
+    "lineWidth": "Spessore linea",
+    "lineColor": "Colore linea"
+  },
+  "choice": {
+    "timeline": "Timeline",
+    "manual": "Manuale",
+    "down": "Giù",
+    "up": "Su",
+    "right": "Destra",
+    "left": "Sinistra",
+    "mirror": "Specchio",
+    "clamp": "Estendi",
+    "transparent": "Trasparente"
+  }
+}
