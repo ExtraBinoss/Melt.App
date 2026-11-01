@@ -63,8 +63,10 @@ test("mobile landing, project library, presets and creation lead to the full-wid
 }, info) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/");
-  await expect(page.getByRole("heading", { level: 1, name: "Créez. Animez." })).toBeVisible();
-  await expect(page.getByText("Aperçu vidéo à venir")).toHaveCount(4);
+  await expect(
+    page.getByRole("heading", { level: 1, name: "Créez simplement. Animez comme un pro." }),
+  ).toBeVisible();
+  await expect(page.getByText("Aperçu vidéo à venir")).toHaveCount(6);
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(390);
   await page.screenshot({ path: info.outputPath("mobile-landing.png") });
   await page.getByRole("button", { name: "Commencer à créer" }).first().click();

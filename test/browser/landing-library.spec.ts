@@ -8,11 +8,14 @@ test("landing follows the app theme and its draggable showcase opens real templa
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.emulateMedia({ colorScheme: "light" });
   await page.goto("/?automation=1&welcome=1");
-  const headline = page.getByRole("heading", { level: 1, name: "Créez. Animez." });
+  const headline = page.getByRole("heading", {
+    level: 1,
+    name: "Créez simplement. Animez comme un pro.",
+  });
   await expect(headline).toBeVisible();
   await expect(page.locator(".landing-nav .landing-brand")).toBeVisible();
   await expect(page.getByRole("button", { name: "Try Melt", exact: true })).toBeVisible();
-  await expect(page.locator(".landing-video-placeholder")).toHaveCount(4);
+  await expect(page.locator(".landing-video-placeholder")).toHaveCount(6);
   await expect(page.locator(".landing-eyebrow")).toHaveCount(0);
   const light = await page
     .locator(".landing-page")
@@ -140,7 +143,9 @@ test("library keeps five decoded recent thumbnails, a real Home action and Stati
   expect(Math.round(gutter!.x + gutter!.width)).toBe(1280);
   await page.screenshot({ path: info.outputPath("library-sidebar-motion.png") });
   await page.getByRole("button", { name: "Retour à l’accueil", exact: true }).click();
-  await expect(page.getByRole("heading", { level: 1, name: "Créez. Animez." })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { level: 1, name: "Créez simplement. Animez comme un pro." }),
+  ).toBeVisible();
   await page.getByRole("button", { name: "Try Melt", exact: true }).click();
   await expect(sidebar).toBeVisible();
   await sidebar.getByRole("button", { name: "Projets", exact: true }).click();

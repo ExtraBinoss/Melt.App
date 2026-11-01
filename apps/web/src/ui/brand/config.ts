@@ -12,6 +12,11 @@ export const brand = {
     ink: "#2B1745",
   },
   mascot: { shape: "fleur8", expression: "surpris", eyes: "capsule" },
+  typeface: {
+    family: "Clash Display",
+    source:
+      "https://cdn.fontshare.com/wf/DK2FOA46SRWJ5HXWWU5TK4N4CMHYD236/FPEAXZZSH5L2K5MTJFRIWD2MC32IJMN3/THOOS4VOCKT7H2XEB27NQDYM2NYS4AAR.woff2",
+  },
   assets: {
     idle: "branding/melt-idle.webp",
     icon: "branding/melt.svg",

@@ -13,10 +13,12 @@ const themeScript = `try{const t=localStorage.getItem('musart.theme')||'system';
 /** SSR and hydration share the selected locale, without an intermediate English layout. */
 export function RootDocument({ children }: { children: ReactNode }) {
   const [initialLocale] = useState(initialDocumentLocale);
-  const [translations] = useState(() => i18n.cloneInstance({ lng: initialLocale }));
+  const [translations] = useState(() =>
+    import.meta.env.SSR ? i18n.cloneInstance({ lng: initialLocale }) : i18n,
+  );
   useLayoutEffect(() => {
     const update = (language: string) => {
-      void translations.changeLanguage(language);
+      if (translations !== i18n) void translations.changeLanguage(language);
       document.documentElement.lang = language;
       document.documentElement.dir = localeDirection(language);
     };

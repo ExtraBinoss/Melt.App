@@ -13,7 +13,7 @@ import { ShowcaseCarousel } from "./ShowcaseCarousel";
 import "./messages";
 import "./landing.css";
 
-const features = ["canvas", "effects", "motion", "agent"] as const;
+const features = ["canvas", "effects", "motion", "agent", "timelapse", "export"] as const;
 /** Video slots remain placeholders until clips are supplied in public/videos. */
 export function LandingPage({
   onCreate,
@@ -34,6 +34,7 @@ export function LandingPage({
       <SiteHeader landing onTry={onCreate} onPrepare={onPrepare} disabled={busy} />
       <section className="landing-intro" id="musart-intro">
         <HeroHeadline lines={[t("titleFirst"), t("titleSecond")]} />
+        <p className="landing-intro-description">{t("heroDescription")}</p>
         <NavigationButton
           className="landing-cta"
           href={dashboardHref}

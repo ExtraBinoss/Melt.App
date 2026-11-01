@@ -1,7 +1,13 @@
 import { expect, test } from "vitest";
 import { messages } from "../../../../src/components/projects/landing/messages";
-test("English and French provide matching nonempty interface strings", () => {
-  expect(Object.keys(messages.en).sort()).toEqual(Object.keys(messages.fr).sort());
-  for (const value of [...Object.values(messages.en), ...Object.values(messages.fr)])
-    expect(value.trim()).not.toBe("");
+
+test("all landing languages provide matching nonempty interface strings", () => {
+  const keys = Object.keys(messages.en).sort();
+  for (const catalog of Object.values(messages)) {
+    expect(Object.keys(catalog).sort()).toEqual(keys);
+    for (const value of Object.values(catalog)) {
+      expect(value).toBeTypeOf("string");
+      expect(String(value).trim()).not.toBe("");
+    }
+  }
 });

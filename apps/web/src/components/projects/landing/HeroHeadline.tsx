@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 
-/** A finite masked letter reveal. Hidden tabs pause CSS work; reduced motion stays readable. */
+/** Two native text runs preserve shaping/wrapping without per-letter React/DOM work. */
 export function HeroHeadline({ lines }: { lines: readonly string[] }) {
   const element = useRef<HTMLHeadingElement>(null);
   useEffect(() => {
@@ -12,17 +12,10 @@ export function HeroHeadline({ lines }: { lines: readonly string[] }) {
   return (
     <h1 ref={element} className="landing-headline" aria-label={lines.join(" ")}>
       {lines.map((line, row) => (
-        <span className="hero-line" key={line} aria-hidden>
-          {(/\p{Script=Arabic}/u.test(line) ? [line] : Array.from(line)).map((letter, index) => (
-            <span className="hero-letter-mask" key={`${index}:${letter}`}>
-              <span
-                className="hero-letter"
-                style={{ animationDelay: `${row * 0.22 + index * 0.055}s` }}
-              >
-                {letter === " " ? "\u00a0" : letter}
-              </span>
-            </span>
-          ))}
+        <span className="hero-line-mask" key={line} aria-hidden>
+          <span className="hero-line" style={{ animationDelay: `${row * 0.14}s` }}>
+            {line}
+          </span>
         </span>
       ))}
     </h1>

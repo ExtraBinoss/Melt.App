@@ -4,6 +4,10 @@ The interface identity lives in `apps/web/src/ui/brand/`. `config.ts` supplies
 `brand.name`, the saturated violet primary `#8B5CF6` and deeper action fill `#7C3AED`, the palette, mascot and asset paths.
 The generated palette.css takes its values from config.ts; regenerate with the asset script.
 Global CSS variables apply the same palette to both themes and Radix portals.
+The same configuration owns the UI display font URL. `bun scripts/brand-assets.ts`
+generates `typeface.css`, and the landing head preloads that exact source. The
+Fontshare display font remains UI-only and is never offered as an editable
+document font or redistributed as a font binary.
 Primary actions and dark-theme switch thumbs use white. The slightly deeper
 action fill keeps white labels legible while accent lines and the mascot use the same saturated violet primary. Translated product copy uses `brand.name`, not separate hardcoded names.
 

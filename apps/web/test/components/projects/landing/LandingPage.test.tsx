@@ -15,13 +15,31 @@ beforeEach(() => {
   );
 });
 
-test("shows the animated headline, real templates and four deliberate video slots", () => {
+test("shows the animated headline, real templates and six deliberate video slots", () => {
   const d = setup(),
     create = vi.fn(),
     choose = vi.fn();
   d.mount(<LandingPage onCreate={create} onTemplate={choose} />);
-  expect(screen.getByRole("heading", { level: 1, name: "Créez. Animez." })).toBeVisible();
-  expect(screen.getAllByText("Aperçu vidéo à venir")).toHaveLength(4);
+  expect(
+    screen.getByRole("heading", { level: 1, name: "Créez simplement. Animez comme un pro." }),
+  ).toBeVisible();
+  expect(
+    screen.getByText(
+      "Un outil simple pour créer des visuels fixes ou animés. Combinez images, vidéos et 3D avec des réglages en temps réel.",
+    ),
+  ).toBeVisible();
+  expect(screen.getAllByText("Aperçu vidéo à venir")).toHaveLength(6);
+  expect(
+    [...document.querySelectorAll("[data-video-slot]")].map((slot) =>
+      slot.getAttribute("data-video-slot"),
+    ),
+  ).toEqual(["canvas", "effects", "motion", "agent", "timelapse", "export"]);
+  expect(
+    screen.getByRole("heading", { name: "Faites de votre création un timelapse." }),
+  ).toBeVisible();
+  expect(
+    screen.getByRole("heading", { name: "Exportez la version qu’il vous faut." }),
+  ).toBeVisible();
   expect(document.querySelector("video")).toBeNull();
   expect(document.querySelector(".landing-eyebrow")).toBeNull();
   expect(create).not.toHaveBeenCalled();
@@ -35,12 +53,23 @@ test("shows the animated headline, real templates and four deliberate video slot
 test("all landing copy follows the selected interface language", async () => {
   const d = setup();
   d.mount(<LandingPage onCreate={vi.fn()} />);
-  expect(screen.getByRole("heading", { name: "Créez. Animez." })).toBeVisible();
+  expect(
+    screen.getByRole("heading", { name: "Créez simplement. Animez comme un pro." }),
+  ).toBeVisible();
   await act(async () => {
     await i18n.changeLanguage("en");
   });
-  expect(screen.getByRole("heading", { name: "Create. Animate." })).toBeVisible();
-  expect(screen.getByRole("heading", { name: "Make room for your ideas." })).toBeVisible();
+  expect(
+    screen.getByRole("heading", { name: "Design with ease. Animate like a pro." }),
+  ).toBeVisible();
+  expect(
+    screen.getByText(
+      "Create still or animated visuals in one simple tool. Combine images, video and 3D with real-time controls.",
+    ),
+  ).toBeVisible();
+  expect(
+    screen.getByRole("heading", { name: "Start with a template or make it your own." }),
+  ).toBeVisible();
 });
 
 test("pending template loading disables creation and offers the actual cancellation action", () => {

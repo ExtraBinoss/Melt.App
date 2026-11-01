@@ -36,43 +36,36 @@
   line-height: 1.02;
   letter-spacing: -0.025em;
 }
+.landing-intro-description {
+  max-width: 530px;
+  margin: -14px auto 28px;
+  color: var(--muted-foreground);
+  font-size: 15px;
+  line-height: 1.7;
+  text-wrap: balance;
+}
 .hero-line {
   display: block;
-  white-space: nowrap;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+  animation: hero-line-reveal 700ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
 }
-.hero-letter-mask {
-  display: inline-block;
+.hero-line-mask {
+  display: block;
   overflow: hidden;
   vertical-align: top;
   padding: 0.1em 0.014em 0.08em;
   margin: -0.1em -0.014em -0.08em;
 }
-.hero-letter {
-  display: inline-block;
-  transform-origin: 30% 100%;
-  animation: hero-letter-reveal 0.85s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-.landing-headline[data-paused] .hero-letter {
+.landing-headline[data-paused] .hero-line {
   animation-play-state: paused;
 }
-@keyframes hero-letter-reveal {
+@keyframes hero-line-reveal {
   0% {
-    transform: translateY(120%) rotate(7deg);
-    opacity: 0;
-    filter: blur(5px);
-  }
-  68% {
-    transform: translateY(-4%) rotate(-0.7deg);
-    opacity: 1;
-    filter: blur(0);
-  }
-  84% {
-    transform: translateY(1%);
+    transform: translateY(100%);
   }
   100% {
-    transform: translateY(0) rotate(0);
-    opacity: 1;
-    filter: blur(0);
+    transform: none;
   }
 }
 .landing-cta[data-slot="button"] {
@@ -94,6 +87,7 @@
 }
 .landing-showcase-scroll {
   position: relative;
+  contain: layout style;
   display: flex;
   gap: 24px;
   width: 100%;
@@ -103,6 +97,15 @@
   scrollbar-width: none;
   user-select: none;
   cursor: grab;
+}
+/* Skip offscreen layout and painting while keeping native anchors and find-in-page. */
+.landing-creativity,
+.landing-feature-tile,
+.landing-page > .site-faq,
+.landing-footer,
+.landing-page > .site-footer {
+  content-visibility: auto;
+  contain-intrinsic-block-size: auto 500px;
 }
 .landing-showcase-scroll::-webkit-scrollbar {
   display: none;
@@ -351,8 +354,11 @@
     padding: 66px 20px 70px;
   }
   .landing-headline {
-    font-size: clamp(72px, 19vw, 112px);
+    font-size: clamp(40px, 11vw, 62px);
     margin-bottom: 30px;
+  }
+  .landing-intro-description {
+    font-size: 14px;
   }
   .landing-cta[data-slot="button"] {
     height: 52px;
@@ -393,6 +399,7 @@
     width: calc(100% - 32px);
   }
   .landing-feature-tile {
+    contain-intrinsic-block-size: auto 430px;
     border-radius: 28px;
   }
   .landing-feature-copy {
@@ -425,7 +432,7 @@
   .landing-page {
     scroll-behavior: auto;
   }
-  .hero-letter {
+  .hero-line {
     animation: none;
     transform: none;
     opacity: 1;

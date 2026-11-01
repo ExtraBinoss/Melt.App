@@ -2,13 +2,13 @@ import { expect, test, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { HeroHeadline } from "../../../../src/components/projects/landing/HeroHeadline";
 
-test("keeps the complete heading accessible while staggered decorative letters animate", () => {
-  render(<HeroHeadline lines={["Créez.", "Animez."]} />);
+test("keeps the full heading accessible with only one animated text run per line", () => {
+  const { container } = render(<HeroHeadline lines={["Créez.", "Animez."]} />);
   expect(screen.getByRole("heading", { level: 1, name: "Créez. Animez." })).toBeVisible();
-  expect(document.querySelectorAll(".hero-line[aria-hidden]")).toHaveLength(2);
-  expect(document.querySelectorAll(".hero-letter")).toHaveLength(13);
-  expect((document.querySelectorAll(".hero-letter")[6] as HTMLElement).style.animationDelay).toBe(
-    "0.22s",
+  expect(container.querySelectorAll(".hero-line-mask[aria-hidden]")).toHaveLength(2);
+  expect(container.querySelectorAll(".hero-line")).toHaveLength(2);
+  expect((container.querySelectorAll(".hero-line")[1] as HTMLElement).style.animationDelay).toBe(
+    "0.14s",
   );
 });
 
@@ -27,10 +27,15 @@ test("pauses the finite reveal while hidden and removes its visibility listener"
   expect(remove).toHaveBeenCalledWith("visibilitychange", expect.any(Function));
 });
 
-test("Arabic text keeps connected glyph shaping while Latin titles retain per-letter reveals", () => {
-  const { container } = render(<HeroHeadline lines={["ابتكر.", "Create."]} />);
-  const rows = container.querySelectorAll(".hero-line");
-  expect(rows[0]!.querySelectorAll(".hero-letter")).toHaveLength(1);
-  expect(rows[0]).toHaveTextContent("ابتكر.");
-  expect(rows[1]!.querySelectorAll(".hero-letter")).toHaveLength(7);
+test("retains natural Arabic and CJK text shaping and keeps markup bounded for longer translations", () => {
+  const view = render(<HeroHeadline lines={["ابتكر.", "Create."]} />);
+  const heading = screen.getByRole("heading");
+  const nodes = heading.querySelectorAll("*").length;
+  expect(heading.querySelector(".hero-line")).toHaveTextContent("ابتكر.");
+  view.rerender(
+    <HeroHeadline lines={["デザインを、シンプルに。", "静止画も、アニメーションも。"]} />,
+  );
+  expect(heading).toHaveAccessibleName("デザインを、シンプルに。 静止画も、アニメーションも。");
+  expect(heading.querySelectorAll("*")).toHaveLength(nodes);
+  expect(heading.textContent).toContain("静止画も、アニメーションも。");
 });

@@ -8,6 +8,7 @@ import {
   writeBrandAssets,
   writeRasterBrandAssets,
 } from "../../scripts/brand-assets";
+import { brand } from "../../apps/web/src/ui/brand/config";
 import { createDahliaEngine } from "../../apps/web/src/ui/brand/dahlia";
 test("exports the exact genuine engine frame as SVG and an inset maskable icon", () => {
   const frame = createDahliaEngine().sample(0.75),
@@ -26,6 +27,9 @@ test("public install icons are exact copies of the canonical source SVGs and mat
   const root = await mkdtemp(join(tmpdir(), "melt-brand-"));
   try {
     await writeBrandAssets(root);
+    const typeface = await readFile(join(root, "apps/web/src/ui/brand/typeface.css"), "utf8");
+    expect(typeface).toContain(`font-family: "${brand.typeface.family}"`);
+    expect(typeface).toContain(`url("${brand.typeface.source}")`);
     const manifest = JSON.parse(
       await readFile(join(root, "apps/web/src/ui/brand/assets/manifest.json"), "utf8"),
     ) as { files: Record<string, string> };

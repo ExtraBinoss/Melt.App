@@ -303,7 +303,9 @@ test("starts with the shared empty dashboard and mounts the editor only after ch
   });
   d.mount(<App engine={d.engine} services={d.services} welcome />);
   expect(screen.queryByTestId("canvas")).not.toBeInTheDocument();
-  expect(screen.getByRole("heading", { name: "Créez. Animez." })).toBeVisible();
+  expect(
+    await screen.findByRole("heading", { name: "Créez simplement. Animez comme un pro." }),
+  ).toBeVisible();
   fireEvent.click(screen.getAllByRole("button", { name: "Commencer à créer" })[0]!);
   expect(
     await screen.findByRole("heading", { name: "Quel projet voulez-vous créer ?" }),
@@ -336,7 +338,7 @@ test("welcome preview can reopen the already restored project without replacing 
     });
     d.mount(<App engine={d.engine} services={d.services} />);
     expect(screen.queryByTestId("canvas")).toBeNull();
-    fireEvent.click(screen.getAllByRole("button", { name: "Commencer à créer" })[0]!);
+    fireEvent.click((await screen.findAllByRole("button", { name: "Commencer à créer" }))[0]!);
     fireEvent.click(await screen.findByRole("button", { name: "Atelier" }));
     const preview = await screen.findByRole("dialog", { name: d.project.name });
     fireEvent.click(within(preview).getByRole("button", { name: "Ouvrir dans Melt" }));

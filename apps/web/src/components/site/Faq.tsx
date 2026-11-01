@@ -1,11 +1,9 @@
-import { useState } from "react";
-import { useHydrated } from "@tanstack/react-router";
-import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "../ui/accordion";
+import { ChevronDown } from "lucide-react";
 export interface FaqItem {
   question: string;
   answer: string;
 }
-/** Keep the full answer text in server HTML; only disclosure presentation is interactive. */
+/** Native exclusive disclosures work from the server HTML, before hydration. */
 export function Faq({
   items,
   title,
@@ -15,34 +13,22 @@ export function Faq({
   title: string;
   id?: string;
 }) {
-  const [open, setOpen] = useState("");
-  const hydrated = useHydrated();
   return (
     <section className="site-faq" id={id} aria-labelledby={`${id}-title`}>
       <h2 id={`${id}-title`}>{title}</h2>
-      <Accordion
-        type="single"
-        collapsible
-        disabled={!hydrated}
-        value={open}
-        onValueChange={setOpen}
-      >
-        {items.map((item, index) => (
-          <AccordionItem key={item.question} value={String(index)}>
-            <AccordionTrigger>{item.question}</AccordionTrigger>
-            <AccordionContent
-              forceMount
-              aria-hidden={open !== String(index)}
-              inert={open !== String(index)}
-              className="site-faq-answer"
-            >
-              <div>
-                <p>{item.answer}</p>
-              </div>
-            </AccordionContent>
-          </AccordionItem>
+      <div className="site-faq-items">
+        {items.map((item) => (
+          <details key={item.question} name={`${id}-answers`} className="site-faq-item">
+            <summary>
+              <h3>{item.question}</h3>
+              <ChevronDown size={16} aria-hidden />
+            </summary>
+            <div className="site-faq-answer">
+              <p>{item.answer}</p>
+            </div>
+          </details>
         ))}
-      </Accordion>
+      </div>
     </section>
   );
 }

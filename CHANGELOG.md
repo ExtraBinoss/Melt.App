@@ -4,7 +4,13 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ## [Unreleased]
 
+### Added
+
+- Add dedicated Timelapse and Export landing cards, with accurate history, preview, resolution and MP4/WebM audio capabilities. Refresh the landing headline and supporting copy in all twelve interface languages around simple static design and professional animation.
+
 ### Changed
+
+- Reduce landing rendering work with two naturally wrapping headline animation runs, native server-rendered FAQ disclosures and offscreen section containment. Reuse the initialized client translation instance, retain isolated server locales, and prioritize the first showcase image and shared display font without downloading the editor or Three.js on idle landing pages. Record the private Chrome/Lighthouse desktop 100 and mobile 82 results, remaining mobile LCP cost, and native regression evidence in `docs/performance/landing-copy-2026-11-01.md`.
 
 - Keep SlimSAM inference in a dedicated single-threaded WASM worker so the editor GPU stays available. Enlarge only the best mask, release temporary tensors, encode PNGs in the worker, retain one image embedding, show the shared throbber, and support cancellation without committing stale masks. Record bounded real-model responsiveness and the remaining cold-encoding cost in `docs/guides/object-selection.md`.
 - Avoid forced synchronous mobile-navigation layout during mount and label updates, and batch carousel geometry reads before presentation writes. Retain the native video poster from the initial server document through touch autoplay instead of inserting a late blank player.

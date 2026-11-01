@@ -1,9 +1,8 @@
 import { brand } from "../../../ui/brand/config";
-import { useLayoutEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { ArrowUpRight } from "lucide-react";
-import { useReducedMotion } from "motion/react";
 import { useTranslation } from "react-i18next";
-import { TEMPLATE_CATALOG } from "../../../services/projects/templates/catalog";
+import { LANDING_TEMPLATES } from "./catalog";
 import { MeltMark } from "../../../ui/brand/MeltMark";
 import { SocialBrandIcon } from "../../assets/SocialBrandIcon";
 import { Button } from "../../ui/button";
@@ -13,16 +12,6 @@ import "./messages";
 import "./motion-showcase.css";
 import { installCarouselPan } from "./carousel/controller";
 
-const featured = [
-  "morphing-type",
-  "bloom-windows",
-  "cornell-box",
-  "preset:instagram-story",
-  "preset:youtube-thumbnail",
-  "preset:instagram-post",
-];
-const templates = featured.flatMap((id) => TEMPLATE_CATALOG.find((item) => item.id === id) ?? []);
-
 export function ShowcaseCarousel({
   onChoose,
   busy = false,
@@ -31,21 +20,21 @@ export function ShowcaseCarousel({
   busy?: boolean;
 }) {
   const { t } = useTranslation();
-  const reduced = useReducedMotion();
   const viewport = useRef<HTMLDivElement>(null);
   const position = useRef(0);
-  useLayoutEffect(() => {
+  useEffect(() => {
     const node = viewport.current;
     if (!node) return;
     const pan = installCarouselPan(node, {
-      reducedMotion: reduced === true,
+      // The retained controller owns the live media query and cancels motion immediately.
+      reducedMotion: false,
       position: position.current,
     });
     return () => {
       position.current = pan.position();
       pan.dispose();
     };
-  }, [reduced]);
+  }, []);
   return (
     <section className="landing-showcase" aria-label={t("landing:showcase")}>
       <div
@@ -57,7 +46,7 @@ export function ShowcaseCarousel({
         aria-description={t("landing:showcaseHint")}
         data-carousel
       >
-        {templates.map((template, index) => (
+        {LANDING_TEMPLATES.map((template, index) => (
           <Button
             key={template.id}
             variant="ghost"

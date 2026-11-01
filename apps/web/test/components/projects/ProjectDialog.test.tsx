@@ -311,7 +311,9 @@ test("welcome opens the landing page and enters the library without creating a d
   const d = setup(),
     close = vi.fn();
   d.mount(<ProjectDialog welcome services={d.services} onClose={close} onTask={d.onTask} />);
-  expect(await screen.findByRole("heading", { name: "Créez. Animez." })).toBeVisible();
+  expect(
+    await screen.findByRole("heading", { name: "Créez simplement. Animez comme un pro." }),
+  ).toBeVisible();
   expect(d.services.listProjectPage).not.toHaveBeenCalled();
   fireEvent.click(screen.getAllByRole("button", { name: "Commencer à créer" })[0]!);
   await screen.findByRole("dialog", { name: "Tableau de bord Melt" });
@@ -366,7 +368,9 @@ test("the library brand returns to landing without modifying the open document",
   d.mount(<ProjectDialog services={d.services} onClose={vi.fn()} onTask={d.onTask} />);
   await screen.findByText("Aucun projet enregistré.");
   fireEvent.click(screen.getByRole("button", { name: "Accueil Melt" }));
-  expect(await screen.findByRole("heading", { name: "Créez. Animez." })).toBeVisible();
+  expect(
+    await screen.findByRole("heading", { name: "Créez simplement. Animez comme un pro." }),
+  ).toBeVisible();
   expect(d.services.createProject).not.toHaveBeenCalled();
   fireEvent.click(screen.getByRole("button", { name: "Try Melt" }));
   expect(screen.getByRole("dialog", { name: "Tableau de bord Melt" })).toBeVisible();

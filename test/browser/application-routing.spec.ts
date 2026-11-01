@@ -14,11 +14,15 @@ test("public landing has server HTML; dashboard/editor links preserve the runtim
     localStorage.setItem("musart.language", "en");
     localStorage.setItem("musart.onboarding.v1", JSON.stringify({ version: 1, completed: true }));
   });
-  const html = await (await request.get("./")).text();
-  expect(html).toContain("Créez. Animez.");
+  const html = await (
+    await request.get("./", { headers: { Cookie: "musart.language=fr" } })
+  ).text();
+  expect(html).toContain("Créez simplement. Animez comme un pro.");
   expect(html).toContain("og:description");
   await page.goto("./");
-  await expect(page.getByRole("heading", { name: "Create. Animate." })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Design with ease. Animate like a pro." }),
+  ).toBeVisible();
   await expect(page.getByRole("link", { name: "Open editor", exact: true })).toHaveCount(0);
   await expect(page.getByRole("link", { name: "Dashboard", exact: true })).toHaveCount(0);
   await page.getByRole("button", { name: "Try Melt", exact: true }).click();

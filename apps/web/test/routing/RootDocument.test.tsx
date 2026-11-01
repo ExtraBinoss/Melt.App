@@ -1,4 +1,4 @@
-import { expect, test, vi } from "vitest";
+import { afterEach, beforeEach, expect, test, vi } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 import type * as Router from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
@@ -14,6 +14,8 @@ vi.mock("@tanstack/react-router", async (original) => ({
   Scripts: () => <script src="/client.js" />,
 }));
 import { RootDocument } from "../../src/routing/RootDocument";
+beforeEach(() => vi.stubEnv("SSR", true));
+afterEach(() => vi.unstubAllEnvs());
 test("the server emits a complete document, theme bootstrap and visible content", () => {
   const html = renderToStaticMarkup(
     <RootDocument>
@@ -50,4 +52,19 @@ test("SSR renders a request's language and direction without mutating the shared
   ).toContain('lang="ar" dir="rtl"');
   expect(i18n.language).toBe(original);
   request.language = undefined;
+});
+
+test("client presentation reuses the already seeded translation registry", () => {
+  vi.stubEnv("SSR", false);
+  const clone = vi.spyOn(i18n, "cloneInstance");
+  try {
+    renderToStaticMarkup(
+      <RootDocument>
+        <main>Studio</main>
+      </RootDocument>,
+    );
+    expect(clone).not.toHaveBeenCalled();
+  } finally {
+    vi.unstubAllEnvs();
+  }
 });

@@ -33,7 +33,9 @@ for (const fallback of [false, true]) {
     page.on("pageerror", (error) => errors.push(error.message));
     await page.goto("/");
     const landing = page.locator(".landing-page");
-    await expect(page.getByRole("heading", { level: 1, name: "Créez. Animez." })).toBeVisible();
+    await expect(
+      page.getByRole("heading", { level: 1, name: "Créez simplement. Animez comme un pro." }),
+    ).toBeVisible();
     await expect(page.locator("canvas")).toHaveCount(0);
     await expect(page.locator("video")).toHaveCount(0);
     expect(await storedProjectIds(page)).toEqual([]);
@@ -96,10 +98,12 @@ test("small screens, system dark mode, reduced motion and English stay usable", 
     localStorage.setItem("musart.language", "en");
   });
   await page.goto("/");
-  await expect(page.getByRole("heading", { level: 1, name: "Create. Animate." })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { level: 1, name: "Design with ease. Animate like a pro." }),
+  ).toBeVisible();
   await expect(page.locator("html")).toHaveClass(/dark/);
-  await expect(page.locator(".hero-letter").first()).toHaveCSS("animation-name", "none");
-  await expect(page.locator(".hero-letter").first()).toHaveCSS("transform", "none");
+  await expect(page.locator(".hero-line").first()).toHaveCSS("animation-name", "none");
+  await expect(page.locator(".hero-line").first()).toHaveCSS("transform", "none");
   await page
     .getByRole("heading", { name: "Your agent, by your side.", exact: true })
     .scrollIntoViewIfNeeded();
