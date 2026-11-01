@@ -25,13 +25,13 @@ it("pauses reading time for hover/focus, replaces rapid undo/redo, closes and cl
   act(() => d.engine.execute({ type: "updateLayers", ids: ["item"], patch: { fill: "#ff0000" } }));
   expect(screen.queryByRole("status")).toBeNull();
   act(() => d.engine.undo());
-  const card = screen.getByRole("status", { name: "Annulé · Couleur #8b5cf6" });
+  const card = screen.getByRole("status", { name: "Annulé · Fond #8b5cf6" });
   await advance(1000);
   fireEvent.pointerOver(card);
   await advance(3000);
   expect(card).toBeVisible();
   act(() => d.engine.redo());
-  expect(screen.getByRole("status", { name: "Rétabli · Couleur #ff0000" })).toBeVisible();
+  expect(screen.getByRole("status", { name: "Rétabli · Fond #ff0000" })).toBeVisible();
   const close = screen.getByRole("button", { name: "Fermer la notification" });
   act(() => close.focus());
   fireEvent.pointerOut(card);

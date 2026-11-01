@@ -35,3 +35,10 @@ The original seven tasks are archived. The requested scene Motion integration is
 The coordinator remains the sole validation owner; heavy checks are serial.
 
 See [scene Motion validation](scene-motion-validation.md) for actual checks, focus fixes, native export and gallery evidence, and explicit limits.
+
+## Validated undo/redo notices
+
+- [11: authoritative history descriptions](validated/11-history-notices/task-idea.md) — bounded core metadata retained with matching undo entries.
+- [12: notice presentation](validated/12-history-notice-presentation/task-idea.md) — shared translated names and restored values without current-selection inference.
+
+See [undo/redo validation](undo-redo-validation.md) for the final behavior, checks and explicit display limits.

@@ -43,6 +43,8 @@ export interface CommandCommitInfo {
   types: readonly Command["type"][];
   /** Deduplicated patch field names; no values, paths or command payloads. */
   layerFields?: readonly (keyof Layer)[];
+  /** Bounded detached descriptions retained by the engine's own undo entries. */
+  history?: import("../history/model").HistoryDescription;
   snapshot: SessionSnapshot;
 }
 /** Immutable references captured at commit time; preparation and persistence belong to the consumer. */

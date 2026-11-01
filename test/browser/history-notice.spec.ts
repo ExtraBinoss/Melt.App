@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { createLayer, createPage, createProject } from "@musart/core";
+import { createEffect, createLayer, createPage, createProject } from "@musart/core";
 import { mkdir } from "node:fs/promises";
 import { installReadbackProbe } from "./support/readback-probe";
 
@@ -52,7 +52,7 @@ test("undo/redo pills match the project pill and canvas center through panel/rul
   });
   await page.keyboard.press("Control+z");
   const notice = page.locator(".history-notice[role=status]:not([aria-hidden=true])");
-  await expect(notice).toHaveAttribute("aria-label", "Undid · Color #8b5cf6");
+  await expect(notice).toHaveAttribute("aria-label", "Undid · Fill #8b5cf6");
   await notice.hover();
   await expect(notice.locator("span")).toHaveJSProperty(
     "scrollWidth",
@@ -79,9 +79,9 @@ test("undo/redo pills match the project pill and canvas center through panel/rul
   await page.waitForTimeout(2200); // Real hover must suspend the two-second reading timer.
   await expect(notice).toBeVisible();
   await page.keyboard.press("Control+Shift+z");
-  await expect(notice).toHaveAttribute("aria-label", "Redid · Color #ff0000");
+  await expect(notice).toHaveAttribute("aria-label", "Redid · Fill #ff0000");
   await page.keyboard.press("Control+z");
-  await expect(notice).toHaveAttribute("aria-label", "Undid · Color #8b5cf6");
+  await expect(notice).toHaveAttribute("aria-label", "Undid · Fill #8b5cf6");
   const oldCanvas = (await page.locator(".editor-canvas").boundingBox())!,
     handle = (await page.locator('[role="separator"][aria-controls="workspace"]').boundingBox())!;
   await page.mouse.move(handle.x + handle.width / 2, handle.y + handle.height / 2);
@@ -106,7 +106,7 @@ test("undo/redo pills match the project pill and canvas center through panel/rul
     window.musart!.execute({ type: "updateLayers", ids: ["item"], patch: { x: 205 } });
     window.musart!.undo();
   });
-  await expect(notice).toHaveAttribute("aria-label", "Undid · Transform");
+  await expect(notice).toHaveAttribute("aria-label", "Undid · Position X 200px");
   await page.mouse.move(1200, 900);
   await expect(notice).toHaveCount(0, { timeout: 3500 });
   await page.keyboard.press("Control+k");
@@ -125,4 +125,74 @@ test("undo/redo pills match the project pill and canvas center through panel/rul
     webgl: 0,
     canvas: 0,
   });
+});
+
+test("background color input and numeric/effect edits announce the actual restored property and value", async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    localStorage.setItem("musart.language", "en");
+    localStorage.setItem("musart.onboarding.v1", JSON.stringify({ version: 1, completed: true }));
+  });
+  await page.goto("/editor?automation=1");
+  await page.waitForFunction(() => Boolean(window.musart));
+  await page.evaluate(
+    (project) => {
+      window.musart!.load(project);
+      window.musart!.select([]);
+    },
+    createProject({
+      id: "history-values-native",
+      pages: [
+        createPage({
+          background: "#123456",
+          width: 640,
+          height: 400,
+          layers: [
+            createLayer("rectangle", {
+              id: "item",
+              x: 200,
+              effects: [createEffect("blur", { id: "blur", amount: 0.57 })],
+            }),
+          ],
+        }),
+      ],
+    }),
+  );
+  await page.waitForFunction(() => {
+    const canvas = document.querySelector<HTMLCanvasElement>(".editor-gpu-scene canvas");
+    return (
+      canvas?.dataset.projectId === "history-values-native" &&
+      canvas.dataset.rendererReady === "true" &&
+      canvas.dataset.sceneRevision === canvas.dataset.renderedRevision
+    );
+  });
+  const hex = page.getByRole("textbox", { name: "Hex color", exact: true }),
+    notice = page.locator(".history-notice[role=status]:not([aria-hidden=true])");
+  await hex.fill("#654321");
+  await hex.press("Enter");
+  await page.locator(".editor-canvas").focus();
+  await page.keyboard.press("Control+z");
+  await expect(notice).toHaveAttribute("aria-label", "Undid · Background #123456");
+  await page.keyboard.press("Control+Shift+z");
+  await expect(notice).toHaveAttribute("aria-label", "Redid · Background #654321");
+  await page.evaluate(() =>
+    window.musart!.execute({ type: "updateLayers", ids: ["item"], patch: { x: 212.75 } }),
+  );
+  await page.keyboard.press("Control+z");
+  await expect(notice).toHaveAttribute("aria-label", "Undid · Position X 200px");
+  await page.keyboard.press("Control+Shift+z");
+  await expect(notice).toHaveAttribute("aria-label", "Redid · Position X 212.75px");
+  await page.evaluate(() => {
+    const effect = window.musart!.snapshot().project.pages[0]!.layers[0]!.effects[0]!;
+    window.musart!.execute({
+      type: "updateLayers",
+      ids: ["item"],
+      patch: { effects: [{ ...effect, amount: 0.25 }] },
+    });
+  });
+  await page.keyboard.press("Control+z");
+  await expect(notice).toHaveAttribute("aria-label", "Undid · Blur · Amount 57%");
+  await page.keyboard.press("Control+Shift+z");
+  await expect(notice).toHaveAttribute("aria-label", "Redid · Blur · Amount 25%");
 });

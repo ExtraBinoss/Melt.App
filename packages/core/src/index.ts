@@ -119,6 +119,22 @@ export { layoutBoxes, measureLayer } from "./layout/measurements";
 export type { LayerMeasurement, MeasurementArrow } from "./layout/measurements";
 export { stateFromProject, normalizeReplayCommands } from "./animation/state";
 export { isCommandType } from "./session/registry";
+export type {
+  HistoryValue,
+  HistoryOwner,
+  HistoryPropertyTarget,
+  LayerHistoryProperty,
+  CompositionHistoryProperty,
+  AudioHistoryProperty,
+  MotionHistoryProperty,
+  HistoryAction,
+  HistoryPropertyChange,
+  HistoryStructuralAction,
+  HistoryChange,
+  HistoryDescription,
+  HistoryPropertyDefinition,
+} from "./history/model";
+export { getHistoryPropertyDefinition } from "./history/properties";
 export { diffReplayState, applyReplayDelta } from "./animation/delta";
 export { recordSession, observeReplay } from "./animation/recording";
 export { observeReplayTransitions } from "./animation/transitions";

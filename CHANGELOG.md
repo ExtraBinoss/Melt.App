@@ -6,6 +6,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Preserve authoritative property names and restored values in undo/redo notices across artboard backgrounds, layers, effects, 3D, Motion, media and audio. Retain bounded immutable summaries with engine history entries, distinguish keyed locations and compound edits, and format translated names, choices and units in all twelve locales without reading the current selection.
+
 - Add reusable camera, environment and per-light Motion actions with genuine timeline rows, editable points/easing, personal presets and shared preview/export sampling. Keep gesture previews imperative, preserve keyboard focus after edits, and reject stale owner navigation. Replace Cornell Box’s parent turntable with a real seamless camera orbit and publish matching portable assets and a newly rendered poster.
 
 - Make certified scalar and compatible 3D pose/material transactions validate only touched domains, preserve unchanged page/resource identities across batches, and reuse complete durable ID indexes while retaining atomic validation, history and conservative structural fallbacks.

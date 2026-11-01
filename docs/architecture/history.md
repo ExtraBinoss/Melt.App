@@ -46,6 +46,14 @@ The engine captures commit envelopes before notifying snapshot subscribers and d
 
 When detailed observers are present, their command payload is detached before handler execution. Later commands in the same transaction and callbacks mutating the caller's array cannot rewrite that payload. Failure to capture it rejects the transaction before state publication; summary-only observation does not allocate this extra copy.
 
+### Undo/redo descriptions
+
+The short engine undo stack owns each transaction’s immutable semantic description together with its existing snapshot. `CommandCommitInfo.history` carries that same description for commit, undo and redo, so an observer mounted later can still name the actual restored property. Selection and page navigation cannot replace the description. Load clears the stacks; failed, cancelled and stale prepared transactions publish no description.
+
+Domain collectors capture command-addressed scalar values before and after mutation, using durable owner/property identities and validated property definitions. They do not diff the whole project or retain SVG paths, original assets, full commands or GPU resources. Repeated writes in a transaction retain the first before value and final after value. Descriptions hold at most 64 changes; display strings hold at most 120 Unicode code points with an explicit truncation flag. Omitted changes use a truthful overflow flag rather than an invented count.
+
+The notice UI formats these retained descriptions without reading the current selection or document. Undo displays the before value and redo the after value. Names, choice labels, units and scales come from domain resources and effect definitions; structural edits retain a semantic action without copying their large payload. This metadata is separate from the durable IndexedDB journal and changes none of its storage formats.
+
 ### Worker capture and transport
 
 | History topic           | Contract                                                                                                                                                                       |

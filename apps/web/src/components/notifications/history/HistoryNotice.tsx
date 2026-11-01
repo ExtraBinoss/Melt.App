@@ -7,6 +7,7 @@ import { useEngineValue } from "../../../state/session/editor";
 import { Button } from "../../ui/button";
 import { createNoticeTimer } from "../notice-timer";
 import { observeHistoryNotices, type HistoryNoticeValue } from "./source";
+import { formatHistoryDescription } from "./presentation";
 import "./messages";
 import "./history-notice.css";
 export function HistoryNotice({ engine }: { engine: EnginePort }) {
@@ -52,8 +53,7 @@ function HistoryCard({ notice, onClose }: { notice: HistoryNoticeValue; onClose:
     return () => timer.clear();
   }, [notice.id, present, timer]);
   useLayoutEffect(() => () => timer.dispose(), [timer]);
-  const value = notice.direction === "undo" ? notice.before : notice.after,
-    description = `${t(notice.action)}${value ? ` ${value}` : ""}`,
+  const description = formatHistoryDescription(notice.description, notice.direction, t),
     label = `${t(notice.direction)} · ${description}`,
     Icon = notice.direction === "undo" ? Undo2 : Redo2;
   return (

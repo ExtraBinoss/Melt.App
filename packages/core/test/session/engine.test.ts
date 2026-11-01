@@ -251,6 +251,9 @@ describe("immutable document session", () => {
     expect(() => engine.transaction(null as never)).toThrow("invalide");
     expect(() => engine.execute(null as never)).toThrow();
     expect(() => engine.execute({ type: "unknown" } as never)).toThrow("Commande inconnue");
+    for (const type of ["constructor", "toString", "__proto__"])
+      expect(() => engine.execute({ type } as never)).toThrow("Commande inconnue");
+    expect(engine.getSnapshot()).toBe(before);
     const throwing = new EditorEngine(createProject(), {
       now: () => {
         throw "clock failed";
@@ -328,6 +331,7 @@ describe("immutable document session", () => {
         order.push("full");
         detailed.push(event);
       });
+    const initial = engine.getSnapshot().project;
     const command: Command = { type: "renameProject", name: "Committed" };
     engine.execute(command);
     command.name = "Caller changed";
@@ -338,7 +342,24 @@ describe("immutable document session", () => {
     expect(order).toEqual(Array.from({ length: 4 }, () => ["state", "info", "full"]).flat());
     expect(information.map((event) => event.kind)).toEqual(["commit", "undo", "redo", "load"]);
     expect(information.map((event) => event.types)).toEqual([["renameProject"], [], [], []]);
-    expect(Object.keys(information[0]!).sort()).toEqual(["kind", "snapshot", "types"]);
+    expect(Object.keys(information[0]!).sort()).toEqual(["history", "kind", "snapshot", "types"]);
+    const history = information[0]!.history!;
+    expect(history.changes).toEqual([
+      {
+        kind: "property",
+        target: { owner: { kind: "project", projectId: initial.id }, property: "name" },
+        before: { kind: "scalar", value: initial.name },
+        after: { kind: "scalar", value: "Committed" },
+      },
+    ]);
+    expect(history.changes.length).toBeLessThanOrEqual(64);
+    expect(Object.isFrozen(history)).toBe(true);
+    expect(Object.isFrozen(history.changes)).toBe(true);
+    expect(information[1]!.history).toBe(history);
+    expect(information[2]!.history).toBe(history);
+    expect(information[3]).not.toHaveProperty("history");
+    expect(information[0]).not.toHaveProperty("commands");
+    expect(history).not.toHaveProperty("commands");
     expect(Object.isFrozen(information[0])).toBe(true);
     expect(Object.isFrozen(information[0]!.types)).toBe(true);
     expect(information[0]!.snapshot.project.name).toBe("Committed");

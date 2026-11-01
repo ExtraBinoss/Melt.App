@@ -13,6 +13,9 @@ import { createCommandDraft } from "./drafts";
 import { commandMutationScope } from "./scopes";
 import { validateLocalProject } from "../document/local-validation";
 import type { PreparedEngineTransaction } from "./reservation";
+import { HistoryCollector, historyContexts } from "../history/collector";
+import { captureHistoryCommand } from "../history/registry";
+import type { HistoryDescription } from "../history/model";
 
 function collectExplicitIds(value: unknown, occupied: Set<string>): void {
   if (Array.isArray(value)) {
@@ -37,6 +40,10 @@ interface CommitEnvelope {
   info: CommandCommitInfo;
   detailed?: CommandCommit;
 }
+interface HistoryEntry {
+  snapshot: SessionSnapshot;
+  description: HistoryDescription;
+}
 
 /** A renderer-free document session. All edits are validated on an isolated draft. */
 export class EditorEngine implements EnginePort {
@@ -47,8 +54,8 @@ export class EditorEngine implements EnginePort {
   private readonly commits: CommitEnvelope[] = [];
   private publications = 0;
   private drainingCommits = false;
-  private past: SessionSnapshot[] = [];
-  private future: SessionSnapshot[] = [];
+  private past: HistoryEntry[] = [];
+  private future: HistoryEntry[] = [];
   private sequence = 0;
   private historyLimit: number;
   private now: (() => string) | undefined;
@@ -175,6 +182,7 @@ export class EditorEngine implements EnginePort {
     kind?: CommandCommit["kind"],
     commands: readonly Command[] = [],
     detailedCommands?: readonly Command[],
+    history?: HistoryDescription,
   ): void {
     const snapshot = freeze(next);
     markPublishedProject(snapshot.project);
@@ -188,6 +196,7 @@ export class EditorEngine implements EnginePort {
           kind,
           types: commands.map((command) => command.type),
           ...(layerFields.length ? { layerFields } : {}),
+          ...(history ? { history } : {}),
           snapshot,
         }),
         ...(detailed ? { detailed: freeze({ kind, commands: detailed, snapshot }) } : {}),
@@ -267,6 +276,7 @@ export class EditorEngine implements EnginePort {
     let occupied: Set<string> | undefined;
     let identities: ReadonlySet<string> | undefined;
     let local = false;
+    const history = new HistoryCollector();
     const nextId = (prefix: string): string => {
       ensure(occupied, "INVALID_COMMAND", "Local commands cannot allocate identities");
       let id: string;
@@ -291,8 +301,13 @@ export class EditorEngine implements EnginePort {
         // Reserve explicit IDs from the entire batch before generating any IDs.
         collectExplicitIds(ownedCommands, occupied);
       }
+      const historyContext = historyContexts(project, history);
       for (const command of ownedCommands) {
+        history.begin();
+        const finishHistory = captureHistoryCommand(historyContext(pageId), command);
         const result = applyCommand(project, pageId, command, nextId, before.revision, scope.kind);
+        finishHistory?.();
+        history.finish();
         pageId = result.pageId;
         if (result.selection) {
           selection = result.selection;
@@ -315,6 +330,7 @@ export class EditorEngine implements EnginePort {
       );
     }
     const page = currentPage(project, pageId);
+    const description = history.snapshot();
     const remainingIds = local ? undefined : new Set(page.layers.map((layer) => layer.id));
     // Preserve presentation identity unless a command actually removed a selected layer.
     if (remainingIds && selection.some((id) => !remainingIds.has(id)))
@@ -323,7 +339,7 @@ export class EditorEngine implements EnginePort {
       before,
       project,
       () => {
-        this.past.push(this.snapshot);
+        this.past.push({ snapshot: this.snapshot, description });
         if (this.past.length > this.historyLimit) this.past.shift();
         this.future = [];
         this.sequence = sequence;
@@ -346,6 +362,7 @@ export class EditorEngine implements EnginePort {
           "commit",
           detailedCommands ?? committedCommands,
           this.commandListeners.size ? detailedCommands : undefined,
+          description,
         );
       },
       options.deferLock ?? false,
@@ -355,30 +372,36 @@ export class EditorEngine implements EnginePort {
     this.assertUnlocked();
     const previous = this.past.pop();
     if (!previous) return;
-    this.future.push(this.snapshot);
+    this.future.push({ snapshot: this.snapshot, description: previous.description });
     this.publish(
       {
-        ...previous,
+        ...previous.snapshot,
         revision: this.snapshot.revision + 1,
         canUndo: this.past.length > 0,
         canRedo: true,
       },
       "undo",
+      [],
+      undefined,
+      previous.description,
     );
   };
   redo = (): void => {
     this.assertUnlocked();
     const next = this.future.pop();
     if (!next) return;
-    this.past.push(this.snapshot);
+    this.past.push({ snapshot: this.snapshot, description: next.description });
     this.publish(
       {
-        ...next,
+        ...next.snapshot,
         revision: this.snapshot.revision + 1,
         canUndo: true,
         canRedo: this.future.length > 0,
       },
       "redo",
+      [],
+      undefined,
+      next.description,
     );
   };
   load = (project: Project): void => {

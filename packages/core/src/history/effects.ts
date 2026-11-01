@@ -1,0 +1,69 @@
+import type { Effect, Layer } from "../document/model";
+import { getEffectDefinition } from "../effects/catalog";
+import { getEffectParameter } from "../effects/parameters";
+import { EFFECT_MOTION_PROPERTIES, readEffectMotionValue } from "../motion/properties/effect";
+import { type HistoryContext } from "./collector";
+import type { HistoryPropertyTarget } from "./model";
+import { sameMorph } from "./structural";
+
+export function captureEffects(
+  context: HistoryContext,
+  layer: Layer,
+  proposed: readonly Effect[],
+): void {
+  const before = new Map(layer.effects.map((effect) => [effect.id, effect]));
+  const next = new Map(proposed.map((effect) => [effect.id, effect]));
+  const compositionId = context.page.id,
+    layerId = layer.id;
+  for (const [effectId, old] of before) {
+    const owner = {
+      kind: "effect",
+      compositionId,
+      layerId,
+      effectId,
+      effectType: old.type,
+    } as const;
+    const effect = next.get(effectId);
+    if (!effect) {
+      context.history.action("delete", owner);
+      continue;
+    }
+    if (effect.type !== old.type) {
+      context.history.action("delete", owner);
+      context.history.action("add", { ...owner, effectType: effect.type });
+      continue;
+    }
+    const read = () => layer.effects.find((item) => item.id === effectId)!;
+    for (const property of EFFECT_MOTION_PROPERTIES) {
+      const target: HistoryPropertyTarget = { owner, property };
+      context.history.watch(
+        target,
+        () => readEffectMotionValue(read(), property, false),
+        readEffectMotionValue(effect, property, false),
+      );
+    }
+    for (const parameter of getEffectDefinition(old.type).parameters) {
+      if (parameter.scope !== "settings") continue;
+      context.history.watch(
+        { owner, property: `settings.${parameter.key}` },
+        () => getEffectParameter(read(), parameter),
+        getEffectParameter(effect, parameter),
+      );
+    }
+    if (!sameMorph(old.shapeMorph, effect.shapeMorph)) context.history.action("geometry", owner);
+  }
+  for (const [effectId, effect] of next)
+    if (!before.has(effectId))
+      context.history.action("add", {
+        kind: "effect",
+        compositionId,
+        layerId,
+        effectId,
+        effectType: effect.type,
+      });
+  if (
+    layer.effects.length === proposed.length &&
+    layer.effects.some((effect, index) => effect.id !== proposed[index]?.id)
+  )
+    context.history.action("reorder", { kind: "layer", compositionId, layerId });
+}
