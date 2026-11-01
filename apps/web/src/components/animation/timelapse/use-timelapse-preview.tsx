@@ -1,5 +1,11 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { evaluateReplay, type Composition, type ReplaySpec } from "@musart/core";
+import {
+  createTimelapseReplay,
+  evaluateReplay,
+  isImageAsset,
+  type Composition,
+  type ReplaySpec,
+} from "@musart/core";
 import type {
   createRenderSession,
   selectionFrameScope,
@@ -36,6 +42,7 @@ export function useTimelapsePreview(
   const slider = useMemo(() => createSliderValue([0]), []);
   const clock = useRef<HTMLOutputElement>(null);
   const controls = useRef<Controls | null>(null);
+  const retiring = useRef<Promise<void>>(Promise.resolve());
   const durationRef = useRef(duration);
   const [playing, setPlaying] = useState(false);
   const [status, setStatus] = useState<"preparing" | "ready" | "failed">("preparing");
@@ -48,6 +55,7 @@ export function useTimelapsePreview(
   useEffect(() => {
     if (!spec || !active) return;
     let stopped = false;
+    const preparation = new AbortController();
     let renderer: ReturnType<typeof createRenderSession> | undefined;
     let crop: ReturnType<typeof selectionFrameScope> | undefined;
     let finalPage: Composition | undefined;
@@ -60,6 +68,14 @@ export function useTimelapsePreview(
     let advancing = false;
     let disposal: Promise<void> | null = null;
     const host = viewport.current;
+    const images = Object.values({ ...spec.initial.assets, ...spec.assets }).filter(
+      isImageAsset,
+    ).length;
+    // Keep most of the strict 64 MiB cache available for effects and spatial resources.
+    const imageDimension = Math.max(
+      1,
+      Math.min(480, Math.floor(Math.sqrt((16 * 1024 * 1024) / (4 * Math.max(1, images))))),
+    );
     function pause() {
       cancelAnimationFrame(frame);
       frame = 0;
@@ -72,8 +88,10 @@ export function useTimelapsePreview(
       if (draining) return;
       draining = true;
       try {
+        const replay = createTimelapseReplay(spec!);
+        const { createRenderSession, estimatePreviewCost } = await import("@musart/render");
         if (!renderer) {
-          const { createRenderSession } = await import("@musart/render");
+          await retiring.current;
           if (stopped) return;
           renderer = createRenderSession({
             maxBytes: 64 * 1024 * 1024,
@@ -81,7 +99,7 @@ export function useTimelapsePreview(
             mediaResolver,
           });
         }
-        const final = (finalPage ??= evaluateReplay(spec!, spec!.duration).pages.find(
+        const final = (finalPage ??= evaluateReplay(replay, replay.duration).pages.find(
           (page) => page.id === pageId,
         ));
         if (!final) throw new Error("Replay page is missing.");
@@ -96,13 +114,21 @@ export function useTimelapsePreview(
         while (requested !== null && !stopped) {
           const index = requested;
           requested = null;
-          const timing = createReplayTiming(durationRef.current, 30, spec!.duration);
+          const timing = createReplayTiming(durationRef.current, 30, replay.duration);
           const sample = replayFrame(timing, index);
-          const project = evaluateReplay(spec!, sample.historyTime);
+          const project = evaluateReplay(replay, sample.historyTime);
           const page = project.pages.find((item) => item.id === pageId) ?? { ...final, layers: [] };
+          const scale = Math.min(1, 480 / Math.max(crop.page.width, crop.page.height));
+          const framePage = crop.frame({ ...page, width: final.width, height: final.height });
+          const cost = estimatePreviewCost(framePage, scale);
+          const effectSourceScale = Math.min(
+            scale,
+            Math.sqrt((16 * 1024 * 1024) / Math.max(1, cost.fixedBytes)),
+            480 / Math.max(1, cost.maxDimension),
+          );
           await renderer.withCanvasFrame(
-            crop.frame({ ...page, width: final.width, height: final.height }),
-            { ...spec!.assets, ...project.assets },
+            framePage,
+            { ...replay.assets, ...project.assets },
             (canvas) => {
               if (stopped || !host) return;
               if (canvas.parentElement !== host) host.replaceChildren(canvas);
@@ -114,7 +140,14 @@ export function useTimelapsePreview(
                 if (autoPlay) controls.current?.play();
               }
             },
-            { scale: Math.min(1, 480 / Math.max(crop.page.width, crop.page.height)) },
+            {
+              scale,
+              imageSourceScale: scale,
+              maxImageDimension: imageDimension,
+              effectSourceScale,
+              canRender: () => !stopped,
+              signal: preparation.signal,
+            },
           );
         }
       } catch (failure) {
@@ -123,6 +156,9 @@ export function useTimelapsePreview(
           pause();
           setError(failure);
           setStatus("failed");
+          await release().catch((cleanup) =>
+            console.error("[Melt timelapse cleanup failed]", cleanup),
+          );
         }
       } finally {
         draining = false;
@@ -142,10 +178,15 @@ export function useTimelapsePreview(
     }
     function release() {
       stopped = true;
+      preparation.abort();
       cancelAnimationFrame(frame);
       controls.current = null;
       host?.replaceChildren();
-      return (disposal ??= renderer?.dispose() ?? Promise.resolve());
+      if (!disposal) {
+        disposal = renderer?.dispose() ?? retiring.current;
+        retiring.current = disposal.catch(() => {});
+      }
+      return disposal;
     }
     controls.current = {
       seek: (time) => {

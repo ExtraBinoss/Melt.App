@@ -28,6 +28,12 @@ describe("Timelapse sample mapping", () => {
     expect(replayFrame(timing, 15).historyTime).toBe(500);
     expect(replayFrameIndex(timing, 0.5)).toBe(15);
   });
+  it("returns the exact final history time even when multiply/divide rounding would miss the last edit", () => {
+    const historyDuration = 123.422258426967;
+    const timing = createReplayTiming(10, 30, historyDuration);
+    expect((historyDuration * 299) / 299).toBeLessThan(historyDuration);
+    expect(replayFrame(timing, 299).historyTime).toBe(historyDuration);
+  });
   it("rejects invalid durations, clocks, FPS and unsupported single-frame output", () => {
     for (const duration of [NaN, Infinity, 0, 0.9, 30.1]) {
       expect(isTimelapseDuration(duration)).toBe(false);

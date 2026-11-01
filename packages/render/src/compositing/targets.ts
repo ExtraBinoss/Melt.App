@@ -27,6 +27,8 @@ export class LayerTargets implements GpuResource {
   constructor(private readonly maxDimension: number) {}
   signature = "";
   output: FrameTexture | null = null;
+  /** Source-local treatment survives changes to the world-space mask mapping. */
+  effectSource: { signature: string; output: FrameTexture } | null = null;
   private readonly buffers = new Map<string, RenderTarget>();
   private source: Texture | null = null;
   sourceSignature = "";
@@ -110,6 +112,7 @@ export class LayerTargets implements GpuResource {
     for (const target of this.buffers.values()) target.dispose();
     this.buffers.clear();
     this.output = null;
+    this.effectSource = null;
     this.sourceBytes = 0;
   }
 }

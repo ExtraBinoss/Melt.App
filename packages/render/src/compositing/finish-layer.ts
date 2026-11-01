@@ -12,6 +12,7 @@ import { effectFootprint } from "../effects/shared/footprint";
 import { maskLayerMapping } from "./mask-binding";
 import type { EffectResources } from "./effect-resources";
 import type { GpuPasses } from "./passes";
+import type { LayerTargets } from "./targets";
 import { rasterExtent, type FrameTexture } from "./types";
 
 interface Context {
@@ -22,6 +23,7 @@ interface Context {
   mask(id: string): Layer;
   maskSource(layer: Layer): FrameTexture;
   image(id: string): FrameTexture["texture"];
+  effectCache?: { entry: LayerTargets; signature: string };
 }
 const translate = (x: number, y: number): Matrix => [1, 0, 0, 1, x, y];
 
@@ -38,7 +40,14 @@ export function finishLayerSource(
   let bounds: Bounds = original;
   const effects = layer.effects.filter(hasEffectTreatment);
   const enabled = effects.length > 0;
-  if (enabled) {
+  const retained = context.effectCache?.entry.effectSource;
+  if (enabled && retained && retained.signature === context.effectCache?.signature) {
+    source = retained.output;
+    bounds = source.bounds ?? original;
+  } else if (enabled) {
+    // The owned target may be overwritten before an operator throws. A failed
+    // render must never leave its previous signature attached to partial pixels.
+    if (context.effectCache) context.effectCache.entry.effectSource = null;
     const outset = effectFootprint(effects);
     bounds = {
       x: original.x - outset.left,
@@ -84,6 +93,11 @@ export function finishLayerSource(
     }
     if (bounds.x || bounds.y || bounds.width !== layer.width || bounds.height !== layer.height)
       source.bounds = bounds;
+    if (context.effectCache)
+      context.effectCache.entry.effectSource = {
+        signature: context.effectCache.signature,
+        output: source,
+      };
   }
   const { width, height } = source;
   if (layer.mask?.enabled) {

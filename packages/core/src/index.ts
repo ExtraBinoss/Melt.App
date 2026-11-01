@@ -151,6 +151,7 @@ export type {
   ReplayRecordOptions,
 } from "./animation/model";
 export { evaluateReplay } from "./animation/evaluate";
+export { createTimelapseReplay } from "./animation/timelapse";
 
 export { validateReplaySpec, projectFromReplayState } from "./animation/validation";
 export type { FillGradient, GradientStop } from "./paint/gradient";

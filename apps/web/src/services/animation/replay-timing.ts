@@ -36,7 +36,10 @@ export function replayFrame(timing: ReplayTiming, index: number) {
   return {
     timestamp,
     duration: Math.min(1 / timing.fps, timing.duration - timestamp),
-    historyTime: (timing.historyDuration * index) / (timing.count - 1),
+    historyTime:
+      index === timing.count - 1
+        ? timing.historyDuration
+        : timing.historyDuration * (index / (timing.count - 1)),
   };
 }
 

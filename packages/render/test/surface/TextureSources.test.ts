@@ -220,3 +220,77 @@ it("prepares at most four real video posters before opacity-keyed Motion appeara
   expect(prepare.mock.calls[1]![1].filter((layer) => layer.kind === "video")).toEqual([live]);
   await sources.dispose();
 });
+
+it("keeps fifty large originals inside the strict preview cache and closes every native bitmap", async () => {
+  const closed = vi.fn();
+  const originalClosed = vi.fn();
+  vi.stubGlobal(
+    "fetch",
+    vi.fn(async () => new Response(new Blob(["image"]))),
+  );
+  vi.stubGlobal(
+    "createImageBitmap",
+    vi.fn(async (_image, options: ImageBitmapOptions) =>
+      options.resizeWidth === undefined
+        ? { width: 4096, height: 4096, close: originalClosed }
+        : { width: options.resizeWidth, height: options.resizeHeight, close: closed },
+    ),
+  );
+  const assets = Object.fromEntries(
+    Array.from({ length: 50 }, (_, i) => [
+      `image-${i}`,
+      {
+        ...asset,
+        id: `image-${i}`,
+        dataUrl: `large:${i}`,
+        width: 4096,
+        height: 4096,
+      },
+    ]),
+  );
+  const page = createPage({
+    layers: Object.keys(assets).map((assetId) =>
+      createLayer("image", { assetId, width: 64, height: 64 }),
+    ),
+  });
+  const cache = new GpuResourceCache(64 * 1024 * 1024),
+    sources = new TextureSources(cache, 16384);
+  await sources.prepare(page, assets, { imageSourceScale: 1, maxImageDimension: 400 });
+  expect(sources.uploads).toBe(50);
+  expect(cache.stats().cacheBytes).toBe(50 * 64 * 64 * 4);
+  for (const id of Object.keys(assets))
+    expect(sources.image(id).image).toMatchObject({ width: 64, height: 64 });
+  await sources.prepare(page, assets, { imageSourceScale: 1, maxImageDimension: 400 });
+  expect(createImageBitmap).toHaveBeenCalledTimes(100);
+  expect(originalClosed).toHaveBeenCalledTimes(50);
+  expect(closed).not.toHaveBeenCalled();
+  expect(context.getImageData).not.toHaveBeenCalled();
+  cache.clear();
+  expect(closed).toHaveBeenCalledTimes(50);
+});
+
+it("closes resized bitmaps when strict allocation fails, preserving the visible error", async () => {
+  const closed = vi.fn();
+  const originalClosed = vi.fn();
+  vi.stubGlobal(
+    "fetch",
+    vi.fn(async () => new Response(new Blob(["image"]))),
+  );
+  vi.stubGlobal(
+    "createImageBitmap",
+    vi.fn(async (_image, options: ImageBitmapOptions) =>
+      options.resizeWidth === undefined
+        ? { width: 1280, height: 960, close: originalClosed }
+        : { width: 64, height: 48, close: closed },
+    ),
+  );
+  const cache = new GpuResourceCache(1),
+    sources = new TextureSources(cache, 16384);
+  const page = createPage({ layers: [createLayer("image", { assetId: "image" })] });
+  await expect(sources.prepare(page, { image: asset }, { maxImageDimension: 64 })).rejects.toThrow(
+    "Budget mémoire GPU",
+  );
+  expect(closed).toHaveBeenCalledOnce();
+  expect(originalClosed).toHaveBeenCalledOnce();
+  expect(cache.stats().cacheBytes).toBe(0);
+});

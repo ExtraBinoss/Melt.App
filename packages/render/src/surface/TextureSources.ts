@@ -11,10 +11,10 @@ import {
 import { LinearFilter, NoColorSpace, Texture, type WebGPURenderer } from "three/webgpu";
 import { assetIdentity } from "../cache/keys";
 import { GpuResourceCache, type GpuResource } from "../cache/GpuResourceCache";
-import { loadAsset } from "./sources";
 import { MediaVideoSources } from "../sources/media/video-sources";
 import type { RenderOptions } from "../compositing/types";
 import { assertTextureSize } from "../cache/texture-limits";
+import { imageFootprints, prepareAssetImage } from "./image-preparation";
 
 class ImageResource implements GpuResource {
   readonly targets = 0;
@@ -23,11 +23,13 @@ class ImageResource implements GpuResource {
     readonly texture: Texture,
     width: number,
     height: number,
+    private readonly close?: () => void,
   ) {
     this.bytes = width * height * 4;
   }
   dispose(): void {
     this.texture.dispose();
+    this.close?.();
   }
 }
 function configure(texture: Texture): Texture {
@@ -97,6 +99,7 @@ export class TextureSources {
         ])
         .filter((id): id is string => !!id),
     );
+    const footprints = imageFootprints(visible, options.imageSourceScale);
     for (const id of active) {
       const asset = assets[id];
       if (!asset) throw new Error(`Ressource introuvable : ${id}`);
@@ -107,14 +110,30 @@ export class TextureSources {
       }
       if (isSceneAsset(asset)) continue;
       if (!isImageAsset(asset)) throw Error("Audio originals cannot be visual texture sources.");
-      const key = `asset:${assetIdentity(asset)}`;
+      const footprint = footprints.get(id);
+      const preparedKey =
+        footprint || options.maxImageDimension !== undefined
+          ? `:prepared:${footprint?.width ?? "native"}:${footprint?.height ?? "native"}:${options.maxImageDimension ?? "native"}`
+          : "";
+      const key = `asset:${assetIdentity(asset)}${preparedKey}`;
       let entry = this.cache.get<ImageResource>(key);
       if (!entry) {
-        const image = await loadAsset(asset);
-        const width = image.naturalWidth || asset.width,
-          height = image.naturalHeight || asset.height;
-        assertTextureSize(width, height, this.maxDimension);
-        entry = new ImageResource(configure(new Texture(image)), width, height);
+        const prepared = await prepareAssetImage(
+          asset,
+          footprint,
+          options.maxImageDimension,
+          options.signal,
+        );
+        try {
+          assertTextureSize(prepared.width, prepared.height, this.maxDimension);
+          const texture = configure(new Texture(prepared.image));
+          // ImageBitmap ignores WebGL unpack flips; native preparation flips both backends once.
+          if (prepared.close) texture.flipY = false;
+          entry = new ImageResource(texture, prepared.width, prepared.height, prepared.close);
+        } catch (error) {
+          prepared.close?.();
+          throw error;
+        }
         this.cache.set(key, entry);
         this.imageUploads++;
       }

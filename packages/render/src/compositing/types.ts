@@ -20,6 +20,12 @@ export interface RenderOptions {
   /** Admission for optional GPU work; preview interactions can defer captures without React. */
   backgroundGpu?: BackgroundGpuActivity;
   scale?: number;
+  /** Preview-only native image preparation cap; exact exports retain original image pixels. */
+  maxImageDimension?: number;
+  /** Prepare plain image sources at their actual local raster footprint for this output scale. */
+  imageSourceScale?: number;
+  /** Optional preview reference density. Exact rendering uses authored pixels (1). */
+  effectSourceScale?: number;
   /** Display applies the document ICC proof. Source is reserved for native CMYK encoding. */
   colorOutput?: "display" | "source";
   /** SVG source coverage at the delivered density; fixed effect/mask references keep authored pixels. */
@@ -58,6 +64,8 @@ export interface GpuStats {
   /** Opt-in CPU wall time, including native/queue waits; never a GPU-duration measurement. */
   profile?: Record<"pipeline" | "sources" | "text" | "compose", readonly number[]> | null;
   passes: number;
+  /** Effect operator draws, distinct from recomposition and mask mapping. */
+  effectPasses?: number;
   readbacks: number;
   video?: ReturnType<MediaVideoSources["stats"]> | null;
   spatial?: {

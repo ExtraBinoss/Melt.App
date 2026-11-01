@@ -20,7 +20,7 @@ import { ColorPipeline } from "../color/ColorPipeline";
 import { PrintProofPass } from "../color/proof/PrintProofPass";
 import { GpuResourceCache } from "../cache/GpuResourceCache";
 import { gpuTextureLimit } from "../cache/texture-limits";
-import { createSourceKeys } from "../cache/keys";
+import { frameSourceKeys, referenceDensity } from "./frame-source-keys";
 import { SourceKeyCache } from "../cache/source-key-cache";
 import { sameCompositionInput } from "../cache/composition-input";
 import { finishLayerSource } from "./finish-layer";
@@ -140,6 +140,7 @@ export class GpuCompositor {
     if (this.disposed) return Promise.reject(new Error("Le compositeur GPU est fermé."));
     const job = this.queue.then(async () => {
       const scale = options.scale ?? 1;
+      const referenceScale = referenceDensity(options);
       assertRenderSize(page, scale);
       this.cache.beginFrame(this.retainedRoot);
       this.cache.get("shared-effects");
@@ -232,7 +233,6 @@ export class GpuCompositor {
       if (options.canRender && !options.canRender())
         throw new DOMException("Rendering deferred.", "AbortError");
       if (this.disposed) throw new Error("Le compositeur GPU est fermé.");
-      // Compose synchronously and restore renderer state before yielding for publication.
       const keyOptions = {
         cache: this.sourceKeys,
         immutableFrame: options.immutableFrame,
@@ -240,16 +240,22 @@ export class GpuCompositor {
         videoStamp: (id: string) => this.sources.videoStamp(id),
         spatialStamp: (id: string) => this.spatial?.reflectionStamp(id) ?? null,
       };
-      const keyFor = createSourceKeys(page, assets, scale, keyOptions);
+      const { density, keyFor, referenceKeyFor } = frameSourceKeys(
+        page,
+        assets,
+        options,
+        keyOptions,
+      );
       const frame: RenderFrame = {
         page,
         scale,
+        referenceScale,
         vectorAntialias: !!options.vectorAntialias,
         keyFor,
-        referenceKeyFor: scale === 1 ? keyFor : createSourceKeys(page, assets, 1, keyOptions),
+        referenceKeyFor,
         geometry,
       };
-      const rootKey = `page:${page.id}:${scale}${options.colorOutput === "source" ? ":source" : ""}${frame.vectorAntialias ? ":vector-aa" : ""}`;
+      const rootKey = `page:${page.id}:${scale}${options.colorOutput === "source" ? ":source" : ""}${frame.vectorAntialias ? ":vector-aa" : ""}${density}`;
       const entry = this.entry(rootKey);
       const roots = geometry.children(null);
       const signature = compositionPaintKey(page, roots, keyFor);
@@ -337,10 +343,14 @@ export class GpuCompositor {
   }
   private layer(layer: Layer, frame: RenderFrame, parentViewport?: Bounds): FrameTexture {
     const reference = layer.effects.some(hasEffectTreatment) || !!layer.mask?.enabled;
-    // Effects and masks consume the same authored reference pixels in every
-    // caller. Output density changes sampling of this plane, never its content.
-    if (reference && (frame.scale !== 1 || frame.vectorAntialias))
-      frame = { ...frame, scale: 1, vectorAntialias: false, keyFor: frame.referenceKeyFor };
+    // Exact frames retain authored references; previews may request bounded raster density.
+    if (reference && (frame.scale !== frame.referenceScale || frame.vectorAntialias))
+      frame = {
+        ...frame,
+        scale: frame.referenceScale,
+        vectorAntialias: false,
+        keyFor: frame.referenceKeyFor,
+      };
     const { page, scale, keyFor, geometry, vectorAntialias } = frame;
     const viewport =
       layer.kind === "group" && !reference
@@ -393,6 +403,9 @@ export class GpuCompositor {
         passes: this.passes!,
         effects: this.effects!,
         cache: this.cache,
+        ...(layer.effects.some(hasEffectTreatment)
+          ? { effectCache: { entry, signature: keyFor({ ...layer, mask: null }) } }
+          : {}),
         image: (id) => this.sources.image(id),
         maskSource: (maskLayer) => this.layer(maskLayer, frame),
         mask: (id) => {
@@ -513,6 +526,7 @@ export class GpuCompositor {
         (this.color?.passes ?? 0) +
         (effects?.passes ?? 0),
       readbacks: 0,
+      effectPasses: effects?.passes ?? 0,
       sourceDependencies: this.sourceKeys.stats(),
       profile: this.profile
         ? {

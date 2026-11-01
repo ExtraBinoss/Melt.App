@@ -10,6 +10,9 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Cache each layer’s pre-mask effect result independently of world-space mask placement, reusing bounded existing textures during transforms without recomputing unchanged treatments.
+- Present every retained history transaction in evenly spaced timelapse slots, including simultaneous edits and undo/redo, and hold the final state. Sample the exact history endpoint on the final video frame to prevent floating-point rounding from omitting the latest discrete edit.
+- Bound timelapse preview image uploads and effect/mask reference surfaces inside the existing GPU budget, close temporary original-image decodes, serialize preview cleanup and stop retaining failed preview contexts. Prepare plain replay-export images at their output footprint while preserving exact effect references and original assets.
 - Align Performance and Static/Motion controls with their artboard edges through zoom and pan. Transfer retained Add Artboard focus before hiding the inert control, avoiding focused aria-hidden warnings and accidental immediate reopening.
 - Keep Export compact at rest and reserve a fixed percentage slot only while running. Preserve identical header padding before and after loading the export workspace, and align processing feedback with its Cancel action.
 - Reveal project opening with a circle from the exact pointer position into the shared loading surface, retaining it until a new canonical canvas frame is visible. Respect reduced motion and cancellation, prepare the editor alongside recent-project reads, and avoid serializing/parsing an already validated template document twice.

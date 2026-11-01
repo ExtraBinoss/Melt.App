@@ -1,4 +1,9 @@
-import { evaluateReplay, type Composition, type ReplaySpec } from "@musart/core";
+import {
+  createTimelapseReplay,
+  evaluateReplay,
+  type Composition,
+  type ReplaySpec,
+} from "@musart/core";
 import type { CanvasSource } from "mediabunny";
 import type { VideoCodec } from "mediabunny";
 import type { FontResolver, MediaSourceResolver } from "@musart/render";
@@ -50,6 +55,7 @@ export async function exportReplayVideo(
     !["auto", "mp4", "webm"].includes(container)
   )
     throw new VideoExportError("invalidOptions");
+  spec = createTimelapseReplay(spec);
   let timing;
   try {
     timing = createReplayTiming(duration, fps, spec.duration);
@@ -150,7 +156,7 @@ export async function exportReplayVideo(
             keyFrame: index % (fps * 2) === 0,
           });
         },
-        { scale },
+        { scale, imageSourceScale: scale, signal },
       );
       const estimate = size.estimate();
       if (estimate !== null) options.onSizeEstimate?.(estimate);

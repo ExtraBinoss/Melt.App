@@ -126,6 +126,25 @@ test("legacy timelapse previews and decoded exports work, while real corruption 
     "1",
     "artifacts/timelapse-recovery/last.png",
   ]);
+  const finalPixel = execFileSync("ffmpeg", [
+    "-v",
+    "error",
+    "-i",
+    "artifacts/timelapse-recovery/last.png",
+    "-vf",
+    "crop=1:1:48:32",
+    "-frames:v",
+    "1",
+    "-pix_fmt",
+    "rgb24",
+    "-f",
+    "rawvideo",
+    "pipe:1",
+  ]);
+  // The final stored edit changes the subject from red to blue; frame count alone cannot prove it landed.
+  expect(finalPixel[0]).toBeLessThan(35);
+  expect(finalPixel[1]).toBeLessThan(35);
+  expect(finalPixel[2]).toBeGreaterThan(220);
   await expect(dialog.locator('.export-job[data-status="complete"]')).toBeVisible();
   expect(consoleErrors).toEqual([]);
   await dialog

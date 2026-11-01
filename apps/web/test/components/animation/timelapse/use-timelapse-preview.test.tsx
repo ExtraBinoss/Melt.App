@@ -18,8 +18,10 @@ const gpu = vi.hoisted(() => ({
   frames: [] as unknown[],
   fail: false,
   contexts: 0,
+  options: [] as { scale: number; maxImageDimension: number; imageSourceScale: number }[],
 }));
 vi.mock("@musart/render", () => ({
+  estimatePreviewCost: () => ({ fixedBytes: 0, maxDimension: 0 }),
   createRenderSession: () => {
     gpu.contexts++;
     const canvas = document.createElement("canvas");
@@ -29,9 +31,11 @@ vi.mock("@musart/render", () => ({
         page: unknown,
         _assets: unknown,
         consume: (canvas: HTMLCanvasElement) => void,
+        options: { scale: number; maxImageDimension: number; imageSourceScale: number },
       ) => {
         if (gpu.fail) throw new Error("GPU failed");
         gpu.frames.push(page);
+        gpu.options.push(options);
         consume(canvas);
       },
     };
@@ -76,6 +80,7 @@ beforeEach(() => {
   gpu.frames = [];
   gpu.fail = false;
   gpu.contexts = 0;
+  gpu.options = [];
   gpu.dispose.mockResolvedValue(undefined);
   renders = 0;
 });
@@ -136,6 +141,7 @@ test("reports GPU and missing-page failures instead of claiming preview readines
   await screen.findByText("failed");
   expect(screen.queryByText("ready")).toBeNull();
   expect(player.error).toBeInstanceOf(Error);
+  expect(gpu.dispose).toHaveBeenCalledOnce();
   expect(log).toHaveBeenCalledWith(
     "[Melt timelapse preview failed]",
     { pageId: "page" },
@@ -149,4 +155,49 @@ test("reports GPU and missing-page failures instead of claiming preview readines
   );
   await screen.findByText("failed");
   next.unmount();
+});
+
+test("bounds all replay original uploads independently of output dimensions and preserves composition room", async () => {
+  const spec = { ...replay() };
+  spec.assets = Object.fromEntries(
+    Array.from({ length: 50 }, (_, i) => [
+      String(i),
+      {
+        id: String(i),
+        name: "large original",
+        width: 4096,
+        height: 4096,
+        mime: "image/png",
+        dataUrl:
+          "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIW2P4z8DwHwAFgAI/ScLbtAAAAABJRU5ErkJggg==",
+      },
+    ]),
+  );
+  const view = render(<Harness spec={spec} />);
+  await screen.findByText("ready");
+  const options = gpu.options[0]!;
+  expect(options.maxImageDimension).toBeLessThanOrEqual(480);
+  expect(50 * options.maxImageDimension ** 2 * 4).toBeLessThanOrEqual(16 * 1024 * 1024);
+  expect(options.imageSourceScale).toBe(options.scale);
+  view.unmount();
+});
+
+test("waits for retired preview resources before opening a replacement renderer", async () => {
+  const first = replay();
+  const view = render(<Harness spec={first} />);
+  await screen.findByText("ready");
+  let retired!: () => void;
+  gpu.dispose.mockImplementationOnce(
+    () =>
+      new Promise<void>((resolve) => {
+        retired = resolve;
+      }),
+  );
+  view.rerender(<Harness spec={replay()} />);
+  await screen.findByText("preparing");
+  expect(gpu.contexts).toBe(1);
+  await act(async () => retired());
+  await screen.findByText("ready");
+  expect(gpu.contexts).toBe(2);
+  view.unmount();
 });

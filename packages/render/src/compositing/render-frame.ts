@@ -3,6 +3,7 @@ import type { Composition, Layer, LayerGeometryIndex } from "@musart/core";
 export interface RenderFrame {
   readonly page: Composition;
   readonly scale: number;
+  readonly referenceScale: number;
   readonly vectorAntialias: boolean;
   readonly keyFor: (layer: Layer) => string;
   readonly referenceKeyFor: (layer: Layer) => string;
