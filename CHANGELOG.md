@@ -10,6 +10,9 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Add native GPU text outlines and direct 2D hard-shadow controls in all twelve interface languages. Preview outline changes before commit, align property rows and switch spacing, and hide these controls in direct or inherited 3D contexts.
+- Keep list-selected shapes and groups as the canvas move target inside their exact visible geometry, without stealing empty corners or bypassing clipping, locks, mask sources or spatial picking.
+- Edit text directly by double-clicking the canvas and preview canvas/Inspector text changes on the GPU while typing. Commit once on blur or Ctrl/Cmd+Enter, and restore cancelled or stale drafts without adding history.
 - Cache each layer’s pre-mask effect result independently of world-space mask placement, reusing bounded existing textures during transforms without recomputing unchanged treatments.
 - Present every retained history transaction in evenly spaced timelapse slots, including simultaneous edits and undo/redo, and hold the final state. Sample the exact history endpoint on the final video frame to prevent floating-point rounding from omitting the latest discrete edit.
 - Bound timelapse preview image uploads and effect/mask reference surfaces inside the existing GPU budget, close temporary original-image decodes, serialize preview cleanup and stop retaining failed preview contexts. Prepare plain replay-export images at their output footprint while preserving exact effect references and original assets.

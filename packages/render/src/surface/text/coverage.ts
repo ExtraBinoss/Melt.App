@@ -108,6 +108,13 @@ const createTraceCurve = (linearOnly: boolean) =>
 const traceCurve = createTraceCurve(false);
 const traceLine = createTraceCurve(true);
 
+// Every analytical sample in a stroked glyph shares the same two flat attributes.
+// Allocating a varying per sample exceeds WebGPU's inter-stage location limit.
+const glyphBands = varying(attribute("glyphBands", "vec2"));
+const glyphRange = varying(attribute("glyphRange", "vec4"));
+glyphBands.setInterpolation("flat");
+glyphRange.setInterpolation("flat");
+
 export const glyphCoverage = (
   atlas: DataTexture,
   atlasWidth: number,
@@ -116,8 +123,8 @@ export const glyphCoverage = (
   linearOnly = false,
 ) =>
   Fn(() => {
-    const bands = varying(attribute("glyphBands", "vec2"));
-    const range = varying(attribute("glyphRange", "vec4"));
+    const bands = glyphBands;
+    const range = glyphRange;
     // Header pointers and band transforms are constant per glyph, as in Slug's flat varyings.
     bands.setInterpolation("flat");
     range.setInterpolation("flat");

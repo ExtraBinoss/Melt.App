@@ -57,8 +57,9 @@ import "./artboards/artboards.css";
 import { QuickAdd } from "./quick-add/QuickAdd";
 import { CanvasSelection } from "./selection/CanvasSelection";
 import { useCanvasHover } from "./selection/use-canvas-hover";
-import { sourceGeometry, sourcePagePoint } from "./selection/frame-geometry";
+import { sourcePagePoint } from "./selection/frame-geometry";
 import { canvasHit } from "./selection/hit";
+import { pickCanvasPointer } from "./interaction/pointer-pick";
 import { editablePresentedLayer, pickMotionPlayback } from "./selection/presented-pick";
 import { useMarquee } from "./selection/use-marquee";
 import { useLiveMarquee } from "./selection/use-live-marquee";
@@ -292,7 +293,7 @@ export function EditorCanvas({
       return;
     }
     const currentPage = controller.read().page;
-    const picked = canvasHit(currentPage, point, tool === "pointer", sourceGeometry(controller)),
+    const picked = pickCanvasPointer(engine, controller, point, tool, additive),
       hit = picked?.layer;
     if (tool === "wand" || tool === "segment") {
       if (hit?.kind === "image") {
@@ -414,7 +415,6 @@ export function EditorCanvas({
       liveMarquee.commit();
     }
     const commands = transformAuthoringCommands(engine, active, patchesRef.current);
-    // Clear the preview before canonical edits so observers cannot apply it twice.
     cancelGesture();
     try {
       if (active.mode === "move" || active.mode === "resize") {
@@ -552,6 +552,7 @@ export function EditorCanvas({
             viewport={viewport}
           />
           <CanvasObjectEditing
+            onError={onError}
             engine={engine}
             controller={controller}
             viewSource={pageViewSource}

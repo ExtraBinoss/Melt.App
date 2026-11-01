@@ -43,8 +43,20 @@ function glyphAttributes(
     const record = atlas.glyphs.get(glyph.index)!;
     const [gx, gy, width, height] = record.bounds;
     if (width <= 0 || height <= 0) continue;
-    positions.push(x + gx * scale, baseline + gy * scale, width * scale, height * scale);
-    bounds.push(gx, gy, width, height);
+    const padding = Math.max(0, layer.strokeWidth),
+      fontPadding = padding / scale;
+    positions.push(
+      x + gx * scale - padding,
+      baseline + gy * scale - padding,
+      width * scale + 2 * padding,
+      height * scale + 2 * padding,
+    );
+    bounds.push(
+      gx - fontPadding,
+      gy - fontPadding,
+      width + 2 * fontPadding,
+      height + 2 * fontPadding,
+    );
     bands.push(record.header, record.bands);
     ranges.push(gx, gy, width, height);
   }

@@ -1,3 +1,4 @@
+import { strokedTextNode } from "./stroke";
 import { TextDiagnostics } from "./diagnostics";
 import { MorphResource, morphResourceKey, sourceMorph } from "../morph/resource";
 import { buildMorphAtlasAsync } from "../morph/atlas";
@@ -38,6 +39,7 @@ export function textGeometryKey(layer: Layer): string {
     layer.lineHeight,
     layer.letterSpacing,
     layer.textAlign,
+    layer.strokeWidth,
   ]);
 }
 
@@ -50,6 +52,7 @@ export function textResourceKey(layer: Layer): string {
     normalizeFontFamily(layer.fontFamily),
     layer.fontWeight,
     layer.text,
+    layer.strokeWidth > 0,
   ]);
 }
 
@@ -100,7 +103,10 @@ export class TextResource implements GpuResource {
       material.positionNode = vertex.position;
       const paint = textPaintNode(this.paint, vertex.pixel),
         coverage = glyphCoverage(atlas.texture, atlas.width, vertex.coordinate);
-      material.fragmentNode = vec4(paint.rgb, paint.a.mul(coverage));
+      material.fragmentNode =
+        layer.strokeWidth > 0
+          ? strokedTextNode(atlas, vertex.coordinate, paint, coverage, this.paint)
+          : vec4(paint.rgb, paint.a.mul(coverage));
       const mesh = new Mesh(geometry, material);
       mesh.frustumCulled = false;
       this.scene.add(mesh);

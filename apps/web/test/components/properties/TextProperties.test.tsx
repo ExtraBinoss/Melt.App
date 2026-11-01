@@ -60,7 +60,10 @@ test("edits text, font, numeric typography and alignment through property action
   d.mount(<TextProperties layer={d.text} patch={patch} preview={preview} cancel={cancel} />);
   fireEvent.blur(screen.getByLabelText("Contenu du texte"));
   expect(patch).not.toHaveBeenCalled();
-  fireEvent.blur(screen.getByLabelText("Contenu du texte"), { target: { value: "New text" } });
+  fireEvent.change(screen.getByLabelText("Contenu du texte"), { target: { value: "New text" } });
+  expect(preview).toHaveBeenLastCalledWith({ text: "New text" });
+  expect(patch).not.toHaveBeenCalled();
+  fireEvent.blur(screen.getByLabelText("Contenu du texte"));
   expect(patch).toHaveBeenLastCalledWith({ text: "New text" });
   await chooseFont("Tinos");
   expect(patch).toHaveBeenLastCalledWith({ fontFamily: "Tinos" });

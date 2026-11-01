@@ -52,3 +52,27 @@ it("updates placement to match fresh geometry without changing buffer identities
   reference.dispose();
   atlas.texture.dispose();
 });
+
+it("pads stroke quads while retaining the original atlas band ranges", () => {
+  const font = outlineFont(),
+    layer = createLayer("text", { text: "A", fontSize: 100, width: 400, height: 200 }),
+    layout = layoutText(layer, font),
+    atlas = buildCurveAtlas(
+      layout.map(({ glyph }) => glyph),
+      1000,
+    ),
+    fill = glyphGeometry(layer, layout, atlas, 1000),
+    stroke = glyphGeometry({ ...layer, strokeWidth: 6 }, layout, atlas, 1000);
+  const before = Array.from(fill.getAttribute("glyphPosition").array),
+    after = Array.from(stroke.getAttribute("glyphPosition").array);
+  expect(after.slice(0, 4)).toEqual([
+    before[0]! - 6,
+    before[1]! - 6,
+    before[2]! + 12,
+    before[3]! + 12,
+  ]);
+  expect(stroke.getAttribute("glyphRange").array).toEqual(fill.getAttribute("glyphRange").array);
+  fill.dispose();
+  stroke.dispose();
+  atlas.texture.dispose();
+});

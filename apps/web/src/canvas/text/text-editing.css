@@ -1,0 +1,25 @@
+.canvas-text-editor {
+  position: absolute;
+  z-index: 8;
+  top: 0;
+  left: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  outline: 1px solid var(--canvas-selection-accent, var(--media-image));
+  background: transparent;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  caret-color: var(--canvas-selection-accent, var(--media-image));
+  resize: none;
+  overflow: hidden;
+  transform-origin: 0 0;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  user-select: text;
+  touch-action: auto;
+}
+.canvas-text-editor::selection {
+  background: color-mix(in srgb, var(--media-image) 25%, transparent);
+}

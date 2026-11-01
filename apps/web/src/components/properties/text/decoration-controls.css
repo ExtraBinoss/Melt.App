@@ -1,0 +1,25 @@
+.text-decoration-controls {
+  display: grid;
+  gap: 10px;
+}
+.text-decoration-controls > .section-title {
+  margin: 0 0 2px;
+}
+.text-decoration-width {
+  width: 100%;
+  margin: 0;
+}
+.text-decoration-width .number-scrub {
+  max-width: none;
+}
+.text-decoration-controls > .motion-property-field {
+  margin: 0;
+}
+.text-decoration-controls > .motion-property-field .effect-color-field {
+  padding-inline: 0;
+  min-height: 34px;
+}
+.text-decoration-controls > .switch-row {
+  min-height: 32px;
+  margin: 0;
+}

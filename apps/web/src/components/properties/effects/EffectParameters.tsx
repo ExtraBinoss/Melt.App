@@ -3,7 +3,7 @@ import "./gradient-messages";
 import "./messages";
 import "./library-messages";
 import "./parameter-layout.css";
-import { memo, useCallback, useRef, useState, useSyncExternalStore } from "react";
+import { memo, useCallback, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { RotateCcw } from "lucide-react";
 import {
   getEffectDefinition,
@@ -41,6 +41,7 @@ export function EffectParameters({
   onCancel,
   deferOffscreen = false,
   parameterKeys,
+  resetDefaults,
 }: {
   effect: Effect;
   engine?: EnginePort;
@@ -52,6 +53,8 @@ export function EffectParameters({
   deferOffscreen?: boolean;
   /** Optional concise surfaces reuse the registry controls without duplicating them. */
   parameterKeys?: readonly string[];
+  /** Specialized surfaces can retain structural settings such as a hard shadow's zero blur. */
+  resetDefaults?: Partial<Pick<Effect, "amount" | "settings">>;
 }) {
   const { t } = useTranslation();
   const definition = getEffectDefinition(effect.type);
@@ -107,7 +110,18 @@ export function EffectParameters({
     setColorOwner(owner);
     setOpenColorKey(null);
   }
-  const defaults: Effect = { id: effect.id, type: effect.type, ...definition.defaults };
+  const defaults: Effect = useMemo(
+    () => ({
+      id: effect.id,
+      type: effect.type,
+      ...definition.defaults,
+      ...resetDefaults,
+      settings: resetDefaults?.settings
+        ? { ...definition.defaults.settings, ...resetDefaults.settings }
+        : definition.defaults.settings,
+    }),
+    [effect.id, effect.type, definition.defaults, resetDefaults],
+  );
 
   return (
     <div
@@ -143,6 +157,7 @@ export function EffectParameters({
               onChange(
                 {
                   ...definition.defaults,
+                  amount: defaults.amount,
                   inputs: undefined,
                   enabled: displayed().enabled,
                   settings: defaults.settings ? { ...defaults.settings } : undefined,
@@ -203,6 +218,7 @@ export function EffectParameters({
                 layerId={ownLayerId}
                 effect={effect}
                 parameter={parameter}
+                defaults={defaults}
                 disabled={disabled}
                 t={t}
                 colorOpen={openColorKey === parameter.key}
@@ -225,6 +241,7 @@ const ParameterField = memo(function ParameterField({
   engine,
   layerId,
   parameter,
+  defaults,
   disabled,
   t,
   colorOpen,
@@ -237,6 +254,7 @@ const ParameterField = memo(function ParameterField({
   engine?: EnginePort;
   layerId?: string;
   parameter: EffectParameter;
+  defaults: Effect;
   disabled: boolean;
   t: ReturnType<typeof useTranslation>["t"];
   colorOpen: boolean;
@@ -245,11 +263,6 @@ const ParameterField = memo(function ParameterField({
   onStart?: () => void;
   onCancel?: () => void;
 }) {
-  const defaults: Effect = {
-    id: effect.id,
-    type: effect.type,
-    ...getEffectDefinition(effect.type).defaults,
-  };
   const label = t(parameter.labelKey);
   const value = getEffectParameter(effect, parameter);
   const target: MotionPropertyTarget | undefined = layerId
@@ -387,18 +400,7 @@ const ParameterField = memo(function ParameterField({
       identity={effect}
       label={label}
       value={Number(value) * parameter.displayScale}
-      resetValue={() =>
-        Number(
-          getEffectParameter(
-            {
-              id: effect.id,
-              type: effect.type,
-              ...getEffectDefinition(effect.type).defaults,
-            },
-            parameter,
-          ),
-        ) * parameter.displayScale
-      }
+      resetValue={() => Number(getEffectParameter(defaults, parameter)) * parameter.displayScale}
       disabled={disabled}
       min={parameter.min * parameter.displayScale}
       max={parameter.max * parameter.displayScale}
