@@ -2,6 +2,7 @@ import {
   createEffect,
   getEffectDefinition,
   isEffectParameterVisible,
+  patchEffectParameter,
   type Effect,
   type EffectParameter,
   type EffectType,
@@ -23,11 +24,17 @@ export function effectControlCases(type: EffectType) {
     const condition = definition.parameters.find(
       (field) => field.key === parameter.visibleWhen!.key,
     );
+    if (!condition) throw new Error(`Unknown visibility field: ${parameter.visibleWhen.key}`);
     for (const value of parameter.visibleWhen.values) {
-      const next = condition?.kind === "number" ? Number(value) : value;
+      const next =
+        condition.kind === "number"
+          ? Number(value)
+          : condition.kind === "boolean"
+            ? value === "true"
+            : value;
       candidates.push({
         ...base,
-        settings: { ...base.settings, [parameter.visibleWhen.key]: next },
+        ...patchEffectParameter(base, condition, next),
       });
     }
   }

@@ -106,6 +106,36 @@ for (const webgl of [false, true])
       }, result.variants![1]!);
       expect(color.pink).toBeGreaterThan(50);
       expect(color.blue).toBeGreaterThan(50);
+      const gradient = await inspect.evaluate(async (src) => {
+        const image = new Image();
+        image.src = src;
+        await image.decode();
+        const canvas = document.createElement("canvas");
+        canvas.width = image.width;
+        canvas.height = image.height;
+        const context = canvas.getContext("2d")!;
+        context.drawImage(image, 0, 0);
+        const { data } = context.getImageData(0, 0, image.width, image.height);
+        const sides = [
+          { red: 0, blue: 0 },
+          { red: 0, blue: 0 },
+        ];
+        for (let y = 0; y < image.height; y++)
+          for (let x = 40; x < image.width; x++) {
+            if (x >= 56 && x < 104) continue;
+            const i = (y * image.width + x) * 4;
+            if (data[i + 3] !== 255) continue;
+            const side = sides[x < 56 ? 0 : 1]!;
+            side.red += data[i]!;
+            side.blue += data[i + 2]!;
+          }
+        return sides;
+      }, result.variants![3]!);
+      expect(gradient[0]!.red).toBeGreaterThan(gradient[0]!.blue * 1.3);
+      expect(gradient[1]!.blue).toBeGreaterThan(gradient[1]!.red * 2);
+      expect(
+        (await imageDifference(inspect, result.variants![3]!, result.variants![4]!)).meanRGB,
+      ).toBeGreaterThan(10);
       const prefix = `artifacts/ascii-native/${result.backend}`;
       await writeFile(prefix + "-grid.png", Buffer.from(result.grid!.split(",")[1]!, "base64"));
       await writeFile(

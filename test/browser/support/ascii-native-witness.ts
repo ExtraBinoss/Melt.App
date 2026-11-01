@@ -140,6 +140,22 @@ export async function asciiNativeWitness(forceWebGL: boolean, photos: string[]) 
         weight: 0.8,
       },
       { characters: " .@", shades: 2, invert: true, cellAspect: 1.1, glyphScale: 0.6 },
+      {
+        characters: "█",
+        palette: "gradient",
+        foreground: "#ff0000",
+        gradientEnd: "#0000ff",
+        glyphScale: 1.5,
+        gradientAngle: 0,
+      },
+      {
+        characters: "█",
+        palette: "gradient",
+        foreground: "#ff0000",
+        gradientEnd: "#0000ff",
+        glyphScale: 1.5,
+        gradientAngle: 90,
+      },
     ]) {
       const effect = createEffect("ascii", { settings }),
         controls = createEffectUniforms(effect, 128, 96),

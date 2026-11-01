@@ -34,7 +34,6 @@ export class ToolDocument {
     const { width, height } = this.size(this.edge);
     const effect = createEffect(tool.effect, {
       id: crypto.randomUUID(),
-      ...(tool.initialSettings ? { settings: { ...tool.initialSettings } } : {}),
     });
     const layer = createLayer(tool.media === "video" ? "video" : "image", {
       id: this.layerId,

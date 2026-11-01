@@ -1,5 +1,7 @@
 import {
   clamp,
+  abs,
+  cos,
   dot,
   exp2,
   float,
@@ -9,6 +11,7 @@ import {
   mix,
   pow,
   step,
+  sin,
   texture,
   uv,
   vec2,
@@ -68,15 +71,34 @@ export function asciiNode({ source, controls, getGlyphAtlas, bindGlyphAtlas }: E
     .mul(0.25);
   const ink = modern ? pow(coverage, exp2(float(0.5).sub(u.weight!).mul(3))) : coverage;
   const originalInk = mix(vec3(brightness), adjusted, controls.color);
+  const angle = modern ? u.gradientAngle!.mul(Math.PI / 180) : float(0);
+  const direction = vec2(cos(angle), sin(angle));
+  const gradient = modern
+    ? mix(
+        controls.colors.foreground!,
+        controls.colors.gradientEnd!,
+        clamp(
+          dot(vec2(position.x, position.y.oneMinus()).sub(0.5), direction)
+            .div(max(0.0001, abs(direction.x).add(abs(direction.y))))
+            .add(0.5),
+          0,
+          1,
+        ),
+      )
+    : vec3(0);
   const color = modern
     ? mix(
         mix(
-          originalInk.mul(controls.colors.foreground!),
-          controls.colors.foreground!.mul(brightness),
-          step(0.5, u.palette!),
+          mix(
+            originalInk.mul(controls.colors.foreground!),
+            controls.colors.foreground!.mul(brightness),
+            step(0.5, u.palette!),
+          ),
+          controls.colors.foreground!,
+          step(1.5, u.palette!),
         ),
-        controls.colors.foreground!,
-        step(1.5, u.palette!),
+        gradient,
+        step(2.5, u.palette!),
       )
     : originalInk;
   const treated = modern ? mix(controls.colors.background!, color, ink) : color.mul(ink);

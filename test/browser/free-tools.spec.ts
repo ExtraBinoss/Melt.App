@@ -244,7 +244,6 @@ test("the local tool uses Three's real WebGL fallback, commits controls and expo
     "data-tool-renderer",
     "webgl",
   );
-  await page.getByRole("button", { name: "Advanced controls", exact: true }).click();
   const amount = page.getByRole("textbox", { name: "Amount", exact: true });
   await amount.fill("50");
   await amount.press("Escape");

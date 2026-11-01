@@ -18,12 +18,17 @@ import {
 } from "three/tsl";
 import { sampleEffect, type EffectNodeContext } from "../shared/context";
 import { bayerThreshold } from "./patterns";
+import type { Node } from "three/webgpu";
 
 /** Authored-cell thresholding, original coverage, no raster/time-dependent noise. */
-export function bitDitherNode({ source, controls }: EffectNodeContext) {
+export function bitDitherColor(
+  { source, controls }: EffectNodeContext,
+  overrides: { method?: Node<"float">; sourceColor?: Node<"float"> } = {},
+) {
   const u = controls.parameters,
-    position = uv(),
-    original = sampleEffect(source, controls, position);
+    method = overrides.method ?? u.method!,
+    sourceColor = overrides.sourceColor ?? u.sourceColor!,
+    position = uv();
   const binary = Fn(() => {
     // Shared operands must be assigned before any algorithm branch: Three's
     // expression cache must not leave sibling branches reading an unset variable.
@@ -44,20 +49,20 @@ export function bitDitherNode({ source, controls }: EffectNodeContext) {
         )
         .toVar(),
       threshold = float(0.5).toVar();
-    If(u.method!.greaterThan(3.5), () => {
+    If(method.greaterThan(3.5), () => {
       threshold.assign(interleavedGradientNoise(point));
     })
-      .ElseIf(u.method!.greaterThan(2.5), () => {
+      .ElseIf(method.greaterThan(2.5), () => {
         threshold.assign(bayerThreshold(point, 8));
       })
-      .ElseIf(u.method!.greaterThan(1.5), () => {
+      .ElseIf(method.greaterThan(1.5), () => {
         threshold.assign(bayerThreshold(point, 4));
       })
-      .ElseIf(u.method!.greaterThan(0.5), () => {
+      .ElseIf(method.greaterThan(0.5), () => {
         threshold.assign(bayerThreshold(point, 2));
       });
     const luminance = dot(blocked.rgb, vec3(0.2126, 0.7152, 0.0722)),
-      channel = mix(vec3(luminance), blocked.rgb, u.sourceColor!),
+      channel = mix(vec3(luminance), blocked.rgb, sourceColor),
       tone = pow(
         clamp(channel.sub(0.5).mul(u.contrast!).add(0.5), 0, 1),
         float(1).div(max(0.1, u.gamma!)),
@@ -66,6 +71,11 @@ export function bitDitherNode({ source, controls }: EffectNodeContext) {
     return mix(bit, bit.oneMinus(), u.invert!);
   })();
   const palette = mix(controls.colors.foreground!, controls.colors.background!, binary),
-    color = mix(palette, binary, u.sourceColor!);
-  return vec4(mix(original.rgb, color, controls.amount), original.a);
+    color = mix(palette, binary, sourceColor);
+  return color;
+}
+
+export function bitDitherNode(context: EffectNodeContext) {
+  const original = sampleEffect(context.source, context.controls, uv());
+  return vec4(mix(original.rgb, bitDitherColor(context), context.controls.amount), original.a);
 }

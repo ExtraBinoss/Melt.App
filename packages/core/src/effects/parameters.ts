@@ -92,7 +92,16 @@ export function isEffectParameterVisible(effect: Effect, parameter: EffectParame
   }
   if (!("visibleWhen" in parameter) || !parameter.visibleWhen) return true;
   const condition = parameter.visibleWhen;
-  return condition.values.includes(String(resolveEffectSettings(effect)[condition.key]));
+  const dependency = getEffectDefinition(effect.type).parameters.find(
+    (item) => item.key === condition.key,
+  );
+  return condition.values.includes(
+    String(
+      dependency
+        ? getEffectParameter(effect, dependency)
+        : resolveEffectSettings(effect)[condition.key],
+    ),
+  );
 }
 export function patchEffectParameter(
   effect: Effect,

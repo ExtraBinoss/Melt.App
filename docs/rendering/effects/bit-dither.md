@@ -62,3 +62,27 @@ RGBA-identical at backing scales 0.625×/1×/2×, corresponding to physical requ
 0.625×/1×/1.5× under the existing quality-tier policy. Production readback counters
 remain zero. The command, decoded PNGs and raw reports live in ignored
 `artifacts/bit-dither/`; these are functional checks, not GPU timing claims.
+
+## Shared Dither authoring (2026-11-01)
+
+The canonical `dither` effect now includes Multilevel Bayer and all five binary
+methods. Existing documents without settings retain Multilevel Bayer, their
+original Levels, Color and seed behavior. Contrast, gamma, threshold, strength,
+inversion and an editable ink/paper palette also work in multilevel mode. Levels
+is shown only there. Source colors uses the original top-level Color field,
+including its existing animation; palette controls disappear when it is enabled.
+
+The original `bit-dither` portable type remains valid. Its binary TSL color builder
+is shared with `dither`; binary modes do not duplicate the algorithm or apply Amount
+twice. The free converter now creates the same `dither` document and defaults as
+the editor and renders the complete shared `EffectParameters` form directly. All
+other converters also expose their complete catalog, without an Advanced split
+or tool-specific parameter defaults.
+
+The focused Chromium 156/Linux test compares 24 pairs per Three backend: frozen
+legacy multilevel output and each binary method, both source-color states and
+Amount 1/0.35. WebGPU and WebGL both pass with exact source alpha and at most one
+RGB byte of difference. Actual production read APIs record zero readbacks. Native
+editor controls cover method switching, palette visibility and undo; native free
+tool checks decode real PNG exports. Captures and logs are ignored under
+`artifacts/effect-placement/`. This does not claim a new playback benchmark.

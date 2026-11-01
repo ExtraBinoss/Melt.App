@@ -15,7 +15,14 @@
     "cellAspect": "Largeur des cellules",
     "glyphScale": "Taille des glyphes",
     "weight": "Épaisseur de l’encre",
-    "color": "Couleurs de la source"
+    "color": "Couleurs de la source",
+    "gradientEnd": "Couleur finale",
+    "gradientAngle": "Angle du dégradé"
   },
-  "palette": { "image": "Tons de l’image", "tonal": "Encre nuancée", "solid": "Encre unie" }
+  "palette": {
+    "image": "Tons de l’image",
+    "tonal": "Encre nuancée",
+    "solid": "Encre unie",
+    "gradient": "Encre dégradée"
+  }
 }

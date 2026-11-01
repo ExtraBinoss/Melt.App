@@ -52,7 +52,7 @@
   "how": "How to convert your {{media}}",
   "steps": [
     "Choose an image or video, or drag the file into the preview. Your file stays on your device.",
-    "Adjust the effect and compare it with the original. Basic controls stay close; advanced settings are optional.",
+    "Adjust the effect and compare it with the original. All effect controls are available in the parameter panel.",
     "Choose your output settings and download the result. Processing and encoding happen in your browser."
   ],
   "imageIntro": "Adjust the treatment on a still image and download a PNG, JPEG or WebP. The output keeps the source aspect ratio and can be up to 1920 pixels on its longest edge.",
@@ -73,7 +73,7 @@
     "ascii": {
       "name": "ASCII",
       "summary": "Turn photographs into grids of characters, from fine typographic detail to bold blocks of text.",
-      "about": "ASCII art builds an image from characters instead of a smooth surface. Melt samples the brightness of each cell and uses its own glyph atlas to draw denser or lighter symbols. The result is rendered by the same TSL effect used in the studio. Color mode keeps tones from the source; monochrome produces a restrained typographic image.",
+      "about": "ASCII art builds an image from characters instead of a smooth surface. Melt samples the brightness of each cell and uses its own glyph atlas to draw denser or lighter symbols. The result is rendered by the same TSL effect used in the studio. Color mode keeps tones from the source; monochrome produces a restrained typographic image. Choose image tones, shaded ink, solid ink or a two-color gradient with an adjustable angle.",
       "tips": [
         "Use smaller characters to preserve faces and small details.",
         "Increase the cell size for a bold poster or a deliberately abstract result.",
@@ -85,14 +85,14 @@
     "dither": {
       "name": "Dither",
       "summary": "Reduce images to a black-and-white or source-color palette with ordered pixel patterns.",
-      "about": "Dithering represents tones with patterns from a limited palette. Choose threshold, Bayer 2 × 2, Bayer 4 × 4, Bayer 8 × 8 or interleaved noise. Source colors switches from black-and-white ink and paper to dithering each source RGB channel. Contrast, gamma and pattern strength refine the result.",
+      "about": "Dithering represents tones with patterns from a limited palette. Choose multilevel Bayer, fixed threshold, Bayer 2 × 2, Bayer 4 × 4, Bayer 8 × 8 or interleaved noise. Multilevel Bayer also exposes the number of tonal levels. Source colors processes each source RGB channel; turn it off to use your ink and paper colors. Contrast, gamma and pattern strength refine the result.",
       "tips": [
         "Start with Bayer 4 × 4 for a balanced, recognizable pattern.",
         "Choose foreground and background colors with enough separation.",
         "Use a larger pattern scale for a chunky print-inspired texture."
       ],
       "question": "What is the difference between threshold and Bayer dithering?",
-      "answer": "Threshold makes a direct light-or-dark choice. Bayer distributes those choices with an ordered matrix to suggest intermediate tones. With Source colors off, the result uses your ink and paper colors. With it on, each RGB channel is dithered separately for up to eight colors."
+      "answer": "Threshold makes a direct light-or-dark choice. Binary Bayer distributes those choices with an ordered matrix to suggest intermediate tones; Multilevel Bayer retains more tonal levels. With Source colors off, the result uses your ink and paper palette. With it on, each RGB channel is processed separately."
     },
     "halftone": {
       "name": "Halftone",
@@ -109,19 +109,19 @@
     "cyanotype": {
       "name": "Cyanotype",
       "summary": "Create a blue photographic-print treatment with ink, paper, exposure and texture controls.",
-      "about": "Cyanotype is inspired by the characteristic blue-and-paper appearance of photographic prints. Melt recreates that visual treatment digitally: exposure and contrast shape the subject, ink and paper colors define the palette, and the advanced controls add wash, unevenness, grain, fibers and edge fade. It is a digital effect, not a chemical printing process.",
+      "about": "Cyanotype is inspired by the characteristic blue-and-paper appearance of photographic prints. Melt recreates that visual treatment digitally: exposure and contrast shape the subject, ink and paper colors define the palette, and texture controls add wash, unevenness, grain, fibers and edge fade. It is a digital effect, not a chemical printing process.",
       "tips": [
         "Adjust exposure first so the subject is readable.",
         "Change ink and paper together to keep a coherent palette.",
         "Use subtle grain and wash when you want the photograph to remain the focus."
       ],
       "question": "Can I change the blue and paper colors?",
-      "answer": "Yes. Ink Color and Paper Color are available in the basic controls. Open Advanced for density, wash, texture, fibers and edge treatment. All of these settings are rendered locally using the same cyanotype effect as the full Melt editor."
+      "answer": "Yes. Ink Color, Paper Color, density, wash, texture, fibers and edge treatment are directly available in the parameter panel. All settings use the same local cyanotype effect as the full Melt editor."
     },
     "crt": {
       "name": "CRT",
       "summary": "Add scanlines, display masks, curvature and glow for a retro screen treatment.",
-      "about": "A CRT-inspired filter changes the appearance of the display rather than simply laying stripes over the picture. Melt combines a configurable screen mask, scanlines, curvature, convergence and glow. The basic controls expose the main look; advanced settings let you adjust the finer display and tonal properties. Try it on typography, artwork, game imagery or a short video clip.",
+      "about": "A CRT-inspired filter changes the appearance of the display rather than simply laying stripes over the picture. Melt combines a configurable screen mask, scanlines, curvature, convergence and glow. All display and tonal controls are available in the parameter panel. Try it on typography, artwork, game imagery or a short video clip.",
       "tips": [
         "Keep scanlines subtle when the source contains small text.",
         "Use curvature and glow sparingly for a cleaner retro display.",

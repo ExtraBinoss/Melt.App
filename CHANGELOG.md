@@ -6,6 +6,7 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Share the full effect catalog and neutral defaults between free converters and the editor, removing the tool-only Advanced split. Expand Dither with all binary methods plus tonal and palette controls while preserving legacy multilevel documents; reuse the existing binary GPU builder. Add two-color gradient ink and angle controls to ASCII, with shared color pickers, validated portable settings, undo and native WebGPU/WebGL pixel/resource checks.
 - Keep Edge Detection shader branches statement-only, avoiding four accidental return values and their Three.js TSL inline-function warnings on images, video and other rendered sources.
 - Add Second Skin, a fully editable portrait dancer loop with native Thermal and Scharr contour Motion treatments, sparse typography actions, a real GPU poster and a pinned licensed local video. Support validated media originals inside each template’s own folder while retaining shared legacy originals, and register Motion template error translations before reporting failures.
 - Version retained template sources as well as their downloads, retire active preview owners when their poster revision changes, and invalidate the final Bloom Windows and Melt Mascot posters using their rendered content hashes.

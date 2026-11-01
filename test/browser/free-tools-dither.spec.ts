@@ -67,6 +67,11 @@ for (const forceWebGL of [false, true]) {
       await expect(page.locator(".tool-loading")).toHaveCSS("opacity", "0");
       await mkdir("artifacts/tools", { recursive: true });
       const previewColors = async () => {
+        // All controls now stay in flow. After Download scrolls the page, keep
+        // the fixed public navbar outside the pixel-inspection rectangle.
+        await page
+          .locator(".tool-preview")
+          .evaluate((node) => node.scrollIntoView({ block: "center", behavior: "instant" }));
         // The canvas extends behind its clipped frame; exclude the page below it.
         const screenshot = await page.locator(".tool-preview").screenshot({
           path: `artifacts/tools/dither-preview-${forceWebGL ? "webgl" : "webgpu"}.png`,

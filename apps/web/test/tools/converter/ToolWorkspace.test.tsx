@@ -20,11 +20,11 @@ vi.mock("../../../src/tools/converter/Transport", () => ({
 }));
 
 for (const hasAudio of [false, true]) {
-  test(`only audio-bearing sources expose Keep audio (${hasAudio}) and Advanced follows unchanged basic controls`, async () => {
+  test(`only audio-bearing sources expose Keep audio (${hasAudio}) and all shared controls are immediately available`, async () => {
     await i18n.changeLanguage("en");
     const state: ToolState = {
       phase: "ready",
-      effect: createEffect("bit-dither"),
+      effect: createEffect("dither", { settings: { method: "bayer4" } }),
       name: "clip.webm",
       width: 160,
       height: 120,
@@ -62,18 +62,9 @@ for (const hasAudio of [false, true]) {
       fireEvent.click(keepAudio!);
       expect(audio).toHaveBeenCalledExactlyOnceWith(false);
     } else expect(keepAudio).toBeNull();
-    const contrast = screen.getByRole("textbox", { name: "Contrast" });
-    const toggle = screen.getByRole("button", { name: "Advanced controls" });
-    expect(contrast.compareDocumentPosition(toggle) & Node.DOCUMENT_POSITION_FOLLOWING).toBe(4);
-    expect(screen.queryByRole("textbox", { name: "Tone gamma" })).toBeNull();
-    fireEvent.click(toggle);
-    expect(toggle).toHaveAttribute("aria-expanded", "true");
-    expect(screen.getByRole("textbox", { name: "Contrast" })).toBe(contrast);
-    const gamma = screen.getByRole("textbox", { name: "Tone gamma" });
-    expect(toggle.compareDocumentPosition(gamma) & Node.DOCUMENT_POSITION_FOLLOWING).toBe(4);
+    expect(screen.getByRole("textbox", { name: "Contrast" })).toBeVisible();
+    expect(screen.getByRole("textbox", { name: "Tone gamma" })).toBeVisible();
     expect(screen.getByRole("switch", { name: "Source colors" })).not.toBeChecked();
-    fireEvent.click(toggle);
-    expect(toggle).toHaveAttribute("aria-expanded", "false");
-    expect(screen.queryByRole("textbox", { name: "Tone gamma" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Advanced controls" })).toBeNull();
   });
 }

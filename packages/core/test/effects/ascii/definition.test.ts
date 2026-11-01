@@ -70,3 +70,20 @@ test("character text remains bounded, preserves spaces/order and round-trips wit
   expect(() => patchEffectParameter(effect, parameter("gamma"), 0)).toThrow();
   expect(() => patchEffectParameter(effect, parameter("foreground"), "red")).toThrow();
 });
+
+test("gradient ink exposes its endpoint and angle and stays portable and undoable", () => {
+  const effect = createEffect("ascii"),
+    layer = createLayer("rectangle", { effects: [effect] });
+  const engine = new EditorEngine(createProject({ pages: [createPage({ layers: [layer] })] }));
+  let changed = { ...effect, ...patchEffectParameter(effect, parameter("palette"), "gradient") };
+  changed = { ...changed, ...patchEffectParameter(changed, parameter("gradientEnd"), "#ff0088") };
+  changed = { ...changed, ...patchEffectParameter(changed, parameter("gradientAngle"), 90) };
+  engine.execute({ type: "updateLayers", ids: [layer.id], patch: { effects: [changed] } });
+  expect(
+    parseProject(serializeProject(engine.getSnapshot().project)).pages[0]!.layers[0]!.effects[0],
+  ).toEqual(changed);
+  expect(() => patchEffectParameter(changed, parameter("gradientAngle"), 181)).toThrow();
+  engine.undo();
+  expect(engine.getSnapshot().project.pages[0]!.layers[0]!.effects[0]).toEqual(effect);
+  expect(engine.getSnapshot().canUndo).toBe(false);
+});

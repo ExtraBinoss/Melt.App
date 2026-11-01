@@ -24,10 +24,17 @@ test("ASCII exposes custom text, tone and palette controls while keeping real GP
   await expect(characters).toHaveValue(" 01@");
   await page.getByRole("combobox", { name: "Color mode", exact: true }).click();
   await page.getByRole("option", { name: "Solid ink", exact: true }).click();
-  await page.getByRole("button", { name: "Advanced controls", exact: true }).click();
   await expect(page.getByRole("textbox", { name: "Tonal steps", exact: true })).toBeVisible();
   await expect(page.getByRole("textbox", { name: "Shadow detail", exact: true })).toBeVisible();
   await expect(page.getByRole("textbox", { name: "Ink weight", exact: true })).toBeVisible();
+  await page.getByRole("combobox", { name: "Color mode", exact: true }).click();
+  await page.getByRole("option", { name: "Gradient ink", exact: true }).click();
+  const angle = page.getByRole("textbox", { name: "Gradient angle", exact: true });
+  await expect(angle).toHaveValue("0");
+  await angle.fill("90");
+  await angle.press("Enter");
+  await expect(angle).toHaveValue("90");
+  await expect(page.getByRole("button", { name: "End color", exact: true })).toBeVisible();
   const pending = page.waitForEvent("download");
   await download.click();
   await (await pending).saveAs("artifacts/ascii-controls/real-ascii.png");

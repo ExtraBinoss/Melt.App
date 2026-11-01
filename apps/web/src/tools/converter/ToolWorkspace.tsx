@@ -1,19 +1,14 @@
 import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
 import { useTranslation } from "react-i18next";
 import { formatUiError } from "../../state/i18n/errors/format";
-import { ChevronDown, Download, Eye } from "lucide-react";
+import { Download, Eye } from "lucide-react";
 import { TooltipProvider } from "../../components/ui/tooltip";
 import { Button } from "../../components/ui/button";
 import { Switch } from "../../components/ui/switch";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "../../components/ui/collapsible";
 import { SelectField } from "../../components/shared/SelectField";
 import { NumberInput } from "../../components/shared/NumberInput";
 import { EffectParameters } from "../../components/properties/effects/EffectParameters";
-import { getEffectDefinition, type Effect } from "@musart/core";
+import { type Effect } from "@musart/core";
 import type { ToolController } from "./controller";
 import { createControllerSlot } from "./lifecycle";
 import { ToolTransport } from "./Transport";
@@ -53,10 +48,9 @@ function ToolControls({
 }: Pick<WorkspaceProps, "file" | "tool"> & { controller: ToolController }) {
   const { t } = useTranslation("tools");
   const state = useSyncExternalStore(controller.subscribe, controller.read, controller.read);
-  const [advanced, setAdvanced] = useState(false),
-    [format, setFormat] = useState<ImageOutput | VideoOutput>(
-      tool.media === "image" ? "png" : "auto",
-    );
+  const [format, setFormat] = useState<ImageOutput | VideoOutput>(
+    tool.media === "image" ? "png" : "auto",
+  );
   const change = useCallback(
     (patch: Partial<Effect>, preview?: boolean) => {
       if (preview) controller.preview(patch);
@@ -95,32 +89,10 @@ function ToolControls({
           <div className="tool-control-viewport">
             <EffectParameters
               effect={state.effect}
-              parameterKeys={tool.basic}
               onChange={change}
               onCancel={controller.cancelPreview}
               disabled={blocked}
             />
-            <Collapsible open={advanced} onOpenChange={setAdvanced}>
-              <CollapsibleTrigger asChild>
-                <Button className="tool-advanced" variant="ghost" size="sm">
-                  {t("advanced")}
-                  <ChevronDown size={13} />
-                </Button>
-              </CollapsibleTrigger>
-              <CollapsibleContent className="tool-advanced-content">
-                <div className="tool-advanced-fields">
-                  <EffectParameters
-                    effect={state.effect}
-                    parameterKeys={getEffectDefinition(state.effect.type)
-                      .parameters.filter((parameter) => !tool.basic.includes(parameter.key))
-                      .map((parameter) => parameter.key)}
-                    onChange={change}
-                    onCancel={controller.cancelPreview}
-                    disabled={blocked}
-                  />
-                </div>
-              </CollapsibleContent>
-            </Collapsible>
           </div>
           <div className="tool-output-controls">
             <SelectField

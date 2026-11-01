@@ -18,10 +18,10 @@ a separate tool-only filter.
   limited by the characters in that ramp. Reverse density flips the selection.
 - Image tones retains the source Color flag, including existing Color keyframes.
   Shaded ink uses luminance with the selected ink; Solid ink uses a constant ink.
-  Both ink/tint and background are editable RGB colors. Source alpha is preserved.
-- Advanced controls expose the finer parameters, including mix amount. The simple
-  tool opens with a gentle tonal lift; the engine's neutral defaults preserve old
-  documents. Reset returns to those engine defaults.
+  Gradient ink interpolates two editable RGB ink colors over the image, with an angle from −180° to 180°. Ink/tint is the starting color, End color is the other endpoint, and Background remains separate. Source alpha is preserved.
+- The editor and free tools expose the same catalog controls and neutral defaults,
+  including mix amount. Free tools show every parameter directly; there is no separate
+  advanced form or tool-specific tonal override. Reset returns to the engine defaults.
 
 The character editor publishes bounded previews while typing, commits once on
 Enter/blur and restores the canonical value on Escape, invalid input or owner
@@ -60,3 +60,14 @@ to zero on disposal. Actual WebGPU, WebGL, Canvas2D and VideoFrame read APIs rec
 zero production readbacks. This is a focused ASCII resource/correctness witness,
 not a full-editor latency benchmark. Raw browser/adapter availability, PNGs and
 reports live in ignored `artifacts/ascii-native/`.
+
+## Shared palette verification (2026-11-01)
+
+The focused native Chromium 156/Linux run verifies horizontal and vertical two-color
+ink gradients on Three WebGPU (Intel Xe-LPG) and the WebGL fallback. Frozen legacy
+ASCII comparisons retain source alpha exactly and differ by at most one RGB byte.
+The existing 50-image, 102-pass atlas churn workload still retains two materials,
+one target and 159,744 owned bytes on each backend, with zero owned resources after
+disposal and zero instrumented production pixel readbacks. Native tool input and
+editor popover checks verify gradient angle commits and undo. These are correctness
+and resource checks, not a new frame-rate claim.

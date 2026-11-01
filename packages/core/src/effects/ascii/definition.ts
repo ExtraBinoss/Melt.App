@@ -49,7 +49,7 @@ export const ASCII_PARAMETERS: readonly EffectParameter[] = [
     key: "palette",
     default: "image",
     labelKey: "asciiFx:parameter.palette",
-    options: ["image", "tonal", "solid"].map((value) => ({
+    options: ["image", "tonal", "solid", "gradient"].map((value) => ({
       value,
       labelKey: `asciiFx:palette.${value}`,
     })),
@@ -61,6 +61,18 @@ export const ASCII_PARAMETERS: readonly EffectParameter[] = [
     default: key === "foreground" ? "#ffffff" : "#000000",
     labelKey: `asciiFx:parameter.${key}`,
   })),
+  {
+    kind: "color",
+    scope: "settings",
+    key: "gradientEnd",
+    default: "#8b5cf6",
+    labelKey: "asciiFx:parameter.gradientEnd",
+    visibleWhen: { key: "palette", values: ["gradient"] },
+  },
+  {
+    ...number("gradientAngle", 0, -180, 180, 1, 1, "°"),
+    visibleWhen: { key: "palette", values: ["gradient"] },
+  },
   { ...number("shades", 16, 2, 64, 1), integer: true },
   {
     kind: "boolean",

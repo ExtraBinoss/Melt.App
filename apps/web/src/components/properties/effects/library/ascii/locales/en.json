@@ -15,7 +15,14 @@
     "cellAspect": "Cell width",
     "glyphScale": "Glyph size",
     "weight": "Ink weight",
-    "color": "Source colors"
+    "color": "Source colors",
+    "gradientEnd": "End color",
+    "gradientAngle": "Gradient angle"
   },
-  "palette": { "image": "Image tones", "tonal": "Shaded ink", "solid": "Solid ink" }
+  "palette": {
+    "image": "Image tones",
+    "tonal": "Shaded ink",
+    "solid": "Solid ink",
+    "gradient": "Gradient ink"
+  }
 }

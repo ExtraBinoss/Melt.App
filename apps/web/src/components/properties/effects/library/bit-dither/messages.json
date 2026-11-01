@@ -18,7 +18,8 @@
       "bayer2": "Bayer 2×2",
       "bayer4": "Bayer 4×4",
       "bayer8": "Bayer 8×8",
-      "interleaved": "Interleaved gradient noise"
+      "interleaved": "Interleaved gradient noise",
+      "multilevel": "Multilevel Bayer"
     }
   },
   "fr": {
@@ -40,7 +41,8 @@
       "bayer2": "Bayer 2×2",
       "bayer4": "Bayer 4×4",
       "bayer8": "Bayer 8×8",
-      "interleaved": "Bruit de gradient entrelacé"
+      "interleaved": "Bruit de gradient entrelacé",
+      "multilevel": "Bayer multinuance"
     }
   },
   "de": {

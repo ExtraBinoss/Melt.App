@@ -43,8 +43,9 @@ test("all parameter kinds retain a shared row and diamond slot across Static and
     expect(
       row.querySelector(":scope > .motion-property-field > .motion-property-input"),
     ).not.toBeNull();
-    expect(row.querySelectorAll("[data-motion-diamond]")).toHaveLength(1);
-    expect(row.querySelector<HTMLElement>("[data-motion-diamond]")!.hidden).toBe(true);
+    expect(row.querySelectorAll(".motion-property-diamond-slot")).toHaveLength(1);
+    expect(row.querySelector<HTMLElement>(".motion-property-diamond-slot")!.hidden).toBe(true);
+    expect(row.querySelectorAll("[data-motion-diamond]")).toHaveLength(0);
   }
   act(() => animationPresentation(d.engine).set({ details: true }));
   act(() =>
@@ -359,11 +360,11 @@ test("legacy numeric and boolean parameters retain normalized document values an
   expect(cancel).toHaveBeenCalled();
   fireEvent.doubleClick(screen.getByRole("button", { name: "Ajuster Intensité" }));
   expect(change).toHaveBeenLastCalledWith({ amount: 1 }, false);
-  fireEvent.click(screen.getByRole("switch", { name: "Couleur" }));
+  fireEvent.click(screen.getByRole("switch", { name: "Couleurs source" }));
   expect(change).toHaveBeenLastCalledWith({ color: true }, false);
   view.rerender(<EffectParameters effect={createEffect("dither")} disabled onChange={change} />);
   expect(screen.getByLabelText("Intensité")).toBeDisabled();
-  expect(screen.getByRole("switch", { name: "Couleur" })).toBeDisabled();
+  expect(screen.getByRole("switch", { name: "Couleurs source" })).toBeDisabled();
 });
 
 test("concise tool surfaces reuse registry controls and reveal the remaining parameters on demand", () => {

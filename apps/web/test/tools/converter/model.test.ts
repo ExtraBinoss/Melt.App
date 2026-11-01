@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { motionTimeToSeconds, type VideoAsset } from "@musart/core";
+import { createEffect, motionTimeToSeconds, type VideoAsset } from "@musart/core";
 import { ToolDocument } from "../../../src/tools/converter/model";
 import { acceptToolFile } from "../../../src/tools/converter/input";
 import { findTool, TOOL_PAGES, sourceTool, TOOLS } from "../../../src/tools/catalog";
@@ -25,7 +25,7 @@ test("every registered tool has a unique route and supported effect; previews do
   for (const style of ["ascii", "dither", "halftone", "cyanotype", "crt", "posterize"]) {
     const tool = findTool(`${style}-image-converter`)!;
     const doc = new ToolDocument(image(), tool);
-    expect(doc.effect().type).toBe(tool.effect);
+    expect(doc.effect()).toEqual(createEffect(tool.effect, { id: doc.effect().id }));
     expect([doc.page().width, doc.page().height]).toEqual([1280, 960]);
   }
   const doc = new ToolDocument(image(), findTool("ascii-image-converter")!);
@@ -99,7 +99,6 @@ test("unsupported and oversized uploads fail before renderer loading, including 
 test("image and video dither share a validated source-color setting without committing drafts", () => {
   for (const media of ["image", "video"] as const) {
     const tool = findTool(`dither-${media}-converter`)!;
-    expect(tool.basic).toContain("sourceColor");
     const source = image();
     const doc = new ToolDocument(
       media === "image"
@@ -130,15 +129,15 @@ test("image and video dither share a validated source-color setting without comm
           },
       tool,
     );
-    expect(doc.effect().settings!.sourceColor).toBe(false);
+    expect(doc.effect().color).toBe(false);
     const before = doc.engine.getSnapshot();
-    const patch = { settings: { ...doc.effect().settings, sourceColor: true } };
-    expect(doc.draft(patch).settings!.sourceColor).toBe(true);
+    const patch = { color: true };
+    expect(doc.draft(patch).color).toBe(true);
     expect(doc.engine.getSnapshot()).toBe(before);
     doc.commit(patch);
-    expect(doc.page().layers[0]!.effects[0]!.settings!.sourceColor).toBe(true);
+    expect(doc.page().layers[0]!.effects[0]!.color).toBe(true);
     doc.engine.undo();
-    expect(doc.effect().settings!.sourceColor).toBe(false);
+    expect(doc.effect().color).toBe(false);
     expect(doc.engine.getSnapshot().canUndo).toBe(false);
   }
 });

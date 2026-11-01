@@ -38,6 +38,7 @@ import { BLUR_DEFINITION } from "./blur/definition";
 import { SHADOW_DEFINITION } from "./shadow/definition";
 import { MORPH_DEFINITION } from "./morph/definition";
 import { ASCII_DEFINITION } from "./ascii/definition";
+import { DITHER_DEFINITION } from "./dither/definition";
 /** Portable effect metadata shared by factories, validation and client controls. */
 export const EFFECT_CATALOG: Readonly<Record<EffectType, EffectDefinition>> = Object.freeze({
   terminal: TERMINAL_DEFINITION,
@@ -50,7 +51,7 @@ export const EFFECT_CATALOG: Readonly<Record<EffectType, EffectDefinition>> = Ob
   thermal: THERMAL_DEFINITION,
   "time-warp-scan": TIME_WARP_SCAN_DEFINITION,
   morph: MORPH_DEFINITION,
-  dither: defineEffect("dither", {}, [AMOUNT, SCALE, LEVELS, COLOR, SEED]),
+  dither: DITHER_DEFINITION,
   ascii: ASCII_DEFINITION,
   brightness: defineEffect("brightness", { amount: 0.5 }, [AMOUNT], "adjustment"),
   contrast: defineEffect("contrast", { amount: 0.5 }, [AMOUNT], "adjustment"),

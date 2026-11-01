@@ -263,33 +263,6 @@
   gap: 12px;
   font-size: 11px;
 }
-.tool-advanced {
-  width: 100%;
-  justify-content: space-between;
-  margin: 12px 0 0;
-  color: var(--muted-foreground);
-}
-.tool-advanced svg {
-  transition: transform 200ms ease;
-}
-.tool-advanced[aria-expanded="true"] svg {
-  transform: rotate(180deg);
-}
-.tool-advanced-content {
-  overflow: hidden;
-}
-.tool-advanced-content[data-state="open"] {
-  animation: tool-advanced-open 220ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-.tool-advanced-content[data-state="closed"] {
-  animation: tool-advanced-close 180ms ease-in;
-}
-.tool-advanced-fields {
-  padding-top: 10px;
-}
-.tool-advanced-fields .effect-controls-actions {
-  display: none;
-}
 .tool-output-controls,
 .tool-video-controls,
 .tool-download-controls {
@@ -469,26 +442,6 @@
   width: 100%;
   margin: 70px 0;
 }
-@keyframes tool-advanced-open {
-  from {
-    height: 0;
-    opacity: 0;
-  }
-  to {
-    height: var(--radix-collapsible-content-height);
-    opacity: 1;
-  }
-}
-@keyframes tool-advanced-close {
-  from {
-    height: var(--radix-collapsible-content-height);
-    opacity: 1;
-  }
-  to {
-    height: 0;
-    opacity: 0;
-  }
-}
 @keyframes tool-canvas-in {
   from {
     opacity: 0;
@@ -569,12 +522,10 @@
   .public-page {
     scroll-behavior: auto;
   }
-  .tool-canvas-host > canvas,
-  .tool-advanced-content[data-state] {
+  .tool-canvas-host > canvas {
     animation: none;
   }
   .tool-card-image img,
-  .tool-advanced svg,
   .tool-loading {
     transition: none;
   }

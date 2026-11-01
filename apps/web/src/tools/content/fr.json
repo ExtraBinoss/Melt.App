@@ -52,7 +52,7 @@
   "how": "Comment convertir votre {{media}}",
   "steps": [
     "Choisissez une image ou une vidéo, ou glissez votre fichier dans l’aperçu. Il reste sur votre appareil.",
-    "Ajustez l’effet et comparez-le à l’original. Les réglages simples restent accessibles ; les détails sont facultatifs.",
+    "Ajustez l’effet et comparez-le à l’original. Tous les réglages sont accessibles dans le panneau des paramètres.",
     "Choisissez les options de sortie et téléchargez le résultat. Le traitement et l’encodage se font dans votre navigateur."
   ],
   "imageIntro": "Ajustez le traitement sur une image fixe, puis téléchargez en PNG, JPEG ou WebP. Le format de la source est conservé, avec jusqu’à 1920 pixels sur le côté le plus long.",
@@ -73,7 +73,7 @@
     "ascii": {
       "name": "ASCII",
       "summary": "Transformez vos photos en grilles de caractères, entre détails typographiques et grands blocs de texte.",
-      "about": "L’art ASCII compose une image avec des caractères plutôt qu’une surface continue. Melt échantillonne la luminosité de chaque cellule et dessine des symboles plus ou moins denses avec son atlas de glyphes. C’est le même effet TSL que dans l’atelier. Le mode couleur conserve les tons de la source ; le monochrome produit un rendu typographique plus sobre.",
+      "about": "L’art ASCII compose une image avec des caractères plutôt qu’une surface continue. Melt échantillonne la luminosité de chaque cellule et dessine des symboles plus ou moins denses avec son atlas de glyphes. C’est le même effet TSL que dans l’atelier. Le mode couleur conserve les tons de la source ; le monochrome produit un rendu typographique plus sobre. Choisissez les tons de l’image, une encre nuancée, une encre unie ou un dégradé bicolore avec un angle réglable.",
       "tips": [
         "Réduisez la taille des caractères pour conserver les visages et les petits détails.",
         "Augmentez la taille des cellules pour un résultat graphique ou abstrait.",
@@ -85,14 +85,14 @@
     "dither": {
       "name": "Dither",
       "summary": "Réduisez les images à une palette noir et blanc ou colorée avec des motifs de pixels ordonnés.",
-      "about": "Le tramage représente les tons par des motifs dans une palette limitée. Choisissez un seuil, Bayer 2 × 2, Bayer 4 × 4, Bayer 8 × 8 ou le bruit entrelacé. Couleurs source remplace le noir et blanc par un tramage de chaque canal RVB de la source. Contraste, gamma et intensité du motif affinent le résultat.",
+      "about": "Le tramage représente les tons par des motifs dans une palette réduite. Choisissez Bayer multinuance, un seuil fixe, Bayer 2 × 2, Bayer 4 × 4, Bayer 8 × 8 ou un bruit entrelacé. Bayer multinuance permet aussi de choisir le nombre de niveaux. Couleurs source traite chaque canal RVB ; désactivez cette option pour utiliser les couleurs d’encre et de papier. Le contraste, le gamma et l’intensité du motif affinent le résultat.",
       "tips": [
         "Commencez avec Bayer 4 × 4 pour un motif équilibré.",
         "Choisissez deux couleurs suffisamment distinctes.",
         "Augmentez l’échelle pour une texture plus marquée, inspirée de l’impression."
       ],
       "question": "Quelle différence entre le seuil et le dithering Bayer ?",
-      "answer": "Le seuil choisit directement un ton clair ou sombre. Bayer répartit ces choix dans une matrice ordonnée pour suggérer des tons intermédiaires. Sans Couleurs source, le résultat utilise vos couleurs d’encre et de papier. Avec cette option, chaque canal RVB est tramé séparément pour produire jusqu’à huit couleurs."
+      "answer": "Le seuil choisit directement entre clair et sombre. Bayer binaire répartit ces choix avec une matrice ordonnée pour suggérer des tons intermédiaires ; Bayer multinuance conserve davantage de niveaux. Sans Couleurs source, le résultat utilise votre palette d’encre et de papier. Avec cette option, chaque canal RVB est traité séparément."
     },
     "halftone": {
       "name": "Halftone",
@@ -109,19 +109,19 @@
     "cyanotype": {
       "name": "Cyanotype",
       "summary": "Créez un rendu de tirage photographique bleu avec des réglages d’encre, de papier, d’exposition et de texture.",
-      "about": "Le cyanotype s’inspire de l’aspect bleu sur papier des tirages photographiques. Melt reproduit ce style numériquement : exposition et contraste révèlent le sujet, les couleurs d’encre et de papier définissent la palette, et les réglages avancés ajoutent délavage, irrégularités, grain, fibres et bords estompés. Il s’agit d’un effet numérique, pas d’un procédé chimique.",
+      "about": "Le cyanotype s’inspire de l’aspect bleu sur papier des tirages photographiques. Melt reproduit ce style numériquement : exposition et contraste révèlent le sujet, les couleurs d’encre et de papier définissent la palette, et les réglages de texture ajoutent délavage, irrégularités, grain, fibres et bords estompés. Il s’agit d’un effet numérique, pas d’un procédé chimique.",
       "tips": [
         "Commencez par l’exposition pour garder le sujet lisible.",
         "Accordez l’encre et le papier pour une palette cohérente.",
         "Gardez le grain et le délavage subtils si la photo doit rester au premier plan."
       ],
       "question": "Peut-on changer le bleu et la couleur du papier ?",
-      "answer": "Oui. Les couleurs d’encre et de papier sont dans les réglages de base. Ouvrez les réglages avancés pour la densité, le délavage, les textures, les fibres et les bords. Tout est calculé localement avec le même effet que dans l’éditeur Melt."
+      "answer": "Oui. Les couleurs d’encre et de papier, la densité, le délavage, les textures, les fibres et les bords sont accessibles directement dans le panneau des paramètres. Tous les réglages utilisent le même effet cyanotype local que l’éditeur Melt."
     },
     "crt": {
       "name": "CRT",
       "summary": "Ajoutez lignes de balayage, masques d’écran, courbure et lueur pour un rendu d’écran rétro.",
-      "about": "Un filtre inspiré des écrans CRT modifie l’apparence de l’affichage plutôt que de simplement superposer des rayures. Melt combine masque d’écran, lignes de balayage, courbure, convergence et lueur. Les réglages de base donnent accès au style principal ; les options avancées affinent l’affichage et les tons. Essayez-le sur des textes, des illustrations, des images de jeu ou une courte vidéo.",
+      "about": "Un filtre inspiré des écrans CRT modifie l’apparence de l’affichage plutôt que de simplement superposer des rayures. Melt combine masque d’écran, lignes de balayage, courbure, convergence et lueur. Tous les réglages d’affichage et de tons sont accessibles dans le panneau des paramètres. Essayez-le sur des textes, des illustrations, des images de jeu ou une courte vidéo.",
       "tips": [
         "Gardez les lignes de balayage discrètes sur les petits textes.",
         "Utilisez la courbure et la lueur avec mesure pour un rendu rétro plus propre.",
