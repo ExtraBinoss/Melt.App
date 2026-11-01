@@ -1,9 +1,11 @@
 .attachment-controls-loading {
   display: grid;
   place-items: center;
-  min-height: min(360px, calc(var(--attachment-available-height, 400px) - 28px));
+  height: 100%;
 }
 .attachment-controls-ready {
+  /* Include trailing space in overflowing content, rather than the fixed shell. */
+  padding-bottom: 14px;
   animation: attachment-controls-reveal 140ms ease-out;
 }
 @keyframes attachment-controls-reveal {

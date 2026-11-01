@@ -20,19 +20,25 @@ export function AttachmentBody({
   const ready = admitted || (active && deferred === generation);
   if (ready && !admitted) setAdmitted(true);
   const { t } = useTranslation("brand");
-  return ready ? (
-    <div className="attachment-controls-ready" data-attachment-ready>
-      {children}
-    </div>
-  ) : (
+  return (
     <div
-      className="attachment-controls-loading"
-      aria-busy="true"
+      className="attachment-controls-body"
+      data-attachment-body
       style={{
-        minHeight: `min(${estimatedHeight}px, calc(var(--attachment-available-height, 400px) - 28px))`,
+        // Include the same viewport padding/border budget before and after admission.
+        // A Radix available-height variable is only known after initial placement.
+        height: `min(${Math.max(0, estimatedHeight - 30)}px, calc(100dvh - 62px))`,
       }}
     >
-      <Throbber variant="dots" size={28} label={t("preparing")} delayMs={0} />
+      {ready ? (
+        <div className="attachment-controls-ready" data-attachment-ready>
+          {children}
+        </div>
+      ) : (
+        <div className="attachment-controls-loading" aria-busy="true">
+          <Throbber variant="dots" size={28} label={t("preparing")} delayMs={0} />
+        </div>
+      )}
     </div>
   );
 }
