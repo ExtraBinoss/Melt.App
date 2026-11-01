@@ -12,6 +12,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Include the shared compositor background used by project-opening reveals, keeping their animation on native transform and opacity tracks.
+
 - Add native GPU text outlines and direct 2D hard-shadow controls in all twelve interface languages. Preview outline changes before commit, align property rows and switch spacing, and hide these controls in direct or inherited 3D contexts.
 - Keep list-selected shapes and groups as the canvas move target inside their exact visible geometry, without stealing empty corners or bypassing clipping, locks, mask sources or spatial picking.
 - Edit text directly by double-clicking the canvas and preview canvas/Inspector text changes on the GPU while typing. Commit once on blur or Ctrl/Cmd+Enter, and restore cancelled or stale drafts without adding history.
