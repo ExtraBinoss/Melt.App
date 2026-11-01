@@ -149,6 +149,95 @@ test("slow playback finishes useful frames while bounding the queue to the lates
   await d.resources.dispose();
 });
 
+test("certified paint previews display an in-flight frame before consuming the latest queued color", async () => {
+  const d = fixture(),
+    base = createPage({ id: "page" }),
+    assets = {};
+  const paint = { ...presentation, preview: {} };
+  let complete!: (frame: ReturnType<typeof result>) => void;
+  gpu.render.mockImplementationOnce(
+    () =>
+      new Promise((resolve) => {
+        complete = resolve;
+      }),
+  );
+  d.resources.submit(base, assets, paint);
+  await frame();
+  const options = gpu.render.mock.calls[0]![2] as { signal: AbortSignal; canRender: () => boolean };
+  for (let index = 1; index <= 20; index++)
+    d.resources.submit(
+      { ...base, background: `#${index.toString(16).padStart(6, "0")}` },
+      assets,
+      paint,
+    );
+  expect(options.signal.aborted).toBe(false);
+  expect(options.canRender()).toBe(true);
+  complete(result());
+  await ticks();
+  expect(gpu.render).toHaveBeenCalledTimes(1);
+  d.resources.present();
+  expect(d.renderer.domElement.dataset.renderedRevision).toBe("1");
+  expect(d.renderer.domElement.dataset.rendererReady).toBe("false");
+  await frame();
+  d.resources.present();
+  expect(gpu.render).toHaveBeenCalledTimes(2);
+  expect((gpu.render.mock.calls[1]![0] as Composition).background).toBe("#000014");
+  expect(d.renderer.domElement.dataset.renderedRevision).toBe("21");
+  d.release();
+  await d.resources.dispose();
+});
+
+test.each(["cancel", "new gesture", "commit", "page", "project", "assets"])(
+  "%s retires a paint frame permanently, even when it resolves after another preview starts",
+  async (change) => {
+    const d = fixture(),
+      base = createPage({ id: "page" }),
+      assets = {};
+    const paint = { ...presentation, preview: {} };
+    let complete!: (frame: ReturnType<typeof result>) => void;
+    gpu.render.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          complete = resolve;
+        }),
+    );
+    d.resources.submit(base, assets, paint);
+    await frame();
+    const options = gpu.render.mock.calls[0]![2] as {
+      signal: AbortSignal;
+      canRender: () => boolean;
+    };
+    d.resources.submit(
+      change === "page" ? { ...base, id: "other-page" } : base,
+      change === "assets" ? {} : assets,
+      {
+        ...paint,
+        canonical: change === "cancel" || change === "commit",
+        ...(change === "new gesture" ? { preview: {} } : {}),
+        origin:
+          change === "project"
+            ? { ...origin, projectId: "other" }
+            : change === "commit"
+              ? { ...origin, revision: origin.revision + 1 }
+              : origin,
+      },
+    );
+    expect(options.signal.aborted).toBe(true);
+    expect(options.canRender()).toBe(false);
+    if (change === "cancel") d.resources.submit(base, assets, { ...paint, preview: {} });
+    expect(options.canRender()).toBe(false);
+    const stale = result();
+    complete(stale);
+    await ticks();
+    expect(d.preparedTextures).not.toContain(stale.texture);
+    await frame();
+    d.resources.present();
+    expect(d.renderer.domElement.dataset.rendererReady).toBe("true");
+    d.release();
+    await d.resources.dispose();
+  },
+);
+
 test.each(["paused seek", "document edit", "project switch", "asset replacement"])(
   "%s cancels older playback and prevents its late presentation",
   async (change) => {

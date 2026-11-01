@@ -3,19 +3,18 @@ import type { MotionFramePlan, Asset, Composition, EnginePort, Layer, Project } 
 import type { PreviewSource, PreviewValue } from "../../state/session/preview-source";
 import { createPlaybackSource, type PlaybackSource, type PlaybackFrame } from "./playback-source";
 import { applyPreview, type LayerPatch } from "../interaction/gestures";
-import {
-  getCanonicalPresentation,
-  type CanonicalOrigin,
-} from "../../state/session/canonical-presentation";
+import { getCanonicalPresentation } from "../../state/session/canonical-presentation";
 import { createMotionTransport, type MotionTransport } from "../../services/motion/transport";
 import { getFontPresentation } from "../../state/session/font-presentation";
+import type { PresentationInput } from "../render/frame-request";
+import { PaintPreviewLineage } from "./preview-lineage";
 
 export interface SceneFrame {
   page: Composition;
   assets: Record<string, Asset>;
   playback?: boolean;
   motionFrame?: MotionFramePlan;
-  presentation?: { origin: CanonicalOrigin; canonical: boolean };
+  presentation?: PresentationInput;
 }
 
 /** Issued plans share compiled target identities. The transport owns the advancing UI clock. */
@@ -65,6 +64,8 @@ export class SceneController {
   private cachedPreview: PreviewValue | null = null;
   private cachedGesture = -1;
   private published: SceneFrame | null = null;
+  private readonly paintPreview = new PaintPreviewLineage();
+  private cachedPaintPreview: object | undefined;
 
   constructor(
     private readonly engine: EnginePort,
@@ -80,6 +81,7 @@ export class SceneController {
   read = (): SceneFrame => {
     const playback = this.playback.read();
     if (playback) {
+      this.paintPreview.clear();
       this.motion.pause();
       if (this.cachedPlayback?.source !== playback) {
         const snapshot = this.engine.getSnapshot();
@@ -103,6 +105,18 @@ export class SceneController {
     const motionPlan = this.motion.readFramePlan();
     const motionPlaying = motionFrame !== null && this.motion.read().playing;
     const motionPreviewing = this.motion.isPreviewing();
+    const page =
+      snapshot.project.pages.find((item) => item.id === snapshot.pageId) ??
+      snapshot.project.pages[0]!;
+    const presented = motionFrame ?? page;
+    const paintPreview = this.paintPreview.read(
+      snapshot.project,
+      presented,
+      snapshot.selection,
+      !motionPlaying && !motionPreviewing && !this.patches.length && !this.draft && !this.flatSource
+        ? preview
+        : null,
+    );
     // Property/presence changes are already represented by the materialized page. Only
     // requested media additionally depends on the plan clock; a still needs no new GPU draw.
     const mediaTimeChanged =
@@ -113,6 +127,7 @@ export class SceneController {
       this.cachedProject === snapshot.project &&
       this.cachedPageId === snapshot.pageId &&
       this.cachedPreview === preview &&
+      this.cachedPaintPreview === paintPreview &&
       !mediaTimeChanged &&
       (this.cachedMotion === motionFrame || sameMotionPose(this.cachedMotionPlan, motionPlan)) &&
       this.cachedMotionPlaying === motionPlaying &&
@@ -120,9 +135,6 @@ export class SceneController {
       this.cachedGesture === this.gestureRevision
     )
       return this.cached;
-    const page =
-      snapshot.project.pages.find((item) => item.id === snapshot.pageId) ??
-      snapshot.project.pages[0]!;
     const layerPatches =
       preview?.target === "layer"
         ? [...this.patches, preview]
@@ -132,7 +144,6 @@ export class SceneController {
               ...preview.layerIds.map((layerId) => ({ layerId, patch: preview.patch })),
             ]
           : this.patches;
-    const presented = motionFrame ?? page;
     let next = applyPreview(
       preview?.target === "page" ? { ...presented, ...preview.patch } : presented,
       layerPatches,
@@ -149,6 +160,7 @@ export class SceneController {
     this.cachedProject = snapshot.project;
     this.cachedPageId = snapshot.pageId;
     this.cachedPreview = preview;
+    this.cachedPaintPreview = paintPreview;
     this.cachedMotion = motionFrame;
     this.cachedMotionPlan = motionPlan;
     this.cachedMotionPlaying = motionPlaying;
@@ -161,6 +173,7 @@ export class SceneController {
       ...(motionPlaying ? { playback: true } : {}),
       presentation: {
         origin: { projectId: snapshot.project.id, revision: snapshot.revision },
+        ...(paintPreview ? { preview: paintPreview } : {}),
         // A paused evaluated frame acknowledges the committed revision just like a still.
         // Playback/gesture drafts must not admit background journal/thumbnail GPU work.
         canonical:

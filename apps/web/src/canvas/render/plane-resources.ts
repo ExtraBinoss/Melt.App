@@ -44,7 +44,7 @@ import type {
   PresentationTicket,
 } from "../../state/session/canonical-presentation";
 import type { FontPresentationPublisher } from "../../state/session/font-presentation";
-const canvasOwners = new WeakMap<HTMLCanvasElement, PlaneResources>();
+import { canvasOwners } from "./canvas-owners";
 /** Owns one display plane and a latest-only queue. GPU allocation begins at activation. */
 export class PlaneResources {
   readonly profile: SceneProfileSource;
@@ -235,6 +235,9 @@ export class PlaneResources {
       revision: ++this.revision,
       scale: previewScale(page, this.density, this.maxTextureDimension, assets),
       playback,
+      ...(presentation?.preview && !presentation.canonical && !playback
+        ? { preview: presentation.preview }
+        : {}),
       immutableFrame,
       ...(fontTicket ? { fontTicket } : {}),
       ...(presentation ? { origin: presentation.origin } : {}),
@@ -340,7 +343,7 @@ export class PlaneResources {
     )
       return;
     if (
-      this.latest.playback &&
+      (this.latest.playback || this.latest.preview) &&
       this.prepared &&
       this.preparedRequest &&
       this.preparedRevision !== this.presentedRevision &&
@@ -413,8 +416,12 @@ export class PlaneResources {
     if (request.revision === this.revision) return true;
     const current = this.current;
     return Boolean(
-      request.playback &&
-      current?.playback &&
+      current &&
+      ((request.playback && current.playback) ||
+        (request.preview &&
+          !current.playback &&
+          current.presentation?.canonical === false &&
+          request.preview === current.presentation.preview)) &&
       request.page.id === current.page.id &&
       request.assets === current.assets &&
       request.origin &&
@@ -580,20 +587,4 @@ export class PlaneResources {
     return this.disposal;
   }
 }
-/** A diagnostic request uses the existing display renderer; it never allocates a second engine. */
-export function canvasProfileSource(canvas: HTMLCanvasElement) {
-  const owner = canvasOwners.get(canvas);
-  return owner
-    ? {
-        source: owner.profile,
-        force: () => owner.requestProfileFrame(),
-      }
-    : null;
-}
-/** Borrowed, canvas-scoped native 3D resources. The display plane retains ownership. */
-export function canvasSpatialSource(canvas: HTMLCanvasElement, layerId: string) {
-  return canvasOwners.get(canvas)?.spatialSource(layerId) ?? null;
-}
-export function canvasNativeRenderer(canvas: HTMLCanvasElement) {
-  return canvasOwners.get(canvas)?.borrowRenderer() ?? null;
-}
+export { canvasProfileSource, canvasSpatialSource, canvasNativeRenderer } from "./canvas-owners";

@@ -16,6 +16,46 @@ function fixture() {
   const controller = new SceneController(engine, createPreviewSource(store));
   return { layer, engine, store, controller };
 }
+test("paint presentation tokens follow one source/property scope and retire at cancel or selection", () => {
+  const d = fixture();
+  const stop = d.controller.subscribe(() => {});
+  d.store.set(previewAtom, { target: "page", patch: { background: "#123456" } });
+  const first = d.controller.read().presentation?.preview;
+  expect(first).toBeDefined();
+  d.store.set(previewAtom, { target: "page", patch: { background: "#654321" } });
+  expect(d.controller.read().presentation?.preview).toBe(first);
+  d.engine.select([d.layer.id]);
+  expect(d.controller.read().presentation?.preview).not.toBe(first);
+  const selected = d.controller.read().presentation?.preview;
+  d.store.set(previewAtom, null);
+  expect(d.controller.read().presentation?.preview).toBeUndefined();
+  d.store.set(previewAtom, { target: "page", patch: { background: "#123456" } });
+  expect(d.controller.read().presentation?.preview).not.toBe(selected);
+  d.store.set(previewAtom, { target: "layer", layerId: d.layer.id, patch: { fill: "#123456" } });
+  expect(d.controller.read().presentation?.preview).toBeDefined();
+  d.store.set(previewAtom, { target: "layer", layerId: d.layer.id, patch: { x: 30 } });
+  expect(d.controller.read().presentation?.preview).toBeUndefined();
+  stop();
+});
+test("mixed geometry, creation and flat-source gestures retire an otherwise unchanged paint scope", () => {
+  const d = fixture();
+  const stop = d.controller.subscribe(() => {});
+  d.store.set(previewAtom, { target: "page", patch: { background: "#123456" } });
+  const first = d.controller.read().presentation?.preview;
+  expect(first).toBeDefined();
+  d.controller.setGesture([{ layerId: d.layer.id, patch: { x: 100 } }]);
+  expect(d.controller.read().presentation?.preview).toBeUndefined();
+  d.controller.setGesture([]);
+  expect(d.controller.read().presentation?.preview).not.toBe(first);
+  d.controller.setGesture([], createLayer("rectangle"));
+  expect(d.controller.read().presentation?.preview).toBeUndefined();
+  d.controller.setGesture([]);
+  d.controller.setFlatSource(d.layer.id);
+  expect(d.controller.read().presentation?.preview).toBeUndefined();
+  d.controller.setFlatSource(null);
+  expect(d.controller.read().presentation?.preview).toBeDefined();
+  stop();
+});
 describe("stable imperative scene controller", () => {
   test.each(["base", "held key"])(
     "clock-only Motion ticks retain the %s pose without republishing the GPU scene",

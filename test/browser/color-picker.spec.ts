@@ -101,10 +101,12 @@ test("compact vertical hue/alpha preview real GPU pixels with no editor React co
       hue: (await hue.boundingBox())!,
       alpha: (await alpha.boundingBox())!,
     };
-    await expect(hue.locator('[data-slot="slider-thumb"]').locator("..")).toHaveCSS(
-      "transition-duration",
-      "0.055s, 0.055s, 0.055s, 0.055s",
-    );
+    for (const thumb of [
+      hue.locator('[data-slot="slider-thumb"]').locator(".."),
+      alpha.locator('[data-slot="slider-thumb"]').locator(".."),
+      sv.locator(".react-colorful__saturation-pointer"),
+    ])
+      await expect(thumb).toHaveCSS("transition-duration", "0s");
     expect(boxes.sv.height).toBe(132);
     expect(boxes.hue.height).toBe(132);
     expect(boxes.alpha.height).toBe(132);

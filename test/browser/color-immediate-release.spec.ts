@@ -22,6 +22,7 @@ test("immediate native color release preserves the last sample, next gesture and
   page,
 }) => {
   await mkdir("artifacts/color-immediate", { recursive: true });
+  await page.addInitScript(() => localStorage.setItem("musart.language", "fr"));
   await page.goto("/?automation=1");
   await page.waitForFunction(() => Boolean(window.musart));
   await page.evaluate(
@@ -173,9 +174,9 @@ test("immediate native color release preserves the last sample, next gesture and
         s = Math.round(clamp((last.x - box.x) / box.width) * 100);
         v = Math.round((1 - clamp((last.y - box.y) / box.height)) * 100);
       }
-      if (channel === "hue") h = Math.round(clamp((last.y - box.y) / box.height) * 360);
+      if (channel === "hue") h = Math.round(clamp((last.y - box.y) / box.height) * 3600) / 10;
       if (channel === "alpha")
-        a = Math.round((1 - clamp((last.y - box.y) / box.height)) * 100) / 100;
+        a = Math.round((1 - clamp((last.y - box.y) / box.height)) * 1000) / 1000;
       const expected = bytes(h, s, v, a);
       const immediate = await page.evaluate(() => window.musart!.snapshot());
       const row = {

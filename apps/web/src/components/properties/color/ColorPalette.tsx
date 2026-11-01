@@ -31,14 +31,22 @@ export function ColorPalette({
 }) {
   const { t } = useTranslation();
   const origin = useMemo(() => ({ value, resetKey }), [value, resetKey]);
-  const [draft, setDraft] = useState<{ origin: typeof origin; color: Hsva } | null>(null);
+  const [draft, setDraft] = useState<{
+    origin: typeof origin;
+    color: Hsva;
+  } | null>(null);
   const [cycle, setCycle] = useState(0);
   const epoch = useRef(0);
   const mounted = useRef(false);
   const color = draft?.origin === origin ? draft.color : hexToHsva(value);
   const current = useRef(color),
     pad = useRef<HTMLDivElement>(null);
-  const pointer = useRef<{ id: number; origin: typeof origin; box: DOMRect } | null>(null);
+  const channels = useRef<HTMLDivElement>(null);
+  const pointer = useRef<{
+    id: number;
+    origin: typeof origin;
+    box: DOMRect;
+  } | null>(null);
   const samplePointer = useRef<(event: PointerEvent) => boolean>(() => false);
   useLayoutEffect(() => {
     current.current = color;
@@ -53,7 +61,24 @@ export function ColorPalette({
     const next = { ...current.current, ...patch, ...(!alpha ? { a: 1 } : {}) };
     if (onPreview(hsvaToHex(next)) === false) return false;
     current.current = next;
-    setDraft({ origin, color: next });
+    if (pointer.current) {
+      const thumb = pad.current?.querySelector<HTMLElement>(".react-colorful__saturation-pointer");
+      const fill = thumb?.querySelector<HTMLElement>(".react-colorful__pointer-fill");
+      if (thumb) {
+        thumb.style.left = `${next.s}%`;
+        thumb.style.top = `${100 - next.v}%`;
+      }
+      if (fill) fill.style.backgroundColor = hsvaToHex({ ...next, a: 1 });
+      pad.current
+        ?.querySelector('[role="slider"]')
+        ?.setAttribute(
+          "aria-valuetext",
+          `${t("pickerSaturation")}: ${Math.round(next.s)}% / ${Math.round(next.v)}%`,
+        );
+      channels.current
+        ?.querySelector<HTMLElement>(".color-alpha")
+        ?.style.setProperty("--color-channel-fill", hsvaToHex({ ...next, a: 1 }));
+    } else setDraft({ origin, color: next });
     return true;
   }
   const latest = useRef({ origin, disabled, preview, onCommit, onCancel });
@@ -97,6 +122,7 @@ export function ColorPalette({
     function release(event: PointerEvent) {
       if (!pointer.current || pointer.current.id !== event.pointerId) return;
       const valid = sample(event);
+      if (valid) setDraft({ origin: latest.current.origin, color: current.current });
       // Retire this genuine widget's pending effects before they can echo an old
       // color after the synchronous final sample has been committed.
       retire();
@@ -138,6 +164,7 @@ export function ColorPalette({
   }
   return (
     <div
+      ref={channels}
       className="color-channels"
       data-alpha={alpha}
       inert={disabled || undefined}
@@ -146,6 +173,12 @@ export function ColorPalette({
       <div
         ref={pad}
         className="color-sv-pad"
+        // Pointer sampling below owns native mouse, pen and touch gestures.
+        // Letting react-colorful also start its compatibility mouse/touch
+        // gesture reads geometry after the pointer preview has written styles.
+        // Keep its genuine focused slider and keyboard interaction intact.
+        onMouseDownCapture={(event) => event.stopPropagation()}
+        onTouchStartCapture={(event) => event.stopPropagation()}
         onPointerDownCapture={(event) => {
           if (disabled || event.button !== 0) return;
           const box = pad.current
@@ -153,6 +186,9 @@ export function ColorPalette({
             ?.getBoundingClientRect();
           if (box && box.width > 0 && box.height > 0) {
             pointer.current = { id: event.pointerId, origin, box };
+            pad.current
+              ?.querySelector<HTMLElement>('.react-colorful__saturation [role="slider"]')
+              ?.focus({ preventScroll: true });
             samplePointer.current(event.nativeEvent);
           }
         }}
@@ -205,7 +241,11 @@ export function ColorPalette({
           max={100}
           step={0.1}
           value={[color.a * 100]}
-          style={{ "--color-channel-fill": hsvaToHex({ ...color, a: 1 }) } as CSSProperties}
+          style={
+            {
+              "--color-channel-fill": hsvaToHex({ ...color, a: 1 }),
+            } as CSSProperties
+          }
           onKeyDownCapture={(event) => channelKey(event, "a")}
           onValueChange={([a]) => preview({ a: a! / 100 })}
         />

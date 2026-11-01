@@ -69,22 +69,8 @@
   grid-template-columns: minmax(0, 1fr) 24px;
 }
 
-/* Presentation interpolation never rounds or delays the actual color command. */
-.color-control .react-colorful__saturation-pointer {
-  transition:
-    left 55ms linear,
-    top 55ms linear;
-}
+/* Pointer positions follow the current sample without a second animation clock. */
+.color-control .react-colorful__saturation-pointer,
 .color-control .color-channel > span:has([data-slot="slider-thumb"]) {
-  transition:
-    left 55ms linear,
-    top 55ms linear,
-    bottom 55ms linear,
-    right 55ms linear;
-}
-@media (prefers-reduced-motion: reduce) {
-  .color-control .react-colorful__saturation-pointer,
-  .color-control .color-channel > span:has([data-slot="slider-thumb"]) {
-    transition: none;
-  }
+  transition: none;
 }
