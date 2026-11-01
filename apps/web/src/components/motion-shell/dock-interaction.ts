@@ -24,6 +24,8 @@ export function observeDockInteraction(root: HTMLElement, actions: DockActions) 
   const document = root.ownerDocument;
   const pointers = new Set<number>();
   let timer: ReturnType<typeof setTimeout> | null = null;
+  let pending: "open" | "close" | null = null;
+  let deadline = 0;
   let hovering = false,
     suppressed = false,
     engaged = false,
@@ -116,6 +118,8 @@ export function observeDockInteraction(root: HTMLElement, actions: DockActions) 
   function clear() {
     if (timer !== null) clearTimeout(timer);
     timer = null;
+    pending = null;
+    deadline = 0;
   }
   function held() {
     const focused = document.activeElement;
@@ -133,23 +137,31 @@ export function observeDockInteraction(root: HTMLElement, actions: DockActions) 
     );
   }
   function reconsider() {
+    const next =
+      disposed || suppressed || held()
+        ? null
+        : hovering && !actions.expanded() && revealIntent
+          ? "open"
+          : !hovering && engaged && actions.expanded()
+            ? "close"
+            : null;
+    if (!next) return clear();
+    const delay = next === "open" ? 100 : fastExit ? 90 : 280;
+    const until = Date.now() + delay;
+    // Playback changes text/DOM continuously. Rechecking an unchanged intent must
+    // not postpone its deadline forever; only a new intent or earlier exit replaces it.
+    if (pending === next && deadline <= until) return;
     clear();
-    if (disposed || suppressed || held()) return;
-    if (hovering) {
-      if (!actions.expanded() && revealIntent)
-        timer = setTimeout(() => {
-          timer = null;
-          if (!disposed && hovering && revealIntent && !suppressed && !pointers.size)
-            actions.open();
-        }, 100);
-    } else if (engaged && actions.expanded())
-      timer = setTimeout(
-        () => {
-          timer = null;
-          if (!disposed && !hovering && !held()) actions.close();
-        },
-        fastExit ? 90 : 280,
-      );
+    pending = next;
+    deadline = until;
+    timer = setTimeout(() => {
+      timer = null;
+      pending = null;
+      deadline = 0;
+      if (disposed || suppressed || held()) return;
+      if (next === "open" && hovering && revealIntent) actions.open();
+      else if (next === "close" && !hovering) actions.close();
+    }, delay);
   }
   const over = (event: PointerEvent) => {
     const wasHovering = hovering;

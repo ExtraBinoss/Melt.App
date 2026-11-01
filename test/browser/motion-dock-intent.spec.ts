@@ -59,3 +59,42 @@ test("gentle ruler and playback approaches keep the peek still; inward movement 
   await expect(dock).toHaveAttribute("data-motion-expanded", "false");
   expect(await page.evaluate(() => window.musart!.snapshot().revision)).toBe(revision);
 });
+
+test("Terminal Signal playback keeps unpinned reveal and auto-hide deadlines live", async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    localStorage.setItem("musart.language", "en");
+    localStorage.setItem("musart.onboarding.v1", JSON.stringify({ version: 1, completed: true }));
+  });
+  await page.goto("/editor?automation=1");
+  await page.waitForFunction(() => Boolean(window.musart));
+  await page.evaluate(async () => {
+    const manifest = await fetch("/templates/motion/terminal-signal/terminal-signal.json").then(
+      (r) => r.json(),
+    );
+    window.musart!.load(manifest.project);
+  });
+  await page.locator('.editor-gpu-scene canvas[data-renderer-ready="true"]').waitFor();
+  const dock = page.locator(".motion-timeline-dock");
+  if ((await dock.getAttribute("data-motion-pinned")) === "true")
+    await page.getByRole("button", { name: "Unpin timeline", exact: true }).click();
+  await expect(dock).toHaveAttribute("data-motion-pinned", "false");
+  await page.getByRole("button", { name: "Play", exact: true }).click();
+  const revision = await page.evaluate(() => window.musart!.session().revision);
+  await page.mouse.move(600, 100);
+  await expect(dock).toHaveAttribute("data-motion-expanded", "false");
+  await expect(dock).not.toHaveAttribute("data-motion-animating");
+  for (let cycle = 0; cycle < 2; cycle++) {
+    await page.mouse.move(600, 800);
+    await page.mouse.move(600, 999, { steps: 5 });
+    await expect(dock).toHaveAttribute("data-motion-expanded", "true");
+    await expect(dock).not.toHaveAttribute("data-motion-animating");
+    await page.mouse.move(600, 100);
+    await expect(dock).toHaveAttribute("data-motion-expanded", "false");
+    await expect(dock).not.toHaveAttribute("data-motion-animating");
+    await expect(page.getByRole("button", { name: "Pause", exact: true })).toBeVisible();
+    await expect(dock).toHaveAttribute("data-motion-pinned", "false");
+  }
+  expect(await page.evaluate(() => window.musart!.session().revision)).toBe(revision);
+});

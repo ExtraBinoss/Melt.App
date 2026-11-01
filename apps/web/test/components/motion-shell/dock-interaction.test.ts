@@ -380,3 +380,27 @@ test("the same movement intent applies over controls without button-specific exc
   expect(d.actions.open).toHaveBeenCalledOnce();
   d.watcher.dispose();
 });
+
+test("playback DOM updates cannot starve an unpinned reveal or departure deadline", async () => {
+  const d = fixture(false, true);
+  const clock = document.createElement("span");
+  d.root.append(clock);
+  fireEvent.pointerOver(d.ruler, { clientX: 500, clientY: 525 });
+  for (let at = 0; at < 8; at++) {
+    clock.textContent = String(at);
+    await Promise.resolve();
+    vi.advanceTimersByTime(16);
+  }
+  expect(d.actions.open).toHaveBeenCalledOnce();
+  d.watcher.refresh();
+  fireEvent.pointerOut(d.ruler, { relatedTarget: document.body, clientX: 500, clientY: 300 });
+  for (let at = 0; at < 24; at++) {
+    clock.textContent = String(at);
+    await Promise.resolve();
+    vi.advanceTimersByTime(16);
+  }
+  expect(d.actions.close).toHaveBeenCalledOnce();
+  expect(d.actions.pinned()).toBe(false);
+  d.watcher.dispose();
+  expect(vi.getTimerCount()).toBe(0);
+});
