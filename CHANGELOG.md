@@ -6,6 +6,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Derive timeline animation text, selection outlines and DOM trim grips from the actual clip fill using the existing canvas grip luminance rule; keep selected, neutral and hovered blocks readable across theme and media-color changes without React updates or pixel sampling.
+
 - Add the GPU Time Warp Scan effect for videos, images, groups and 3D sources, with deterministic Motion sampling, an analytical still-image scan, four directions, editable/keyframeable controls, twelve localized resources and bounded cancellable source replay shared by preview/export.
 
 - Use the shared platform modifier label in the timeline zoom tooltip: Command on Apple platforms and Ctrl on Windows/Linux, retaining the mounted tooltip during zoom changes.

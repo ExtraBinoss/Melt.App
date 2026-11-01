@@ -1,3 +1,15 @@
+.motion-row {
+  /* The canvas trim ink uses the same linear-luminance threshold in paint.ts. */
+  --motion-contrast-channel: clamp(
+    0,
+    calc((0.25 - r * 0.2126 - g * 0.7152 - b * 0.0722) * 100000),
+    1
+  );
+  --motion-track-ink: color(
+    from var(--motion-track-color) srgb-linear var(--motion-contrast-channel)
+      var(--motion-contrast-channel) var(--motion-contrast-channel)
+  );
+}
 .motion-trim-handle::after {
   content: "";
   position: absolute;
@@ -20,10 +32,7 @@
   opacity: 1;
 }
 .motion-row.is-selected {
-  --motion-trim-ink: var(--motion-accent-foreground);
-}
-.motion-row.is-selected[data-layer-kind="audio"] {
-  --motion-trim-ink: #000000;
+  --motion-trim-ink: var(--motion-track-ink, var(--motion-accent-foreground));
 }
 .motion-trim-handle:focus-visible::after {
   opacity: 1;

@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { expect, test } from "vitest";
 import {
@@ -79,6 +80,12 @@ test("pins a compact geometry-only angel with embedded attribution and 16-bit in
   });
   expect(gltf.asset.copyright).toContain("noe-3d.at");
   expect(gltf.extras.license).toBe(ANGEL_SOURCE.license);
+  const provenance = JSON.parse(
+    await readFile("apps/web/public/templates/motion/media/angel-source.json", "utf8"),
+  );
+  expect(provenance.sourceSha256).toBe(gltf.extras.sourceSha256);
+  expect(provenance.preparedSha256).toBe(createHash("sha256").update(bytes).digest("hex"));
+  expect(provenance.preparedBytes).toBe(bytes.byteLength);
   for (const invalid of [new Uint8Array(), new Uint8Array(32), bytes])
     expect(() => prepareAngel(invalid)).toThrow();
 });
