@@ -1,0 +1,21 @@
+.attachment-controls-loading {
+  display: grid;
+  place-items: center;
+  min-height: min(360px, calc(var(--attachment-available-height, 400px) - 28px));
+}
+.attachment-controls-ready {
+  animation: attachment-controls-reveal 140ms ease-out;
+}
+@keyframes attachment-controls-reveal {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .attachment-controls-ready {
+    animation: none;
+  }
+}

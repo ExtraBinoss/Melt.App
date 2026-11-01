@@ -142,3 +142,18 @@ it.each([false, true])(
     view.unmount();
   },
 );
+
+it("selecting an unrelated effect layer retains unchanged animation lane controls", () => {
+  const d = fixture(false);
+  const summary = vi.mocked(MotionSummaryBlock);
+  summary.mockClear();
+  d.mount(<PanelHost engine={d.engine} transport={d.runtime.transport} />);
+  const count = () =>
+    summary.mock.calls.filter(([props]) => props.animationId === d.animation().id).length;
+  const before = count();
+  expect(before).toBeGreaterThan(0);
+  act(() => d.engine.select([d.text.id]));
+  expect(count()).toBe(before);
+  act(() => d.engine.select([d.rectangle.id]));
+  expect(count()).toBe(before);
+});

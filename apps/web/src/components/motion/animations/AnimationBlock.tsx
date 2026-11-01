@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { memo, useMemo } from "react";
 import {
   projectAnimationProperties,
   motionTimeToSeconds,
@@ -13,7 +13,7 @@ import type { TimelineTransport } from "../model";
 import type { TimelineGestures } from "../gestures";
 import type { TimelineSource } from "../rows/timeline-source";
 
-export function AnimationBlock({
+export const AnimationBlock = memo(function AnimationBlock({
   engine,
   animation,
   layerId,
@@ -83,4 +83,4 @@ export function AnimationBlock({
       onDelete={() => engine.execute({ type: "deleteMotionAnimation", animationId: animation.id })}
     />
   );
-}
+});

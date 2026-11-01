@@ -56,12 +56,23 @@ export function getEffectParameter(
   effect: Effect,
   parameter: EffectParameter,
 ): EffectParameterValue {
-  const value: unknown = settingsScoped(parameter)
-    ? resolveEffectSettings(effect)[parameter.key]
-    : (effect[parameter.key as keyof Effect] ??
-      getEffectDefinition(effect.type).defaults[
-        parameter.key as keyof Omit<Effect, "id" | "type">
-      ]);
+  const definition = getEffectDefinition(effect.type);
+  // A scalar read must not rebuild and merge the entire settings object. Keep
+  // Gradient's legacy normalization, and preserve explicit undefined overrides.
+  let value: unknown;
+  if (!settingsScoped(parameter))
+    value =
+      effect[parameter.key as keyof Effect] ??
+      definition.defaults[parameter.key as keyof Omit<Effect, "id" | "type">];
+  else if (effect.type === "gradient") value = resolveEffectSettings(effect)[parameter.key];
+  else if (effect.settings && Object.hasOwn(effect.settings, parameter.key))
+    value = effect.settings[parameter.key];
+  else if (
+    definition.defaults.settings &&
+    Object.hasOwn(definition.defaults.settings, parameter.key)
+  )
+    value = definition.defaults.settings[parameter.key];
+  else value = "default" in parameter ? parameter.default : undefined;
   ensure(
     typeof value === "number" || typeof value === "boolean" || typeof value === "string",
     "INVALID_COMMAND",

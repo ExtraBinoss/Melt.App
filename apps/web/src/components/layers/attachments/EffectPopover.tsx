@@ -35,6 +35,7 @@ import { MotionValueField } from "../../properties/motion/MotionValueField";
 import { MotionNumberInput } from "../../properties/motion/MotionNumberInput";
 import type { MotionEditTarget } from "../../../state/session/motion-edit";
 import { resolvePageEditingScope } from "../../../state/session/page-editing-scope";
+import { AttachmentBody } from "./AttachmentBody";
 export function EffectPopover({
   engine,
   page,
@@ -117,16 +118,34 @@ export function EffectPopover({
         >
           <ScrollShadow key={owner.generation} className="layer-attachment-scroll">
             <div className="layer-attachment-viewport">
-              <EffectDetails
+              <AttachmentBody
                 key={owner.generation}
-                engine={engine}
-                page={currentPage ?? ownedPage}
-                layer={layer}
-                effectId={effectId}
-                run={run}
-                isCurrent={isCurrent}
-                registerDeactivate={owner.registerDeactivate}
-              />
+                generation={owner.generation}
+                active={owner.open}
+                estimatedHeight={Math.min(
+                  600,
+                  160 +
+                    layer.effects
+                      .filter((effect) => !effectId || effect.id === effectId)
+                      .reduce(
+                        (count, effect) =>
+                          count + getEffectDefinition(effect.type).parameters.length,
+                        0,
+                      ) *
+                      36,
+                )}
+              >
+                <EffectDetails
+                  key={owner.generation}
+                  engine={engine}
+                  page={currentPage ?? ownedPage}
+                  layer={layer}
+                  effectId={effectId}
+                  run={run}
+                  isCurrent={isCurrent}
+                  registerDeactivate={owner.registerDeactivate}
+                />
+              </AttachmentBody>
             </div>
           </ScrollShadow>
         </PopoverContent>
