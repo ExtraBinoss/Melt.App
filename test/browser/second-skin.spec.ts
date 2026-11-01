@@ -8,6 +8,11 @@ test("Second Skin renders distinct native treatments, exports a loop and install
   page,
 }) => {
   test.setTimeout(90000);
+  const tslWarnings: string[] = [];
+  page.on("console", (message) => {
+    if (message.type() === "warning" && message.text().includes("THREE.TSL"))
+      tslWarnings.push(message.text());
+  });
   const folder = "artifacts/second-skin/native";
   await mkdir(folder, { recursive: true });
   const manifest = JSON.parse(
@@ -169,4 +174,5 @@ print(json.dumps({'seam':d(im[0],im[6]),'adjacent':max(d(im[0],im[1]),d(im[5],im
     project.pages,
   );
   await expect(page.locator('canvas[data-renderer-ready="true"]').first()).toBeVisible();
+  expect(tslWarnings).toEqual([]);
 });

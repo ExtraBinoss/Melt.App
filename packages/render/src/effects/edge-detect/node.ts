@@ -41,10 +41,18 @@ export function edgeDetectNode({ source, backdrop, controls }: EffectNodeContext
           g.add(i).sub(a).sub(c).add(h.sub(b).mul(weight)),
         ),
       ).div(divisor);
-    If(u.method!.equal(1), () => response.assign(gradient(2, 4)));
-    If(u.method!.equal(2), () => response.assign(gradient(1, 3)));
-    If(u.method!.equal(3), () => response.assign(length(vec2(e.sub(i), f.sub(h)))));
-    If(u.method!.equal(4), () => response.assign(abs(b.add(d).add(f).add(h).sub(e.mul(4))).div(4)));
+    If(u.method!.equal(1), () => {
+      response.assign(gradient(2, 4));
+    });
+    If(u.method!.equal(2), () => {
+      response.assign(gradient(1, 3));
+    });
+    If(u.method!.equal(3), () => {
+      response.assign(length(vec2(e.sub(i), f.sub(h))));
+    });
+    If(u.method!.equal(4), () => {
+      response.assign(abs(b.add(d).add(f).add(h).sub(e.mul(4))).div(4));
+    });
     If(u.method!.equal(5), () => {
       const near = a.add(c).add(g).add(i).add(b.add(d).add(f).add(h).mul(2)).add(e.mul(4)).div(16);
       let far: Node<"float"> = e.mul(4);
