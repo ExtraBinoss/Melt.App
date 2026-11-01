@@ -37,9 +37,6 @@ vi.mock("../../../src/services/files/download", () => ({
   downloadBlob: vi.fn(),
   safeName: (name: string) => name.replace(/\//g, "-"),
 }));
-vi.mock("../../../src/services/selection/pixel-selection", () => ({
-  maskToDataUrl: vi.fn(() => "data:image/png;base64,mask"),
-}));
 const stores: ProjectStore[] = [];
 const pipelines: ThumbnailPipeline[] = [];
 async function setup(project = createProject(), databaseName = crypto.randomUUID()) {
@@ -55,7 +52,7 @@ async function setup(project = createProject(), databaseName = crypto.randomUUID
   stores.push(store);
   await store.save(project);
   const selection = {
-    segment: vi.fn(),
+    segmentEncoded: vi.fn(),
     wand: vi.fn(),
     prepare: vi.fn(async () => {}),
     dispose: vi.fn(),
@@ -274,9 +271,13 @@ describe("asset and mask orchestration", () => {
     const { engine, services, selection } = await setup(sourceProject());
     await services.prepareSegmentation();
     expect(selection.prepare).toHaveBeenCalledTimes(1);
-    selection.segment.mockResolvedValue({ data: new Uint8ClampedArray(8), width: 2, height: 1 });
+    selection.segmentEncoded.mockResolvedValue({
+      blob: new Blob(["mask"], { type: "image/png" }),
+      width: 2,
+      height: 1,
+    });
     await services.selectImagePoint("image", 100, -20, "segment", 16);
-    expect(selection.segment).toHaveBeenCalledWith("data:image/png;base64,original", 50, 0);
+    expect(selection.segmentEncoded).toHaveBeenCalledWith("data:image/png;base64,original", 50, 0);
     const snapshot = engine.getSnapshot();
     const mask = snapshot.project.pages[0]!.layers[0]!.mask;
     expect(mask).toMatchObject({ enabled: true, inverted: false });
@@ -316,10 +317,10 @@ describe("asset and mask orchestration", () => {
     await expect(services.selectImagePoint("image", 0, 0, "segment", 16)).rejects.toThrow(
       "verrouillé",
     );
-    expect(selection.segment).not.toHaveBeenCalled();
+    expect(selection.segmentEncoded).not.toHaveBeenCalled();
     engine.execute({ type: "updateLayers", ids: ["image"], patch: { locked: false } });
-    let release!: (mask: { data: Uint8ClampedArray; width: number; height: number }) => void;
-    selection.segment.mockImplementationOnce(
+    let release!: (mask: { blob: Blob; width: number; height: number }) => void;
+    selection.segmentEncoded.mockImplementationOnce(
       () =>
         new Promise((resolve) => {
           release = resolve;
@@ -327,7 +328,7 @@ describe("asset and mask orchestration", () => {
     );
     const pending = services.selectImagePoint("image", 0, 0, "segment", 16);
     engine.execute({ type: "deleteLayers", ids: ["image"] });
-    release({ data: new Uint8ClampedArray(4), width: 1, height: 1 });
+    release({ blob: new Blob(["mask"], { type: "image/png" }), width: 1, height: 1 });
     await expect(pending).rejects.toThrow("cible a changé");
   });
 });

@@ -52,15 +52,15 @@ page.on("requestfailed", (request) => {
 await page.route(`${baseURL}/__segmentation_check__`, (route) =>
   route.fulfill({
     contentType: "text/html",
-    body: "<!doctype html><html><title>MusArt real segmentation verification</title></html>",
+    body: '<!doctype html><html><title>Melt real segmentation verification</title><button style="width:160px;height:80px">Input probe</button></html>',
   }),
 );
 await page.goto(`${baseURL}/__segmentation_check__`);
 report.adapter = await page.evaluate(async () => {
   const adapter = await navigator.gpu?.requestAdapter();
   if (!adapter) return null;
-  const { vendor, architecture, device, description } = adapter.info;
-  return { vendor, architecture, device, description };
+  const { vendor, architecture, device, description, isFallbackAdapter } = adapter.info;
+  return { vendor, architecture, device, description, isFallbackAdapter };
 });
 await page.exposeFunction("samProgress", (phase: unknown) =>
   console.log(JSON.stringify({ segmentation: phase })),
@@ -74,6 +74,7 @@ self.onmessage=async({data})=>{
    Object.defineProperty(globalThis,'navigator',{configurable:true,value:new Proxy(original,{has:(target,key)=>key==='gpu'?false:Reflect.has(target,key),get:(target,key)=>key==='gpu'?undefined:Reflect.get(target,key,target)})});
   }
   const {prepareSam,segmentObject}=await import(moduleURL);
+  const {encodeMask}=await import(moduleURL.replace("/sam.ts","/encode-mask.ts"));
   const begin=performance.now();
   self.postMessage({phase:'preparing',mode:data.mode});
   const loaded=await prepareSam();
@@ -86,7 +87,8 @@ self.onmessage=async({data})=>{
    let selected=0,transparent=0;const histogram={};
    for(let index=3;index<result.data.length;index+=4){const alpha=result.data[index];if(alpha>0)selected++;else transparent++;histogram[alpha]=(histogram[alpha]??0)+1;}
    if(result.data.length!==result.width*result.height*4||selected===0||transparent===0)throw new Error('Real model returned invalid, empty or fully opaque mask');
-   masks.push({point,width:result.width,height:result.height,pixels:result.width*result.height,selected,transparent,alphaHistogram:histogram,durationMs:performance.now()-start});
+   const encoded=await encodeMask(result);if(encoded.blob.type!=='image/png'||encoded.blob.size===0)throw new Error('Worker PNG encoding failed');
+   masks.push({point,pngBytes:encoded.blob.size,width:result.width,height:result.height,pixels:result.width*result.height,selected,transparent,alphaHistogram:histogram,durationMs:performance.now()-start});
    self.postMessage({phase:'mask-ready',mode:data.mode,index:masks.length,durationMs:masks.at(-1).durationMs});
   }
   const sessions=Object.entries(loaded.model.sessions??{}).map(([name,session])=>({name,config:session.config??null}));
@@ -102,7 +104,27 @@ try {
   report.imageDataUrlCharacters = image.length;
   const run = async (mode: string, forceWasm: boolean) => {
     console.log(JSON.stringify({ segmentation: { phase: "run-start", mode } }));
-    const result = await page.evaluate(
+    await page.evaluate(() => {
+      const probe = {
+        samples: [] as number[],
+        frames: [] as number[],
+        running: true,
+        last: performance.now(),
+      };
+      Object.assign(window, { __samInput: probe });
+      document.querySelector("button")!.onclick = (event) => {
+        if (!event.isTrusted) throw new Error("The probe requires native input");
+        requestAnimationFrame(() => probe.samples.push(performance.now() - event.timeStamp));
+      };
+      const frame = (now: number) => {
+        probe.frames.push(now - probe.last);
+        probe.last = now;
+        if (probe.running) requestAnimationFrame(frame);
+      };
+      requestAnimationFrame(frame);
+    });
+    let completed = false;
+    const inference = page.evaluate(
       async ({ source, image, mode, forceWasm }) =>
         new Promise<Record<string, unknown>>((resolve, reject) => {
           const url = URL.createObjectURL(new Blob([source], { type: "text/javascript" }));
@@ -110,8 +132,8 @@ try {
           const timer = setTimeout(() => {
             worker.terminate();
             URL.revokeObjectURL(url);
-            reject(new Error("Real segmentation exceeded ten minutes"));
-          }, 600000);
+            reject(new Error("Real segmentation exceeded two minutes"));
+          }, 120000);
           worker.onmessage = ({ data }) => {
             if (!data.done) {
               const bridge = (window as unknown as { samProgress: (phase: unknown) => void })
@@ -135,6 +157,32 @@ try {
         }),
       { source: workerSource, image, mode, forceWasm },
     );
+    void inference
+      .finally(() => {
+        completed = true;
+      })
+      .catch(() => {});
+    while (!completed) {
+      await page.mouse.click(80, 40);
+      await new Promise((resolve) => setTimeout(resolve, 200));
+    }
+    const result = await inference;
+    const responsiveness = await page.evaluate(() => {
+      const probe = (
+        window as unknown as {
+          __samInput: { running: boolean; samples: number[]; frames: number[] };
+        }
+      ).__samInput;
+      probe.running = false;
+      const sorted = [...probe.samples].sort((a, b) => a - b);
+      return {
+        nativeInputCount: sorted.length,
+        inputToRafP95Ms: sorted[Math.floor(sorted.length * 0.95)] ?? null,
+        maxInputToRafMs: Math.max(0, ...sorted),
+        maxRafGapMs: Math.max(0, ...probe.frames),
+      };
+    });
+    Object.assign(result, { responsiveness });
     (report.attempts as unknown[]).push(result);
     await writeFile(
       "artifacts/segmentation.json",
@@ -144,19 +192,23 @@ try {
     return result;
   };
   await mkdir("artifacts", { recursive: true });
-  const gpu = await run("webgpu-cold-and-warm", false);
-  if (!gpu.ok) throw new Error(`WebGPU preparation/inference failed: ${JSON.stringify(gpu.error)}`);
-  let blocked = 0;
-  await context.route("https://**/*", (route) => {
-    blocked++;
-    return route.abort("internetdisconnected");
-  });
-  const wasm = await run("wasm-fresh-worker-remote-network-blocked", true);
-  report.blockedRemoteRequests = blocked;
-  if (!wasm.ok)
-    throw new Error(
-      `Cached WASM inference failed with remote network blocked: ${JSON.stringify(wasm.error)}`,
-    );
+  const gpu = await run("adapter-selected-cold-and-warm", false);
+  if (!gpu.ok) throw new Error(`Model preparation/inference failed: ${JSON.stringify(gpu.error)}`);
+  if (process.env.MUSART_SEGMENTATION_SINGLE === "1") {
+    report.offlineVerification = "Not requested in this bounded run.";
+  } else {
+    let blocked = 0;
+    await context.route("https://**/*", (route) => {
+      blocked++;
+      return route.abort("internetdisconnected");
+    });
+    const wasm = await run("wasm-fresh-worker-remote-network-blocked", true);
+    report.blockedRemoteRequests = blocked;
+    if (!wasm.ok)
+      throw new Error(
+        `Cached WASM inference failed with remote network blocked: ${JSON.stringify(wasm.error)}`,
+      );
+  }
   report.ok = true;
 } catch (error) {
   report.ok = false;

@@ -14,6 +14,29 @@ function reply(port: WorkerPort, data: SelectionResponse) {
 const mask: MaskResult = { data: new Uint8ClampedArray([255, 255, 255, 255]), width: 1, height: 1 };
 afterEach(() => vi.unstubAllGlobals());
 describe("bounded selection worker client", () => {
+  it("requests worker PNG encoding and returns its blob without transferring RGBA to the editor", async () => {
+    const port = worker(),
+      client = new SelectionClient(() => port);
+    const pending = client.segmentEncoded("source", 2, 3);
+    expect(port.postMessage).toHaveBeenCalledWith(
+      {
+        id: 1,
+        type: "segment",
+        dataUrl: "source",
+        x: 2,
+        y: 3,
+        encode: true,
+      },
+      [],
+    );
+    const result = { blob: new Blob(["png"], { type: "image/png" }), width: 2, height: 1 };
+    reply(port, { id: 1, result });
+    expect(await pending).toBe(result);
+    const missing = client.segmentEncoded("source", 2, 3);
+    reply(port, { id: 2, result: mask });
+    await expect(missing).rejects.toThrow("Masque absent");
+    client.dispose();
+  });
   it("retains requests during real progress, reports completion and clears undecodable workers", async () => {
     const port = worker(),
       client = new SelectionClient(() => port);

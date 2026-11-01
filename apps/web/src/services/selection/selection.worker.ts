@@ -2,6 +2,7 @@ import { floodMask } from "./pixel-selection";
 import type { SelectionRequest, SelectionResponse } from "./selection";
 import type { ModelDownloadEvent } from "./model/contract";
 import { modelProgressSink } from "./model/progress";
+import { encodeMask } from "./encode-mask";
 export async function processSelection(
   request: SelectionRequest,
   onProgress?: (event: ModelDownloadEvent) => void,
@@ -28,11 +29,12 @@ export async function processSelection(
       await prepareSam(onProgress);
       return { id: request.id, result: null };
     }
+    const mask = onProgress
+      ? await segmentObject(request.dataUrl, request.x, request.y, onProgress)
+      : await segmentObject(request.dataUrl, request.x, request.y);
     return {
       id: request.id,
-      result: onProgress
-        ? await segmentObject(request.dataUrl, request.x, request.y, onProgress)
-        : await segmentObject(request.dataUrl, request.x, request.y),
+      result: request.encode ? await encodeMask(mask) : mask,
     };
   } catch (error) {
     return { id: request.id, error: error instanceof Error ? error.message : String(error) };
@@ -46,7 +48,9 @@ export async function handleSelection(event: MessageEvent<SelectionRequest>) {
   sink.flush();
   globalThis.postMessage(
     response,
-    "result" in response && response.result ? [response.result.data.buffer as ArrayBuffer] : [],
+    "result" in response && response.result && "data" in response.result
+      ? [response.result.data.buffer as ArrayBuffer]
+      : [],
   );
 }
 globalThis.onmessage = handleSelection;

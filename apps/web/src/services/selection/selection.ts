@@ -3,7 +3,7 @@ import type { ModelDownloadEvent } from "./model/contract";
 
 export type SelectionRequest =
   | { id: number; type: "prepare" }
-  | { id: number; type: "segment"; dataUrl: string; x: number; y: number }
+  | { id: number; type: "segment"; dataUrl: string; x: number; y: number; encode?: boolean }
   | {
       id: number;
       type: "wand";
@@ -19,9 +19,15 @@ export interface MaskResult {
   width: number;
   height: number;
 }
+export interface EncodedMaskResult {
+  blob: Blob;
+  width: number;
+  height: number;
+}
+type SelectionResult = MaskResult | EncodedMaskResult;
 export type SelectionResponse =
   | { id: number; progress: ModelDownloadEvent }
-  | { id: number; result: MaskResult | null }
+  | { id: number; result: SelectionResult | null }
   | { id: number; error: string };
 export interface WorkerPort {
   postMessage(message: SelectionRequest, transfer?: Transferable[]): void;
@@ -35,11 +41,15 @@ export class SelectionClient {
   readonly model: LocalModelManager;
   private worker: WorkerPort | undefined;
   private nextId = 0;
+  private workerGeneration = 0;
+  get generation(): number {
+    return this.workerGeneration;
+  }
   private pending:
     | {
         id: number;
         type: SelectionRequest["type"];
-        resolve: (result: MaskResult | null) => void;
+        resolve: (result: SelectionResult | null) => void;
         reject: (error: Error) => void;
       }
     | undefined;
@@ -86,7 +96,7 @@ export class SelectionClient {
     };
     return this.worker;
   }
-  request(request: SelectionRequest): Promise<MaskResult | null> {
+  request(request: SelectionRequest): Promise<SelectionResult | null> {
     if (this.pending) return Promise.reject(new Error("Une sélection est déjà en cours."));
     return new Promise((resolve, reject) => {
       const worker = this.connect();
@@ -107,7 +117,20 @@ export class SelectionClient {
   }
   async segment(dataUrl: string, x: number, y: number) {
     const result = await this.request({ id: ++this.nextId, type: "segment", dataUrl, x, y });
-    if (!result) throw new Error("Masque absent.");
+    if (!result || !("data" in result)) throw new Error("Masque absent.");
+    return result;
+  }
+  /** PNG encoding remains in the worker, away from editor input and painting. */
+  async segmentEncoded(dataUrl: string, x: number, y: number): Promise<EncodedMaskResult> {
+    const result = await this.request({
+      id: ++this.nextId,
+      type: "segment",
+      dataUrl,
+      x,
+      y,
+      encode: true,
+    });
+    if (!result || !("blob" in result)) throw new Error("Masque absent.");
     return result;
   }
   async wand(
@@ -128,10 +151,11 @@ export class SelectionClient {
       y,
       tolerance,
     });
-    if (!result) throw new Error("Masque absent.");
+    if (!result || !("data" in result)) throw new Error("Masque absent.");
     return result;
   }
   private resetWorker() {
+    this.workerGeneration++;
     this.pending?.reject(new DOMException("Sélection annulée.", "AbortError"));
     this.pending = undefined;
     if (this.worker) {

@@ -28,6 +28,8 @@ test("shows real byte/percentage progress, cancellation and cached-model removal
   const view = d.mount(<SegmentationModel services={d.services} onTask={d.onTask} />);
   await screen.findByText(/Sur cet appareil/);
   fireEvent.click(screen.getByRole("button", { name: "Charger le modèle local" }));
+  expect(screen.getByRole("status")).toHaveTextContent("Téléchargement du modèle local");
+  expect(view.container.querySelector('.ui-throbber[data-visible="true"]')).toBeTruthy();
   expect(screen.getByRole("progressbar", { name: "Téléchargement du modèle" })).toHaveAttribute(
     "aria-valuenow",
     "0",

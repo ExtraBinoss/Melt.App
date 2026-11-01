@@ -19,6 +19,51 @@ beforeAll(async () => {
 beforeEach(() => {
   vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockReturnValue(canvasContext() as never);
 });
+test("keeps a cancellable shared throbber during segmentation and ignores additional clicks until it settles", async () => {
+  const d = setup();
+  let reject!: (error: Error) => void;
+  vi.mocked(d.services.selectImagePoint).mockImplementation(
+    () =>
+      new Promise<void>((_, fail) => {
+        reject = fail;
+      }),
+  );
+  const cancel = vi.fn(() => reject(new DOMException("Cancelled", "AbortError")));
+  const modelStatus = {
+    phase: "ready" as const,
+    available: true,
+    supported: true,
+    bytes: 1,
+    files: 4,
+    loaded: 1,
+    total: 1,
+  };
+  d.services.segmentationModel = {
+    read: () => modelStatus,
+    subscribe: () => () => {},
+    refresh: async () => {},
+    prepare: async () => {},
+    remove: async () => {},
+    cancel,
+  };
+  d.mount(<App engine={d.engine} services={d.services} />);
+  await screen.findByTestId("canvas");
+  act(() => d.store.set(toolAtom, "segment"));
+  fireEvent.click(screen.getByText("Image point"));
+  fireEvent.click(screen.getByText("Image point"));
+  expect(d.services.selectImagePoint).toHaveBeenCalledTimes(1);
+  expect(
+    document.querySelector('.processing-notice .ui-throbber[data-visible="true"]'),
+  ).toBeTruthy();
+  fireEvent.click(
+    within(document.querySelector(".processing-notice") as HTMLElement).getByRole("button", {
+      name: "Annuler",
+    }),
+  );
+  await waitFor(() => expect(document.querySelector(".processing-notice")).toBeNull());
+  expect(cancel).toHaveBeenCalledOnce();
+  expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+});
 vi.mock("../src/canvas/EditorCanvas", () => ({
   EditorCanvas: ({
     onError,

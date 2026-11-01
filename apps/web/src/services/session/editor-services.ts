@@ -35,7 +35,6 @@ import { createPreviewExport } from "./previews";
 import { importMediaFiles } from "../assets/media-import";
 import { importBatch, readDataUrl } from "../assets/imports";
 import { downloadBlob, safeName } from "../files/download";
-import { maskToDataUrl } from "../selection/pixel-selection";
 import { SelectionClient } from "../selection/selection";
 import { PixelSelectionController } from "../selection/wand/controller";
 import { i18n } from "../../state/i18n";
@@ -403,7 +402,11 @@ export function createEditorServices(
       if (layer.locked) throw new Error("Le calque est verrouillé.");
       const sx = Math.max(0, Math.min(asset.width - 1, (x / layer.width) * asset.width)),
         sy = Math.max(0, Math.min(asset.height - 1, (y / layer.height) * asset.height));
-      const result = await selection.segment(asset.dataUrl, sx, sy);
+      const generation = selection.generation;
+      const result = await selection.segmentEncoded(asset.dataUrl, sx, sy);
+      const dataUrl = await readDataUrl(result.blob);
+      if (generation !== selection.generation)
+        throw new DOMException("Sélection annulée.", "AbortError");
       const latest = engine.getSnapshot();
       if (
         latest.project.id !== snapshot.project.id ||
@@ -417,7 +420,7 @@ export function createEditorServices(
         mime: "image/png",
         width: result.width,
         height: result.height,
-        dataUrl: maskToDataUrl(result.data, result.width, result.height),
+        dataUrl,
       };
       engine.transaction([
         { type: "addAssets", assets: [mask] },

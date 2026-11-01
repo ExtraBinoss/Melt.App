@@ -14,15 +14,15 @@
 - Immutable revision: `5850ab45f587c112167512ffef949107115e26a0`.
 - Precision: `fp32` for both ONNX sessions. Quantized variants are not assumed to be compatible with the decoder.
 - Model license: Apache-2.0, stated in the [model card at the pinned revision](https://huggingface.co/Xenova/slimsam-77-uniform/resolve/5850ab45f587c112167512ffef949107115e26a0/README.md).
-- Runtime: `@huggingface/transformers@4.3.1`, pinned with its ONNX Runtime dependency in `bun.lock`; Transformers.js uses Apache-2.0 and ONNX Runtime uses MIT.
+- Runtime: `@huggingface/transformers@4.3.2`, pinned with its ONNX Runtime dependency in `bun.lock`; Transformers.js uses Apache-2.0 and ONNX Runtime uses MIT.
 
-| Model topic          | Details                                                                                             |
-| -------------------- | --------------------------------------------------------------------------------------------------- |
-| First-use resources  | The first use downloads configuration, the processor, both ONNX weight files, and the WASM runtime. |
-| Explicit preparation | The interface explicitly requests this preparation.                                                 |
-| Backend fallback     | WebGPU is attempted when available; initialization failure triggers a WASM retry.                   |
-| Request bounds       | The client accepts one active request and rejects stale responses.                                  |
-| Cleanup              | Closing the session terminates the worker and releases its resources.                               |
+| Model topic          | Details                                                                                                  |
+| -------------------- | -------------------------------------------------------------------------------------------------------- |
+| First-use resources  | The first use downloads configuration, the processor, both ONNX weight files, and the WASM runtime.      |
+| Explicit preparation | The interface explicitly requests this preparation.                                                      |
+| Backend fallback     | Both sessions run in single-threaded WASM inside the dedicated worker, leaving the editor GPU available. |
+| Request bounds       | The client accepts one active request and rejects stale responses.                                       |
+| Cleanup              | Closing the session terminates the worker and releases its resources.                                    |
 
 ## Cache and operation without remote network access
 
@@ -44,7 +44,7 @@
 | Deletion                  | Deletion first releases the local worker and uses the same origin lock as model loading; other model IDs and the shared ORT runtime cache are preserved.                                     |
 | Failures and project data | Cache failures remain real errors. The model controls and project data have independent lifecycles.                                                                                          |
 
-Transformers.js 4.3.1 enables `useBrowserCache` and `useWasmCache` by default when Cache API is available. The second setting caches **both the WASM binary and its `.mjs` JavaScript factory**, in addition to the weights. This is necessary to start a new worker without contacting a CDN. See the [official environment settings API](https://huggingface.co/docs/transformers.js/api/env).
+Transformers.js 4.3.2 enables `useBrowserCache` and `useWasmCache` by default when Cache API is available. The second setting caches **both the WASM binary and its `.mjs` JavaScript factory**, in addition to the weights. This is necessary to start a new worker without contacting a CDN. See the [official environment settings API](https://huggingface.co/docs/transformers.js/api/env).
 
 The real verification observed these six entries in `transformers-cache`:
 
@@ -67,7 +67,42 @@ The real verification observed these six entries in `transformers-cache`:
 
 No additional locally hosted ORT files are required for this verified version. A preloaded standalone installation can host them and configure `env.backends.onnx.wasm.wasmPaths`, but the `.mjs` and `.wasm` paths must belong to the same pinned version; do not point to a "latest" CDN. The [official configuration guide](https://huggingface.co/docs/transformers.js/en/custom_usage) describes this option.
 
-## Executed measurements
+## Responsiveness recovery (November 1, 2026)
+
+The first encoder run and a mixed CPU/GPU configuration both exceeded an isolated
+2.2 GiB browser limit on an Intel Xe-LPG adapter. Production therefore keeps both
+full-precision sessions on one WASM thread. This favors editor responsiveness over
+maximum inference throughput. It does not make the first image encoding instant.
+
+Only the highest-IoU low-resolution candidate is now enlarged to source resolution,
+instead of enlarging all three candidates. Source input tensors are released after
+encoding; old embeddings are released before changing images; decoder inputs,
+predictions, selected candidates and final tensors are released in `finally` blocks.
+PNG encoding uses native `OffscreenCanvas.convertToBlob` inside the worker.
+The editor receives a PNG Blob and checks cancellation/stale targets before one
+undoable transaction. Repeated clicks cannot queue concurrent selections.
+
+The shared Melt throbber covers model initialization and inference. Inference can
+be cancelled, terminating its worker without committing a mask.
+
+A bounded real-model run used Chromium, a 614×410 image, CPUQuota=150%,
+MemoryHigh=MemoryMax=2200M, MemorySwapMax=0, on a workstation under memory pressure.
+Both loaded session configurations reported `wasm`, `fp32`. Preparation including
+remote resources took 11,529 ms; first mask plus PNG encoding took 18,019 ms;
+repeat prompts took 441 and 423 ms. All masks had binary alpha and a nonempty
+selection. This is a responsiveness check, not a like-for-like speed comparison
+with the historical cohort below. Browser-scope peak memory was approximately
+2.1 GiB; it remains a substantial local model.
+
+During inference, 146 native clicks were handled. Browser event timestamp to next
+RAF measured p95 42.8 ms, maximum 86.8 ms; maximum RAF gap was 83.4 ms. These
+presentation opportunities are not physical display latency or INP. Evidence is
+in ignored `artifacts/segmentation-recovery/`; the failed GPU memory experiment
+is retained separately. Offline verification was not repeated in this bounded run.
+`MUSART_SEGMENTATION_SINGLE=1` runs just this first cohort; the default script also
+checks a fresh worker with remote requests blocked.
+
+## Historical executed measurements
 
 Verified on October 27, 2026 in Playwright's headless Chromium on Linux with Vulkan. **Adapter hardware classification was not recorded for this segmentation run.** These timings describe that environment and are not promises for users' machines.
 

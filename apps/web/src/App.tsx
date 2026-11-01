@@ -26,6 +26,7 @@ import { ResizablePanel, ResizableHandle } from "./components/ui/resizable";
 import { ProjectPanelGroup } from "./components/workspace/ProjectPanelGroup";
 import { ProjectPreferencesProvider } from "./components/workspace/preferences/context";
 import { Button } from "./components/ui/button";
+import { Throbber } from "./components/ui/throbber/Throbber";
 const Toolbar = lazy(() =>
   import("./components/toolbar/Toolbar").then((module) => ({ default: module.Toolbar })),
 );
@@ -95,7 +96,8 @@ export function App({ engine, services, welcome = false, routing }: AppProps) {
   const [dialogs] = useState(() => atom({ exportOpen: false, timelapseOpen: false }));
   const motionTransport = useMemo(() => createMotionTransport(engine), [engine]);
   const [notice, setNotice] = useState<EditorNoticeValue | null>(null);
-  const [processing, setProcessing] = useState(false);
+  const [processing, setProcessing] = useState<"wand" | "segment" | null>(null);
+  const selectionPending = useRef(false);
   const input = useRef<HTMLInputElement>(null);
   const store = useStore();
   const onError = useCallback(
@@ -148,11 +150,19 @@ export function App({ engine, services, welcome = false, routing }: AppProps) {
   const onImagePoint = useCallback(
     (layerId: string, x: number, y: number) => {
       const tool = store.get(toolAtom);
-      if (tool !== "wand" && tool !== "segment") return;
-      setProcessing(true);
-      void onTask(() =>
-        services.selectImagePoint(layerId, x, y, tool, store.get(toleranceAtom)),
-      ).finally(() => setProcessing(false));
+      if ((tool !== "wand" && tool !== "segment") || selectionPending.current) return;
+      selectionPending.current = true;
+      setProcessing(tool);
+      void onTask(async () => {
+        try {
+          await services.selectImagePoint(layerId, x, y, tool, store.get(toleranceAtom));
+        } catch (error) {
+          if (!(error instanceof DOMException && error.name === "AbortError")) throw error;
+        }
+      }).finally(() => {
+        selectionPending.current = false;
+        setProcessing(null);
+      });
     },
     [onTask, services, store],
   );
@@ -258,7 +268,16 @@ export function App({ engine, services, welcome = false, routing }: AppProps) {
                       {!mobile && <ToolSettings services={services} onTask={onTask} />}
                       {processing && (
                         <div className="processing-notice floating-panel" role="status">
-                          {t("processing")}
+                          <Throbber label={t("processing")} delayMs={0} variant="shimmer" />
+                          {processing === "segment" && services.segmentationModel && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => services.segmentationModel?.cancel()}
+                            >
+                              {t("cancel")}
+                            </Button>
+                          )}
                         </div>
                       )}
                     </ResizablePanel>

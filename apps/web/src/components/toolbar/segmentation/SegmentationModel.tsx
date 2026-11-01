@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { useTranslation } from "react-i18next";
-import { Check, Download, LoaderCircle, Trash2, X } from "lucide-react";
+import { Check, Download, Trash2, X } from "lucide-react";
 import { Progress } from "radix-ui";
 import type { EditorServices } from "../../../state/contracts";
 import type { LocalModelPort } from "../../../services/selection/model/contract";
 import { MODEL_BYTES } from "../../../services/selection/model/manifest";
 import type { TaskRunner } from "../../projects/ProjectDialog";
 import { Button } from "../../ui/button";
+import { Throbber } from "../../ui/throbber/Throbber";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../../ui/tooltip";
 import "./messages";
 import "./model.css";
@@ -52,11 +53,13 @@ function ManagedModel({ model, onTask }: { model: LocalModelPort; onTask: TaskRu
       </div>
       {busy ? (
         <>
-          <p>
-            {t(
+          <Throbber
+            delayMs={0}
+            variant="shimmer"
+            label={t(
               state.phase === "initializing" ? "localModel:initializing" : "localModel:downloading",
             )}
-          </p>
+          />
           <Progress.Root
             className="local-model-progress"
             value={percent}
@@ -109,7 +112,7 @@ function ManagedModel({ model, onTask }: { model: LocalModelPort; onTask: TaskRu
             {state.phase === "ready" ? (
               <Check size={14} />
             ) : removing ? (
-              <LoaderCircle size={14} className="animate-spin" />
+              <Throbber size={14} delayMs={0} decorative />
             ) : (
               <Download size={14} />
             )}
@@ -191,7 +194,7 @@ function LegacyPreparation({
         }}
       >
         {state === "loading" ? (
-          <LoaderCircle size={14} className="animate-spin" />
+          <Throbber size={14} delayMs={0} decorative />
         ) : state === "ready" ? (
           <Check size={14} />
         ) : (

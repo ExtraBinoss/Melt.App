@@ -9,6 +9,46 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 describe("selection worker protocol", () => {
+  it("encodes PNGs off the main thread, posts only the blob and releases canvas memory on success/error", async () => {
+    const putImageData = vi.fn(),
+      convertToBlob = vi.fn(async () => new Blob(["png"], { type: "image/png" }));
+    const canvas = { width: 2, height: 1, getContext: () => ({ putImageData }), convertToBlob };
+    vi.stubGlobal(
+      "OffscreenCanvas",
+      vi.fn(function () {
+        return canvas;
+      }),
+    );
+    vi.stubGlobal(
+      "ImageData",
+      vi.fn(function (data, width, height) {
+        return { data, width, height };
+      }),
+    );
+    const post = vi.fn();
+    vi.stubGlobal("postMessage", post);
+    const mask = { data: new Uint8ClampedArray(8), width: 2, height: 1 };
+    sam.segmentObject.mockResolvedValue(mask);
+    const request = {
+      id: 8,
+      type: "segment",
+      dataUrl: "source",
+      x: 0,
+      y: 0,
+      encode: true,
+    } as const;
+    await handleSelection({ data: request } as MessageEvent);
+    expect(putImageData).toHaveBeenCalledWith({ data: mask.data, width: 2, height: 1 }, 0, 0);
+    expect(post).toHaveBeenLastCalledWith(
+      { id: 8, result: { blob: expect.any(Blob), width: 2, height: 1 } },
+      [],
+    );
+    expect(canvas.width).toBe(1);
+    expect(canvas.height).toBe(1);
+    convertToBlob.mockRejectedValueOnce(Error("encode failed"));
+    expect(await processSelection(request)).toEqual({ id: 8, error: "encode failed" });
+    expect(canvas.width).toBe(1);
+  });
   it("posts bounded progress separately from the final model response", async () => {
     const post = vi.fn();
     vi.stubGlobal("postMessage", post);

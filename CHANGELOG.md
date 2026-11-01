@@ -6,6 +6,7 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Keep SlimSAM inference in a dedicated single-threaded WASM worker so the editor GPU stays available. Enlarge only the best mask, release temporary tensors, encode PNGs in the worker, retain one image embedding, show the shared throbber, and support cancellation without committing stale masks. Record bounded real-model responsiveness and the remaining cold-encoding cost in `docs/guides/object-selection.md`.
 - Avoid forced synchronous mobile-navigation layout during mount and label updates, and batch carousel geometry reads before presentation writes. Retain the native video poster from the initial server document through touch autoplay instead of inserting a late blank player.
 - Link dashboard presentation styles from the initial document head so they do not wait for lazy JavaScript or disappear during hydration. Render the dashboard and its real template cards on the server, and acquire the editing runtime only when an operation needs it. Reuse the same project, font and thumbnail owners when opening the editor; cancel stale startup work and preserve cached metadata-only library reads.
 - Apply the saved interface language in the initial server document, migrate legacy language preferences before visible content, and keep landing navigation stable through hydration. Defer unused creation forms, native preview engines and the footer language menu until intent.
