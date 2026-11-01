@@ -197,6 +197,9 @@
 .motion-scroll-shadow::before {
   top: 32px;
 }
+.motion-scroll-shadow > .scroll-shadow-inline-end {
+  right: 0;
+}
 .motion-timeline-scroll {
   position: relative;
   overflow: auto;

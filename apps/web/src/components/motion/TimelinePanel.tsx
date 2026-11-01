@@ -449,7 +449,7 @@ export function TimelinePanel({
           <span className="panel-divider-grip" aria-hidden />
         </div>
         {compact && <div className="motion-compact-toolbar">{controls}</div>}
-        <ScrollShadow className="motion-scroll-shadow" axis="both">
+        <ScrollShadow className="motion-scroll-shadow" axis="both" endX={GUTTER + duration * scale}>
           <div
             className="motion-timeline-scroll"
             ref={viewport}

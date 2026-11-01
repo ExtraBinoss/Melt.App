@@ -58,9 +58,10 @@ test("timeline modes keep native scrollbar geometry stable and peek hides vertic
   expect(await page.evaluate(() => window.musart!.snapshot().project)).toEqual(before);
 });
 
-test("right timeline fade reaches the content edge with reserved and overlay scrollbar geometry", async ({
+test("right timeline fade stays at the outer edge and ignores empty trailing space in both modes", async ({
   page,
 }) => {
+  await page.setViewportSize({ width: 1000, height: 800 });
   await page.addInitScript(() => {
     localStorage.setItem("musart.language", "fr");
     localStorage.setItem("musart.theme", "light");
@@ -69,38 +70,75 @@ test("right timeline fade reaches the content edge with reserved and overlay scr
   await page.emulateMedia({ reducedMotion: "reduce" });
   await prepare(page, fixture(12));
   await page.evaluate(() => window.musart!.select(["card"]));
-  await page.getByRole("slider", { name: "Zoom de la timeline", exact: true }).focus();
-  await page.keyboard.press("End");
+  const before = await page.evaluate(() => window.musart!.snapshot().project);
   const viewport = page.locator(".motion-timeline-scroll"),
-    shadow = page.locator(".motion-scroll-shadow");
+    shadow = page.locator(".motion-scroll-shadow"),
+    slider = page.getByRole("slider", { name: "Zoom de la timeline", exact: true });
   const readEdge = () =>
     viewport.evaluate((node) => {
-      const end = node.parentElement!.querySelector<HTMLElement>(".scroll-shadow-inline-end")!;
+      const root = node.parentElement!;
+      const end = root.querySelector<HTMLElement>(".scroll-shadow-inline-end")!;
       return {
-        gap:
-          node.getBoundingClientRect().left +
-          node.clientLeft +
-          node.clientWidth -
-          end.getBoundingClientRect().right,
+        gap: root.getBoundingClientRect().right - end.getBoundingClientRect().right,
         gutter: node.offsetWidth - node.clientWidth,
       };
     });
-  await expect(shadow).toHaveAttribute("data-overflow-right", "");
-  await expect.poll(async () => Math.abs((await readEdge()).gap)).toBeLessThan(0.5);
-  expect((await readEdge()).gutter).toBeGreaterThan(0);
-  // No reserved gutter, as with overlay scrollbars: authored pixels reach the outer edge.
+  const zoom = async (key: "Home" | "End") => {
+    await slider.focus();
+    await page.keyboard.press(key);
+  };
+  await mkdir("artifacts/scroll-shadow-edge", { recursive: true });
+  for (const mode of ["Animations", "Keyframes"]) {
+    await page.getByRole("button", { name: mode, exact: true }).click();
+    await zoom("End");
+    await viewport.evaluate((node) => {
+      node.scrollLeft = 0;
+    });
+    await expect(shadow).toHaveAttribute("data-overflow-right", "");
+    expect((await readEdge()).gutter).toBeGreaterThan(0);
+    await expect.poll(async () => Math.abs((await readEdge()).gap)).toBeLessThan(0.5);
+    const bounds = (await shadow.boundingBox())!;
+    await page.screenshot({
+      path: `artifacts/scroll-shadow-edge/outer-${mode}.png`,
+      clip: {
+        x: bounds.x + bounds.width - 110,
+        y: bounds.y,
+        width: 110,
+        height: 130,
+      },
+    });
+    // The authored end is visible while the native scrollbar still has layout padding ahead.
+    await viewport.evaluate((node) => {
+      const marker = node.querySelector<HTMLElement>(".motion-end-marker")!;
+      const gutter = parseFloat(getComputedStyle(node).getPropertyValue("--motion-gutter"));
+      node.scrollLeft = parseFloat(marker.style.left) + gutter - node.clientWidth + 20;
+    });
+    await expect(shadow).not.toHaveAttribute("data-overflow-right");
+    await expect(shadow).toHaveAttribute("data-overflow-left", "");
+    expect(
+      await viewport.evaluate((node) => node.scrollWidth - node.clientWidth - node.scrollLeft),
+    ).toBeGreaterThan(100);
+    // At fit zoom, only that empty padding overflows: there must be no right fade at all.
+    await zoom("Home");
+    await viewport.evaluate((node) => {
+      node.scrollLeft = 0;
+    });
+    expect(await viewport.evaluate((node) => node.scrollWidth > node.clientWidth)).toBe(true);
+    await expect(shadow).not.toHaveAttribute("data-overflow-right");
+    await shadow.screenshot({ path: `artifacts/scroll-shadow-edge/empty-${mode}.png` });
+  }
+  await zoom("End");
   await viewport.evaluate((node) => {
     node.style.scrollbarGutter = "auto";
     node.style.scrollbarWidth = "none";
   });
   await expect.poll(async () => (await readEdge()).gutter).toBe(0);
   await expect.poll(async () => Math.abs((await readEdge()).gap)).toBeLessThan(0.5);
+  await expect(shadow).toHaveAttribute("data-overflow-right", "");
   await expect(shadow.locator(":scope > .scroll-shadow-inline-end")).toHaveCSS(
     "pointer-events",
     "none",
   );
-  await mkdir("artifacts/scroll-shadow-edge", { recursive: true });
-  await shadow.screenshot({ path: "artifacts/scroll-shadow-edge/after-overlay.png" });
   const bounds = (await viewport.boundingBox())!;
   await page.mouse.move(bounds.x + bounds.width - 20, bounds.y + 80);
   await page.mouse.wheel(600, 0);
@@ -109,4 +147,5 @@ test("right timeline fade reaches the content edge with reserved and overlay scr
     node.scrollLeft = node.scrollWidth;
   });
   await expect(shadow).not.toHaveAttribute("data-overflow-right");
+  expect(await page.evaluate(() => window.musart!.snapshot().project)).toEqual(before);
 });

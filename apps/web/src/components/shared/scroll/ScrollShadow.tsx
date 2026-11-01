@@ -8,6 +8,7 @@ export function ScrollShadow({
   style,
   surface,
   viewportSelector,
+  endX,
   axis = "vertical",
   fade = "auto",
 }: {
@@ -18,6 +19,8 @@ export function ScrollShadow({
   surface?: string;
   /** Locate a viewport inside a component that emits sibling metadata (for example Radix Select). */
   viewportSelector?: string;
+  /** Meaningful horizontal end in scroll coordinates, excluding trailing layout spacers. */
+  endX?: number;
   axis?: "vertical" | "horizontal" | "both";
   /** Fade content itself on translucent/blurred panels, without painting an opaque surface. */
   fade?: "auto" | "surface" | "mask";
@@ -61,10 +64,10 @@ export function ScrollShadow({
         top = viewport.scrollTop,
         left = viewport.scrollLeft;
       maximumTop = Math.max(0, viewport.scrollHeight - height);
-      maximumLeft = Math.max(0, scrollWidth - width);
+      maximumLeft = Math.max(0, Math.min(scrollWidth, endX ?? scrollWidth) - width);
       // Keep the shared bottom bar clear. Side fades follow the actual native gutter:
       // overlay scrollbars reserve no space, so their content must fade to the outer edge.
-      const bottom = Math.max(viewport.offsetHeight - height, maximumLeft > 1 ? 6 : 0),
+      const bottom = Math.max(viewport.offsetHeight - height, scrollWidth - width > 1 ? 6 : 0),
         right = Math.max(0, viewport.offsetWidth - width);
       if (bottom !== bottomGutter) {
         bottomGutter = bottom;
@@ -96,7 +99,7 @@ export function ScrollShadow({
       resize.disconnect();
       childrenObserver.disconnect();
     };
-  }, [children.type, children.key, viewportSelector, axis, fade]);
+  }, [children.type, children.key, viewportSelector, endX, axis, fade]);
   return (
     <div
       className={cn("scroll-shadow", className)}
