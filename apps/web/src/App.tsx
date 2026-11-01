@@ -1,3 +1,4 @@
+import { Tutorial, REPLAY_TUTORIAL } from "./components/onboarding/tutorial/Tutorial";
 import { useProjectTitle } from "./components/workspace/use-project-title";
 import { dashboardHref, isPlainPrimaryClick, dialogLinkKeyDown } from "./ui/navigation/activation";
 import { ExportLeaveGuard } from "./components/export/ExportLeaveGuard";
@@ -361,6 +362,12 @@ export function App({ engine, services, welcome = false, routing }: AppProps) {
                   />
                 </>
               )}
+              <Tutorial
+                engine={engine}
+                services={services}
+                hidden={choosingProject || !!projectMenu}
+                onProjectCreated={routing ? (id) => routing.navigate("editor", id) : undefined}
+              />
               <EditorNotice notice={notice} onClose={dismissNotice} />
               {projectMenu && (
                 <ProjectMenu
@@ -368,6 +375,14 @@ export function App({ engine, services, welcome = false, routing }: AppProps) {
                   services={services}
                   {...(choosingProject ? { welcome: true } : { projectName, projectId })}
                   initialView={projectMenu}
+                  onReplayTutorial={
+                    !choosingProject
+                      ? () => {
+                          setProjectMenu(null);
+                          window.dispatchEvent(new Event(REPLAY_TUTORIAL));
+                        }
+                      : undefined
+                  }
                   showLanding={!routing}
                   onHome={routing ? () => routing.navigate("home") : undefined}
                   onClose={() => {

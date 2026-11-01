@@ -6,6 +6,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Added
 
+- Add a mascot-guided editor tutorial with a separate three-photo practice project, live UI highlights, skippable dither and Pop animation tasks, real video export completion, exit confirmation and editor-only replay.
+
 - Add dedicated Timelapse and Export landing cards, with accurate history, preview, resolution and MP4/WebM audio capabilities. Refresh the landing headline and supporting copy in all twelve interface languages around simple static design and professional animation.
 
 ### Changed

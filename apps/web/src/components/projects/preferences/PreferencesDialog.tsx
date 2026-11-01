@@ -12,10 +12,12 @@ import { SnappingPlayground } from "./SnappingPlayground";
 import "../dashboard/messages";
 export function PreferencesDialog({
   onClose,
+  onReplayTutorial,
   initialSection,
   open,
 }: {
   onClose: () => void;
+  onReplayTutorial?: () => void;
   initialSection?: PreferencesSection;
   open?: boolean;
 }) {
@@ -62,6 +64,7 @@ export function PreferencesDialog({
         </DialogHeader>
         <Preferences
           initialSection={initialSection}
+          onReplayTutorial={onReplayTutorial}
           editorPreview={<SnappingPlayground compact />}
         />
       </DialogContent>

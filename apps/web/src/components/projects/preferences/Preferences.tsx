@@ -1,3 +1,5 @@
+import { Button } from "../../ui/button";
+import { copy } from "../../onboarding/tutorial/content";
 import { useState, type ReactNode } from "react";
 import { useAtom } from "jotai";
 import { useTranslation } from "react-i18next";
@@ -47,9 +49,11 @@ function Panel({ section, children }: { section: PreferencesSection; children: R
 export function Preferences({
   initialSection = "general",
   editorPreview,
+  onReplayTutorial,
 }: {
   initialSection?: PreferencesSection;
   editorPreview?: ReactNode;
+  onReplayTutorial?: () => void;
 } = {}) {
   const { t, i18n } = useTranslation();
   const [switched, setSwitched] = useState(false);
@@ -145,6 +149,13 @@ export function Preferences({
           <ShortcutSettings />
         </Panel>
         <Panel section="editor">
+          {onReplayTutorial && (
+            <div className="preferences-card">
+              <Button variant="outline" onClick={onReplayTutorial}>
+                {copy.replay}
+              </Button>
+            </div>
+          )}
           <MarqueePreference />
           <div className="preferences-card">
             <label className="preferences-setting-row">

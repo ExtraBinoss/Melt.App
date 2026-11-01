@@ -46,6 +46,7 @@ import "./dashboard/dashboard.css";
 
 export type TaskRunner = (task: () => void | Promise<void>, success?: string) => Promise<boolean>;
 export interface ProjectDialogProps {
+  onReplayTutorial?: () => void;
   services: EditorServices;
   projectName?: string;
   welcome?: boolean;
@@ -64,6 +65,7 @@ export function ProjectDialog(props: ProjectDialogProps) {
   return props.initialView === "settings" || props.initialView === "settingsEditor" ? (
     <LazyPreferencesDialog
       onClose={props.onClose}
+      onReplayTutorial={props.onReplayTutorial}
       initialSection={props.initialView === "settingsEditor" ? "editor" : "general"}
     />
   ) : props.initialView === "newProject" && !props.welcome ? (

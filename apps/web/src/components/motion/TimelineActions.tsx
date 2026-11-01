@@ -34,6 +34,7 @@ export function TimelineActions({
       {children}
       {!compact && (
         <TimelineIconButton
+          data-tutorial={onPin ? "timeline-pin" : undefined}
           label={t(onPin ? (pinned ? "unpin" : "pin") : expanded ? "close" : "open")}
           onClick={onPin ?? onClose}
           {...(onPin ? { "aria-pressed": pinned } : { "aria-expanded": expanded })}

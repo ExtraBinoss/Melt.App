@@ -1,0 +1,29 @@
+# Editor tutorial
+
+The editor offers a short optional guided exercise on its first visit. The tutorial
+creates and saves a separate `Learning with Melt` project after saving the current
+project. It never adds practice assets to the user's current document.
+
+The guide observes real editor commands and export jobs. Its helper buttons perform
+the corresponding action; the export step completes only after a successful Motion
+export. Each document action uses the engine command boundary and remains undoable.
+Closing the tutorial leaves the practice project available. Editor preferences offer
+Replay onboarding; dashboard preferences do not.
+
+The browser preference `musart.editor-tutorial.v1` records dismissal or completion.
+If browser storage is unavailable, dismissal still works for the current session.
+The tutorial copy is intentionally English pending product review. Motion respects
+the system reduced-motion preference. A fast text reveal is confined to the guide.
+
+## Practice photographs
+
+The three JPEGs in `apps/web/public/images/tutorial/` are local, compressed copies of
+Unsplash photographs. No third-party image requests are needed during the tutorial:
+
+- Mountains: https://images.unsplash.com/photo-1464822759023-fed622ff2c3b
+- Lake: https://images.unsplash.com/photo-1470770841072-f978cf4d019e
+- Forest: https://images.unsplash.com/photo-1441974231531-c6227db76b6e
+
+The source image identifiers are also retained in the original images.unsplash.com
+URLs: `photo-1464822759023-fed622ff2c3b`, `photo-1470770841072-f978cf4d019e`,
+and `photo-1441974231531-c6227db76b6e` (640px, quality 75).

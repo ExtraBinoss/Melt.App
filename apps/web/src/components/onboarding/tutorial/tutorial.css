@@ -1,0 +1,59 @@
+.tutorial-invite {
+  max-width: 430px;
+  padding: 28px;
+  gap: 18px;
+}
+.tutorial-invite footer,
+.tutorial-card footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.tutorial-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 100;
+}
+.tutorial-highlight {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border: 2px solid var(--primary);
+  border-radius: 10px;
+  box-shadow: 0 0 0 3px var(--background);
+  pointer-events: none;
+}
+.tutorial-card {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: auto;
+  background: var(--popover);
+  color: var(--popover-foreground);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 18px;
+  box-shadow: 0 12px 40px #0003;
+}
+.tutorial-card header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.tutorial-card header > span {
+  flex: 1;
+  font-size: 12px;
+  color: var(--muted-foreground);
+}
+.tutorial-card h2 {
+  font-size: 17px;
+  font-weight: 600;
+  margin: 12px 0 8px;
+}
+.tutorial-card p {
+  font-size: 13px;
+  line-height: 1.6;
+  min-height: 84px;
+  margin-bottom: 16px;
+}
