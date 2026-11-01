@@ -53,7 +53,7 @@ export function AddArtboardOverlay({
       data-testid="canvas-add-artboard"
       data-canvas-control
       data-visible="false"
-      aria-hidden="true"
+      inert
       label={t("quickAdd:addArtboard")}
       onClick={() => {
         const candidate = binding.current?.take();

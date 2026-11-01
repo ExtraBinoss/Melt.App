@@ -29,7 +29,7 @@ function setup() {
     const viewport = useRef<HTMLDivElement>(null);
     return (
       <TooltipProvider>
-        <div ref={viewport} data-testid="viewport">
+        <div ref={viewport} data-testid="viewport" tabIndex={0}>
           <AddArtboardOverlay
             engine={engine}
             controller={controller}
@@ -107,4 +107,41 @@ it("suppresses the action during playback and releases native subscriptions", as
   expect(d.engine.getSnapshot().project.pages).toHaveLength(1);
   d.unmount();
   act(() => createPlaybackSource(d.engine).set(null));
+});
+
+it("returns retained button focus to the viewport before making a consumed action inert", async () => {
+  const d = setup();
+  expect(d.button).toHaveAttribute("inert");
+  expect(d.button).not.toHaveAttribute("aria-hidden");
+  act(() => d.viewport.focus());
+  await waitFor(() => expect(d.button).toHaveAttribute("data-visible", "true"));
+  expect(d.button).not.toHaveAttribute("inert");
+  act(() => d.button.focus());
+  expect(d.button).toHaveFocus();
+  const focus = vi.spyOn(d.viewport, "focus").mockImplementation(() => {
+    expect(d.button).not.toHaveAttribute("inert");
+    HTMLElement.prototype.focus.call(d.viewport, { preventScroll: true });
+  });
+  fireEvent.click(d.button);
+  expect(focus).toHaveBeenCalledWith({ preventScroll: true });
+  expect(d.viewport).toHaveFocus();
+  expect(d.button).toHaveAttribute("data-visible", "false");
+  expect(d.button).toHaveAttribute("inert");
+  expect(d.button).not.toHaveAttribute("aria-hidden");
+  await act(() => new Promise<void>((resolve) => requestAnimationFrame(() => resolve())));
+  expect(d.button).toHaveAttribute("data-visible", "false");
+  expect(d.engine.getSnapshot().project.pages).toHaveLength(2);
+  d.unmount();
+});
+
+it("removes focused hover actions from the tab order when the pointer leaves", async () => {
+  const d = setup();
+  fireEvent.pointerMove(d.viewport, { clientX: 620, clientY: 400, buttons: 0 });
+  await waitFor(() => expect(d.button).toHaveAttribute("data-visible", "true"));
+  act(() => d.button.focus());
+  fireEvent.pointerLeave(d.viewport);
+  expect(d.viewport).toHaveFocus();
+  expect(d.button).toHaveAttribute("inert");
+  expect(d.engine.getSnapshot().project.pages).toHaveLength(1);
+  d.unmount();
 });

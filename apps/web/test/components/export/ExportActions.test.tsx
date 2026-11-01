@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { expect, test, vi } from "vitest";
+import { beforeAll, expect, test, vi } from "vitest";
 import { fireEvent, screen } from "@testing-library/react";
 import { ExportActions } from "../../../src/components/export/ExportActions";
 import { setup } from "../../support/ui";
@@ -7,6 +7,10 @@ import { createMotionTransport } from "../../../src/services/motion/transport";
 vi.mock("../../../src/components/export/MotionExportPreview", () => ({
   MotionExportPreview: () => <div />,
 }));
+// This behavior suite tests the dialog; native browser cases cover cold chunk loading.
+beforeAll(async () => {
+  await import("../../../src/components/export/ExportWorkspace");
+});
 
 test("uses one full Export button and selects Timelapse inside the shared output group", async () => {
   const d = setup();

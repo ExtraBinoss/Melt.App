@@ -14,9 +14,11 @@ export function ExportTriggerLabel({ engine }: { engine: EnginePort }) {
       ) : (
         <Download size={14} />
       )}
-      <span>
-        {t("export")}
-        {jobs.pending && job ? ` ${job.percent} %` : ""}
+      <span className="export-trigger-caption" data-pending={Boolean(jobs.pending && job)}>
+        <span className="export-trigger-name">{t("export")}</span>
+        <span className="export-trigger-percent" aria-hidden={!jobs.pending}>
+          {jobs.pending && job ? `${job.percent} %` : "100 %"}
+        </span>
       </span>
       {job && (
         <span className="sr-only" role="status">

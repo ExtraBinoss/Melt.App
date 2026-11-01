@@ -24,9 +24,14 @@ export function bindArtboardAdd(options: {
     candidates: ArtboardInsertion[] = [];
   function hide() {
     current = undefined;
+    if (button.contains(button.ownerDocument.activeElement)) {
+      keyboard = false;
+      pointer = null;
+      element.focus({ preventScroll: true });
+    }
     if (button.dataset.visible === "false") return;
     button.dataset.visible = "false";
-    button.setAttribute("aria-hidden", "true");
+    button.setAttribute("inert", "");
   }
   function paint() {
     frame = undefined;
@@ -98,7 +103,7 @@ export function bindArtboardAdd(options: {
     button.dataset.side = best.candidate.side;
     button.dataset.sourceId = best.candidate.sourceId;
     button.dataset.visible = "true";
-    button.removeAttribute("aria-hidden");
+    button.removeAttribute("inert");
   }
   function schedule() {
     if (frame === undefined) frame = requestAnimationFrame(paint);
@@ -120,7 +125,7 @@ export function bindArtboardAdd(options: {
     hide();
   }
   function focus(event: FocusEvent) {
-    if (event.target === element) {
+    if (event.target === element && event.relatedTarget !== button) {
       keyboard = true;
       pointer = null;
       schedule();

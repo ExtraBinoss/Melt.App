@@ -10,6 +10,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Align Performance and Static/Motion controls with their artboard edges through zoom and pan. Transfer retained Add Artboard focus before hiding the inert control, avoiding focused aria-hidden warnings and accidental immediate reopening.
+- Keep Export compact at rest and reserve a fixed percentage slot only while running. Preserve identical header padding before and after loading the export workspace, and align processing feedback with its Cancel action.
 - Reveal project opening with a circle from the exact pointer position into the shared loading surface, retaining it until a new canonical canvas frame is visible. Respect reduced motion and cancellation, prepare the editor alongside recent-project reads, and avoid serializing/parsing an already validated template document twice.
 - Replace the CPU-only SlimSAM path with an independently integrated SAM 2.1 Tiny 512 FP16 WebGPU pipeline using pinned public Apache-2.0 model files, verified SHA-256 downloads, GPU-resident embeddings and bounded worker cleanup. Release temporary buffers after WebGPU submission and serialize embedding replacement to prevent destroyed-buffer errors. Native inference validation is left to the requested user test; the model requires WebGPU shader-f16.
 - Preserve feature translation namespaces after i18next reinitialization so local-model labels never fall back to raw translation keys.
