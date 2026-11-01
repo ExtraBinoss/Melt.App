@@ -1,5 +1,5 @@
-import { animationPresentation } from "../../motion/animations/presentation";
-import { memo, useLayoutEffect, useRef, useState } from "react";
+import { memo, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
+import { motionDiamondVisibility } from "./diamond-visibility";
 import { Diamond } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import {
@@ -47,20 +47,19 @@ interface Props {
 }
 /** Document edits update the existing imperative binding; only address/owner/UI changes render it. */
 export function MotionDiamond(props: Props) {
-  const ownerKey = useEngineValue(props.engine, (snapshot) =>
-    JSON.stringify([snapshot.project.id, snapshot.pageId]),
+  const visibility = motionDiamondVisibility(props.engine);
+  const visible = useSyncExternalStore(visibility.subscribe, visibility.read, visibility.read);
+  return visible ? (
+    <DiamondControl {...props} />
+  ) : (
+    <span className="motion-property-diamond-slot" hidden aria-hidden />
   );
-  return <DiamondControl {...props} ownerKey={ownerKey} />;
 }
 const DiamondControl = memo(
-  function DiamondControl({
-    engine,
-    target,
-    targets,
-    label,
-    disabled = false,
-    ownerKey,
-  }: Props & { ownerKey: string }) {
+  function DiamondControl({ engine, target, targets, label, disabled = false }: Props) {
+    const ownerKey = useEngineValue(engine, (snapshot) =>
+      JSON.stringify([snapshot.project.id, snapshot.pageId]),
+    );
     const { t } = useTranslation("motionProperties");
     const button = useRef<HTMLButtonElement>(null);
     const wrapper = useRef<HTMLSpanElement>(null);
@@ -104,7 +103,6 @@ const DiamondControl = memo(
         const animated = properties.some((property) => property?.keyframes.length);
         const node = button.current;
         if (!node) return;
-        const hidden = state.mode !== "motion" || !animationPresentation(engine).read().details;
         const blocked =
           disabled ||
           unavailable ||
@@ -112,12 +110,10 @@ const DiamondControl = memo(
           locked ||
           snapshot.project.id !== owner.projectId ||
           snapshot.pageId !== owner.pageId;
-        const presentation = `${hidden}:${blocked}:${animated}:${current}:${unavailable}:${absent}`;
+        const presentation = `${blocked}:${animated}:${current}:${unavailable}:${absent}`;
         if (presentation === lastPresentation) return;
         lastPresentation = presentation;
-        node.hidden = hidden;
         if (wrapper.current) {
-          wrapper.current.hidden = hidden;
           wrapper.current.tabIndex = blocked ? 0 : -1;
         }
         node.disabled = blocked;
@@ -133,12 +129,8 @@ const DiamondControl = memo(
         if (open.current) setTooltip(help.current);
       };
       const stop = transport.subscribe(update);
-      const stopPresentation = animationPresentation(engine).subscribe(update);
       update();
-      return () => {
-        stop();
-        stopPresentation();
-      };
+      return stop;
     }, [engine, target, targets, label, disabled, ownerKey, t]);
     return (
       <Tooltip
@@ -148,7 +140,7 @@ const DiamondControl = memo(
         }}
       >
         <TooltipTrigger asChild>
-          <span ref={wrapper} className="motion-property-diamond-slot" hidden>
+          <span ref={wrapper} className="motion-property-diamond-slot">
             <Button
               ref={button}
               type="button"
@@ -156,7 +148,6 @@ const DiamondControl = memo(
               size="icon-xs"
               className="motion-property-diamond"
               data-motion-diamond
-              hidden
               aria-label={t("add", { property: label })}
               onPointerDown={(event) => event.preventDefault()}
               onClick={() => addMotionPropertyKeys(engine, targets ?? [target])}
@@ -171,7 +162,6 @@ const DiamondControl = memo(
   },
   (before, after) =>
     before.engine === after.engine &&
-    before.ownerKey === after.ownerKey &&
     before.label === after.label &&
     Boolean(before.disabled) === Boolean(after.disabled) &&
     motionTargetKey(before.target) === motionTargetKey(after.target) &&

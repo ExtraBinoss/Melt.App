@@ -26,7 +26,11 @@ export class ThumbnailActivity implements ActivityPort {
   constructor(
     private readonly quietMs = 600,
     private readonly surface: Window = window,
-    private readonly suspension?: { busy(): boolean; subscribe(listener: () => void): () => void },
+    private readonly suspension?: {
+      busy(): boolean;
+      optionalBusy?(): boolean;
+      subscribe(listener: () => void): () => void;
+    },
   ) {
     this.stopSuspension = suspension?.subscribe(this.notify);
     this.presentation = getUiPresentation(surface);
@@ -53,9 +57,11 @@ export class ThumbnailActivity implements ActivityPort {
     ).scheduling;
     return scheduling?.isInputPending?.({ includeContinuous: true }) ?? false;
   };
+  private optionalSuspended = () =>
+    this.suspension?.optionalBusy?.() ?? this.suspension?.busy() ?? false;
   busy = () =>
     this.presentation.busy() ||
-    Boolean(this.suspension?.busy()) ||
+    this.optionalSuspended() ||
     this.surface.document.hidden ||
     this.dragging ||
     this.pointers.size > 0 ||
@@ -71,7 +77,7 @@ export class ThumbnailActivity implements ActivityPort {
     this.inputPending();
   visibleBusy = () =>
     this.presentation.busy() ||
-    Boolean(this.suspension?.busy()) ||
+    this.optionalSuspended() ||
     this.surface.document.hidden ||
     this.dragging ||
     this.pointers.size > 0 ||

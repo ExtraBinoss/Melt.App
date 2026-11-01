@@ -19,12 +19,14 @@ export function usePaintOwner(engine: EnginePort, pageId: string): string {
 interface RetainedPaintProps {
   visible: boolean;
   retain?: boolean;
+  /** Prepare a bounded inactive editor at React hidden priority, without mounting its effects. */
+  prepare?: boolean;
   children: ReactNode;
 }
 
 /** One visited owner only. Hidden effects stop; active drafts and portals are never cached. */
 export class RetainedPaint extends Component<RetainedPaintProps, { visited: boolean }, boolean> {
-  state = { visited: this.props.visible };
+  state = { visited: this.props.visible || Boolean(this.props.prepare) };
   private readonly scope = createRef<HTMLDivElement>();
 
   static getDerivedStateFromProps(props: RetainedPaintProps, state: { visited: boolean }) {

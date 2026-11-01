@@ -1,3 +1,4 @@
+import { createRenderActivity } from "../../../src/services/session/render-activity";
 import type { EditorServices } from "../../../src/state/contracts";
 import { expect, test, vi } from "vitest";
 import { act, fireEvent, screen, waitFor } from "@testing-library/react";
@@ -51,6 +52,7 @@ test("exports the selected layer in two actions with sensible defaults; work sur
     ),
   );
   expect(screen.getByRole("progressbar")).toHaveAttribute("value", "42");
+  expect(createRenderActivity(d.engine).optionalBusy()).toBe(false);
   fireEvent.click(screen.getByRole("button", { name: "Fermer" }));
   expect(close).toHaveBeenCalledOnce();
   view.unmount();
@@ -162,4 +164,17 @@ test("offers translated centering help only for one selected layer and forwards 
     expect(screen.queryByRole("button", { name: "Centrer le calque sélectionné" })).toBeNull();
     hidden.unmount();
   }
+});
+
+test("holds optional snapshots for the entire export workspace and releases on unmount", () => {
+  const d = setup();
+  const activity = createRenderActivity(d.engine);
+  expect(activity.optionalBusy()).toBe(false);
+  const view = d.mount(
+    <ExportWorkspace engine={d.engine} services={d.services} onClose={vi.fn()} />,
+  );
+  expect(activity.optionalBusy()).toBe(true);
+  expect(activity.busy()).toBe(false);
+  view.unmount();
+  expect(activity.optionalBusy()).toBe(false);
 });

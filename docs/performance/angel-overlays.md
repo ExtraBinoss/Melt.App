@@ -1,5 +1,7 @@
 # Angel.exe overlays and Window trails
 
+The original select isolation did not eliminate the reported stutter. See [the follow-up measurements and foreground-clock correction](export-select-follow-up.md).
+
 ## Shared interaction boundary
 
 Local choice fields use `components/shared/SelectField`, backed by a genuine Radix nonmodal DropdownMenu with listbox/option roles. The field owns selected labels, bounded scroll shadows, disabled options, closed typeahead, keyboard navigation, draft cancellation, native form reset and owner supersession. Its popup uses Radix's trigger width, with no animation-frame measurement of transformed ancestors. The outer dialog keeps its intentional modal behavior.

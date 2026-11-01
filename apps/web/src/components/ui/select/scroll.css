@@ -2,7 +2,10 @@
   --select-scroll-max-height: min(
     360px,
     60dvh,
-    var(--radix-select-content-available-height, calc(100dvh - 16px))
+    var(
+      --radix-popover-content-available-height,
+      var(--radix-select-content-available-height, calc(100dvh - 16px))
+    )
   );
   display: flex;
   flex-shrink: 0;

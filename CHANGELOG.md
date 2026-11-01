@@ -6,6 +6,12 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Keep foreground export playback running through select entrances: reserve the UI admission gate for optional work, while retaining initial dialog admission and explicit pause/export cleanup.
+- Retain bounded plain select menus, stable option trees and imperative player clock presentation; defer optional thumbnails behind active export and Inspector work, preserving owner guards, native input, form reset and trigger width.
+- Publish Inspector owner changes after a bounded outline-first frame boundary and omit hidden keyframe control trees and frame subscriptions; retain active attachment ownership.
+- Prepare bounded background gradient controls at hidden priority without active effects, and avoid rebuilding their unchanged editor when switching Solid/Gradient, preserving exact authored values, cancellation and undo.
+- Keep unchanged spatial scene controls mounted across background paint changes, with fresh canonical-page action bindings, load/selection ownership guards and cancellation of interrupted drafts.
+
 - Add a reusable codebase metrics command with source/test/JSON/public breakdowns, physical and nonblank line counts, dependency declarations, historical coverage metadata, ignored-file footprint and Markdown/JSON/CSV reports.
 - Add static GPU Ink Bleed, segmented Pixel Sort and Edge Detection with six selectable kernels, shared image/layer/export rendering, bounded scratch resources, validated parameters and translations in all twelve locales.
 - Make editor tab titles follow the project name, including rename and undo/redo, while preserving dashboard titles.

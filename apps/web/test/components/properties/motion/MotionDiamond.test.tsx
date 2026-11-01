@@ -6,6 +6,34 @@ import { MotionDiamond } from "../../../../src/components/properties/motion/Moti
 import { createMotionTransport } from "../../../../src/services/motion/transport";
 import { setup as baseSetup } from "../../../support/ui";
 import userEvent from "@testing-library/user-event";
+test("static and simple animation views omit the hidden keyframe control tree", () => {
+  const d = baseSetup();
+  const view = d.mount(
+    <MotionDiamond
+      engine={d.engine}
+      target={{ kind: "layer", layerId: d.rectangle.id, property: "x" }}
+      label="X"
+    />,
+  );
+  expect(view.container.querySelector("[data-motion-diamond]")).toBeNull();
+  expect(view.container.querySelector(".motion-property-diamond-slot")).toHaveAttribute("hidden");
+  act(() => d.engine.execute({ type: "setCompositionMode", mode: "motion" }));
+  expect(view.container.querySelector("[data-motion-diamond]")).toBeNull();
+  act(() => animationPresentation(d.engine).set({ details: true }));
+  expect(screen.getByRole("button", { name: "Ajouter une image clé · X" })).toBeVisible();
+  act(() => animationPresentation(d.engine).set({ details: false }));
+  expect(view.container.querySelector("[data-motion-diamond]")).toBeNull();
+  act(() => d.engine.execute({ type: "setCompositionMode", mode: "static" }));
+  act(() => animationPresentation(d.engine).set({ details: true }));
+  expect(view.container.querySelector("[data-motion-diamond]")).toBeNull();
+  act(() => d.engine.execute({ type: "setCompositionMode", mode: "motion" }));
+  fireEvent.click(screen.getByRole("button", { name: "Ajouter une image clé · X" }));
+  expect(screen.getByRole("button", { name: "Modifier l’image clé · X" })).toHaveAttribute(
+    "data-current",
+    "true",
+  );
+});
+
 test("adds the first real key and imperatively reflects playhead, mode and lock changes", () => {
   const d = setup();
   d.engine.execute({

@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { selectionComposition, type Composition, type Project } from "@musart/core";
-import { getUiPresentation } from "../../state/session/ui-presentation";
 import { PreviewPreparation } from "./PreviewPreparation";
 import { PreviewAudio } from "../../services/motion/audio/preview";
 import { MediaPlayer } from "../shared/player/MediaPlayer";
@@ -63,7 +62,6 @@ export function MotionExportPreview({
           selection,
           centerSelection,
           edge: 768,
-          presentation: getUiPresentation(),
           mediaResolver: services.mediaResolverFor?.(project.id),
           fontResolver: services.fonts?.resolve,
           onFrame(canvas, backend) {

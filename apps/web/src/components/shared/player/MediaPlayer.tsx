@@ -1,4 +1,5 @@
-import { useLayoutEffect, useRef } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
+import { flushSync } from "react-dom";
 import { Pause, Play } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "../../ui/button";
@@ -39,6 +40,7 @@ export function MediaPlayer({
   const ownerRef = useRef<unknown>(null);
   const gestureRef = useRef<{ original: number; playing: boolean; keyboard: boolean } | null>(null);
   const usable = Number.isFinite(duration) && duration > 0;
+  const [seekValue, setSeekValue] = useState(() => [position.read()[0] ?? 0]);
   useLayoutEffect(() => {
     ownerRef.current = disabled ? null : identity;
     return () => {
@@ -47,6 +49,7 @@ export function MediaPlayer({
     };
   }, [identity, disabled]);
   useLayoutEffect(() => {
+    const thumb = rootRef.current?.querySelector<HTMLElement>('.media-player-seek [role="slider"]');
     const paint = () => {
       const time = Math.max(0, Math.min(usable ? duration : 0, position.read()[0] ?? 0));
       if (rootRef.current) {
@@ -66,15 +69,21 @@ export function MediaPlayer({
         );
         lastTimeRef.current = time;
       }
+      // Playback is presentation, not a React transaction. Radix catches up before input.
+      if (thumb && thumb.getAttribute("aria-valuenow") !== String(time))
+        thumb.setAttribute("aria-valuenow", String(time));
       if (outputRef.current) {
         outputRef.current.dataset.time = String(time);
       }
     };
     paint();
     return position.subscribe(paint);
-  }, [position, duration, usable, playing]);
+  }, [position, duration, usable, playing, identity]);
   function begin(keyboard: boolean) {
     if (ownerRef.current !== identity || disabled || !usable || gestureRef.current) return;
+    const current = Math.max(0, Math.min(duration, position.read()[0] ?? 0));
+    // The capture phase synchronizes Radix's keyboard/drag model before its bubble handler.
+    if (seekValue[0] !== current) flushSync(() => setSeekValue([current]));
     if (rootRef.current) rootRef.current.dataset.interpolate = "false";
     gestureRef.current = { original: position.read()[0] ?? 0, playing, keyboard };
     onPlayingChange(false);
@@ -128,7 +137,7 @@ export function MediaPlayer({
         min={0}
         max={usable ? duration : 1}
         step={0.001}
-        valueSource={position}
+        value={seekValue}
         disabled={disabled || !usable}
         aria-label={t("seek")}
         onPointerDownCapture={(event) => {
@@ -159,8 +168,10 @@ export function MediaPlayer({
         }}
         onBlur={() => finish()}
         onValueChange={([value]) => {
-          if (value !== undefined && gestureRef.current && ownerRef.current === identity)
+          if (value !== undefined && gestureRef.current && ownerRef.current === identity) {
+            setSeekValue([value]);
             onSeek(value);
+          }
         }}
         onValueCommit={() => {
           if (!gestureRef.current?.keyboard) finish();

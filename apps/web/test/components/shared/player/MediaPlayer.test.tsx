@@ -1,3 +1,4 @@
+import { Profiler } from "react";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, expect, test, vi } from "vitest";
 import { i18n } from "../../../../src/state/i18n";
@@ -129,4 +130,30 @@ test("time drafts survive frame updates, commit once, clamp and reject a retired
   expect(parsePlayerTime("1:02:03.5")).toBe(3723.5);
   for (const text of ["-1", "0:60", "a", "", "0.5:20", "Infinity"])
     expect(parsePlayerTime(text)).toBeNull();
+});
+
+test("playback frames update native progress and accessibility without any descendant React commit", () => {
+  const position = createSliderValue([0]);
+  const commits = vi.fn();
+  render(
+    <Profiler id="player" onRender={commits}>
+      <MediaPlayer
+        position={position}
+        duration={5}
+        playing
+        onPlayingChange={vi.fn()}
+        onSeek={vi.fn()}
+      />
+    </Profiler>,
+  );
+  commits.mockClear();
+  const slider = screen.getByRole("slider", { name: "Preview time" });
+  for (const time of [1, 2.5, 5, 0]) {
+    act(() => position.set([time]));
+    expect(slider).toHaveAttribute("aria-valuenow", String(time));
+    expect(document.querySelector("[data-player]")).toHaveStyle({
+      "--player-position": `${(time / 5) * 100}%`,
+    });
+  }
+  expect(commits).not.toHaveBeenCalled();
 });

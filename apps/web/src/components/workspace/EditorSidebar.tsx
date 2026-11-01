@@ -1,9 +1,10 @@
-import { memo, useMemo, useState } from "react";
+import { memo, useLayoutEffect, useMemo, useState } from "react";
 import { PenTool } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import type { Composition, EnginePort, Project } from "@musart/core";
 import type { EditorServices } from "../../state/contracts";
 import { useEngine } from "../../state/session/editor";
+import { createRenderActivity } from "../../services/session/render-activity";
 import { ResizablePanel, ResizableHandle } from "../ui/resizable";
 import { ProjectPanelGroup } from "./ProjectPanelGroup";
 import { Inspector } from "../properties/Inspector";
@@ -13,7 +14,7 @@ import { layerSelection } from "../layers/menu/selection";
 import { ExportActions } from "../export/ExportActions";
 import type { TaskRunner } from "../projects/ProjectDialog";
 import { InspectorInteractionBoundary } from "./InspectorInteractionBoundary";
-import { useAttachmentPresentation } from "../shared/use-attachment-presentation";
+import { useInspectorPresentation } from "./use-inspector-presentation";
 
 /** Selection-driven panels subscribe here, without rebuilding the workspace and toolbar. */
 export const EditorSidebar = memo(function EditorSidebar({
@@ -115,7 +116,7 @@ const InspectorPresentation = memo(function InspectorPresentation({
   properties: InspectorProperties;
   run: (action: () => void) => void;
 }) {
-  const deferredProperties = useAttachmentPresentation(properties, sameInspectorOwner);
+  const deferredProperties = useInspectorPresentation(properties, sameInspectorOwner);
   const [retained, setRetained] = useState(deferredProperties);
   const unchanged =
     retained.target === deferredProperties.target &&
@@ -127,6 +128,9 @@ const InspectorPresentation = memo(function InspectorPresentation({
     properties.target !== deferredProperties.target ||
     properties.assets !== deferredProperties.assets ||
     !sameInspectorPage(properties.page, deferredProperties.page);
+  useLayoutEffect(() => {
+    if (pending) return createRenderActivity(engine).holdForeground();
+  }, [engine, pending]);
   const selected = useMemo(
     () => layerSelection(shownProperties.page, shownProperties.selection).selected,
     [shownProperties],

@@ -24,6 +24,7 @@ function mount() {
   d.engine.execute({
     type: "updatePage",
     patch: {
+      background: "#ff0000",
       backgroundGradient: {
         kind: "linear",
         angle: 0,
@@ -139,4 +140,54 @@ test("same-ID load disposes a dirty background owner and rejects its late releas
   fireEvent.blur(field);
   expect(d.engine.getSnapshot().project).toEqual(project);
   expect(d.run).not.toHaveBeenCalled();
+});
+
+test("idle solid/gradient switches reuse unchanged editor elements and preserve canonical undo", async () => {
+  const d = mount(),
+    field = screen.getByLabelText("Couleur hexadécimale du point 1"),
+    original = d.engine.getSnapshot().project.pages[0]!.backgroundGradient;
+  observed.row.mockClear();
+  for (let index = 0; index < 3; index++) {
+    await act(async () => fireEvent.click(screen.getByRole("radio", { name: "Uni" })));
+    expect(d.engine.getSnapshot().project.pages[0]!.backgroundGradient).toBeUndefined();
+    expect(field.isConnected).toBe(true);
+    expect(field).not.toBeVisible();
+    await act(async () => fireEvent.click(screen.getByRole("radio", { name: "Dégradé" })));
+    expect(d.engine.getSnapshot().project.pages[0]!.backgroundGradient).toEqual(original);
+    expect(screen.getByLabelText("Couleur hexadécimale du point 1")).toBe(field);
+    expect(field).toBeVisible();
+  }
+  expect(observed.row).not.toHaveBeenCalled();
+  expect(d.run).toHaveBeenCalledTimes(6);
+  act(() => d.engine.undo());
+  expect(d.engine.getSnapshot().project.pages[0]!.backgroundGradient).toBeUndefined();
+  act(() => d.engine.redo());
+  expect(d.engine.getSnapshot().project.pages[0]!.backgroundGradient).toEqual(original);
+  fireEvent.change(field, { target: { value: "#123456" } });
+  fireEvent.blur(field);
+  expect(d.engine.getSnapshot().project.pages[0]!.backgroundGradient!.stops[0]!.color).toBe(
+    "#123456",
+  );
+});
+
+test("retained paint follows exact authored angle and current stop values after mode changes", async () => {
+  const d = mount();
+  await act(async () => fireEvent.click(screen.getByRole("radio", { name: "Uni" })));
+  const paint = {
+    kind: "linear" as const,
+    angle: 360,
+    stops: [
+      { offset: 0, color: "#abcdef80" },
+      { offset: 1, color: "#ffffff" },
+    ],
+  };
+  act(() => d.engine.execute({ type: "updatePage", patch: { backgroundGradient: paint } }));
+  expect(screen.getByRole("textbox", { name: "Angle du dégradé" })).toHaveValue("360");
+  expect(screen.getByLabelText("Couleur hexadécimale du point 1")).toHaveValue("#ABCDEF");
+  const angle = screen.getByRole("textbox", { name: "Angle du dégradé" });
+  fireEvent.change(angle, { target: { value: "361" } });
+  fireEvent.blur(angle);
+  expect(d.engine.getSnapshot().project.pages[0]!.backgroundGradient!.angle).toBe(361);
+  act(() => d.engine.undo());
+  expect(angle).toHaveValue("360");
 });

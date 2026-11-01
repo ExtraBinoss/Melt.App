@@ -133,3 +133,13 @@
   -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px);
 }
+
+/* The shared clock paints progress without rendering the Radix tree on each frame. */
+.media-player-seek:dir(ltr) [data-slot="slider-range"] {
+  left: 0 !important;
+  right: calc(100% - var(--player-position, 0%)) !important;
+}
+.media-player-seek:dir(rtl) [data-slot="slider-range"] {
+  right: 0 !important;
+  left: calc(100% - var(--player-position, 0%)) !important;
+}

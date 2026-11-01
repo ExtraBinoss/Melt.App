@@ -454,3 +454,24 @@ it("defers optional popup work while preserving explicit export admission and un
   next();
   expect(vi.getTimerCount()).toBe(0);
 });
+
+it("defers optional thumbnails while leaving an explicitly foreground image preview admissible", () => {
+  let optional = false;
+  const notify = vi.fn(),
+    stop = vi.fn();
+  const activity = new ThumbnailActivity(600, window, {
+    busy: () => false,
+    optionalBusy: () => optional,
+    subscribe: () => stop,
+  });
+  const unsubscribe = activity.subscribe(notify);
+  optional = true;
+  expect(activity.busy()).toBe(true);
+  expect(activity.visibleBusy()).toBe(true);
+  expect(activity.interacting()).toBe(false);
+  optional = false;
+  expect(activity.busy()).toBe(false);
+  unsubscribe();
+  activity.dispose();
+  expect(stop).toHaveBeenCalledOnce();
+});

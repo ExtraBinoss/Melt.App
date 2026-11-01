@@ -1,3 +1,4 @@
+import { renderToString } from "react-dom/server";
 import { useState } from "react";
 import { expect, test, vi } from "vitest";
 import { act, fireEvent, render, screen } from "@testing-library/react";
@@ -336,4 +337,38 @@ test("changing owner retains the trigger, cancels only the old draft and drops i
   await choose("Owned mode", "Two");
   expect(newChange).toHaveBeenCalledExactlyOnceWith("two");
   expect(oldChange).not.toHaveBeenCalled();
+});
+
+test("server rendering a retained plain menu emits only its trigger without browser portal access", () => {
+  const html = renderToString(
+    <SelectField
+      label="SSR choice"
+      value="one"
+      options={[
+        { value: "one", label: "One" },
+        { value: "two", label: "Two" },
+      ]}
+      onValueChange={vi.fn()}
+    />,
+  );
+  expect(html).toContain('role="combobox"');
+  expect(html).not.toContain('role="option"');
+});
+
+test("keyboard navigation during placement wins over the pending initial focus", () => {
+  render(
+    <SelectField
+      label="Immediate keyboard"
+      value="one"
+      options={[
+        { value: "one", label: "One" },
+        { value: "two", label: "Two" },
+      ]}
+      onValueChange={() => {}}
+    />,
+  );
+  const trigger = screen.getByRole("combobox", { name: "Immediate keyboard" });
+  fireEvent.keyDown(trigger, { key: "ArrowDown" });
+  fireEvent.keyDown(trigger, { key: "End" });
+  expect(screen.getByRole("option", { name: "Two" })).toHaveFocus();
 });

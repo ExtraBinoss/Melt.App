@@ -1,3 +1,4 @@
+import { createRenderActivity } from "../../services/session/render-activity";
 import { InfoTooltip } from "../shared/InfoTooltip";
 import { usePreviewAdmission } from "./use-preview-admission";
 import type { RefObject } from "react";
@@ -54,6 +55,9 @@ export function ExportWorkspace({
     () => jobs.pending,
     () => false,
   );
+  useLayoutEffect(() => {
+    if (!busy) return createRenderActivity(engine).holdForeground();
+  }, [engine, busy]);
   const selected = page.id === origin.pageId ? origin.selection : empty;
   const selection = !whole && !allPages ? selected : empty;
   const controls = (

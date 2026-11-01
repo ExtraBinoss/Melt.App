@@ -18,6 +18,7 @@ function makeRenderActivity(engine: EnginePort) {
   const motion = createMotionTransport(engine);
   const presentation = getCanonicalPresentation(engine);
   let opening: { token: symbol; sequence: number } | null = null;
+  const foreground = new Set<symbol>();
   const listeners = new Set<() => void>();
   let stops: (() => void)[] = [];
   const busy = () => {
@@ -30,15 +31,26 @@ function makeRenderActivity(engine: EnginePort) {
       Boolean(opening) || effects.busy() || motion.read().playing || (state.available && !ready)
     );
   };
-  let previous = busy();
+  const signature = () => (busy() ? 1 : 0) | (foreground.size ? 2 : 0);
+  let previous = signature();
   const notify = () => {
-    const next = busy();
+    const next = signature();
     if (next === previous) return;
     previous = next;
     for (const listener of listeners) listener();
   };
   return {
     busy,
+    optionalBusy: () => foreground.size > 0 || busy(),
+    /** Visible previews precede optional snapshots; explicit foreground thumbnails remain admitted. */
+    holdForeground() {
+      const token = Symbol("foreground-preview");
+      foreground.add(token);
+      notify();
+      return () => {
+        if (foreground.delete(token)) notify();
+      };
+    },
     /** Cancellation belongs to a failed open/unmount; success releases on a real presentation. */
     holdUntilPresented() {
       const token = Symbol("opening-canvas");
@@ -52,7 +64,7 @@ function makeRenderActivity(engine: EnginePort) {
     },
     subscribe(listener: () => void): () => void {
       if (!listeners.size) {
-        previous = busy();
+        previous = signature();
         stops = [
           effects.subscribe(notify),
           motion.subscribe(notify),

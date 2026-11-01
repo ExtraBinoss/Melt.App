@@ -15,9 +15,10 @@ import {
   type SpatialScene,
   type LightMotionProperty,
   type SceneMotionPropertyTarget,
+  type SceneAnimationOwner,
   CAMERA_MOTION_SCHEMAS,
 } from "@musart/core";
-import { useMemo, useRef, useState } from "react";
+import { createContext, memo, useContext, useMemo, useRef, useState } from "react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../ui/accordion";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Button } from "../ui/button";
@@ -26,11 +27,13 @@ import { SceneNumberInput as NumberInput } from "./SceneNumberInput";
 import { IconButton } from "../shared/IconButton";
 import { SelectField } from "../shared/SelectField";
 import { SpatialLightEditor } from "./SpatialLightEditor";
-import { useScenePreview } from "./use-scene-preview";
+import { useCurrentSceneEdit } from "./use-current-scene-edit";
 import { LIGHTING_RIGS, lightingRig } from "./lighting-presets";
 import { importSpatialEnvironment } from "../../services/assets/spatial-import";
 import "./messages";
 import "./spatial.css";
+const ScenePage = createContext<Composition | null>(null);
+
 export function SpatialSceneProperties({
   engine,
   page,
@@ -40,9 +43,54 @@ export function SpatialSceneProperties({
   page: Composition;
   run: (task: () => void) => void;
 }) {
+  const settings = useMemo(() => page.spatial ?? createSpatialScene(), [page.spatial]);
+  const binding = useCurrentSceneEdit(engine, page, run, settings);
+  const assetName = settings.environment.assetId
+    ? engine.getSnapshot().project.assets[settings.environment.assetId]?.name
+    : undefined;
+  return (
+    <ScenePage value={page}>
+      <SpatialSceneView
+        key={binding.owner}
+        engine={engine}
+        pageId={page.id}
+        settings={settings}
+        identity={binding.identity}
+        edit={binding.edit}
+        assetName={assetName}
+      />
+    </ScenePage>
+  );
+}
+
+/** Animation actions still receive the exact live page required by their stale-page guards. */
+function CurrentSceneAnimations({
+  engine,
+  owner,
+}: {
+  engine: EnginePort;
+  owner: SceneAnimationOwner;
+}) {
+  const page = useContext(ScenePage)!;
+  return <SceneAnimations engine={engine} page={page} owner={owner} />;
+}
+
+const SpatialSceneView = memo(function SpatialSceneView({
+  engine,
+  pageId,
+  settings,
+  identity,
+  edit,
+  assetName,
+}: {
+  engine: EnginePort;
+  pageId: string;
+  settings: SpatialScene;
+  identity: ReturnType<typeof useCurrentSceneEdit>["identity"];
+  edit: ReturnType<typeof useCurrentSceneEdit>["edit"];
+  assetName?: string;
+}) {
   const { t } = useTranslation("spatial");
-  const settings = useMemo(() => page.spatial ?? createSpatialScene(), [page]);
-  const edit = useScenePreview(engine, page, run, settings);
   const navigation = useSceneMotionNavigation(engine);
   const input = useRef<HTMLInputElement>(null);
   const [error, setError] = useState("");
@@ -58,7 +106,7 @@ export function SpatialSceneProperties({
       Object.keys(patch).length === 1 && ("intensity" in patch || "rotation" in patch)
         ? {
             kind: "environment",
-            compositionId: page.id,
+            compositionId: pageId,
             property: "intensity" in patch ? "intensity" : "rotation",
           }
         : undefined,
@@ -69,7 +117,7 @@ export function SpatialSceneProperties({
       Object.keys(patch).length === 1
         ? ({
             kind: "camera",
-            compositionId: page.id,
+            compositionId: pageId,
             property: Object.keys(patch)[0],
           } as SceneMotionPropertyTarget)
         : undefined,
@@ -80,7 +128,7 @@ export function SpatialSceneProperties({
         ...settings,
         lights: settings.lights.map((light) => (light.id === value.id ? value : light)),
       },
-      property ? { kind: "light", compositionId: page.id, lightId: value.id, property } : undefined,
+      property ? { kind: "light", compositionId: pageId, lightId: value.id, property } : undefined,
     );
   function cameraField(
     key: "fov" | "yaw" | "pitch" | "distance",
@@ -92,15 +140,15 @@ export function SpatialSceneProperties({
     return (
       <SceneMotionField
         engine={engine}
-        target={{ kind: "camera", compositionId: page.id, property: key }}
+        target={{ kind: "camera", compositionId: pageId, property: key }}
         label={t(key)}
       >
         <NumberInput
           engine={engine}
-          target={{ kind: "camera", compositionId: page.id, property: key }}
+          target={{ kind: "camera", compositionId: pageId, property: key }}
           onStart={edit.begin}
           label={t(key)}
-          identity={page}
+          identity={identity}
           value={camera[key]}
           min={descriptor.kind === "number" ? descriptor.min : min}
           max={descriptor.kind === "number" ? descriptor.max : max}
@@ -152,16 +200,14 @@ export function SpatialSceneProperties({
       )}
       <SelectField
         label={t("environment")}
-        identity={page}
+        identity={identity}
         value={environment.assetId ?? environment.preset}
         options={[
           ...(environment.assetId
             ? [
                 {
                   value: environment.assetId,
-                  label:
-                    engine.getSnapshot().project.assets[environment.assetId]?.name ??
-                    t("environment"),
+                  label: assetName ?? t("environment"),
                 },
               ]
             : []),
@@ -180,15 +226,15 @@ export function SpatialSceneProperties({
       <div className="fields-grid">
         <SceneMotionField
           engine={engine}
-          target={{ kind: "environment", compositionId: page.id, property: "intensity" }}
+          target={{ kind: "environment", compositionId: pageId, property: "intensity" }}
           label={t("intensity")}
         >
           <NumberInput
             engine={engine}
-            target={{ kind: "environment", compositionId: page.id, property: "intensity" }}
+            target={{ kind: "environment", compositionId: pageId, property: "intensity" }}
             onStart={edit.begin}
             label={t("intensity")}
-            identity={page}
+            identity={identity}
             value={environment.intensity}
             min={0}
             max={10}
@@ -200,15 +246,15 @@ export function SpatialSceneProperties({
         </SceneMotionField>
         <SceneMotionField
           engine={engine}
-          target={{ kind: "environment", compositionId: page.id, property: "rotation" }}
+          target={{ kind: "environment", compositionId: pageId, property: "rotation" }}
           label={t("rotation")}
         >
           <NumberInput
             engine={engine}
-            target={{ kind: "environment", compositionId: page.id, property: "rotation" }}
+            target={{ kind: "environment", compositionId: pageId, property: "rotation" }}
             onStart={edit.begin}
             label={t("rotation")}
-            identity={page}
+            identity={identity}
             value={environment.rotation}
             min={-360}
             max={360}
@@ -220,10 +266,9 @@ export function SpatialSceneProperties({
           />
         </SceneMotionField>
       </div>
-      <SceneAnimations
+      <CurrentSceneAnimations
         engine={engine}
-        page={page}
-        owner={{ kind: "environment", compositionId: page.id }}
+        owner={{ kind: "environment", compositionId: pageId }}
       />
       <div className="spatial-title">
         <span>{t("reflections")}</span>
@@ -231,7 +276,7 @@ export function SpatialSceneProperties({
       </div>
       <SelectField
         label={t("reflections")}
-        identity={page}
+        identity={identity}
         value={settings.reflections?.mode ?? "scene"}
         options={[
           { value: "scene", label: t("sceneReflections") },
@@ -250,7 +295,7 @@ export function SpatialSceneProperties({
       {(settings.reflections?.mode ?? "scene") === "scene" && (
         <SelectField
           label={t("reflectionQuality")}
-          identity={page}
+          identity={identity}
           value={settings.reflections?.quality ?? "balanced"}
           options={["draft", "balanced", "high"].map((value) => ({
             value,
@@ -323,16 +368,15 @@ export function SpatialSceneProperties({
               <SpatialLightEditor
                 light={light}
                 engine={engine}
-                compositionId={page.id}
+                compositionId={pageId}
                 onPreview={(value, property) => changeLight(value, false, property)}
                 onCommit={(value, property) => changeLight(value, true, property)}
                 onCancel={edit.cancel}
                 onStart={edit.begin}
               />
-              <SceneAnimations
+              <CurrentSceneAnimations
                 engine={engine}
-                page={page}
-                owner={{ kind: "light", compositionId: page.id, lightId: light.id }}
+                owner={{ kind: "light", compositionId: pageId, lightId: light.id }}
               />
             </PopoverContent>
           </Popover>
@@ -375,18 +419,18 @@ export function SpatialSceneProperties({
             <div className="spatial-accordion-body">
               <SceneMotionField
                 engine={engine}
-                target={{ kind: "camera", compositionId: page.id, property: "projection" }}
+                target={{ kind: "camera", compositionId: pageId, property: "projection" }}
                 label={t("projection")}
               >
                 <SceneMotionValue
                   engine={engine}
-                  target={{ kind: "camera", compositionId: page.id, property: "projection" }}
+                  target={{ kind: "camera", compositionId: pageId, property: "projection" }}
                   fallback={camera.projection}
                 >
                   {(value) => (
                     <SelectField
                       label={t("projection")}
-                      identity={page}
+                      identity={identity}
                       value={value as string}
                       options={["perspective", "orthographic"].map((value) => ({
                         value,
@@ -408,10 +452,9 @@ export function SpatialSceneProperties({
                 {cameraField("distance", 0.2, 100, 0.1)}
                 {camera.projection === "perspective" && cameraField("fov", 5, 120)}
               </div>
-              <SceneAnimations
+              <CurrentSceneAnimations
                 engine={engine}
-                page={page}
-                owner={{ kind: "camera", compositionId: page.id }}
+                owner={{ kind: "camera", compositionId: pageId }}
               />
               <Button
                 variant="ghost"
@@ -425,4 +468,4 @@ export function SpatialSceneProperties({
       </Accordion>
     </section>
   );
-}
+});

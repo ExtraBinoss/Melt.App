@@ -75,3 +75,22 @@ it("gives foreground startup priority over optional work and releases only after
   stop();
   owner.release();
 });
+
+it("reserves optional work for nested foreground consumers without blocking explicit foreground previews", () => {
+  const engine = new EditorEngine(createProject());
+  const activity = createRenderActivity(engine);
+  const changed = vi.fn(),
+    stop = activity.subscribe(changed);
+  const first = activity.holdForeground(),
+    second = activity.holdForeground();
+  expect(activity.busy()).toBe(false);
+  expect(activity.optionalBusy()).toBe(true);
+  expect(changed).toHaveBeenCalledTimes(1);
+  first();
+  first();
+  expect(activity.optionalBusy()).toBe(true);
+  second();
+  expect(activity.optionalBusy()).toBe(false);
+  expect(changed).toHaveBeenCalledTimes(2);
+  stop();
+});

@@ -23,6 +23,25 @@ test("Angel playback retains local select sizing, native choice and inspector fo
   await page.locator('canvas[data-renderer-ready="true"]').waitFor();
   await page.getByRole("button", { name: "Export", exact: true }).click();
   await page.locator('.motion-export-preview-surface[data-preview-ready="true"]').waitFor();
+  const player = page.locator(".export-dialog .media-player");
+  const seek = player.getByRole("slider", { name: "Preview time" });
+  await player.getByRole("button", { name: "Pause preview", exact: true }).click();
+  await seek.focus();
+  await page.keyboard.press("End");
+  await expect(seek).toHaveAttribute("aria-valuenow", "12.8");
+  await page.keyboard.press("Home");
+  await expect(seek).toHaveAttribute("aria-valuenow", "0");
+  const time = player.getByRole("textbox", { name: "Start time" });
+  await time.fill("0:02.5");
+  await time.press("Enter");
+  await expect(seek).toHaveAttribute("aria-valuenow", "2.5");
+  await seek.focus();
+  await page.keyboard.press("ArrowRight");
+  await expect(seek).toHaveAttribute("aria-valuenow", "2.501");
+  await player.getByRole("button", { name: "Play preview", exact: true }).click();
+  await expect
+    .poll(async () => Number(await seek.getAttribute("aria-valuenow")))
+    .toBeGreaterThan(2.501);
   const locks = await page.evaluateHandle(() => {
     const mutations: string[] = [];
     const observer = new MutationObserver((records) => {
@@ -35,6 +54,27 @@ test("Angel playback retains local select sizing, native choice and inspector fo
     return { mutations, observer };
   });
   const trigger = page.locator("#motion-export-scale");
+  await page.evaluate(() => {
+    const state = window as Window & { menuAdvanceMs?: number };
+    const trigger = document.querySelector("#motion-export-scale")!;
+    const seek = document.querySelector(
+      '.export-dialog [role="slider"][aria-label="Preview time"]',
+    )!;
+    trigger.addEventListener(
+      "pointerdown",
+      () => {
+        const started = performance.now(),
+          before = seek.getAttribute("aria-valuenow");
+        const tick = () => {
+          if (seek.getAttribute("aria-valuenow") !== before)
+            state.menuAdvanceMs = performance.now() - started;
+          else if (performance.now() - started < 1500) requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+      },
+      { once: true },
+    );
+  });
   await trigger.click();
   const list = page.getByRole("listbox");
   await expect(list).toBeVisible();
@@ -46,6 +86,15 @@ test("Angel playback retains local select sizing, native choice and inspector fo
     })
     .toBeLessThan(1);
   await expect(list.getByRole("option", { selected: true })).toBeFocused();
+  // Input-to-clock progress, measured from native pointer capture, not after menu settlement.
+  await page.waitForFunction(
+    () => (window as Window & { menuAdvanceMs?: number }).menuAdvanceMs !== undefined,
+  );
+  const advanceMs = await page.evaluate(
+    () => (window as Window & { menuAdvanceMs?: number }).menuAdvanceMs!,
+  );
+  console.log("EXPORT_MENU_CLOCK_ADVANCE_MS", advanceMs);
+  expect(advanceMs).toBeLessThan(240);
   const original = await trigger.textContent();
   const half = list.getByRole("option", { name: "0.5×", exact: true });
   await half.hover();

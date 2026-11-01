@@ -24,6 +24,7 @@ function PopoverContent({
   align = "center",
   sideOffset = 4,
   portalContainer,
+  forceMount,
   initialFocus = "first-control",
   onOpenAutoFocus,
   ...props
@@ -33,8 +34,9 @@ function PopoverContent({
   initialFocus?: "first-control" | "content";
 }) {
   return (
-    <PopoverPrimitive.Portal container={portalContainer}>
+    <PopoverPrimitive.Portal container={portalContainer} forceMount={forceMount}>
       <PopoverPrimitive.Content
+        forceMount={forceMount}
         asChild={asChild}
         data-slot="popover-content"
         align={align}

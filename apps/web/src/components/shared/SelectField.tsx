@@ -1,4 +1,12 @@
-import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import { FieldFormValue } from "../ui/select/form-value";
 import { FieldMenu, FieldMenuOption } from "../ui/select/field-menu";
 import { getUiPresentation } from "../../state/session/ui-presentation";
@@ -42,7 +50,7 @@ export function SelectField({
   scrollButtons?: boolean;
   contentAttributes?: Record<`data-${string}`, string | boolean | undefined>;
 }) {
-  const [owner, setOwner] = useState(() => ({ identity, token: {} }));
+  const [owner, setOwner] = useState(() => ({ identity, token: {}, generation: 0 }));
   const current = useRef<object | null>(owner.token);
   const openingOwner = useRef(owner.token);
   const session = useRef<{
@@ -56,7 +64,7 @@ export function SelectField({
   const [mounted, setMounted] = useState(false);
   const [open, setOpen] = useState(false);
   if (!Object.is(owner.identity, identity)) {
-    setOwner({ identity, token: {} });
+    setOwner({ identity, token: {}, generation: owner.generation + 1 });
     setMounted(false);
     setOpen(false);
   }
@@ -97,33 +105,64 @@ export function SelectField({
   useLayoutEffect(() => {
     if (open && !disabled) return getUiPresentation().hold();
   }, [open, disabled]);
-  function owned() {
-    return !disabled && current.current === owner.token;
-  }
-  function guardItem(event: { preventDefault(): void }) {
-    if (!owned() || session.current.owner !== owner.token || !session.current.open)
-      event.preventDefault();
-  }
-  function preview(option: SelectOption) {
-    if (
-      !owned() ||
-      option.disabled ||
-      session.current.owner !== owner.token ||
-      !session.current.open ||
-      session.current.last === option.value
-    )
-      return;
-    session.current.last = option.value;
-    onPreview?.(option.value);
-  }
+  const owned = useCallback(
+    () => !disabled && current.current === owner.token,
+    [disabled, owner.token],
+  );
+  const guardItem = useCallback(
+    (event: { preventDefault(): void }) => {
+      if (!owned() || session.current.owner !== owner.token || !session.current.open)
+        event.preventDefault();
+    },
+    [owned, owner.token],
+  );
+  const preview = useCallback(
+    (option: SelectOption) => {
+      if (
+        !owned() ||
+        option.disabled ||
+        session.current.owner !== owner.token ||
+        !session.current.open ||
+        session.current.last === option.value
+      )
+        return;
+      session.current.last = option.value;
+      onPreview?.(option.value);
+    },
+    [owned, owner.token, onPreview],
+  );
+  const richOptions = options.filter((option) => typeof option.label !== "string");
   const selected =
     value === ""
       ? ""
       : (selectedLabel ?? options.find((option) => option.value === value)?.label ?? value);
+  // Opening a local menu must not rebuild its unchanged option/controller tree.
+  // These handlers consult the live session refs, so retained options remain owner guarded.
+  const items = useMemo(
+    () =>
+      options.map((option) => (
+        <FieldMenuOption
+          key={option.value}
+          value={option.value}
+          selected={option.value === value}
+          disabled={option.disabled}
+          onPointerMove={() => preview(option)}
+          onFocus={() => preview(option)}
+          onClick={guardItem}
+          onPointerUp={guardItem}
+          onKeyDown={guardItem}
+        >
+          {option.label}
+        </FieldMenuOption>
+      )),
+    [options, value, preview, guardItem],
+  );
   return (
     <>
       <FieldMenu
         id={id}
+        cacheKey={owner.generation}
+        prewarm={richOptions.length === 0 && options.length <= 32}
         label={label}
         className={className}
         contentClassName={["property-select-menu", contentClassName].filter(Boolean).join(" ")}
@@ -134,7 +173,7 @@ export function SelectField({
         open={open && !disabled}
         disabled={disabled}
         onFocus={() => {
-          if (owned()) setMounted(true);
+          if (owned() && richOptions.length) setMounted(true);
         }}
         onKeyDown={(event) => {
           if (open || !owned()) return;
@@ -182,7 +221,7 @@ export function SelectField({
           setOpen(open && !disabled);
           if (open && !disabled) {
             openingOwner.current = owner.token;
-            setMounted(true);
+            if (richOptions.length) setMounted(true);
             session.current.open = true;
             session.current.last = value;
             session.current.cancel = onPreviewCancel;
@@ -197,21 +236,7 @@ export function SelectField({
             onValueChange(next);
         }}
       >
-        {options.map((option) => (
-          <FieldMenuOption
-            key={option.value}
-            value={option.value}
-            selected={option.value === value}
-            disabled={option.disabled}
-            onPointerMove={() => preview(option)}
-            onFocus={() => preview(option)}
-            onClick={guardItem}
-            onPointerUp={guardItem}
-            onKeyDown={guardItem}
-          >
-            {option.label}
-          </FieldMenuOption>
-        ))}
+        {items}
       </FieldMenu>
       <FieldFormValue
         identity={owner.token}
@@ -221,7 +246,7 @@ export function SelectField({
       />
       {mounted && !open && (
         <div hidden aria-hidden="true">
-          {options.map((option) => (
+          {richOptions.map((option) => (
             <span
               key={option.value}
               ref={(node) => {

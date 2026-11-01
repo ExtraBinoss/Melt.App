@@ -166,3 +166,36 @@ test("hiding aborts native sampling and a late result cannot commit or leave the
   expect(screen.getByLabelText("Couleur hexadécimale")).toHaveValue("#3366FF");
   expect(screen.getByRole("button", { name: "Prélever une couleur à l’écran" })).toBeEnabled();
 });
+
+test("an explicitly prepared bounded editor has no active effects until it becomes visible", async () => {
+  let active = 0;
+  function Resource() {
+    useLayoutEffect(() => {
+      active++;
+      return () => {
+        active--;
+      };
+    }, []);
+    return <input aria-label="Prepared paint" defaultValue="canonical" />;
+  }
+  const child = <Resource />;
+  const view = setup().mount(
+    <RetainedPaint prepare visible={false}>
+      {child}
+    </RetainedPaint>,
+  );
+  await act(async () => {});
+  const input = screen.getByLabelText("Prepared paint");
+  expect(input).not.toBeVisible();
+  expect(active).toBe(0);
+  view.rerender(
+    <RetainedPaint prepare visible>
+      {child}
+    </RetainedPaint>,
+  );
+  expect(screen.getByLabelText("Prepared paint")).toBe(input);
+  expect(input).toBeVisible();
+  expect(active).toBe(1);
+  view.unmount();
+  expect(active).toBe(0);
+});

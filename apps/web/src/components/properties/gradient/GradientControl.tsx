@@ -1,4 +1,4 @@
-import { memo, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { memo, useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { RetainedPaint } from "./retained-paint";
 import { Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -142,15 +142,24 @@ function PaintGradientControl({
   onCancel: () => void;
   presentation?: PaintInvalidation;
 }) {
-  const target = (
-    property: "fillGradient.kind" | "fillGradient.angle",
-  ): MotionPropertyTarget | undefined =>
-    layerId ? { kind: "layer", layerId, property } : undefined;
   const { t } = useTranslation("gradient");
   const [selection, setSelection] = useState({ ownerId, index: 0 });
-  const [remembered, setRemembered] = useState(layerId ? undefined : gradient);
-  if (!layerId && gradient && gradient !== remembered) setRemembered(gradient);
-  const paint = gradient ?? (layerId ? undefined : remembered);
+  const [remembered, setRemembered] = useState<FillGradient | undefined>(() =>
+    layerId
+      ? undefined
+      : (gradient ?? {
+          kind: "linear",
+          angle: 0,
+          stops: [
+            { offset: 0, color },
+            { offset: 1, color: "#ffffff" },
+          ],
+        }),
+  );
+  // Mode changes may recreate an identical default gradient. Preserve its exact
+  // authored identity so a retained editor does not rebuild its fields on return.
+  if (!layerId && gradient && !sameAuthoredPaint(gradient, remembered)) setRemembered(gradient);
+  const paint = layerId ? gradient : remembered;
   const root = useRef<HTMLDivElement>(null);
   const index =
     selection.ownerId === ownerId
@@ -160,10 +169,10 @@ function PaintGradientControl({
   const anglePresentation = useMemo(
     () =>
       presentation && {
-        read: () => gradient?.angle ?? 0,
+        read: () => paint?.angle ?? 0,
         subscribe: presentation.subscribe,
       },
-    [presentation, gradient?.angle],
+    [presentation, paint?.angle],
   );
   const drafting = useRef(false);
   useLayoutEffect(
@@ -176,11 +185,14 @@ function PaintGradientControl({
       }),
     [presentation, gradient, onCancel],
   );
-  function select(index: number) {
-    setSelection((current) =>
-      current.ownerId === ownerId && current.index === index ? current : { ownerId, index },
-    );
-  }
+  const select = useCallback(
+    (index: number) => {
+      setSelection((current) =>
+        current.ownerId === ownerId && current.index === index ? current : { ownerId, index },
+      );
+    },
+    [ownerId],
+  );
   useLayoutEffect(() => {
     if (!engine || !gradient) return;
     const transport = createMotionTransport(engine);
@@ -195,21 +207,174 @@ function PaintGradientControl({
     update();
     return stop;
   }, [engine, layerId, gradient]);
-  function previewPaint(next: FillGradient) {
-    if (disabled) return;
-    drafting.current = true;
-    presentPaint(root.current, next);
-    onPreview(next);
-  }
-  function commitPaint(next: FillGradient) {
+  const previewPaint = useCallback(
+    (next: FillGradient) => {
+      if (disabled) return;
+      drafting.current = true;
+      presentPaint(root.current, next);
+      onPreview(next);
+    },
+    [disabled, onPreview],
+  );
+  const commitPaint = useCallback(
+    (next: FillGradient) => {
+      drafting.current = false;
+      if (!disabled) onCommit(next);
+    },
+    [disabled, onCommit],
+  );
+  const cancelPaint = useCallback(() => {
     drafting.current = false;
-    if (!disabled) onCommit(next);
-  }
-  function cancelPaint() {
-    drafting.current = false;
-    if (gradient) presentPaint(root.current, gradient);
+    if (paint) presentPaint(root.current, paint);
     onCancel();
-  }
+  }, [paint, onCancel]);
+  const editor = useMemo(() => {
+    if (!paint) return null;
+    const target = (
+      property: "fillGradient.kind" | "fillGradient.angle",
+    ): MotionPropertyTarget | undefined =>
+      layerId ? { kind: "layer", layerId, property } : undefined;
+    return (
+      <div className={styles.editor} inert={disabled || undefined}>
+        <GradientPresets
+          identity={ownerId}
+          gradient={paint}
+          disabled={disabled}
+          onPreview={previewPaint}
+          onCommit={commitPaint}
+          onCancel={cancelPaint}
+        />
+        <div className={styles.settings}>
+          <div className={styles.setting}>
+            <span className={styles.caption}>{t("gradient")}</span>
+            <MotionField
+              engine={engine}
+              target={target("fillGradient.kind")}
+              label={t("gradientType")}
+              disabled={disabled}
+            >
+              <MotionValueField
+                engine={engine}
+                target={target("fillGradient.kind")}
+                fallback={paint.kind}
+              >
+                {(kind) => (
+                  <SelectField
+                    label={t("gradientType")}
+                    side="bottom"
+                    value={String(kind)}
+                    disabled={disabled}
+                    options={(["linear", "radial"] as const).map((value) => ({
+                      value,
+                      label: t(value),
+                    }))}
+                    onValueChange={(kind) =>
+                      commitPaint({ ...paint, kind: kind as FillGradient["kind"] })
+                    }
+                  />
+                )}
+              </MotionValueField>
+            </MotionField>
+          </div>
+          {paint.kind === "linear" && (
+            <div className={styles.setting}>
+              <span className={styles.caption}>{t("angleLabel")}</span>
+              <NumberInput
+                engine={engine}
+                target={target("fillGradient.angle")}
+                identity={identity}
+                presentation={anglePresentation}
+                label={t("angle")}
+                value={paint.angle}
+                min={-360000}
+                max={360000}
+                unit="°"
+                disabled={disabled}
+                onPreview={(angle) => previewPaint({ ...paint, angle })}
+                onCommit={(angle) => commitPaint({ ...paint, angle })}
+                onCancel={cancelPaint}
+              />
+            </div>
+          )}
+        </div>
+        <GradientBar
+          gradient={paint}
+          identity={ownerId}
+          selected={index}
+          disabled={disabled}
+          invalidation={invalidation}
+          onSelect={select}
+          onPreview={previewPaint}
+          onCommit={commitPaint}
+          onCancel={cancelPaint}
+        />
+        <div className={styles.stopsHeading}>
+          <span className={styles.caption}>{t("stops")}</span>
+          <IconButton
+            label={t("add")}
+            disabled={disabled || paint.stops.length >= 8}
+            onClick={() => {
+              if (disabled) return;
+              const next = insertStop(paint);
+              if (next) {
+                select(next.index);
+                commitPaint(next.gradient);
+              }
+            }}
+          >
+            <Plus size={14} />
+          </IconButton>
+        </div>
+        <div className={styles.rows}>
+          {paint.stops.map((_, at) => (
+            <GradientStopRow
+              key={`${ownerId}:${at}`}
+              gradient={paint}
+              index={at}
+              ownerId={ownerId}
+              identity={identity}
+              selected={at === index}
+              disabled={disabled}
+              invalidation={invalidation}
+              onSelect={() => select(at)}
+              onPreview={(change) => previewPaint(replaceStop(paint, at, change))}
+              onCommit={(change) => commitPaint(replaceStop(paint, at, change))}
+              onCancel={cancelPaint}
+              onRemove={() => {
+                if (
+                  disabled ||
+                  at === 0 ||
+                  at === paint.stops.length - 1 ||
+                  paint.stops.length <= 2
+                )
+                  return;
+                select(Math.max(0, at - 1));
+                commitPaint({
+                  ...paint,
+                  stops: paint.stops.filter((_, position) => position !== at),
+                });
+              }}
+            />
+          ))}
+        </div>
+      </div>
+    );
+  }, [
+    paint,
+    disabled,
+    engine,
+    layerId,
+    identity,
+    ownerId,
+    index,
+    invalidation,
+    anglePresentation,
+    select,
+    previewPaint,
+    commitPaint,
+    cancelPaint,
+    t,
+  ]);
   return (
     <div ref={root} className={styles.control} aria-disabled={disabled || undefined}>
       <SegmentedTabs
@@ -241,133 +406,30 @@ function PaintGradientControl({
         }}
       />
       {paint && (
-        <RetainedPaint key={ownerId} visible={Boolean(gradient)} retain={!layerId}>
-          <div className={styles.editor} inert={disabled || undefined}>
-            <GradientPresets
-              identity={ownerId}
-              gradient={paint}
-              disabled={disabled}
-              onPreview={previewPaint}
-              onCommit={commitPaint}
-              onCancel={cancelPaint}
-            />
-            <div className={styles.settings}>
-              <div className={styles.setting}>
-                <span className={styles.caption}>{t("gradient")}</span>
-                <MotionField
-                  engine={engine}
-                  target={target("fillGradient.kind")}
-                  label={t("gradientType")}
-                  disabled={disabled}
-                >
-                  <MotionValueField
-                    engine={engine}
-                    target={target("fillGradient.kind")}
-                    fallback={paint.kind}
-                  >
-                    {(kind) => (
-                      <SelectField
-                        label={t("gradientType")}
-                        side="bottom"
-                        value={String(kind)}
-                        disabled={disabled}
-                        options={(["linear", "radial"] as const).map((value) => ({
-                          value,
-                          label: t(value),
-                        }))}
-                        onValueChange={(kind) =>
-                          commitPaint({ ...paint, kind: kind as FillGradient["kind"] })
-                        }
-                      />
-                    )}
-                  </MotionValueField>
-                </MotionField>
-              </div>
-              {paint.kind === "linear" && (
-                <div className={styles.setting}>
-                  <span className={styles.caption}>{t("angleLabel")}</span>
-                  <NumberInput
-                    engine={engine}
-                    target={target("fillGradient.angle")}
-                    identity={identity}
-                    presentation={anglePresentation}
-                    label={t("angle")}
-                    value={paint.angle}
-                    min={-360000}
-                    max={360000}
-                    unit="°"
-                    disabled={disabled}
-                    onPreview={(angle) => previewPaint({ ...paint, angle })}
-                    onCommit={(angle) => commitPaint({ ...paint, angle })}
-                    onCancel={cancelPaint}
-                  />
-                </div>
-              )}
-            </div>
-            <GradientBar
-              gradient={paint}
-              identity={ownerId}
-              selected={index}
-              disabled={disabled}
-              invalidation={invalidation}
-              onSelect={select}
-              onPreview={previewPaint}
-              onCommit={commitPaint}
-              onCancel={cancelPaint}
-            />
-            <div className={styles.stopsHeading}>
-              <span className={styles.caption}>{t("stops")}</span>
-              <IconButton
-                label={t("add")}
-                disabled={disabled || paint.stops.length >= 8}
-                onClick={() => {
-                  if (disabled) return;
-                  const next = insertStop(paint);
-                  if (next) {
-                    select(next.index);
-                    commitPaint(next.gradient);
-                  }
-                }}
-              >
-                <Plus size={14} />
-              </IconButton>
-            </div>
-            <div className={styles.rows}>
-              {paint.stops.map((_, at) => (
-                <GradientStopRow
-                  key={`${ownerId}:${at}`}
-                  gradient={paint}
-                  index={at}
-                  ownerId={ownerId}
-                  identity={identity}
-                  selected={at === index}
-                  disabled={disabled}
-                  invalidation={invalidation}
-                  onSelect={() => select(at)}
-                  onPreview={(change) => previewPaint(replaceStop(paint, at, change))}
-                  onCommit={(change) => commitPaint(replaceStop(paint, at, change))}
-                  onCancel={cancelPaint}
-                  onRemove={() => {
-                    if (
-                      disabled ||
-                      at === 0 ||
-                      at === paint.stops.length - 1 ||
-                      paint.stops.length <= 2
-                    )
-                      return;
-                    select(Math.max(0, at - 1));
-                    commitPaint({
-                      ...paint,
-                      stops: paint.stops.filter((_, position) => position !== at),
-                    });
-                  }}
-                />
-              ))}
-            </div>
-          </div>
+        <RetainedPaint
+          key={ownerId}
+          visible={Boolean(gradient)}
+          retain={!layerId}
+          prepare={!layerId}
+        >
+          {editor}
         </RetainedPaint>
       )}
     </div>
   );
 }
 const BackgroundPaintLeaf = memo(PaintGradientControl);
+
+/** Exact comparison: retaining presentation must not normalize authored values. */
+function sameAuthoredPaint(a: FillGradient, b: FillGradient | undefined): boolean {
+  return Boolean(
+    b &&
+    a.kind === b.kind &&
+    a.angle === b.angle &&
+    a.stops.length === b.stops.length &&
+    a.stops.every(
+      (stop, index) =>
+        stop.offset === b.stops[index]!.offset && stop.color === b.stops[index]!.color,
+    ),
+  );
+}

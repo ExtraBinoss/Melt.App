@@ -54,6 +54,8 @@ test("mounts its own GPU canvas and updates local clock controls without repaint
     project,
     expect.objectContaining({ compositionId: page.id, edge: 768, mediaResolver: resolver }),
   );
+  // Visible playback must not subscribe to the optional-work menu entrance gate.
+  expect(state.create.mock.calls[0]![1].presentation).toBeUndefined();
   expect(document.querySelector(".motion-export-preview-surface canvas")).not.toBeNull();
   act(() => {
     state.time = { value: 1, rate: 2 };
