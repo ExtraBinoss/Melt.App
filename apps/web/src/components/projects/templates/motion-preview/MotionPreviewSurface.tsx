@@ -16,6 +16,7 @@ import "./motion-preview.css";
 export function MotionPreviewSurface({
   startPreview,
   poster,
+  nativeVideo = false,
   disabled = false,
   autoplay = false,
   className = "",
@@ -26,6 +27,7 @@ export function MotionPreviewSurface({
     onStatus: (status: PreviewStatus, error?: unknown) => void,
   ) => PreviewOwner;
   poster?: string;
+  nativeVideo?: boolean;
   children?: ReactNode;
   disabled?: boolean;
   autoplay?: boolean;
@@ -184,8 +186,18 @@ export function MotionPreviewSurface({
   }, [startPreview, disabled, t, loading, controlHost, autoplay]);
   return (
     <span ref={mount} className={`motion-template-preview ${className}`} data-preview-status="idle">
-      {poster ? <img src={poster} alt="" loading="lazy" draggable={false} /> : children}
-      <span ref={viewport} className="motion-template-preview-canvas" aria-hidden />
+      {!nativeVideo &&
+        (poster ? <img src={poster} alt="" loading="lazy" draggable={false} /> : children)}
+      <span
+        ref={viewport}
+        className="motion-template-preview-canvas"
+        data-native-video={nativeVideo || undefined}
+        aria-hidden
+      >
+        {nativeVideo && (
+          <video data-preview-video poster={poster} preload="none" muted playsInline loop />
+        )}
+      </span>
       <span className="motion-template-preview-loading-mark">
         <BrandStatus size={24} state="preparing" activity={loading} />
       </span>

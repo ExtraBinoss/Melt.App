@@ -118,3 +118,18 @@ five editor React counters, performs zero GPU/WebGL/Canvas readbacks and cancels
 without changing the current document.
 
 Theme changes crossfade the complete interface through native View Transitions when available. Initial application, unchanged resolved colors and reduced motion apply immediately. System-color changes use the same path; rapid selections supersede pending transitions without a React frame loop.
+
+## Immediate native artwork
+
+Use `MeltMark` for decorative interface marks. Its transparent 256 px WebP is
+rasterized from the same timestamped idle engine frame (`bun scripts/brand-assets.ts
+--webp`). It reserves the final dimensions in server HTML and requires no animation
+code to display. Header and footer links acquire the SVG only on fine-pointer hover
+or focus; touch and reduced-motion idle marks remain native images. Leaving the
+link crossfades to the image and releases the SVG leaf.
+
+Real loaders use the same mark with `state="working"`. The native image remains
+visible while the animation module loads, then crossfades only after the first SVG
+frame has been painted. There is no simulated progress or extra completion delay.
+`BrandStatus` displays immediately beside an existing pending label; standalone
+`Throbber` keeps its configurable reveal delay for short operations.

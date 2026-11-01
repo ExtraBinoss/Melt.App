@@ -12,3 +12,38 @@
   justify-content: center;
   flex-shrink: 0;
 }
+.melt-mark {
+  position: relative;
+  display: inline-block;
+  flex-shrink: 0;
+  vertical-align: middle;
+  user-select: none;
+}
+.melt-mark > img,
+.melt-mark-animation {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  transition: opacity 160ms ease;
+}
+.melt-mark:not([data-state="idle"]) > img {
+  transform: scale(calc(232 / 316));
+}
+.melt-mark-animation {
+  opacity: 0;
+  pointer-events: none;
+}
+.melt-mark[data-motion="true"][data-ready="true"] > img {
+  opacity: 0;
+}
+.melt-mark[data-motion="true"][data-ready="true"] > .melt-mark-animation {
+  opacity: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .melt-mark > img,
+  .melt-mark-animation {
+    transition: none;
+  }
+}

@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 import { Throbber } from "../../ui/throbber/Throbber";
-import { MeltLogo } from "../../../ui/brand/MeltLogo";
+import { MeltMark } from "../../../ui/brand/MeltMark";
 
 /** Native motion preparation owns its own feedback; only idle cards use this placeholder. */
 export function ProjectPreviewPlaceholder({
@@ -29,7 +29,7 @@ export function ProjectPreviewPlaceholder({
       {failed ? (
         <span className="preview-pending">{label}</span>
       ) : idleFallback && !pending ? (
-        <MeltLogo size={40} />
+        <MeltMark size={40} />
       ) : (
         <Throbber active={pending && idle} variant="shimmer" size={40} label={label} decorative />
       )}

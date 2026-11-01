@@ -1,4 +1,5 @@
 import { useCallback, useState } from "react";
+import { useHydrated } from "@tanstack/react-router";
 import type { ProjectSummary } from "../../../state/contracts";
 
 export type LibraryMode = "all" | "static" | "motion";
@@ -17,6 +18,7 @@ export function readLibraryMode(): LibraryMode {
 /** A user preference shared by both library sections, separate from project data and history. */
 export function useLibraryMode() {
   const [mode, update] = useState<LibraryMode>(readLibraryMode);
+  const hydrated = useHydrated();
   const setMode = useCallback((value: LibraryMode) => {
     update(value);
     try {
@@ -25,7 +27,7 @@ export function useLibraryMode() {
       /* The filter remains usable when preference storage is blocked. */
     }
   }, []);
-  return [mode, setMode] as const;
+  return [hydrated ? mode : "all", setMode] as const;
 }
 export function projectLibraryMode(project: ProjectSummary): Exclude<LibraryMode, "all"> {
   return (

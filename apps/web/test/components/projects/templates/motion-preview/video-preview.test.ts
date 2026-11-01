@@ -64,3 +64,19 @@ test("play rejection is reported, while a released owner's late rejection is ign
   await Promise.resolve();
   expect(status).toHaveBeenCalledTimes(count);
 });
+
+test("reuses the server poster element without replacing it, then restores its source-free idle state", async () => {
+  vi.spyOn(HTMLMediaElement.prototype, "play").mockResolvedValue();
+  vi.spyOn(HTMLMediaElement.prototype, "pause").mockImplementation(() => {});
+  vi.spyOn(HTMLMediaElement.prototype, "load").mockImplementation(() => {});
+  const host = document.createElement("span");
+  host.innerHTML = '<video data-preview-video poster="/poster.webp" preload="none"></video>';
+  const poster = host.firstElementChild!;
+  const owner = startVideoPreview(host, "/card.mp4", vi.fn());
+  expect(host.children).toHaveLength(1);
+  expect(host.firstElementChild).toBe(poster);
+  await owner.release();
+  expect(host.firstElementChild).toBe(poster);
+  expect(poster).toHaveAttribute("poster", "/poster.webp");
+  expect(poster).not.toHaveAttribute("src");
+});

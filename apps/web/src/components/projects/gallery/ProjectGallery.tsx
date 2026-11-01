@@ -7,7 +7,7 @@ import type { TaskRunner } from "../ProjectDialog";
 import { SearchInput } from "../../assets/SearchInput";
 import { ProjectSearchPreview } from "./ProjectSearchPreview";
 import { Throbber } from "../../ui/throbber/Throbber";
-import { MeltLogo } from "../../../ui/brand/MeltLogo";
+import { MeltMark } from "../../../ui/brand/MeltMark";
 import "../dashboard/messages";
 import { Button } from "../../ui/button";
 import { LibraryModeFilter } from "../dashboard/LibraryModeFilter";
@@ -183,7 +183,7 @@ export function ProjectGallery({
                 loaded?.projects.slice(0, 6).map((project) => ({
                   label: project.name,
                   preview: <ProjectSearchPreview project={project} services={services} />,
-                })) ?? [{ label: t("dashboard:projects"), preview: <MeltLogo size={20} /> }]
+                })) ?? [{ label: t("dashboard:projects"), preview: <MeltMark size={20} /> }]
               }
               value={query}
               disabled={disabled}

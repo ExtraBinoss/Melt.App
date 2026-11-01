@@ -4,7 +4,7 @@ import { ArrowUpRight } from "lucide-react";
 import { useReducedMotion } from "motion/react";
 import { useTranslation } from "react-i18next";
 import { TEMPLATE_CATALOG } from "../../../services/projects/templates/catalog";
-import { MeltLogo } from "../../../ui/brand/MeltLogo";
+import { MeltMark } from "../../../ui/brand/MeltMark";
 import { SocialBrandIcon } from "../../assets/SocialBrandIcon";
 import { Button } from "../../ui/button";
 import { templatePreview } from "../templates/preview";
@@ -98,7 +98,7 @@ export function ShowcaseCarousel({
             <span className="landing-template-caption">
               <span>{t(template.nameKey)}</span>
               <span>
-                <MeltLogo size={14} />
+                <MeltMark size={14} />
                 {brand.name}
               </span>
             </span>

@@ -1,5 +1,6 @@
+import { motionValue } from "motion/react";
 import { expect, test, vi } from "vitest";
-import { fireEvent, screen, within } from "@testing-library/react";
+import { act, fireEvent, screen, within } from "@testing-library/react";
 import { MobileNavigation } from "../../../../src/components/shared/navigation/MobileNavigation";
 import { setup } from "../../../support/ui";
 
@@ -73,4 +74,49 @@ test("editor instances retain expanded semantics and globally disabled navigatio
   const busy = screen.getByRole("navigation", { name: "Busy library" });
   for (const button of within(busy).getAllByRole("button")) expect(button).toBeDisabled();
   expect(busy.querySelectorAll(".mobile-nav-indicator")).toHaveLength(1);
+});
+
+test("measures swipe stride after layout and retains the observer across translated labels", () => {
+  let measure!: ResizeObserverCallback;
+  const observe = vi.fn(),
+    disconnect = vi.fn();
+  vi.stubGlobal(
+    "ResizeObserver",
+    class {
+      constructor(callback: ResizeObserverCallback) {
+        measure = callback;
+      }
+      observe = observe;
+      disconnect = disconnect;
+    },
+  );
+  const reads = vi.spyOn(HTMLElement.prototype, "offsetLeft", "get");
+  const position = motionValue(0);
+  const view = setup().mount(
+    <MobileNavigation
+      label="Library"
+      value="projects"
+      items={items}
+      position={position}
+      onSelect={vi.fn()}
+    />,
+  );
+  expect(reads).not.toHaveBeenCalled();
+  act(() => measure([], {} as ResizeObserver));
+  const measured = reads.mock.calls.length;
+  expect(measured).toBe(2);
+  view.rerender(
+    <MobileNavigation
+      label="Library"
+      value="projects"
+      items={items.map((item) => ({ ...item, label: item.label + " translated" }))}
+      position={position}
+      onSelect={vi.fn()}
+    />,
+  );
+  expect(reads).toHaveBeenCalledTimes(measured);
+  expect(observe).toHaveBeenCalledOnce();
+  view.unmount();
+  expect(disconnect).toHaveBeenCalledOnce();
+  vi.unstubAllGlobals();
 });

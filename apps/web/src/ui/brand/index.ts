@@ -1,5 +1,6 @@
 export { brand } from "./config";
 export { MeltLogo } from "./MeltLogo";
+export { MeltMark } from "./MeltMark";
 export { BrandStatus } from "./BrandStatus";
 export { createBrandActivity } from "./activity";
 export { createDahliaEngine } from "./dahlia";

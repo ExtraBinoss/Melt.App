@@ -1,5 +1,5 @@
 import { changeLanguage } from "../../src/state/i18n";
-import { render, screen, act, fireEvent } from "@testing-library/react";
+import { render, screen, act, fireEvent, waitFor } from "@testing-library/react";
 import { vi } from "vitest";
 import { createProject, EditorEngine } from "@musart/core";
 const mocks = vi.hoisted(() => ({ createRuntime: vi.fn(), attach: vi.fn() }));
@@ -43,9 +43,9 @@ it("shows startup then mounts editor and closes resources", async () => {
   expect(screen.getByRole("status")).toHaveTextContent("Ouverture");
   expect(screen.getByRole("status")).toHaveAttribute("data-variant", "shimmer");
   expect(screen.getByRole("status")).toHaveAttribute("data-visible", "true");
-  expect(screen.getByRole("status").querySelector("svg")).toHaveAttribute("width", "80");
-  expect(screen.getByRole("status").querySelector("svg")).toHaveAttribute(
-    "data-brand-state",
+  expect(screen.getByRole("status").querySelector("img")).toHaveAttribute("width", "80");
+  expect(screen.getByRole("status").querySelector(".melt-mark")).toHaveAttribute(
+    "data-state",
     "working",
   );
   await screen.findByText("Atelier prêt");
@@ -115,9 +115,10 @@ it("translates startup and dismiss controls in English", async () => {
   await changeLanguage("fr");
 });
 
-it("cancels an initializing runtime when StrictMode cleans up its first mount", () => {
+it("cancels an initializing runtime when StrictMode cleans up its first mount", async () => {
   mocks.createRuntime.mockReturnValue(new Promise(() => {}));
   const view = render(<Studio />);
+  await waitFor(() => expect(mocks.createRuntime).toHaveBeenCalledOnce());
   const options = mocks.createRuntime.mock.calls[0]![1] as { signal: AbortSignal };
   expect(options.signal.aborted).toBe(false);
   view.unmount();

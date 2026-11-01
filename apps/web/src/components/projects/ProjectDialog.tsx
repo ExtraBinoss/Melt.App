@@ -1,4 +1,7 @@
 import { readLibraryPreview } from "./items/links";
+import type { LibraryPreviewRequest } from "./items/links";
+import { useHydrated } from "@tanstack/react-router";
+import { DashboardSurface } from "./dashboard/DashboardSurface";
 import {
   dashboardHref,
   isPlainPrimaryClick,
@@ -8,7 +11,8 @@ import { atom, useStore } from "jotai";
 import { LazyPreferencesDialog, PreferencesHost } from "./preferences/PreferencesHost";
 import { LibraryBrowser } from "./items/LibraryBrowser";
 import { brand } from "../../ui/brand/config";
-import { useCallback, useEffect, useId, useRef, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useId, useRef, useState } from "react";
+import { Throbber } from "../ui/throbber/Throbber";
 import { ArrowLeft } from "lucide-react";
 import { AnimatePresence } from "motion/react";
 import { useMobileLayout } from "../workspace/mobile/use-mobile";
@@ -19,17 +23,22 @@ import { LibraryTransition } from "./dashboard/LibraryTransition";
 import { ProjectCreateActions } from "./dashboard/ProjectCreateActions";
 import { useTranslation } from "react-i18next";
 import type { EditorServices, ProjectSummary } from "../../state/contracts";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "../ui/dialog";
+import { Dialog, DialogHeader, DialogTitle, DialogDescription } from "../ui/dialog";
 import { Button } from "../ui/button";
 import { LibrarySidebar } from "./dashboard/LibrarySidebar";
 import { MobileLibraryNavigation } from "./dashboard/MobileLibraryNavigation";
-import { MeltLogo } from "../../ui/brand/MeltLogo";
+import { MeltMark } from "../../ui/brand/MeltMark";
 import { CreationDialogHost, StandaloneProjectCreation } from "./creation/ProjectCreationDialog";
-import { ProjectGallery } from "./gallery/ProjectGallery";
+const ProjectGallery = lazy(() =>
+  import("./gallery/ProjectGallery").then((module) => ({ default: module.ProjectGallery })),
+);
 import { TemplateGallery } from "./templates/TemplateGallery";
 import { createProjectFromTemplate } from "../../services/projects/templates/catalog";
 import type { TemplateLoadOptions } from "../../services/projects/templates/motion/loader";
-import { LandingPage } from "./landing/LandingPage";
+import { isMotionTemplateId } from "../../services/projects/templates/motion/identity";
+const LandingPage = lazy(() =>
+  import("./landing/LandingPage").then((module) => ({ default: module.LandingPage })),
+);
 import "./creation/messages";
 import "./dashboard/messages";
 import "./dashboard/dashboard.css";
@@ -47,6 +56,7 @@ export interface ProjectDialogProps {
   showLanding?: boolean;
   onHome?: () => void;
   onPrepareEditor?: () => Promise<void>;
+  standalone?: boolean;
 }
 /** The same dashboard works before the first document and above an open project. */
 export function ProjectDialog(props: ProjectDialogProps) {
@@ -73,23 +83,29 @@ function ProjectDashboard({
   showLanding = true,
   onHome,
   onPrepareEditor,
+  standalone = false,
 }: ProjectDialogProps) {
   const { t } = useTranslation();
   const mobile = useMobileLayout();
   const headingId = useId();
-  const [linkedPreview] = useState(readLibraryPreview);
+  const [requestedPreview] = useState<LibraryPreviewRequest | null>(() =>
+    typeof location === "undefined" ? null : readLibraryPreview(),
+  );
+  const hydrated = useHydrated();
+  const linkedPreview = hydrated ? requestedPreview : null;
   const [landing, setLanding] = useState(
     Boolean(showLanding && welcome && initialView !== "newProject"),
   );
-  const [view, setView] = useState<"projects" | "templates">(
-    linkedPreview
+  const [selectedView, setView] = useState<"projects" | "templates" | null>(null);
+  const view =
+    selectedView ??
+    (linkedPreview
       ? linkedPreview.kind === "template"
         ? "templates"
         : "projects"
       : initialView === "templates"
         ? "templates"
-        : "projects",
-  );
+        : "projects");
   const [queries, setQueries] = useState({ projects: "", templates: "" });
   const [libraryMode, setLibraryMode] = useLibraryMode();
   const [projectHints, setProjectHints] = useState<ProjectSummary[]>([]);
@@ -164,7 +180,7 @@ function ProjectDashboard({
     const request = new AbortController();
     templateRequest.current?.abort();
     templateRequest.current = request;
-    setTemplateLoading(id === "in-bloom" || id === "motion-stress-lab");
+    setTemplateLoading(isMotionTemplateId(id));
     complete(async () => {
       try {
         // Begin editor code only after an explicit open, alongside validated installation.
@@ -188,12 +204,14 @@ function ProjectDashboard({
   }
   if (landing)
     return (
-      <LandingPage
-        onCreate={() => setLanding(false)}
-        onTemplate={chooseTemplate}
-        busy={busy}
-        onCancel={templateLoading ? () => templateRequest.current?.abort() : undefined}
-      />
+      <Suspense fallback={<Throbber size={28} label={t("brand:loading")} />}>
+        <LandingPage
+          onCreate={() => setLanding(false)}
+          onTemplate={chooseTemplate}
+          busy={busy}
+          onCancel={templateLoading ? () => templateRequest.current?.abort() : undefined}
+        />
+      </Suspense>
     );
   return (
     <LibraryBrowser
@@ -215,6 +233,7 @@ function ProjectDashboard({
     >
       <Dialog
         open
+        modal={!standalone}
         onOpenChange={(open) => {
           if (
             !open &&
@@ -226,7 +245,10 @@ function ProjectDashboard({
             onClose();
         }}
       >
-        <DialogContent
+        <DashboardSurface
+          standalone={standalone}
+          titleId={`${headingId}-title`}
+          descriptionId={`${headingId}-description`}
           closeLabel={t("close")}
           showCloseButton={!welcome && !busy}
           onEscapeKeyDown={(event) => {
@@ -274,7 +296,7 @@ function ProjectDashboard({
                   home();
                 }}
               >
-                <MeltLogo size={32} interactive />
+                <MeltMark size={32} interactive />
                 <span>{brand.name}</span>
               </BrandTrigger>
             </Button>
@@ -302,8 +324,16 @@ function ProjectDashboard({
                   {t("dashboard:backHome")}
                 </Button>
               </div>
-              <DialogTitle className="sr-only">{t("dashboard:title")}</DialogTitle>
-              <DialogDescription className="sr-only">
+              <DialogTitle
+                {...(standalone ? { id: `${headingId}-title` } : {})}
+                className="sr-only"
+              >
+                {t("dashboard:title")}
+              </DialogTitle>
+              <DialogDescription
+                {...(standalone ? { id: `${headingId}-description` } : {})}
+                className="sr-only"
+              >
                 {t("dashboard:description")}
               </DialogDescription>
             </DialogHeader>
@@ -351,20 +381,22 @@ function ProjectDashboard({
                       <AnimatePresence initial={false}>
                         <LibraryTransition key={view}>
                           {view === "projects" ? (
-                            <ProjectGallery
-                              services={services}
-                              activeProjectId={projectId}
-                              onTask={perform}
-                              busy={busy}
-                              onOpen={() => {
-                                if (scope.current.alive) onClose();
-                              }}
-                              onCreate={custom}
-                              query={queries.projects}
-                              hideSearch
-                              mode={libraryMode}
-                              onProjectsLoaded={setProjectHints}
-                            />
+                            <Suspense fallback={<Throbber size={28} label={t("brand:loading")} />}>
+                              <ProjectGallery
+                                services={services}
+                                activeProjectId={projectId}
+                                onTask={perform}
+                                busy={busy}
+                                onOpen={() => {
+                                  if (scope.current.alive) onClose();
+                                }}
+                                onCreate={custom}
+                                query={queries.projects}
+                                hideSearch
+                                mode={libraryMode}
+                                onProjectsLoaded={setProjectHints}
+                              />
+                            </Suspense>
                           ) : (
                             <TemplateGallery
                               busy={busy}
@@ -415,7 +447,7 @@ function ProjectDashboard({
               event.target.value = "";
             }}
           />
-        </DialogContent>
+        </DashboardSurface>
       </Dialog>
     </LibraryBrowser>
   );

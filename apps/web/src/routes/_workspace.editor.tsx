@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 export const Route = createFileRoute("/_workspace/editor")({
+  ssr: false,
   validateSearch: (search: Record<string, unknown>) => ({
     ...search,
     ...(typeof search.project === "string" ? { project: search.project } : {}),

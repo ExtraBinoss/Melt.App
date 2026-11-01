@@ -11,7 +11,7 @@ export function BrandStatus({
 }) {
   return (
     <span className="melt-status" aria-hidden>
-      <Throbber size={size} activity={activity} decorative />
+      <Throbber size={size} activity={activity} decorative delayMs={0} />
     </span>
   );
 }

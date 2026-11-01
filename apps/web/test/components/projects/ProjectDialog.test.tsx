@@ -16,7 +16,7 @@ test("editor creation Escape closes without mounting the library or editing the 
       onTask={d.onTask}
     />,
   );
-  const name = screen.getByLabelText("Nom");
+  const name = await screen.findByLabelText("Nom");
   expect(name).toHaveFocus();
   expect(screen.queryByRole("tooltip")).not.toBeInTheDocument();
   fireEvent.keyDown(name, { key: "Escape" });
@@ -46,7 +46,7 @@ test("shares a clean two-section dashboard between welcome and open-project stat
     expect(screen.getByRole("heading", { name: "Quel projet voulez-vous créer ?" })).toBeVisible(),
   );
   fireEvent.click(screen.getByRole("button", { name: "Canvas personnalisé" }));
-  fireEvent.click(screen.getByRole("button", { name: "Créer" }));
+  fireEvent.click(await screen.findByRole("button", { name: "Créer" }));
   await waitFor(() => expect(d.services.createProject).toHaveBeenCalledOnce());
   expect(close).toHaveBeenCalledOnce();
 });
@@ -140,7 +140,7 @@ test("late work cannot dismiss a replacement dashboard after unmount", async () 
       onTask={d.onTask}
     />,
   );
-  fireEvent.click(screen.getByRole("button", { name: "Créer" }));
+  fireEvent.click(await screen.findByRole("button", { name: "Créer" }));
   view.unmount();
   await act(async () => resolve());
   expect(close).not.toHaveBeenCalled();
@@ -166,7 +166,7 @@ test("captures template origin before download, prevents duplicate opening, and 
   };
   const view = d.mount(<ProjectDialog {...props} origin={first} />);
   fireEvent.click(screen.getByRole("radio", { name: "Motion" }));
-  const card = screen.getByRole("button", { name: "Créer depuis In Bloom — Démo Motion" });
+  const card = screen.getByRole("button", { name: "Créer depuis Mascotte Melt" });
   fireEvent.click(card);
   fireEvent.click(card);
   expect(create).toHaveBeenCalledOnce();
@@ -311,7 +311,7 @@ test("welcome opens the landing page and enters the library without creating a d
   const d = setup(),
     close = vi.fn();
   d.mount(<ProjectDialog welcome services={d.services} onClose={close} onTask={d.onTask} />);
-  expect(screen.getByRole("heading", { name: "Créez. Animez." })).toBeVisible();
+  expect(await screen.findByRole("heading", { name: "Créez. Animez." })).toBeVisible();
   expect(d.services.listProjectPage).not.toHaveBeenCalled();
   fireEvent.click(screen.getAllByRole("button", { name: "Commencer à créer" })[0]!);
   await screen.findByRole("dialog", { name: "Tableau de bord Melt" });
@@ -342,7 +342,7 @@ test("landing template selection uses the same guarded loader and aborts stale w
       origin={origin}
     />,
   );
-  const card = screen.getByRole("button", { name: "Créer depuis In Bloom — Démo Motion" });
+  const card = screen.getByRole("button", { name: "Créer depuis Mascotte Melt" });
   fireEvent.click(card);
   fireEvent.click(card);
   expect(create).toHaveBeenCalledOnce();
@@ -366,7 +366,7 @@ test("the library brand returns to landing without modifying the open document",
   d.mount(<ProjectDialog services={d.services} onClose={vi.fn()} onTask={d.onTask} />);
   await screen.findByText("Aucun projet enregistré.");
   fireEvent.click(screen.getByRole("button", { name: "Accueil Melt" }));
-  expect(screen.getByRole("heading", { name: "Créez. Animez." })).toBeVisible();
+  expect(await screen.findByRole("heading", { name: "Créez. Animez." })).toBeVisible();
   expect(d.services.createProject).not.toHaveBeenCalled();
   fireEvent.click(screen.getByRole("button", { name: "Try Melt" }));
   expect(screen.getByRole("dialog", { name: "Tableau de bord Melt" })).toBeVisible();
@@ -409,7 +409,11 @@ test("a recent-metadata failure reports once without acquiring or looping the mu
   expect(
     vi.mocked(d.services.listProjectPage).mock.calls.filter(([options]) => options?.limit === 5),
   ).toHaveLength(1);
-  expect(screen.getByRole("button", { name: "Nouveau projet" })).toBeEnabled();
+  expect(
+    within(screen.getByRole("group", { name: "Options de création" })).getByRole("button", {
+      name: "Nouveau projet",
+    }),
+  ).toBeEnabled();
   expect(screen.getByRole("button", { name: "Retour à l’accueil" })).toBeEnabled();
   fireEvent.click(screen.getByRole("button", { name: "Réessayer" }));
   await waitFor(() =>
@@ -417,7 +421,11 @@ test("a recent-metadata failure reports once without acquiring or looping the mu
       vi.mocked(d.services.listProjectPage).mock.calls.filter(([options]) => options?.limit === 5),
     ).toHaveLength(2),
   );
-  expect(screen.getByRole("button", { name: "Nouveau projet" })).toBeEnabled();
+  expect(
+    within(screen.getByRole("group", { name: "Options de création" })).getByRole("button", {
+      name: "Nouveau projet",
+    }),
+  ).toBeEnabled();
 });
 
 test("section changes retain header, creation controls and one search input with independent drafts", async () => {
@@ -433,7 +441,10 @@ test("section changes retain header, creation controls and one search input with
   await screen.findByText("Aucun projet enregistré.");
   const input = screen.getByRole("searchbox", { name: "Rechercher un projet" });
   const heading = screen.getByRole("heading", { name: "Vos projets" });
-  const create = screen.getByRole("button", { name: "Nouveau projet" });
+  const create = within(screen.getByRole("group", { name: "Options de création" })).getByRole(
+    "button",
+    { name: "Nouveau projet" },
+  );
   fireEvent.change(input, { target: { value: "draft" } });
   fireEvent.click(screen.getByRole("button", { name: "Templates" }));
   expect(screen.getByRole("searchbox", { name: "Rechercher un modèle" })).toBe(input);
@@ -448,7 +459,11 @@ test("section changes retain header, creation controls and one search input with
   fireEvent.click(screen.getByRole("button", { name: "Projets" }));
   expect(screen.getByRole("searchbox", { name: "Rechercher un projet" })).toBe(input);
   expect(input).toHaveValue("draft");
-  expect(screen.getByRole("button", { name: "Nouveau projet" })).toBe(create);
+  expect(
+    within(screen.getByRole("group", { name: "Options de création" })).getByRole("button", {
+      name: "Nouveau projet",
+    }),
+  ).toBe(create);
 });
 
 beforeEach(() => localStorage.removeItem(LIBRARY_MODE_KEY));
@@ -478,7 +493,7 @@ test("prepares editor code alongside an explicit template open and waits for bot
       onPrepareEditor={prepare}
     />,
   );
-  fireEvent.click(screen.getByRole("button", { name: "Créer depuis Mascotte Melt" }));
+  fireEvent.click(await screen.findByRole("button", { name: "Créer depuis Mascotte Melt" }));
   expect(install).toHaveBeenCalledOnce();
   expect(prepare).toHaveBeenCalledOnce();
   await act(async () => finishInstall());

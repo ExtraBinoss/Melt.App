@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { LayoutTemplate } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { PRESETS, type CompositionPreset } from "@musart/core";
+import { PRESETS } from "@musart/core/presets";
+import type { CompositionPreset } from "@musart/core";
 import { Button } from "../../ui/button";
 import { Tabs, TabsContent } from "../../ui/tabs";
 import { Popover, PopoverContent, PopoverTrigger } from "../../ui/popover";

@@ -17,6 +17,7 @@ export default defineConfig({
     fiberTimerCompatibility(fiberThreeAdapter),
     tanstackStart({
       start: { entry: "start.ts" },
+      client: { entry: "client.tsx" },
       sitemap: { host: "https://melt.plinka.eu" },
       prerender: {
         enabled: true,

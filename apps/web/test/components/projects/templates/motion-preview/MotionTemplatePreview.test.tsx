@@ -1,5 +1,5 @@
 import { beforeEach, expect, test, vi } from "vitest";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MotionTemplatePreview } from "../../../../../src/components/projects/templates/motion-preview/MotionTemplatePreview";
 import { startMotionTemplatePreview } from "../../../../../src/components/projects/templates/motion-preview/runtime";
 import { i18n } from "../../../../../src/state/i18n";
@@ -22,7 +22,7 @@ function media(hover = true, reduced = false) {
   );
 }
 
-test("hover/focus intent owns native preview lifecycle without a parent render", () => {
+test("hover/focus intent owns native preview lifecycle without a parent render", async () => {
   media();
   const renders = vi.fn();
   function Host() {
@@ -37,8 +37,10 @@ test("hover/focus intent owns native preview lifecycle without a parent render",
     button = screen.getByRole("button");
   const before = renders.mock.calls.length;
   fireEvent.pointerEnter(button);
-  expect(startMotionTemplatePreview).toHaveBeenCalledOnce();
+  await waitFor(() => expect(startMotionTemplatePreview).toHaveBeenCalledOnce());
+  await waitFor(() => expect(startMotionTemplatePreview).toHaveBeenCalled());
   const release = vi.mocked(startMotionTemplatePreview).mock.results.at(-1)!.value.release;
+  await waitFor(() => expect(startMotionTemplatePreview).toHaveBeenCalled());
   const options = vi.mocked(startMotionTemplatePreview).mock.calls.at(-1)![0];
   options.onStatus("loading");
   expect(screen.getByRole("status")).toHaveTextContent("Préparation de l’aperçu…");
@@ -49,7 +51,7 @@ test("hover/focus intent owns native preview lifecycle without a parent render",
   fireEvent.pointerLeave(button);
   expect(release).toHaveBeenCalledOnce();
   fireEvent.focusIn(button);
-  expect(startMotionTemplatePreview).toHaveBeenCalledTimes(2);
+  await waitFor(() => expect(startMotionTemplatePreview).toHaveBeenCalledTimes(2));
   const second = vi.mocked(startMotionTemplatePreview).mock.results.at(-1)!.value.release;
   view.unmount();
   expect(second).toHaveBeenCalledOnce();
@@ -99,8 +101,10 @@ test("late cleanup errors cannot replace a newer hover owner’s status", async 
   );
   const button = screen.getByRole("button");
   fireEvent.pointerEnter(button);
+  await waitFor(() => expect(startMotionTemplatePreview).toHaveBeenCalledOnce());
   fireEvent.pointerLeave(button);
   fireEvent.pointerEnter(button);
+  await waitFor(() => expect(startMotionTemplatePreview).toHaveBeenCalledTimes(2));
   const options = vi.mocked(startMotionTemplatePreview).mock.calls.at(-1)![0];
   options.onStatus("playing");
   reject(new Error("Old cleanup failed"));
@@ -113,7 +117,7 @@ test("late cleanup errors cannot replace a newer hover owner’s status", async 
   expect(screen.getByRole("status")).toHaveTextContent("");
 });
 
-test("pointer gestures stop rendering and their focus event cannot restart GPU work", () => {
+test("pointer gestures stop rendering and their focus event cannot restart GPU work", async () => {
   media();
   render(
     <button>
@@ -123,19 +127,20 @@ test("pointer gestures stop rendering and their focus event cannot restart GPU w
   const button = screen.getByRole("button"),
     before = vi.mocked(startMotionTemplatePreview).mock.calls.length;
   fireEvent.pointerEnter(button);
-  expect(startMotionTemplatePreview).toHaveBeenCalledTimes(before + 1);
+  await waitFor(() => expect(startMotionTemplatePreview).toHaveBeenCalledTimes(before + 1));
+  await waitFor(() => expect(startMotionTemplatePreview).toHaveBeenCalled());
   const release = vi.mocked(startMotionTemplatePreview).mock.results.at(-1)!.value.release;
   fireEvent.pointerDown(button);
   fireEvent.focusIn(button);
   expect(release).toHaveBeenCalledOnce();
-  expect(startMotionTemplatePreview).toHaveBeenCalledTimes(before + 1);
+  await waitFor(() => expect(startMotionTemplatePreview).toHaveBeenCalledTimes(before + 1));
   fireEvent.pointerUp(window);
   fireEvent.pointerLeave(button);
   fireEvent.pointerEnter(button);
-  expect(startMotionTemplatePreview).toHaveBeenCalledTimes(before + 2);
+  await waitFor(() => expect(startMotionTemplatePreview).toHaveBeenCalledTimes(before + 2));
 });
 
-test("replacing a poster revision retires the old live preview and displays the new image", () => {
+test("replacing a poster revision retires the old live preview and displays the new image", async () => {
   media();
   const view = render(
     <button>
@@ -143,6 +148,7 @@ test("replacing a poster revision retires the old live preview and displays the 
     </button>,
   );
   fireEvent.pointerEnter(screen.getByRole("button"));
+  await waitFor(() => expect(startMotionTemplatePreview).toHaveBeenCalled());
   const release = vi.mocked(startMotionTemplatePreview).mock.results.at(-1)!.value.release;
   view.rerender(
     <button>

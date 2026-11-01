@@ -13,6 +13,7 @@ export const brand = {
   },
   mascot: { shape: "fleur8", expression: "surpris", eyes: "capsule" },
   assets: {
+    idle: "branding/melt-idle.webp",
     icon: "branding/melt.svg",
     maskableIcon: "branding/melt-maskable.svg",
     appleIcon: "branding/melt-icon-180.png",

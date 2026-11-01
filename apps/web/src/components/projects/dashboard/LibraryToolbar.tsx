@@ -3,7 +3,7 @@ import type { EditorServices, ProjectSummary } from "../../../state/contracts";
 import { TEMPLATE_CATALOG } from "../../../services/projects/templates/catalog";
 import { SearchInput } from "../../assets/SearchInput";
 import { SocialBrandIcon } from "../../assets/SocialBrandIcon";
-import { MeltLogo } from "../../../ui/brand/MeltLogo";
+import { MeltMark } from "../../../ui/brand/MeltMark";
 import { LibraryModeFilter } from "./LibraryModeFilter";
 import { projectLibraryMode, type LibraryMode } from "./library-mode";
 import { ProjectSearchPreview } from "../gallery/ProjectSearchPreview";
@@ -59,7 +59,7 @@ export function LibraryToolbar({
           hints={
             hints.length
               ? hints
-              : [{ label: t("dashboard:projects"), preview: <MeltLogo size={20} /> }]
+              : [{ label: t("dashboard:projects"), preview: <MeltMark size={20} /> }]
           }
           value={query}
           disabled={disabled}

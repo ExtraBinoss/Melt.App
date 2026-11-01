@@ -475,3 +475,30 @@ it("defers optional thumbnails while leaving an explicitly foreground image prev
   activity.dispose();
   expect(stop).toHaveBeenCalledOnce();
 });
+
+it("binds the editor's canonical admission on library handoff and replaces/releases its subscription", () => {
+  let blocked = true,
+    changed!: () => void;
+  const firstStop = vi.fn(),
+    lastStop = vi.fn(),
+    notify = vi.fn();
+  const activity = new ThumbnailActivity();
+  activity.subscribe(notify);
+  expect(activity.busy()).toBe(false);
+  activity.setSuspension({
+    busy: () => blocked,
+    subscribe: (listener) => {
+      changed = listener;
+      return firstStop;
+    },
+  });
+  expect(activity.busy()).toBe(true);
+  blocked = false;
+  changed();
+  expect(activity.busy()).toBe(false);
+  expect(notify).toHaveBeenCalled();
+  activity.setSuspension({ busy: () => true, subscribe: () => lastStop });
+  expect(firstStop).toHaveBeenCalledOnce();
+  activity.dispose();
+  expect(lastStop).toHaveBeenCalledOnce();
+});

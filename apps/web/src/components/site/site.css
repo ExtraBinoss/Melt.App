@@ -185,6 +185,13 @@
 .site-languages [data-slot="select-trigger"] {
   width: 100%;
 }
+.site-languages .site-language-pending {
+  width: 100%;
+  height: 32px;
+  justify-content: space-between;
+  font-size: 11px;
+  font-weight: 400;
+}
 
 .site-footer-bottom {
   display: flex;

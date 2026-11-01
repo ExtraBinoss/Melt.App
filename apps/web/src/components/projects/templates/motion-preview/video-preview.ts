@@ -7,7 +7,8 @@ export function startVideoPreview(
   source: string,
   status: (state: PreviewStatus, error?: unknown) => void,
 ): PreviewOwner {
-  const video = document.createElement("video");
+  const retained = host.querySelector<HTMLVideoElement>("video[data-preview-video]");
+  const video = retained ?? document.createElement("video");
   video.muted = true;
   video.playsInline = true;
   video.loop = true;
@@ -47,7 +48,7 @@ export function startVideoPreview(
   video.addEventListener("playing", playing);
   video.addEventListener("pause", paused);
   video.addEventListener("error", failed);
-  host.append(video);
+  if (!retained) host.append(video);
   status("loading");
   video.src = source;
   play();
@@ -75,7 +76,7 @@ export function startVideoPreview(
       video.removeEventListener("error", failed);
       video.removeAttribute("src");
       video.load();
-      video.remove();
+      if (!retained) video.remove();
       delete host.dataset.previewTime;
       playback.update({ playing: false, ready: false });
     },

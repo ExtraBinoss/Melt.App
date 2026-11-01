@@ -1,7 +1,8 @@
 import { useCallback, type ReactNode } from "react";
 import type { EditorServices } from "../../../state/contracts";
 import { MotionPreviewSurface } from "../templates/motion-preview/MotionPreviewSurface";
-import { startMotionPreview, type PreviewStatus } from "../templates/motion-preview/runtime";
+import type { PreviewStatus } from "../templates/motion-preview/runtime";
+import { startDeferredPreview } from "../templates/motion-preview/deferred-preview";
 
 /** Reading a saved project for hover never replaces the current editor or installs a document. */
 export function ProjectMotionPreview({
@@ -23,25 +24,29 @@ export function ProjectMotionPreview({
 }) {
   const start = useCallback(
     (host: HTMLElement, onStatus: (status: PreviewStatus, error?: unknown) => void) =>
-      startMotionPreview({
-        label: "Hover saved project",
-        host,
-        onStatus,
-        prepare: async (signal) => {
-          if (!services.loadProjectPreview)
-            throw new Error("Saved project previews are unavailable.");
-          const project = await services.loadProjectPreview(projectId, { signal });
-          signal.throwIfAborted();
-          if (!project.pages.some((page) => page.id === pageId))
-            throw new Error("This saved artboard is no longer available.");
-          return {
-            project,
-            compositionId: pageId,
-            mediaResolver: services.mediaResolverFor?.(projectId),
-            fontResolver: services.fonts?.resolve,
-          };
-        },
-      }),
+      startDeferredPreview(async (signal) => {
+        const module = await import("../templates/motion-preview/runtime");
+        signal.throwIfAborted();
+        return module.startMotionPreview({
+          label: "Hover saved project",
+          host,
+          onStatus,
+          prepare: async (signal) => {
+            if (!services.loadProjectPreview)
+              throw new Error("Saved project previews are unavailable.");
+            const project = await services.loadProjectPreview(projectId, { signal });
+            signal.throwIfAborted();
+            if (!project.pages.some((page) => page.id === pageId))
+              throw new Error("This saved artboard is no longer available.");
+            return {
+              project,
+              compositionId: pageId,
+              mediaResolver: services.mediaResolverFor?.(projectId),
+              fontResolver: services.fonts?.resolve,
+            };
+          },
+        });
+      }, onStatus),
     [services, projectId, pageId],
   );
   return (

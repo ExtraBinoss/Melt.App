@@ -1,3 +1,4 @@
+import userEvent from "@testing-library/user-event";
 import { act, fireEvent, screen, waitFor } from "@testing-library/react";
 import { expect, test, vi } from "vitest";
 import { ProjectDialog } from "../../../../src/components/projects/ProjectDialog";
@@ -20,10 +21,10 @@ test("creation visibility stays in its leaf and Escape restores the library open
   opener.focus();
   const before = renderGallery.mock.calls.length;
   fireEvent.click(opener);
-  const name = screen.getByLabelText("Nom");
+  const name = await screen.findByLabelText("Nom");
   expect(name).toHaveFocus();
   expect(renderGallery.mock.calls).toHaveLength(before);
-  fireEvent.keyDown(name, { key: "Escape" });
+  await userEvent.keyboard("{Escape}");
   await waitFor(() => expect(screen.queryByLabelText("Nom")).toBeNull());
   await waitFor(() => expect(opener).toHaveFocus());
   expect(renderGallery.mock.calls).toHaveLength(before);
@@ -48,7 +49,7 @@ test("direct creation blocks repeat submits and dismissal, then allows retry aft
       onClose={close}
     />,
   );
-  const form = screen.getByLabelText("Nom").closest("form")!;
+  const form = (await screen.findByLabelText("Nom")).closest("form")!;
   fireEvent.submit(form);
   fireEvent.submit(form);
   expect(d.services.createProject).toHaveBeenCalledOnce();

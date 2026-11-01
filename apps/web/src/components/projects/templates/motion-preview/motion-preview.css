@@ -21,6 +21,9 @@
   opacity: 0;
   pointer-events: none;
 }
+.motion-template-preview-canvas[data-native-video="true"] {
+  opacity: 1;
+}
 .motion-template-preview:is([data-preview-status="playing"], [data-preview-status="paused"])
   .motion-template-preview-canvas {
   opacity: 1;

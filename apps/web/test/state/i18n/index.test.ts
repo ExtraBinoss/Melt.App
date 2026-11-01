@@ -1,6 +1,9 @@
 import { beforeEach, expect, test, vi } from "vitest";
 import { changeLanguage, i18n, readLanguage } from "../../../src/state/i18n";
-beforeEach(() => localStorage.removeItem("musart.language"));
+beforeEach(() => {
+  localStorage.removeItem("musart.language");
+  document.cookie = "musart.language=; Max-Age=0; Path=/";
+});
 
 test("starts in English before mounted routes restore the saved preference", () => {
   expect(i18n.language).toBe("en");

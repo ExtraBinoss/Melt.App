@@ -1,24 +1,20 @@
 import { ArrowUp } from "lucide-react";
-import { useHydrated } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { changeLanguage } from "../../state/i18n";
-import { supportedLocales, isSupportedLocale } from "../../state/i18n/locales";
-import { SelectField } from "../shared/SelectField";
-import { MeltLogo } from "../../ui/brand/MeltLogo";
+import { SiteLanguagePicker } from "./SiteLanguagePicker";
+import { MeltMark } from "../../ui/brand/MeltMark";
 import { brand } from "../../ui/brand/config";
 import { TOOL_PAGES, publicHref, toolPath } from "../../tools/catalog";
 import "./messages";
 import "./site.css";
 const repository = "https://github.com/ExtraBinoss/MusArt";
 export function SiteFooter() {
-  const hydrated = useHydrated();
-  const { t, i18n } = useTranslation("site");
+  const { t } = useTranslation("site");
   return (
     <footer className="site-footer">
       <div className="site-footer-columns">
         <div className="site-footer-about">
           <a className="landing-footer-brand" href={publicHref("/")}>
-            <MeltLogo size={30} />
+            <MeltMark size={30} interactive loading="lazy" />
             {brand.name}
           </a>
           <p>{t("footerDescription")}</p>
@@ -46,21 +42,7 @@ export function SiteFooter() {
           <a href={`${repository}/blob/main/CHANGELOG.md`}>{t("changes")}</a>
           <a href={`${repository}/issues`}>{t("feedback")}</a>
           <a href={`${repository}/blob/main/LICENSE`}>{t("license")}</a>
-          <div className="site-languages">
-            <SelectField
-              scrollButtons={false}
-              disabled={!hydrated}
-              label={t("language")}
-              value={i18n.language.split("-")[0]!}
-              options={supportedLocales.map((locale) => ({
-                value: locale.code,
-                label: <span lang={locale.code}>{locale.label}</span>,
-              }))}
-              onValueChange={(language) => {
-                if (isSupportedLocale(language)) void changeLanguage(language);
-              }}
-            />
-          </div>
+          <SiteLanguagePicker />
         </nav>
       </div>
       <div className="site-footer-bottom">

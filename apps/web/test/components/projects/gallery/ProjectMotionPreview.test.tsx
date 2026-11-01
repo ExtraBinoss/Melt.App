@@ -1,5 +1,5 @@
 import { expect, test, vi } from "vitest";
-import { fireEvent, screen } from "@testing-library/react";
+import { fireEvent, screen, waitFor } from "@testing-library/react";
 import { ProjectMotionPreview } from "../../../../src/components/projects/gallery/ProjectMotionPreview";
 import { startMotionPreview } from "../../../../src/components/projects/templates/motion-preview/runtime";
 import { setup } from "../../../support/ui";
@@ -35,6 +35,7 @@ test("saved Motion hover loads only on intent and returns the exact artboard/ori
   expect(d.services.loadProjectPreview).not.toHaveBeenCalled();
   const before = d.engine.getSnapshot();
   fireEvent.pointerEnter(screen.getByRole("button"));
+  await waitFor(() => expect(startMotionPreview).toHaveBeenCalled());
   const options = vi.mocked(startMotionPreview).mock.calls.at(-1)![0],
     signal = new AbortController().signal;
   expect(await options.prepare(signal)).toEqual({
@@ -70,6 +71,7 @@ test("late saved-project reads are rejected after cancellation instead of publis
     </button>,
   );
   fireEvent.pointerEnter(screen.getByRole("button"));
+  await waitFor(() => expect(startMotionPreview).toHaveBeenCalled());
   const options = vi.mocked(startMotionPreview).mock.calls.at(-1)![0];
   await expect(options.prepare(request.signal)).rejects.toMatchObject({ name: "AbortError" });
 });

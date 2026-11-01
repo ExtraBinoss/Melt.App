@@ -1,7 +1,8 @@
 import { useCallback } from "react";
 import type { MotionTemplateId } from "../../../../services/projects/templates/motion/model";
 import { MotionPreviewSurface } from "./MotionPreviewSurface";
-import { startMotionTemplatePreview, type PreviewStatus } from "./runtime";
+import type { PreviewStatus } from "./runtime";
+import { startDeferredPreview } from "./deferred-preview";
 import { startVideoPreview } from "./video-preview";
 import {
   MOTION_TEMPLATE_ASSET_REVISIONS,
@@ -30,7 +31,11 @@ export function MotionTemplatePreview({
     (host: HTMLElement, onStatus: (status: PreviewStatus, error?: unknown) => void) =>
       source
         ? startVideoPreview(host, source, onStatus)
-        : startMotionTemplatePreview({ templateId, host, onStatus }),
+        : startDeferredPreview(async (signal) => {
+            const module = await import("./runtime");
+            signal.throwIfAborted();
+            return module.startMotionTemplatePreview({ templateId, host, onStatus });
+          }, onStatus),
     [templateId, source],
   );
   return (
@@ -39,6 +44,7 @@ export function MotionTemplatePreview({
       autoplay={autoplay}
       startPreview={start}
       poster={poster}
+      nativeVideo={Boolean(source)}
       disabled={disabled}
       className={className}
     />

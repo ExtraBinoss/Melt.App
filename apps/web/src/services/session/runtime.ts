@@ -20,6 +20,7 @@ export interface RuntimeOptions {
   selection?: SelectionClient;
   autosaveDelay?: number;
   thumbnails?: ThumbnailPipeline;
+  thumbnailActivity?: ThumbnailActivity;
   signal?: AbortSignal;
   fonts?: FontLibraryPort;
   projectId?: string;
@@ -90,6 +91,7 @@ export async function createRuntime(
   const fonts = options.fonts ?? new FontLibrary();
   const journal = getAnimationSession(engine);
   const renderActivity = createRenderActivity(engine);
+  options.thumbnailActivity?.setSuspension(renderActivity);
   if (options.editor) renderActivity.holdUntilPresented();
   const thumbnails =
     options.thumbnails ??

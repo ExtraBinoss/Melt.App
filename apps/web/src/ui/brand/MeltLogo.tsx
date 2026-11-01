@@ -14,6 +14,7 @@ export const MeltLogo = memo(function MeltLogo({
   activity,
   className = "",
   interactive = false,
+  onReady,
 }: {
   size?: number;
   decorative?: boolean;
@@ -21,6 +22,7 @@ export const MeltLogo = memo(function MeltLogo({
   activity?: BrandActivity;
   className?: string;
   interactive?: boolean;
+  onReady?: (ready: boolean) => void;
 }) {
   const { t } = useTranslation("brand"),
     id = useId().replace(/[^a-zA-Z0-9_-]/g, ""),
@@ -31,6 +33,7 @@ export const MeltLogo = memo(function MeltLogo({
     const surface = createMascotSurface(svg, `melt-${id}`),
       playback = createBrandPlayback(surface);
     runtime.current = playback;
+    onReady?.(true);
     const observer =
       typeof IntersectionObserver === "undefined"
         ? null
@@ -39,12 +42,13 @@ export const MeltLogo = memo(function MeltLogo({
           );
     observer?.observe(svg);
     return () => {
+      onReady?.(false);
       runtime.current = null;
       observer?.disconnect();
       playback.dispose();
       surface.dispose();
     };
-  }, [id]);
+  }, [id, onReady]);
   useLayoutEffect(() => {
     if (!interactive) return;
     const owner = element.current?.closest("button,a") ?? element.current;
@@ -59,6 +63,7 @@ export const MeltLogo = memo(function MeltLogo({
     owner.addEventListener("pointerleave", leave);
     owner.addEventListener("focusin", enter);
     owner.addEventListener("focusout", update);
+    update();
     return () => {
       runtime.current?.setHovered(false);
       owner.removeEventListener("pointerenter", enter);

@@ -7,7 +7,7 @@ import type { EditorServices } from "../../../state/contracts";
 import { libraryItemKey, type LibraryItem } from "../../../services/projects/library/favorites";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "../../ui/dialog";
 import { Button } from "../../ui/button";
-import { MeltLogo } from "../../../ui/brand/MeltLogo";
+import { MeltMark } from "../../../ui/brand/MeltMark";
 import { ItemPreview } from "./ItemPreview";
 import { useLibraryFavorites } from "./favorites-context";
 import { TEMPLATE_CATALOG } from "../../../services/projects/templates/catalog";
@@ -83,7 +83,7 @@ export function ItemDialog({
             )}
             {contentsFailed && <p role="alert">{t("libraryContents:failed")}</p>}
             <div className="library-item-author">
-              <MeltLogo
+              <MeltMark
                 size={38}
                 className={selected.item.kind === "project" ? "library-author-avatar" : ""}
               />

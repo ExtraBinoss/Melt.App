@@ -1,6 +1,5 @@
 import { preloadEditor } from "./preload";
-import { createRenderActivity } from "../services/session/render-activity";
-import { MeltLogo } from "../ui/brand/MeltLogo";
+import { MeltMark } from "../ui/brand/MeltMark";
 import { StudioPreparation } from "./StudioPreparation";
 import { useTranslation } from "react-i18next";
 import "./messages";
@@ -8,8 +7,7 @@ import "./loading.css";
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { ProjectDialog } from "../components/projects/ProjectDialog";
 import { TooltipProvider } from "../components/ui/tooltip";
-import { createRuntime, type EditorRuntime } from "../services/session/runtime";
-import { attachAutomation } from "../services/automation/automation";
+import { useStudioSession } from "./use-studio-session";
 import { formatUiError } from "../state/i18n/errors/format";
 import type { StudioRouting } from "../state/contracts";
 import { createProjectFromTemplate } from "../services/projects/templates/catalog";
@@ -18,36 +16,36 @@ const prepareEditor = preloadEditor;
 const App = lazy(() => loadApp().then((module) => ({ default: module.App })));
 export function Studio({ routing }: { routing?: StudioRouting } = {}) {
   const { t } = useTranslation("startup");
-  const [runtime, setRuntime] = useState<EditorRuntime | null>(null);
   const [error, setError] = useState("");
+  const [automation] = useState(
+    () =>
+      typeof location !== "undefined" &&
+      new URLSearchParams(location.search).get("automation") === "1",
+  );
+  const { runtime, services, ensureRuntime, publishRuntime, peek } = useStudioSession(
+    routing,
+    (failure) => setError(formatUiError(failure)),
+  );
   const initialRouting = useRef(routing);
   const cancelBackgroundHold = useRef<(() => void) | null>(null);
   const [editorOpened, setEditorOpened] = useState(routing?.view !== "dashboard");
   if (routing?.view === "editor" && !editorOpened) setEditorOpened(true);
   useEffect(() => {
     let disposed = false;
-    const controller = new AbortController();
-    let current: EditorRuntime | undefined;
-    let detach: (() => void) | undefined;
     const report = (error: unknown) => {
       if (!disposed) setError(formatUiError(error));
     };
     const initial = initialRouting.current;
+    if (initial?.view === "dashboard") return;
+    const controller = new AbortController();
     const editorCode = initial?.view === "editor" ? prepareEditor() : undefined;
     // Keep rejection observed while local project preparation is still pending.
     void editorCode?.catch(() => {});
-    void createRuntime(report, {
-      signal: controller.signal,
-      projectId: initial?.projectId,
-      editor: initial?.view === "editor",
-      library: initial?.view === "dashboard",
-    })
+    void ensureRuntime()
       .then(async (result) => {
         if (disposed) {
-          void result.dispose().catch(report);
           return;
         }
-        current = result;
         if (initial?.templateId) {
           await Promise.all([
             editorCode,
@@ -59,19 +57,38 @@ export function Studio({ routing }: { routing?: StudioRouting } = {}) {
           initial.navigate("editor", result.engine.getSnapshot().project.id);
         }
         await editorCode;
-        if (new URLSearchParams(location.search).get("automation") === "1")
-          detach = attachAutomation(result.engine, result.services);
-        setRuntime(result);
+        if (!disposed) publishRuntime(result);
       })
       .catch(report);
     return () => {
       disposed = true;
       controller.abort();
       cancelBackgroundHold.current?.();
-      detach?.();
-      void current?.dispose().catch(report);
     };
-  }, []);
+  }, [ensureRuntime, publishRuntime]);
+  useEffect(() => {
+    if (initialRouting.current?.view === "dashboard" && routing?.view === "editor" && !runtime)
+      void ensureRuntime()
+        .then(publishRuntime)
+        .catch((failure: unknown) => setError(formatUiError(failure)));
+  }, [routing?.view, runtime, ensureRuntime, publishRuntime]);
+  useEffect(() => () => cancelBackgroundHold.current?.(), []);
+  useEffect(() => {
+    if (!runtime || !automation) return;
+    let active = true,
+      detach: (() => void) | undefined;
+    void import("../services/automation/automation")
+      .then((module) => {
+        if (active) detach = module.attachAutomation(runtime.engine, runtime.services);
+      })
+      .catch((failure: unknown) => {
+        if (active) setError(formatUiError(failure));
+      });
+    return () => {
+      active = false;
+      detach?.();
+    };
+  }, [runtime, automation]);
   useEffect(() => {
     if (
       !runtime ||
@@ -85,27 +102,36 @@ export function Studio({ routing }: { routing?: StudioRouting } = {}) {
   }, [runtime, routing?.projectId]);
   return (
     <>
-      {runtime && !editorOpened && routing ? (
+      {!editorOpened && routing ? (
         <TooltipProvider>
           <ProjectDialog
-            services={runtime.services}
+            services={services}
+            standalone
             welcome
             showLanding={false}
             initialView="templates"
             onHome={() => routing.navigate("home")}
             onPrepareEditor={async () => {
-              cancelBackgroundHold.current?.();
-              cancelBackgroundHold.current = createRenderActivity(
-                runtime.engine,
-              ).holdUntilPresented();
+              const code = prepareEditor();
+              void code.catch(() => {});
               try {
-                await prepareEditor();
+                const current = await ensureRuntime();
+                const { createRenderActivity } =
+                  await import("../services/session/render-activity");
+                cancelBackgroundHold.current?.();
+                cancelBackgroundHold.current = createRenderActivity(
+                  current.engine,
+                ).holdUntilPresented();
+                await code;
               } catch (error) {
                 cancelBackgroundHold.current?.();
                 throw error;
               }
             }}
-            onClose={() => routing.navigate("editor", runtime.engine.getSnapshot().project.id)}
+            onClose={() => {
+              const current = peek();
+              if (current) routing.navigate("editor", current.engine.getSnapshot().project.id);
+            }}
             onTask={async (task) => {
               try {
                 await task();
@@ -129,7 +155,7 @@ export function Studio({ routing }: { routing?: StudioRouting } = {}) {
         </Suspense>
       ) : error ? (
         <div className="studio-loading">
-          <MeltLogo size={52} />
+          <MeltMark size={52} />
         </div>
       ) : (
         <StudioPreparation />

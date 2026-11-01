@@ -3,7 +3,7 @@ import { ArrowUpRight } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { brand } from "../../ui/brand/config";
-import { MeltLogo } from "../../ui/brand/MeltLogo";
+import { MeltMark } from "../../ui/brand/MeltMark";
 import { Button } from "../ui/button";
 import { publicHref } from "../../tools/catalog";
 import "./messages";
@@ -43,7 +43,7 @@ export function SiteHeader({
   return (
     <header className={`site-header ${landing ? "landing-nav" : ""}`}>
       <a href={landing ? "#musart-intro" : publicHref("/")} className="landing-brand">
-        <MeltLogo size={30} interactive />
+        <MeltMark size={30} interactive />
         {brand.name}
       </a>
       <nav aria-label={t("resources")}>

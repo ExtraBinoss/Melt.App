@@ -199,7 +199,6 @@ export function installCarouselPan(
   }
   function measure() {
     if (disposed || !cards.length) return;
-    cancel();
     const before = period;
     width = node.clientWidth;
     for (const card of cards) {
@@ -214,6 +213,8 @@ export function installCarouselPan(
         ? Math.max(0, cards[1]!.left - origin - cards[0]!.width)
         : 0;
     const last = cards[cards.length - 1]!;
+    // Finish all geometry reads before cancellation restores presentation styles.
+    cancel();
     period = Math.max(0, last.left + last.width - origin + gap);
     if (before && period !== before) position = (position / before) * period;
     paint();

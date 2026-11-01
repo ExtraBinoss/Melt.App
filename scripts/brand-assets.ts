@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { mascotTint } from "../apps/web/src/ui/brand/tint";
@@ -94,6 +94,7 @@ if (import.meta.main) await writeBrandAssets();
 /** Optional native SVG rasterization for install platforms requiring PNG; never part of app rendering. */
 export async function writeRasterBrandAssets(
   root = resolve(dirname(fileURLToPath(import.meta.url)), ".."),
+  webpOnly = false,
 ) {
   const { chromium } = await import("@playwright/test");
   const browser = await chromium.launch({ headless: true, args: ["--no-sandbox"] });
@@ -102,7 +103,7 @@ export async function writeRasterBrandAssets(
     const folder = resolve(root, "apps/web/public/branding"),
       files: Record<string, string> = {};
     await mkdir(folder, { recursive: true });
-    for (const size of [32, 180, 192, 512]) {
+    for (const size of webpOnly ? [256] : [32, 180, 192, 256, 512]) {
       const svg = renderBrandSvg(size === 180);
       const data = await page.evaluate(
         async ({ svg, size }) => {
@@ -117,7 +118,7 @@ export async function writeRasterBrandAssets(
             const context = canvas.getContext("2d");
             if (!context) throw new Error("PNG image preparation unavailable.");
             context.drawImage(image, 0, 0, size, size);
-            return canvas.toDataURL("image/png").split(",")[1]!;
+            return canvas.toDataURL(size === 256 ? "image/webp" : "image/png", 1).split(",")[1]!;
           } finally {
             URL.revokeObjectURL(url);
           }
@@ -125,7 +126,7 @@ export async function writeRasterBrandAssets(
         { svg, size },
       );
       const bytes = Buffer.from(data, "base64"),
-        name = `melt-icon-${size}.png`;
+        name = size === 256 ? "melt-idle.webp" : `melt-icon-${size}.png`;
       if (size === 32) {
         // ICO directory followed by one natively encoded PNG image.
         const header = Buffer.alloc(22);
@@ -144,13 +145,17 @@ export async function writeRasterBrandAssets(
       await writeFile(resolve(folder, name), bytes);
       files[name] = createHash("sha256").update(bytes).digest("hex");
     }
+    const manifestPath = resolve(root, "apps/web/src/ui/brand/assets/raster-manifest.json");
+    const previous: { files: Record<string, string> } = webpOnly
+      ? JSON.parse(await readFile(manifestPath, "utf8"))
+      : { files: {} };
     await writeFile(
-      resolve(root, "apps/web/src/ui/brand/assets/raster-manifest.json"),
+      manifestPath,
       JSON.stringify(
         {
           generator: "bun scripts/brand-assets.ts --png",
           source: "melt.svg; melt-maskable.svg for Apple Touch",
-          files,
+          files: { ...previous.files, ...files },
         },
         null,
         2,
@@ -161,3 +166,5 @@ export async function writeRasterBrandAssets(
   }
 }
 if (import.meta.main && process.argv.includes("--png")) await writeRasterBrandAssets();
+if (import.meta.main && process.argv.includes("--webp"))
+  await writeRasterBrandAssets(undefined, true);

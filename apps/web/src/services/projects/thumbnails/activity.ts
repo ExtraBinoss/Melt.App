@@ -20,13 +20,13 @@ export class ThumbnailActivity implements ActivityPort {
   private wheelTimer: ReturnType<typeof setTimeout> | undefined;
   private timer: ReturnType<typeof setTimeout> | undefined;
   private readonly listeners = new Set<() => void>();
-  private readonly stopSuspension?: () => void;
+  private stopSuspension?: () => void;
   private readonly presentation: UiPresentationPort;
   private readonly stopPresentation: () => void;
   constructor(
     private readonly quietMs = 600,
     private readonly surface: Window = window,
-    private readonly suspension?: {
+    private suspension?: {
       busy(): boolean;
       optionalBusy?(): boolean;
       subscribe(listener: () => void): () => void;
@@ -185,6 +185,13 @@ export class ThumbnailActivity implements ActivityPort {
     clearTimeout(this.wheelTimer);
     this.quiet();
   };
+  /** Attach canonical editor admission when the library becomes an editor. */
+  setSuspension(suspension: NonNullable<ThumbnailActivity["suspension"]>) {
+    this.stopSuspension?.();
+    this.suspension = suspension;
+    this.stopSuspension = suspension.subscribe(this.notify);
+    this.notify();
+  }
   dispose(): void {
     this.layerIntent = false;
     this.layerUntil = 0;

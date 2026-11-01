@@ -47,16 +47,20 @@ export function MobileNavigation({
   const buttons = useRef(new Map<string, HTMLButtonElement>());
   const selected = items.findIndex((item) => item.value === value),
     stride = useMotionValue(0);
+  const itemKeys = items.map((item) => item.value).join("\0");
   useLayoutEffect(() => {
-    const first = buttons.current.get(items[0]?.value ?? ""),
-      next = buttons.current.get(items[1]?.value ?? "");
+    if (!position) return;
+    const [firstKey, nextKey] = itemKeys.split("\0");
+    const first = buttons.current.get(firstKey ?? ""),
+      next = buttons.current.get(nextKey ?? "");
     if (!first || !next) return;
+    // ResizeObserver supplies the initial measurement after layout. Selection/label
+    // rerenders must not force layout synchronously or rebuild this subscription.
     const measure = () => stride.set(next.offsetLeft - first.offsetLeft);
-    measure();
     const observer = new ResizeObserver(measure);
     observer.observe(first.parentElement!);
     return () => observer.disconnect();
-  }, [items, stride]);
+  }, [itemKeys, position, stride]);
   const offset = useTransform(() => {
     const index = (position ?? fallback).get();
     return Number.isFinite(index) ? (index - selected) * stride.get() : 0;
