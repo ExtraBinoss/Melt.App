@@ -44,8 +44,8 @@ export function useLayerPreview(
       if (!session.snapshot) return false;
       const snapshot = engine.getSnapshot();
       const sameSelection = snapshot.selection === session.snapshot.selection;
-      // An Inspector may intentionally retain its controls across ruler-only metadata.
-      // Its resolver admits only the same immutable editing scope, never changed artwork.
+      // Retained property surfaces may admit paint/ruler metadata through their resolver.
+      // It must preserve the immutable editing scope, never changed artwork or Motion.
       if (
         snapshot.project !== session.snapshot.project &&
         resolvePage?.() &&

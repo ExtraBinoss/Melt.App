@@ -34,6 +34,7 @@ import { MotionField } from "../../properties/motion/MotionField";
 import { MotionValueField } from "../../properties/motion/MotionValueField";
 import { MotionNumberInput } from "../../properties/motion/MotionNumberInput";
 import type { MotionEditTarget } from "../../../state/session/motion-edit";
+import { resolvePageEditingScope } from "../../../state/session/page-editing-scope";
 export function EffectPopover({
   engine,
   page,
@@ -157,7 +158,8 @@ const EffectDetails = memo(function EffectDetails({
         if (isCurrent()) task();
       });
   };
-  const edit = useLayerPreview(engine, page, [layer.id], runCurrent);
+  const resolve = useCallback(() => resolvePageEditingScope(engine, page), [engine, page]);
+  const edit = useLayerPreview(engine, page, [layer.id], runCurrent, false, resolve);
   const cancelEdit = edit.cancel;
   useLayoutEffect(
     () =>

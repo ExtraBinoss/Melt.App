@@ -33,13 +33,13 @@ export function createSearchCommandItems(
   const page =
     snapshot.project.pages.find((item) => item.id === snapshot.pageId) ??
     snapshot.project.pages[0]!;
-  const { selected, editable, hasGroup } = layerSelection(page, snapshot.selection);
+  const { selected, editable, canGroup, canUngroup } = layerSelection(page, snapshot.selection);
   const disabled = {
     motion: page.motion?.mode === "motion" ? undefined : t("motion:requiresMotion"),
     selection: selected.length ? undefined : t("search:noSelection"),
     editable: editable ? undefined : t("search:noSelection"),
-    group: editable && selected.length > 1 ? undefined : t("search:groupSelection"),
-    ungroup: editable && hasGroup ? undefined : t("search:ungroupSelection"),
+    group: canGroup ? undefined : t("search:groupSelection"),
+    ungroup: canUngroup ? undefined : t("search:ungroupSelection"),
     undo: snapshot.canUndo ? undefined : t("search:noUndo"),
     redo: snapshot.canRedo ? undefined : t("search:noRedo"),
   };

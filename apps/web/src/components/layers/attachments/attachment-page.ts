@@ -1,6 +1,7 @@
 import { useCallback, useLayoutEffect, useMemo, useState, useSyncExternalStore } from "react";
 import type { Composition, EnginePort } from "@musart/core";
 import { resolveLayerPage } from "../tree/activation";
+import { samePageEditingScope } from "../../../state/session/page-editing-scope";
 
 export interface AttachmentPagePort {
   readonly projectId: string;
@@ -54,6 +55,17 @@ export type AttachmentPageInput =
   | { page: Composition; pagePort?: never }
   | { page?: Composition; pagePort: AttachmentPagePort };
 
+/** External-store cache, independent from React's render phase. */
+function createAttachmentReader(engine: EnginePort, source: Composition | null) {
+  let previous: Composition | null = null;
+  return () => {
+    const current = source ? resolveLayerPage(engine, source) : null;
+    if (previous && current && samePageEditingScope(previous, current)) return previous;
+    previous = current;
+    return current;
+  };
+}
+
 /** Port reads are admission only. Open drafts remain pinned to their captured immutable page. */
 export function useAttachmentPage(
   engine: EnginePort,
@@ -62,15 +74,16 @@ export function useAttachmentPage(
   open: boolean,
 ) {
   const [captured, setCaptured] = useState<WeakRef<Composition> | null>(null);
-  const source = page ?? (open ? (captured?.deref() ?? null) : null);
+  const candidate = page ?? (open ? (captured?.deref() ?? null) : null);
+  const [retained, setRetained] = useState(candidate);
+  const source =
+    retained && candidate && samePageEditingScope(retained, candidate) ? retained : candidate;
+  if (retained !== source) setRetained(source);
   const subscribe = useCallback(
     (listener: () => void) => (open ? engine.subscribe(listener) : () => {}),
     [engine, open],
   );
-  const read = useCallback(
-    () => (source ? resolveLayerPage(engine, source) : null),
-    [engine, source],
-  );
+  const read = useMemo(() => createAttachmentReader(engine, source), [engine, source]);
   const current = useSyncExternalStore(subscribe, read, read);
   return {
     source,

@@ -20,6 +20,7 @@ test("custom toolbar shortcuts unpin through right-click and keyboard menus, per
   const addPage = page.locator('.dock-pinned [data-dock-command="action:addPage"]');
   const deleteCommand = page.locator('.dock-pinned [data-dock-command="action:delete"]');
   const builtins = page.locator(".toolbar .tool-button");
+  await expect(builtins.first()).toBeVisible();
   const builtinCount = await builtins.count();
   const before = await page.evaluate(() => window.musart!.snapshot());
   await addPage.click({ button: "right" });

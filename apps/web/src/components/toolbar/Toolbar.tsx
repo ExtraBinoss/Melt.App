@@ -20,6 +20,7 @@ import { ShapeToolSlot } from "../assets/ShapeToolSlot";
 import { Separator } from "../ui/separator";
 import { MagicSearch, type MagicSearchProps, type SearchSurface } from "../search/MagicSearch";
 import { PinnedCommands } from "./dock/PinnedCommands";
+import { ToolbarCommand } from "./ToolbarCommand";
 import { useKeybindings } from "../../state/keybindings/use-keybindings";
 import { bindingLabel } from "../search/shortcuts";
 
@@ -44,30 +45,30 @@ function ToolbarContents(surface: SearchSurface) {
       <ToolbarScroll>
         <StaticTools engine={engine} />
         <Separator />
-        <IconButton
+        <ToolbarCommand
+          id="action:importImages"
           label={t("import")}
           shortcut={bindingLabel("action:importImages", bindings)}
-          onClick={() => surface.run("action:importImages")}
-        >
-          <ImagePlus strokeWidth={1.65} />
-        </IconButton>
+          run={surface.run}
+          Icon={ImagePlus}
+        />
         <Separator />
-        <IconButton
+        <ToolbarCommand
+          id="action:undo"
           label={t("undo")}
           shortcut={bindingLabel("action:undo", bindings)}
           disabled={!canUndo}
-          onClick={() => surface.run("action:undo")}
-        >
-          <Undo2 strokeWidth={1.65} />
-        </IconButton>
-        <IconButton
+          run={surface.run}
+          Icon={Undo2}
+        />
+        <ToolbarCommand
+          id="action:redo"
           label={t("redo")}
           shortcut={bindingLabel("action:redo", bindings)}
           disabled={!canRedo}
-          onClick={() => surface.run("action:redo")}
-        >
-          <Redo2 strokeWidth={1.65} />
-        </IconButton>
+          run={surface.run}
+          Icon={Redo2}
+        />
         <PinnedCommands commands={surface.commands} run={surface.run} />
         {surface.trigger}
       </ToolbarScroll>

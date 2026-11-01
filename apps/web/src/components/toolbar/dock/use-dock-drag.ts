@@ -22,8 +22,10 @@ interface Origin {
 export function useDockDrag(ids: readonly string[], commands: readonly SearchItem[]) {
   const store = useStore();
   const scope = JSON.stringify(commands.map((command) => command.id));
+  // Availability is irrelevant to reorder identity; retain handlers when history gates change.
+  const available = useMemo(() => new Set<string>(JSON.parse(scope)), [scope]);
   const session = useMemo(() => new DeferredDragSession<Origin>(), []);
-  const diagnostics = useMemo(createDragDiagnostics, []);
+  const diagnostics = useMemo(() => createDragDiagnostics(), []);
   const source = useSyncExternalStore(session.subscribe, session.read, session.read);
   const anchor = useRef<HTMLElement | null>(null);
   const cancel = useCallback(() => {
@@ -59,25 +61,16 @@ export function useDockDrag(ids: readonly string[], commands: readonly SearchIte
   useEffect(() => {
     cancel();
   }, [ids, scope, cancel]);
-  function current(origin: Origin) {
-    return (
-      origin.ids === ids && origin.ids === store.get(dockCommandsAtom) && origin.scope === scope
-    );
-  }
+  const current = useCallback(
+    (origin: Origin) =>
+      origin.ids === ids && origin.ids === store.get(dockCommandsAtom) && origin.scope === scope,
+    [ids, store, scope],
+  );
   const active = source && current(source) ? source : null;
-  return {
-    ids,
-    dragging: active?.id ?? null,
-    target: active?.target ?? null,
-    anchor,
-    cancel,
-    start(event: DragEvent<HTMLElement>, id: string) {
+  const start = useCallback(
+    (event: DragEvent<HTMLElement>, id: string) => {
       diagnostics.begin({ mode: "dock", input: "native", sourceId: id });
-      if (
-        store.get(dockCommandsAtom) !== ids ||
-        !ids.includes(id) ||
-        !commands.some((command) => command.id === id)
-      ) {
+      if (store.get(dockCommandsAtom) !== ids || !ids.includes(id) || !available.has(id)) {
         event.preventDefault();
         diagnostics.refuse("begin", "sourceRejected", id, event);
         cancel();
@@ -94,7 +87,10 @@ export function useDockDrag(ids: readonly string[], commands: readonly SearchIte
         throw error;
       }
     },
-    over(event: DragEvent<HTMLElement>, id: string) {
+    [store, ids, available, diagnostics, cancel, session, scope],
+  );
+  const over = useCallback(
+    (event: DragEvent<HTMLElement>, id: string) => {
       const origin = session.read();
       if (!origin) return;
       if (!current(origin) || !ids.includes(id)) {
@@ -114,7 +110,10 @@ export function useDockDrag(ids: readonly string[], commands: readonly SearchIte
       if (origin.target?.id !== target?.id || origin.target?.position !== target?.position)
         session.publish({ ...origin, target });
     },
-    overViewport(this: void, event: DragEvent<HTMLElement>) {
+    [session, current, ids, diagnostics, cancel],
+  );
+  const overViewport = useCallback(
+    (event: DragEvent<HTMLElement>) => {
       if (
         session.read()?.target &&
         event.target instanceof Element &&
@@ -124,7 +123,10 @@ export function useDockDrag(ids: readonly string[], commands: readonly SearchIte
         event.dataTransfer.dropEffect = "move";
       }
     },
-    drop(event: DragEvent<HTMLElement>): boolean {
+    [session],
+  );
+  const drop = useCallback(
+    (event: DragEvent<HTMLElement>): boolean => {
       event.preventDefault();
       event.stopPropagation();
       const origin = session.read();
@@ -158,5 +160,19 @@ export function useDockDrag(ids: readonly string[], commands: readonly SearchIte
         });
       });
     },
+    [session, current, diagnostics, cancel, ids, store],
+  );
+  return {
+    ids,
+    dragging: active?.id ?? null,
+    target: active?.target ?? null,
+    anchor,
+    cancel,
+    start,
+    over,
+    overViewport,
+    drop,
   };
 }
+
+export type DockDragHandlers = Pick<ReturnType<typeof useDockDrag>, "start" | "over" | "cancel">;

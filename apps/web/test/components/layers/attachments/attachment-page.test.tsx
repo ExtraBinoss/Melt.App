@@ -1,7 +1,10 @@
 import { Suspense, type ReactNode } from "react";
 import { act, renderHook } from "@testing-library/react";
 import { expect, test } from "vitest";
-import { useAttachmentPagePort } from "../../../../src/components/layers/attachments/attachment-page";
+import {
+  useAttachmentPagePort,
+  useAttachmentPage,
+} from "../../../../src/components/layers/attachments/attachment-page";
 import { setup } from "../../../support/ui";
 
 test("an abandoned wrapper render cannot publish its page into a retained attachment port", () => {
@@ -54,4 +57,47 @@ test("project changes rebind primitive owners and same-ID replacement still requ
   hook.rerender({ page: d.engine.getSnapshot().project.pages[0]! });
   expect(hook.result.current).toBe(replacement);
   expect(replacement.read()).toBe(d.engine.getSnapshot().project.pages[0]);
+});
+
+test("open attachment publication stays local to its editing scope across background metadata", () => {
+  const d = setup();
+  const page = d.engine.getSnapshot().project.pages[0]!;
+  let renders = 0;
+  const hook = renderHook(() => {
+    renders++;
+    return useAttachmentPage(d.engine, page, undefined, true);
+  });
+  const before = renders;
+  act(() => d.engine.execute({ type: "updatePage", patch: { background: "#123456" } }));
+  act(() => d.engine.undo());
+  act(() => d.engine.redo());
+  expect(renders).toBe(before);
+  expect(hook.result.current.current).toBe(page);
+  act(() => expect(hook.result.current.capture()).toBe(d.engine.getSnapshot().project.pages[0]));
+  act(() =>
+    d.engine.execute({ type: "updateLayers", ids: [d.rectangle.id], patch: { opacity: 0.5 } }),
+  );
+  expect(hook.result.current.current).toBeNull();
+  expect(renders).toBeGreaterThan(before);
+  hook.unmount();
+});
+
+test("a parent passing a fresh metadata page still retains the attachment presentation source", () => {
+  const d = setup();
+  const page = d.engine.getSnapshot().project.pages[0]!;
+  const hook = renderHook(
+    ({ incoming }) => useAttachmentPage(d.engine, incoming, undefined, true),
+    {
+      initialProps: { incoming: page },
+    },
+  );
+  act(() => d.engine.execute({ type: "updatePage", patch: { background: "#123456" } }));
+  const current = d.engine.getSnapshot().project.pages[0]!;
+  hook.rerender({ incoming: current });
+  expect(hook.result.current.source).toBe(page);
+  expect(hook.result.current.current).toBe(page);
+  act(() => expect(hook.result.current.capture()).toBe(current));
+  act(() => d.engine.load(d.engine.getSnapshot().project));
+  hook.rerender({ incoming: d.engine.getSnapshot().project.pages[0]! });
+  expect(hook.result.current.source).not.toBe(page);
 });

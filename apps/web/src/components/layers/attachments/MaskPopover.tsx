@@ -19,6 +19,7 @@ import "../messages";
 import { LockedLayerNotice } from "../../properties/locked/LockedLayerNotice";
 import { usePopoverOwner } from "./use-popover-owner";
 import { useLayerPopoverAnchor } from "./use-layer-popover-anchor";
+import { resolvePageEditingScope } from "../../../state/session/page-editing-scope";
 export function MaskPopover({
   engine,
   page,
@@ -134,7 +135,8 @@ function MaskDetails({
         if (isCurrent()) task();
       });
   };
-  const edit = useLayerPreview(engine, page, [layer.id], runCurrent);
+  const resolve = useCallback(() => resolvePageEditingScope(engine, page), [engine, page]);
+  const edit = useLayerPreview(engine, page, [layer.id], runCurrent, false, resolve);
   useLayoutEffect(() => registerDeactivate(edit.cancel), [edit.cancel, registerDeactivate]);
   return (
     <>

@@ -1,20 +1,13 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAtom, useSetAtom, useStore } from "jotai";
 import { DropCue } from "../../layers/drag/DropCue";
 import { useTranslation } from "react-i18next";
-import { PinOff } from "lucide-react";
-import { IconButton } from "../../shared/IconButton";
 import { Separator } from "../../ui/separator";
-import {
-  ContextMenu,
-  ContextMenuContent,
-  ContextMenuItem,
-  ContextMenuTrigger,
-} from "../../ui/context-menu";
 import type { SearchItem } from "../../search/catalog/model";
 import { getSearchIcon } from "../../search/icons";
 import { modifierLabel } from "../../search/shortcuts";
 import { DockCustomizer } from "./DockCustomizer";
+import { PinnedCommand } from "./PinnedCommand";
 import { dockCommandsAtom, initializeDockAtom } from "./preferences";
 import { useDockDrag } from "./use-dock-drag";
 import "./messages";
@@ -52,9 +45,30 @@ export function PinnedCommands({
       group.current
     )?.focus();
   }, [ids]);
-  function drop(event: Parameters<typeof drag.drop>[0]) {
-    if (drag.drop(event)) setAnnouncement(t("dock:reordered"));
-  }
+  const { cancel, drop: finishDrop, start, over } = drag;
+  const drop = useCallback(
+    (event: Parameters<typeof finishDrop>[0]) => {
+      if (finishDrop(event)) setAnnouncement(t("dock:reordered"));
+    },
+    [finishDrop, t],
+  );
+  const changePins = useCallback(
+    (value: string[]) => {
+      cancel();
+      setIds(value);
+    },
+    [cancel, setIds],
+  );
+  const unpin = useCallback(
+    (id: string, label: string) => {
+      cancel();
+      const current = store.get(dockCommandsAtom);
+      focusAfterUnpin.current = current.indexOf(id);
+      setIds(current.filter((value) => value !== id));
+      setAnnouncement(t("dock:unpinned", { name: label }));
+    },
+    [cancel, store, setIds, t],
+  );
   return (
     <>
       {drag.ids.length > 0 && <Separator />}
@@ -71,68 +85,25 @@ export function PinnedCommands({
         {ids.map((id) => {
           const command = catalog.get(id);
           if (!command) return null;
-          const Icon = getSearchIcon(command);
           return (
-            <ContextMenu key={id} onOpenChange={(open) => open && drag.cancel()}>
-              <ContextMenuTrigger asChild>
-                <div
-                  data-dock-command={id}
-                  data-dragging={drag.dragging === id || undefined}
-                  data-dock-drop-position={
-                    drag.target?.id === id ? drag.target.position : undefined
-                  }
-                  tabIndex={command.disabled ? 0 : -1}
-                  role="group"
-                  aria-label={t("dock:options", { name: command.label })}
-                  aria-haspopup="menu"
-                  draggable
-                  onDragStartCapture={(event) => drag.start(event, id)}
-                  onDragOver={(event) => drag.over(event, id)}
-                  onDrop={drop}
-                  onDragEndCapture={drag.cancel}
-                  onKeyDown={(event) => {
-                    if (event.key !== "ContextMenu" && !(event.shiftKey && event.key === "F10"))
-                      return;
-                    event.preventDefault();
-                    event.stopPropagation();
-                    const bounds = event.currentTarget.getBoundingClientRect();
-                    event.currentTarget.dispatchEvent(
-                      new MouseEvent("contextmenu", {
-                        bubbles: true,
-                        cancelable: true,
-                        clientX: bounds.right,
-                        clientY: bounds.top + bounds.height / 2,
-                      }),
-                    );
-                  }}
-                >
-                  <IconButton
-                    label={command.label}
-                    disabled={Boolean(command.disabled)}
-                    shortcut={command.shortcut
-                      ?.map((key) => (key === "Mod" ? modifierLabel() : key))
-                      .join("+")}
-                    onClick={() => run(id)}
-                  >
-                    <Icon strokeWidth={1.65} />
-                  </IconButton>
-                </div>
-              </ContextMenuTrigger>
-              <ContextMenuContent className="floating-panel">
-                <ContextMenuItem
-                  onSelect={() => {
-                    drag.cancel();
-                    const current = store.get(dockCommandsAtom);
-                    focusAfterUnpin.current = current.indexOf(id);
-                    setIds(current.filter((value) => value !== id));
-                    setAnnouncement(t("dock:unpinned", { name: command.label }));
-                  }}
-                >
-                  <PinOff size={14} />
-                  {t("dock:unpin", { name: command.label })}
-                </ContextMenuItem>
-              </ContextMenuContent>
-            </ContextMenu>
+            <PinnedCommand
+              key={id}
+              id={id}
+              label={command.label}
+              disabled={Boolean(command.disabled)}
+              shortcut={command.shortcut
+                ?.map((key) => (key === "Mod" ? modifierLabel() : key))
+                .join("+")}
+              Icon={getSearchIcon(command)}
+              dragging={drag.dragging === id}
+              position={drag.target?.id === id ? drag.target.position : undefined}
+              start={start}
+              over={over}
+              cancel={cancel}
+              drop={drop}
+              run={run}
+              unpin={unpin}
+            />
           );
         })}
       </div>
@@ -140,14 +111,7 @@ export function PinnedCommands({
         <DropCue key={drag.target.id} anchor={drag.anchor} position={drag.target.position} />
       )}
       <Separator />
-      <DockCustomizer
-        ids={ids}
-        commands={commands}
-        onChange={(value) => {
-          drag.cancel();
-          setIds(value);
-        }}
-      />
+      <DockCustomizer ids={ids} commands={commands} onChange={changePins} />
       {announcement && (
         <span className="sr-only" role="status">
           {announcement}

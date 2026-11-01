@@ -1,19 +1,29 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import { ImagePlus, Upload, Trash2 } from "lucide-react";
-import { getEffectDefinition, type Effect, type EnginePort, type ImageAsset } from "@musart/core";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { ImagePlus } from "lucide-react";
+import {
+  createLayerGeometryIndex,
+  getEffectDefinition,
+  type Effect,
+  type EnginePort,
+  type ImageAsset,
+  type SessionSnapshot,
+} from "@musart/core";
 import { useTranslation } from "react-i18next";
 import { Popover, PopoverContent, PopoverTrigger } from "../../../ui/popover";
 import { Button } from "../../../ui/button";
-import { ScrollShadow } from "../../../shared/scroll/ScrollShadow";
-import { SegmentedTabs } from "../../../shared/segmented/SegmentedTabs";
 import { TextureStore, type TextureHeader } from "../../../../services/textures/store";
-import {
-  assignEffectImage,
-  BUILTIN_TEXTURES,
-  loadBuiltinTexture,
-} from "../../../../services/textures/library";
+import { assignEffectImage, loadBuiltinTexture } from "../../../../services/textures/library";
+import { TexturePickerContent } from "./TexturePickerContent";
 import "../library-messages";
 import "./texture-picker.css";
+interface TextureOpening {
+  controller: AbortController;
+  engine: EnginePort;
+  snapshot: SessionSnapshot;
+  layerId: string;
+  effect: Effect;
+  inputKey: string;
+}
 export function EffectImageInputs({
   engine,
   layerId,
@@ -61,52 +71,150 @@ function TextureInput({
     [items, setItems] = useState<TextureHeader[]>([]),
     [busy, setBusy] = useState(false),
     [error, setError] = useState("");
-  const session = useRef<AbortController | null>(null),
-    file = useRef<HTMLInputElement>(null);
-  useEffect(() => {
-    const owned = getStore();
-    return () => {
-      session.current?.abort();
-      owned.dispose();
-      if (store.current === owned) store.current = null;
-    };
-  }, [getStore]);
-  function changeOpen(next: boolean) {
-    session.current?.abort();
-    session.current = next ? new AbortController() : null;
-    setOpen(next);
+  const session = useRef<TextureOpening | null>(null);
+  const latest = useRef({ engine, layerId, effect, inputKey, disabled });
+  const close = useCallback(() => {
+    session.current?.controller.abort();
+    session.current = null;
+    setOpen(false);
     setBusy(false);
     setError("");
+  }, []);
+  const current = useCallback((opening: TextureOpening | null) => {
+    const props = latest.current;
+    if (
+      !opening ||
+      session.current !== opening ||
+      opening.controller.signal.aborted ||
+      props.disabled ||
+      props.engine !== opening.engine ||
+      props.layerId !== opening.layerId ||
+      props.effect !== opening.effect ||
+      props.inputKey !== opening.inputKey
+    )
+      return false;
+    const snapshot = opening.engine.getSnapshot();
+    const page = snapshot.project.pages.find((item) => item.id === snapshot.pageId);
+    const origin = opening.snapshot.project.pages.find(
+      (item) => item.id === opening.snapshot.pageId,
+    );
+    return Boolean(
+      page &&
+      snapshot.project.id === opening.snapshot.project.id &&
+      snapshot.pageId === opening.snapshot.pageId &&
+      page.layers === origin?.layers &&
+      snapshot.selection.length === opening.snapshot.selection.length &&
+      snapshot.selection.every((id, index) => id === opening.snapshot.selection[index]) &&
+      page.layers.some(
+        (layer) =>
+          layer.id === opening.layerId && layer.effects.some((item) => item === opening.effect),
+      ) &&
+      !createLayerGeometryIndex(page).isLocked(opening.layerId),
+    );
+  }, []);
+  useLayoutEffect(() => {
+    latest.current = { engine, layerId, effect, inputKey, disabled };
+    if (session.current && !current(session.current)) close();
+  }, [engine, layerId, effect, inputKey, disabled, current, close]);
+  useLayoutEffect(() => {
+    return engine?.subscribe(() => {
+      if (session.current && !current(session.current)) close();
+    });
+  }, [engine, current, close]);
+  useEffect(() => {
+    return () => {
+      session.current?.controller.abort();
+      session.current = null;
+      store.current?.dispose();
+      store.current = null;
+    };
+  }, []);
+  function changeOpen(next: boolean) {
+    close();
     if (next) {
-      const controller = session.current!;
+      if (!engine || !layerId || disabled) return;
+      const opening = {
+        controller: new AbortController(),
+        engine,
+        snapshot: engine.getSnapshot(),
+        layerId,
+        effect,
+        inputKey,
+      };
+      session.current = opening;
+      if (!current(opening)) return close();
+      setOpen(true);
       void getStore()
         .list()
         .then(
           (value) => {
-            if (!controller.signal.aborted) setItems(value);
+            if (current(opening)) setItems(value);
           },
           () => {
-            if (!controller.signal.aborted) setError(t("loadError"));
+            if (current(opening)) setError(t("loadError"));
           },
         );
     }
   }
   async function choose(load: (signal: AbortSignal) => Promise<ImageAsset>) {
-    const controller = session.current;
-    if (!engine || !layerId || !controller || busy) return;
-    const before = engine.getSnapshot();
+    const opening = session.current;
+    if (!opening || !current(opening) || busy) return;
+    const { controller } = opening;
+    const before = opening.engine.getSnapshot();
     setBusy(true);
     setError("");
     try {
       const asset = await load(controller.signal);
       controller.signal.throwIfAborted();
-      assignEffectImage(engine, before, layerId, effect.id, inputKey, asset);
+      if (!current(opening)) return;
+      assignEffectImage(
+        opening.engine,
+        before,
+        opening.layerId,
+        opening.effect.id,
+        opening.inputKey,
+        asset,
+      );
       changeOpen(false);
     } catch (reason) {
       if (!controller.signal.aborted)
         setError(t(reason instanceof Error && reason.message === "stale" ? "stale" : "saveError"));
     } finally {
       if (!controller.signal.aborted) setBusy(false);
+    }
+  }
+  function remove(id: string) {
+    const opening = session.current;
+    if (!opening || !current(opening) || busy) return;
+    setBusy(true);
+    void getStore()
+      .delete(id)
+      .then(
+        () => {
+          if (current(opening)) setItems((items) => items.filter((item) => item.id !== id));
+        },
+        () => {
+          if (current(opening)) setError(t("saveError"));
+        },
+      )
+      .finally(() => {
+        if (current(opening)) setBusy(false);
+      });
+  }
+  function clear() {
+    const opening = session.current;
+    if (!opening || !current(opening) || busy) return;
+    try {
+      assignEffectImage(
+        opening.engine,
+        opening.engine.getSnapshot(),
+        opening.layerId,
+        opening.effect.id,
+        opening.inputKey,
+      );
+      changeOpen(false);
+    } catch {
+      setError(t("stale"));
     }
   }
   const selected = effect.inputs?.[inputKey];
@@ -129,141 +237,29 @@ function TextureInput({
           align="end"
           aria-label={t("library")}
         >
-          <div className="texture-picker-heading">
-            <strong>{t("library")}</strong>
-            <Button
-              variant="ghost"
-              size="icon-xs"
-              aria-label={t("import")}
-              disabled={busy}
-              onClick={() => file.current?.click()}
-            >
-              <Upload size={14} />
-            </Button>
-          </div>
-          <input
-            ref={file}
-            type="file"
-            hidden
-            accept="image/png,image/jpeg,image/webp"
-            onChange={(event) => {
-              const original = event.currentTarget.files?.[0];
-              event.currentTarget.value = "";
-              if (original)
-                void choose(async (signal) => {
-                  const owned = getStore();
-                  const header = await owned.import(original, signal);
-                  signal.throwIfAborted();
-                  return owned.get(header.id);
-                });
+          <TexturePickerContent
+            tab={tab}
+            items={items}
+            selected={selected}
+            busy={busy}
+            disabled={!open || disabled || busy}
+            error={error}
+            onTabChange={(next) => {
+              if (current(session.current) && !busy) setTab(next);
             }}
+            onImport={(original) => {
+              void choose(async (signal) => {
+                const owned = getStore();
+                const header = await owned.import(original, signal);
+                signal.throwIfAborted();
+                return owned.get(header.id);
+              });
+            }}
+            onBuiltin={(id) => void choose((signal) => loadBuiltinTexture(id, signal))}
+            onSaved={(id) => void choose(() => getStore().get(id))}
+            onDelete={remove}
+            onClear={clear}
           />
-          <SegmentedTabs
-            mode="choice"
-            size="compact"
-            value={tab}
-            label={t("library")}
-            onValueChange={setTab}
-            items={[
-              { value: "base", label: t("base") },
-              { value: "saved", label: t("saved") },
-            ]}
-          />
-          {error && (
-            <p role="alert" className="texture-picker-error">
-              {error}
-            </p>
-          )}
-          <ScrollShadow>
-            <div className="texture-picker-scroll">
-              <div className="texture-picker-grid" aria-busy={busy}>
-                {tab === "base"
-                  ? BUILTIN_TEXTURES.map((item) => (
-                      <button
-                        type="button"
-                        key={item.id}
-                        aria-pressed={selected === `texture-${item.sha256}`}
-                        disabled={busy}
-                        className="texture-picker-tile"
-                        onClick={() => void choose((signal) => loadBuiltinTexture(item.id, signal))}
-                      >
-                        <img
-                          loading="lazy"
-                          src={`${import.meta.env.BASE_URL}textures/${item.id}.webp`}
-                          alt=""
-                        />
-                        <span>{t(`textures.${item.id}`)}</span>
-                      </button>
-                    ))
-                  : items.map((item) => (
-                      <div key={item.id} className="texture-picker-saved">
-                        <button
-                          type="button"
-                          disabled={busy}
-                          aria-pressed={selected === item.id}
-                          className="texture-picker-tile"
-                          onClick={() => void choose(() => getStore().get(item.id))}
-                        >
-                          <img loading="lazy" src={item.preview} alt="" />
-                          <span>{item.name}</span>
-                        </button>
-                        <Button
-                          variant="ghost"
-                          size="icon-xs"
-                          disabled={busy}
-                          aria-label={t("delete", { name: item.name })}
-                          onClick={() => {
-                            const controller = session.current;
-                            setBusy(true);
-                            void getStore()
-                              .delete(item.id)
-                              .then(
-                                () => {
-                                  if (!controller?.signal.aborted)
-                                    setItems((current) =>
-                                      current.filter((value) => value.id !== item.id),
-                                    );
-                                },
-                                () => {
-                                  if (!controller?.signal.aborted) setError(t("saveError"));
-                                },
-                              )
-                              .finally(() => {
-                                if (!controller?.signal.aborted) setBusy(false);
-                              });
-                          }}
-                        >
-                          <Trash2 size={12} />
-                        </Button>
-                      </div>
-                    ))}
-              </div>
-              {tab === "saved" && !items.length && (
-                <Button variant="outline" disabled={busy} onClick={() => file.current?.click()}>
-                  <Upload size={14} />
-                  {t("import")}
-                </Button>
-              )}
-            </div>
-          </ScrollShadow>
-          {selected && (
-            <Button
-              variant="ghost"
-              disabled={busy}
-              onClick={() => {
-                if (engine && layerId) {
-                  try {
-                    assignEffectImage(engine, engine.getSnapshot(), layerId, effect.id, inputKey);
-                    changeOpen(false);
-                  } catch {
-                    setError(t("stale"));
-                  }
-                }
-              }}
-            >
-              {t("clear")}
-            </Button>
-          )}
         </PopoverContent>
       </Popover>
     </div>

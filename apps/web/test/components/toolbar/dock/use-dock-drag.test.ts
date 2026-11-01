@@ -55,6 +55,20 @@ test("canonical order stays stationary until drop and destinations follow the ac
   act(() => expect(d.result.current.drop(d.event(2))).toBe(true));
   expect(d.store.get(dockCommandsAtom)).toEqual([d.ids[1], d.ids[2], d.ids[0]]);
 });
+test("history availability preserves native drag handlers and a held reorder", () => {
+  const d = fixture(),
+    initial = d.result.current;
+  act(() => d.result.current.start(d.event(0), d.ids[0]!));
+  d.engine.execute({ type: "updatePage", patch: { background: "#123456" } });
+  d.rerender({ items: createSearchCommandItems(d.engine.getSnapshot(), (key) => key) });
+  expect(d.result.current.start).toBe(initial.start);
+  expect(d.result.current.over).toBe(initial.over);
+  expect(d.result.current.drop).toBe(initial.drop);
+  expect(d.result.current.dragging).toBe(d.ids[0]);
+  act(() => d.result.current.over(d.event(1), d.ids[1]!));
+  act(() => expect(d.result.current.drop(d.event(1))).toBe(true));
+  expect(d.store.get(dockCommandsAtom)).toEqual([d.ids[1], d.ids[0], d.ids[2]]);
+});
 test("no-op/foreign/cancelled drops do not write and replacing preferences invalidates held drags", () => {
   const d = fixture(),
     set = vi.spyOn(d.store, "set");

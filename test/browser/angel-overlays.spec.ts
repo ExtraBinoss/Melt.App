@@ -134,6 +134,29 @@ test("Angel playback retains local select sizing, native choice and inspector fo
   const inspector = page.locator('.layer-attachment-popover[data-state="open"]');
   await expect(inspector).toBeFocused();
   await expect(page.getByRole("button", { name: "Pause", exact: true })).toBeVisible();
+  // An unrelated publication must neither retire this editor nor stale its next input.
+  await page.evaluate(() =>
+    window.musart!.execute({ type: "updatePage", patch: { background: "#242424" } }),
+  );
+  await expect(inspector).toBeVisible();
+  const opacity = inspector.getByRole("textbox", { name: "Opacity", exact: true });
+  await opacity.fill("42");
+  await opacity.press("Tab");
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () =>
+          window
+            .musart!.snapshot()
+            .project.pages[0]!.layers.flatMap((layer) => layer.effects)
+            .find((effect) => effect.type === "window-trails")?.opacity,
+      ),
+    )
+    .toBe(0.42);
+  await page.evaluate(() => window.musart!.undo());
+  expect(await page.evaluate(() => window.musart!.snapshot().project.pages[0]!.background)).toBe(
+    "#242424",
+  );
   await page.keyboard.press("Escape");
   await expect(inspector).toHaveCount(0);
   expect(errors).toEqual([]);

@@ -274,3 +274,28 @@ test("empty layer controls keep their cached menu owner through background edits
   fireEvent.click(option!);
   expect(d.engine.getSnapshot().project).toBe(before);
 });
+
+test("selected compositing controls retain their render owner across paint metadata and edit the current page", () => {
+  const previous = location.href;
+  history.replaceState(null, "", "?automation=1");
+  try {
+    const d = fixture("single");
+    const group = screen.getByRole("group", { name: "Composition des calques" });
+    const renders = group.getAttribute("data-react-renders");
+    expect(Number(renders)).toBeGreaterThan(0);
+    act(() => d.engine.execute({ type: "updatePage", patch: { background: "#123456" } }));
+    act(() => d.engine.undo());
+    act(() => d.engine.redo());
+    expect(group).toHaveAttribute("data-react-renders", renders);
+    const field = screen.getByRole("textbox", { name: "Opacité" });
+    fireEvent.focus(field);
+    fireEvent.change(field, { target: { value: "42" } });
+    fireEvent.blur(field);
+    expect(d.engine.getSnapshot().project.pages[0]!.layers[0]!.opacity).toBe(0.42);
+    act(() => d.engine.undo());
+    expect(d.engine.getSnapshot().project.pages[0]!.layers[0]!.opacity).toBe(1);
+    expect(d.engine.getSnapshot().project.pages[0]!.background).toBe("#123456");
+  } finally {
+    history.replaceState(null, "", previous);
+  }
+});

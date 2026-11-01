@@ -18,9 +18,11 @@ test("indexes all real actions, effects and every page/layer with localized labe
   const items = createSearchItems(d.engine.getSnapshot(), t);
   expect(new Set(items.map((item) => item.id)).size).toBe(items.length);
   expect(items.filter((item) => item.target.kind === "effect")).toHaveLength(
-    Object.values(EFFECT_CATALOG).filter((effect) => !effect.source).length,
+    Object.values(EFFECT_CATALOG).filter((effect) => !effect.source && !effect.retired).length,
   );
-  for (const definition of Object.values(EFFECT_CATALOG).filter((effect) => !effect.source)) {
+  for (const definition of Object.values(EFFECT_CATALOG).filter(
+    (effect) => !effect.source && !effect.retired,
+  )) {
     const label = t(definition.nameKey);
     expect(label).not.toBe(definition.nameKey);
     expect(items.find((item) => item.id === `effect:${definition.type}`)).toMatchObject({
@@ -28,6 +30,8 @@ test("indexes all real actions, effects and every page/layer with localized labe
       target: { kind: "effect", effect: definition.type },
     });
   }
+  for (const definition of Object.values(EFFECT_CATALOG).filter((effect) => effect.retired))
+    expect(items.find((item) => item.id === `effect:${definition.type}`)).toBeUndefined();
   expect(items.filter((item) => item.category === "layers")).toHaveLength(4);
   expect(items.find((item) => item.label === "Légende")).toMatchObject({
     detail: "Texte · Story",

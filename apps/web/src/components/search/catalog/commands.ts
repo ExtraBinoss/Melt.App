@@ -1,4 +1,4 @@
-import type { SessionSnapshot } from "@musart/core";
+import { isPublishedComposition, type Composition, type SessionSnapshot } from "@musart/core";
 import type { BindingSnapshot } from "../../../state/keybindings/model";
 import { layerSelection } from "../../layers/menu/selection";
 import { ACTIONS, type ActionDefinition } from "./definitions";
@@ -16,6 +16,10 @@ export class SearchCommands {
   private locale = "";
   private motionHint = "";
   private base: SearchItem[] = [];
+  private enabled: SearchItem[] = [];
+  private selectionPage: Composition | null = null;
+  private selection: readonly string[] | null = null;
+  private selectionState: ReturnType<typeof layerSelection> | null = null;
   private readonly states = new Map<string, SearchItem[]>();
   read(
     snapshot: SessionSnapshot,
@@ -29,6 +33,11 @@ export class SearchCommands {
         { ...snapshot, selection: EMPTY_SELECTION, canUndo: false, canRedo: false },
         t,
         bindings,
+      ).map((item) =>
+        gates.get(item.id) === "motion" ? { ...item, disabled: this.motionHint } : item,
+      );
+      this.enabled = this.base.map((item) =>
+        item.disabled === undefined ? item : { ...item, disabled: undefined },
       );
       this.translate = t;
       this.bindings = bindings;
@@ -38,24 +47,35 @@ export class SearchCommands {
     const page =
       snapshot.project.pages.find((page) => page.id === snapshot.pageId) ??
       snapshot.project.pages[0]!;
-    const state = layerSelection(page, snapshot.selection);
+    // Metadata/history publications reuse artwork. Spatial ungroup also consumes motion tracks.
+    if (
+      !this.selectionState ||
+      !isPublishedComposition(page) ||
+      !Object.isFrozen(snapshot.selection) ||
+      this.selectionPage?.layers !== page.layers ||
+      this.selectionPage?.motion !== page.motion ||
+      this.selection !== snapshot.selection
+    ) {
+      this.selectionState = layerSelection(page, snapshot.selection);
+      this.selectionPage = page;
+      this.selection = snapshot.selection;
+    }
+    const state = this.selectionState;
     const allowed: Record<Gate, boolean> = {
       motion: page.motion?.mode === "motion",
       selection: state.selected.length > 0,
       editable: state.editable,
-      group: state.editable && state.selected.length > 1,
-      ungroup: state.editable && state.hasGroup,
+      group: state.canGroup,
+      ungroup: state.canUngroup,
       undo: snapshot.canUndo,
       redo: snapshot.canRedo,
     };
-    const key = JSON.stringify([snapshot.pageId, ...Object.values(allowed)]);
+    const key = JSON.stringify(Object.values(allowed));
     let rows = this.states.get(key);
     if (!rows)
-      rows = this.base.map((item) => {
+      rows = this.base.map((item, index) => {
         const gate = item.target.kind === "effect" ? "editable" : gates.get(item.id);
-        if (gate === "motion")
-          return { ...item, disabled: allowed.motion ? undefined : this.motionHint };
-        return gate && allowed[gate] ? { ...item, disabled: undefined } : item;
+        return gate && allowed[gate] ? this.enabled[index]! : item;
       });
     this.states.delete(key);
     this.states.set(key, rows);
