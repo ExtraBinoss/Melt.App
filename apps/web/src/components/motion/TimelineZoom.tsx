@@ -3,6 +3,7 @@ import { useMemo } from "react";
 import { Slider } from "../ui/slider";
 import { Kbd, KbdGroup } from "../ui/kbd";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
+import { modifierLabel } from "../search/shortcuts";
 
 export function TimelineZoom({
   value,
@@ -22,7 +23,7 @@ export function TimelineZoom({
       <TooltipContent side="top" className="motion-control-tooltip">
         <span>{t("zoom")}</span>
         <KbdGroup>
-          <Kbd>Ctrl / ⌘</Kbd>
+          <Kbd>{modifierLabel()}</Kbd>
           <Kbd>{t("wheel")}</Kbd>
         </KbdGroup>
       </TooltipContent>
