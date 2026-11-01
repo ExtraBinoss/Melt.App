@@ -1,5 +1,5 @@
 import { AttachmentTooltips } from "./attachments/AttachmentTooltips";
-import { memo, useEffect, useMemo, useRef, type ComponentProps } from "react";
+import { memo, useEffect, useMemo, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import type { Composition, EnginePort, Layer, Project } from "@musart/core";
 import type { EditorServices } from "../../state/contracts";
@@ -11,7 +11,6 @@ import { LayerTree } from "./tree/LayerTree";
 import { useRenderMetrics } from "../../state/session/render-metrics";
 import { attachmentSelection } from "../../state/selection/attachments";
 import { useAttachmentSelection } from "../../state/selection/use-attachment-selection";
-import { useAttachmentPresentation } from "../shared/use-attachment-presentation";
 import "./messages";
 const EMPTY_SELECTION: readonly string[] = Object.freeze([]);
 export function flattenLayers(layers: Layer[], parentId: string | null = null): Layer[] {
@@ -67,7 +66,7 @@ export const LayersPanel = memo(function LayersPanel({
   const headerActions = (
     <>
       <span className="small-count">{layerCount}</span>
-      <FooterPresentation {...footerProps} />
+      <LayerFooter {...footerProps} />
     </>
   );
   return (
@@ -104,11 +103,4 @@ export const LayersPanel = memo(function LayersPanel({
       />
     </section>
   );
-});
-
-const FooterPresentation = memo(function FooterPresentation(
-  props: ComponentProps<typeof LayerFooter>,
-) {
-  const shown = useAttachmentPresentation(props);
-  return <LayerFooter {...shown} />;
 });

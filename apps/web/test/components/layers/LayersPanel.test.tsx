@@ -22,7 +22,7 @@ function renderLayers() {
   data.mount(<Live />);
   return data;
 }
-test("footer availability defers while row selection and attachment highlighting publish immediately", () => {
+test("footer availability publishes with row selection and attachment highlighting", () => {
   const previousURL = location.href;
   history.replaceState({}, "", "/?automation=1");
   const d = renderLayers(),
@@ -54,7 +54,8 @@ test("footer availability defers while row selection and attachment highlighting
     });
     expect(add).toBeDisabled();
     act(() => d.engine.select([d.rectangle.id]));
-    expect(observed[0]).toEqual({ renders: initial, rowSelected: "true", disabled: true });
+    expect(observed[0]).toMatchObject({ rowSelected: "true", disabled: false });
+    expect(observed[0]!.renders).toBeGreaterThan(initial);
     expect(add).toBeEnabled();
     expect(Number(footer.dataset.reactRenders)).toBeGreaterThan(initial);
     const enabledRenders = Number(footer.dataset.reactRenders);
@@ -68,7 +69,8 @@ test("footer availability defers while row selection and attachment highlighting
         effectId: effect.id,
       });
     });
-    expect(observed[0]).toEqual({ renders: enabledRenders, rowSelected: "false", disabled: false });
+    expect(observed[0]).toMatchObject({ rowSelected: "false", disabled: false });
+    expect(observed[0]!.renders).toBeGreaterThan(enabledRenders);
     expect(document.querySelector(`[data-attachment-effect-id="${effect.id}"]`)).toHaveAttribute(
       "aria-pressed",
       "true",
