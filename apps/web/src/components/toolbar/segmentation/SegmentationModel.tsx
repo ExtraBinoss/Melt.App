@@ -4,7 +4,7 @@ import { Check, Download, Trash2, X } from "lucide-react";
 import { Progress } from "radix-ui";
 import type { EditorServices } from "../../../state/contracts";
 import type { LocalModelPort } from "../../../services/selection/model/contract";
-import { MODEL_BYTES } from "../../../services/selection/model/manifest";
+import { MODEL_BYTES, MODEL_NAME } from "../../../services/selection/model/manifest";
 import type { TaskRunner } from "../../projects/ProjectDialog";
 import { Button } from "../../ui/button";
 import { Throbber } from "../../ui/throbber/Throbber";
@@ -26,7 +26,7 @@ export function SegmentationModel({
   );
 }
 function ManagedModel({ model, onTask }: { model: LocalModelPort; onTask: TaskRunner }) {
-  const { t, i18n } = useTranslation();
+  const { t, i18n } = useTranslation(["translation", "localModel"]);
   const state = useSyncExternalStore(model.subscribe, model.read, model.read),
     [error, setError] = useState("");
   const number = new Intl.NumberFormat(i18n.language, { maximumFractionDigits: 1 });
@@ -48,7 +48,7 @@ function ManagedModel({ model, onTask }: { model: LocalModelPort; onTask: TaskRu
   return (
     <div className="local-model" aria-live="polite">
       <div className="local-model-summary">
-        <strong>SlimSAM</strong>
+        <strong>{MODEL_NAME}</strong>
         <span>{mb(MODEL_BYTES)}</span>
       </div>
       {busy ? (

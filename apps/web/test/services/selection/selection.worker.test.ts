@@ -1,3 +1,4 @@
+import { ENCODER_FILE } from "../../../src/services/selection/model/manifest";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   processSelection,
@@ -53,8 +54,8 @@ describe("selection worker protocol", () => {
     const post = vi.fn();
     vi.stubGlobal("postMessage", post);
     sam.prepareSam.mockImplementationOnce(async (progress) => {
-      progress({ file: "vision_encoder.onnx", status: "progress", loaded: 100 });
-      progress({ file: "vision_encoder.onnx", status: "done" });
+      progress({ file: ENCODER_FILE, status: "progress", loaded: 100 });
+      progress({ file: ENCODER_FILE, status: "done" });
     });
     await handleSelection({ data: { id: 21, type: "prepare" } } as MessageEvent);
     expect(post).toHaveBeenCalledWith({

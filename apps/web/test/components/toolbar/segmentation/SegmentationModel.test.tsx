@@ -2,7 +2,7 @@ import { act, fireEvent, screen, waitFor } from "@testing-library/react";
 import { expect, test, vi } from "vitest";
 import { SegmentationModel } from "../../../../src/components/toolbar/segmentation/SegmentationModel";
 import { LocalModelManager } from "../../../../src/services/selection/model/manager";
-import { MODEL_BYTES } from "../../../../src/services/selection/model/manifest";
+import { MODEL_BYTES, ENCODER_FILE } from "../../../../src/services/selection/model/manifest";
 import { setup } from "../../../support/ui";
 test("shows real byte/percentage progress, cancellation and cached-model removal without document changes", async () => {
   let cached = { available: true, bytes: MODEL_BYTES, files: 4, supported: true };
@@ -35,10 +35,10 @@ test("shows real byte/percentage progress, cancellation and cached-model removal
     "0",
   );
   act(() => {
-    model.note({ file: "vision_encoder.onnx", status: "progress", loaded: 10_000_000 });
+    model.note({ file: ENCODER_FILE, status: "progress", loaded: 30_000_000 });
   });
   expect(Number(screen.getByRole("progressbar").getAttribute("aria-valuenow"))).toBeGreaterThan(25);
-  expect(screen.getByText(/10 Mo/)).toBeVisible();
+  expect(screen.getByText(/30 Mo/)).toBeVisible();
   await act(async () => resolve());
   await waitFor(() => expect(screen.getByRole("button", { name: "Modèle prêt" })).toBeDisabled());
   fireEvent.click(screen.getByRole("button", { name: "Supprimer le modèle téléchargé" }));

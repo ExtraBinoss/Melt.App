@@ -2,7 +2,7 @@ import i18n from "i18next";
 import { brand } from "../../ui/brand/config";
 
 type FeatureMessages = Record<string, Record<string, unknown>>;
-const pending: [string, FeatureMessages][] = [];
+const pending = new Map<string, FeatureMessages>();
 let listening = false;
 
 function brandValues(value: unknown): unknown {
@@ -36,19 +36,20 @@ function install(namespace: string, messages: FeatureMessages) {
 }
 function flush() {
   for (const [namespace, messages] of pending) install(namespace, messages);
-  pending.length = 0;
-  listening = false;
-  i18n.off("initialized", flush);
 }
 
 /** Feature imports own their resources; every locale shares the same app preference. */
 export function registerFeatureTranslations(namespace: string, messages: FeatureMessages): void {
-  if (i18n.isInitialized) install(namespace, messages);
-  else {
-    pending.push([namespace, messages]);
-    if (!listening) {
-      listening = true;
-      i18n.on("initialized", flush);
-    }
+  // Reinitializing the shared i18next instance (including dev HMR) replaces its
+  // resource store. Retain feature registrations so their labels remain available.
+  const previous = pending.get(namespace) ?? {};
+  const merged = { ...previous };
+  for (const [language, resource] of Object.entries(messages))
+    merged[language] = { ...previous[language], ...resource };
+  pending.set(namespace, merged);
+  if (!listening) {
+    listening = true;
+    i18n.on("initialized", flush);
   }
+  if (i18n.isInitialized) install(namespace, messages);
 }

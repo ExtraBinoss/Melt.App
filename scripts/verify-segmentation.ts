@@ -1,6 +1,7 @@
 import { chromium } from "@playwright/test";
 import { mkdir, writeFile } from "node:fs/promises";
 import { performance } from "node:perf_hooks";
+import { MODEL_ID, MODEL_REVISION } from "../apps/web/src/services/selection/model/manifest";
 
 const baseURL = process.env.MUSART_BASE_URL ?? "http://127.0.0.1:6100";
 const imageURL =
@@ -9,8 +10,8 @@ const started = performance.now();
 const report: Record<string, unknown> = {
   checkedAt: new Date().toISOString(),
   baseURL,
-  model: "Xenova/slimsam-77-uniform",
-  revision: "5850ab45f587c112167512ffef949107115e26a0",
+  model: MODEL_ID,
+  revision: MODEL_REVISION,
   imageSource: imageURL,
   notes: [
     "Real production SAM module and real pinned ONNX weights. No model/inference mocks.",
@@ -202,11 +203,11 @@ try {
       blocked++;
       return route.abort("internetdisconnected");
     });
-    const wasm = await run("wasm-fresh-worker-remote-network-blocked", true);
+    const wasm = await run("webgpu-fresh-worker-remote-network-blocked", false);
     report.blockedRemoteRequests = blocked;
     if (!wasm.ok)
       throw new Error(
-        `Cached WASM inference failed with remote network blocked: ${JSON.stringify(wasm.error)}`,
+        `Cached WebGPU inference failed with remote network blocked: ${JSON.stringify(wasm.error)}`,
       );
   }
   report.ok = true;

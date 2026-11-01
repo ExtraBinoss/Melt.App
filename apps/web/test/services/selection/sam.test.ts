@@ -1,180 +1,156 @@
-import { beforeEach, afterEach, describe, expect, it, vi } from "vitest";
-import type { Tensor } from "@huggingface/transformers";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 const fake = vi.hoisted(() => ({
-  model: Object.assign(vi.fn(), { get_image_embeddings: vi.fn() }),
-  processor: Object.assign(vi.fn(), { reshape_input_points: vi.fn(), post_process_masks: vi.fn() }),
-  modelLoader: vi.fn(),
-  processorLoader: vi.fn(),
-  read: vi.fn(),
-  ones: vi.fn(),
-  env: { allowLocalModels: true, backends: { onnx: { wasm: { numThreads: 4 } } } },
+  load: vi.fn(),
+  image: vi.fn(),
+  encode: vi.fn(),
+  decode: vi.fn(),
+  tensors: [] as { dispose: ReturnType<typeof vi.fn>; data: Float32Array; dims: number[] }[],
 }));
-vi.mock("@huggingface/transformers", () => ({
-  SamModel: { from_pretrained: fake.modelLoader },
-  AutoProcessor: { from_pretrained: fake.processorLoader },
-  RawImage: { read: fake.read },
-  env: fake.env,
-  ones: fake.ones,
+vi.mock("../../../src/services/selection/websam/runtime", () => ({
+  loadSam: fake.load,
+  disposeTensors: (values: Record<string, { dispose(): void }>) =>
+    Object.values(values).forEach((value) => value.dispose()),
 }));
-function tensor(data: number[]): Tensor {
-  return {
-    data: new Float32Array(data),
-    dims: [1, 1, 1, 2],
-    dispose: vi.fn(),
-    slice: vi.fn(() => tensor([1])),
-  } as unknown as Tensor;
+vi.mock("../../../src/services/selection/websam/image", () => ({
+  INPUT_SIZE: 512,
+  prepareImage: fake.image,
+}));
+function tensor(data: number[], dims = [1, 2, 1, 2]) {
+  return { type: "float32", data: new Float32Array(data), dims, dispose: vi.fn() };
 }
 beforeEach(() => {
   vi.resetModules();
   vi.resetAllMocks();
-  fake.ones.mockImplementation(() => tensor([1]));
-  fake.modelLoader.mockResolvedValue(fake.model);
-  fake.processorLoader.mockResolvedValue(fake.processor);
-  fake.read.mockResolvedValue({});
-  fake.processor.mockResolvedValue({
-    pixel_values: tensor([1]),
-    original_sizes: [[2, 3]],
-    reshaped_input_sizes: [[256, 256]],
+  fake.tensors.length = 0;
+  class Tensor {
+    data: Float32Array;
+    dims: number[];
+    dispose = vi.fn();
+    constructor(_type: string, data: Float32Array, dims: number[]) {
+      this.data = data;
+      this.dims = dims;
+      fake.tensors.push(this);
+    }
+  }
+  fake.load.mockResolvedValue({
+    ort: { Tensor },
+    encoder: { run: fake.encode },
+    decoder: { run: fake.decode },
   });
-  fake.model.get_image_embeddings.mockResolvedValue({ image_embeddings: tensor([1]) });
-  fake.processor.reshape_input_points.mockReturnValue(tensor([1, 1]));
-  fake.model.mockResolvedValue({ pred_masks: tensor([1]), iou_scores: tensor([0.1, 0.9]) });
-  fake.processor.post_process_masks.mockResolvedValue([tensor([1, 0, 1, 0, 1, 0])]);
+  fake.image.mockResolvedValue({ width: 4, height: 2, data: new Float32Array(3) });
+  fake.encode.mockImplementation(async () => ({
+    feats2_no_mem: tensor([1]),
+    feats0: tensor([1]),
+    feats1: tensor([1]),
+  }));
+  fake.decode.mockImplementation(async () => ({
+    low_res_mask: tensor([1, -1], [1, 1, 1, 2]),
+    iou: tensor([0.9], [1, 1]),
+  }));
 });
-afterEach(() => {
-  vi.unstubAllGlobals();
-});
-describe("local SAM loading and inference", () => {
-  it("forwards real file progress without exposing unrelated model lifecycle events", async () => {
+afterEach(() => vi.unstubAllGlobals());
+describe("SAM 2 worker inference", () => {
+  it("shares lazy preparation, forwards progress and retries failures", async () => {
     const { prepareSam } = await import("../../../src/services/selection/sam");
     const progress = vi.fn();
-    await prepareSam(progress);
-    const callback = fake.modelLoader.mock.calls[0]![1].progress_callback;
-    callback({ status: "download", file: "config.json", name: "model" });
-    callback({
-      status: "progress",
-      file: "vision_encoder.onnx",
-      name: "model",
-      progress: 10,
-      loaded: 100,
-      total: 1000,
-    });
-    callback({ status: "done", file: "vision_encoder.onnx", name: "model" });
-    expect(progress).toHaveBeenCalledTimes(2);
-    expect(progress).toHaveBeenLastCalledWith(expect.objectContaining({ status: "done" }));
-  });
-  it("lazily shares a single WASM model preparation and keeps downloaded model execution local", async () => {
-    const { prepareSam } = await import("../../../src/services/selection/sam");
-    expect(fake.modelLoader).not.toHaveBeenCalled();
-    const first = prepareSam(),
-      second = prepareSam();
-    expect(first).toBe(second);
+    const first = prepareSam(progress);
+    expect(prepareSam()).toBe(first);
     await first;
-    expect(fake.processorLoader).toHaveBeenCalledWith("Xenova/slimsam-77-uniform", {
-      revision: "5850ab45f587c112167512ffef949107115e26a0",
-    });
-    expect(fake.modelLoader).toHaveBeenCalledWith("Xenova/slimsam-77-uniform", {
-      revision: "5850ab45f587c112167512ffef949107115e26a0",
-      device: "wasm",
-      dtype: "fp32",
-    });
-    expect(fake.env.allowLocalModels).toBe(false);
+    expect(fake.load).toHaveBeenCalledOnce();
+    expect(fake.load).toHaveBeenCalledWith(progress);
+    vi.resetModules();
+    fake.load.mockRejectedValueOnce(Error("GPU failed"));
+    const retry = await import("../../../src/services/selection/sam");
+    await expect(retry.prepareSam()).rejects.toThrow("GPU failed");
+    await expect(retry.prepareSam()).resolves.toHaveProperty("encoder");
   });
-  it("keeps inference on one CPU thread even when a GPU is exposed", async () => {
-    vi.stubGlobal("navigator", { gpu: {} });
-    const { prepareSam } = await import("../../../src/services/selection/sam");
-    await prepareSam();
-    expect(fake.modelLoader.mock.calls[0]![1].device).toBe("wasm");
-    expect(fake.env.backends.onnx.wasm.numThreads).toBe(1);
-  });
-  it("clears failed model promises so preparation can be retried", async () => {
-    fake.modelLoader
-      .mockRejectedValueOnce(new Error("Download failed"))
-      .mockResolvedValue(fake.model);
-    const { prepareSam } = await import("../../../src/services/selection/sam");
-    await expect(prepareSam()).rejects.toThrow("Download failed");
-    await expect(prepareSam()).resolves.toHaveProperty("model");
-    expect(fake.modelLoader).toHaveBeenCalledTimes(2);
-  });
-  it("encodes each active source once, rescales points and selects the highest-IoU mask", async () => {
+  it("reuses one GPU embedding, maps non-square coordinates and returns only highest IoU", async () => {
     const { segmentObject } = await import("../../../src/services/selection/sam");
-    const result = await segmentObject("source-A", 1, 1);
-    expect(result).toMatchObject({ width: 3, height: 2 });
-    expect(Array.from(result.data.filter((_, index) => index % 4 === 3))).toEqual([
-      255, 0, 255, 0, 255, 0,
+    const mask = await segmentObject("a", 1, 1);
+    expect(mask).toMatchObject({ width: 4, height: 2 });
+    expect(Array.from(mask.data.filter((_, i) => i % 4 === 3))).toEqual([
+      255, 255, 0, 0, 255, 255, 0, 0,
     ]);
-    expect(fake.processor.reshape_input_points).toHaveBeenCalledWith(
-      [[[1, 1]]],
-      [[2, 3]],
-      [[256, 256]],
-    );
-    const prediction = (await fake.model.mock.results[0]!.value).pred_masks;
-    expect(prediction.slice).toHaveBeenCalledWith(null, null, [1, 2]);
-    expect(fake.processor.post_process_masks.mock.calls[0]![0]).toBe(
-      prediction.slice.mock.results[0]!.value,
-    );
-    expect(prediction.dispose).toHaveBeenCalledOnce();
-    expect(
-      (await fake.processor.mock.results[0]!.value).pixel_values.dispose,
-    ).toHaveBeenCalledOnce();
-    expect(
-      fake.processor.reshape_input_points.mock.results[0]!.value.dispose,
-    ).toHaveBeenCalledOnce();
-    expect(fake.model).toHaveBeenCalledWith(
-      expect.objectContaining({
-        image_embeddings: expect.anything(),
-        input_points: expect.anything(),
-      }),
-    );
-    await segmentObject("source-A", 2, 1);
-    expect(fake.read).toHaveBeenCalledTimes(1);
-    expect(fake.model.get_image_embeddings).toHaveBeenCalledTimes(1);
-    const firstEmbedding = (await fake.model.get_image_embeddings.mock.results[0]!.value)
-      .image_embeddings;
-    expect(firstEmbedding.dispose).not.toHaveBeenCalled();
-    await segmentObject("source-B", 1, 1);
-    expect(firstEmbedding.dispose).toHaveBeenCalledOnce();
-    expect(fake.read).toHaveBeenCalledTimes(2);
-    expect(fake.model.get_image_embeddings).toHaveBeenCalledTimes(2);
+    const feeds = fake.decode.mock.calls[0]![0];
+    expect(Array.from(feeds.input_points.data)).toEqual([128, 256, 0, 0]);
+    expect(Array.from(feeds.input_labels.data)).toEqual([1, -1]);
+    const embeddings = await fake.encode.mock.results[0]!.value;
+    await segmentObject("a", 2, 1);
+    expect(fake.encode).toHaveBeenCalledOnce();
+    expect(embeddings.feats2_no_mem.dispose).not.toHaveBeenCalled();
+    await segmentObject("b", 1, 1);
+    expect(embeddings.feats2_no_mem.dispose).toHaveBeenCalledOnce();
+    expect(fake.image).toHaveBeenCalledTimes(2);
+    expect(fake.tensors.every((value) => value.dispose.mock.calls.length === 1)).toBe(true);
+    const outputs = await fake.decode.mock.results[0]!.value;
+    expect(outputs.low_res_mask.dispose).toHaveBeenCalledOnce();
+    expect(outputs.iou.dispose).toHaveBeenCalledOnce();
   });
-  it("releases encoder inputs on failure and temporary decoder tensors when postprocessing fails", async () => {
+  it("cleans failed encoder/decoder work and rejects invalid points and malformed outputs", async () => {
     const { segmentObject } = await import("../../../src/services/selection/sam");
-    fake.model.get_image_embeddings.mockRejectedValueOnce(Error("encoder"));
+    await expect(segmentObject("a", NaN, 1)).rejects.toThrow("position");
+    expect(fake.load).not.toHaveBeenCalled();
+    fake.encode.mockRejectedValueOnce(Error("encoder"));
     await expect(segmentObject("a", 1, 1)).rejects.toThrow("encoder");
-    expect(
-      (await fake.processor.mock.results[0]!.value).pixel_values.dispose,
-    ).toHaveBeenCalledOnce();
-    fake.processor.post_process_masks.mockRejectedValueOnce(Error("resize"));
-    await expect(segmentObject("b", 1, 1)).rejects.toThrow("resize");
-    const result = await fake.model.mock.results[0]!.value;
-    expect(result.pred_masks.dispose).toHaveBeenCalledOnce();
-    expect(result.iou_scores.dispose).toHaveBeenCalledOnce();
-    expect(
-      fake.processor.reshape_input_points.mock.results[0]!.value.dispose,
-    ).toHaveBeenCalledOnce();
-    expect(fake.ones.mock.results[0]!.value.dispose).toHaveBeenCalledOnce();
-    const embedding = (await fake.model.get_image_embeddings.mock.results[1]!.value)
-      .image_embeddings;
-    expect(embedding.dispose).not.toHaveBeenCalled();
+    expect(fake.tensors[0]!.dispose).toHaveBeenCalledOnce();
+    fake.decode.mockRejectedValueOnce(Error("decoder"));
+    await expect(segmentObject("a", 1, 1)).rejects.toThrow("decoder");
+    await expect(segmentObject("a", 4, 1)).rejects.toThrow("outside");
+    fake.decode.mockResolvedValueOnce({});
+    await expect(segmentObject("a", 1, 1)).rejects.toThrow("valid masks");
+    expect(fake.tensors.every((value) => value.dispose.mock.calls.length === 1)).toBe(true);
   });
-  it("rejects invalid points before downloading models and missing output masks explicitly", async () => {
+  it("rejects overlapping source changes until decoder work releases its input tensors", async () => {
     const { segmentObject } = await import("../../../src/services/selection/sam");
-    await expect(segmentObject("a", NaN, 1)).rejects.toThrow("Position");
-    await expect(segmentObject("a", 1, Infinity)).rejects.toThrow("Position");
-    expect(fake.modelLoader).not.toHaveBeenCalled();
-    fake.processor.post_process_masks.mockResolvedValue([]);
-    await expect(segmentObject("a", 1, 1)).rejects.toThrow("aucun masque");
+    let begin!: () => void;
+    let finish!: () => void;
+    const entered = new Promise<void>((resolve) => {
+      begin = resolve;
+    });
+    const pending = new Promise<void>((resolve) => {
+      finish = resolve;
+    });
+    const outputs = {
+      low_res_mask: tensor([1, -1], [1, 1, 1, 2]),
+      iou: tensor([0.9], [1, 1]),
+    };
+    fake.decode.mockImplementationOnce(async () => {
+      begin();
+      await pending;
+      return outputs;
+    });
+    const first = segmentObject("a", 1, 1);
+    await entered;
+    const embeddings = await fake.encode.mock.results[0]!.value;
+    await expect(segmentObject("b", 1, 1)).rejects.toThrow("already running");
+    await expect(segmentObject("a", 2, 1)).rejects.toThrow("already running");
+    expect(fake.encode).toHaveBeenCalledOnce();
+    expect(fake.decode).toHaveBeenCalledOnce();
+    expect(fake.image).toHaveBeenCalledOnce();
+    expect(embeddings.feats0.dispose).not.toHaveBeenCalled();
+    expect(embeddings.feats1.dispose).not.toHaveBeenCalled();
+    expect(embeddings.feats2_no_mem.dispose).not.toHaveBeenCalled();
+    expect(fake.tensors.slice(1).every((value) => !value.dispose.mock.calls.length)).toBe(true);
+    finish();
+    await first;
+    expect(outputs.low_res_mask.dispose).toHaveBeenCalledOnce();
+    expect(outputs.iou.dispose).toHaveBeenCalledOnce();
+    expect(fake.tensors.every((value) => value.dispose.mock.calls.length === 1)).toBe(true);
+    await segmentObject("b", 1, 1);
+    expect(embeddings.feats0.dispose).toHaveBeenCalledOnce();
+    expect(embeddings.feats1.dispose).toHaveBeenCalledOnce();
+    expect(embeddings.feats2_no_mem.dispose).toHaveBeenCalledOnce();
   });
 });
-describe("SAM mask selection", () => {
-  it("keeps the first mask on equal scores and converts boolean mask values into alpha", async () => {
+describe("SAM 2 mask reconstruction", () => {
+  it("keeps tied first scores and rejects truncated or nonfinite results", async () => {
     const { bestMask } = await import("../../../src/services/selection/sam");
-    const result = bestMask(tensor([1, 0, 0, 1, 0, 1]), tensor([0.9, 0.2, 0.9]), 2, 1);
-    expect(Array.from(result)).toEqual([255, 255, 255, 255, 255, 255, 255, 0]);
-  });
-  it("rejects empty scores and truncated prediction buffers", async () => {
-    const { bestMask } = await import("../../../src/services/selection/sam");
-    expect(() => bestMask(tensor([]), tensor([]), 1, 1)).toThrow("valide");
-    expect(() => bestMask(tensor([1]), tensor([0.1, 0.9]), 1, 1)).toThrow("valide");
+    const masks = tensor([1, -1, -1, 1], [1, 2, 1, 2]);
+    expect(Array.from(bestMask(masks, tensor([1, 1]), 2, 1))).toEqual([
+      255, 255, 255, 255, 255, 255, 255, 0,
+    ]);
+    expect(() => bestMask(masks, tensor([]), 2, 1)).toThrow("scores");
+    expect(() => bestMask(masks, tensor([NaN]), 2, 1)).toThrow("scores");
+    expect(() => bestMask(masks, tensor([1]), 2, 1)).toThrow("valid masks");
   });
 });

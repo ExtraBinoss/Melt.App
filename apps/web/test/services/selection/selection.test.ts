@@ -1,3 +1,4 @@
+import { ENCODER_FILE } from "../../../src/services/selection/model/manifest";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   SelectionClient,
@@ -43,7 +44,7 @@ describe("bounded selection worker client", () => {
     const pending = client.model.prepare();
     reply(port, {
       id: 1,
-      progress: { file: "vision_encoder.onnx", status: "progress", loaded: 100 },
+      progress: { file: ENCODER_FILE, status: "progress", loaded: 100 },
     });
     expect(client.model.read()).toMatchObject({ phase: "loading", loaded: 100 });
     reply(port, { id: 1, result: null });

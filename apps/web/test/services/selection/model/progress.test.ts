@@ -19,6 +19,6 @@ test("bounds download progress messages to the latest known file and flushes ter
   sink.flush();
   expect(send).toHaveBeenCalledTimes(3);
   const native = modelProgressSink(send);
-  native.note({ file: "config.json", status: "done" });
+  native.note({ file: "mask_decoder.onnx", status: "done" });
   expect(send).toHaveBeenCalledTimes(4);
 });

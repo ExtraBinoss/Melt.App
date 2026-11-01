@@ -47,7 +47,7 @@ export default defineConfig({
     tailwindcss(),
   ],
   optimizeDeps: {
-    include: ["@huggingface/transformers"],
+    include: ["@huggingface/transformers", "onnxruntime-web/webgpu"],
     rolldownOptions: { plugins: [fiberTimerCompatibility(fiberThreeAdapter)] },
   },
   resolve: { alias: { "@": fileURLToPath(new URL("./apps/web/src", import.meta.url)) } },

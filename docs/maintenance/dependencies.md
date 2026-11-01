@@ -83,6 +83,7 @@ and intensity without replacing Three's standard light classes.
 | `magic-string`                         | 1.4.5                    |
 | `mediabunny`                           | 1.65.0                   |
 | `motion`                               | 14.9.0                   |
+| `onnxruntime-web`                      | 1.31.1                   |
 | `opentype.js`                          | 2.0.0                    |
 | `oxfmt`                                | 0.75.0                   |
 | `oxlint`                               | 1.90.0                   |
