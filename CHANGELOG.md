@@ -6,6 +6,7 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Add a reusable codebase metrics command with source/test/JSON/public breakdowns, physical and nonblank line counts, dependency declarations, historical coverage metadata, ignored-file footprint and Markdown/JSON/CSV reports.
 - Add static GPU Ink Bleed, segmented Pixel Sort and Edge Detection with six selectable kernels, shared image/layer/export rendering, bounded scratch resources, validated parameters and translations in all twelve locales.
 - Make editor tab titles follow the project name, including rename and undo/redo, while preserving dashboard titles.
 - Keep local select fields nonmodal across the editor, export and performance panel: preserve Radix keyboard/focus behavior, draft cancellation, form reset and trigger width without nested body locks or per-opening viewport styles. Opening effect properties no longer starts a numeric edit or pauses playback. Enforce the shared-field boundary and add a native Angel.exe overlay regression.

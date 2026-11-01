@@ -12,6 +12,7 @@
   "scripts": {
     "dev": "vite --host 0.0.0.0",
     "brand:social": "bun scripts/brand-social.ts",
+    "metrics": "bun scripts/metrics/cli.ts",
     "build": "bun run typecheck && vite build",
     "preview": "vite preview --host 0.0.0.0",
     "typecheck": "tsc --noEmit && tsc -p packages/core/tsconfig.json",
