@@ -126,3 +126,10 @@
     animation: none;
   }
 }
+
+/* Shared treatment for players over artwork (the controls and timing remain identical). */
+.media-player-overlay {
+  background: color-mix(in srgb, var(--popover) 86%, transparent);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}

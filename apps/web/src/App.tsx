@@ -1,7 +1,7 @@
 import { dashboardHref, isPlainPrimaryClick, dialogLinkKeyDown } from "./ui/navigation/activation";
 import { ExportLeaveGuard } from "./components/export/ExportLeaveGuard";
 import { guardExportNavigation, ExportLeaveCancelled } from "./services/export/leave";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { lazy, Suspense, useCallback, useMemo, useRef, useState } from "react";
 import { useStore } from "jotai";
 import { useRenderMetrics } from "./state/session/render-metrics";
 import { MeltLogo } from "./ui/brand/MeltLogo";
@@ -24,10 +24,20 @@ import { ResizablePanel, ResizableHandle } from "./components/ui/resizable";
 import { ProjectPanelGroup } from "./components/workspace/ProjectPanelGroup";
 import { ProjectPreferencesProvider } from "./components/workspace/preferences/context";
 import { Button } from "./components/ui/button";
-import { Toolbar } from "./components/toolbar/Toolbar";
-import { MobileEditor } from "./components/workspace/mobile/MobileEditor";
+const Toolbar = lazy(() =>
+  import("./components/toolbar/Toolbar").then((module) => ({ default: module.Toolbar })),
+);
+const MobileEditor = lazy(() =>
+  import("./components/workspace/mobile/MobileEditor").then((module) => ({
+    default: module.MobileEditor,
+  })),
+);
 import { MobileControlsContext, useMobileLayout } from "./components/workspace/mobile/use-mobile";
-import { EditorSidebar } from "./components/workspace/EditorSidebar";
+const EditorSidebar = lazy(() =>
+  import("./components/workspace/EditorSidebar").then((module) => ({
+    default: module.EditorSidebar,
+  })),
+);
 import { CanvasArea } from "./components/viewport/CanvasArea";
 import { ProjectDialog, type ProjectDialogProps } from "./components/projects/ProjectDialog";
 import { TransitionRequestHost } from "./components/motion/transitions/TransitionRequestHost";
@@ -38,7 +48,11 @@ import { ProjectPill } from "./components/projects/ProjectPill";
 import { freezeEffectPreviews } from "./state/session/effect-preview";
 import { ToolSettings } from "./components/toolbar/ToolSettings";
 import type { ProjectView } from "./components/search/actions";
-import { MotionTimelineDock } from "./components/motion-shell/MotionTimelineDock";
+const MotionTimelineDock = lazy(() =>
+  import("./components/motion-shell/MotionTimelineDock").then((module) => ({
+    default: module.MotionTimelineDock,
+  })),
+);
 import { createMotionTransport } from "./services/motion/transport";
 import {
   FontLibraryProvider,
@@ -221,17 +235,19 @@ export function App({ engine, services, welcome = false, routing }: AppProps) {
                         />
                       </div>
                       {!mobile && (
-                        <Toolbar
-                          engine={engine}
-                          services={services}
-                          onTask={onTask}
-                          onProjects={showProjectMenu}
-                          onExport={() => showExport(true)}
-                          onPanelMode={(mode) => {
-                            if (mode === "animate") showTimelapse(true);
-                          }}
-                          onImport={onImport}
-                        />
+                        <Suspense fallback={null}>
+                          <Toolbar
+                            engine={engine}
+                            services={services}
+                            onTask={onTask}
+                            onProjects={showProjectMenu}
+                            onExport={() => showExport(true)}
+                            onPanelMode={(mode) => {
+                              if (mode === "animate") showTimelapse(true);
+                            }}
+                            onImport={onImport}
+                          />
+                        </Suspense>
                       )}
                       {!mobile && <ToolSettings services={services} onTask={onTask} />}
                       {processing && (
@@ -250,49 +266,57 @@ export function App({ engine, services, welcome = false, routing }: AppProps) {
                           defaultSize="320px"
                           className="sidebar"
                         >
-                          <EditorSidebar
-                            engine={engine}
-                            services={services}
-                            run={run}
-                            onTask={onTask}
-                            exportOpen={exportMenu}
-                            onExportOpenChange={showExport}
-                            timelapseOpen={timelapseMenu}
-                            onTimelapseOpenChange={showTimelapse}
-                          />
+                          <Suspense fallback={null}>
+                            <EditorSidebar
+                              engine={engine}
+                              services={services}
+                              run={run}
+                              onTask={onTask}
+                              exportOpen={exportMenu}
+                              onExportOpenChange={showExport}
+                              timelapseOpen={timelapseMenu}
+                              onTimelapseOpenChange={showTimelapse}
+                            />
+                          </Suspense>
                         </ResizablePanel>
                       </>
                     )}
                   </ProjectPanelGroup>
                   {mobile ? (
-                    <MobileEditor
-                      engine={engine}
-                      services={services}
-                      run={run}
-                      onTask={onTask}
-                      exportOpen={exportMenu}
-                      onExportOpenChange={showExport}
-                      timelapseOpen={timelapseMenu}
-                      onTimelapseOpenChange={showTimelapse}
-                      tools={
-                        <>
-                          <Toolbar
-                            engine={engine}
-                            services={services}
-                            onTask={onTask}
-                            onProjects={showProjectMenu}
-                            onExport={() => showExport(true)}
-                            onPanelMode={(mode) => {
-                              if (mode === "animate") showTimelapse(true);
-                            }}
-                            onImport={onImport}
-                          />
-                          <ToolSettings services={services} onTask={onTask} />
-                        </>
-                      }
-                    />
+                    <Suspense fallback={null}>
+                      <MobileEditor
+                        engine={engine}
+                        services={services}
+                        run={run}
+                        onTask={onTask}
+                        exportOpen={exportMenu}
+                        onExportOpenChange={showExport}
+                        timelapseOpen={timelapseMenu}
+                        onTimelapseOpenChange={showTimelapse}
+                        tools={
+                          <>
+                            <Suspense fallback={null}>
+                              <Toolbar
+                                engine={engine}
+                                services={services}
+                                onTask={onTask}
+                                onProjects={showProjectMenu}
+                                onExport={() => showExport(true)}
+                                onPanelMode={(mode) => {
+                                  if (mode === "animate") showTimelapse(true);
+                                }}
+                                onImport={onImport}
+                              />
+                            </Suspense>
+                            <ToolSettings services={services} onTask={onTask} />
+                          </>
+                        }
+                      />
+                    </Suspense>
                   ) : (
-                    <MotionTimelineDock engine={engine} />
+                    <Suspense fallback={null}>
+                      <MotionTimelineDock engine={engine} />
+                    </Suspense>
                   )}
                   <input
                     ref={input}

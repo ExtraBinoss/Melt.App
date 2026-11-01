@@ -11,6 +11,11 @@ vi.mock("../../src/App", () => ({
   ),
 }));
 vi.mock("../../src/canvas/EditorCanvas", () => ({ default: () => null }));
+vi.mock("../../src/components/toolbar/Toolbar", () => ({ Toolbar: () => null }));
+vi.mock("../../src/components/workspace/EditorSidebar", () => ({ EditorSidebar: () => null }));
+vi.mock("../../src/components/motion-shell/MotionTimelineDock", () => ({
+  MotionTimelineDock: () => null,
+}));
 import { Studio } from "../../src/bootstrap/Studio";
 const runtime = () => ({
   welcome: false,
@@ -25,7 +30,8 @@ it("forwards the memory-only welcome mode to the shared app dashboard", async ()
   expect(await screen.findByText("Atelier prêt")).toHaveAttribute("data-welcome", "true");
   view.unmount();
 });
-beforeEach(() => {
+beforeEach(async () => {
+  await changeLanguage("fr");
   mocks.createRuntime.mockReset();
   mocks.attach.mockReset();
   history.replaceState(null, "", "/");
@@ -37,6 +43,11 @@ it("shows startup then mounts editor and closes resources", async () => {
   expect(screen.getByRole("status")).toHaveTextContent("Ouverture");
   expect(screen.getByRole("status")).toHaveAttribute("data-variant", "shimmer");
   expect(screen.getByRole("status")).toHaveAttribute("data-visible", "true");
+  expect(screen.getByRole("status").querySelector("svg")).toHaveAttribute("width", "80");
+  expect(screen.getByRole("status").querySelector("svg")).toHaveAttribute(
+    "data-brand-state",
+    "working",
+  );
   await screen.findByText("Atelier prêt");
   view.unmount();
   expect(result.dispose).toHaveBeenCalledOnce();

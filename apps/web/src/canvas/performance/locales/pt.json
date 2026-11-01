@@ -105,5 +105,10 @@
   },
   "contributions": "Contribuições",
   "overBudget": "Orçamento excedido em {{value}}",
-  "copyReport": "Copiar relatório"
+  "copyReport": "Copiar relatório",
+  "environment": {
+    "title": "Sistema",
+    "yes": "Sim",
+    "no": "Não"
+  }
 }

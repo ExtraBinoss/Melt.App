@@ -6,6 +6,13 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Release library dialog previews as soon as an item opens, prepare independent editor chunks together on intent, defer video proxies until the foreground canvas is presented, and yield between cold font preparation stages. Include observed main-thread long-task totals in development-only opening diagnostics.
+- Give editor frames sole ownership of physical canvas sizing through Three's public CanvasTarget API, avoiding temporary DPR buffers; prioritize the first visible canvas over optional thumbnail rendering, preload studio code during landing idle time, and defer unopened mobile, shortcut, timelapse and export-workspace modules.
+- Record bounded development startup CPU profiles for library navigation, template creation and saved-project reopening, distinguishing mascot work from initial interface rendering, style recalculation and native canvas sizing waits.
+- Give studio entry actions native hrefs before hydration, keep unopened preferences and shortcut styles out of library startup, and enlarge the centered studio loader while preserving its animated mascot.
+- Include bounded browser, operating system, display, WebCodecs and active renderer/GPU diagnostics in the copyable performance report; align the performance control height, icon and padding with the composition mode controls.
+- Keep video on WebGPU where native imports work, use Three's WebGL 2 backend for desktop Linux Chromium and unsupported imports, and safely reevaluate the renderer when the first video is added. Reuse the export player in library dialogs with a blurred overlay, bounded paused seeking and smooth progress at the artwork/caption divider.
+
 - Preserve authoritative property names and restored values in undo/redo notices across artboard backgrounds, layers, effects, 3D, Motion, media and audio. Retain bounded immutable summaries with engine history entries, distinguish keyed locations and compound edits, and format translated names, choices and units in all twelve locales without reading the current selection.
 
 - Add reusable camera, environment and per-light Motion actions with genuine timeline rows, editable points/easing, personal presets and shared preview/export sampling. Keep gesture previews imperative, preserve keyboard focus after edits, and reject stale owner navigation. Replace Cornell Box’s parent turntable with a real seamless camera orbit and publish matching portable assets and a newly rendered poster.

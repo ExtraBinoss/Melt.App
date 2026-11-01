@@ -105,5 +105,10 @@
   },
   "contributions": "内訳",
   "overBudget": "予算を {{value}} 超過",
-  "copyReport": "レポートをコピー"
+  "copyReport": "レポートをコピー",
+  "environment": {
+    "title": "システム",
+    "yes": "はい",
+    "no": "いいえ"
+  }
 }

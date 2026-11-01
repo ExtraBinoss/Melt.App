@@ -1,3 +1,4 @@
+import { PreviewPlayer, PreviewProgress } from "./PreviewPlayer";
 import { bindVisiblePreview } from "../../../shared/preview/visible-preview";
 import { bindHoverPreview } from "../../../shared/preview/hover-preview";
 import { createBrandActivity } from "../../../../ui/brand/activity";
@@ -36,12 +37,14 @@ export function MotionPreviewSurface({
   const feedback = useRef<HTMLSpanElement>(null);
   const controls = useRef<HTMLButtonElement>(null);
   const toggle = useRef<() => void>(() => {});
+  const [previewOwner, setPreviewOwner] = useState<PreviewOwner | null>(null);
   const [controlHost, setControlHost] = useState<HTMLElement | null>(null);
   const mount = useCallback((node: HTMLSpanElement | null) => {
     root.current = node;
     setControlHost(
-      node?.closest<HTMLElement>(".project-preview, .template-card-entry, .library-item-preview") ??
-        null,
+      node?.closest<HTMLElement>(
+        ".project-preview, .library-card-artwork, .template-card-entry, .library-item-preview",
+      ) ?? null,
     );
   }, []);
   const loading = useMemo(() => createBrandActivity(), []);
@@ -81,6 +84,7 @@ export function MotionPreviewSurface({
     function stop() {
       const current = preview;
       preview = null;
+      setPreviewOwner(null);
       const token = ++generation;
       if (current) {
         status("idle");
@@ -105,6 +109,7 @@ export function MotionPreviewSurface({
       preview = startPreview(host!, (value, error) => {
         if (generation === token) status(value, error);
       });
+      setPreviewOwner(preview);
     }
     toggle.current = () => {
       if (disabled) return;
@@ -185,6 +190,7 @@ export function MotionPreviewSurface({
         <BrandStatus size={24} state="preparing" activity={loading} />
       </span>
       {controlHost &&
+        !controlHost.classList.contains("library-item-preview") &&
         createPortal(
           <button
             ref={controls}
@@ -205,6 +211,24 @@ export function MotionPreviewSurface({
             <Play className="motion-preview-play" size={12} fill="currentColor" />
             <Pause className="motion-preview-pause" size={12} fill="currentColor" />
           </button>,
+          controlHost,
+        )}
+      {controlHost &&
+        previewOwner?.playback &&
+        createPortal(
+          controlHost.classList.contains("library-item-preview") ? (
+            <div
+              className="motion-preview-player"
+              data-preview-control
+              onPointerDown={(event) => event.stopPropagation()}
+              onClick={(event) => event.stopPropagation()}
+              onDoubleClick={(event) => event.stopPropagation()}
+            >
+              <PreviewPlayer owner={{ ...previewOwner, playback: previewOwner.playback }} />
+            </div>
+          ) : (
+            <PreviewProgress playback={previewOwner.playback} />
+          ),
           controlHost,
         )}
       <span ref={feedback} className="motion-template-preview-status" role="status" />

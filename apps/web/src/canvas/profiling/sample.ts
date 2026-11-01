@@ -6,7 +6,8 @@ import {
   type EnginePort,
   type MotionTime,
 } from "@musart/core";
-import { canvasProfileSource } from "../render/plane-resources";
+import { performanceEnvironment } from "./environment";
+import { canvasNativeRenderer, canvasProfileSource } from "../render/plane-resources";
 import type { SceneFrameSample } from "../render/scene-profile-source";
 import { createMotionTransport } from "../../services/motion/transport";
 import { CompositionPerformanceError } from "../../state/session/composition-performance";
@@ -154,6 +155,7 @@ export async function sampleComposition(
       samples.push(sample);
     }
     return compositionReport({
+      environment: performanceEnvironment(canvas, canvasNativeRenderer(canvas)),
       page,
       samples,
       durationMs: performance.now() - started,

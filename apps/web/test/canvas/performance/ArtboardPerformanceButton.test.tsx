@@ -81,6 +81,7 @@ test("links additive budget contributions and copies a report while omitting zer
     writeText = vi.fn<(text: string) => Promise<void>>(async () => {});
   const previous = Object.getOwnPropertyDescriptor(navigator, "clipboard");
   Object.defineProperty(navigator, "clipboard", { configurable: true, value: { writeText } });
+  data.environment = { browser: "Chrome 156", os: "Linux", backend: "webgl" };
   data.cpu = { value: 20, availability: "measured" };
   data.contributions = {
     cpu: [
@@ -116,6 +117,8 @@ test("links additive budget contributions and copies a report while omitting zer
     fireEvent.click(trigger);
     const panel = screen.getByRole("dialog", { name: "Performances" });
     await waitFor(() => expect(within(panel).getByText(/Budget dépassé/)).toBeVisible());
+    fireEvent.click(within(panel).getByRole("button", { name: "Système" }));
+    expect(within(panel).getByText("Chrome 156")).toBeVisible();
     expect(within(panel).queryByRole("button", { name: /^Audio/ })).toBeNull();
     expect(within(panel).queryByRole("button", { name: /^3D/ })).toBeNull();
     const bar = panel.querySelector<HTMLElement>(
@@ -132,6 +135,7 @@ test("links additive budget contributions and copies a report while omitting zer
       compositionId: d.page.id,
       cpu: { value: 20 },
       targetFps: 60,
+      environment: data.environment,
       contributions: data.contributions,
     });
   } finally {

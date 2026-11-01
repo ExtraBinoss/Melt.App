@@ -1,3 +1,4 @@
+import { usesVideoSources } from "../../renderer/video-backend";
 import { selectionFrameScope } from "./selection";
 import {
   applyMotionFrame,
@@ -45,6 +46,7 @@ export function createMotionPreview(project: Project, options: MotionPreviewOpti
     mediaResolver: options.mediaResolver,
     fontResolver: options.fontResolver,
     forceWebGL: options.forceWebGL,
+    videoSources: usesVideoSources(program.composition),
     maxBytes: options.maxGpuBytes ?? 256 * 1024 * 1024,
   });
   const abort = new AbortController(),

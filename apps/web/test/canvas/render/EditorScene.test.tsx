@@ -13,6 +13,7 @@ import {
   type Composition,
 } from "@musart/core";
 import {
+  CanvasTarget,
   DataTexture,
   LinearSRGBColorSpace,
   MeshBasicNodeMaterial,
@@ -30,6 +31,7 @@ import {
 import { FiberTimerClock } from "../../../src/canvas/render/fiber-timer";
 
 const gpu = vi.hoisted(() => ({
+  videoFallback: vi.fn(async () => true),
   init: vi.fn(),
   dispose: vi.fn(),
   clear: vi.fn(),
@@ -42,6 +44,10 @@ const gpu = vi.hoisted(() => ({
   frame: null as (() => void) | null,
   framePriority: undefined as number | undefined,
   state: {} as Record<string, unknown>,
+}));
+vi.mock("@musart/render/renderer-policy", async (original) => ({
+  ...(await original<typeof import("@musart/render/renderer-policy")>()),
+  videoNeedsWebGL: gpu.videoFallback,
 }));
 vi.mock("@react-three/fiber", () => ({
   Canvas: vi.fn(({ children }: { children: ReactNode }) => <>{children}</>),
@@ -70,9 +76,15 @@ vi.mock("three/webgpu", async (importOriginal) => {
   return {
     ...actual,
     WebGPURenderer: class {
-      constructor(options: unknown) {
+      private target: CanvasTarget;
+      constructor(options: { canvas: HTMLCanvasElement }) {
+        this.target = new actual.CanvasTarget(options.canvas);
         gpu.constructors(options);
       }
+      getCanvasTarget = () => this.target;
+      setCanvasTarget = (target: CanvasTarget) => {
+        this.target = target;
+      };
       init = gpu.init;
       dispose = gpu.dispose;
       setClearColor = gpu.clear;
@@ -304,6 +316,7 @@ describe("R3F direct WebGPU scene lifetime", () => {
     expect(gpu.compositorDispose).toHaveBeenCalledOnce();
   });
   it("tags WebGL fallback, reports asynchronous compositor errors and catches render boundaries", async () => {
+    await changeLanguage("fr");
     const renderer = gpu.state.gl as { backend: Record<string, unknown> };
     renderer.backend.isWebGLBackend = true;
     gpu.render.mockRejectedValueOnce("pipeline lost");
@@ -407,4 +420,20 @@ describe("R3F direct WebGPU scene lifetime", () => {
     expect(input.controller.presentation.read().available).toBe(false);
     expect(screen.getByRole("alert")).toBeInTheDocument();
   });
+});
+
+it("initializes video canvases directly on Three's WebGL backend", async () => {
+  await makeRenderer(canvas(), true);
+  expect(gpu.constructors).toHaveBeenCalledOnce();
+  expect(gpu.constructors).toHaveBeenCalledWith(expect.objectContaining({ forceWebGL: true }));
+  gpu.init.mockRejectedValueOnce(Error("Video WebGL unavailable"));
+  await expect(makeRenderer(canvas(), true)).rejects.toThrow("Video WebGL unavailable");
+  expect(gpu.constructors).toHaveBeenCalledTimes(2);
+});
+
+it("keeps WebGPU for compatible video imports", async () => {
+  gpu.videoFallback.mockResolvedValueOnce(false);
+  await makeRenderer(canvas(), true);
+  expect(gpu.constructors).toHaveBeenCalledOnce();
+  expect(gpu.constructors).toHaveBeenCalledWith(expect.not.objectContaining({ forceWebGL: true }));
 });

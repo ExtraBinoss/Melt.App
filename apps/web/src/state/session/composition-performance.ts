@@ -1,3 +1,7 @@
+import {
+  capturePerformanceEnvironment,
+  type PerformanceEnvironment,
+} from "./performance-environment";
 import type { EnginePort, Project } from "@musart/core";
 
 export type CompositionPerformanceAvailability = "measured" | "unavailable" | "not-measured";
@@ -14,6 +18,7 @@ export interface CompositionPerformanceMetric extends CompositionPerformanceValu
   kind: "timing" | "counter" | "inventory";
 }
 export interface CompositionPerformanceSnapshot {
+  environment?: PerformanceEnvironment;
   compositionId: string;
   measuredAt: number;
   budgetMs: number;
@@ -125,6 +130,9 @@ function capture(value: CompositionPerformanceSnapshot, id: string) {
     })
   )
     throw new CompositionPerformanceError("invalid");
+  const environment =
+    value.environment !== undefined ? capturePerformanceEnvironment(value.environment) : undefined;
+  if (environment === null) throw new CompositionPerformanceError("invalid");
   const measured = (item: CompositionPerformanceValue) =>
     Object.freeze({
       value: item.value,
@@ -132,6 +140,7 @@ function capture(value: CompositionPerformanceSnapshot, id: string) {
       ...(item.reason === undefined ? {} : { reason: item.reason }),
     });
   return Object.freeze({
+    ...(environment ? { environment } : {}),
     compositionId: value.compositionId,
     measuredAt: value.measuredAt,
     budgetMs: value.budgetMs,

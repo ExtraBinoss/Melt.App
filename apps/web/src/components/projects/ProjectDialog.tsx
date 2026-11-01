@@ -5,7 +5,7 @@ import {
   dialogLinkKeyDown,
 } from "../../ui/navigation/activation";
 import { atom, useStore } from "jotai";
-import { PreferencesHost } from "./preferences/PreferencesHost";
+import { LazyPreferencesDialog, PreferencesHost } from "./preferences/PreferencesHost";
 import { LibraryBrowser } from "./items/LibraryBrowser";
 import { brand } from "../../ui/brand/config";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
@@ -25,7 +25,6 @@ import { LibrarySidebar } from "./dashboard/LibrarySidebar";
 import { MobileLibraryNavigation } from "./dashboard/MobileLibraryNavigation";
 import { MeltLogo } from "../../ui/brand/MeltLogo";
 import { NewProjectForm } from "./creation/NewProjectForm";
-import { PreferencesDialog } from "./preferences/PreferencesDialog";
 import { ProjectGallery } from "./gallery/ProjectGallery";
 import { TemplateGallery } from "./templates/TemplateGallery";
 import { createProjectFromTemplate } from "../../services/projects/templates/catalog";
@@ -52,7 +51,7 @@ export interface ProjectDialogProps {
 /** The same dashboard works before the first document and above an open project. */
 export function ProjectDialog(props: ProjectDialogProps) {
   return props.initialView === "settings" || props.initialView === "settingsEditor" ? (
-    <PreferencesDialog
+    <LazyPreferencesDialog
       onClose={props.onClose}
       initialSection={props.initialView === "settingsEditor" ? "editor" : "general"}
     />

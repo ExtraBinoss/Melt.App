@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { ChevronDown, Clapperboard } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import type { EnginePort } from "@musart/core";
@@ -9,7 +9,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import { TimelapseDialog } from "../animation/timelapse/TimelapseDialog";
+const TimelapseDialog = lazy(() =>
+  import("../animation/timelapse/TimelapseDialog").then((module) => ({
+    default: module.TimelapseDialog,
+  })),
+);
 import { ExportPopover } from "./ExportPopover";
 import type { ExportPopoverProps } from "./model";
 import "../animation/timelapse/messages";
@@ -86,12 +90,14 @@ export function ExportActions({
         </DropdownMenuContent>
       </DropdownMenu>
       {timelapseOpen && (
-        <TimelapseDialog
-          engine={engine}
-          services={props.services}
-          returnFocus={trigger}
-          onClose={closeTimelapse}
-        />
+        <Suspense fallback={null}>
+          <TimelapseDialog
+            engine={engine}
+            services={props.services}
+            returnFocus={trigger}
+            onClose={closeTimelapse}
+          />
+        </Suspense>
       )}
     </div>
   );

@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+import { preloadStudio, scheduleStudioPreload } from "../bootstrap/preload";
 import { useNavigate } from "@tanstack/react-router";
 import { LandingPage } from "../components/projects/landing/LandingPage";
 import { useTheme } from "../state/session/editor";
@@ -8,6 +10,7 @@ export function LandingRoute() {
   useRestoreLocale();
   const navigate = useNavigate();
   useTheme();
+  useEffect(() => scheduleStudioPreload(), []);
   return (
     <LandingPage
       onCreate={() => {
@@ -17,7 +20,7 @@ export function LandingRoute() {
         void navigate({ to: "/editor", search: { template: id } });
       }}
       onPrepare={() => {
-        void import("../bootstrap/Studio");
+        void preloadStudio().catch(() => {});
       }}
     />
   );

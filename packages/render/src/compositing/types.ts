@@ -16,6 +16,8 @@ export interface RenderOptions {
   /** SVG source coverage at the delivered density; fixed effect/mask references keep authored pixels. */
   vectorAntialias?: boolean;
   forceWebGL?: boolean;
+  /** Stable canonical hint when a materialized Motion pose hides future video tracks. */
+  videoSources?: boolean;
   canRender?: () => boolean;
   fontResolver?: FontResolver;
   mediaResolver?: MediaSourceResolver;

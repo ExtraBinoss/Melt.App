@@ -1,6 +1,7 @@
 import { FONT_CATALOG, MAX_FONT_FILE_BYTES } from "@musart/assets";
 import { createOutlineFont, type OutlineFont, type OutlineGlyph } from "./outlines";
 import { createShaper } from "./shaping";
+import { yieldPreparation } from "../preparation-task";
 export type { OutlineFont } from "./outlines";
 export interface FontLease {
   readonly font: OutlineFont;
@@ -139,6 +140,9 @@ export class FontRepository {
     const { Font, Face, getGlyphDelta, getGlyphPath, getGlyphPathWithVariation } =
       await import("text-shaper");
     signal.throwIfAborted();
+    // Separate cold module evaluation, font parsing and shaping into presentation opportunities.
+    await yieldPreparation();
+    signal.throwIfAborted();
     // Own the lazy reader storage and normalize cross-realm platform ArrayBuffers.
     const native = Font.load(new Uint8Array(buffer).slice().buffer);
     const outlines = createOutlineFont(native, {
@@ -149,6 +153,8 @@ export class FontRepository {
     });
     let shaper: Awaited<ReturnType<typeof createShaper>>;
     try {
+      await yieldPreparation();
+      signal.throwIfAborted();
       shaper = await createShaper(native, (index) => outlines.font.glyphs.get(index));
     } catch (error) {
       outlines.dispose();
@@ -161,9 +167,12 @@ export class FontRepository {
         outlines.dispose();
       }
     };
-    if (signal.aborted) {
-      dispose();
+    try {
+      await yieldPreparation();
       signal.throwIfAborted();
+    } catch (error) {
+      dispose();
+      throw error;
     }
     outlines.font.shape = (text, weight) => shaper.shape(text, weight);
     return { font: outlines.font, dispose };

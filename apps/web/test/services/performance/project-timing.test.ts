@@ -3,7 +3,46 @@ import { createProject, EditorEngine } from "@musart/core";
 afterEach(() => {
   vi.restoreAllMocks();
   vi.unstubAllEnvs();
+  vi.unstubAllGlobals();
   vi.resetModules();
+});
+test("development reports bounded main-thread totals and disconnects its observer on completion", async () => {
+  vi.stubEnv("DEV", true);
+  vi.resetModules();
+  const log = consoleSpies();
+  let callback!: PerformanceObserverCallback;
+  const disconnect = vi.fn(),
+    observe = vi.fn();
+  const entry = (startTime: number, duration: number) =>
+    ({ startTime, duration }) as PerformanceEntry;
+  vi.stubGlobal(
+    "PerformanceObserver",
+    class {
+      static supportedEntryTypes = ["longtask"];
+      constructor(receive: PerformanceObserverCallback) {
+        callback = receive;
+      }
+      observe = observe;
+      disconnect = disconnect;
+      takeRecords() {
+        return [entry(200, 55)];
+      }
+    },
+  );
+  vi.spyOn(performance, "now").mockReturnValue(100);
+  const { beginProjectTiming } = await import("../../../src/services/performance/project-timing");
+  const timing = beginProjectTiming("Open project")!;
+  callback(
+    { getEntries: () => [entry(80, 90), entry(110, 80)] } as PerformanceObserverEntryList,
+    {} as PerformanceObserver,
+  );
+  timing.finish("published");
+  timing.finish("failed");
+  expect(observe).toHaveBeenCalledExactlyOnceWith({ type: "longtask" });
+  expect(disconnect).toHaveBeenCalledOnce();
+  expect(log.info).toHaveBeenCalledWith(
+    expect.objectContaining({ mainThread: { longTasks: 2, totalMs: 135, maxMs: 80 } }),
+  );
 });
 function consoleSpies() {
   return {

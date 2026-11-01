@@ -105,5 +105,10 @@
   },
   "contributions": "Bijdragen",
   "overBudget": "Budget met {{value}} overschreden",
-  "copyReport": "Rapport kopiëren"
+  "copyReport": "Rapport kopiëren",
+  "environment": {
+    "title": "Systeem",
+    "yes": "Ja",
+    "no": "Nee"
+  }
 }

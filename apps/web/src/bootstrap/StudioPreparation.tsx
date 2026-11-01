@@ -8,7 +8,7 @@ export function StudioPreparation() {
   const { t } = useTranslation("startup");
   return (
     <div className="studio-loading">
-      <Throbber size={52} variant="shimmer" label={t("opening")} delayMs={0} />
+      <Throbber size={80} variant="shimmer" label={t("opening")} delayMs={0} />
     </div>
   );
 }

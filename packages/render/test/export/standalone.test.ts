@@ -7,6 +7,7 @@ import {
   snapshotComposition,
 } from "../../src/export/standalone";
 const gpu = vi.hoisted(() => ({
+  videoFallback: vi.fn(async () => true),
   init: vi.fn(),
   dispose: vi.fn(),
   constructors: vi.fn(),
@@ -16,6 +17,10 @@ const gpu = vi.hoisted(() => ({
   presentationDispose: vi.fn(),
   compositorConstructors: vi.fn(),
   settle: vi.fn(async () => {}),
+}));
+vi.mock("../../src/renderer/video-backend", async (original) => ({
+  ...(await original<typeof import("../../src/renderer/video-backend")>()),
+  videoNeedsWebGL: gpu.videoFallback,
 }));
 vi.mock("three/webgpu", async (importOriginal) => {
   const actual = await importOriginal<typeof import("three/webgpu")>();
@@ -61,6 +66,7 @@ let transfer: ReturnType<typeof vi.fn>;
 let close: ReturnType<typeof vi.fn>;
 beforeEach(async () => {
   await disposeExportRenderers();
+  gpu.videoFallback.mockReset().mockResolvedValue(true);
   gpu.init.mockReset().mockResolvedValue(undefined);
   gpu.dispose.mockReset().mockResolvedValue(undefined);
   gpu.constructors.mockClear();
@@ -266,4 +272,56 @@ it("releases the presentation and renderer even if a native compositor cleanup f
   expect(gpu.presentationDispose).toHaveBeenCalledTimes(1);
   expect(gpu.dispose).toHaveBeenCalledTimes(1);
   expect(session.stats()).toBeNull();
+});
+
+it("chooses WebGL for video before first draw, retains it across hidden poses and switches queued surfaces safely", async () => {
+  const session = createRenderSession();
+  const still = createPage(),
+    video = createPage({ layers: [createLayer("video", { assetId: "v" })] });
+  await session.render(still, {});
+  expect(gpu.constructors).toHaveBeenLastCalledWith({ alpha: true, antialias: false });
+  const original = { v: { kind: "video" } } as never;
+  await session.render(video, original);
+  expect(gpu.constructors).toHaveBeenLastCalledWith({
+    alpha: true,
+    antialias: false,
+    forceWebGL: true,
+  });
+  expect(gpu.compositorDispose).toHaveBeenCalledTimes(1);
+  expect(gpu.presentationDispose).toHaveBeenCalledTimes(1);
+  expect(gpu.dispose).toHaveBeenCalledTimes(1);
+  await session.render(still, original);
+  expect(gpu.constructors).toHaveBeenCalledTimes(2);
+  await session.render(still, {});
+  expect(gpu.constructors).toHaveBeenCalledTimes(3);
+  expect(gpu.constructors).toHaveBeenLastCalledWith({ alpha: true, antialias: false });
+  await session.dispose();
+  expect(gpu.dispose).toHaveBeenCalledTimes(3);
+});
+it("starts video sessions on WebGL directly and reports a genuine initialization failure without retry loops", async () => {
+  const session = createRenderSession();
+  gpu.init.mockRejectedValueOnce(Error("WebGL unavailable"));
+  await expect(session.render(createPage({ layers: [createLayer("video")] }), {})).rejects.toThrow(
+    "WebGL unavailable",
+  );
+  expect(gpu.constructors).toHaveBeenCalledTimes(1);
+  expect(gpu.dispose).toHaveBeenCalledOnce();
+  await session.dispose();
+});
+
+it("retains WebGPU and the same renderer when video imports are compatible", async () => {
+  gpu.videoFallback.mockResolvedValue(false);
+  const session = createRenderSession();
+  await session.render(createPage(), {});
+  await session.render(createPage({ layers: [createLayer("video")] }), {});
+  expect(gpu.constructors).toHaveBeenCalledOnce();
+  expect(gpu.constructors).toHaveBeenCalledWith({ alpha: true, antialias: false });
+  expect(gpu.dispose).not.toHaveBeenCalled();
+  await session.dispose();
+});
+it("honors stable canonical video hints before a future video appears", async () => {
+  const session = createRenderSession({ videoSources: true });
+  await session.render(createPage(), {});
+  expect(gpu.constructors).toHaveBeenCalledWith(expect.objectContaining({ forceWebGL: true }));
+  await session.dispose();
 });

@@ -1,3 +1,5 @@
+import { preloadEditor, scheduleStudioPreload } from "./preload";
+import { createRenderActivity } from "../services/session/render-activity";
 import { MeltLogo } from "../ui/brand/MeltLogo";
 import { StudioPreparation } from "./StudioPreparation";
 import { useTranslation } from "react-i18next";
@@ -12,15 +14,14 @@ import { formatUiError } from "../state/i18n/errors/format";
 import type { StudioRouting } from "../state/contracts";
 import { createProjectFromTemplate } from "../services/projects/templates/catalog";
 const loadApp = () => import("../App");
-const prepareEditor = async () => {
-  await Promise.all([loadApp(), import("../canvas/EditorCanvas")]);
-};
+const prepareEditor = preloadEditor;
 const App = lazy(() => loadApp().then((module) => ({ default: module.App })));
 export function Studio({ routing }: { routing?: StudioRouting } = {}) {
   const { t } = useTranslation("startup");
   const [runtime, setRuntime] = useState<EditorRuntime | null>(null);
   const [error, setError] = useState("");
   const initialRouting = useRef(routing);
+  const cancelBackgroundHold = useRef<(() => void) | null>(null);
   const [editorOpened, setEditorOpened] = useState(routing?.view !== "dashboard");
   if (routing?.view === "editor" && !editorOpened) setEditorOpened(true);
   useEffect(() => {
@@ -66,6 +67,7 @@ export function Studio({ routing }: { routing?: StudioRouting } = {}) {
     return () => {
       disposed = true;
       controller.abort();
+      cancelBackgroundHold.current?.();
       detach?.();
       void current?.dispose().catch(report);
     };
@@ -81,6 +83,15 @@ export function Studio({ routing }: { routing?: StudioRouting } = {}) {
       .openProject(routing.projectId)
       .catch((failure: unknown) => setError(formatUiError(failure)));
   }, [runtime, routing?.projectId]);
+  useEffect(() => {
+    if (!runtime || editorOpened || routing?.view !== "dashboard") return;
+    return scheduleStudioPreload(
+      prepareEditor,
+      window,
+      2000,
+      () => !document.querySelector('[data-preview-status="playing"]'),
+    );
+  }, [runtime, editorOpened, routing?.view]);
   return (
     <>
       {runtime && !editorOpened && routing ? (
@@ -91,13 +102,25 @@ export function Studio({ routing }: { routing?: StudioRouting } = {}) {
             showLanding={false}
             initialView="templates"
             onHome={() => routing.navigate("home")}
-            onPrepareEditor={prepareEditor}
+            onPrepareEditor={async () => {
+              cancelBackgroundHold.current?.();
+              cancelBackgroundHold.current = createRenderActivity(
+                runtime.engine,
+              ).holdUntilPresented();
+              try {
+                await prepareEditor();
+              } catch (error) {
+                cancelBackgroundHold.current?.();
+                throw error;
+              }
+            }}
             onClose={() => routing.navigate("editor", runtime.engine.getSnapshot().project.id)}
             onTask={async (task) => {
               try {
                 await task();
                 return true;
               } catch (failure) {
+                cancelBackgroundHold.current?.();
                 setError(formatUiError(failure));
                 return false;
               }

@@ -38,3 +38,5 @@ export { encodeManagedImage } from "./export/print/encode";
 export { printComposition, DEFAULT_PRINT } from "./export/print/layout";
 export type { PrintExportOptions, ManagedImageOptions } from "./export/print/model";
 export { selectionFrameScope } from "./export/motion/selection";
+
+export { usesVideoSources } from "./renderer/video-backend";

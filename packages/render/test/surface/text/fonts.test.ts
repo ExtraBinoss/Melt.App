@@ -198,6 +198,28 @@ it("disposes native shaping that resolves after clear instead of publishing stal
   repository.clear();
   expect(dispose).toHaveBeenCalledOnce();
 });
+it("cancels cold font publication while yielding after shaping, releasing both native owners", async () => {
+  const { handles } = mockFaces(),
+    repository = new FontRepository();
+  let resume: (() => void) | undefined;
+  vi.stubGlobal("scheduler", {
+    yield: () =>
+      handles.length
+        ? new Promise<void>((resolve) => {
+            resume = resolve;
+          })
+        : Promise.resolve(),
+  });
+  const pending = repository.acquire("Inter"),
+    rejected = expect(pending).rejects.toThrow("cleared");
+  await vi.waitFor(() => expect(resume).toBeTypeOf("function"));
+  repository.clear();
+  resume!();
+  await rejected;
+  expect(handles[0]!.dispose).toHaveBeenCalledOnce();
+  repository.clear();
+  expect(handles[0]!.dispose).toHaveBeenCalledOnce();
+});
 it("rejects failed, oversized, invalid and failed-shaping fonts and permits retries", async () => {
   const { fetcher, create } = mockFaces(),
     repository = new FontRepository();

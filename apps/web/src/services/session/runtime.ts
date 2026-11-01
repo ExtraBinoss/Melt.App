@@ -89,11 +89,13 @@ export async function createRuntime(
   const selection = options.selection ?? new SelectionClient();
   const fonts = options.fonts ?? new FontLibrary();
   const journal = getAnimationSession(engine);
+  const renderActivity = createRenderActivity(engine);
+  if (options.editor) renderActivity.holdUntilPresented();
   const thumbnails =
     options.thumbnails ??
     new ThumbnailPipeline(store, {
       onError,
-      activity: new ThumbnailActivity(600, window, createRenderActivity(engine)),
+      activity: new ThumbnailActivity(600, window, renderActivity),
       renderer: new ThumbnailRenderer(undefined, fonts?.resolve),
     });
   let stopThumbnails: (() => void) | undefined,

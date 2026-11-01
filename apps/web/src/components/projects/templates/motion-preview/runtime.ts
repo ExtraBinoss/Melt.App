@@ -1,3 +1,5 @@
+import { createPreviewPlayback, type PreviewPlayback } from "./playback";
+import { usesVideoSources } from "@musart/render/renderer-policy";
 import {
   getUiPresentation,
   type UiPresentationPort,
@@ -54,6 +56,8 @@ const native: PreviewDependencies = {
 export interface PreviewOwner {
   release: () => Promise<void>;
   setPaused?: (paused: boolean) => void;
+  seek?: (seconds: number) => void;
+  playback?: PreviewPlayback;
 }
 let active: PreviewOwner | null = null;
 async function clearPreviews() {
@@ -106,7 +110,9 @@ export function startMotionPreview(
     () => session?.stats?.() ?? null,
   );
   let frame: number | null = null;
-  let requested: MotionTime | null = null;
+  let requested: { time: MotionTime; position?: number } | null = null;
+  const playback = createPreviewPlayback();
+  let changeTime: ((seconds: number) => void) | null = null;
   let draining: Promise<void> | null = null;
   let disposal: Promise<void> | null = null;
   const clock = new BufferedPlaybackClock(dependencies.now);
@@ -125,6 +131,7 @@ export function startMotionPreview(
     timing?.finish("cancelled");
     stopped = true;
     clock.stop();
+    playback.update({ playing: false, ready: false });
     diagnostics?.dispose();
     stopPresentation?.();
     abort.abort();
@@ -147,6 +154,8 @@ export function startMotionPreview(
   const owner: PreviewOwner = {
     release: () => stop(true),
     setPaused: (next) => changePaused?.(next),
+    seek: (seconds) => changeTime?.(seconds),
+    playback,
   };
   active = owner;
   options.onStatus("loading");
@@ -167,6 +176,7 @@ export function startMotionPreview(
         ? prepared.project.pages.find((item) => item.id === prepared.compositionId)
         : prepared.project.pages[0];
       if (!page) throw new Error("The saved Motion preview artboard is no longer available.");
+      const videoSources = usesVideoSources(page, prepared.project.assets);
       timing?.stage("Compile animation");
       if (presentation?.busy()) await waitForPresentation(presentation, abort.signal);
       const program =
@@ -176,6 +186,8 @@ export function startMotionPreview(
       if (program.mode !== "motion" || !program.duration)
         throw new Error("The preview does not contain a Motion composition.");
       const duration = program.duration;
+      const durationSeconds = motionTimeToSeconds(duration);
+      playback.update({ duration: durationSeconds });
       const mediaResolver: MediaSourceResolver = prepared.mediaResolver ?? {
         resolveOriginal: async (asset, request) => {
           abort.signal.throwIfAborted();
@@ -193,6 +205,7 @@ export function startMotionPreview(
       if (presentation?.busy()) await waitForPresentation(presentation, abort.signal);
       session = await dependencies.createSession({
         maxBytes: 128 * 1024 * 1024,
+        videoSources,
         fontResolver: prepared.fontResolver,
         mediaResolver,
         mediaMode: "playback",
@@ -206,11 +219,11 @@ export function startMotionPreview(
             Math.min(2, globalThis.devicePixelRatio || 1)
           : Infinity;
       const scale = Math.min(1, 480 / Math.max(page.width, page.height), displayScale);
-      async function render(time: MotionTime) {
+      async function render(time: MotionTime, allowPaused = false, position?: number) {
         const started = diagnostics ? performance.now() : 0;
         const generation = renderGeneration;
         if (presentation?.busy()) await waitForPresentation(presentation, abort.signal);
-        if (!alive() || paused || generation !== renderGeneration) return;
+        if (!alive() || (paused && !allowPaused) || generation !== renderGeneration) return;
         const plan = evaluateMotion(program, time);
         const releaseFrame = clock.hold(PLAYBACK_FRAME_CREDIT_MS);
         try {
@@ -218,15 +231,25 @@ export function startMotionPreview(
             applyMotionFrame(program, plan),
             prepared.project.assets,
             (canvas) => {
-              if (!alive() || paused || generation !== renderGeneration) return;
-              if (canvas.parentElement !== options.host) options.host.replaceChildren(canvas);
-              options.host.dataset.previewTime = String(motionTimeToSeconds(plan.time));
+              if (!alive() || (paused && !allowPaused) || generation !== renderGeneration) return;
+              if (canvas.parentElement !== options.host) {
+                options.host.replaceChildren(canvas);
+                if (import.meta.env.DEV)
+                  console.info("[Melt renderer]", {
+                    surface: options.label ?? "Library",
+                    backend: canvas.dataset.backend,
+                    videoSources,
+                  });
+              }
+              const seconds = motionTimeToSeconds(plan.time);
+              options.host.dataset.previewTime = String(seconds);
+              playback.position.set([position ?? seconds]);
               if (import.meta.env.DEV && typeof performance.mark === "function") {
                 performance.mark("Melt frame: preview-submit", {
                   detail: {
                     compositionId: program.compositionId,
                     projectId: prepared.project.id,
-                    playing: true,
+                    playing: !paused,
                     time: plan.time,
                   },
                 });
@@ -241,7 +264,8 @@ export function startMotionPreview(
               traceFrames: import.meta.env.DEV,
               profileVideo: import.meta.env.DEV,
               signal: abort.signal,
-              canRender: () => alive() && !paused && generation === renderGeneration,
+              canRender: () =>
+                alive() && (!paused || allowPaused) && generation === renderGeneration,
             },
           );
           if (alive() && !paused && generation === renderGeneration)
@@ -269,18 +293,19 @@ export function startMotionPreview(
         void stop(false).catch((cleanupError) => options.onStatus("failed", cleanupError));
       }
       function drain() {
-        if (draining || !alive() || paused) return;
+        if (draining || !alive()) return;
         draining = (async () => {
-          while (requested !== null && alive() && !paused) {
+          while (requested !== null && alive()) {
             const sample = requested;
             requested = null;
-            await render(sample);
+            await render(sample.time, paused, sample.position);
           }
         })()
           .catch(failure)
           .finally(() => {
             draining = null;
-            schedule();
+            if (requested !== null) drain();
+            else schedule();
           });
       }
       function schedule() {
@@ -293,7 +318,7 @@ export function startMotionPreview(
         const { time } = samplePlaybackPhase(clock.read(), duration);
         if (time.value !== lastSample) {
           lastSample = time.value;
-          requested = time;
+          requested = { time };
           drain();
         } else schedule();
       }
@@ -303,6 +328,7 @@ export function startMotionPreview(
       changePaused = (next) => {
         if (!alive() || paused === next) return;
         paused = next;
+        playback.update({ playing: !next });
         if (next) {
           diagnostics?.pause();
           clock.stop();
@@ -320,7 +346,31 @@ export function startMotionPreview(
           schedule();
         }
       };
+      changeTime = (seconds) => {
+        if (!alive() || !Number.isFinite(seconds)) return;
+        const target = Math.max(0, Math.min(durationSeconds, seconds));
+        renderGeneration++;
+        if (frame !== null) dependencies.cancelFrame(frame);
+        frame = null;
+        clock.start(target);
+        if (paused) clock.stop();
+        else if (presentation?.busy()) presentationRelease = clock.hold();
+        lastSample = -1;
+        // Motion's terminal boundary is exclusive, while the player's end is inclusive.
+        requested = {
+          time: {
+            value: Math.min(
+              Math.round(target * 1_000_000),
+              Math.ceil(durationSeconds * 1_000_000) - 1,
+            ),
+            rate: 1_000_000,
+          },
+          position: target,
+        };
+        drain();
+      };
       clock.start(0);
+      playback.update({ playing: true, ready: true });
       stopPresentation = presentation?.subscribe(() => {
         if (!alive() || paused) return;
         if (presentation.busy()) {

@@ -1,4 +1,6 @@
 import {
+  lazy,
+  Suspense,
   useCallback,
   useLayoutEffect,
   useId,
@@ -8,6 +10,7 @@ import {
   type ComponentType,
   type ReactNode,
 } from "react";
+import "./keybindings/messages";
 import { useSetAtom } from "jotai";
 import { useTranslation } from "react-i18next";
 import { Ellipsis } from "lucide-react";
@@ -25,7 +28,9 @@ import { SearchCatalog } from "./catalog/cache";
 import { browserSearchTiming } from "./open-timing";
 import type { SearchItem } from "./catalog/model";
 import { captureSearchItem, type PanelMode, type ProjectView, type SearchActions } from "./actions";
-import { ShortcutsDialog } from "./ShortcutsDialog";
+const ShortcutsDialog = lazy(() =>
+  import("./ShortcutsDialog").then((module) => ({ default: module.ShortcutsDialog })),
+);
 import { useSearchShortcuts } from "./use-search-shortcuts";
 import { useKeybindings } from "../../state/keybindings/use-keybindings";
 import { createCommandPort } from "../../state/keybindings/command-port";
@@ -280,7 +285,11 @@ export function MagicSearch({
           onClose={close}
         />
       </SearchDialog>
-      {help && <ShortcutsDialog onClose={() => setHelp(false)} />}
+      {help && (
+        <Suspense fallback={null}>
+          <ShortcutsDialog onClose={() => setHelp(false)} />
+        </Suspense>
+      )}
       <input
         ref={svgInput}
         className="sr-only"

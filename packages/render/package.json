@@ -8,7 +8,8 @@
     "./spatial": "./src/spatial/public.ts",
     "./audio": "./src/audio.ts",
     "./playback": "./src/playback/index.ts",
-    "./preview-cost": "./src/compositing/preview-cost.ts"
+    "./preview-cost": "./src/compositing/preview-cost.ts",
+    "./renderer-policy": "./src/renderer/video-backend.ts"
   },
   "dependencies": {
     "@imagemagick/magick-wasm": "0.0.45",

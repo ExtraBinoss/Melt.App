@@ -1,7 +1,10 @@
 import { preservePlayerTimeEdit } from "../shared/player/PlayerTimeField";
-import { useRef } from "react";
+import { lazy, Suspense, useRef } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
-import { ExportWorkspace } from "./ExportWorkspace";
+import { Throbber } from "../ui/throbber/Throbber";
+const ExportWorkspace = lazy(() =>
+  import("./ExportWorkspace").then((module) => ({ default: module.ExportWorkspace })),
+);
 import { ExportTriggerLabel } from "./ExportTriggerLabel";
 import { Download } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -35,13 +38,21 @@ export function ExportPopover(props: ExportPopoverProps) {
         <DialogHeader className="export-dialog-header">
           <DialogTitle>{t("exportTitle")}</DialogTitle>
         </DialogHeader>
-        <ExportWorkspace
-          entrance={surface}
-          engine={props.engine}
-          services={props.services}
-          initialCompositionId={props.initialCompositionId}
-          onClose={() => props.onOpenChange(false)}
-        />
+        <Suspense
+          fallback={
+            <div className="export-workspace-loading">
+              <Throbber size={40} label={t("brand:preparing")} />
+            </div>
+          }
+        >
+          <ExportWorkspace
+            entrance={surface}
+            engine={props.engine}
+            services={props.services}
+            initialCompositionId={props.initialCompositionId}
+            onClose={() => props.onOpenChange(false)}
+          />
+        </Suspense>
       </DialogContent>
     </Dialog>
   );

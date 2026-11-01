@@ -426,3 +426,63 @@ test("optional preview preparation and frame admission yield to overlay transiti
   expect(listeners.size).toBe(0);
   expect(f.callbacks.size).toBe(0);
 });
+
+test("shared player seeks while paused, preserves endpoints and resumes from the accepted seek", async () => {
+  const f = fixture(),
+    owner = f.start();
+  await flush();
+  expect(owner.playback!.read()).toEqual({ duration: 5, playing: true, ready: true });
+  const state = vi.fn(),
+    positions = vi.fn();
+  const offState = owner.playback!.subscribe(state),
+    offPosition = owner.playback!.position.subscribe(positions);
+  f.tick(1100);
+  await flush();
+  expect(owner.playback!.position.read()).toEqual([0.1]);
+  expect(state).not.toHaveBeenCalled();
+  owner.setPaused!(true);
+  owner.seek!(3);
+  await flush();
+  expect(f.times.at(-1)).toBe(3);
+  expect(owner.playback!.position.read()).toEqual([3]);
+  expect(f.callbacks.size).toBe(0);
+  owner.seek!(5);
+  await flush();
+  expect(f.times.at(-1)).toBe(4.999999);
+  expect(owner.playback!.position.read()).toEqual([5]);
+  owner.seek!(-2);
+  await flush();
+  expect(owner.playback!.position.read()).toEqual([0]);
+  owner.seek!(2);
+  await flush();
+  owner.setPaused!(false);
+  f.tick(1200);
+  await flush();
+  expect(f.times.at(-1)).toBeCloseTo(2.1);
+  expect(positions).toHaveBeenCalled();
+  offState();
+  offPosition();
+  await owner.release();
+  const count = f.times.length;
+  owner.seek!(4);
+  expect(f.times.length).toBe(count);
+});
+
+test("latest seek wins over an in-flight frame without stale position publication", async () => {
+  const f = fixture(),
+    owner = f.start();
+  await flush();
+  const gate = f.hold();
+  f.tick(1200);
+  await flush();
+  owner.setPaused!(true);
+  owner.seek!(1);
+  owner.seek!(4);
+  gate.resolve();
+  await flush();
+  expect(f.times.at(-1)).toBe(4);
+  expect(owner.playback!.position.read()).toEqual([4]);
+  expect(f.status).toHaveBeenLastCalledWith("paused");
+  expect(f.callbacks.size).toBe(0);
+  await owner.release();
+});

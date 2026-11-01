@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { preloadEditor } from "../../../bootstrap/preload";
 import { useAtomValue, type Atom } from "jotai";
 import { ArrowUpRight, Star } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -70,6 +71,12 @@ export function ItemDialog({
             <Button
               className="library-item-primary"
               disabled={busy}
+              onPointerEnter={() => {
+                void preloadEditor().catch(() => {});
+              }}
+              onFocus={() => {
+                void preloadEditor().catch(() => {});
+              }}
               onClick={() => {
                 setDismissed(selected);
                 selected.open();
@@ -96,6 +103,7 @@ export function ItemDialog({
             key={libraryItemKey(selected.item)}
             item={selected.item}
             services={services}
+            disabled={busy || !open}
           />
         </DialogContent>
       )}

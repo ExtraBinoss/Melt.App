@@ -358,7 +358,8 @@ test("switches appearance/language and opens real keyboard help from search or ?
   await act(() => i18n.changeLanguage("fr"));
   await d.choose("shortcuts", /Raccourcis clavier/);
   const help = await screen.findByRole("dialog", { name: "Raccourcis clavier" });
-  expect(within(help).getByText("Enregistrer")).toBeInTheDocument();
+  fireEvent.change(within(help).getByRole("searchbox"), { target: { value: "Enregistrer" } });
+  expect(await within(help).findByText("Enregistrer")).toBeInTheDocument();
   fireEvent.click(within(help).getByRole("button", { name: "Fermer" }));
   await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
   fireEvent.keyDown(document, { key: "?" });

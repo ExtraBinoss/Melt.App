@@ -7,7 +7,15 @@ import { ProjectMotionPreview } from "../gallery/ProjectMotionPreview";
 import { MotionTemplatePreview } from "../templates/motion-preview/MotionTemplatePreview";
 import { TEMPLATE_CATALOG } from "../../../services/projects/templates/catalog";
 import { isMotionTemplateId } from "../../../services/projects/templates/motion/identity";
-export function ItemPreview({ item, services }: { item: LibraryItem; services: EditorServices }) {
+export function ItemPreview({
+  item,
+  services,
+  disabled = false,
+}: {
+  item: LibraryItem;
+  services: EditorServices;
+  disabled?: boolean;
+}) {
   const { t } = useTranslation("libraryItem");
   const [source, setSource] = useState<{ key: string; url?: string; failed?: boolean } | null>(
     null,
@@ -53,10 +61,16 @@ export function ItemPreview({ item, services }: { item: LibraryItem; services: E
       style={template?.previewBackground ? { background: template.previewBackground } : undefined}
     >
       {item.kind === "template" && item.mode === "motion" && isMotionTemplateId(item.id) ? (
-        <MotionTemplatePreview autoplay templateId={item.id} poster={poster ?? ""} />
+        <MotionTemplatePreview
+          autoplay
+          disabled={disabled}
+          templateId={item.id}
+          poster={poster ?? ""}
+        />
       ) : item.kind === "project" && item.mode === "motion" && item.pageId ? (
         <ProjectMotionPreview
           autoplay
+          disabled={disabled}
           projectId={item.id}
           pageId={item.pageId}
           services={services}

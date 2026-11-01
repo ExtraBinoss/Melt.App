@@ -1,3 +1,5 @@
+import { createPreviewPlayback } from "../../../../../src/components/projects/templates/motion-preview/playback";
+import { changeLanguage } from "../../../../../src/state/i18n";
 import { expect, test, vi } from "vitest";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { MotionPreviewSurface } from "../../../../../src/components/projects/templates/motion-preview/MotionPreviewSurface";
@@ -260,4 +262,47 @@ test("touch cards admit only one visible preview and hand ownership back after a
   expect(start).toHaveBeenCalledTimes(2);
   card.unmount();
   vi.unstubAllGlobals();
+});
+
+test("dialog imports the shared player as an overlay; frame updates keep control metadata stable", async () => {
+  await changeLanguage("en");
+  vi.spyOn(window, "matchMedia").mockImplementation(
+    (query) =>
+      ({
+        matches: query.includes("hover"),
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+      }) as unknown as MediaQueryList,
+  );
+  const playback = createPreviewPlayback(),
+    release = vi.fn(async () => {}),
+    seek = vi.fn(),
+    setPaused = vi.fn();
+  const owner = { playback, release, seek, setPaused };
+  const start = vi.fn(() => owner),
+    metadata = vi.fn();
+  const unsubscribe = playback.subscribe(metadata);
+  const view = render(
+    <div className="library-item-preview" data-preview-owner>
+      <MotionPreviewSurface startPreview={start} />
+    </div>,
+  );
+  fireEvent.pointerEnter(view.container.firstElementChild!);
+  act(() => playback.update({ duration: 12, playing: true, ready: true }));
+  const overlay = view.container.querySelector(".motion-preview-player")!;
+  expect(overlay.querySelector(".media-player.media-player-overlay")).not.toBeNull();
+  expect(view.container.querySelector(".motion-preview-control")).toBeNull();
+  metadata.mockClear();
+  act(() => {
+    for (let frame = 1; frame <= 60; frame++) playback.position.set([frame / 30]);
+  });
+  expect(metadata).not.toHaveBeenCalled();
+  expect(overlay.querySelector("[data-player]")).toHaveStyle({
+    "--player-position": `${(2 / 12) * 100}%`,
+  });
+  fireEvent.click(screen.getByRole("button", { name: "Pause preview" }));
+  expect(setPaused).toHaveBeenCalledWith(true);
+  unsubscribe();
+  view.unmount();
+  expect(release).toHaveBeenCalledOnce();
 });

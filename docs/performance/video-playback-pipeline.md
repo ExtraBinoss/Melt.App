@@ -120,3 +120,110 @@ problem rather than missing or incorrectly timed decoded source frames, but does
 not establish the exact upstream fault. No automatic browser/GPU blocklist or
 renderer switch was shipped from this one-machine result. The more stable WebGL
 path remains a candidate for a measured compatibility workaround.
+
+## Minimal reproduction and GPU-preserving display workaround (November 1)
+
+A minimal Three.js test also reproduces black captures without Mediabunny, MP4
+parsing, WebCodecs decoding, a Motion timeline or the document compositor. It
+constructs native I420 VideoFrames from known nonblack bytes and renders them
+through a VideoFrameTexture. Direct rendering produced five black captures among
+94; the production video rasterizer plus presentation produced three among 96.
+This rules out demuxing/decoding as a necessary trigger, but does not by itself
+identify whether Three, Chromium, the driver or native presentation is responsible.
+A flipY change initially passed the minimal case but still failed the full Bloom
+composition, so it was also rejected rather than shipped as a fix.
+
+An X11 launch recorded zero black captures among 133, but checking the actual
+upload calls and adapter selection invalidated the initial interpretation:
+WebGPU accepted no VideoFrame uploads and Three had selected its WebGL backend.
+Direct X11 adapter probes returned null. This is evidence for the WebGL
+compatibility path, **not** a verified X11 fix for hardware WebGPU. Earlier claims
+that WebGPU remained active in that test were incorrect. A standalone browser's
+global feature-status table is insufficient to identify the renderer actually used.
+The isolated CLI editor was closed after it failed to reach a visible canvas;
+no change was made to the user's daily Chrome or Firefox profiles.
+
+Related primary reports:
+
+- [Three #32391](https://github.com/mrdoob/three.js/issues/32391) and its
+  [#32441 workaround](https://github.com/mrdoob/three.js/pull/32441): bad video
+  uploads can break a WebGPU pipeline. That exception guard is already present
+  in the installed Three version; our reproduced black frames raise no such error.
+- [Chromium #548711898](https://issues.chromium.org/issues/548711898): native
+  Wayland black video with an X11 workaround. Its reported NVIDIA/DRM environment
+  differs from this Intel/unprotected-I420 reproduction, so it is supporting
+  platform evidence rather than an identification of the same underlying bug.
+- [MasterSelects video texture paths](https://www.masterselects.com/docs/features/gpu-engine/)
+  documents browser-specific black imported video textures and persistent-copy
+  workarounds. Its separate Linux software-presentation/readback fallback does
+  not meet Melt's no-readback constraint and was not adopted.
+
+Ignored reproduction/capture evidence: `artifacts/video-stress/minimal/` and
+`artifacts/video-stress/bloom-x11-inspect/`. No experimental native-copy, decoder
+preference, UV-flip or automatic backend-switch code remains in production.
+
+## Automatic backend policy
+
+Video compositions keep WebGPU when native VideoFrame import is supported. A
+cached, one-time capability probe uploads a synthetic 2×2 native frame, checks the
+validation scope and GPU queue completion, then destroys its frame, texture and
+probe device. It runs before binding the editor canvas, so fallback never tries to
+rebind a WebGPU canvas to WebGL. It performs no GPU pixel readback. Unsupported
+imports select Three's WebGL 2 backend via `WebGPURenderer({ forceWebGL: true })`.
+
+Desktop Linux Chromium video surfaces use WebGL conservatively. A narrower
+Chrome-156/Intel-xe-lpg criterion passed the isolated native check but did not cover
+the user's live Chrome failure. Validation cannot detect black pixels without
+readback, so successful upload admission alone cannot certify pixel correctness.
+Other operating systems retain WebGPU when the native operation succeeds. Firefox
+uses the capability probe rather than a permanent browser-version blocklist, so a
+future implementation with native import support can retain WebGPU.
+Nonvideo documents do not run the video probe. Canonical authored tracks are
+checked before the first pose, including videos starting later in the composition.
+Audio-only documents do not select the video policy.
+
+The editor subscribes to a video-presence boolean. Playback/property-preview ticks
+do not rerender its root; adding the first video or removing the last one remounts
+the canvas and retires the old owner. Reusable standalone sessions choose the
+backend inside their exclusive frame queue, release previous compositor,
+presentation and renderer resources before changing backend, and include retained
+video originals when a materialized pose hides an inactive video. Canonical
+preview/export callers provide their stable composition choice explicitly.
+An explicit `forceWebGL: false` remains available for controlled WebGPU diagnostics.
+
+This does not replace Mediabunny, alter clocks or force software decoding. Source
+frames still use the existing native VideoFrame texture owner and GPU effects/masks.
+No native bitmap intermediate, software canvas, pixel array or GPU readback was
+added to rendering. Native encoding and test-only pixel inspection keep their
+existing roles.
+
+Firefox additionally documents unsupported WebGPU VideoFrame uploads in
+[Mozilla #1922100](https://bugzilla.mozilla.org/show_bug.cgi?id=1922100), while
+[WebGL VideoFrame uploads were implemented in Firefox 119](https://bugzilla.mozilla.org/show_bug.cgi?id=1781526).
+Selecting the supported Three backend avoids treating an initialized GPU session
+as proof that every video-source import operation is supported.
+
+## Library playback controls
+
+The Open in Melt preview imports the same `MediaPlayer` used by export, placed
+at the bottom of the artwork with the shared translucent, blurred overlay style.
+Hover cards show a compact purple progress strip between their artwork and caption. Both consume
+accepted preview-frame positions, not a second extrapolated clock. Frame position
+updates are imperative; only readiness, duration and play/pause update the control
+component. Seeks share the renderer's bounded latest-request queue, cancel stale
+admission and render while paused without starting a background playback loop.
+The player can select the inclusive endpoint; Motion evaluates the last valid
+subframe at its exclusive composition boundary.
+
+## Copyable environment diagnostics
+
+The on-demand Performance report includes the browser user agent/version, reported
+OS/platform, logical processor count and browser-reported memory when available,
+viewport/screen/DPR, language, motion preference, security context and native media
+API availability. Renderer details come from the existing canvas owner: selected
+backend, Three revision, canvas density/color space, GPU vendor/description and
+exposed architecture/features/limits. WebGL uses ordinary capability queries and
+the optional debug-renderer extension; WebGPU uses the active device metadata.
+No second adapter/context or pixel readback is created for this report. Unexposed
+fields are omitted, and the bounded snapshot freezes these values with its sampled
+metrics so the copied report describes the measured renderer.

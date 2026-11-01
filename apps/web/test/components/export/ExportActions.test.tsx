@@ -37,21 +37,21 @@ test("keeps normal image export independent and opens Timelapse from the small d
   d.mount(<Harness />);
   fireEvent.click(screen.getByRole("button", { name: "Exporter" }));
   expect(screen.getByRole("dialog", { name: "Exporter la composition" })).toBeVisible();
-  fireEvent.click(screen.getByRole("button", { name: "Annuler" }));
+  fireEvent.click(await screen.findByRole("button", { name: "Annuler" }));
   fireEvent.pointerDown(screen.getByRole("button", { name: "Options d’export" }), {
     button: 0,
     ctrlKey: false,
     pointerType: "mouse",
   });
   fireEvent.click(await screen.findByRole("menuitem", { name: "Exporter un timelapse…" }));
-  expect(screen.getByRole("dialog", { name: "Timelapse" })).toBeVisible();
+  expect(await screen.findByRole("dialog", { name: "Timelapse" })).toBeVisible();
   expect(screen.queryByRole("dialog", { name: "Exporter la composition" })).toBeNull();
   expect(d.services.exportImage).not.toHaveBeenCalled();
   fireEvent.click(screen.getByText("Close Timelapse"));
   expect(screen.queryByRole("dialog", { name: "Timelapse" })).toBeNull();
 });
 
-test("opening the common exporter pauses only the editor's presentation and never resumes or seeks on close", () => {
+test("opening the common exporter pauses only the editor's presentation and never resumes or seeks on close", async () => {
   const d = setup();
   d.engine.execute({ type: "setCompositionMode", mode: "motion" });
   const transport = createMotionTransport(d.engine);
@@ -78,7 +78,7 @@ test("opening the common exporter pauses only the editor's presentation and neve
   d.mount(<Harness />);
   fireEvent.click(screen.getByRole("button", { name: "Exporter" }));
   expect(transport.read()).toMatchObject({ playing: false, time: position });
-  fireEvent.click(screen.getByRole("button", { name: "Annuler" }));
+  fireEvent.click(await screen.findByRole("button", { name: "Annuler" }));
   expect(transport.read()).toMatchObject({ playing: false, time: position });
   expect(d.engine.getSnapshot()).toBe(before);
 });

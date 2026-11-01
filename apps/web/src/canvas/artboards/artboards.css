@@ -45,6 +45,12 @@
   background: var(--workspace, oklch(0.945 0.004 260));
   isolation: isolate;
 }
+.artboard-mode-footer,
+.artboard-performance-footer {
+  --artboard-control-height: 26px;
+  --artboard-control-padding: 7px;
+  --artboard-control-icon-size: 15px;
+}
 .artboard-mode-footer {
   position: absolute;
   top: 50%;
@@ -68,15 +74,16 @@
 }
 .artboard-mode-footer .segmented-tab,
 .artboard-mode-footer .artboard-mode-activate {
-  height: 26px;
-  min-height: 26px;
+  height: var(--artboard-control-height);
+  min-height: var(--artboard-control-height);
   font-size: 10px;
-  padding-inline: 7px;
+  padding-inline: var(--artboard-control-padding);
   gap: 4px;
 }
-.artboard-mode-footer .segmented-tab svg {
-  width: 15px;
-  height: 15px;
+.artboard-mode-footer .segmented-tab svg,
+.artboard-mode-footer .segmented-tabs[data-size="compact"] .segmented-tab-icon svg {
+  width: var(--artboard-control-icon-size);
+  height: var(--artboard-control-icon-size);
 }
 .artboard-mode-footer .motion-mode {
   min-width: 0;

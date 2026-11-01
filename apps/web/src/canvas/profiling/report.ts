@@ -1,3 +1,4 @@
+import type { PerformanceEnvironment } from "../../state/session/performance-environment";
 import { frameContributions } from "./contributions";
 import type { Composition } from "@musart/core";
 import type { SceneFrameSample } from "../render/scene-profile-source";
@@ -22,6 +23,7 @@ const value = (
   availability: number === null ? missing : "measured",
 });
 export interface PerformanceReportInput {
+  environment?: PerformanceEnvironment;
   page: Composition;
   samples: readonly SceneFrameSample[];
   durationMs: number;
@@ -210,6 +212,7 @@ export function compositionReport(input: PerformanceReportInput): CompositionPer
   const { samples } = input;
   const intervals = samples.slice(1).map((sample, i) => sample.at - samples[i]!.at);
   return {
+    ...(input.environment ? { environment: input.environment } : {}),
     contributions: frameContributions(samples, (sample, index) =>
       sample.hostMs === null ? null : hostWork(sample, input.animationIntervals[index]),
     ),

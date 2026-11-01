@@ -105,5 +105,10 @@
   },
   "contributions": "Contributi",
   "overBudget": "Budget superato di {{value}}",
-  "copyReport": "Copia rapporto"
+  "copyReport": "Copia rapporto",
+  "environment": {
+    "title": "Sistema",
+    "yes": "Sì",
+    "no": "No"
+  }
 }

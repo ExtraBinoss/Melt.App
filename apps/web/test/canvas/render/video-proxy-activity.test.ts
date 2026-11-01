@@ -2,6 +2,28 @@ import { afterEach, expect, it, vi } from "vitest";
 import { fireEvent } from "@testing-library/react";
 import { CanvasVideoProxyActivity } from "../../../src/canvas/render/video-proxy-activity";
 afterEach(() => vi.useRealTimers());
+it("keeps proxy conversion behind the current canonical presentation, including a reopened project", () => {
+  vi.useFakeTimers();
+  let presented = false;
+  const activity = new CanvasVideoProxyActivity(vi.fn(), () => presented);
+  const changed = vi.fn();
+  activity.subscribe(changed);
+  vi.advanceTimersByTime(1000);
+  expect(activity.read()).toBe(false);
+  presented = true;
+  activity.framePresented();
+  expect(activity.read()).toBe(false);
+  vi.advanceTimersByTime(180);
+  expect(activity.read()).toBe(true);
+  presented = false;
+  changed.mockClear();
+  activity.setBlocked(false);
+  expect(changed).toHaveBeenCalled();
+  vi.advanceTimersByTime(1000);
+  expect(activity.read()).toBe(false);
+  activity.dispose();
+  expect(vi.getTimerCount()).toBe(0);
+});
 it("admits native conversion after quiet time and stops it throughout pointer gestures, wheel and playback", () => {
   vi.useFakeTimers();
   const ready = vi.fn(),

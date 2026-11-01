@@ -24,6 +24,7 @@ import {
   CompositionPerformanceError,
   getCompositionPerformance,
 } from "../../state/session/composition-performance";
+import { PerformanceEnvironment } from "./PerformanceEnvironment";
 import { PerformanceMeasurements } from "./PerformanceMeasurements";
 import "./messages";
 import "./performance.css";
@@ -167,7 +168,12 @@ function PerformancePanel({
             </p>
           )}
           {status === "ready" && snapshot && (
-            <PerformanceMeasurements snapshot={snapshot} budgetMs={budgetMs} />
+            <>
+              <PerformanceMeasurements snapshot={snapshot} budgetMs={budgetMs} />
+              {snapshot.environment && (
+                <PerformanceEnvironment environment={snapshot.environment} />
+              )}
+            </>
           )}
           {!loading && status === "ready" && !snapshot && (
             <p className="composition-performance-status" role="status">

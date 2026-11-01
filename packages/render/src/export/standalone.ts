@@ -3,12 +3,14 @@ import { LinearSRGBColorSpace, NoToneMapping, WebGPURenderer } from "three/webgp
 import { GpuCompositor } from "../compositing/GpuCompositor";
 import type { RenderOptions } from "../compositing/types";
 import { createSurface } from "../surface/sources";
+import { usesVideoSources, videoNeedsWebGL } from "../renderer/video-backend";
 import { GpuPresentation } from "./presentation";
 import type { FontResolver } from "../surface/text/fonts";
 
 /** Dedicated export context. One queue covers render, GPU snapshot and all consumers. */
 export class StandaloneRenderer {
   private renderer: WebGPURenderer | null = null;
+  private backendPreference: boolean | undefined;
   private compositor: GpuCompositor | null = null;
   private presentation: GpuPresentation | null = null;
   private queue: Promise<unknown> = Promise.resolve();
@@ -20,20 +22,23 @@ export class StandaloneRenderer {
     private readonly fontResolver?: FontResolver,
     private readonly mediaDefaults: Pick<
       RenderOptions,
-      "mediaResolver" | "mediaMode" | "signal"
+      "mediaResolver" | "mediaMode" | "signal" | "videoSources"
     > = {},
   ) {}
-  private async init(): Promise<void> {
-    if (this.renderer) return;
+  private async init(video: boolean): Promise<void> {
+    const preferWebGL = this.forceWebGL ?? (video && (await videoNeedsWebGL()));
+    if (this.renderer && this.backendPreference === preferWebGL) return;
+    if (this.renderer) await this.releaseGpu();
     let renderer = new WebGPURenderer({
       alpha: true,
       antialias: false,
-      ...(this.forceWebGL === undefined ? {} : { forceWebGL: this.forceWebGL }),
+      ...(preferWebGL ? { forceWebGL: true } : {}),
     });
     try {
       await renderer.init();
-    } catch {
+    } catch (error) {
       await renderer.dispose();
+      if (preferWebGL) throw error;
       renderer = new WebGPURenderer({ alpha: true, antialias: false, forceWebGL: true });
       try {
         await renderer.init();
@@ -42,11 +47,16 @@ export class StandaloneRenderer {
         throw error;
       }
     }
+    renderer.domElement.dataset.backend =
+      renderer.backend && "isWebGLBackend" in renderer.backend && renderer.backend.isWebGLBackend
+        ? "webgl"
+        : "webgpu";
     renderer.outputColorSpace = LinearSRGBColorSpace;
     renderer.toneMapping = NoToneMapping;
     renderer.setPixelRatio(1);
     renderer.setClearColor(0, 0);
     this.renderer = renderer;
+    this.backendPreference = preferWebGL;
     this.compositor = new GpuCompositor(renderer, {
       maxBytes: this.maxBytes,
       fontResolver: this.fontResolver,
@@ -63,7 +73,9 @@ export class StandaloneRenderer {
       if (this.disposed) throw new Error("L’export GPU est fermé.");
       if (options.canRender && !options.canRender())
         throw new DOMException("Rendering deferred.", "AbortError");
-      await this.init();
+      await this.init(
+        options.videoSources ?? this.mediaDefaults.videoSources ?? usesVideoSources(page, assets),
+      );
       const mediaMode = options.mediaMode ?? this.mediaDefaults.mediaMode ?? "exact";
       const frame = await this.compositor!.render(page, assets, {
         mediaMode: "exact",
@@ -129,30 +141,30 @@ export class StandaloneRenderer {
   dispose(): Promise<void> {
     if (this.disposal) return this.disposal;
     this.disposed = true;
-    this.disposal = this.queue.then(async () => {
-      const failures: unknown[] = [];
-      try {
-        await this.compositor?.dispose();
-      } catch (error) {
-        failures.push(error);
-      }
-      try {
-        this.presentation?.dispose();
-      } catch (error) {
-        failures.push(error);
-      }
-      try {
-        await this.renderer?.dispose();
-      } catch (error) {
-        failures.push(error);
-      }
-      this.renderer = null;
-      this.compositor = null;
-      this.presentation = null;
-      if (failures.length)
-        throw new AggregateError(failures, "Standalone renderer cleanup failed.");
-    });
+    this.disposal = this.queue.then(() => this.releaseGpu());
     return this.disposal;
+  }
+  private async releaseGpu(): Promise<void> {
+    const failures: unknown[] = [];
+    try {
+      await this.compositor?.dispose();
+    } catch (error) {
+      failures.push(error);
+    }
+    try {
+      this.presentation?.dispose();
+    } catch (error) {
+      failures.push(error);
+    }
+    try {
+      await this.renderer?.dispose();
+    } catch (error) {
+      failures.push(error);
+    }
+    this.renderer = null;
+    this.compositor = null;
+    this.presentation = null;
+    if (failures.length) throw new AggregateError(failures, "Standalone renderer cleanup failed.");
   }
 }
 interface SnapshotEntry {

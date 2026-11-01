@@ -1,3 +1,5 @@
+import { NavigationButton } from "../../../ui/navigation/NavigationButton";
+import { dashboardHref } from "../../../ui/navigation/activation";
 import { BrandStatus } from "../../../ui/brand/BrandStatus";
 import { SiteHeader } from "../../site/SiteHeader";
 import { SiteFooter } from "../../site/SiteFooter";
@@ -32,19 +34,31 @@ export function LandingPage({
       <SiteHeader landing onTry={onCreate} onPrepare={onPrepare} disabled={busy} />
       <section className="landing-intro" id="musart-intro">
         <HeroHeadline lines={[t("titleFirst"), t("titleSecond")]} />
-        <Button className="landing-cta" disabled={busy} onClick={onCreate}>
+        <NavigationButton
+          className="landing-cta"
+          href={dashboardHref}
+          disabled={busy}
+          onNavigate={onCreate}
+          onPrepare={onPrepare}
+        >
           {t("create")}
           <ArrowUpRight size={18} />
-        </Button>
+        </NavigationButton>
       </section>
       <ShowcaseCarousel onChoose={onTemplate ?? onCreate} busy={busy} />
       <section className="landing-creativity">
         <h2>{t("creativity")}</h2>
         <p>{t("description")}</p>
-        <Button className="landing-cta" disabled={busy} onClick={onCreate}>
+        <NavigationButton
+          className="landing-cta"
+          href={dashboardHref}
+          disabled={busy}
+          onNavigate={onCreate}
+          onPrepare={onPrepare}
+        >
           {t("create")}
           <ArrowUpRight size={18} />
-        </Button>
+        </NavigationButton>
       </section>
       <section id="features" className="landing-features" aria-label={t("features")}>
         {features.map((feature) => (
@@ -65,10 +79,16 @@ export function LandingPage({
       <Faq title={t("site:faq")} items={t("site:faqItems", { returnObjects: true }) as FaqItem[]} />
       <section className="landing-footer">
         <h2>{t("end")}</h2>
-        <Button className="landing-cta" disabled={busy} onClick={onCreate}>
+        <NavigationButton
+          className="landing-cta"
+          href={dashboardHref}
+          disabled={busy}
+          onNavigate={onCreate}
+          onPrepare={onPrepare}
+        >
           {t("create")}
           <ArrowUpRight size={18} />
-        </Button>
+        </NavigationButton>
       </section>
       <SiteFooter />
       {busy && (

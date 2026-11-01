@@ -1,13 +1,16 @@
 .artboard-performance-button {
-  height: 26px;
-  min-height: 26px;
-  padding: 0 7px;
+  height: var(--artboard-control-height, 26px);
+  min-height: var(--artboard-control-height, 26px);
+  width: 30px;
+  min-width: 30px;
+  padding: 0 var(--artboard-control-padding, 7px);
+  border-radius: 6px;
   gap: 4px;
   font-size: 10px;
 }
 .artboard-performance-button svg {
-  width: 15px;
-  height: 15px;
+  width: var(--artboard-control-icon-size, 15px);
+  height: var(--artboard-control-icon-size, 15px);
 }
 .composition-performance-popover {
   width: min(352px, calc(100vw - 32px));
@@ -188,14 +191,6 @@
   align-items: center;
   gap: 4px;
 }
-.artboard-performance-button {
-  width: 26px;
-  padding: 3px;
-}
-.artboard-performance-button svg {
-  width: 18px;
-  height: 18px;
-}
 .composition-performance-target-select {
   grid-column: 1 / -1;
   width: 100%;
@@ -218,4 +213,14 @@
   margin: 6px 0 0;
   color: var(--destructive);
   font-size: 11px;
+}
+
+.composition-performance-environment .composition-performance-row {
+  align-items: baseline;
+}
+.composition-performance-environment .composition-performance-row dd {
+  flex-shrink: 1;
+  min-width: 0;
+  max-width: 66%;
+  overflow-wrap: anywhere;
 }

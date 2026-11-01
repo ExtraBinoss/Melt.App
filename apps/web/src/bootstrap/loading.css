@@ -17,3 +17,8 @@
   justify-items: center;
   gap: 1.15rem;
 }
+
+.studio-loading > .ui-throbber .ui-throbber-label {
+  font-size: 14px;
+  line-height: 1.6;
+}

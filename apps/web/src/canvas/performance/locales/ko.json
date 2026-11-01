@@ -105,5 +105,10 @@
   },
   "contributions": "기여도",
   "overBudget": "예산 {{value}} 초과",
-  "copyReport": "보고서 복사"
+  "copyReport": "보고서 복사",
+  "environment": {
+    "title": "시스템",
+    "yes": "예",
+    "no": "아니요"
+  }
 }

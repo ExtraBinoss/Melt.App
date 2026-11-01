@@ -105,5 +105,10 @@
   },
   "contributions": "Składowe",
   "overBudget": "Budżet przekroczony o {{value}}",
-  "copyReport": "Kopiuj raport"
+  "copyReport": "Kopiuj raport",
+  "environment": {
+    "title": "System",
+    "yes": "Tak",
+    "no": "Nie"
+  }
 }

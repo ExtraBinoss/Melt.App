@@ -1,3 +1,4 @@
+import { NavigationButton } from "../../ui/navigation/NavigationButton";
 import { ArrowUpRight } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -60,16 +61,16 @@ export function SiteHeader({
         </a>
       </nav>
       {onTry ? (
-        <Button
+        <NavigationButton
           className="site-try landing-try"
+          href={publicHref("/dashboard")}
           disabled={disabled}
-          onClick={onTry}
-          onPointerEnter={onPrepare}
-          onFocus={onPrepare}
+          onNavigate={onTry}
+          onPrepare={onPrepare}
         >
           {t("try")}
           <ArrowUpRight size={16} />
-        </Button>
+        </NavigationButton>
       ) : (
         <Button className="site-try" asChild>
           <a href={publicHref("/dashboard")}>

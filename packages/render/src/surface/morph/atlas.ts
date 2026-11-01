@@ -4,7 +4,7 @@ import {
   type MorphShapeFrame,
   type ShapeMorph,
 } from "@musart/core";
-import { yieldPreparation } from "./preparation-task";
+import { yieldPreparation } from "../preparation-task";
 import { DataTexture, FloatType, NearestFilter, NoColorSpace, RGBAFormat } from "three/webgpu";
 
 export interface MorphAtlas {

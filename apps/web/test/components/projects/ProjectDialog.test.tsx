@@ -203,14 +203,14 @@ test("preferences requested by search open in a separate dialog rather than a da
       onTask={d.onTask}
     />,
   );
-  expect(screen.getByRole("dialog", { name: "Préférences" })).toBeVisible();
+  expect(await screen.findByRole("dialog", { name: "Préférences" })).toBeVisible();
   expect(screen.getByRole("tab", { name: "Général" })).toHaveAttribute("aria-selected", "true");
   expect(screen.queryByRole("tab", { name: "Projets" })).not.toBeInTheDocument();
   expect(d.services.listProjectPage).not.toHaveBeenCalled();
   fireEvent.click(screen.getByRole("button", { name: "Fermer" }));
   await waitFor(() => expect(close).toHaveBeenCalled());
 });
-test("the search editor route opens snapping preferences directly without loading the project gallery", () => {
+test("the search editor route opens snapping preferences directly without loading the project gallery", async () => {
   const d = setup();
   d.mount(
     <ProjectDialog
@@ -220,7 +220,10 @@ test("the search editor route opens snapping preferences directly without loadin
       onTask={d.onTask}
     />,
   );
-  expect(screen.getByRole("tab", { name: "Éditeur" })).toHaveAttribute("aria-selected", "true");
+  expect(await screen.findByRole("tab", { name: "Éditeur" })).toHaveAttribute(
+    "aria-selected",
+    "true",
+  );
   expect(screen.getByRole("switch", { name: "Accrocher aux éléments" })).toBeVisible();
   expect(d.services.listProjectPage).not.toHaveBeenCalled();
 });
@@ -293,7 +296,7 @@ test("dashboard settings are an accessory that returns to the same two-section w
   d.mount(<ProjectDialog services={d.services} onClose={close} onTask={d.onTask} />);
   await screen.findByText("Aucun projet enregistré.");
   fireEvent.click(screen.getByRole("button", { name: "Préférences" }));
-  const settings = screen.getByRole("dialog", { name: "Préférences" });
+  const settings = await screen.findByRole("dialog", { name: "Préférences" });
   const shortcuts = within(settings).getByRole("tab", { name: "Raccourcis" });
   expect(shortcuts).toBeVisible();
   fireEvent.mouseDown(shortcuts, { button: 0 });

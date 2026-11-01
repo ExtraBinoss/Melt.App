@@ -105,5 +105,10 @@
   },
   "contributions": "耗时分布",
   "overBudget": "超出预算 {{value}}",
-  "copyReport": "复制报告"
+  "copyReport": "复制报告",
+  "environment": {
+    "title": "系统",
+    "yes": "是",
+    "no": "否"
+  }
 }

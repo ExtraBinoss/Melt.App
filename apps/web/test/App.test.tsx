@@ -1,5 +1,5 @@
 import { canvasContext } from "./components/motion/canvas/support";
-import { beforeEach, expect, test, vi } from "vitest";
+import { beforeAll, beforeEach, expect, test, vi } from "vitest";
 import { screen, fireEvent, waitFor, act, within } from "@testing-library/react";
 import { App } from "../src/App";
 import { setup } from "./support/ui";
@@ -8,6 +8,14 @@ import { toolAtom } from "../src/state/session/editor";
 import { createEffect, createProject } from "@musart/core";
 import { createMotionTransport } from "../src/services/motion/transport";
 import { requestLayerTransition } from "../src/components/motion/transitions/requests";
+// These behavior checks exercise the assembled editor; cold chunk loading is covered in Chrome.
+beforeAll(async () => {
+  await Promise.all([
+    import("../src/components/toolbar/Toolbar"),
+    import("../src/components/workspace/EditorSidebar"),
+    import("../src/components/motion-shell/MotionTimelineDock"),
+  ]);
+});
 beforeEach(() => {
   vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockReturnValue(canvasContext() as never);
 });
@@ -54,7 +62,9 @@ test("opening an effect on an unselected layer leaves the app shell untouched", 
     await screen.findByTestId("canvas");
     const root = document.querySelector(".musart-app")!;
     const before = root.getAttribute("data-react-renders");
-    fireEvent.click(screen.getByRole("button", { name: "Ticket de caisse · Rectangle bleu" }));
+    fireEvent.click(
+      await screen.findByRole("button", { name: "Ticket de caisse · Rectangle bleu" }),
+    );
     expect(screen.getByRole("dialog", { name: "Effets · Rectangle bleu" })).toBeVisible();
     expect(root).toHaveAttribute("data-react-renders", before);
     expect(d.engine.getSnapshot().selection).toEqual([d.rectangle.id]);
@@ -66,7 +76,7 @@ test("opening an effect on an unselected layer leaves the app shell untouched", 
     fireEvent.keyDown(screen.getByRole("dialog", { name: "Effets · Rectangle bleu" }), {
       key: "Escape",
     });
-    expect(screen.getByRole("region", { name: "Propriétés" })).toHaveAttribute(
+    expect(await screen.findByRole("region", { name: "Propriétés" })).toHaveAttribute(
       "data-selected-layer-id",
       d.rectangle.id,
     );
@@ -78,7 +88,7 @@ test("assembles the pinned inspector, layers, project menu, export and import ac
   const d = setup();
   d.mount(<App engine={d.engine} services={d.services} />);
   await screen.findByTestId("canvas");
-  expect(screen.getByRole("region", { name: "Propriétés" })).toBeInTheDocument();
+  expect(await screen.findByRole("region", { name: "Propriétés" })).toBeInTheDocument();
   expect(screen.getByRole("tree", { name: "Calques" })).toBeInTheDocument();
   expect(screen.getAllByRole("separator").length).toBeGreaterThanOrEqual(2);
   fireEvent.click(screen.getByText("Drop image"));
@@ -94,7 +104,9 @@ test("assembles the pinned inspector, layers, project menu, export and import ac
   fireEvent.click(screen.getByRole("button", { name: "Importer des images" }));
   fireEvent.click(screen.getByRole("button", { name: "Exporter" }));
   expect(screen.getByRole("dialog")).toHaveAccessibleName("Exporter la composition");
-  fireEvent.click(within(screen.getByRole("dialog")).getByRole("button", { name: "Annuler" }));
+  fireEvent.click(
+    await within(screen.getByRole("dialog")).findByRole("button", { name: "Annuler" }),
+  );
   fireEvent.click(screen.getByRole("button", { name: "Menu du projet" }));
   await screen.findByRole("dialog", { name: "Tableau de bord Melt" });
   expect(screen.queryByRole("dialog", { name: "Un nouvel espace pour vos idées." })).toBeNull();

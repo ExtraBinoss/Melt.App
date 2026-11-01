@@ -60,11 +60,16 @@ async function compare(inspector: Page, live: string, exported: string) {
         canvas.height = image.height;
         const context = canvas.getContext("2d")!;
         context.drawImage(image, 0, 0);
-        return {
-          width: image.width,
-          height: image.height,
-          bytes: context.getImageData(0, 0, image.width, image.height).data,
-        };
+        try {
+          return {
+            width: image.width,
+            height: image.height,
+            bytes: context.getImageData(0, 0, image.width, image.height).data,
+          };
+        } finally {
+          canvas.width = canvas.height = 0;
+          image.src = "";
+        }
       }
       const a = await decode(live),
         b = await decode(exported);
@@ -104,6 +109,9 @@ test("live preview follows zoom and changed DPR within target/device limits and 
   page.on("pageerror", (error) => errors.push(error.message));
   await installReadbackProbe(page);
   await page.addInitScript(() => {
+    localStorage.setItem("musart.language", "fr");
+    localStorage.setItem("musart.canvas-zoom-controls.v1", "true");
+    localStorage.setItem("musart.onboarding.v1", JSON.stringify({ version: 1, completed: true }));
     window.__previewDensityResizes = [];
     window.addEventListener("resize", () =>
       window.__previewDensityResizes!.push({ dpr: devicePixelRatio, width: innerWidth }),
@@ -123,7 +131,7 @@ test("live preview follows zoom and changed DPR within target/device limits and 
     (project) => window.musart!.load(project),
     createProject({ id: projectId, pages: [art] }),
   );
-  const inspector = await page.context().newPage();
+  let inspector = await page.context().newPage();
   await page.bringToFront();
   const rows: unknown[] = [];
   async function ownerReady() {
@@ -188,6 +196,10 @@ test("live preview follows zoom and changed DPR within target/device limits and 
       scale,
     );
     const pixels = await compare(inspector, live, exported);
+    // Validation owns large native PNG decodes; do not retain them across DPR/zoom cohorts.
+    await inspector.close();
+    inspector = await page.context().newPage();
+    await page.bringToFront();
     expect(pixels.live).toEqual(dimensions);
     expect(pixels.exported).toEqual(dimensions);
     expect(pixels.unequal).toBe(0);

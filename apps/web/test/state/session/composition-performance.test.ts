@@ -201,3 +201,24 @@ test("same-id project replacement invalidates cached and pending measurements", 
   expect(port.read(id)).toBeNull();
   release();
 });
+
+test("copies bounded environment metadata immutably and rejects malformed diagnostics", async () => {
+  const { port, id } = fixture();
+  const source = performanceSnapshot(id);
+  source.environment = {
+    browser: "Chrome 156",
+    os: "Linux",
+    backend: "webgl",
+    logicalProcessors: 8,
+    webGPU: true,
+  };
+  port.registerProfiler(async () => source);
+  const result = await port.request(id, new AbortController().signal);
+  expect(result.environment).toEqual(source.environment);
+  expect(Object.isFrozen(result.environment)).toBe(true);
+  expect(result.environment).not.toBe(source.environment);
+  source.environment = { userAgent: "x".repeat(2049) };
+  await expect(port.request(id, new AbortController().signal)).rejects.toMatchObject({
+    code: "invalid",
+  });
+});

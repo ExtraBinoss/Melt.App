@@ -10,7 +10,10 @@ export class CanvasVideoProxyActivity implements VideoProxyActivity {
   private blocked = false;
   private dragging = false;
   private closed = false;
-  constructor(private readonly onReady: () => void) {
+  constructor(
+    private readonly onReady: () => void,
+    private readonly presented: () => boolean = () => true,
+  ) {
     window.addEventListener("pointerdown", this.down, true);
     window.addEventListener("pointerup", this.up, true);
     window.addEventListener("pointercancel", this.up, true);
@@ -28,6 +31,7 @@ export class CanvasVideoProxyActivity implements VideoProxyActivity {
   read = () =>
     !this.closed &&
     !this.blocked &&
+    this.presented() &&
     !this.dragging &&
     this.idle &&
     !this.pointers.size &&
@@ -87,8 +91,12 @@ export class CanvasVideoProxyActivity implements VideoProxyActivity {
     this.pulse();
   };
   setBlocked(value: boolean) {
-    if (this.closed || this.blocked === value) return;
+    if (this.closed) return;
     this.blocked = value;
+    this.pulse();
+  }
+  /** Wake queued proxy work only after the matching foreground frame is actually visible. */
+  framePresented() {
     this.pulse();
   }
   dispose() {

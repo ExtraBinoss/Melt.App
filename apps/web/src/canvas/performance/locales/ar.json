@@ -105,5 +105,10 @@
   },
   "contributions": "المساهمات",
   "overBudget": "تجاوز الميزانية بمقدار {{value}}",
-  "copyReport": "نسخ التقرير"
+  "copyReport": "نسخ التقرير",
+  "environment": {
+    "title": "النظام",
+    "yes": "نعم",
+    "no": "لا"
+  }
 }

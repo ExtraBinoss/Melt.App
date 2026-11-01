@@ -23,6 +23,23 @@ export function beginProjectTiming(
   if (!isDev) return;
   const id = ++sequence,
     started = performance.now();
+  let longTasks = 0,
+    blockedMs = 0,
+    longestTaskMs = 0;
+  const collect = (entries: PerformanceEntry[]) => {
+    for (const entry of entries) {
+      if (entry.startTime < started) continue;
+      longTasks++;
+      blockedMs += entry.duration;
+      longestTaskMs = Math.max(longestTaskMs, entry.duration);
+    }
+  };
+  const observer =
+    typeof PerformanceObserver !== "undefined" &&
+    PerformanceObserver.supportedEntryTypes?.includes("longtask")
+      ? new PerformanceObserver((list) => collect(list.getEntries()))
+      : undefined;
+  observer?.observe({ type: "longtask" });
   const rows: { stage: string; ms: number; elapsedMs: number }[] = [];
   let label = operation,
     stage = "Start",
@@ -51,6 +68,10 @@ export function beginProjectTiming(
       if (finished) return;
       closeStage();
       finished = true;
+      if (observer) {
+        collect(observer.takeRecords());
+        observer.disconnect();
+      }
       if (pending?.timing === timing) pending = undefined;
       console.groupCollapsed(
         `[Melt perf] #${id} ${label} — ${round(checkpoint - started)} ms (${status})`,
@@ -60,9 +81,10 @@ export function beginProjectTiming(
         ...details,
         totalMs: round(checkpoint - started),
         status,
-        ...(error !== undefined
-          ? { error: error instanceof Error ? error.message : error }
+        ...(observer
+          ? { mainThread: { longTasks, totalMs: round(blockedMs), maxMs: round(longestTaskMs) } }
           : {}),
+        ...(error !== undefined ? { error: error instanceof Error ? error.message : error } : {}),
       });
       console.groupEnd();
     },

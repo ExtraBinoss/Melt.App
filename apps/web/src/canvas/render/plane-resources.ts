@@ -23,7 +23,11 @@ import {
   type WebGPURenderer,
 } from "three/webgpu";
 import { texture, uv } from "three/tsl";
-import { CanvasGpuDiagnostics, rendererMemoryDiagnostics } from "./gpu-diagnostics";
+import {
+  CanvasGpuDiagnostics,
+  rendererMemoryDiagnostics,
+  observeRendererLoss,
+} from "./gpu-diagnostics";
 import { CanvasPlaybackBuffering } from "./playback-buffering";
 import { createPlaybackPipelineDiagnostics } from "../../services/performance/playback-pipeline";
 import type { PresentationInput, PreviewRequest } from "./frame-request";
@@ -142,17 +146,20 @@ export class PlaneResources {
   ): () => void {
     if (this.disposed) throw new Error("Aperçu GPU déjà libéré");
     this.users++;
-    this.videoProxyActivity ??= new CanvasVideoProxyActivity(() => {
-      const current = this.current;
-      if (!current || this.disposed || !this.users || current.playback) return;
-      this.submit(
-        { ...current.page },
-        current.assets,
-        current.presentation,
-        current.motionFrame,
-        false,
-      );
-    });
+    this.videoProxyActivity ??= new CanvasVideoProxyActivity(
+      () => {
+        const current = this.current;
+        if (!current || this.disposed || !this.users || current.playback) return;
+        this.submit(
+          { ...current.page },
+          current.assets,
+          current.presentation,
+          current.motionFrame,
+          false,
+        );
+      },
+      () => this.completed > 0 && this.presentedRevision === this.revision,
+    );
     canvasOwners.set(this.renderer.domElement, this);
     this.scene = scene;
     this.camera = camera;
@@ -461,6 +468,7 @@ export class PlaneResources {
       this.profile.presented(this.preparedRequest.page.id, this.preparedRevision);
       traceCanvasFrame(this.preparedRequest, this.sample.value.uuid);
       this.presentedRevision = this.preparedRevision;
+      this.videoProxyActivity?.framePresented();
       element.dataset.rendererReady = String(this.preparedRevision === this.revision);
       element.dataset.presentationReady = "true";
       element.dataset.displayInitialized = "true";
@@ -508,31 +516,21 @@ export class PlaneResources {
     this.onError?.(formatUiError(error), errorDiagnostics(error));
   }
   private observeDevice(): () => void {
-    const previous = this.renderer.onDeviceLost;
-    const lost: WebGPURenderer["onDeviceLost"] = (info) => {
-      try {
-        // Three must still mark its renderer unusable and preserve its native diagnostic.
-        previous?.call(this.renderer, info);
-      } finally {
-        if (!this.disposed && !this.deviceLost) {
-          this.deviceLost = true;
-          this.fontPresenter?.unavailable();
-          this.activeAbort?.abort();
-          this.latest = null;
-          this.frameScheduler.clear();
-          this.renderer.domElement.dataset.rendererReady = "false";
-          this.renderer.domElement.dataset.deviceLost = "true";
-          const message = `${info.api} device lost: ${info.message}`;
-          if (this.users) this.report(new Error(message));
-          else this.renderer.domElement.dataset.renderError = message;
-          this.publish();
-        }
+    return observeRendererLoss(this.renderer, (info) => {
+      if (!this.disposed && !this.deviceLost) {
+        this.deviceLost = true;
+        this.fontPresenter?.unavailable();
+        this.activeAbort?.abort();
+        this.latest = null;
+        this.frameScheduler.clear();
+        this.renderer.domElement.dataset.rendererReady = "false";
+        this.renderer.domElement.dataset.deviceLost = "true";
+        const message = `${info.api} device lost: ${info.message}`;
+        if (this.users) this.report(new Error(message));
+        else this.renderer.domElement.dataset.renderError = message;
+        this.publish();
       }
-    };
-    this.renderer.onDeviceLost = lost;
-    return () => {
-      if (this.renderer.onDeviceLost === lost) this.renderer.onDeviceLost = previous;
-    };
+    });
   }
   dispose(): Promise<void> {
     if (this.disposal) return this.disposal;

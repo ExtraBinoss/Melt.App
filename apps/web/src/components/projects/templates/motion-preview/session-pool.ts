@@ -32,7 +32,8 @@ export class PreviewSessionPool {
         (this.entry.failed ||
           this.entry.options.fontResolver !== options.fontResolver ||
           this.entry.options.maxBytes !== options.maxBytes ||
-          this.entry.options.forceWebGL !== options.forceWebGL)
+          this.entry.options.forceWebGL !== options.forceWebGL ||
+          this.entry.options.videoSources !== options.videoSources)
       )
         await this.retire();
       if (!this.entry) {
@@ -41,6 +42,7 @@ export class PreviewSessionPool {
           maxBytes: options.maxBytes,
           fontResolver: options.fontResolver,
           forceWebGL: options.forceWebGL,
+          videoSources: options.videoSources,
         };
         this.entry = {
           session: await this.create(configuration),

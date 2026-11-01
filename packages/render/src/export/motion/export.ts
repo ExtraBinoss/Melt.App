@@ -1,3 +1,4 @@
+import { usesVideoSources } from "../../renderer/video-backend";
 import { selectionFrameScope } from "./selection";
 import { applyMotionFrame, compileMotion, evaluateMotion, type Project } from "@musart/core";
 import { AudioSample, AudioSampleSource, CanvasSource, Output } from "mediabunny";
@@ -113,6 +114,7 @@ export async function exportMotionVideo(
     output = new Output({ target: target.target, format: encoding.format });
     session = createRenderSession({
       forceWebGL: options.forceWebGL,
+      videoSources: usesVideoSources(program.composition),
       maxBytes: options.maxGpuBytes,
       fontResolver: options.fontResolver,
       mediaResolver: options.mediaResolver,

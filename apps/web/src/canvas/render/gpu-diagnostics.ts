@@ -1,5 +1,24 @@
 import type { WebGPURenderer } from "three/webgpu";
 
+/** Preserve Three's native loss handler and restore it only while this observer owns the slot. */
+export function observeRendererLoss(
+  renderer: WebGPURenderer,
+  onLoss: WebGPURenderer["onDeviceLost"],
+): () => void {
+  const previous = renderer.onDeviceLost;
+  const lost: WebGPURenderer["onDeviceLost"] = (info) => {
+    try {
+      previous?.call(renderer, info);
+    } finally {
+      onLoss(info);
+    }
+  };
+  renderer.onDeviceLost = lost;
+  return () => {
+    if (renderer.onDeviceLost === lost) renderer.onDeviceLost = previous;
+  };
+}
+
 /** Bound diagnostic DOM work independently of drawing; retain the latest state after a burst. */
 export class CanvasGpuDiagnostics {
   private last = -Infinity;

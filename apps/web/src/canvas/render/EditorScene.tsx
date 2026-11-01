@@ -1,3 +1,5 @@
+import { installExactCanvasTarget } from "./exact-canvas-target";
+import { videoNeedsWebGL } from "@musart/render/renderer-policy";
 import { SpatialControlsSlot } from "../spatial/SpatialControlsSlot";
 import type { EnginePort } from "@musart/core";
 import { CanvasPreparation } from "./CanvasPreparation";
@@ -15,6 +17,7 @@ import type { SceneController } from "../session/scene-controller";
 import type { FontResolver, MediaSourceResolver } from "@musart/render";
 import { useRenderMetrics } from "../../state/session/render-metrics";
 import { PlaneResources } from "./plane-resources";
+import { useVideoBackend } from "./use-video-backend";
 import { FiberTimerClock } from "./fiber-timer";
 import { DrawingDensity } from "./drawing-density";
 import { watchDisplayDensity } from "./display-density";
@@ -31,22 +34,27 @@ export interface SceneProps {
 }
 export async function makeRenderer(
   canvas: HTMLCanvasElement | OffscreenCanvas,
+  videoSources = false,
 ): Promise<WebGPURenderer> {
+  const forceWebGL = videoSources && (await videoNeedsWebGL());
   function create(forceWebGL = false) {
     if (canvas instanceof HTMLCanvasElement)
       canvas.dataset.rendererInstances = String(Number(canvas.dataset.rendererInstances ?? 0) + 1);
-    return new WebGPURenderer({
+    const renderer = new WebGPURenderer({
       canvas,
       alpha: true,
       antialias: false,
       ...(forceWebGL ? { forceWebGL: true } : {}),
     });
+    installExactCanvasTarget(renderer, canvas);
+    return renderer;
   }
-  let renderer = create();
+  let renderer = create(forceWebGL);
   try {
     await renderer.init();
-  } catch {
+  } catch (error) {
     await renderer.dispose();
+    if (forceWebGL) throw error;
     renderer = create(true);
     try {
       await renderer.init();
@@ -55,6 +63,15 @@ export async function makeRenderer(
       throw error;
     }
   }
+  if (import.meta.env.DEV)
+    console.info("[Melt renderer]", {
+      surface: "canvas",
+      videoSources,
+      backend:
+        renderer.backend && "isWebGLBackend" in renderer.backend && renderer.backend.isWebGLBackend
+          ? "webgl"
+          : "webgpu",
+    });
   renderer.toneMapping = NoToneMapping;
   renderer.outputColorSpace = LinearSRGBColorSpace;
   renderer.setClearColor(0, 0);
@@ -182,6 +199,7 @@ export const EditorScene = memo(function EditorScene({
   mediaResolverFor,
 }: SceneProps) {
   const [{ page }] = useState(() => controller.read());
+  const videoBackend = useVideoBackend(controller, engine);
   const density = useMemo(() => new DrawingDensity(), []);
   const { t } = useTranslation();
   const element = useRef<HTMLDivElement>(null);
@@ -217,6 +235,7 @@ export const EditorScene = memo(function EditorScene({
     >
       <div className="editor-gpu-scene" ref={element}>
         <Canvas
+          key={videoBackend ? "video-exact" : "graphics-exact"}
           orthographic
           frameloop="demand"
           shadows={{ enabled: false, type: PCFShadowMap }}
@@ -235,7 +254,7 @@ export const EditorScene = memo(function EditorScene({
             bottom: -page.height / 2,
             manual: true,
           }}
-          gl={async (props) => makeRenderer(props.canvas as HTMLCanvasElement)}
+          gl={async (props) => makeRenderer(props.canvas as HTMLCanvasElement, videoBackend)}
           style={{ width: "100%", height: "100%" }}
         >
           {engine && <SpatialControlsSlot engine={engine} controller={controller} />}

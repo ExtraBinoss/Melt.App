@@ -8,6 +8,12 @@ test("performance icon opens a fresh copyable report with a full-width target se
   await page.addInitScript(() => {
     localStorage.setItem("musart.language", "en");
     localStorage.setItem("musart.onboarding.v1", JSON.stringify({ version: 1, completed: true }));
+    const write = navigator.clipboard.writeText.bind(navigator.clipboard);
+    navigator.clipboard.writeText = async (text) => {
+      await write(text);
+      // The native system clipboard is shared with the user's other applications.
+      Object.assign(window, { __performanceReportCopied: text });
+    };
   });
   const rectangle = createLayer("rectangle", {
     id: "budget-shape",
@@ -42,6 +48,17 @@ test("performance icon opens a fresh copyable report with a full-width target se
     .locator(".artboard-performance-footer")
     .getByRole("button", { name: "Performance", exact: true });
   expect(await trigger.textContent()).toBe("");
+  const dimensions = await trigger.evaluate((button) => {
+    const mode = document.querySelector(".artboard-mode-footer .segmented-tab")!;
+    return {
+      button: button.getBoundingClientRect().height,
+      mode: mode.getBoundingClientRect().height,
+      icon: button.querySelector("svg")!.getBoundingClientRect().width,
+      modeIcon: mode.querySelector("svg")!.getBoundingClientRect().width,
+    };
+  });
+  expect(dimensions.button).toBeCloseTo(dimensions.mode, 1);
+  expect(dimensions.icon).toBeCloseTo(dimensions.modeIcon, 1);
   await trigger.click();
   const popup = page.locator(".composition-performance-popover");
   await expect(popup).toBeFocused();
@@ -67,8 +84,19 @@ test("performance icon opens a fresh copyable report with a full-width target se
     .toBeLessThanOrEqual(0);
   await copy.click();
   await expect(popup.getByRole("button", { name: "Copied", exact: true })).toBeVisible();
-  const report = JSON.parse(await page.evaluate(() => navigator.clipboard.readText()));
+  const report = JSON.parse(
+    await page.evaluate(
+      () => (window as unknown as { __performanceReportCopied: string }).__performanceReportCopied,
+    ),
+  );
   expect(report).toMatchObject({ sampleCount: 12, targetFps: 144 });
+  expect(report.environment.userAgent).toContain("Chrome");
+  expect(report.environment.backend).toBe(
+    await page.locator(".editor-gpu-scene canvas").getAttribute("data-backend"),
+  );
+  expect(report.environment.gpuDescription).toBeTruthy();
+  await popup.getByRole("button", { name: "System", exact: true }).click();
+  await expect(popup.getByText(report.environment.gpuDescription, { exact: true })).toBeVisible();
   expect(report.contributions.cpu.length).toBeGreaterThan(0);
   expect(
     report.contributions.cpu.reduce((sum: number, part: { value: number }) => sum + part.value, 0),
@@ -79,7 +107,11 @@ test("performance icon opens a fresh copyable report with a full-width target se
   await expect(copy).toBeEnabled();
   await copy.click();
   await expect(popup.getByRole("button", { name: "Copied", exact: true })).toBeVisible();
-  const fresh = JSON.parse(await page.evaluate(() => navigator.clipboard.readText()));
+  const fresh = JSON.parse(
+    await page.evaluate(
+      () => (window as unknown as { __performanceReportCopied: string }).__performanceReportCopied,
+    ),
+  );
   expect(fresh.measuredAt).toBeGreaterThan(report.measuredAt);
   expect(fresh.targetFps).toBe(60);
   await page.screenshot({ path: "artifacts/composition-performance-ui.png" });
