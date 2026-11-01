@@ -82,7 +82,10 @@
     "spatialMeshes": "Maillages 3D",
     "spatialVertices": "Sommets 3D",
     "spatialTriangles": "Triangles 3D",
-    "otherCpu": "Autres tâches hôte"
+    "otherCpu": "Autres tâches hôte",
+    "svgGeometryBuilds": "Constructions de géométrie SVG (session)",
+    "gpuFramesPending": "Soumissions de lecture en attente",
+    "gpuFramesPeak": "Pic de soumissions de lecture (limite 8)"
   },
   "warmthNote": "Reflète l’état actuel du cache. Le temps côté CPU hôte peut inclure des attentes asynchrones ; ce n’est pas une mesure d’utilisation du CPU.",
   "sharedNote": "La mémoire des textures et les compteurs de cache concernent le cache partagé du moteur de rendu. Les commandes de dessin et passes de rendu concernent cet échantillon.",
@@ -153,5 +156,31 @@
       "maxSamples": "Échantillons MSAA maximaux",
       "rasterSizing": "Dimensionnement du canevas"
     }
+  },
+  "textMetrics": {
+    "glyphs": "Glyphes préparés",
+    "morphShapes": "Formes de morphing préparées",
+    "morphStates": "États de morphing créés",
+    "morphSegments": "Segments préparés par pose",
+    "maxBandCurves": "Segments maximum par bande",
+    "atlasBytes": "Mémoire des atlas texte/morphing actifs",
+    "cacheHits": "Réutilisations du cache texte (session)",
+    "rebuilds": "Constructions de géométrie (session)",
+    "shapings": "Calculs de mise en forme (session)",
+    "compilations": "Compilations de shaders (session)",
+    "draws": "Rendus texte/morphing (session)",
+    "morphUpdates": "Mises à jour des uniformes (session)"
+  },
+  "textPhases": {
+    "font": "Dernière acquisition de police (temps écoulé)",
+    "shaping": "Dernière mise en forme du texte",
+    "contours": "Dernière génération de contours",
+    "atlas": "Dernière préparation d’atlas (temps écoulé)",
+    "compile": "Dernière compilation de shader (temps écoulé)",
+    "update": "Mise à jour des uniformes (p95)",
+    "draw": "Soumission de rendu (p95, CPU)",
+    "correspondence": "Dernière correspondance des contours (CPU)",
+    "simplification": "Dernière simplification des trajectoires (CPU)",
+    "packing": "Dernier assemblage de l’atlas (CPU)"
   }
 }

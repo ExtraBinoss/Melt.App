@@ -99,3 +99,62 @@ test("overlapping synchronous Motion and renderer preparation are counted once",
   expect(report.frame.value).toBeNull();
   expect(report.gpu.availability).toBe("unavailable");
 });
+
+test("exposes text cache, retained contour complexity and opt-in host timings separately from GPU morph time", () => {
+  const report = compositionReport({
+    page: createPage(),
+    durationMs: 20,
+    animationIntervals: [],
+    uploadsBefore: 0,
+    hitsBefore: 0,
+    samples: [
+      {
+        compositionId: "page",
+        revision: 1,
+        at: 20,
+        hostMs: 2,
+        hostStarted: 18,
+        gpuMs: 1,
+        gpuPasses: { morph: 0.7 },
+        drawCommands: 2,
+        passes: 2,
+        phases: { pipeline: 0, sources: 0, text: 0.1, compose: 1.9 },
+        stats: {
+          passes: 2,
+          readbacks: 0,
+          uploads: 1,
+          targets: 2,
+          cacheBytes: 4096,
+          frames: 1,
+          cacheHits: 1,
+          vectorParses: 0,
+          maxBytes: 100000,
+          text: {
+            cacheHits: 20,
+            rebuilds: 1,
+            shapings: 1,
+            compilations: 1,
+            draws: 20,
+            morphUpdates: 20,
+            glyphs: 0,
+            morphShapes: 4,
+            morphStates: 268,
+            morphSegments: 185,
+            maxBandCurves: 90,
+            atlasBytes: 4096,
+            profile: { shaping: [0.3], atlas: [10], update: [0.01, 0.02], draw: [0.2, 0.3] },
+          },
+        },
+      },
+    ],
+  });
+  expect(report.metrics.find((m) => m.id === "text:morphSegments")).toMatchObject({
+    domain: "text",
+    kind: "inventory",
+    value: 185,
+  });
+  expect(report.metrics.find((m) => m.id === "text:rebuilds")?.value).toBe(1);
+  expect(report.metrics.find((m) => m.id === "textPhase:atlas")?.value).toBe(10);
+  expect(report.metrics.find((m) => m.id === "textPhase:draw")?.value).toBe(0.3);
+  expect(report.metrics.find((m) => m.id === "gpuPass:morph")?.value).toBe(0.7);
+});

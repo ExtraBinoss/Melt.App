@@ -1,3 +1,4 @@
+import { resampleClosed, alignClosedInto } from "@musart/path-morph";
 import type { MorphContour, MorphPoint, MorphShapeFrame } from "./model";
 const area = (points: readonly MorphPoint[]) =>
   points.reduce((sum, p, i) => {
@@ -9,44 +10,6 @@ const center = (points: readonly MorphPoint[]): MorphPoint =>
     (p, q) => [p[0] + q[0] / points.length, p[1] + q[1] / points.length],
     [0, 0],
   );
-function sample(points: readonly MorphPoint[], count: number): MorphPoint[] {
-  const lengths = points.map((p, i) =>
-    Math.hypot(
-      p[0] - points[(i + 1) % points.length]![0],
-      p[1] - points[(i + 1) % points.length]![1],
-    ),
-  );
-  const perimeter = lengths.reduce((a, b) => a + b, 0);
-  if (perimeter < 1e-10) return Array.from({ length: count }, () => points[0]!);
-  let edge = 0,
-    passed = 0;
-  return Array.from({ length: count }, (_, i) => {
-    const distance = (i / count) * perimeter;
-    while (edge < points.length - 1 && passed + lengths[edge]! < distance)
-      passed += lengths[edge++]!;
-    const p = points[edge]!,
-      q = points[(edge + 1) % points.length]!,
-      t = (distance - passed) / Math.max(lengths[edge]!, 1e-12);
-    return [p[0] + (q[0] - p[0]) * t, p[1] + (q[1] - p[1]) * t] as MorphPoint;
-  });
-}
-function align(points: MorphPoint[], previous: readonly MorphPoint[]): MorphPoint[] {
-  let best = 0,
-    score = Infinity;
-  for (let shift = 0; shift < points.length; shift++) {
-    let cost = 0;
-    for (let i = 0; i < points.length; i++) {
-      const p = points[(i + shift) % points.length]!,
-        q = previous[i]!;
-      cost += (p[0] - q[0]) ** 2 + (p[1] - q[1]) ** 2;
-    }
-    if (cost < score) {
-      score = cost;
-      best = shift;
-    }
-  }
-  return points.map((_, i) => points[(i + best) % points.length]!);
-}
 /** Bounded cold geometry preparation. Missing holes collapse instead of popping or filling. */
 export function* prepareMorphShapeSteps(
   frames: readonly MorphShapeFrame[],
@@ -100,7 +63,7 @@ export function* prepareMorphShapeSteps(
     }),
   );
   const slots = [0, 1].flatMap((kind) => anchors[kind]!.map((_, index) => ({ kind, index })));
-  const previous: MorphPoint[][] = [];
+  const previous: Float64Array[] = [];
   for (let fi = 0; fi < frames.length; fi++) {
     const frame = frames[fi]!;
     yield {
@@ -114,9 +77,17 @@ export function* prepareMorphShapeSteps(
           ? [...original.points]
           : Array.from({ length: 3 }, () => center(reference.points));
         if (area(points) > 0 === hole) points.reverse();
-        points = sample(points, hole ? 64 : 256);
-        if (previous[slot]) points = align(points, previous[slot]);
-        previous[slot] = points;
+        let prepared = resampleClosed(points, hole ? 64 : 256);
+        if (previous[slot]) {
+          const aligned = new Float64Array(prepared.length);
+          alignClosedInto(prepared, previous[slot]!, aligned);
+          prepared = aligned;
+        }
+        previous[slot] = prepared;
+        points = Array.from(
+          { length: prepared.length / 2 },
+          (_, i) => [prepared[i * 2]!, prepared[i * 2 + 1]!] as MorphPoint,
+        );
         return { hole, points };
       }),
     };

@@ -82,7 +82,10 @@
     "spatialMeshes": "3D meshes",
     "spatialVertices": "3D vertices",
     "spatialTriangles": "3D triangles",
-    "otherCpu": "Other host work"
+    "otherCpu": "Other host work",
+    "svgGeometryBuilds": "SVG geometry builds (session)",
+    "gpuFramesPending": "Pending playback submissions",
+    "gpuFramesPeak": "Peak playback submissions (limit 8)"
   },
   "warmthNote": "Reflects the current cache state. CPU host timing can include async waiting; it does not measure CPU utilization.",
   "sharedNote": "Texture memory and cache counters cover the shared renderer cache. Draw commands and render passes cover this sample.",
@@ -153,5 +156,31 @@
       "maxSamples": "Maximum MSAA samples",
       "rasterSizing": "Canvas sizing"
     }
+  },
+  "textMetrics": {
+    "glyphs": "Prepared glyphs",
+    "morphShapes": "Prepared morph shapes",
+    "morphStates": "Authored morph states",
+    "morphSegments": "Prepared morph edges per pose",
+    "maxBandCurves": "Maximum edges in a ray band",
+    "atlasBytes": "Active text/morph atlas memory",
+    "cacheHits": "Text cache hits (session)",
+    "rebuilds": "Geometry builds (session)",
+    "shapings": "Text shaping runs (session)",
+    "compilations": "Shader compilations (session)",
+    "draws": "Text/morph draws (session)",
+    "morphUpdates": "Morph uniform updates (session)"
+  },
+  "textPhases": {
+    "font": "Last font acquisition (host elapsed)",
+    "shaping": "Last text shaping",
+    "contours": "Last contour generation",
+    "atlas": "Last atlas preparation (host elapsed)",
+    "compile": "Last shader compilation (host elapsed)",
+    "update": "Uniform/paint update (p95)",
+    "draw": "Draw submission (p95, CPU)",
+    "correspondence": "Last contour correspondence (CPU)",
+    "simplification": "Last trajectory simplification (CPU)",
+    "packing": "Last atlas packing (CPU)"
   }
 }

@@ -1,3 +1,7 @@
+import type { TextSourceStats } from "../surface/text/diagnostics";
+import type { VideoProxyActivity } from "../sources/video/proxy/model";
+import type { MediaVideoSources } from "../sources/media/video-sources";
+import type { ReflectionStats } from "../spatial/reflections/model";
 import type { Texture } from "three/webgpu";
 import type { Bounds, Composition, MotionFramePlan } from "@musart/core";
 import type { MediaSourceResolver } from "../sources/media/model";
@@ -32,7 +36,7 @@ export interface RenderOptions {
   /** Optional User Timing lineage; no sample arrays or GPU pixel reads. Disabled by default. */
   traceFrames?: boolean;
   /** Interactive canvas only. Exports omit this activity-owned proxy preparation gate. */
-  videoProxy?: import("../sources/video/proxy/model").VideoProxyActivity;
+  videoProxy?: VideoProxyActivity;
 }
 export interface FrameTexture {
   texture: Texture;
@@ -43,17 +47,19 @@ export interface FrameTexture {
   bounds?: Bounds;
 }
 export interface GpuStats {
+  submission?: { pending: number; peak: number; limit: number };
+  text?: TextSourceStats | null;
   /** Opt-in CPU wall time, including native/queue waits; never a GPU-duration measurement. */
   profile?: Record<"pipeline" | "sources" | "text" | "compose", readonly number[]> | null;
   passes: number;
   readbacks: number;
-  video?: ReturnType<import("../sources/media/video-sources").MediaVideoSources["stats"]> | null;
+  video?: ReturnType<MediaVideoSources["stats"]> | null;
   spatial?: {
     sources: number;
     meshes: number;
     vertices: number;
     triangles: number;
-    reflections?: import("../spatial/reflections/model").ReflectionStats;
+    reflections?: ReflectionStats;
   } | null;
   uploads: number;
   targets: number;

@@ -41,6 +41,9 @@ export const performanceMetrics = new Set([
   "cacheMisses",
   "sourcePreparation",
   "textPreparation",
+  "svgGeometryBuilds",
+  "gpuFramesPending",
+  "gpuFramesPeak",
   "composition",
 ]);
 
@@ -67,6 +70,8 @@ export function performanceMetricLabel(
 ): string {
   if (id === "cpu") return t("timings.cpu");
   if (id === "otherCpu") return t("metrics.otherCpu");
+  if (id.startsWith("text:")) return t(`textMetrics.${id.slice(5)}`);
+  if (id.startsWith("textPhase:")) return t(`textPhases.${id.slice(10)}`);
   if (id.startsWith("gpuPass:")) {
     const [kind, ...stage] = id.slice(8).split("/");
     const label = t(`gpuStages.${kind}`, { defaultValue: t("gpuStages.other") });

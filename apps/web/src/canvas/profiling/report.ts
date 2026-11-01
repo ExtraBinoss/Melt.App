@@ -107,6 +107,9 @@ registerPerformanceContributor({
       metric("allocations", "gpu", "count", stats?.targets ?? null),
       metric("uploads", "gpu", "count", stats ? Math.max(0, stats.uploads - uploadsBefore) : null),
       metric("textureBytes", "gpu", "bytes", stats?.cacheBytes ?? null),
+      metric("svgGeometryBuilds", "shapes", "count", stats?.vectorParses ?? null),
+      metric("gpuFramesPending", "gpu", "count", stats?.submission?.pending ?? null),
+      metric("gpuFramesPeak", "gpu", "count", stats?.submission?.peak ?? null),
       metric("cacheEntries", "gpu", "count", stats?.cacheEntries ?? null),
       metric("cacheHits", "gpu", "count", stats ? Math.max(0, stats.cacheHits - hitsBefore) : null),
     ];
@@ -168,6 +171,56 @@ registerPerformanceContributor({
       "timing",
     ),
   ],
+});
+registerPerformanceContributor({
+  id: "text-morph",
+  collect: ({ samples }) => {
+    const text = samples.at(-1)?.stats?.text;
+    if (!text) return [];
+    const inventory = [
+      "glyphs",
+      "morphShapes",
+      "morphStates",
+      "morphSegments",
+      "maxBandCurves",
+    ] as const;
+    const counters = [
+      "cacheHits",
+      "rebuilds",
+      "shapings",
+      "compilations",
+      "draws",
+      "morphUpdates",
+    ] as const;
+    const phases = [
+      "font",
+      "shaping",
+      "contours",
+      "atlas",
+      "compile",
+      "update",
+      "draw",
+      "correspondence",
+      "simplification",
+      "packing",
+    ] as const;
+    return [
+      ...inventory.map((id) => metric(`text:${id}`, "text", "count", text[id], "inventory")),
+      metric("text:atlasBytes", "text", "bytes", text.atlasBytes, "inventory"),
+      ...counters.map((id) => metric(`text:${id}`, "text", "count", text[id])),
+      ...phases.map((id) =>
+        metric(
+          `textPhase:${id}`,
+          "text",
+          "ms",
+          id === "update" || id === "draw"
+            ? percentile95(text.profile?.[id]?.slice(-samples.length) ?? [])
+            : (text.profile?.[id]?.at(-1) ?? null),
+          "timing",
+        ),
+      ),
+    ];
+  },
 });
 registerPerformanceContributor({
   id: "animation-host",

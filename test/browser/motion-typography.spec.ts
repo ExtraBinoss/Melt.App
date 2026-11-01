@@ -1,3 +1,4 @@
+import type * as MorphWitness from "./support/morph-witness";
 import { expect, test } from "@playwright/test";
 import { execFileSync } from "node:child_process";
 import { readFile, writeFile } from "node:fs/promises";
@@ -8,7 +9,14 @@ test.beforeAll(async () => {
   const path = resolve("artifacts/morph-witness.js");
   execFileSync(
     "bun",
-    ["build", "test/browser/support/morph-witness.ts", "--target=browser", "--outfile", path],
+    [
+      "build",
+      "test/browser/support/morph-witness.ts",
+      "--target=browser",
+      "--outfile",
+      path,
+      "--external=*?url",
+    ],
     { stdio: "pipe" },
   );
   bundle = await readFile(path, "utf8");
@@ -30,12 +38,13 @@ for (const forceWebGL of [false, true])
     await page.goto("/morph-witness.html");
     const result = await page.evaluate(async (forceWebGL) => {
       const url = "/morph-witness.js";
-      const module = (await import(
-        /* @vite-ignore */ url
-      )) as typeof import("./support/morph-witness");
+      const module = (await import(/* @vite-ignore */ url)) as typeof MorphWitness;
       return module.runMorphWitness(forceWebGL);
     }, forceWebGL);
     expect(result.stats?.backend).toBe(forceWebGL ? "webgl" : "webgpu");
+    expect(result.retainedMorph).toMatchObject({ rebuilds: 1, shapings: 1 });
+    expect(result.retainedMorph!.morphSegments).toBeLessThan(1024);
+    expect(result.retainedMorph!.morphStates).toBe(268);
     expect(result.frames.every((frame) => frame.uploads === 1)).toBe(true);
     expect(result.frames.find((frame) => frame.frame === 30)!.png).toBe(result.frames.at(-2)!.png);
     expect(result.frames[0]!.png).toBe(result.frames.at(-1)!.png);
@@ -71,7 +80,7 @@ for (const forceWebGL of [false, true])
       const video = await page.evaluate(async () => {
         const url = "/morph-witness.js";
         return (
-          (await import(/* @vite-ignore */ url)) as typeof import("./support/morph-witness")
+          (await import(/* @vite-ignore */ url)) as typeof MorphWitness
         ).exportMorphReference();
       });
       expect(video.frames).toBe(180);

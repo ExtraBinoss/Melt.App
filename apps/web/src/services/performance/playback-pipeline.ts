@@ -121,6 +121,17 @@ export class PlaybackPipelineDiagnostics {
       slowestPose: this.slowest,
       // Compose includes CPU submission and queue wait. It is not isolated shader execution.
       preparationPhasesMs: phases,
+      text: stats?.text
+        ? {
+            ...stats.text,
+            profile: Object.fromEntries(
+              Object.entries(stats.text.profile ?? {}).map(([phase, values]) => [
+                phase,
+                summary(values),
+              ]),
+            ),
+          }
+        : undefined,
       video: video
         ? {
             decoders: video.playback.length,
@@ -141,6 +152,7 @@ export class PlaybackPipelineDiagnostics {
         : undefined,
       gpu: stats
         ? {
+            submissions: stats.submission,
             passes: stats.passes - (before?.passes ?? 0),
             cacheHits: stats.cacheHits - (before?.cacheHits ?? 0),
             cacheBytes: stats.cacheBytes,

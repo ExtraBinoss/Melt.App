@@ -44,7 +44,7 @@ const shape: ShapeMorph = {
 test("morph atlases retain union bands and independent state planes within the byte budget", () => {
   const atlas = buildMorphAtlas(shape);
   expect(atlas.states).toBe(2);
-  expect(atlas.shapes[0]!.frames[0]!.contours[0]!.points).toHaveLength(256);
+  expect(atlas.shapes[0]!.frames[0]!.contours[0]!.points.length).toBeLessThan(256);
   expect(atlas.bytes).toBe(atlas.texture.image.data!.byteLength);
   expect(atlas.bytes).toBeLessThan(64 * 1024 * 1024);
   const pixels = atlas.texture.image.data as Float32Array,

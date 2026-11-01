@@ -138,10 +138,19 @@ export class MorphResource implements GpuResource {
           mix(fetch(at, int(selected)), fetch(at, int(selected).add(1)), blend),
           this.amount,
         );
-      return { first: sample(pointer), last: sample(pointer.add(1)) };
+      // Morph contours are straight edges: one RGBA texel stores both endpoints.
+      // Reconstructing the midpoint avoids three additional texture loads per tested edge.
+      const edge = sample(pointer).toVar();
+      return { first: vec4(edge.xy, edge.xy.add(edge.zw).mul(0.5)), last: vec4(edge.zw, 0, 0) };
     };
     const paint = textPaintNode(this.paint, vertex.pixel),
-      coverage = glyphCoverage(this.atlas.texture, this.atlas.width, vertex.coordinate, curve);
+      coverage = glyphCoverage(
+        this.atlas.texture,
+        this.atlas.width,
+        vertex.coordinate,
+        curve,
+        true,
+      );
     this.material = new MeshBasicNodeMaterial({
       transparent: true,
       premultipliedAlpha: true,
@@ -171,9 +180,10 @@ export class MorphResource implements GpuResource {
     updateTextPaint(this.paint, layer);
   }
   async prepare(renderer: WebGPURenderer, target: RenderTarget, canContinue?: () => boolean) {
-    if (this.compiled) return;
+    if (this.compiled) return false;
     await compileGpuScene(renderer, this.scene, this.camera, target, canContinue);
     this.compiled = true;
+    return true;
   }
   dispose() {
     if (this.closed) return;

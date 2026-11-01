@@ -82,8 +82,13 @@
       "name": "@musart/core",
       "version": "0.2.0",
       "dependencies": {
+        "@musart/path-morph": "workspace:*",
         "svg-pathdata": "9.0.0",
       },
+    },
+    "packages/path-morph": {
+      "name": "@musart/path-morph",
+      "version": "0.2.0",
     },
     "packages/render": {
       "name": "@musart/render",
@@ -92,6 +97,7 @@
         "@imagemagick/magick-wasm": "0.0.45",
         "@musart/assets": "workspace:*",
         "@musart/core": "workspace:*",
+        "@musart/path-morph": "workspace:*",
         "clipper-lib": "6.4.2",
         "mediabunny": "1.62.1",
         "text-shaper": "0.1.28",
@@ -317,6 +323,8 @@
     "@musart/assets": ["@musart/assets@workspace:packages/assets"],
 
     "@musart/core": ["@musart/core@workspace:packages/core"],
+
+    "@musart/path-morph": ["@musart/path-morph@workspace:packages/path-morph"],
 
     "@musart/render": ["@musart/render@workspace:packages/render"],
 

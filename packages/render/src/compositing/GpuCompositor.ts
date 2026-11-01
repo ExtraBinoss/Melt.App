@@ -1,6 +1,7 @@
+import { PlaybackSubmissions } from "../cache/playback-submissions";
 import type { RenderFrame } from "./render-frame";
 import { hasEffectTreatment } from "../effects/shared/active";
-import { completeGpuFrame } from "./publication";
+import { completeGpuFrame, isGraphicsPlayback } from "./publication";
 import { drawLayerSource, isSrgbLayerSource } from "./layer-source";
 import type { SpatialSources } from "../spatial/SpatialSources";
 import {
@@ -47,6 +48,7 @@ export class GpuCompositor {
   private readonly sources: TextureSources;
   private readonly fontResolver?: FontResolver;
   private readonly texts: TextSources;
+  private readonly submissions: PlaybackSubmissions;
   private effects: EffectResources | null = null;
   private passes: GpuPasses | null = null;
   private normal: NormalBatch | null = null;
@@ -88,6 +90,7 @@ export class GpuCompositor {
     private readonly renderer: WebGPURenderer,
     options: { maxBytes?: number; fontResolver?: FontResolver } = {},
   ) {
+    this.submissions = new PlaybackSubmissions(renderer);
     this.fontResolver = options.fontResolver;
     this.maxTextureDimension = gpuTextureLimit(renderer);
     this.cache = new GpuResourceCache(options.maxBytes);
@@ -130,7 +133,6 @@ export class GpuCompositor {
   releasePresentation(): void {
     this.retainedRoot = "";
   }
-
   render(
     page: Composition,
     assets: Record<string, Asset>,
@@ -210,7 +212,11 @@ export class GpuCompositor {
       await this.sources.prepare(page, assets, options);
       this.sample("sources", sourceStarted, options.profileVideo);
       const textStarted = options.profileVideo ? performance.now() : 0;
-      await this.texts.prepare(page, { target: preparationTarget, canContinue: canPrepare });
+      await this.texts.prepare(page, {
+        target: preparationTarget,
+        canContinue: canPrepare,
+        profile: options.profileVideo,
+      });
       this.sample("text", textStarted, options.profileVideo);
       if (this.spatial || page.layers.some((layer) => layer.spatial?.enabled)) {
         this.spatial ??= new (await import("../spatial/SpatialSources")).SpatialSources(
@@ -275,6 +281,7 @@ export class GpuCompositor {
         this.sample("compose", composeStarted, options.profileVideo);
         return entry.output;
       }
+      if (isGraphicsPlayback(options)) await this.submissions.admit(options.signal);
       entry.signature = "";
       const composed = this.children(
         null,
@@ -299,6 +306,7 @@ export class GpuCompositor {
       else if (page.colorSpace === "cmyk-proof") this.color.render(composed, target, "cmyk-proof");
       else this.passes.copyTo(composed, target);
       entry.output = await completeGpuFrame(this.renderer, target, options);
+      if (isGraphicsPlayback(options)) this.submissions.submitted();
       entry.signature = signature;
       this.retainedRoot = rootKey;
       this.rememberInput(entry, page, assets, options.motionFrame);
@@ -309,7 +317,6 @@ export class GpuCompositor {
     this.queue = job.catch(() => undefined);
     return job;
   }
-
   private rememberInput(
     entry: LayerTargets,
     page: Composition,
@@ -326,7 +333,6 @@ export class GpuCompositor {
       });
     else this.retainedInputs.delete(entry);
   }
-
   private entry(key: string): LayerTargets {
     let entry = this.cache.get<LayerTargets>(key);
     if (!entry) {
@@ -419,7 +425,6 @@ export class GpuCompositor {
     entry.signature = signature;
     return source;
   }
-
   private children(
     parentId: string | null,
     width: number,
@@ -533,6 +538,8 @@ export class GpuCompositor {
           }
         : null,
       video: this.sources.videoStats(),
+      text: this.texts.stats(),
+      submission: this.submissions.stats(),
       spatial: this.currentSpatial,
       uploads: this.sources.uploads + this.texts.parses + (this.spatial?.parses ?? 0),
       targets: cache.targets,
@@ -559,10 +566,12 @@ export class GpuCompositor {
     this.disposed = true;
     this.disposal = this.queue.then(async () => {
       const failures: unknown[] = [];
-      try {
-        await this.sources.dispose();
-      } catch (error) {
-        failures.push(error);
+      for (const settle of [() => this.sources.dispose(), () => this.submissions.dispose()]) {
+        try {
+          await settle();
+        } catch (error) {
+          failures.push(error);
+        }
       }
       for (const release of [
         () => this.spatial?.dispose(),

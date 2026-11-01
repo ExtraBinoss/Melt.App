@@ -1,3 +1,4 @@
+import { compactPreparedMorph } from "./compact-prepared";
 import {
   prepareMorphShapeSteps,
   validateShapeMorph,
@@ -7,16 +8,20 @@ import {
 import { yieldPreparation } from "../preparation-task";
 import { DataTexture, FloatType, NearestFilter, NoColorSpace, RGBAFormat } from "three/webgpu";
 
+export type MorphPreparationPhase = "correspondence" | "simplification" | "packing";
 export interface MorphAtlas {
+  preparation?: Record<MorphPreparationPhase, number>;
   texture: DataTexture;
   width: number;
   stride: number;
   states: number;
   shapes: { frames: MorphShapeFrame[]; header: number; metadata: number }[];
   bytes: number;
+  segments: number;
+  maxBandCurves: number;
 }
 /** Stable union bands cover every interpolated contour; playback never rebuilds an atlas. */
-function* atlasSteps(definition: ShapeMorph): Generator<void, MorphAtlas> {
+function* atlasSteps(definition: ShapeMorph): Generator<MorphPreparationPhase, MorphAtlas> {
   validateShapeMorph(definition);
   const maximumStates = Math.max(...definition.shapes.map((shape) => shape.frames.length));
   const estimate =
@@ -31,13 +36,16 @@ function* atlasSteps(definition: ShapeMorph): Generator<void, MorphAtlas> {
       0,
     ) * maximumStates;
   if (estimate > 262144) throw Error("Prepared morph geometry exceeds its point budget");
+  let maxBandCurves = 0;
   const shapes: MorphAtlas["shapes"] = [];
   for (const shape of definition.shapes) {
     const frames: MorphShapeFrame[] = [];
     for (const frame of prepareMorphShapeSteps(shape.frames)) {
       frames.push(frame);
-      yield;
+      yield "correspondence";
     }
+    const compaction = compactPreparedMorph(frames);
+    while (!compaction.next().done) yield "simplification";
     shapes.push({ frames, header: 0, metadata: 0 });
   }
   const states = Math.max(...shapes.map((shape) => shape.frames.length));
@@ -53,11 +61,11 @@ function* atlasSteps(definition: ShapeMorph): Generator<void, MorphAtlas> {
         frame.contours.flatMap((contour) =>
           contour.points.map((p, i) => {
             const q = contour.points[(i + 1) % contour.points.length]!;
-            return [p[0], p[1], (p[0] + q[0]) / 2, (p[1] + q[1]) / 2, q[0], q[1], 0, 0];
+            return [p[0], p[1], q[0], q[1]];
           }),
         ),
       );
-      yield;
+      yield "packing";
     }
     shape.metadata = data[0]!.length / 4;
     for (const buffer of data)
@@ -72,7 +80,7 @@ function* atlasSteps(definition: ShapeMorph): Generator<void, MorphAtlas> {
     const base = data[0]!.length / 4;
     for (let state = 0; state < states; state++) {
       for (const curve of curves[state]!) data[state]!.push(...curve);
-      yield;
+      yield "packing";
     }
     shape.header = data[0]!.length / 4;
     for (const buffer of data) buffer.push(...Array.from({ length: 16 * 2 * 4 }, () => 0));
@@ -83,30 +91,31 @@ function* atlasSteps(definition: ShapeMorph): Generator<void, MorphAtlas> {
         y1 = -Infinity;
       for (const state of curves) {
         const c = state[i]!;
-        x0 = Math.min(x0, c[0]!, c[2]!, c[4]!);
-        y0 = Math.min(y0, c[1]!, c[3]!, c[5]!);
-        x1 = Math.max(x1, c[0]!, c[2]!, c[4]!);
-        y1 = Math.max(y1, c[1]!, c[3]!, c[5]!);
+        x0 = Math.min(x0, c[0]!, c[2]!);
+        y0 = Math.min(y0, c[1]!, c[3]!);
+        x1 = Math.max(x1, c[0]!, c[2]!);
+        y1 = Math.max(y1, c[1]!, c[3]!);
       }
       return { min: [x0, y0], max: [x1, y1] };
     });
-    yield;
+    yield "packing";
     for (let axis = 0; axis < 2; axis++)
       for (let band = 0; band < 16; band++) {
         const start = data[0]!.length / 4;
         ranges.forEach((range, i) => {
           const cross = 1 - axis;
           if (range.max[cross]! >= band / 16 - 1e-5 && range.min[cross]! <= (band + 1) / 16 + 1e-5)
-            for (const buffer of data) buffer.push(base + i * 2, 0, 0, 0);
+            for (const buffer of data) buffer.push(base + i, 0, 0, 0);
         });
         const count = data[0]!.length / 4 - start;
+        maxBandCurves = Math.max(maxBandCurves, count);
         if (count > 1024) throw Error("Morph contour band exceeds the GPU loop budget");
         for (const buffer of data) {
           const offset = (shape.header + axis * 16 + band) * 4;
           buffer[offset] = start;
           buffer[offset + 1] = count;
         }
-        yield;
+        yield "packing";
       }
   }
   const texels = data[0]!.length / 4;
@@ -122,14 +131,26 @@ function* atlasSteps(definition: ShapeMorph): Generator<void, MorphAtlas> {
   const pixels = new Float32Array(width * height * 4);
   for (let i = 0; i < data.length; i++) {
     pixels.set(data[i]!, i * stride * 4);
-    yield;
+    yield "packing";
   }
   const texture = new DataTexture(pixels, width, height, RGBAFormat, FloatType);
   texture.minFilter = texture.magFilter = NearestFilter;
   texture.colorSpace = NoColorSpace;
   texture.generateMipmaps = false;
   texture.needsUpdate = true;
-  return { texture, width, stride, states, shapes, bytes: pixels.byteLength };
+  return {
+    texture,
+    width,
+    stride,
+    states,
+    shapes,
+    bytes: pixels.byteLength,
+    maxBandCurves,
+    segments: shapes.reduce(
+      (n, shape) => n + shape.frames[0]!.contours.reduce((m, c) => m + c.points.length, 0),
+      0,
+    ),
+  };
 }
 
 /** Existing synchronous callers retain exactly the same atlas bytes. */
@@ -145,6 +166,7 @@ export async function buildMorphAtlasAsync(
   definition: ShapeMorph,
   options: {
     canContinue?: () => boolean;
+    profile?: boolean;
     yieldTask?: () => Promise<void>;
   } = {},
 ): Promise<MorphAtlas> {
@@ -154,8 +176,17 @@ export async function buildMorphAtlasAsync(
   };
   check();
   const steps = atlasSteps(definition);
+  const timings: Record<MorphPreparationPhase, number> | null = options.profile
+    ? { correspondence: 0, simplification: 0, packing: 0 }
+    : null;
+  const advance = () => {
+    const start = timings ? performance.now() : 0;
+    const next = steps.next();
+    if (timings) timings[next.done ? "packing" : next.value] += performance.now() - start;
+    return next;
+  };
   let began = performance.now();
-  let next = steps.next();
+  let next = advance();
   try {
     while (!next.done) {
       check();
@@ -164,7 +195,7 @@ export async function buildMorphAtlasAsync(
         check();
         began = performance.now();
       }
-      next = steps.next();
+      next = advance();
     }
     try {
       check();
@@ -172,6 +203,7 @@ export async function buildMorphAtlasAsync(
       next.value.texture.dispose();
       throw error;
     }
+    if (timings) next.value.preparation = timings;
     return next.value;
   } finally {
     steps.return(undefined as never);

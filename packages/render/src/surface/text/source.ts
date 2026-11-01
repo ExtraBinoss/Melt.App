@@ -1,3 +1,4 @@
+import { TextDiagnostics } from "./diagnostics";
 import { MorphResource, morphResourceKey, sourceMorph } from "../morph/resource";
 import { buildMorphAtlasAsync } from "../morph/atlas";
 import { textMorph } from "../morph/text";
@@ -138,14 +139,18 @@ export class TextResource implements GpuResource {
     this.camera.updateProjectionMatrix();
     this.layoutKey = textGeometryKey(layer);
   }
+  get glyphCount() {
+    return this.glyphIds.length;
+  }
   async prepare(
     renderer: WebGPURenderer,
     target: RenderTarget,
     canContinue?: () => boolean,
-  ): Promise<void> {
-    if (this.compiled) return;
+  ): Promise<boolean> {
+    if (this.compiled) return false;
     await compileGpuScene(renderer, this.scene, this.camera, target, canContinue);
     this.compiled = true;
+    return true;
   }
   dispose(): void {
     if (this.closed) return;
@@ -159,6 +164,7 @@ export class TextResource implements GpuResource {
 
 /** Font parsing/layout are cached preparation; paint and analytical glyph coverage run in TSL. */
 export class TextSources {
+  readonly diagnostics = new TextDiagnostics();
   parses = 0;
   passes = 0;
   private readonly fonts: FontRepository;
@@ -174,9 +180,20 @@ export class TextSources {
   }
   async prepare(
     page: Composition,
-    options: { target?: RenderTarget; canContinue?: () => boolean } = {},
+    options: { target?: RenderTarget; canContinue?: () => boolean; profile?: boolean } = {},
   ): Promise<void> {
     this.assertOpen();
+    this.diagnostics.enabled = !!options.profile;
+    const active = new Set<TextResource | MorphResource>();
+    const prepareResource = async (resource: TextResource | MorphResource) => {
+      active.add(resource);
+      if (!options.target) return;
+      const start = this.diagnostics.start();
+      if (await resource.prepare(this.renderer, options.target, options.canContinue)) {
+        this.diagnostics.compilations++;
+        this.diagnostics.end("compile", start);
+      }
+    };
     const byParent = new Map<string | null, Layer[]>();
     for (const layer of page.layers) {
       const siblings = byParent.get(layer.parentId) ?? [];
@@ -193,8 +210,8 @@ export class TextSources {
         const key = `text:${textResourceKey(layer)}`;
         let resource = this.cache.get<TextResource | MorphResource>(key);
         if (resource?.matchesLayout(layer)) {
-          if (options.target)
-            await resource.prepare(this.renderer, options.target, options.canContinue);
+          this.diagnostics.cacheHits++;
+          await prepareResource(resource);
           continue;
         }
         let job = this.pending.get(key);
@@ -206,21 +223,49 @@ export class TextSources {
         }
         await job;
         resource = this.cache.get<TextResource | MorphResource>(key);
-        if (options.target && resource)
-          await resource.prepare(this.renderer, options.target, options.canContinue);
+        if (resource) await prepareResource(resource);
       }
     }
     this.assertOpen();
+    this.diagnostics.inventory = {
+      glyphs: 0,
+      morphShapes: 0,
+      morphStates: 0,
+      morphSegments: 0,
+      maxBandCurves: 0,
+      atlasBytes: 0,
+    };
+    const inventory = this.diagnostics.inventory;
+    for (const resource of active) {
+      inventory.atlasBytes += resource.atlas.bytes;
+      if (resource instanceof MorphResource) {
+        inventory.morphShapes += resource.atlas.shapes.length;
+        inventory.morphStates += resource.atlas.shapes.reduce(
+          (n, shape) => n + shape.frames.length,
+          0,
+        );
+        inventory.morphSegments += resource.atlas.segments;
+        inventory.maxBandCurves = Math.max(inventory.maxBandCurves, resource.atlas.maxBandCurves);
+      } else inventory.glyphs += resource.glyphCount;
+    }
+  }
+  stats() {
+    return this.diagnostics.stats();
   }
   private async prepareLayer(
     layer: Layer,
     key: string,
     canContinue?: () => boolean,
   ): Promise<void> {
+    const fontStarted = this.diagnostics.start();
     const lease = await this.fonts.acquire(layer.fontFamily, layer.fontWeight);
+    this.diagnostics.end("font", fontStarted);
     try {
       this.assertOpen();
+      const layoutStarted = this.diagnostics.start();
       const layout = layoutText(layer, lease.font);
+      this.diagnostics.shapings++;
+      this.diagnostics.end("shaping", layoutStarted);
       const existing = this.cache.get<TextResource | MorphResource>(key);
       if (existing instanceof TextResource && existing.canUpdateLayout(layout)) {
         existing.updateLayout(layer, layout, lease.font.unitsPerEm);
@@ -229,10 +274,18 @@ export class TextSources {
       const effect = sourceMorph(layer);
       let resource: TextResource | MorphResource;
       if (effect) {
+        const contourStarted = this.diagnostics.start();
         const definition = textMorph(layer, effect, lease.font, layout);
+        this.diagnostics.end("contours", contourStarted);
+        const atlasStarted = this.diagnostics.start();
         const atlas = await buildMorphAtlasAsync(definition, {
+          profile: this.diagnostics.enabled,
           canContinue: () => !this.disposed && (canContinue?.() ?? true),
         });
+        this.diagnostics.end("atlas", atlasStarted);
+        if (atlas.preparation)
+          for (const phase of ["correspondence", "simplification", "packing"] as const)
+            this.diagnostics.sample(phase, atlas.preparation[phase]);
         try {
           this.assertOpen();
           resource = new MorphResource(layer, effect, definition, atlas);
@@ -240,7 +293,11 @@ export class TextSources {
           atlas.texture.dispose();
           throw error;
         }
-      } else resource = new TextResource(layer, lease.font, layout);
+      } else {
+        const atlasStarted = this.diagnostics.start();
+        resource = new TextResource(layer, lease.font, layout);
+        this.diagnostics.end("atlas", atlasStarted);
+      }
       if (this.disposed) {
         resource.dispose();
         this.assertOpen();
@@ -248,6 +305,7 @@ export class TextSources {
       // The GPU resource contains copied curves and no longer depends on its font face.
       this.cache.set(key, resource);
       this.parses++;
+      this.diagnostics.rebuilds++;
     } finally {
       lease.release();
     }
@@ -259,14 +317,22 @@ export class TextSources {
     this.assertOpen();
     const resource = this.cache.get<TextResource | MorphResource>(`text:${textResourceKey(layer)}`);
     if (!resource?.matchesLayout(layer)) throw new Error("Text outline source was not prepared.");
+    const updateStarted = this.diagnostics.start();
     updateTextPaint(resource.paint, layer);
-    if (resource instanceof MorphResource) resource.update(layer, sourceMorph(layer)!);
+    if (resource instanceof MorphResource) {
+      resource.update(layer, sourceMorph(layer)!);
+      this.diagnostics.morphUpdates++;
+    }
+    this.diagnostics.end("update", updateStarted);
     const previous = this.renderer.getRenderTarget(),
       auto = this.renderer.autoClear;
     try {
       this.renderer.autoClear = false;
       this.renderer.setRenderTarget(target);
+      const drawStarted = this.diagnostics.start();
       this.renderer.render(resource.scene, resource.camera);
+      this.diagnostics.end("draw", drawStarted);
+      this.diagnostics.draws++;
       this.passes++;
     } finally {
       this.renderer.setRenderTarget(previous);

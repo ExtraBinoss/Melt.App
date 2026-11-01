@@ -35,6 +35,7 @@ export async function runMorphWitness(forceWebGL: boolean) {
         milliseconds: performance.now() - started,
       });
     }
+    const retainedMorph = session.stats()?.text;
     const generated = createProject({
       pages: [
         createPage({
@@ -149,6 +150,7 @@ export async function runMorphWitness(forceWebGL: boolean) {
       text,
       shape,
       stats: session.stats(),
+      retainedMorph,
       readbacks: window.__musartVideoReadbacks,
     };
   } finally {

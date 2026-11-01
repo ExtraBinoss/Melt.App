@@ -8,6 +8,7 @@
     ".": "./src/index.ts"
   },
   "dependencies": {
+    "@musart/path-morph": "workspace:*",
     "svg-pathdata": "9.0.0"
   }
 }
