@@ -108,7 +108,12 @@ export function CompositionPlane({
       ),
     [renderer, fontResolver, mediaResolverFor, controller],
   );
-  useFrame(() => density.prepare(renderer), -1);
+  useFrame(() => {
+    density.prepare(renderer);
+    // Composition preparation uses offscreen targets. Fiber's display draw must
+    // explicitly return to the canvas after those asynchronous GPU passes.
+    renderer.setRenderTarget(null);
+  }, -1);
   useEffect(() => {
     const presenter = controller.presentation.acquire();
     const fontPresenter = controller.fontPresentation.acquire();

@@ -1,14 +1,15 @@
-import { InstancedMesh, Vector3, type RenderTarget, type Texture } from "three/webgpu";
+import { InstancedMesh, Vector3, type CubeRenderTarget, type Texture } from "three/webgpu";
 import type { GpuResource } from "../../cache/GpuResourceCache";
 import type { EnvironmentSources } from "../EnvironmentSources";
 import type { ReflectionBudget, ReflectionStats } from "./model";
 import type { CaptureMesh } from "./meshes";
 import { CaptureScene } from "./CaptureScene";
 import { ReflectionBindings } from "./bindings";
+import { pmremTargetBytes } from "../pmrem-budget";
 export class ReflectionResource implements GpuResource {
   readonly capture = new CaptureScene();
   readonly bindings = new ReflectionBindings();
-  readonly probes: { target: RenderTarget | null; center: Vector3 }[] = [];
+  readonly probes: { target: CubeRenderTarget | null; center: Vector3 }[] = [];
   signature = "";
   lastCapture = -Infinity;
   revision = 0;
@@ -25,9 +26,8 @@ export class ReflectionResource implements GpuResource {
   };
   constructor(readonly budget: ReflectionBudget) {}
   projectedBytes(contributors: CaptureMesh[], receivers: CaptureMesh[] = contributors) {
-    // PMREM scene targets include half-float radiance and depth; shared scratch is reserved by EnvironmentSources.
-    const targets =
-      this.budget.probes * Math.max(3 * this.budget.size, 336) * 4 * this.budget.size * 12;
+    // Output cubemaps have explicit radiance mips; source/depth scratch belongs to EnvironmentSources.
+    const targets = this.budget.probes * pmremTargetBytes(this.budget.size);
     const materials = (item: CaptureMesh) =>
       Array.isArray(item.original.material) ? item.original.material.length : 1;
     const captureBytes = contributors.reduce(
@@ -52,11 +52,7 @@ export class ReflectionResource implements GpuResource {
       this.capture.bytes +
       this.bindings.bytes +
       this.probes.reduce(
-        (sum, probe) =>
-          sum +
-          (probe.target
-            ? probe.target.width * probe.target.height * (probe.target.depthBuffer ? 12 : 8)
-            : 0),
+        (sum, probe) => sum + (probe.target ? pmremTargetBytes(probe.target.width) : 0),
         0,
       )
     );

@@ -33,12 +33,20 @@ it("enumerates every catalog control without hiding conditional/dormant paramete
         macros.some((macro) => macro.property === parameter.key && parameter.scope === "settings")
       )
         continue;
-      const target: MotionPropertyTarget = {
-        kind: parameter.scope === "settings" ? "effectSetting" : "effect",
-        layerId: layer.id,
-        effectId: effect.id,
-        property: parameter.key as never,
-      };
+      const target: MotionPropertyTarget =
+        parameter.scope === "settings"
+          ? {
+              kind: "effectSetting",
+              layerId: layer.id,
+              effectId: effect.id,
+              property: parameter.key,
+            }
+          : {
+              kind: "effect",
+              layerId: layer.id,
+              effectId: effect.id,
+              property: parameter.key as never,
+            };
       const descriptor = resolveMotionProperty(page, target)!;
       expect(descriptor, `${effect.type}.${parameter.key}`).not.toBeNull();
       expect(addresses).toContain(JSON.stringify(target));

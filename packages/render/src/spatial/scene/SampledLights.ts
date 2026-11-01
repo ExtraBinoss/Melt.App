@@ -10,8 +10,8 @@ import {
 } from "three/webgpu";
 import type { SpatialLight } from "@musart/core";
 
-// Distinct light constructors extend this renderer's library without replacing its
-// standard registrations or changing another scene's native light scheduling.
+// Distinct light constructors own their node registration without replacing
+// standard light classes or changing another scene's native light scheduling.
 class SampledDirectionalLight extends DirectionalLight {}
 class SampledPointLight extends PointLight {}
 class SampledSpotLight extends SpotLight {}
@@ -28,15 +28,14 @@ class SampledSpotLightNode extends SpotLightNode {
   override updateType = NodeUpdateType.RENDER;
 }
 
-/** Register composition-owned native light nodes through Three's light extension API. */
-export function registerSampledLights(renderer: WebGPURenderer) {
-  const { library } = renderer;
-  if (!library.getLightNodeClass(SampledDirectionalLight))
-    library.addLight(SampledDirectionalLightNode, SampledDirectionalLight);
-  if (!library.getLightNodeClass(SampledPointLight))
-    library.addLight(SampledPointLightNode, SampledPointLight);
-  if (!library.getLightNodeClass(SampledSpotLight))
-    library.addLight(SampledSpotLightNode, SampledSpotLight);
+let registered = false;
+/** r187 registers node types on these private light subclasses. */
+export function registerSampledLights(_renderer: WebGPURenderer) {
+  if (registered) return;
+  SampledDirectionalLight.registerNode(SampledDirectionalLightNode);
+  SampledPointLight.registerNode(SampledPointLightNode);
+  SampledSpotLight.registerNode(SampledSpotLightNode);
+  registered = true;
 }
 
 export function createSampledLight(type: "directional"): DirectionalLight;

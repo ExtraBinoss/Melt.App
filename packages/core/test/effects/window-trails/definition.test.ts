@@ -54,6 +54,7 @@ test("accepts optional image chrome and rejects missing or wrong-kind input asse
         kind: "model3d",
         name: "Model",
         mime: "model/gltf-binary",
+        byteLength: 1,
         width: 1,
         height: 1,
         dataUrl: "data:model/gltf-binary;base64,AA==",

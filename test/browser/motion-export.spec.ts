@@ -1,27 +1,11 @@
 import { expect, test, type BrowserContext, type Page } from "@playwright/test";
-import { execFileSync } from "node:child_process";
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { installReadbackProbe } from "./support/readback-probe";
 import { installNativeVideoProbe } from "./support/native-video-probe";
 const cohort = resolve("artifacts/motion/export");
-let bundle: string, wasm: Buffer;
 test.beforeAll(async () => {
   await mkdir(cohort, { recursive: true });
-  execFileSync(
-    "bun",
-    [
-      "build",
-      "test/browser/support/motion-export-witness.ts",
-      "--target=browser",
-      "--external=harfbuzzjs/hb.wasm?url",
-      "--outfile",
-      resolve(cohort, "witness.js"),
-    ],
-    { stdio: "pipe" },
-  );
-  bundle = await readFile(resolve(cohort, "witness.js"), "utf8");
-  wasm = await readFile(resolve("node_modules/harfbuzzjs/hb.wasm"));
 });
 async function verifyMotionExport(
   page: Page,
@@ -35,31 +19,23 @@ async function verifyMotionExport(
   await context.route("**/motion-export-witness.html", (route) =>
     route.fulfill({
       contentType: "text/html",
-      body: '<!doctype html><title>Headless Motion export</title><script type="importmap">{"imports":{"harfbuzzjs/hb.wasm?url":"/motion-export-font-url.js"}}</script>',
+      body: "<!doctype html><title>Headless Motion export</title>",
     }),
-  );
-  await context.route("**/motion-export-font-url.js", (route) =>
-    route.fulfill({
-      contentType: "text/javascript",
-      body: 'export default "/motion-export-font.wasm";',
-    }),
-  );
-  await context.route("**/motion-export-font.wasm", (route) =>
-    route.fulfill({ contentType: "application/wasm", body: wasm }),
-  );
-  await context.route("**/motion-export-witness.js", (route) =>
-    route.fulfill({ contentType: "text/javascript", body: bundle }),
   );
   await page.goto("/motion-export-witness.html", { waitUntil: "domcontentloaded" });
   const result = await page.evaluate(
     async (options) => {
-      const url = "/motion-export-witness.js";
+      const url = options.modulePath;
       const module = (await import(
         /* @vite-ignore */ url
       )) as typeof import("./support/motion-export-witness");
       return module.runMotionExportWitness(options.webgl, options.container);
     },
-    { webgl: forceWebGL, container },
+    {
+      webgl: forceWebGL,
+      container,
+      modulePath: `/@fs${resolve("test/browser/support/motion-export-witness.ts")}`,
+    },
   );
   const name = (forceWebGL ? "webgl" : "webgpu") + "-" + container;
   const { encoded, ...evidence } = result;
@@ -91,18 +67,26 @@ async function verifyMotionExport(
   const inspector = await context.newPage();
   try {
     await inspector.goto("/motion-export-witness.html", { waitUntil: "domcontentloaded" });
-    const decoded = await inspector.evaluate(async (encoded) => {
-      const url = "/motion-export-witness.js";
-      const module = (await import(
-        /* @vite-ignore */ url
-      )) as typeof import("./support/motion-export-witness");
-      return module.inspectMotionFile(encoded);
-    }, encoded);
+    const decoded = await inspector.evaluate(
+      async ({ encoded, modulePath }) => {
+        const url = modulePath;
+        const module = (await import(
+          /* @vite-ignore */ url
+        )) as typeof import("./support/motion-export-witness");
+        return module.inspectMotionFile(encoded);
+      },
+      { encoded, modulePath: `/@fs${resolve("test/browser/support/motion-export-witness.ts")}` },
+    );
     await writeFile(resolve(cohort, name + "-decoded.json"), JSON.stringify(decoded, null, 2));
     expect(decoded).toMatchObject({ width: 64, height: 64, sampleRate: 48000, channels: 2 });
     expect(decoded.timeResolution).toBe(result.timestampResolution);
     const encodedEnd = result.encodedDuration.value / result.encodedDuration.rate;
-    expect(decoded.duration).toBeCloseTo(encodedEnd, 6);
+    expect(decoded.videoDuration).toBeCloseTo(encodedEnd, 6);
+    expect(decoded.duration).toBeCloseTo(Math.max(decoded.videoDuration, decoded.audioDuration), 6);
+    // Native audio codecs pad their last packet; r1.63 now compensates priming
+    // and exposes that packet tail. Video must still end at its exact authored tick.
+    expect(decoded.audioDuration).toBeGreaterThanOrEqual(encodedEnd - 1 / decoded.sampleRate);
+    expect(decoded.audioDuration).toBeLessThan(encodedEnd + decoded.audioPacketDuration);
     expect(decoded.frames).toHaveLength(12);
     for (let i = 0; i < decoded.frames.length; i++)
       expect(decoded.frames[i]!.timestamp).toBeCloseTo(

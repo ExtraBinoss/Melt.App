@@ -45,9 +45,11 @@ import type {
 } from "../../state/session/canonical-presentation";
 import type { FontPresentationPublisher } from "../../state/session/font-presentation";
 import { canvasOwners } from "./canvas-owners";
+import { CanvasOpenDiagnostics } from "./open-diagnostics";
 /** Owns one display plane and a latest-only queue. GPU allocation begins at activation. */
 export class PlaneResources {
   readonly profile: SceneProfileSource;
+  private readonly opening: CanvasOpenDiagnostics;
   private readonly buffering: CanvasPlaybackBuffering;
   private videoProxyActivity: CanvasVideoProxyActivity | null = null;
   private readonly profileVideo =
@@ -122,6 +124,7 @@ export class PlaneResources {
     private readonly mediaResolverFor?: (projectId: string) => MediaSourceResolver,
     holdPlayback?: () => () => void,
   ) {
+    this.opening = new CanvasOpenDiagnostics(renderer.domElement, () => this.diagnosticSnapshot());
     this.buffering = new CanvasPlaybackBuffering(holdPlayback);
     this.maxTextureDimension = gpuTextureLimit(renderer);
     renderer.domElement.dataset.gpuTextureLimit = String(this.maxTextureDimension);
@@ -363,6 +366,7 @@ export class PlaneResources {
     });
   }
   private async render(request: PreviewRequest): Promise<void> {
+    if (!request.playback && !request.preview) this.opening.start(request);
     const started = this.diagnostics ? performance.now() : 0;
     if (!request.playback) this.diagnostics?.pause();
     this.profile.begin(request.revision);
@@ -442,6 +446,7 @@ export class PlaneResources {
     this.onScale?.(request.scale, result.width, result.height);
   }
   private preparedFrame(request: PreviewRequest, result: FrameTexture): void {
+    this.opening.prepared(request.revision);
     this.profile.prepared(request.revision);
     this.completed++;
     if (request.motionFrame)
@@ -479,6 +484,7 @@ export class PlaneResources {
       this.profile.presented(this.preparedRequest.page.id, this.preparedRevision);
       traceCanvasFrame(this.preparedRequest, this.sample.value.uuid);
       this.presentedRevision = this.preparedRevision;
+      this.opening.presented(this.preparedRevision);
       this.videoProxyActivity?.framePresented();
       element.dataset.rendererReady = String(this.preparedRevision === this.revision);
       element.dataset.presentationReady = "true";
@@ -520,6 +526,7 @@ export class PlaneResources {
     };
   }
   private report(error: unknown) {
+    this.opening.failed(error);
     const message = error instanceof Error ? error.message : String(error);
     this.renderer.domElement.dataset.renderError = message;
     this.buffering.presented();
@@ -546,6 +553,7 @@ export class PlaneResources {
   dispose(): Promise<void> {
     if (this.disposal) return this.disposal;
     this.disposed = true;
+    this.opening.dispose();
     this.buffering.presented();
     this.profile.dispose();
     this.diagnostics?.dispose();

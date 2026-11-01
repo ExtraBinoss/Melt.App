@@ -4,14 +4,16 @@ import { createMotionEasingPreset } from "../../src/motion/easing";
 import type { MotionPropertyDescriptor } from "../../src/motion/properties/model";
 
 const target = { kind: "layer", layerId: "hero", property: "opacity" } as const;
-const numeric: MotionPropertyDescriptor = {
+const capability = { animatable: true, dependencies: [] } as const;
+const numeric = {
+  ...capability,
   target,
   kind: "number",
   value: 0,
   min: 0,
   max: 1,
   interpolation: "continuous",
-};
+} satisfies MotionPropertyDescriptor;
 
 test("numeric interpolation preserves valid bounds after overshooting easing", () => {
   const sample = compileMotionInterpolator(numeric, 0, 1, createMotionEasingPreset("easeOutBack"));
@@ -30,10 +32,29 @@ test("discrete descriptors hold until the destination regardless of spring overs
     number | string | boolean,
   ][] = [
     [{ ...numeric, kind: "integer", interpolation: "hold", max: 42 }, 1, 42],
-    [{ target, kind: "boolean", interpolation: "hold", value: false }, false, true],
-    [{ target, kind: "choice", interpolation: "hold", value: "a", options: ["a", "b"] }, "a", "b"],
+    [{ ...capability, target, kind: "boolean", interpolation: "hold", value: false }, false, true],
     [
-      { target, kind: "string", interpolation: "hold", value: "a", minLength: 0, maxLength: 100 },
+      {
+        ...capability,
+        target,
+        kind: "choice",
+        interpolation: "hold",
+        value: "a",
+        options: ["a", "b"],
+      },
+      "a",
+      "b",
+    ],
+    [
+      {
+        ...capability,
+        target,
+        kind: "string",
+        interpolation: "hold",
+        value: "a",
+        minLength: 0,
+        maxLength: 100,
+      },
       "a",
       "b",
     ],
@@ -52,13 +73,14 @@ test("discrete descriptors hold until the destination regardless of spring overs
 });
 
 test("interpolates straight RGB/RGBA paint with explicit alpha and channel clamping", () => {
-  const rgba: MotionPropertyDescriptor = {
+  const rgba = {
+    ...capability,
     target: { kind: "layer", layerId: "hero", property: "fill" },
     kind: "color",
     value: "#fff",
     format: "rgba",
     interpolation: "continuous",
-  };
+  } satisfies MotionPropertyDescriptor;
   expect(compileMotionInterpolator(rgba, "#f00", "#00f")(0.5)).toBe("#800080ff");
   expect(compileMotionInterpolator(rgba, "transparent", "#ffffff")(0.5)).toBe("#80808080");
   expect(compileMotionInterpolator(rgba, "#f008", "#00ff0080")(0.5)).toBe("#80800084");

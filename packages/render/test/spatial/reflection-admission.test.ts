@@ -7,7 +7,7 @@ import {
   Mesh,
   MeshStandardMaterial,
   MeshStandardNodeMaterial,
-  RenderTarget,
+  CubeRenderTarget,
   SphereGeometry,
   Texture,
   type Scene,
@@ -79,14 +79,14 @@ function fixture({
   const cache = new GpuResourceCache(64 * 1024 * 1024);
   const captured: { meshes: string[]; center: number[] }[] = [];
   const captureScene = vi.fn(
-    async (scene: Scene, center: Vector3, _size: number, target: RenderTarget | null) => {
+    async (scene: Scene, center: Vector3, _size: number, target: CubeRenderTarget | null) => {
       captured.push({
         meshes: scene.children
           .filter((node) => node instanceof Mesh && node.visible)
           .map((node) => node.name),
         center: center.toArray(),
       });
-      return target ?? new RenderTarget(48, 16);
+      return target ?? new CubeRenderTarget(256, { depthBuffer: false });
     },
   );
   const environments = { captureScene } as unknown as EnvironmentSources;
@@ -220,7 +220,7 @@ test("cancelled captures restore self exclusion, preserve originals and account 
   let active = true;
   f.captureScene.mockImplementationOnce(async () => {
     active = false;
-    return new RenderTarget(48, 16);
+    return new CubeRenderTarget(256, { depthBuffer: false });
   });
   const original = f.a.material;
   await expect(f.prepare({}, () => active)).rejects.toMatchObject({ name: "AbortError" });

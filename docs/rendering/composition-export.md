@@ -74,10 +74,17 @@ samples stay contiguous. The result reports authored `duration` separately from
 `encodedDuration` and `timestampResolution`. A zero-length sample or frame rate
 beyond the format's grid fails rather than dropping or fabricating a frame.
 
-The reproducible [Mediabunny patch](../../patches/README.md) preserves explicit
-WebM video sample durations, including a shortened last sample. It uses the
-library's existing BlockGroup/BlockDuration path and does not add alpha data or a
-different muxer. Decoder timestamps may additionally round to native WebCodecs
+`encodedDuration` describes the video span. Native audio encoders may retain
+padding in their final codec packet after priming compensation; the overall
+container can therefore be slightly longer than the authored video. This does
+not add PCM to the authored mix. The native witness validates each track
+separately, keeps the video end exact, and bounds the audio tail by one actual
+encoded packet rather than hiding it in a broad timing tolerance.
+
+Unmodified Mediabunny 1.65.0 preserves explicit WebM video sample durations,
+including a shortened last sample. Its upstream Matroska fix replaced the
+[former local patch](../../patches/README.md). No alpha data or alternate muxer
+is added. Decoder timestamps may additionally round to native WebCodecs
 microseconds; native witnesses compare those against the declared container grid.
 
 The exporter awaits each GPU-canvas/encoder consumer before reusing the canvas.

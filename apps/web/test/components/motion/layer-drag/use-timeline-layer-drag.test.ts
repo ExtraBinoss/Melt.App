@@ -69,7 +69,9 @@ it("projects the shared source into a bounded canonical DOM window and restores 
   ]);
   const window = hook.result.current.window(0, 1);
   expect(window).toHaveLength(2);
-  expect(window.map(({ entry }) => entry.layer.id)).toEqual([d.image.id, d.rectangle.id]);
+  expect(window.map(({ entry }) => (entry.kind === "layer" ? entry.layer.id : entry.kind))).toEqual(
+    [d.image.id, d.rectangle.id],
+  );
   expect(hook.result.current.moving).toBe(true);
   hook.rerender({ ...options, active: false });
   expect(hook.result.current.moving).toBe(false);

@@ -78,7 +78,7 @@ test.each(["directional", "point", "spot"] as const)(
   },
 );
 
-test("registration is renderer-local, idempotent and preserves standard light classes", () => {
+test("registration belongs only to sampled subclasses, is idempotent and preserves standard lights", () => {
   const library = new StandardNodeLibrary(),
     other = new StandardNodeLibrary();
   const standard = library.getLightNodeClass(DirectionalLight),
@@ -86,12 +86,14 @@ test("registration is renderer-local, idempotent and preserves standard light cl
   const first = createSampledLight;
   registerSampledLights({ library } as WebGPURenderer);
   registerSampledLights({ library } as WebGPURenderer);
-  expect(add).toHaveBeenCalledTimes(3);
+  expect(add).not.toHaveBeenCalled();
   expect(library.getLightNodeClass(DirectionalLight)).toBe(standard);
   expect(first("directional")).toBeInstanceOf(DirectionalLight);
   expect(first("point")).toBeInstanceOf(PointLight);
   expect(first("spot")).toBeInstanceOf(SpotLight);
-  expect(other.getLightNodeClass(first("directional").constructor as new () => Light)).toBeNull();
+  expect(other.getLightNodeClass(first("directional").constructor as new () => Light)).toBe(
+    library.getLightNodeClass(first("directional").constructor as new () => Light),
+  );
 });
 
 test.each(["directional", "point", "spot"] as const)(

@@ -1,4 +1,4 @@
-# text-shaper dependency patch
+# Dependency patches
 
 `text-shaper@0.1.28.patch` is applied by Bun through the root package's
 `patchedDependencies`. Both the application and performance comparisons use the
@@ -72,30 +72,26 @@ regenerate the applied bundle patch deliberately. Never reuse these minified
 identifiers or recorded bundle hashes for a different tarball. Remove the patch
 only after an upstream fix and the same public-API assertions pass.
 
-## Mediabunny WebM duration
+## Mediabunny: patch retired
 
-`mediabunny@1.62.1.patch` fixes an observed WebM duration loss in opaque video.
-Upstream's SimpleBlock path has no explicit duration. Without DefaultDuration,
-the final decoded video sample therefore had duration zero; a 0.370 s authored
-composition was measured as 0.367 s. Adding frame-rate metadata would instead
-resnap the shortened final sample, so it is not an equivalent fix.
+The former `mediabunny@1.62.1.patch` compensated for missing duration on the last
+opaque WebM sample. Upstream 1.63.0 now writes the last packet duration in each
+Matroska cluster as part of Project Sync. The project uses unmodified 1.65.0;
+the obsolete patch and Bun `patchedDependencies` entry have been removed.
+The native export witness still checks a shortened final sample, independently
+decoded container duration and audio/video timing.
 
-The patch enables the existing BlockGroup/BlockDuration path for video, retaining
-its ordinary key/delta reference logic. It changes neither encoded packet bytes
-nor alpha data, codecs, native encoding or GPU rendering. Both the published
-TypeScript source and the ESM distribution used by this project are patched.
-CommonJS bundles remain upstream; this project uses ESM imports.
+Primary source: [Mediabunny 1.63.0 release](https://github.com/Vanilagy/mediabunny/releases/tag/v1.63.0).
 
-Mediabunny's MPL-2.0 license and original notices remain intact. The patch is
-stored as source and applied through Bun's root `patchedDependencies` entry and
-lockfile. Always prepare with `bun patch mediabunny@1.62.1` before editing:
-ordinary Linux installs can share hardlinks with Bun's cache and other worktrees.
-Save an isolated change with `bun patch --commit node_modules/mediabunny`.
-These are dependency-patch operations, not Git commits.
+## Radix Menu: retained
 
-Patch files preserve upstream tab-indented context verbatim. Their Git whitespace
-attribute reflects unified-diff syntax; application sources retain normal checks.
+The latest published `@radix-ui/react-menu` remains 2.2.1. Its patch avoids
+reading item `textContent` when an explicit `textValue` is supplied, preserving
+local menu performance. Both ESM and CommonJS builds retain the same fix.
+Keyboard typeahead and native non-primary pointer/focus behavior remain covered
+by the shared menu regressions. Remove it only when upstream has the equivalent
+behavior and those checks pass.
 
-The original failing output, hashes and inode evidence are kept in ignored
-`artifacts/motion/`. Native verification covers both real container decoding and
-the public generic renderer; see [composition export](../docs/rendering/composition-export.md).
+The text-shaper package above also remains at the latest published 0.1.28; its
+cache/positioning compatibility patch is still required. Both retained patches
+remain reproducible through Bun's lockfile.

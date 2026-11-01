@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import type { EditorServices, ProjectSummary } from "../../../state/contracts";
 import type { TaskRunner } from "../ProjectDialog";
 import { RecentProject } from "./RecentProject";
+import { Throbber } from "../../ui/throbber/Throbber";
 import "./library-messages";
 import "./library-sidebar.css";
 
@@ -97,9 +98,9 @@ export function LibrarySidebar({
             </button>
           </div>
         ) : projects === null ? (
-          <p className="library-sidebar-status" role="status">
-            {t("loading")}
-          </p>
+          <div className="library-sidebar-status">
+            <Throbber active size={24} variant="shimmer" label={t("loading")} />
+          </div>
         ) : !projects.length ? (
           <p className="library-sidebar-status">{t("empty")}</p>
         ) : (

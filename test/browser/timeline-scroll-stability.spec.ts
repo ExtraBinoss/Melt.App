@@ -75,7 +75,7 @@ test("right timeline fade stays at the outer edge and ignores empty trailing spa
     shadow = page.locator(".motion-scroll-shadow"),
     slider = page.getByRole("slider", { name: "Zoom de la timeline", exact: true });
   const readEdge = () =>
-    viewport.evaluate((node) => {
+    viewport.evaluate((node: HTMLElement) => {
       const root = node.parentElement!;
       const end = root.querySelector<HTMLElement>(".scroll-shadow-inline-end")!;
       return {

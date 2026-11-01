@@ -45,7 +45,7 @@ export interface MotionVideoExportResult {
   frameCount: number;
   /** Exact authored duration, before the container timestamp grid is applied. */
   duration: MotionTime;
-  /** Encoded video end on its container grid; frame sampling remains authored/rational. */
+  /** Video duration on the container grid; native audio packet padding can extend file duration. */
   encodedDuration: MotionTime;
   timestampResolution: number;
   bytes: number;

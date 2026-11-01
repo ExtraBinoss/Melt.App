@@ -19,8 +19,9 @@ export const REFLECTION_BUDGETS: Record<
   SpatialReflectionQuality,
   { size: number; probes: number; meshes: number; triangles: number; fps: number }
 > = {
-  draft: { size: 64, probes: 1, meshes: 128, triangles: 100000, fps: 6 },
-  balanced: { size: 128, probes: 2, meshes: 256, triangles: 250000, fps: 10 },
+  // r187's public PMREM generator clamps every face to at least 256 pixels.
+  draft: { size: 256, probes: 1, meshes: 128, triangles: 100000, fps: 6 },
+  balanced: { size: 256, probes: 2, meshes: 256, triangles: 250000, fps: 10 },
   high: { size: 256, probes: 4, meshes: 512, triangles: 500000, fps: 15 },
 };
 export type ReflectionBudget = (typeof REFLECTION_BUDGETS)[SpatialReflectionQuality];

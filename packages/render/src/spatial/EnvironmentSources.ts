@@ -4,7 +4,7 @@ import {
   EquirectangularReflectionMapping,
   PMREMGenerator,
   Mesh,
-  type RenderTarget,
+  type CubeRenderTarget,
   type Texture,
   type Scene,
   type Vector3,
@@ -14,11 +14,12 @@ import { decodeEnvironment, disposeEnvironmentInput } from "./environment-input"
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 import { GpuResourceCache, type GpuResource } from "../cache/GpuResourceCache";
 import { assetIdentity } from "../cache/keys";
+import { pmremScratchBytes, pmremTargetBytes } from "./pmrem-budget";
 class EnvironmentResource implements GpuResource {
   readonly targets = 1;
   readonly bytes: number;
-  constructor(readonly target: RenderTarget) {
-    this.bytes = target.width * target.height * 8;
+  constructor(readonly target: CubeRenderTarget) {
+    this.bytes = pmremTargetBytes(target.width);
   }
   dispose() {
     this.target.dispose();
@@ -27,13 +28,16 @@ class EnvironmentResource implements GpuResource {
 /** Shared environment preparation, bounded by the compositor's GPU cache. */
 export class EnvironmentSources {
   private generator: PMREMGenerator | null = null;
+  private scratchBytes = 0;
   constructor(
     private readonly renderer: WebGPURenderer,
     private readonly cache: GpuResourceCache,
   ) {}
-  private getGenerator() {
+  private getGenerator(size = 256) {
+    const bytes = Math.max(this.scratchBytes, pmremScratchBytes(size));
+    this.cache.reserveExternal("spatial:pmrem", bytes);
+    this.scratchBytes = bytes;
     if (!this.generator) {
-      this.cache.reserveExternal("spatial:pmrem", 32 * 1024 * 1024);
       this.generator = new PMREMGenerator(this.renderer);
     }
     return this.generator;
@@ -42,10 +46,10 @@ export class EnvironmentSources {
     scene: Scene,
     position: Vector3,
     size: number,
-    target: RenderTarget | null,
+    target: CubeRenderTarget | null,
     canContinue: () => boolean,
   ) {
-    const generator = this.getGenerator();
+    const generator = this.getGenerator(size);
     await generator.compileCubemapShader();
     if (!canContinue()) throw new DOMException("3D capture superseded", "AbortError");
     const previous = this.renderer.getRenderTarget(),
@@ -76,9 +80,7 @@ export class EnvironmentSources {
     const cached = this.cache.get<EnvironmentResource>(key);
     if (cached) return cached.target.texture;
     if (!canContinue()) throw new DOMException("3D preparation superseded", "AbortError");
-    this.cache.ensureCapacity(key, 40 * 1024 * 1024);
-    this.getGenerator();
-    let target: RenderTarget;
+    let target: CubeRenderTarget;
     if (asset) {
       if (!isSceneAsset(asset) || asset.kind !== "environment")
         throw Error("Environment original is unavailable");
@@ -88,6 +90,8 @@ export class EnvironmentSources {
         const image = texture.image as { width: number; height: number };
         if (image.width > 4096 || image.height > 2048)
           throw Error("Environment exceeds 4096 × 2048 pixels");
+        this.getGenerator(image.width / 4);
+        this.cache.ensureCapacity(key, pmremTargetBytes(image.width / 4));
         texture.mapping = EquirectangularReflectionMapping;
         await this.generator!.compileEquirectangularShader();
         if (!canContinue()) throw new DOMException("3D preparation superseded", "AbortError");
@@ -96,6 +100,8 @@ export class EnvironmentSources {
         disposeEnvironmentInput(texture);
       }
     } else {
+      this.getGenerator();
+      this.cache.ensureCapacity(key, pmremTargetBytes(256));
       const room = new RoomEnvironment();
       try {
         const colors: Record<string, string> = {
@@ -132,5 +138,6 @@ export class EnvironmentSources {
     this.generator?.dispose();
     this.generator = null;
     this.cache.reserveExternal("spatial:pmrem", 0);
+    this.scratchBytes = 0;
   }
 }

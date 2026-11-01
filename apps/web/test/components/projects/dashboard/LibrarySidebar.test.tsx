@@ -16,6 +16,25 @@ function props(d: ReturnType<typeof setup>) {
   };
 }
 
+test("pending recent-project metadata uses the shared throbber and retires it after loading", async () => {
+  const d = setup();
+  let done!: (result: { projects: never[]; before: null }) => void;
+  vi.mocked(d.services.listProjectPage).mockImplementation(
+    () =>
+      new Promise((resolve) => {
+        done = resolve;
+      }),
+  );
+  d.mount(<LibrarySidebar {...props(d)} />);
+  expect(
+    document.querySelector('.library-sidebar-status .ui-throbber[data-active="true"]'),
+  ).not.toBeNull();
+  expect(screen.queryByText("Vos prochains projets apparaîtront ici.")).toBeNull();
+  await act(async () => done({ projects: [], before: null }));
+  expect(screen.getByText("Vos prochains projets apparaîtront ici.")).toBeVisible();
+  expect(document.querySelector(".library-sidebar-status .ui-throbber")).toBeNull();
+});
+
 test("lists at most five recent durable IDs and delegates navigation/open without reading originals", async () => {
   const d = setup(),
     p = props(d);

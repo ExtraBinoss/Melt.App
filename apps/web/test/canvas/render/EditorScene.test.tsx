@@ -139,6 +139,7 @@ beforeEach(() => {
       backend: {},
       compileAsync: gpu.compile,
       getRenderTarget: vi.fn(() => null),
+      setRenderTarget: vi.fn(),
     },
     scene: new Scene(),
     camera: new OrthographicCamera(),
@@ -395,10 +396,12 @@ describe("R3F direct WebGPU scene lifetime", () => {
     const renderer = gpu.state.gl as {
       domElement: HTMLCanvasElement;
       setDrawingBufferSize: ReturnType<typeof vi.fn>;
+      setRenderTarget: ReturnType<typeof vi.fn>;
     };
     renderer.domElement.width = 158;
     renderer.domElement.height = 3;
     act(() => gpu.frame?.());
+    expect(renderer.setRenderTarget).toHaveBeenLastCalledWith(null);
     expect(renderer.setDrawingBufferSize).toHaveBeenLastCalledWith(159, 4, 1);
     act(() => gpu.frame?.());
     expect(renderer.setDrawingBufferSize).toHaveBeenCalledTimes(1);

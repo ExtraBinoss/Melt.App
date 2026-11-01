@@ -1,6 +1,6 @@
 # Deterministic replay and video encoding
 
-Verified against Mediabunny 1.62.1 on 2026-10-27.
+Verified against unmodified Mediabunny 1.65.0 on 2026-11-01.
 
 Committed command transactions form a millisecond journal. Pointer previews and selection changes do not enter it. Portable replay data keeps original assets once, outside frame snapshots. Playback evaluates the journal without modifying the live document or undo history.
 

@@ -1,4 +1,4 @@
-import manifest from "../../../public/textures/sources.json";
+import manifest from "./sources.json";
 import {
   sameAssetOriginal,
   type EnginePort,

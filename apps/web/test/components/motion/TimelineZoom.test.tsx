@@ -57,20 +57,23 @@ it.each([
   ["MacIntel", "⌘"],
   ["Win32", "Ctrl"],
   ["Linux x86_64", "Ctrl"],
-])("shows only the shared platform modifier for %s in the zoom tooltip", async (platform, key) => {
-  const platformValue = vi.spyOn(navigator, "platform", "get").mockReturnValue(platform);
-  try {
-    const user = userEvent.setup();
-    render(
-      <TooltipProvider delayDuration={0}>
-        <TimelineZoom value={120} disabled={false} onPreview={vi.fn()} onCommit={vi.fn()} />
-      </TooltipProvider>,
-    );
-    await user.hover(screen.getByRole("slider"));
-    const tooltip = await screen.findByRole("tooltip");
-    expect(tooltip.querySelector("kbd")).toHaveTextContent(key);
-    expect(tooltip).not.toHaveTextContent(key === "⌘" ? "Ctrl" : "⌘");
-  } finally {
-    platformValue.mockRestore();
-  }
-});
+] as const)(
+  "shows only the shared platform modifier for %s in the zoom tooltip",
+  async (platform, key) => {
+    const platformValue = vi.spyOn(navigator, "platform", "get").mockReturnValue(platform);
+    try {
+      const user = userEvent.setup();
+      render(
+        <TooltipProvider delayDuration={0}>
+          <TimelineZoom value={120} disabled={false} onPreview={vi.fn()} onCommit={vi.fn()} />
+        </TooltipProvider>,
+      );
+      await user.hover(screen.getByRole("slider"));
+      const tooltip = await screen.findByRole("tooltip");
+      expect(tooltip.querySelector("kbd")).toHaveTextContent(key);
+      expect(tooltip).not.toHaveTextContent(key === "⌘" ? "Ctrl" : "⌘");
+    } finally {
+      platformValue.mockRestore();
+    }
+  },
+);

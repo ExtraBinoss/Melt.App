@@ -6,7 +6,14 @@ import {
   type AudioAsset,
   type VideoAsset,
 } from "@musart/core";
-import { AudioSampleSink, ALL_FORMATS, BlobSource, Input, VideoSampleSink } from "mediabunny";
+import {
+  AudioSampleSink,
+  ALL_FORMATS,
+  BlobSource,
+  EncodedPacketSink,
+  Input,
+  VideoSampleSink,
+} from "mediabunny";
 import {
   exportMotionVideo,
   probeAudioOriginal,
@@ -277,6 +284,11 @@ export async function inspectMotionFile(encoded: string) {
     }
     return {
       duration: await input.computeDuration(),
+      videoDuration: await video.computeDuration(),
+      audioDuration: await audio.computeDuration(),
+      audioPacketDuration: (await new EncodedPacketSink(audio).getPacket(Infinity, {
+        metadataOnly: true,
+      }))!.duration,
       width: await video.getDisplayWidth(),
       height: await video.getDisplayHeight(),
       videoCodec: await video.getCodec(),

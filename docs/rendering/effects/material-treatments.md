@@ -46,7 +46,7 @@ preparation. Missing assigned images fail rather than silently switching maps.
 The texture picker uses a nonmodal popover, animated shared segmented control and
 scroll shadows. Bundled originals load only on selection, with exact size/hash
 checks; the initial grid loads small previews. The three bundled maps are CC0
-Poly Haven assets; see [the source ledger](../../../apps/web/public/textures/sources.json)
+Poly Haven assets; see [the source ledger](../../../apps/web/src/services/textures/sources.json)
 and [license notice](../../../apps/web/public/textures/LICENSE.md).
 
 Imported PNG/JPEG/WebP files enter a global browser library. Limits are 128 items,

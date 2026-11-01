@@ -45,7 +45,7 @@ actual acknowledgement and remain bounded during cancellation/disposal.
 
 ## Mediabunny references
 
-The implementation follows the pinned 1.62.1 API and its official [conversion guide](https://mediabunny.dev/guide/converting-media-files), [conversion video options](https://mediabunny.dev/api/ConversionVideoOptions), [media sinks](https://mediabunny.dev/guide/media-sinks) and [VideoSampleSink API](https://mediabunny.dev/api/VideoSampleSink). Playback already used sequential `samples(start)` with latency optimization; the new work keeps that path and reduces the resolution entering it. See [the five-video measurements](../performance/video-preview.md) for native verification and limitations.
+The implementation follows the pinned 1.65.0 API and its official [conversion guide](https://mediabunny.dev/guide/converting-media-files), [conversion video options](https://mediabunny.dev/api/ConversionVideoOptions), [media sinks](https://mediabunny.dev/guide/media-sinks) and [VideoSampleSink API](https://mediabunny.dev/api/VideoSampleSink). Playback already used sequential `samples(start)` with latency optimization; the new work keeps that path and reduces the resolution entering it. See [the five-video measurements](../performance/video-preview.md) for native verification and limitations.
 
 ## Shared interactive playback clock
 
