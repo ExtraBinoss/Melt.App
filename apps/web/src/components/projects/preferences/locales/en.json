@@ -29,5 +29,20 @@
   "marqueeContainDescription": "By default, touching a layer selects it. Enable this to select only layers fully inside the selection rectangle.",
   "marqueeExample": "Selection rectangle examples",
   "marqueeTouch": "Touching selects",
-  "marqueeEnclose": "Fully inside only"
+  "marqueeEnclose": "Fully inside only",
+  "accent": "Accent color",
+  "accentDescription": "Choose the colors of buttons, selections and focus indicators.",
+  "accentPreview": "Accent color preview",
+  "accentLight": "Light",
+  "accentDark": "Dark",
+  "accentWorkspace": "My workspace",
+  "accentAction": "Play",
+  "accentSelected": "Selected layer",
+  "accentSaveError": "Applied for this session. The preference could not be saved on this device.",
+  "accentName_violet": "Violet",
+  "accentName_green": "Green",
+  "accentName_blue": "Blue",
+  "accentName_teal": "Teal",
+  "accentName_rose": "Rose",
+  "accentName_amber": "Amber"
 }

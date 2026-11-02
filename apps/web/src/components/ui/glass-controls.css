@@ -107,7 +107,7 @@
   transform: translateX(0);
 }
 .dark .glass-switch[data-state="checked"] .glass-switch-thumb {
-  background: var(--primary-foreground);
+  background: var(--action-foreground);
 }
 .dark .glass-switch[data-state="unchecked"] .glass-switch-thumb {
   background: var(--brand-primary-foreground);

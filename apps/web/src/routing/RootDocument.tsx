@@ -5,6 +5,7 @@ import { i18n } from "../state/i18n";
 import { localeDirection } from "../state/i18n/locales";
 import { initialDocumentLocale } from "../state/i18n/initial-locale";
 import { localeBootstrapScript } from "../state/i18n/locale-bootstrap";
+import { accentBootstrapScript } from "../ui/brand/accents";
 import "../styles/fonts.css";
 import "../styles/global.css";
 
@@ -37,7 +38,7 @@ export function RootDocument({ children }: { children: ReactNode }) {
     >
       <head>
         <HeadContent />
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+        <script dangerouslySetInnerHTML={{ __html: themeScript + accentBootstrapScript }} />
         <script dangerouslySetInnerHTML={{ __html: localeBootstrapScript }} />
       </head>
       <body>

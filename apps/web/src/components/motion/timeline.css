@@ -27,7 +27,6 @@
   --motion-gutter: 244px;
   --primary: var(--motion-accent);
   --primary-foreground: var(--motion-accent-foreground);
-  --action: var(--motion-accent);
   --media-image: var(--motion-accent);
   position: relative;
   display: flex;

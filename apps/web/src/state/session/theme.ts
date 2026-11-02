@@ -1,5 +1,7 @@
 import { useEffect } from "react";
 import { atom, useAtomValue } from "jotai";
+import { useAccent } from "./accent";
+import { isAccent, paintAccent } from "../../ui/brand/accents";
 
 export type Theme = "system" | "light" | "dark";
 const initialized = new WeakSet<HTMLElement>();
@@ -19,6 +21,7 @@ export const themeAtom = atom<Theme>(readTheme());
 function paint(root: HTMLElement, dark: boolean) {
   root.classList.toggle("dark", dark);
   root.style.colorScheme = dark ? "dark" : "light";
+  paintAccent(root, isAccent(root.dataset.accent) ? root.dataset.accent : "violet");
 }
 
 /** Native snapshots blend the complete interface, including portals, without a React frame loop. */
@@ -72,6 +75,7 @@ export function disposeThemeTransition() {
 }
 
 export function useTheme() {
+  useAccent();
   const theme = useAtomValue(themeAtom);
   useEffect(() => {
     applyTheme(theme);

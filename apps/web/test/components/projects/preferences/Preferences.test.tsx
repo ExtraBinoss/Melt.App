@@ -1,6 +1,7 @@
 import { expect, test, vi } from "vitest";
 import { act, screen, fireEvent, waitFor } from "@testing-library/react";
 import { Preferences } from "../../../../src/components/projects/preferences/Preferences";
+import { accentAtom } from "../../../../src/state/session/accent";
 import { themeAtom } from "../../../../src/state/session/editor";
 import { choose } from "../../../support/select";
 import { setup } from "../../../support/ui";
@@ -121,4 +122,34 @@ test("full enclosure is opt-in, persisted locally, and illustrated beside touchi
   );
   expect(d.engine.getSnapshot()).toBe(before);
   fireEvent.click(control);
+});
+
+test("accent selection previews both themes and persists without editing the document", async () => {
+  const d = setup(),
+    before = d.engine.getSnapshot();
+  d.mount(<Preferences initialSection="appearance" />);
+  await choose("Couleur d’accent", "Vert");
+  expect(d.store.get(accentAtom)).toBe("green");
+  expect(localStorage.getItem("musart.accent.v1")).toBe("green");
+  expect(document.querySelector("[data-accent-preview]")).toHaveAttribute(
+    "data-accent-preview",
+    "green",
+  );
+  expect(screen.getByRole("group", { name: "Aperçu de la couleur d’accent" })).toBeVisible();
+  expect(d.engine.getSnapshot()).toBe(before);
+});
+
+test("failed accent persistence is reported while the interface still applies the choice", async () => {
+  const d = setup();
+  d.mount(<Preferences initialSection="appearance" />);
+  const save = vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
+    throw Error("Storage denied");
+  });
+  try {
+    await choose("Couleur d’accent", "Bleu");
+    expect(screen.getByRole("alert")).toHaveTextContent("Impossible d’enregistrer la préférence");
+    expect(d.store.get(accentAtom)).toBe("blue");
+  } finally {
+    save.mockRestore();
+  }
 });

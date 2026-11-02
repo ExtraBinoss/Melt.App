@@ -12,6 +12,7 @@ import { zoomControlsAtom } from "../../../state/viewport/preferences";
 import { clipboardAtom } from "../../../state/clipboard/preferences";
 import { SegmentedTabs } from "../../shared/segmented/SegmentedTabs";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "../../ui/tabs";
+import { AccentPreference } from "./appearance/AccentPreference";
 import { MarqueePreference } from "./MarqueePreference";
 import { Switch } from "../../ui/switch";
 import { SelectField } from "../../shared/SelectField";
@@ -144,6 +145,7 @@ export function Preferences({
               }}
             />
           </div>
+          <AccentPreference />
         </Panel>
         <Panel section="shortcuts">
           <ShortcutSettings />

@@ -29,5 +29,20 @@
   "marqueeContainDescription": "Par défaut, toucher un calque suffit à le sélectionner. Activez cette option pour sélectionner uniquement les calques entièrement dans le rectangle.",
   "marqueeExample": "Exemples de rectangle de sélection",
   "marqueeTouch": "Toucher suffit",
-  "marqueeEnclose": "Entièrement à l’intérieur"
+  "marqueeEnclose": "Entièrement à l’intérieur",
+  "accent": "Couleur d’accent",
+  "accentDescription": "Choisissez la couleur des boutons, des sélections et des indicateurs de focus.",
+  "accentPreview": "Aperçu de la couleur d’accent",
+  "accentLight": "Clair",
+  "accentDark": "Sombre",
+  "accentWorkspace": "Mon espace",
+  "accentAction": "Lecture",
+  "accentSelected": "Calque sélectionné",
+  "accentSaveError": "Appliquée pour cette session. Impossible d’enregistrer la préférence sur cet appareil.",
+  "accentName_violet": "Violet",
+  "accentName_green": "Vert",
+  "accentName_blue": "Bleu",
+  "accentName_teal": "Turquoise",
+  "accentName_rose": "Rose",
+  "accentName_amber": "Ambre"
 }

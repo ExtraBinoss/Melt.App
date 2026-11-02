@@ -15,6 +15,26 @@ Existing local projects, `.musart` imports/exports, clipboard payloads, database
 keys, automation methods, package names and GitHub URLs keep their established
 identifiers. Changing the visible brand does not migrate or rename documents.
 
+## Personal interface accents
+
+Appearance preferences offer six curated interface palettes in `ui/brand/accents.ts`.
+Each supplies theme-specific primary text, selection and focus colors, plus a
+separate action fill and contrasting foreground. Brand assets and document colors
+retain their original values; audio, video and error semantics remain independent.
+
+The validated `musart.accent.v1` local preference stores a palette ID. A shared
+pre-hydration script and an imperative Jotai subscription apply the same tokens to
+the document root, including portals and the timeline's observed canvas palette.
+Theme changes reapply the selected variant. Storage events synchronize other tabs;
+blocked storage keeps the current session usable and the settings report failed
+persistence. Menu hover/focus previews stay inside the two theme samples until an
+option is selected. Closing the menu cancels the preview.
+
+Focused palette checks require 4.5:1 for primary text against supported neutral
+surfaces and for labels on primary/action fills, including action hover opacity;
+focus accents require 3:1. These checks cover the accent roles, not an accessibility
+certification of the entire application.
+
 ## Logo and real pending states
 
 ```tsx
