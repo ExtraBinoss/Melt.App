@@ -1,5 +1,5 @@
 import { memo, useLayoutEffect, useMemo, useState } from "react";
-import { PenTool } from "lucide-react";
+import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import type { Composition, EnginePort, Project } from "@musart/core";
 import type { EditorServices } from "../../state/contracts";
@@ -11,7 +11,7 @@ import { Inspector } from "../properties/Inspector";
 import { sameInspectorPage } from "../properties/inspector-scope";
 import { LayersPresentation } from "./LayersPresentation";
 import { layerSelection } from "../layers/menu/selection";
-import { ExportActions } from "../export/ExportActions";
+import { InspectorExportHeader } from "./InspectorExportHeader";
 import type { TaskRunner } from "../projects/ProjectDialog";
 import { InspectorInteractionBoundary } from "./InspectorInteractionBoundary";
 import { useInspectorPresentation } from "./use-inspector-presentation";
@@ -75,28 +75,31 @@ export const EditorSidebar = memo(function EditorSidebar({
     }),
     [page, snapshot.project, snapshot.selection, historyNavigation, properties.origin],
   );
+  const header = useMemo(
+    () => (
+      <InspectorExportHeader
+        engine={engine}
+        services={services}
+        onTask={onTask}
+        open={exportOpen}
+        onOpenChange={onExportOpenChange}
+        timelapseOpen={timelapseOpen}
+        onTimelapseOpenChange={onTimelapseOpenChange}
+      />
+    ),
+    [
+      engine,
+      services,
+      onTask,
+      exportOpen,
+      onExportOpenChange,
+      timelapseOpen,
+      onTimelapseOpenChange,
+    ],
+  );
   const inspector = (
     <div className="inspector-tabs">
-      <div className="inspector-header">
-        <span className="inspector-design-label">
-          <PenTool size={13} />
-          {t("design")}
-        </span>
-        <ExportActions
-          engine={engine}
-          timelapseOpen={timelapseOpen}
-          onTimelapseOpenChange={onTimelapseOpenChange ?? (() => {})}
-          open={exportOpen}
-          onOpenChange={onExportOpenChange}
-          page={page}
-          pageCount={snapshot.project.pages.length}
-          selection={snapshot.selection}
-          revision={snapshot.revision}
-          services={services}
-          onTask={onTask}
-        />
-      </div>
-      <InspectorPresentation engine={engine} properties={properties} run={run} />
+      <InspectorPresentation engine={engine} properties={properties} run={run} header={header} />
     </div>
   );
   const layers = (
@@ -140,9 +143,11 @@ const InspectorPresentation = memo(function InspectorPresentation({
   engine,
   properties,
   run,
+  header,
 }: {
   engine: EnginePort;
   properties: InspectorProperties;
+  header: ReactNode;
   run: (action: () => void) => void;
 }) {
   const presentedProperties = usePresentedHistory(
@@ -176,6 +181,7 @@ const InspectorPresentation = memo(function InspectorPresentation({
   return (
     <InspectorInteractionBoundary busy={pending}>
       <Inspector
+        header={header}
         engine={engine}
         page={shownProperties.page}
         assets={shownProperties.assets}

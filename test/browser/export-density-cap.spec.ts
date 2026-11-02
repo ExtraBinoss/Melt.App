@@ -29,7 +29,7 @@ for (const forceWebGL of [false, true])
       window.musart!.load(project);
       window.musart!.select(["tiny-image"]);
     }, project);
-    await page.locator(".export-trigger").click();
+    await page.locator("[data-inspector-export-trigger]").click();
     const preview = page.locator(".export-preview img");
     await expect(preview).toBeVisible();
     await preview.evaluate((image) => (image as HTMLImageElement).decode());

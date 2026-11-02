@@ -79,13 +79,13 @@ for (const forceWebGL of [false, true])
           time + 0.1,
         paused.effect.time!,
       );
-      await page.locator(".export-trigger").click();
+      await page.locator("[data-inspector-export-trigger]").click();
       await expect(page.locator(".export-popover")).toBeVisible();
       const frozen = await snapshot();
       expect(frozen.effect.time).toBeGreaterThan(paused.effect.time!);
       await page.keyboard.press("Escape");
       await expect(page.locator(".export-popover")).toHaveCount(0);
-      await expect(page.locator(".export-trigger")).toBeFocused();
+      await expect(page.locator("[data-inspector-export-trigger]")).toBeFocused();
       await d.ready(id);
       const exported = await d.png();
       const live = forceWebGL

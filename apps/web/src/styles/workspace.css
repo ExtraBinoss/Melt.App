@@ -35,15 +35,6 @@
   color: var(--muted-foreground);
   font-size: 10px;
 }
-.export-trigger {
-  position: relative;
-  inset: auto;
-  z-index: 20;
-  box-shadow: 0 3px 8px #0000000d;
-  height: 36px;
-  padding: 0 15px;
-  font-size: 12px;
-}
 .toolbar {
   position: absolute;
   z-index: 20;
@@ -84,13 +75,6 @@
 }
 .icon-button.is-active:hover {
   background: var(--action);
-}
-.export-trigger {
-  background: var(--action);
-  color: var(--action-foreground);
-}
-.export-trigger:hover {
-  background: color-mix(in srgb, var(--action) 90%, #000);
 }
 .tool-settings {
   position: absolute;
@@ -194,11 +178,6 @@
   }
   .toolbar {
     left: 12px;
-  }
-  .export-trigger {
-    top: 12px;
-    right: 12px;
-    padding: 0 10px;
   }
   .project-dialog-layout {
     grid-template-columns: 145px 1fr;
@@ -385,6 +364,7 @@
   height: 24px;
 }
 .inspector-tabs {
+  --inspector-gutter: 18px;
   width: 100%;
   min-width: 0;
   max-width: 100%;

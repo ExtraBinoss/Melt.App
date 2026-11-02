@@ -46,7 +46,7 @@ test("the compact Export button stays inside header padding through real job pro
   });
   await page.goto("/editor?automation=1");
   await page.waitForFunction(() => Boolean(window.musart && window.__exportGeometryJobs));
-  const button = page.locator(".inspector-header .export-trigger");
+  const button = page.locator(".inspector-header [data-inspector-export-trigger]");
   const measure = (state: string, target = button) =>
     target.evaluate((element, state) => {
       const header = element.closest(".inspector-header")!,
@@ -62,8 +62,9 @@ test("the compact Export button stays inside header padding through real job pro
         width: bounds.width,
         height: bounds.height,
         viewport: [innerWidth, innerHeight],
-        panelWidth: parent.width,
+        panelWidth: (header.closest(".sidebar") ?? header).getBoundingClientRect().width,
         headerHeight: parent.height,
+        headerBorder: parseFloat(headerStyle.borderBottomWidth),
         rightPadding: parent.right - bounds.right,
         topPadding: bounds.top - parent.top,
         direct: element.parentElement === header,
@@ -157,7 +158,7 @@ test("the compact Export button stays inside header padding through real job pro
       const freshPage = await fresh.newPage();
       await freshPage.routeWebSocket("**", () => {});
       await freshPage.goto("/editor?automation=1");
-      const freshButton = freshPage.locator(".inspector-header .export-trigger");
+      const freshButton = freshPage.locator(".inspector-header [data-inspector-export-trigger]");
       await expect(freshButton).toBeVisible();
       resizeSamples.push(await measure("fresh-context", freshButton));
     } finally {
@@ -171,18 +172,18 @@ test("the compact Export button stays inside header padding through real job pro
       expect(sample.height).toBe(32);
       expect(sample.direct).toBe(true);
       expect(sample.variant).toBe("default");
-      expect(sample.topPadding).toBe(12);
-      expect(sample.rightPadding).toBe(12);
-      expect(Math.abs(sample.rightPadding - sample.bottomPadding)).toBeLessThanOrEqual(0.5);
+      expect(sample.topPadding).toBe(8);
+      expect(sample.rightPadding).toBe(18);
+      expect(Math.abs(sample.topPadding - sample.bottomPadding)).toBeLessThanOrEqual(0.5);
       expect(sample.gap).toBe(8);
-      expect(sample.position).toBe("relative");
+      expect(sample.position).toBe("static");
       expect([sample.iconWidth, sample.iconHeight]).toEqual([14, 14]);
     }
     for (const sample of resizeSamples) {
       expect(sample.width).toBe(
         sample.state.startsWith("pending-") ? samples[1]!.width : samples[0]!.width,
       );
-      expect(sample.headerHeight).toBe(57);
+      expect(sample.headerHeight).toBeCloseTo(48 + sample.headerBorder, 2);
       if (sample.state === "narrow-panel") expect(sample.panelWidth).toBeGreaterThanOrEqual(310);
       if (sample.state === "narrow-panel") expect(sample.panelWidth).toBeLessThanOrEqual(330);
     }
@@ -204,7 +205,9 @@ test("the compact Export button stays inside header padding through real job pro
   }
 });
 
-test("mobile Export uses matching right and bottom spacing", async ({ page }) => {
+test("mobile Export aligns with the property gutter and keeps compact vertical spacing", async ({
+  page,
+}) => {
   await page.routeWebSocket("**", () => {});
   await page.setViewportSize({ width: 390, height: 844 });
   await page.addInitScript(() => {
@@ -215,7 +218,7 @@ test("mobile Export uses matching right and bottom spacing", async ({ page }) =>
   await page.goto("/editor?automation=1");
   await page.getByRole("button", { name: "Properties", exact: true }).click();
   const spacing = await page
-    .locator(".mobile-sheet .inspector-header .export-trigger")
+    .locator(".mobile-sheet .inspector-header [data-inspector-export-trigger]")
     .evaluate((button) => {
       const header = button.closest(".inspector-header")!,
         bounds = button.getBoundingClientRect(),
@@ -235,7 +238,7 @@ test("mobile Export uses matching right and bottom spacing", async ({ page }) =>
     top: 12,
     gap: 12,
     direct: true,
-    right: 12,
+    right: 20,
     bottom: 12,
     start: 20,
     height: 32,
@@ -277,14 +280,14 @@ test("French Export stays inside every visible panel edge at narrow sidebar widt
     });
   const before = await measure();
   expect(before.direct).toBe(true);
-  expect(Math.abs(before.visibleGap - 12)).toBeLessThan(1);
+  expect(Math.abs(before.visibleGap - 18)).toBeLessThan(1);
   const divider = (await page.locator(".sidebar-resize").boundingBox())!;
   await page.mouse.move(divider.x + divider.width / 2, divider.y + divider.height / 2);
   await page.mouse.down();
   await page.mouse.move(1000, divider.y + divider.height / 2, { steps: 4 });
   await page.mouse.up();
   const after = await measure();
-  expect(Math.abs(after.visibleGap - 12)).toBeLessThan(1);
+  expect(Math.abs(after.visibleGap - 18)).toBeLessThan(1);
   const layer = createLayer("rectangle", {
     name: "A deliberately long layer name for the narrow properties panel",
     width: 240,
@@ -300,14 +303,14 @@ test("French Export stays inside every visible panel edge at narrow sidebar widt
   );
   for (const width of [1920, 1280, 1024, 900, 801]) {
     await page.setViewportSize({ width, height: 620 });
-    await expect.poll(async () => (await measure()).visibleGap).toBeCloseTo(12, 0);
+    await expect.poll(async () => (await measure()).visibleGap).toBeCloseTo(18, 0);
     expect(Math.abs((await measure()).headerOverflow)).toBeLessThan(1);
     const handle = (await page.locator(".sidebar-resize").boundingBox())!;
     await page.mouse.move(handle.x + handle.width / 2, handle.y + handle.height / 2);
     await page.mouse.down();
     await page.mouse.move(width - 260, handle.y + handle.height / 2, { steps: 4 });
     await page.mouse.up();
-    await expect.poll(async () => (await measure()).visibleGap).toBeCloseTo(12, 0);
+    await expect.poll(async () => (await measure()).visibleGap).toBeCloseTo(18, 0);
     expect(Math.abs((await measure()).headerOverflow)).toBeLessThan(1);
   }
   await page

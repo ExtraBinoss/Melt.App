@@ -209,10 +209,6 @@
 .export-failure [data-slot="button"] {
   flex-shrink: 0;
 }
-.export-trigger {
-  position: relative;
-  overflow: hidden;
-}
 .export-trigger-progress {
   position: absolute;
   inset: auto auto 0 0;

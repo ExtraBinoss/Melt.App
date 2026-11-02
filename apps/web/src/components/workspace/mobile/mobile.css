@@ -84,6 +84,7 @@
   scrollbar-width: thin;
 }
 .mobile-sheet .inspector-tabs {
+  --inspector-gutter: 20px;
   height: auto;
   min-height: 100%;
 }
@@ -91,11 +92,11 @@
   overflow: visible;
 }
 .mobile-sheet .inspector-section {
-  padding: 16px 20px;
+  padding: 16px var(--inspector-gutter);
 }
-.mobile-sheet .inspector-header {
+.mobile-sheet .inspector-section.inspector-header {
   gap: 12px;
-  padding: 12px 12px 12px 20px;
+  padding-block: 12px;
 }
 .mobile-sheet .properties-grid {
   gap: 16px 20px;

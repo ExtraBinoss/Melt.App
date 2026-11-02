@@ -54,7 +54,7 @@ test("Export paints before GPU preparation and crossfades the shared mascot into
       return request(options);
     };
   });
-  await page.locator(".inspector-header .export-trigger").click();
+  await page.locator(".inspector-header [data-inspector-export-trigger]").click();
   const dialog = page.getByRole("dialog");
   await expect(
     dialog.getByRole("heading", { name: "Export composition", exact: true }),
@@ -188,7 +188,7 @@ test("Export paints before GPU preparation and crossfades the shared mascot into
   await expect(dialog.locator(".export-job")).toHaveAttribute("data-status", "complete");
   await page.keyboard.press("Escape");
   await expect(dialog).toHaveCount(0);
-  await page.locator(".inspector-header .export-trigger").click();
+  await page.locator(".inspector-header [data-inspector-export-trigger]").click();
   await expect(dialog).toBeVisible();
   await expect(dialog.getByRole("progressbar")).toHaveCount(0);
   await expect(dialog.locator(".export-background-note")).toHaveCount(0);

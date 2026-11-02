@@ -4,6 +4,7 @@ import { SpatialLayerProperties } from "../spatial/SpatialLayerProperties";
 import { SpatialSceneProperties } from "../spatial/SpatialSceneProperties";
 import { VectorProperties } from "./vector/VectorProperties";
 import { LayerAnimations } from "../motion/animations/LayerAnimations";
+import type { ReactNode } from "react";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 import {
   Palette,
@@ -61,9 +62,10 @@ interface Props {
   selected: readonly Layer[];
   run: (action: () => void) => void;
   assets?: Project["assets"];
+  header?: ReactNode;
 }
 export const Inspector = memo(
-  function Inspector({ engine, page, selected, run, assets }: Props) {
+  function Inspector({ engine, page, selected, run, assets, header }: Props) {
     const { t } = useTranslation();
     const element = useRef<HTMLElement>(null);
     useRenderMetrics(element);
@@ -224,6 +226,7 @@ export const Inspector = memo(
             data-selected-layer-id={layer?.id}
             aria-label={t("properties")}
           >
+            {header}
             <div className="inspector-title">
               <span className="inspector-selection">
                 {selected.length > 1
@@ -560,6 +563,7 @@ export const Inspector = memo(
     );
   },
   (previous, next) =>
+    previous.header === next.header &&
     previous.engine === next.engine &&
     previous.run === next.run &&
     previous.assets === next.assets &&

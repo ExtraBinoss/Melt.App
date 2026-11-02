@@ -91,7 +91,7 @@ test("first launch enters the empty library; the visible techno template creates
   await expect(page.locator('.canvas-artboard canvas[data-renderer-ready="true"]')).toBeVisible({
     timeout: 60000,
   });
-  const action = await page.locator(".export-trigger").evaluate((button) =>
+  const action = await page.locator("[data-inspector-export-trigger]").evaluate((button) =>
     getComputedStyle(button)
       .backgroundColor.match(/[\d.]+/g)!
       .slice(0, 3)

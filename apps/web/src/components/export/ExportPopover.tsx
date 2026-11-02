@@ -25,8 +25,15 @@ export function ExportPopover(props: ExportPopoverProps) {
   return (
     <Dialog open={props.open} onOpenChange={props.onOpenChange}>
       <DialogTrigger asChild>
-        <Button className="export-trigger" size="sm" aria-label={t("export")}>
-          <ExportTriggerLabel engine={props.engine} />
+        <Button
+          className="inspector-export-button"
+          data-inspector-export-trigger
+          size="sm"
+          aria-label={t("export")}
+        >
+          <span className="export-trigger-label">
+            <ExportTriggerLabel engine={props.engine} />
+          </span>
         </Button>
       </DialogTrigger>
       <DialogContent
@@ -69,9 +76,11 @@ function LegacyExportPopover(props: ExportPopoverProps) {
   return (
     <Popover open={props.open} onOpenChange={show}>
       <PopoverTrigger asChild>
-        <Button className="export-trigger" size="sm">
-          <Download size={14} />
-          {t("export")}
+        <Button className="inspector-export-button" data-inspector-export-trigger size="sm">
+          <span className="export-trigger-label">
+            <Download size={14} />
+            {t("export")}
+          </span>
         </Button>
       </PopoverTrigger>
       <PopoverContent

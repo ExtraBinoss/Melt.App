@@ -458,6 +458,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Fixed
 
+- Align the editor Export header with the same shared gutter as the property sections, while retaining its original compact 49 px height and 32 px button. Place it inside the same scrolling viewport and section container so native scrollbar space is shared, keep it sticky, remove obsolete floating-button positioning, load its layout with the inspector styles rather than the lazy export feature, and capture the full editor after opening a template and resizing its panels.
+
 - Keep 12 px of equal spacing to the right, above and below the inspector Export button. Constrain the inspector to its allocated panel width so intrinsic property content cannot push the header beyond its visible edge, prevent the header from shrinking vertically, and verify visible edge spacing in French across window and sidebar resizing.
 
 - Render inspector Export as one primary button without a split-action wrapper or obsolete split styles. Keep equal outer spacing above, below, to the right and beside Design, including on mobile and before the export workspace loads.
