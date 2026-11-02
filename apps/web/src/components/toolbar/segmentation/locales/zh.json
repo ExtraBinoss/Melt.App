@@ -1,0 +1,15 @@
+{
+  "megabytes": "{{value}} MB",
+  "downloading": "正在下载本地模型…",
+  "initializing": "正在初始化本地模型…",
+  "downloadProgress": "模型下载",
+  "progress": "{{loaded}} / {{total}}，{{percent}}%",
+  "loadCached": "加载本地模型",
+  "cached": "存储于此设备 · {{size}}",
+  "remove": "删除已下载的模型",
+  "removing": "正在删除…",
+  "localHint": "在你的设备上运行。图像绝不会被上传。",
+  "unavailable": "浏览器存储不可用。本次会话仍可加载模型。",
+  "inspectError": "无法检查已下载的模型。",
+  "prepareError": "模型操作失败。请重试。"
+}

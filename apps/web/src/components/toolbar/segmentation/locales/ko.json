@@ -1,0 +1,15 @@
+{
+  "megabytes": "{{value}} MB",
+  "downloading": "로컬 모델 다운로드 중…",
+  "initializing": "로컬 모델 초기화 중…",
+  "downloadProgress": "모델 다운로드",
+  "progress": "{{total}} 중 {{loaded}}, {{percent}}퍼센트",
+  "loadCached": "로컬 모델 불러오기",
+  "cached": "이 기기에 저장됨 · {{size}}",
+  "remove": "다운로드한 모델 삭제",
+  "removing": "삭제 중…",
+  "localHint": "기기에서 실행됩니다. 이미지는 업로드되지 않습니다.",
+  "unavailable": "브라우저 저장소를 사용할 수 없습니다. 이번 세션에서는 모델을 불러올 수 있습니다.",
+  "inspectError": "다운로드한 모델을 확인하지 못했습니다.",
+  "prepareError": "모델 작업에 실패했습니다. 다시 시도하세요."
+}

@@ -1,6 +1,6 @@
 {
   "newText": "テキスト",
-  "selectImageFirst": "画像をクリックしてマスクを作成します。",
+  "selectImageFirst": "ロックされていない画像をクリックして選択を開始してください。",
   "canvas": "コンポジションのキャンバス",
   "toolHint": "キャンバスをクリックするか描画してください",
   "dropImages": "画像をドロップ",
@@ -11,5 +11,14 @@
   "resize": "サイズ変更",
   "zoomOut": "縮小",
   "zoomIn": "拡大",
-  "resetView": "100%で中央に表示"
+  "resetView": "100%で中央に表示",
+  "segment": "オブジェクト選択",
+  "wand": "自動選択",
+  "tolerance": "許容値",
+  "prepareModel": "ローカルモデルを準備",
+  "modelReady": "モデルの準備完了",
+  "modelLoading": "モデルを読み込み中…",
+  "modelHint": "初回はダウンロードが必要です。画像はデバイス上に保持されます。",
+  "processing": "処理中…",
+  "cancel": "キャンセル"
 }

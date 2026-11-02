@@ -469,6 +469,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Fixed
 
+- Translate SAM and magic-wand instructions, shared selection actions, model download/status messages and tool labels into all twelve supported languages, with key/interpolation and direct-registration regressions to prevent silent English fallback.
+
 - Replay completed hero-letter hover animations on the same glyph, coalesce native pointer input with current geometry, and recover hover after asynchronous path rebuilds or reduced-motion changes. Remove the explanatory hero paragraph so the main headline carries the message.
 
 - Align the editor Export header with the same shared gutter as the property sections, while retaining its original compact 49 px height and 32 px button. Place it inside the same scrolling viewport and section container so native scrollbar space is shared, keep it sticky, remove obsolete floating-button positioning, load its layout with the inspector styles rather than the lazy export feature, and capture the full editor after opening a template and resizing its panels.

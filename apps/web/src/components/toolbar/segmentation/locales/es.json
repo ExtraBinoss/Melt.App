@@ -1,0 +1,15 @@
+{
+  "megabytes": "{{value}} MB",
+  "downloading": "Descargando el modelo local…",
+  "initializing": "Inicializando el modelo local…",
+  "downloadProgress": "Descarga del modelo",
+  "progress": "{{loaded}} de {{total}}, {{percent}} por ciento",
+  "loadCached": "Cargar modelo local",
+  "cached": "En este dispositivo · {{size}}",
+  "remove": "Eliminar modelo descargado",
+  "removing": "Eliminando…",
+  "localHint": "Se ejecuta en tu dispositivo. Tus imágenes nunca se suben.",
+  "unavailable": "El almacenamiento del navegador no está disponible. El modelo puede cargarse en esta sesión.",
+  "inspectError": "No se ha podido comprobar el modelo descargado.",
+  "prepareError": "La operación del modelo ha fallado. Inténtalo de nuevo."
+}

@@ -1,6 +1,6 @@
 {
   "newText": "Twój tekst",
-  "selectImageFirst": "Kliknij obraz, aby utworzyć jego maskę.",
+  "selectImageFirst": "Kliknij odblokowany obraz, aby rozpocząć zaznaczanie.",
   "canvas": "Płótno kompozycji",
   "toolHint": "Kliknij lub rysuj na płótnie",
   "dropImages": "Upuść obrazy",
@@ -11,5 +11,14 @@
   "resize": "Zmień rozmiar",
   "zoomOut": "Oddal",
   "zoomIn": "Przybliż",
-  "resetView": "100% i wyśrodkuj"
+  "resetView": "100% i wyśrodkuj",
+  "segment": "Zaznaczanie obiektów",
+  "wand": "Różdżka",
+  "tolerance": "Tolerancja",
+  "prepareModel": "Przygotuj lokalny model",
+  "modelReady": "Model gotowy",
+  "modelLoading": "Wczytywanie modelu…",
+  "modelHint": "Wymagane jest pierwsze pobranie. Twoje obrazy pozostają na Twoim urządzeniu.",
+  "processing": "Przetwarzanie…",
+  "cancel": "Anuluj"
 }

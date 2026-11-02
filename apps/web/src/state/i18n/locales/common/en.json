@@ -3,7 +3,7 @@
   "pickerSaturation": "Saturation and brightness",
   "alpha": "Transparency",
   "newText": "Your text",
-  "selectImageFirst": "Click an image to create its mask.",
+  "selectImageFirst": "Click an unlocked image to start a selection.",
   "rotate": "Rotate",
   "resize": "Resize",
   "canvasHint": "Space to pan · Ctrl + scroll to zoom",

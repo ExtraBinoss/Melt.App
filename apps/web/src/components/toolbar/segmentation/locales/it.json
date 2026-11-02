@@ -1,0 +1,15 @@
+{
+  "megabytes": "{{value}} MB",
+  "downloading": "Download del modello locale…",
+  "initializing": "Inizializzazione del modello locale…",
+  "downloadProgress": "Download del modello",
+  "progress": "{{loaded}} di {{total}}, {{percent}} percento",
+  "loadCached": "Carica modello locale",
+  "cached": "Su questo dispositivo · {{size}}",
+  "remove": "Rimuovi modello scaricato",
+  "removing": "Rimozione…",
+  "localHint": "Funziona sul tuo dispositivo. Le tue immagini non vengono mai caricate online.",
+  "unavailable": "L’archiviazione del browser non è disponibile. Il modello può comunque essere caricato in questa sessione.",
+  "inspectError": "Impossibile verificare il modello scaricato.",
+  "prepareError": "L’operazione sul modello non è riuscita. Riprova."
+}

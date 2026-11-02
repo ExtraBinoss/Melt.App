@@ -1,6 +1,6 @@
 {
   "newText": "你的文字",
-  "selectImageFirst": "点击图像以创建蒙版。",
+  "selectImageFirst": "单击未锁定的图像以开始选择。",
   "canvas": "合成画布",
   "toolHint": "在画布上点击或绘制",
   "dropImages": "拖放你的图像",
@@ -11,5 +11,14 @@
   "resize": "调整大小",
   "zoomOut": "缩小",
   "zoomIn": "放大",
-  "resetView": "100% 并居中"
+  "resetView": "100% 并居中",
+  "segment": "对象选择",
+  "wand": "魔棒",
+  "tolerance": "容差",
+  "prepareModel": "准备本地模型",
+  "modelReady": "模型已就绪",
+  "modelLoading": "正在加载模型…",
+  "modelHint": "首次使用需要下载。图像会保留在你的设备上。",
+  "processing": "正在处理…",
+  "cancel": "取消"
 }

@@ -1,6 +1,6 @@
 {
   "newText": "Il tuo testo",
-  "selectImageFirst": "Fai clic su un’immagine per crearne la maschera.",
+  "selectImageFirst": "Fai clic su un’immagine sbloccata per iniziare una selezione.",
   "canvas": "Tela della composizione",
   "toolHint": "Fai clic o disegna sulla tela",
   "dropImages": "Trascina qui le immagini",
@@ -11,5 +11,14 @@
   "resize": "Ridimensiona",
   "zoomOut": "Riduci zoom",
   "zoomIn": "Aumenta zoom",
-  "resetView": "100% e centra"
+  "resetView": "100% e centra",
+  "segment": "Selezione oggetti",
+  "wand": "Bacchetta magica",
+  "tolerance": "Tolleranza",
+  "prepareModel": "Prepara modello locale",
+  "modelReady": "Modello pronto",
+  "modelLoading": "Caricamento del modello…",
+  "modelHint": "È necessario un download iniziale. Le immagini rimangono sul tuo dispositivo.",
+  "processing": "Elaborazione…",
+  "cancel": "Annulla"
 }

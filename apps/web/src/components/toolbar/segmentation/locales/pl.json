@@ -1,0 +1,15 @@
+{
+  "megabytes": "{{value}} MB",
+  "downloading": "Pobieranie lokalnego modelu…",
+  "initializing": "Inicjalizowanie lokalnego modelu…",
+  "downloadProgress": "Pobieranie modelu",
+  "progress": "{{loaded}} z {{total}}, {{percent}} procent",
+  "loadCached": "Wczytaj lokalny model",
+  "cached": "Na tym urządzeniu · {{size}}",
+  "remove": "Usuń pobrany model",
+  "removing": "Usuwanie…",
+  "localHint": "Działa na Twoim urządzeniu. Twoje obrazy nigdy nie są wysyłane.",
+  "unavailable": "Pamięć przeglądarki jest niedostępna. Model nadal można wczytać w tej sesji.",
+  "inspectError": "Nie udało się sprawdzić pobranego modelu.",
+  "prepareError": "Operacja modelu nie powiodła się. Spróbuj ponownie."
+}

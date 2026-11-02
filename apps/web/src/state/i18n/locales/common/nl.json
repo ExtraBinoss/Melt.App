@@ -1,6 +1,6 @@
 {
   "newText": "Jouw tekst",
-  "selectImageFirst": "Klik op een afbeelding om een masker te maken.",
+  "selectImageFirst": "Klik op een ontgrendelde afbeelding om een selectie te starten.",
   "canvas": "Compositiecanvas",
   "toolHint": "Klik of teken op het canvas",
   "dropImages": "Sleep je afbeeldingen hierheen",
@@ -11,5 +11,14 @@
   "resize": "Formaat wijzigen",
   "zoomOut": "Uitzoomen",
   "zoomIn": "Inzoomen",
-  "resetView": "100% en centreren"
+  "resetView": "100% en centreren",
+  "segment": "Objectselectie",
+  "wand": "Toverstaf",
+  "tolerance": "Tolerantie",
+  "prepareModel": "Lokaal model voorbereiden",
+  "modelReady": "Model gereed",
+  "modelLoading": "Model laden…",
+  "modelHint": "Een eerste download is nodig. Je afbeeldingen blijven op je apparaat.",
+  "processing": "Verwerken…",
+  "cancel": "Annuleren"
 }

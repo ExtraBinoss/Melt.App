@@ -1,6 +1,6 @@
 {
   "newText": "Dein Text",
-  "selectImageFirst": "Klicke auf ein Bild, um seine Maske zu erstellen.",
+  "selectImageFirst": "Klicken Sie auf ein entsperrtes Bild, um eine Auswahl zu beginnen.",
   "canvas": "Kompositionsfläche",
   "toolHint": "Klicke oder zeichne auf der Arbeitsfläche",
   "dropImages": "Bilder hier ablegen",
@@ -11,5 +11,14 @@
   "resize": "Größe ändern",
   "zoomOut": "Verkleinern",
   "zoomIn": "Vergrößern",
-  "resetView": "100 % und zentrieren"
+  "resetView": "100 % und zentrieren",
+  "segment": "Objektauswahl",
+  "wand": "Zauberstab",
+  "tolerance": "Toleranz",
+  "prepareModel": "Lokales Modell vorbereiten",
+  "modelReady": "Modell bereit",
+  "modelLoading": "Modell wird geladen…",
+  "modelHint": "Ein erster Download ist erforderlich. Ihre Bilder bleiben auf Ihrem Gerät.",
+  "processing": "Verarbeitung…",
+  "cancel": "Abbrechen"
 }

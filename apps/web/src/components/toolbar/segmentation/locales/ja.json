@@ -1,0 +1,15 @@
+{
+  "megabytes": "{{value}} MB",
+  "downloading": "ローカルモデルをダウンロード中…",
+  "initializing": "ローカルモデルを初期化中…",
+  "downloadProgress": "モデルのダウンロード",
+  "progress": "{{loaded}} / {{total}}、{{percent}} パーセント",
+  "loadCached": "ローカルモデルを読み込む",
+  "cached": "このデバイス上 · {{size}}",
+  "remove": "ダウンロードしたモデルを削除",
+  "removing": "削除中…",
+  "localHint": "デバイス上で動作します。画像がアップロードされることはありません。",
+  "unavailable": "ブラウザーのストレージが利用できません。このセッションではモデルを読み込めます。",
+  "inspectError": "ダウンロードしたモデルを確認できませんでした。",
+  "prepareError": "モデルの操作に失敗しました。もう一度お試しください。"
+}

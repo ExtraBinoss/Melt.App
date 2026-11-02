@@ -1,6 +1,6 @@
 {
   "newText": "내 텍스트",
-  "selectImageFirst": "이미지를 클릭하여 마스크를 만드세요.",
+  "selectImageFirst": "잠금 해제된 이미지를 클릭하여 선택을 시작하세요.",
   "canvas": "컴포지션 캔버스",
   "toolHint": "캔버스를 클릭하거나 그리세요",
   "dropImages": "이미지를 놓으세요",
@@ -11,5 +11,14 @@
   "resize": "크기 조절",
   "zoomOut": "축소",
   "zoomIn": "확대",
-  "resetView": "100% 및 가운데 맞춤"
+  "resetView": "100% 및 가운데 맞춤",
+  "segment": "개체 선택",
+  "wand": "자동 선택",
+  "tolerance": "허용치",
+  "prepareModel": "로컬 모델 준비",
+  "modelReady": "모델 준비 완료",
+  "modelLoading": "모델 불러오는 중…",
+  "modelHint": "최초 다운로드가 필요합니다. 이미지는 기기에 보관됩니다.",
+  "processing": "처리 중…",
+  "cancel": "취소"
 }

@@ -1,0 +1,15 @@
+{
+  "megabytes": "{{value}} MB",
+  "downloading": "Lokaal model downloaden…",
+  "initializing": "Lokaal model initialiseren…",
+  "downloadProgress": "Modeldownload",
+  "progress": "{{loaded}} van {{total}}, {{percent}} procent",
+  "loadCached": "Lokaal model laden",
+  "cached": "Op dit apparaat · {{size}}",
+  "remove": "Gedownload model verwijderen",
+  "removing": "Verwijderen…",
+  "localHint": "Werkt op je apparaat. Je afbeeldingen worden nooit geüpload.",
+  "unavailable": "Browseropslag is niet beschikbaar. Het model kan tijdens deze sessie nog steeds worden geladen.",
+  "inspectError": "Het gedownloade model kon niet worden gecontroleerd.",
+  "prepareError": "De modelbewerking is mislukt. Probeer het opnieuw."
+}

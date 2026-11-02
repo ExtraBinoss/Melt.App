@@ -49,6 +49,11 @@ latest prompt intent; intermediate clicks do not create an unbounded GPU queue.
 Project/page/document/target changes, deselection and disposal invalidate pending
 work. Rectangle movement writes its retained SVG directly without React updates.
 
+The selection controls, tool instructions, shared actions and model status messages
+are localized in all twelve supported application languages. Translation checks
+require matching keys, preserved interpolation tokens and direct locale resources
+so a missing translation cannot pass through the English fallback.
+
 ## Model and runtime
 
 The requested [WebSAM project](https://github.com/Xevion/WebSAM) demonstrates

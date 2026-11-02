@@ -1,0 +1,15 @@
+{
+  "megabytes": "{{value}} MB",
+  "downloading": "Lokales Modell wird heruntergeladen…",
+  "initializing": "Lokales Modell wird initialisiert…",
+  "downloadProgress": "Modell herunterladen",
+  "progress": "{{loaded}} von {{total}}, {{percent}} Prozent",
+  "loadCached": "Lokales Modell laden",
+  "cached": "Auf diesem Gerät · {{size}}",
+  "remove": "Heruntergeladenes Modell entfernen",
+  "removing": "Wird entfernt…",
+  "localHint": "Läuft auf Ihrem Gerät. Ihre Bilder werden niemals hochgeladen.",
+  "unavailable": "Der Browserspeicher ist nicht verfügbar. Das Modell kann in dieser Sitzung trotzdem geladen werden.",
+  "inspectError": "Das heruntergeladene Modell konnte nicht überprüft werden.",
+  "prepareError": "Die Modellaktion ist fehlgeschlagen. Versuchen Sie es erneut."
+}
