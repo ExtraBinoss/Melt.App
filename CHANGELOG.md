@@ -456,6 +456,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Fixed
 
+- Keep 12 px of equal spacing to the right, above and below the inspector Export button. Constrain the inspector to its allocated panel width so intrinsic property content cannot push the header beyond its visible edge, prevent the header from shrinking vertically, and verify visible edge spacing in French across window and sidebar resizing.
+
 - Render inspector Export as one primary button without a split-action wrapper or obsolete split styles. Keep equal outer spacing above, below, to the right and beside Design, including on mobile and before the export workspace loads.
 
 - Style the dashboard Custom canvas split action from the route-critical dashboard stylesheet using the shared ButtonGroup. Remove its export-style dependency so its layout and joined corners are correct before studio hydration and remain stable when export styles load.

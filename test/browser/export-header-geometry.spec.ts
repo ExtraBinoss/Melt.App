@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { createLayer, createPage, createProject } from "@musart/core";
 import type { ExportJobs } from "../../apps/web/src/services/export/jobs";
 
 declare global {
@@ -170,8 +171,8 @@ test("the compact Export button stays inside header padding through real job pro
       expect(sample.height).toBe(32);
       expect(sample.direct).toBe(true);
       expect(sample.variant).toBe("default");
-      expect(sample.topPadding).toBe(8);
-      expect(sample.rightPadding).toBe(8);
+      expect(sample.topPadding).toBe(12);
+      expect(sample.rightPadding).toBe(12);
       expect(Math.abs(sample.rightPadding - sample.bottomPadding)).toBeLessThanOrEqual(0.5);
       expect(sample.gap).toBe(8);
       expect(sample.position).toBe("relative");
@@ -181,7 +182,7 @@ test("the compact Export button stays inside header padding through real job pro
       expect(sample.width).toBe(
         sample.state.startsWith("pending-") ? samples[1]!.width : samples[0]!.width,
       );
-      expect(sample.headerHeight).toBe(49);
+      expect(sample.headerHeight).toBe(57);
       if (sample.state === "narrow-panel") expect(sample.panelWidth).toBeGreaterThanOrEqual(310);
       if (sample.state === "narrow-panel") expect(sample.panelWidth).toBeLessThanOrEqual(330);
     }
@@ -270,19 +271,45 @@ test("French Export stays inside every visible panel edge at narrow sidebar widt
       }
       return {
         visibleGap: edge - box.right,
+        headerOverflow: node.closest(".inspector-header")!.getBoundingClientRect().right - edge,
         direct: node.parentElement?.classList.contains("inspector-header"),
       };
     });
   const before = await measure();
   expect(before.direct).toBe(true);
-  expect(Math.abs(before.visibleGap - 8)).toBeLessThan(1);
+  expect(Math.abs(before.visibleGap - 12)).toBeLessThan(1);
   const divider = (await page.locator(".sidebar-resize").boundingBox())!;
   await page.mouse.move(divider.x + divider.width / 2, divider.y + divider.height / 2);
   await page.mouse.down();
   await page.mouse.move(1000, divider.y + divider.height / 2, { steps: 4 });
   await page.mouse.up();
   const after = await measure();
-  expect(Math.abs(after.visibleGap - 8)).toBeLessThan(1);
+  expect(Math.abs(after.visibleGap - 12)).toBeLessThan(1);
+  const layer = createLayer("rectangle", {
+    name: "A deliberately long layer name for the narrow properties panel",
+    width: 240,
+    height: 160,
+  });
+  const project = createProject({ pages: [createPage({ layers: [layer] })] });
+  await page.evaluate(
+    ({ project, layerId }) => {
+      window.musart!.load(project);
+      window.musart!.select([layerId]);
+    },
+    { project, layerId: layer.id },
+  );
+  for (const width of [1920, 1280, 1024, 900, 801]) {
+    await page.setViewportSize({ width, height: 620 });
+    await expect.poll(async () => (await measure()).visibleGap).toBeCloseTo(12, 0);
+    expect(Math.abs((await measure()).headerOverflow)).toBeLessThan(1);
+    const handle = (await page.locator(".sidebar-resize").boundingBox())!;
+    await page.mouse.move(handle.x + handle.width / 2, handle.y + handle.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(width - 260, handle.y + handle.height / 2, { steps: 4 });
+    await page.mouse.up();
+    await expect.poll(async () => (await measure()).visibleGap).toBeCloseTo(12, 0);
+    expect(Math.abs((await measure()).headerOverflow)).toBeLessThan(1);
+  }
   await page
     .locator(".inspector-header")
     .screenshot({ path: info.outputPath("exporter-padding-fr.png") });
