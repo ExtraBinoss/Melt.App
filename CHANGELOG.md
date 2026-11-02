@@ -475,6 +475,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Fixed
 
+- Pair landing action labels and hover fills with the action palette, and editor dimension labels with the primary palette foreground. Verify computed text contrast on all landing calls to action and selection labels across six accents in light and dark themes.
+
 - Translate SAM and magic-wand instructions, shared selection actions, model download/status messages and tool labels into all twelve supported languages, with key/interpolation and direct-registration regressions to prevent silent English fallback.
 
 - Replay completed hero-letter hover animations on the same glyph, coalesce native pointer input with current geometry, and recover hover after asynchronous path rebuilds or reduced-motion changes. Remove the explanatory hero paragraph so the main headline carries the message.

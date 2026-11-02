@@ -170,7 +170,7 @@
   transform: translateX(-50%);
   white-space: nowrap;
   background: var(--primary);
-  color: white;
+  color: var(--primary-foreground);
   font-size: 10px;
   line-height: 18px;
   padding-inline: 6px;
