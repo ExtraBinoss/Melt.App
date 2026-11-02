@@ -143,8 +143,11 @@ Effects, adjustments and actions such as **Copy composition as editable JSON**, 
 
 ## Finding commands
 
-Magic Search and the shortcut editor match current-language and English names,
-command descriptions, effect parameter/algorithm names and actual configured
-bindings. `ctrl j`, `ctrl+j`, `cmd j` and `⌘J` all find Layer via Copy; rebinding
+Magic Search and the shortcut editor match English and the user's current
+language in all twelve supported interface locales. Names, descriptions and
+categories have complete local resources; effect parameter/algorithm names and
+actual configured bindings are indexed too. Changing the interface language
+rebuilds the cached index. Inactive-language descriptions and French action aliases are
+not added to another locale's index. `ctrl j`, `ctrl+j`, `cmd j` and `⌘J` all find Layer via Copy; rebinding
 a command updates its search keys. Keycaps use visible **+** separators between
 keys. Existing custom assignments take priority over newly introduced defaults.

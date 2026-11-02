@@ -479,6 +479,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Fixed
 
+- Complete command/effect names, descriptions, search controls and shortcut settings in all twelve interface languages. Index English together with the active locale, refresh cached catalogs on language changes, remove forced French aliases from other locales and preserve localized plural forms and shortcut matching. Keep key combinations left-to-right and mirror dialog alignment/close controls in RTL interfaces. Add complete-resource and bilingual search regressions for every supported locale.
+
 - Pair landing action labels and hover fills with the action palette, and editor dimension labels with the primary palette foreground. Verify computed text contrast on all landing calls to action and selection labels across six accents in light and dark themes.
 
 - Translate SAM and magic-wand instructions, shared selection actions, model download/status messages and tool labels into all twelve supported languages, with key/interpolation and direct-registration regressions to prevent silent English fallback.

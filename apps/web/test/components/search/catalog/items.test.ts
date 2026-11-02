@@ -23,8 +23,8 @@ test("indexes all real actions, effects and every page/layer with localized labe
   for (const definition of Object.values(EFFECT_CATALOG).filter(
     (effect) => !effect.source && !effect.retired,
   )) {
-    const label = t(definition.nameKey);
-    expect(label).not.toBe(definition.nameKey);
+    const label = t(`search:effectLabels.${definition.type}`);
+    expect(label).not.toBe(`search:effectLabels.${definition.type}`);
     expect(items.find((item) => item.id === `effect:${definition.type}`)).toMatchObject({
       label,
       target: { kind: "effect", effect: definition.type },
@@ -32,7 +32,9 @@ test("indexes all real actions, effects and every page/layer with localized labe
   }
   for (const definition of Object.values(EFFECT_CATALOG).filter((effect) => effect.retired))
     expect(items.find((item) => item.id === `effect:${definition.type}`)).toBeUndefined();
-  expect(items.filter((item) => item.category === "layers")).toHaveLength(4);
+  expect(
+    items.filter((item) => item.category === "layers" && item.target.kind === "layer"),
+  ).toHaveLength(4);
   expect(items.find((item) => item.label === "Légende")).toMatchObject({
     detail: "Texte · Story",
     terms: expect.stringContaining("Café du matin"),

@@ -2,6 +2,7 @@ import { EFFECT_CATALOG, type EffectType } from "@musart/core";
 import { i18n } from "../../../state/i18n";
 import type { KeyChord } from "../../../state/keybindings/model";
 import { chordTokens } from "../../../state/keybindings/chords";
+import type { BindingCommand } from "../../../state/keybindings/registry";
 /** Search aliases are shared by the command palette and the configurable-shortcuts screen. */
 export function shortcutTerms(tokens: readonly string[]): string {
   return tokens
@@ -44,6 +45,32 @@ function shortcutWords(value: string): string[] {
 }
 export function shortcutMatches(chords: readonly KeyChord[], query: string): boolean {
   return chords.some((chord) => shortcutTokenMatch(chordTokens(chord), query) > 0);
+}
+/** Use only the active locale and English; configured chords retain their platform aliases. */
+export function bindingMatches(
+  command: BindingCommand,
+  chords: readonly KeyChord[],
+  query: string,
+  translate: (key: string) => string,
+): boolean {
+  const shortcut = shortcutMatches(chords, query);
+  if (isShortcutQuery(query)) return shortcut;
+  return (
+    shortcut ||
+    textMatches(
+      [
+        translate(command.label),
+        i18n.t(command.label, { lng: "en" }),
+        commandDescription(command.id.slice(7), undefined, command.descriptionKey),
+        commandDescription(command.id.slice(7), "en", command.descriptionKey),
+        translate(`search:${command.category}`),
+        i18n.t(`search:${command.category}`, { lng: "en" }),
+        command.terms ?? "",
+        command.id.startsWith("effect:") ? effectSearchTerms(command.id.slice(7)) : "",
+      ].join(" "),
+      query,
+    )
+  );
 }
 export function commandDescription(
   action: string,

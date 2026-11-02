@@ -6,7 +6,7 @@ export function createDocumentSearchItems(project: Project, t: SearchTranslate):
     id: `page:${item.id}`,
     label: item.name,
     category: "pages",
-    terms: `page composition ${item.width} ${item.height}`,
+    terms: `page composition ${t("search:pages")} ${item.width} ${item.height}`,
     detail: `${item.width} × ${item.height}`,
     target: { kind: "page", pageId: item.id },
   }));
@@ -33,7 +33,7 @@ export function createDocumentSearchItems(project: Project, t: SearchTranslate):
       id: `layer:${item.id}:${layer.id}`,
       label: layer.name,
       category: "layers",
-      terms: `layer calque ${layer.kind} ${kindLabel(layer.kind)} ${item.name} ${layer.text ?? ""}`,
+      terms: `layer ${t("search:layers")} ${layer.kind} ${kindLabel(layer.kind)} ${item.name} ${layer.text ?? ""}`,
       detail: detail(layer.kind),
       target: { kind: "layer", pageId: item.id, layerId: layer.id },
     }));

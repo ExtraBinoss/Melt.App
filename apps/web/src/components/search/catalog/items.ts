@@ -56,7 +56,7 @@ export function createSearchCommandItems(
     shortcutSearch: (bindings.bindings.get(`action:${item.action}`) ?? [])
       .map((chord) => shortcutTerms(chordTokens(chord)))
       .join(" "),
-    terms: `${item.terms} ${t(`search:${item.category}`)}`,
+    terms: `${item.terms} ${t(`search:${item.category}`)} ${i18n.t(`search:${item.category}`, { lng: "en" })}`,
     shortcut: shortcut(`action:${item.action}`),
     disabled: item.gate ? disabled[item.gate] : undefined,
     target: { kind: "action", action: item.action },
@@ -65,8 +65,8 @@ export function createSearchCommandItems(
     .filter((effect) => !effect.source && !effect.retired)
     .map((effect) => ({
       id: `effect:${effect.type}`,
-      label: t(effect.nameKey),
-      englishLabel: String(i18n.t(effect.nameKey, { lng: "en" })),
+      label: t(`search:effectLabels.${effect.type}`),
+      englishLabel: String(i18n.t(`search:effectLabels.${effect.type}`, { lng: "en" })),
       description: effect.descriptionKey ? t(effect.descriptionKey) : "",
       englishDescription: effect.descriptionKey
         ? String(i18n.t(effect.descriptionKey, { lng: "en" }))
@@ -76,7 +76,7 @@ export function createSearchCommandItems(
         .map((chord) => shortcutTerms(chordTokens(chord)))
         .join(" "),
       category: effect.category === "effect" ? "effects" : "adjustments",
-      terms: `${effect.type} effect effet adjustment correction couleur color ${effectSearchTerms(effect.type)}`,
+      terms: `${effect.type} effect adjustment color ${effectSearchTerms(effect.type)} ${t(`search:${effect.category === "effect" ? "effects" : "adjustments"}`)} ${i18n.t(`search:${effect.category === "effect" ? "effects" : "adjustments"}`, { lng: "en" })}`,
       detail: t("search:applyToSelection"),
       disabled: disabled.editable,
       shortcut: shortcut(`effect:${effect.type}`),
@@ -87,8 +87,8 @@ export function createSearchCommandItems(
     .map(({ code, label, englishLabel }) => ({
       id: `language:${code}`,
       category: "preferences",
-      label: `${t("language")}: ${label}`,
-      terms: `${code} ${label} ${englishLabel} language langue`,
+      label: `${t("search:language")}: ${label}`,
+      terms: `${code} ${label} ${englishLabel} language ${t("search:language")}`,
       target: { kind: "language", language: code },
     }));
   return [...actions, ...effects, ...languages].sort(

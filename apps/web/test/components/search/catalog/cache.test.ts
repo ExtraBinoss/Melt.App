@@ -113,7 +113,7 @@ test("revisiting selection gates reuses normalized commands and joined document 
   ).toBe("New group");
 });
 
-test("bounds revisited gate states and invalidates bindings and language for every state", () => {
+test("reuses equivalent gate states across pages and invalidates bindings and language for every state", () => {
   const pages = Array.from({ length: 9 }, () => createPage()),
     engine = new EditorEngine(createProject({ pages })),
     cache = new SearchCatalog(),
@@ -131,7 +131,7 @@ test("bounds revisited gate states and invalidates bindings and language for eve
   engine.setPage(pages[8]!.id);
   cache.read(engine.getSnapshot(), t, defaults, "en");
   engine.setPage(pages[1]!.id);
-  expect(cache.read(engine.getSnapshot(), t, defaults, "en")).not.toBe(second);
+  expect(cache.read(engine.getSnapshot(), t, defaults, "en")).toBe(second);
   const unbound = bindingSnapshot({ "action:save": [] });
   cache.read(engine.getSnapshot(), t, unbound, "en");
   engine.setPage(pages[0]!.id);

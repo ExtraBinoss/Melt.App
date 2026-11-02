@@ -63,12 +63,18 @@ export const BINDING_COMMANDS: readonly BindingCommand[] = Object.freeze([
     .filter((effect) => !effect.source && !effect.retired)
     .map((effect): BindingCommand => ({
       id: `effect:${effect.type}`,
-      label: effect.nameKey,
+      label: `search:effectLabels.${effect.type}`,
       descriptionKey: effect.descriptionKey,
       category: effect.category === "effect" ? "effects" : "adjustments",
       defaults: [],
     })),
-  { id: "app:search", label: "search:title", category: "help", defaults: [key("k", true)] },
+  {
+    id: "app:search",
+    label: "search:title",
+    descriptionKey: "search:description",
+    category: "help",
+    defaults: [key("k", true)],
+  },
   ...directions.flatMap((direction): BindingCommand[] => [
     {
       id: `nudge:${direction}`,
