@@ -17,6 +17,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Refresh the README around the landing headline, real editable template previews, live effects, typography, 3D, interactive selections, Motion, audio, timelapses and portable projects. Keep performance claims tied to documented integrated-graphics workloads and point the GitHub presentation to melt.plinka.eu.
+
 - Restore portable project export for video/audio projects with versioned binary `.musart` archives and an explicit ZIP download. Store deduplicated originals as relative asset files, import both archive extensions atomically, retain legacy JSON imports and reject missing, damaged, oversized or unsafe archive entries. Encode/decode away from the UI thread.
 - Keep the tutorial Dither library stable while hovering its category and reading the guide. Seed the actual React search state, hold the guided submenu open, and place the card clear of the whole popup. Verify French hover navigation in narrow and wide editor windows.
 
