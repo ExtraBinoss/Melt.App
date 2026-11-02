@@ -1,128 +1,130 @@
 <p align="center">
-  <img src="apps/web/src/ui/brand/assets/melt.svg" width="96" height="96" alt="Melt logo" />
+  <img src="apps/web/src/ui/brand/assets/melt.svg" width="88" height="88" alt="Melt" />
 </p>
 
-<h1 align="center">Melt</h1>
+<h1 align="center">Design that melts social feeds.</h1>
 
-<p align="center">A browser-based creative studio for design and motion.</p>
+<p align="center">
+  <strong>Images. Video. Type. 3D. Motion.</strong><br />
+  A free, open-source creative studio in your browser.
+</p>
+
+<p align="center">
+  <a href="https://melt.plinka.eu/">
+    <img src="https://img.shields.io/badge/Start_creating_↗-8B5CF6?style=for-the-badge" alt="Start creating with Melt" />
+  </a>
+</p>
+
+<p align="center">
+  No account. Your projects stay with you.
+</p>
 
 <p align="center">
   <a href="apps/web/public/videos/landing/morphing-type/preview-c84f0e1119f4.webm">
-    <img src="docs/media/readme/melt-typography.webp" width="960" height="540" alt="Melt mascot beside violet lettering that stretches and morphs in a six-second loop" />
+    <img src="docs/media/readme/melt-typography.webp" width="960" height="540" alt="Made in Melt: an animated mascot beside violet lettering that stretches and morphs" />
   </a>
 </p>
 
-<p align="center"><a href="apps/web/public/videos/landing/morphing-type/preview-c84f0e1119f4.webm">Watch the typography loop</a> · Made in Melt, with editable type and native Motion.</p>
+<p align="center">Made in Melt. The letters are still editable. <a href="apps/web/public/videos/landing/morphing-type/preview-c84f0e1119f4.webm">Watch the loop →</a></p>
 
-<p align="center">
-  <a href="https://melt.plinka.eu/">
-    <img src="https://img.shields.io/badge/Open_Melt-8B5CF6?style=for-the-badge" alt="Open Melt" />
-  </a>
-</p>
+Make a poster. Push it into motion. Export the reel — and the timelapse of how you made it.
 
-Melt brings images, typography, shapes and effects into one editable composition. Design posters and graphics in **Static**, or switch to **Motion** to animate layers, morph typography and build loops. Export your artwork, a motion video or a timelapse of how you made it.
+Melt gives you a canvas for mixing photos, video, typography, shapes and 3D. Start with a template, replace the media, bend the type and build your own look. Effects preview as you work. Every layer stays yours to change.
 
-Your projects save on your device. No account is required. Melt is free and open source, built as an independent project for the [2026 Meta Global AI Developer Hackathon](https://dev.meta.ai/events/global-hackathon).
+[Start creating](https://melt.plinka.eu/) · [See what you can make](#made-in-melt) · [Explore the features](#effects-in-real-time) · [Get involved](#make-it-with-us)
 
-[What you can make](#available-today) · [Get started](#get-started) · [Headless mode](#headless-mode) · [Documentation](docs/README.md)
+## Made in Melt
 
-## Available today
+These are editable templates made with the same tools you get in the editor. Open a preview, then make the design your own.
 
-| Capability                 | What you can do                                                                                                                                                                         |
-| -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Layers and composition** | Combine images, editable text, rectangles, ellipses and vectors. Nest groups, transform layers, adjust opacity and choose from 26 blend modes.                                          |
-| **Editable effects**       | Stack and adjust blur, grain, halftone, dither, ASCII, CRT, cyanotype, gradients and other treatments. Fine-tune exposure, contrast, hue and color without changing the original image. |
-| **Selections and masks**   | Select connected colors with the magic wand or select objects with an on-device AI model. Use images, layers or groups as masks; invert or disable them as you work.                    |
-| **Typography**             | Browse bundled and Google Fonts, import TTF/OTF fonts, and use available system fonts. Style text with solid colors or gradients, spacing and alignment.                                |
-| **Shapes and artwork**     | Use the built-in shape, icon and brand libraries, or import supported SVG artwork. Edit fills and strokes.                                                                              |
-| **Artboards and layout**   | Keep several designs in one project. Start from social or print-size presets, use rulers and guides, snap objects into place, and adjust alignment and spacing.                         |
-| **Local projects**         | Autosave in your browser, undo and redo edits, and download a `.musart` project with its original images. Reopen it later or move it to another device.                                 |
-| **Image export**           | Export a selection or a whole artboard as PNG, JPEG or WebP, with scale options up to 4×. Download all artboards together as a ZIP.                                                     |
-| **Creation timelapses**    | Replay your recorded edits in Animate and export an MP4 or WebM video, depending on browser support.                                                                                    |
-| **Motion**                 | Animate layers with editable blocks, presets and keyframes. Morph typography, refine timing and easing, and export motion videos.                                                       |
+<table>
+  <tr>
+    <td align="center" width="33%">
+      <a href="apps/web/public/videos/landing/second-skin/preview-66d3da2e2db3.webm"><img src="apps/web/public/videos/landing/second-skin/poster-597d7bef8c03.webp" width="240" alt="Second Skin: dancing footage transformed with thermal color and bold typography" /></a><br />
+      <strong>Second Skin</strong><br />
+      Footage. Thermal color. Moving type.
+    </td>
+    <td align="center" width="33%">
+      <a href="apps/web/public/videos/landing/terminal-signal/preview-9107e5b8b25c.webm"><img src="apps/web/public/videos/landing/terminal-signal/poster-27f0cace708d.webp" width="240" alt="Terminal Signal: a curved green terminal with animated typing" /></a><br />
+      <strong>Terminal Signal</strong><br />
+      A terminal with a pulse.
+    </td>
+    <td align="center" width="33%">
+      <a href="apps/web/public/videos/landing/angel-windows/preview-87add9372461.webm"><img src="apps/web/public/videos/landing/angel-windows/poster-13de5acfe3f6.webp" width="240" alt="Angel.exe: a rotating 3D character surrounded by ASCII and effect windows" /></a><br />
+      <strong>Angel.exe</strong><br />
+      3D meets desktop chaos.
+    </td>
+  </tr>
+</table>
 
-The interface offers **12 languages**, with light and dark themes and customizable keyboard shortcuts. Some controls fall back to English; see [localization coverage](docs/guides/editor-localization.md).
+There’s more to remix: chrome typography and reflections in **Cornell Box**, flower timelapses in **Bloom Windows**, the **Melt Mascot**, and animated photo collages. Templates contain real layers, effects and animation you can edit.
 
-## Get started
+## Effects in real time.
 
-To run Melt on your computer, install **Bun 1.4.4** and **Node.js 22.12 or newer**, then run these commands from the project folder:
+Explore **40+ effects and color adjustments**. Drag a slider, move an effect across the canvas or paint a distortion. Watch the look change while you work.
 
-```sh
-bun install --frozen-lockfile
-bun dev
-```
+- **Give it a look.** Halftone dots, circular color grids, dithering, ASCII, grain, cyanotype, thermal palettes, CRT, digital glitches, pink phosphor and printed-receipt treatments. Stack effects and keep adjusting them.
+- **Get hands-on.** Push, pinch, inflate and twist with a round **Liquify** brush. Build torn-paper edges, displaced fragments, ink bleed and pixel-sorted streaks.
+- **Make blur do more.** Gaussian, box, directional, spin, zoom, lens and edge-preserving blur, with controls for each technique. Keep an area sharp with a movable, feathered protection circle.
+- **Find your color.** Adjust exposure, contrast, hue, saturation, temperature and gradients. Blend layers, add shadows and keep the original media intact.
 
-Open **[localhost:6100](http://localhost:6100)** in your browser.
+## One canvas. Every ingredient.
 
-1. Choose a template, create an artboard, or open a `.musart` file from the dashboard.
-2. Drop in images, add text and shapes, then build your composition with layers, effects and masks. Try **Melt Mascot** for editable typography in Motion.
-3. Use **Export** to download an image or motion video, or open **Animate** to prepare a timelapse. Download a `.musart` copy from the project-name menu to keep a portable backup.
+Bring photos, video, text, shapes and 3D into the same design.
 
-Press **Ctrl/Cmd + K** to find tools and actions. Scroll to pan, **Ctrl/Cmd + scroll** to zoom around the pointer, and click the zoom percentage to return to 100%. See the [shortcut guide](docs/guides/keyboard-shortcuts.md).
+**Type that has a personality.** Explore 1,950 Google Fonts families, use bundled fonts or bring your own. Add colored outlines, gradients and crisp offset shadows. Animate letters, stretch them, inflate them and keep the words editable.
 
-## Headless mode
+**3D you can actually play with.** Add shapes, extruded text or models from the library, or import a GLB. Adjust materials, lights, shadows, reflections and the camera. Mix 3D with your images and type, then bring it into motion.
 
-Headless mode lets scripts create and edit projects, export images, or capture the editor without operating it manually.
+**Room to build.** Keep multiple artboards in one project. Arrange layers and nested groups, try blend modes, align with guides and snapping, and work in phone, square, landscape or print-size formats. Bring in shapes, icons, logos and editable SVG artwork.
 
-Creating and editing project files only requires Bun:
+## Cut it out. Keep creating.
 
-```sh
-bun run headless create --output artifacts/example.musart
-bun run headless apply --input artifacts/example.musart --commands commands.json --output artifacts/changed.musart
-```
+Click to select an object with local AI. Add points to include or exclude areas, draw a box, preview the outline and refine it before applying anything. The magic wand gives you color-based selection with adjustable tolerance.
 
-`create` makes a square demo project with a MusArt text layer. `apply` reads a JSON list of editor commands and applies them together; the [headless guide](docs/guides/headless.md) includes a complete command-file example.
+Keep or erase an area, invert the selection, or turn selected pixels into a new layer. Use **masks and clipping** to fit one layer inside another’s silhouette. Your originals stay intact, and undo/redo lets you try another direction.
 
-Rendering uses an invisible Chromium browser. Install it once:
+Familiar shortcuts help you keep moving: **Ctrl/Cmd + J** to copy into a layer, **Ctrl/Cmd + Shift + J** to cut into one. **Ctrl/Cmd + K** finds commands by name, description or shortcut, in English and your current language.
 
-```sh
-bunx playwright install --with-deps chromium
-```
+## Make it move.
 
-Keep `bun dev` running in one terminal, then run these commands in another:
+Pick an animation preset, set its timing and make it yours. Stagger letters, build entrances, rotate objects, morph typography or turn a composition into a loop. Save your own motion presets and use them again in another project.
 
-```sh
-bun run headless render --input artifacts/example.musart --output artifacts/example.png --scale 2
-bun run headless screenshot --input artifacts/example.musart --output artifacts/editor.png
-```
+When you want more control, reach for keyframes and curves. Bring video and audio onto the timeline, adjust clips, mix sound and add fades. Static designs and motion live in the same project.
 
-See [Headless mode](docs/guides/headless.md) for image formats, artboard selection, browser automation, requirements and troubleshooting.
+**Show the process, too.** Turn your recorded editing history into a creation timelapse. The making-of becomes another thing to share.
 
-## Still to implement
+## Made for the laptop you already have.
 
-These are current gaps and possible next steps. None has a delivery date.
+Melt puts your laptop’s graphics to work for live effects and canvas navigation. It’s tested on integrated graphics, too.
 
-- [ ] Embed custom font files in portable projects. They currently need to be installed separately in each browser.
-- [ ] Support mixed left-to-right/right-to-left paragraphs and color emoji.
-- [ ] Export editable vector/PDF files and print-ready, ICC-managed CMYK artwork. Current image exports are RGB.
+- **60 FPS canvas panning** in the documented integrated-graphics test scene.
+- **50 image layers and 100 effects** in a separate photographic stress test.
 
-## Before you start
+[See the measurements →](docs/rendering/performance-protocol.md)
 
-- **Keep a portable backup.** Clearing your browser's site data can remove locally saved projects and fonts. A `.musart` file contains the design and original images; recorded edit history can be downloaded separately in Animate.
-- **Some resources need an initial download.** Google Fonts and the object-selection model download when requested. Image processing stays on your device. See [fonts](docs/guides/fonts.md) and [local object selection](docs/guides/object-selection.md).
-- **Browser capabilities matter.** Rendering needs WebGPU or WebGL2. System-font access and video encoding depend on browser support; large exports are also limited by the graphics device and available memory.
+## Finish it. Share it. Keep the project.
 
-<details>
-<summary>Technical details</summary>
+Export **PNG, JPEG or WebP** for your artwork, and **MP4 or WebM** for motion and timelapses. Export a selection, an artboard or a batch of artboards. Include audio in your motion videos.
 
-Melt uses **TypeScript, React, Vite and Bun**, with **Three.js, React Three Fiber and TSL** for graphics. **Jotai** manages interface state; **Tailwind CSS, shadcn/Radix, Motion and i18next** support the interface. Projects are stored locally in **IndexedDB**.
+Download an editable **`.musart` or ZIP project** with its images, video and audio. Reopen it later or take it to another device. Autosave keeps your work in this browser while you create.
 
-The document engine can run independently of the interface. The editor and image exports share the same renderer, with WebGPU and Three.js's WebGL fallback.
+Choose light or dark mode, six accent palettes and **12 interface languages** ([coverage](docs/guides/editor-localization.md)). Customize your shortcuts and pin the commands you reach for most. A guided tour helps you get from your first layers to your first export.
 
-Read [Technical stack and design choices](docs/architecture/tech-stack.md) for the reasons behind the stack and the [architecture contracts](docs/architecture/contracts.md) for module boundaries.
+## Your turn.
 
-</details>
+1. [Open Melt](https://melt.plinka.eu/) and choose a template or a blank artboard.
+2. Drop in your media. Change the type. Try an effect. Add some motion.
+3. Export your creation, save the editable project, and share the process.
 
-## Documentation and contributions
+No account to make. Your projects save on your device, and image processing happens locally. Fonts and the optional object-selection model download when you choose to use them.
 
-Start with the [documentation index](docs/README.md) for usage guides, headless automation and contributor references. Read [CONTRIBUTING.md](CONTRIBUTING.md) before making changes, follow development in the [changelog](CHANGELOG.md), and report vulnerabilities through the [security policy](SECURITY.md).
+## Make it with us
 
-Melt's source code is available under the [MIT License](LICENSE). Fonts, models, artwork and other third-party material retain their own licenses; see [credits and provenance](docs/legal/provenance.md) and [third-party notices](THIRD_PARTY_NOTICES.md).
+Melt is free and open source under the [MIT License](LICENSE), built as an independent project for the [2026 Meta Global AI Developer Hackathon](https://dev.meta.ai/events/global-hackathon).
 
-<p align="center">
-  <a href="https://melt.plinka.eu/">
-    <img src="https://img.shields.io/badge/Open_Melt-8B5CF6?style=for-the-badge" alt="Open Melt" />
-  </a>
-</p>
+Have an idea, found a bug, or made something worth sharing? [Open an issue](https://github.com/ExtraBinoss/Melt.App/issues) or [contribute](CONTRIBUTING.md).
 
-The interface is now **Melt**. Existing `.musart` files, local browser libraries, CLI commands and package identifiers remain compatible. See [the shared brand and SVG animation API](docs/guides/brand.md).
+[User guides](docs/README.md) · [Run locally](CONTRIBUTING.md) · [Work with your agent](docs/guides/headless.md) · [What’s new](CHANGELOG.md) · [Credits](docs/legal/provenance.md) · [Third-party notices](THIRD_PARTY_NOTICES.md) · [Security](SECURITY.md)
+
+<p align="center"><a href="https://melt.plinka.eu/"><strong>Start creating → melt.plinka.eu</strong></a></p>

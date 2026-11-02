@@ -27,6 +27,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Refresh the README around the landing headline, real editable template previews, live effects, typography, 3D, interactive selections, Motion, audio, timelapses and portable projects. Keep performance claims tied to documented integrated-graphics workloads and point the GitHub presentation to melt.plinka.eu.
+
 - Anchor every tutorial card to its current UI target, center it along the available side and reject distant retained positions. Keep popup reopening stable, follow changing card heights and render real control icons and OS-aware keyboard components throughout the guided copy.
 
 - Stabilize tutorial cards around context-menu reopening and the full Pop picker, reserve clearance for the mascot, and restore parent surfaces when navigating backward from animation or export. Preserve pickers during rapid queued Next actions, target the real Export button and reopen it when reviewing. Finish the tutorial as soon as a real video export starts, while rendering and delivery continue independently.
