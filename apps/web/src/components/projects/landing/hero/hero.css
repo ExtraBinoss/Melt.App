@@ -14,20 +14,18 @@
   z-index: 2;
   user-select: none;
   pointer-events: none;
-  animation: hero-mascot-exit 280ms cubic-bezier(0.55, 0, 0.8, 0.4) 1120ms both;
 }
 .hero-mascot-landing {
   position: absolute;
   inset: 0;
   display: grid;
   place-items: center;
-  animation: hero-mascot-arrive 440ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  transform: scale(0);
 }
 .hero-mascot-turn {
   position: relative;
   width: 88px;
   height: 88px;
-  animation: hero-mascot-unwind 620ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 .hero-mascot-face {
   position: absolute;
@@ -47,49 +45,15 @@
   visibility: hidden;
 }
 .landing-intro-description {
-  animation: hero-support-in 500ms ease 1350ms both;
+  animation: hero-support-in 500ms ease 1550ms both;
 }
 .landing-intro > .landing-cta {
-  animation: hero-support-in 500ms ease 1450ms both;
+  animation: hero-support-in 500ms ease 1650ms both;
 }
 .landing-intro:has([data-paused]) *,
 .landing-intro:has([data-paused]) *::before,
 .landing-intro:has([data-paused]) *::after {
   animation-play-state: paused;
-}
-@keyframes hero-mascot-arrive {
-  0% {
-    transform: scale(0);
-  }
-  72% {
-    transform: scale(1.04);
-  }
-  100% {
-    transform: none;
-  }
-}
-@keyframes hero-mascot-unwind {
-  0% {
-    transform: rotate(-28deg);
-  }
-  55% {
-    transform: rotate(12deg);
-  }
-  100% {
-    transform: none;
-  }
-}
-@keyframes hero-mascot-exit {
-  0% {
-    opacity: 1;
-    transform: none;
-    visibility: visible;
-  }
-  100% {
-    opacity: 0;
-    transform: scale(0);
-    visibility: hidden;
-  }
 }
 @keyframes hero-support-in {
   from {
@@ -105,9 +69,6 @@
   .hero-mascot-stage {
     display: none;
   }
-  .hero-mascot-stage,
-  .hero-mascot-landing,
-  .hero-mascot-turn,
   .landing-intro-description,
   .landing-intro > .landing-cta {
     animation: none;

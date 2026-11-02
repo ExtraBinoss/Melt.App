@@ -24,6 +24,27 @@ for (const language of ["en", "fr"] as const) {
     const glyphs = stage.locator("[data-hero-glyph]");
     await expect(glyphs.first()).toHaveAttribute("opacity", "1");
     await expect(glyphs.last()).toHaveAttribute("opacity", "0");
+    const motion = await page.evaluate(
+      () =>
+        new Promise<{ time: number; scale: number }[]>((resolve) => {
+          const landing = document.querySelector<HTMLElement>(".hero-mascot-landing")!;
+          const samples: { time: number; scale: number }[] = [];
+          const sample = () => {
+            samples.push({
+              time: performance.now(),
+              scale: new DOMMatrixReadOnly(getComputedStyle(landing).transform).a,
+            });
+            if (samples.length === 24) resolve(samples);
+            else requestAnimationFrame(sample);
+          };
+          requestAnimationFrame(sample);
+        }),
+    );
+    expect(new Set(motion.map(({ scale }) => scale.toFixed(5))).size).toBeGreaterThan(6);
+    await info.attach("native-mascot-motion", {
+      body: JSON.stringify(motion),
+      contentType: "application/json",
+    });
     await page
       .locator(".landing-intro")
       .screenshot({ path: info.outputPath("hero-writing.png"), animations: "allow" });
@@ -33,8 +54,21 @@ for (const language of ["en", "fr"] as const) {
     await expect(mascot).toHaveAttribute("data-mascot-finished");
     expect(await mascot.locator(".hero-mascot-face").innerHTML()).toBe("");
     await page.evaluate(() => document.fonts.ready);
+    const colors = await chunks.evaluateAll((nodes) =>
+      nodes.map((node) => getComputedStyle(node).color),
+    );
+    expect(colors[0]).not.toBe(colors[1]);
+    const accents = await stage
+      .locator('.hero-glyph-overlay > g[data-hero-tone="1"]')
+      .first()
+      .evaluate((node) => ({
+        stroke: getComputedStyle(node.querySelector("path")!).stroke,
+        fill: getComputedStyle(node.querySelector("path")!).fill,
+        point: getComputedStyle(node.querySelector("circle")!).fill,
+      }));
+    expect(accents).toEqual({ stroke: colors[1], fill: colors[1], point: colors[1] });
     await page.locator(".landing-intro").screenshot({ path: info.outputPath("hero-settled.png") });
-    const target = await chunks.first().evaluate((node) => {
+    const target = await chunks.nth(1).evaluate((node) => {
       const range = document.createRange();
       range.setStart(node.firstChild!, 2);
       range.setEnd(node.firstChild!, 3);
@@ -43,6 +77,9 @@ for (const language of ["en", "fr"] as const) {
     });
     await page.mouse.move(target.x, target.y);
     await expect(stage).toHaveAttribute("data-ink-active");
+    await expect(
+      stage.locator('.hero-glyph-overlay > g[opacity="1"] > path').first(),
+    ).toHaveAttribute("fill-opacity", "0");
     expect(await stage.locator(".hero-glyph-overlay circle").count()).toBeGreaterThan(30);
     expect(await chunks.first().textContent()).toBe(language === "fr" ? "Créez et" : "Design and");
     await page

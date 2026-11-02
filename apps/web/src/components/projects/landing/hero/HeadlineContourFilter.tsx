@@ -23,7 +23,7 @@ export function HeadlineContourFilter({ id }: { id: string }) {
           <feComponentTransfer in="rounded" result="nodes">
             <feFuncA type="discrete" tableValues="0 0 1 1" />
           </feComponentTransfer>
-          <feFlood floodColor="var(--hero-ink)" result="color" />
+          <feMorphology in="SourceGraphic" operator="dilate" radius="4" result="color" />
           <feComposite in="color" in2="nodes" operator="in" />
         </filter>
       </defs>

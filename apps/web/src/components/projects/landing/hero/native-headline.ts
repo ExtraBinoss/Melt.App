@@ -1,5 +1,8 @@
+import { heroTiming, signalHeroReady } from "./choreography";
+
 /** One finite contour sweep, then on-demand pointer lighting of the same native text. */
 export function installNativeHeadlineFallback(stage: HTMLElement, heading: HTMLElement) {
+  signalHeroReady(stage);
   const reduced = matchMedia("(prefers-reduced-motion: reduce)");
   const chunks = [...heading.querySelectorAll<HTMLElement>(".hero-chunk")];
   const lattice = stage.querySelector("feImage");
@@ -55,7 +58,7 @@ export function installNativeHeadlineFallback(stage: HTMLElement, heading: HTMLE
     if (phase === "scanning") {
       elapsed += last === undefined ? 0 : Math.min(60, stamp - last);
       last = stamp;
-      const progress = elapsed / 1600;
+      const progress = elapsed / (heroTiming.textFinish - heroTiming.textAt);
       if (progress >= 1) {
         phase = "done";
         last = undefined;

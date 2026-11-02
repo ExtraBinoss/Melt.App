@@ -4,10 +4,26 @@
   --hero-tone-2: #299d8f;
   --hero-tone-3: #6684dc;
   --hero-ink: var(--hero-tone-0);
+  --hero-run-0: var(--landing-ink, var(--foreground));
+  --hero-run-1: #0da33f;
+  --hero-run-2: var(--brand-primary);
   position: relative;
   max-inline-size: 1120px;
   margin: 0 auto 30px;
   isolation: isolate;
+}
+
+:root.dark .hero-type-stage {
+  --hero-run-1: #0cc147;
+}
+.hero-chunk[data-hero-tone="0"] {
+  --hero-run-ink: var(--hero-run-0);
+}
+.hero-chunk[data-hero-tone="1"] {
+  --hero-run-ink: var(--hero-run-1);
+}
+.hero-chunk[data-hero-tone="2"] {
+  --hero-run-ink: var(--hero-run-2);
 }
 
 .hero-contour-definitions {
@@ -27,7 +43,7 @@
   color: var(--hero-ink);
 }
 .hero-glyph-overlay > g > path {
-  fill: var(--landing-ink, var(--foreground));
+  fill: currentColor;
   stroke: currentColor;
   stroke-width: 0.9;
   stroke-linecap: round;
@@ -42,7 +58,7 @@
 }
 .hero-type-stage[data-vector-ready][data-ink-active] .hero-chunk {
   background: none;
-  color: var(--landing-ink, var(--foreground));
+  color: var(--hero-run-ink, var(--foreground));
 }
 .hero-type-stage[data-vector-ready][data-ink-pending] .hero-chunk {
   color: transparent;
@@ -60,6 +76,7 @@
 }
 
 .hero-chunk {
+  color: var(--hero-run-ink, var(--foreground));
   --ink-x: -200px;
   --ink-y: 50%;
   position: relative;
@@ -76,7 +93,7 @@
 
 @keyframes hero-ink-fallback {
   to {
-    color: var(--landing-ink, var(--foreground));
+    color: var(--hero-run-ink, var(--foreground));
   }
 }
 
@@ -93,7 +110,7 @@
 /* The filter samples SourceAlpha: every dot belongs to the actual shaped glyph edge. */
 .hero-chunk::before {
   z-index: 2;
-  color: var(--hero-ink);
+  color: var(--hero-run-ink, var(--hero-ink));
   filter: var(--hero-contour-filter);
   mask-image: radial-gradient(
     ellipse 135px 110px at var(--ink-x) var(--ink-y),
@@ -104,7 +121,7 @@
 
 .hero-chunk::after {
   color: transparent;
-  -webkit-text-stroke: 1px var(--hero-ink);
+  -webkit-text-stroke: 1px var(--hero-run-ink, var(--hero-ink));
   mask-image: radial-gradient(
     ellipse 115px 95px at var(--ink-x) var(--ink-y),
     #000 32%,
@@ -118,14 +135,14 @@
     ellipse 155px 125px at var(--ink-x) var(--ink-y),
     transparent 0 25%,
     var(--hero-ink) 48%,
-    var(--landing-ink, var(--foreground)) 100%
+    var(--hero-run-ink, var(--foreground)) 100%
   );
   background-clip: text;
   -webkit-background-clip: text;
 }
 
 .hero-type-stage[data-ink-auto] .hero-chunk {
-  background-image: linear-gradient(var(--landing-ink, var(--foreground)) 0 0);
+  background-image: linear-gradient(var(--hero-run-ink, var(--foreground)) 0 0);
   background-size: var(--reveal-x, 0px) 100%;
   background-repeat: no-repeat;
   background-position: left top;
@@ -170,7 +187,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .hero-type-stage[data-ink-pending] .hero-chunk {
-    color: var(--landing-ink, var(--foreground));
+    color: var(--hero-run-ink, var(--foreground));
     animation: none;
   }
   .hero-chunk::before,

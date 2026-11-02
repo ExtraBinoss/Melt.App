@@ -8,6 +8,7 @@ export interface GlyphGeometry {
   y: number;
   width: number;
   height: number;
+  tone?: number;
 }
 let font: Promise<Font> | undefined;
 
@@ -49,7 +50,7 @@ export async function prepareHeroGlyphs(
   const ascent = context.measureText("Hg").fontBoundingBoxAscent;
   const bounds = stage.getBoundingClientRect();
   const glyphs: GlyphGeometry[] = [];
-  for (const chunk of chunks) {
+  for (const [tone, chunk] of chunks.entries()) {
     const node = chunk.firstChild;
     if (!node || node.nodeType !== Node.TEXT_NODE) continue;
     const text = node.textContent ?? "";
@@ -101,6 +102,7 @@ export async function prepareHeroGlyphs(
           y: rect.top - bounds.top,
           width: rect.width,
           height: rect.height,
+          tone: tone % 3,
         });
       }
     } finally {

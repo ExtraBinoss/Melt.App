@@ -45,7 +45,9 @@ export function createGlyphSurface(
     hole.setAttribute("opacity", "0");
     const group = node("g", svg);
     group.setAttribute("data-hero-glyph", String(index));
+    group.setAttribute("data-hero-tone", String(glyph.tone ?? 0));
     group.setAttribute("opacity", "0");
+    group.style.color = `var(--hero-run-${glyph.tone ?? 0})`;
     const path = node("path", group);
     path.setAttribute("d", glyph.d);
     path.setAttribute("pathLength", "1");

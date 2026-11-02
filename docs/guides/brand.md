@@ -95,10 +95,12 @@ in [provenance](../legal/provenance.md).
 ## Playback and disposal
 
 The landing hero owns a separate finite choreography in
-`components/projects/landing/hero/`. Its server-rendered `MeltMark` is visible
-before the lazy SVG face engine loads. The original silhouette briefly scales in,
-looks around, blinks and shrinks away as the title forms. Its finite clock paints
-at most 30 times per second and releases the SVG surface after departure. Hidden
+`components/projects/landing/hero/`. Its server-rendered `MeltMark` reserves the
+mascot artwork before the lazy SVG face engine loads. The original silhouette
+grows, holds and shrinks along the reference's continuous scale envelope. The
+face makes one complete 360-degree spherical turn without rolling the body.
+Mascot and title share a start epoch published after font preparation. Both finite
+clocks paint at the display's RAF cadence and release work after completion. Hidden
 and offscreen states pause the clock; reduced motion skips the character intro.
 
 The choreography follows the supplied DevDay screen recording: scattered points
@@ -108,6 +110,9 @@ the existing text shaper. Native ranges position shaped glyphs; the original fon
 curves supply both outlines and control points. A retained SVG mask permits local
 hover replays without splitting the native text or moving its layout. Font bytes
 are fetched from their existing UI source, rather than copied into document fonts.
+The first run is neutral, the next green, and a third uses the brand violet; the
+palette repeats for additional runs. Outlines, points, fills and the final native
+text keep their run's color in both themes, without splitting shaped text.
 
 If the display font does not cover a script, browser-shaped text and a native
 contour filter retain its actual fallback glyphs, Arabic shaping and CJK wrapping.

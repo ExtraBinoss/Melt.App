@@ -3,6 +3,11 @@ import { createDahliaEngine } from "../../../../src/ui/brand/dahlia";
 import { installHeroMascot } from "../../../../src/components/projects/landing/hero/mascot-playback";
 import { installNativeHeadlineFallback } from "../../../../src/components/projects/landing/hero/native-headline";
 import { installVectorHeadline } from "../../../../src/components/projects/landing/hero/vector-playback";
+import {
+  mascotGaze,
+  mascotScale,
+  signalHeroReady,
+} from "../../../../src/components/projects/landing/hero/choreography";
 
 let frames: Map<number, FrameRequestCallback>;
 let stamp: number;
@@ -81,20 +86,23 @@ function mascot() {
   );
   const host = parent.firstElementChild as HTMLElement;
   const dispose = installHeroMascot(host);
+  signalHeroReady(host);
   return { parent, host, dispose, geometry: () => host.querySelector("svg")!.innerHTML };
 }
 
 test("the original face looks around, blinks goodbye, leaves and retires every frame", () => {
   const engine = createDahliaEngine();
   const blink = vi.spyOn(Object.getPrototypeOf(engine), "blink");
+  const look = vi.spyOn(Object.getPrototypeOf(engine), "setLook");
   const f = mascot();
   expect(f.host).toHaveAttribute("data-face-ready");
+  expect(look).toHaveBeenCalledWith(mascotGaze(0), -1, 0.001);
   const initial = f.geometry();
   for (let i = 0; i < 20; i++) step();
   expect(f.geometry()).not.toBe(initial);
   expect(f.geometry()).not.toContain("NaN");
   for (let i = 0; i < 60; i++) step();
-  expect(blink).toHaveBeenCalledTimes(2);
+  expect(blink).toHaveBeenCalledOnce();
   expect(f.host).toHaveAttribute("data-mascot-finished");
   expect(f.geometry()).toBe("");
   expect(frames.size).toBe(0);
@@ -102,6 +110,21 @@ test("the original face looks around, blinks goodbye, leaves and retires every f
   expect(preferenceListeners.size).toBe(0);
   expect(disconnect).toHaveBeenCalledOnce();
   f.parent.remove();
+});
+
+test("the measured mascot envelope grows smoothly, holds and accelerates into its exit", () => {
+  expect(mascotScale(0)).toBe(0);
+  expect(mascotScale(100)).toBeCloseTo(0.598, 3);
+  expect(mascotScale(600)).toBe(1);
+  expect(mascotScale(800)).toBe(1);
+  expect(mascotScale(1125)).toBe(0.75);
+  expect(mascotScale(1450)).toBe(0);
+  expect(mascotScale(599.9)).toBeCloseTo(mascotScale(600.1), 7);
+  expect(mascotScale(799.9)).toBeCloseTo(mascotScale(800.1), 7);
+  expect(mascotGaze(0).pitch).toBe(-45);
+  expect(mascotGaze(300).pitch).toBeCloseTo(28.62);
+  expect(mascotGaze(1100).pitch).toBeCloseTo(28.62);
+  expect(mascotGaze(1450).pitch).toBeCloseTo(28.62 - 360);
 });
 
 test("hidden/offscreen mascot clocks pause without catching up; reduced motion retires them", () => {

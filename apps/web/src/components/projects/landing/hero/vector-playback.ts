@@ -1,5 +1,6 @@
 import type { GlyphGeometry } from "./glyph-geometry";
 import { createGlyphSurface } from "./glyph-surface";
+import { heroTiming, signalHeroReady } from "./choreography";
 
 /** Reference choreography: point cloud → traced glyph → solid ink, with local hover replays. */
 export function installVectorHeadline(
@@ -10,9 +11,8 @@ export function installVectorHeadline(
   const surface = createGlyphSurface(stage, heading, glyphs);
   const reduced = matchMedia("(prefers-reduced-motion: reduce)");
   let intro = stage.hasAttribute("data-ink-pending");
-  let time = 0;
+  let time = Math.max(0, performance.now() - signalHeroReady(stage));
   let last: number | undefined;
-  let paintedAt = -Infinity;
   let frame: number | undefined;
   let visible = true;
   let disposed = false;
@@ -38,27 +38,29 @@ export function installVectorHeadline(
     if (disposed || !visible || document.hidden || reduced.matches) return;
     time += last === undefined ? 0 : Math.min(60, stamp - last);
     last = stamp;
-    if (stamp - paintedAt >= 1000 / 30) {
-      paintedAt = stamp;
-      if (intro) {
-        if (time >= 300) {
-          stage.setAttribute("data-ink-auto", "");
-          stage.setAttribute("data-ink-active", "");
-        }
-        glyphs.forEach((_, index) =>
-          surface.paint(index, (time - 300 - (index / glyphs.length) * 750) / 450, true),
-        );
-        if (time >= 1500) clear();
-      } else {
-        for (const [index, start] of pulses) {
-          const progress = (time - start) / 1100;
-          surface.paint(index, progress, false);
-          if (progress >= 1) pulses.delete(index);
-        }
-        if (!pulses.size) {
-          stage.removeAttribute("data-ink-active");
-          last = undefined;
-        }
+    if (intro) {
+      if (time >= heroTiming.textAt) {
+        stage.setAttribute("data-ink-auto", "");
+        stage.setAttribute("data-ink-active", "");
+      }
+      glyphs.forEach((_, index) =>
+        surface.paint(
+          index,
+          (time - heroTiming.textAt - (index / glyphs.length) * heroTiming.textSpread) /
+            heroTiming.glyph,
+          true,
+        ),
+      );
+      if (time >= heroTiming.textFinish) clear();
+    } else {
+      for (const [index, start] of pulses) {
+        const progress = (time - start) / 1100;
+        surface.paint(index, progress, false);
+        if (progress >= 1) pulses.delete(index);
+      }
+      if (!pulses.size) {
+        stage.removeAttribute("data-ink-active");
+        last = undefined;
       }
     }
     if (intro || pulses.size) frame = requestAnimationFrame(tick);

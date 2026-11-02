@@ -31,7 +31,7 @@ export function HeroHeadline({ lines }: { lines: readonly string[] }) {
       <noscript>
         <style>
           {
-            ".hero-type-stage[data-ink-pending] .hero-chunk{color:var(--landing-ink,var(--foreground))!important}"
+            ".hero-type-stage[data-ink-pending] .hero-chunk{color:var(--hero-run-ink,var(--foreground))!important}"
           }
         </style>
       </noscript>
@@ -40,7 +40,7 @@ export function HeroHeadline({ lines }: { lines: readonly string[] }) {
           {chunks.map((chunk, index) => (
             <span key={`${index}-${chunk}`}>
               {index > 0 && (cjkBoundary.test(chunks[index - 1] ?? "") ? <wbr /> : " ")}
-              <span className="hero-chunk" data-text={chunk}>
+              <span className="hero-chunk" data-text={chunk} data-hero-tone={index % 3}>
                 {chunk}
               </span>
             </span>
