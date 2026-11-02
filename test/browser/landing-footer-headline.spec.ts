@@ -1,11 +1,12 @@
 import { expect, test } from "@playwright/test";
 
 for (const language of ["fr", "en"] as const) {
-  test(`closing headline replays violet glyph contours on hover without an entrance (${language})`, async ({
+  test(`closing headline replays green glyph contours on hover without an entrance (${language})`, async ({
     page,
     context,
     baseURL,
   }, info) => {
+    await page.emulateMedia({ colorScheme: "light" });
     await context.addCookies([{ name: "musart.language", value: language, url: baseURL! }]);
     await page.goto("/");
     const footer = page.locator(".landing-footer");
@@ -28,11 +29,12 @@ for (const language of ["fr", "en"] as const) {
       return { x: rect.x + rect.width / 2, y: rect.y + rect.height / 2 };
     });
     for (let repeat = 0; repeat < 2; repeat++) {
+      await page.emulateMedia({ colorScheme: repeat ? "dark" : "light" });
       await page.mouse.move(target.x + repeat, target.y);
       await expect(stage).toHaveAttribute("data-ink-active");
       const path = stage.locator('.hero-glyph-overlay > g[opacity="1"] > path').first();
       await expect(path).toHaveAttribute("fill-opacity", "0");
-      expect(await path.evaluate((node) => getComputedStyle(node).color)).toBe("rgb(139, 92, 246)");
+      await expect(path).toHaveCSS("color", repeat ? "rgb(12, 193, 71)" : "rgb(13, 163, 63)");
       expect(
         await stage.locator('.hero-glyph-overlay circle[opacity="1"]').count(),
       ).toBeGreaterThan(0);

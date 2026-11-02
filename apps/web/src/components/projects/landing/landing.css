@@ -257,11 +257,11 @@
   margin: 0;
 }
 .landing-footer .hero-glyph-overlay {
-  --hero-run-0: var(--brand-primary);
+  --hero-run-0: var(--hero-run-1);
 }
 .landing-footer .hero-chunk::before,
 .landing-footer .hero-chunk::after {
-  --hero-run-ink: var(--brand-primary);
+  --hero-run-ink: var(--hero-run-1);
 }
 .landing-footer p {
   margin: 0;
