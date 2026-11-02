@@ -2,6 +2,10 @@ import { expect, test, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { HeroHeadline } from "../../../../src/components/projects/landing/HeroHeadline";
 
+vi.mock("../../../../src/components/projects/landing/hero/glyph-geometry", () => ({
+  prepareHeroGlyphs: async () => undefined,
+}));
+
 test("presents one accessible phrase with two native animated chunks", () => {
   const { container } = render(<HeroHeadline lines={["Créez et", "animez."]} />);
   const heading = screen.getByRole("heading", { level: 1, name: "Créez et animez." });

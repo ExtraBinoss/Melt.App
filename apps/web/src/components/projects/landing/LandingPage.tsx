@@ -12,9 +12,11 @@ import { ArrowUpRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "../../ui/button";
 import { HeroHeadline } from "./HeroHeadline";
+import { HeroMascot } from "./hero/HeroMascot";
 import { ShowcaseCarousel } from "./ShowcaseCarousel";
 import "./messages";
 import "./landing.css";
+import "./hero/hero.css";
 
 const features = ["canvas", "effects", "motion", "agent", "timelapse", "export"] as const;
 /** Supplied feature clips share the same native playback budget as the showcase. */
@@ -38,7 +40,10 @@ export function LandingPage({
     <div ref={host} className="landing-page" id="top">
       <SiteHeader landing onTry={onCreate} onPrepare={onPrepare} disabled={busy} />
       <section className="landing-intro" id="musart-intro">
-        <HeroHeadline lines={[t("titleFirst"), t("titleSecond")]} />
+        <div className="landing-title-block">
+          <HeroMascot />
+          <HeroHeadline lines={[t("titleFirst"), t("titleSecond")]} />
+        </div>
         <p className="landing-intro-description">{t("heroDescription")}</p>
         <NavigationButton
           className="landing-cta"

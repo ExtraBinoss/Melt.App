@@ -50,6 +50,8 @@ test("localized headlines stay readable and unclipped on narrow touch viewports"
   baseURL,
 }, info) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
+  // Each cookie is the input under test, rather than the preceding locale's saved preference.
+  await context.addInitScript(() => localStorage.removeItem("musart.language"));
   for (const [language, copy] of Object.entries({ fr, de, ar, ja })) {
     await context.addCookies([{ name: "musart.language", value: language, url: baseURL! }]);
     for (const width of [320, 390]) {

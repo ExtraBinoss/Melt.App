@@ -4,6 +4,14 @@ import { LandingPage } from "../../../../src/components/projects/landing/Landing
 import { setup } from "../../../support/ui";
 import { i18n } from "../../../../src/state/i18n";
 
+// Native face playback has its own lifecycle and real-browser regressions.
+vi.mock("../../../../src/components/projects/landing/hero/mascot-playback", () => ({
+  installHeroMascot: () => () => {},
+}));
+vi.mock("../../../../src/components/projects/landing/hero/glyph-geometry", () => ({
+  prepareHeroGlyphs: async () => undefined,
+}));
+
 beforeEach(() => {
   vi.stubGlobal(
     "IntersectionObserver",

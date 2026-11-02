@@ -94,6 +94,28 @@ in [provenance](../legal/provenance.md).
 
 ## Playback and disposal
 
+The landing hero owns a separate finite choreography in
+`components/projects/landing/hero/`. Its server-rendered `MeltMark` is visible
+before the lazy SVG face engine loads. The original silhouette briefly scales in,
+looks around, blinks and shrinks away as the title forms. Its finite clock paints
+at most 30 times per second and releases the SVG surface after departure. Hidden
+and offscreen states pause the clock; reduced motion skips the character intro.
+
+The choreography follows the supplied DevDay screen recording: scattered points
+settle onto curve endpoints, glyph contours trace, and whole letters fill in a
+left-to-right stagger. The exact shared display-font source is parsed lazily with
+the existing text shaper. Native ranges position shaped glyphs; the original font
+curves supply both outlines and control points. A retained SVG mask permits local
+hover replays without splitting the native text or moving its layout. Font bytes
+are fetched from their existing UI source, rather than copied into document fonts.
+
+If the display font does not cover a script, browser-shaped text and a native
+contour filter retain its actual fallback glyphs, Arabic shaping and CJK wrapping.
+These contours use glyph alpha without pixel readbacks. Geometry is rebuilt on
+resize, asynchronous results reject stale owners, and completed or unmounted
+animations release their RAF, listeners, observers and retained SVG nodes. Reduced
+motion and JavaScript-disabled pages show the complete native heading immediately.
+
 The branded playback adapter owns at most one RAF and updates retained SVG
 attributes at most 30 times per second. Geometry sampling and path morphing run
 on the CPU; the browser owns SVG painting and compositing. Idle requests no

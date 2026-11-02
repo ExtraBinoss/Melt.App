@@ -6,6 +6,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Added
 
+- Recreate the supplied DevDay reference choreography for the landing hero: a brief native mascot entrance, scattered points settling onto real glyph curve endpoints, traced contours and staggered solid letter fills, with individual hover replays. Parse the shared display font for exact paths, retain browser-shaped contours for fallback scripts, preserve selectable accessible text and reduced motion, and dispose completed animation clocks and SVG surfaces.
+
 - Add seven lightweight, poster-first landing template recordings and the supplied timelapse and effects feature media. Bound native playback to two visible players and three retained sources, hold the timelapse endpoint for two seconds, and stop hidden or reduced-motion playback.
 - Add a looping Melt typography animation to the English README. Rename the GitHub repository and local origin to `ExtraBinoss/Melt.App` while preserving portable-format and persistence identifiers.
 
