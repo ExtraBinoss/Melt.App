@@ -32,6 +32,8 @@ test("shows the animated headline, real templates and six deliberate video slots
     screen.getByRole("heading", { level: 1, name: "Du design à faire fondre les feeds." }),
   ).toBeVisible();
   expect(document.querySelector(".landing-intro p, .landing-creativity p")).toBeNull();
+  expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
+  expect(screen.getByRole("heading", { level: 2, name: "À vous de jouer." })).toBeVisible();
   expect(screen.queryByText("Aperçu vidéo à venir")).toBeNull();
   expect(document.querySelectorAll("[data-feature-ui]")).toHaveLength(3);
   expect(

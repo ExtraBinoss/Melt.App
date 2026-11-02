@@ -16,7 +16,7 @@ for (const language of ["en", "fr"] as const) {
     await context.addCookies([{ name: "musart.language", value: language, url: baseURL! }]);
     await page.goto("/");
     const mascot = page.locator(".hero-mascot-stage");
-    const stage = page.locator(".hero-type-stage");
+    const stage = page.locator(".landing-intro .hero-type-stage");
     await expect(page.locator(".landing-intro p")).toHaveCount(0);
     await expect(mascot).toHaveAttribute("data-face-ready");
     await expect(stage).toHaveAttribute("data-ink-pending");
@@ -113,7 +113,9 @@ test("reduced motion skips the mascot and writing sequence with immediately read
   await expect(heading).toBeVisible();
   await expect(page.locator(".hero-mascot-stage")).toBeHidden();
   await heading.hover();
-  await expect(page.locator(".hero-type-stage")).not.toHaveAttribute("data-ink-active");
+  await expect(page.locator(".landing-intro .hero-type-stage")).not.toHaveAttribute(
+    "data-ink-active",
+  );
   expect(
     await page
       .locator(".landing-intro")
@@ -122,7 +124,7 @@ test("reduced motion skips the mascot and writing sequence with immediately read
   await expect(page.locator(".landing-intro .landing-cta")).toHaveCSS("opacity", "1");
   // Paths can be acquired while the pointer already remains inside the heading.
   await page.emulateMedia({ reducedMotion: "no-preference" });
-  const stage = page.locator(".hero-type-stage");
+  const stage = page.locator(".landing-intro .hero-type-stage");
   await expect(stage).toHaveAttribute("data-vector-ready");
   const target = await heading
     .locator(".hero-chunk")
@@ -145,7 +147,7 @@ test("hover repeats the same letter and recovers after a path rebuild without le
   page,
 }) => {
   await page.goto("/");
-  const stage = page.locator(".hero-type-stage");
+  const stage = page.locator(".landing-intro .hero-type-stage");
   const heading = page.getByRole("heading", { level: 1 });
   await expect(stage).toHaveAttribute("data-vector-ready");
   await expect(stage).not.toHaveAttribute("data-ink-pending");

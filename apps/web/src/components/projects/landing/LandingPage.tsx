@@ -82,7 +82,7 @@ export function LandingPage({
       </section>
       <Faq title={t("site:faq")} items={t("site:faqItems", { returnObjects: true }) as FaqItem[]} />
       <section className="landing-footer">
-        <h2>{t("end")}</h2>
+        <HeroHeadline lines={[t("end")]} level={2} intro={false} />
         <NavigationButton
           className="landing-cta"
           href={dashboardHref}

@@ -60,3 +60,12 @@ test("bounds animation work to four chunks without dropping longer input", () =>
   expect(heading.querySelectorAll(".hero-chunk")).toHaveLength(4);
   expect(heading.querySelectorAll(".hero-chunk")[3]).toHaveTextContent("your next idea.");
 });
+
+test("secondary hover-only headings remain readable without an entrance reveal", () => {
+  const { container } = render(
+    <HeroHeadline lines={["À vous de jouer."]} level={2} intro={false} />,
+  );
+  expect(screen.getByRole("heading", { level: 2, name: "À vous de jouer." })).toBeVisible();
+  expect(screen.queryByRole("heading", { level: 1 })).toBeNull();
+  expect(container.querySelector(".hero-type-stage")).not.toHaveAttribute("data-ink-pending");
+});

@@ -19,6 +19,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Reuse the native glyph contour and point hover animation on the localized closing landing headline, with immediate readable text, a violet hover accent, semantic heading levels and reduced-motion support.
+
 - Add circular Halftone grids, round color mosaics and independently angled source-color channel screens while preserving classic documents, configurable Torn Edges graphic/paper treatments, and reversible GPU Liquify strokes with a round canvas brush, per-stroke undo, cancellation and reset.
 - Replace the landing headline with the Melt-inspired “Design that melts social feeds” tagline across all twelve languages, remove the remaining introductory description, and resume the showcase immediately after hover without extending the manual interaction cooldown. Keep animated contour points on visible glyph boundaries when font components overlap.
 

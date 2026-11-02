@@ -7,7 +7,16 @@ import "./headline.css";
 const cjkBoundary = /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}、。，！？]$/u;
 
 /** Short, native text runs keep Arabic shaping and CJK line breaks intact. */
-export function HeroHeadline({ lines }: { lines: readonly string[] }) {
+export function HeroHeadline({
+  lines,
+  level = 1,
+  intro = true,
+}: {
+  lines: readonly string[];
+  level?: 1 | 2;
+  intro?: boolean;
+}) {
+  const Heading = level === 2 ? "h2" : "h1";
   const element = useRef<HTMLHeadingElement>(null);
   const stage = useRef<HTMLDivElement>(null);
   const filter = `hero-contour-${useId().replace(/[^a-zA-Z0-9_-]/g, "")}`;
@@ -19,12 +28,15 @@ export function HeroHeadline({ lines }: { lines: readonly string[] }) {
     document.addEventListener("visibilitychange", sync);
     return () => document.removeEventListener("visibilitychange", sync);
   }, []);
-  useEffect(() => installHeadlineInteraction(stage.current!, element.current!), [phrase]);
+  useEffect(
+    () => installHeadlineInteraction(stage.current!, element.current!),
+    [phrase, level, intro],
+  );
   return (
     <div
       ref={stage}
       className="hero-type-stage"
-      data-ink-pending=""
+      data-ink-pending={intro ? "" : undefined}
       style={{ "--hero-contour-filter": `url(#${filter})` } as CSSProperties}
     >
       <HeadlineContourFilter id={filter} />
@@ -35,7 +47,7 @@ export function HeroHeadline({ lines }: { lines: readonly string[] }) {
           }
         </style>
       </noscript>
-      <h1 ref={element} className="landing-headline" aria-label={lines.join(" ")} dir="auto">
+      <Heading ref={element} className="landing-headline" aria-label={lines.join(" ")} dir="auto">
         <span aria-hidden>
           {chunks.map((chunk, index) => (
             <span key={`${index}-${chunk}`}>
@@ -46,7 +58,7 @@ export function HeroHeadline({ lines }: { lines: readonly string[] }) {
             </span>
           ))}
         </span>
-      </h1>
+      </Heading>
     </div>
   );
 }

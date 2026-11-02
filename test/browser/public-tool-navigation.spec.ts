@@ -31,6 +31,8 @@ test("Free tools and every converter share the route reveal, native Back links a
     ).toBe(marker);
   }
   await page.locator(".tool-back").click();
-  await expect(page.locator(".landing-headline")).toHaveAccessibleName("Design and animate.");
+  await expect(page.locator(".landing-intro .landing-headline")).toHaveAccessibleName(
+    "Design that melts social feeds.",
+  );
   await expect(page.locator(".project-opening-surface")).toHaveCount(0);
 });

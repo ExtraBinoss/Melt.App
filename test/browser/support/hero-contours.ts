@@ -2,7 +2,7 @@ import type { Page } from "@playwright/test";
 
 /** Compare real browser pixels against the same native glyph, never DOM bounding boxes. */
 export async function measureHeroContourPoints(page: Page) {
-  const chunk = page.locator(".hero-type-stage");
+  const chunk = page.locator(".landing-intro .hero-type-stage");
   const pointsStyle = await page.addStyleTag({
     content: `
     .hero-type-stage { --hero-ink: #d25488 !important; }
