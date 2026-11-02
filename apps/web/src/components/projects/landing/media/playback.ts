@@ -1,6 +1,10 @@
+import { heroWrittenEvent } from "../hero/choreography";
+
 /** Native decoded clips share a bounded visible playback budget, without React frame updates. */
 export function installLandingVideos(host: HTMLElement): () => void {
   if (typeof IntersectionObserver === "undefined") return () => {};
+  const hero = host.querySelector(".landing-intro .hero-type-stage");
+  let heroVisible = true;
   const videos = [...host.querySelectorAll<HTMLVideoElement>("video[data-landing-video]")];
   const ratios = new Map<HTMLVideoElement, number>();
   const retained = new Map<HTMLVideoElement, number>();
@@ -101,7 +105,10 @@ export function installLandingVideos(host: HTMLElement): () => void {
   function update() {
     if (disposed) return;
     const visible =
-      document.hidden || reduced.matches || connection?.saveData
+      (heroVisible && hero?.hasAttribute("data-ink-pending")) ||
+      document.hidden ||
+      reduced.matches ||
+      connection?.saveData
         ? []
         : [...ratios]
             .filter(([, ratio]) => ratio >= 0.1)
@@ -135,26 +142,34 @@ export function installLandingVideos(host: HTMLElement): () => void {
   }
   const observer = new IntersectionObserver(
     (entries) => {
-      for (const entry of entries)
+      for (const entry of entries) {
+        if (entry.target === hero) {
+          heroVisible = entry.isIntersecting;
+          continue;
+        }
         ratios.set(
           entry.target as HTMLVideoElement,
           entry.isIntersecting ? entry.intersectionRatio : 0,
         );
+      }
       update();
     },
     { threshold: [0, 0.1, 0.25, 0.5, 0.75, 1] },
   );
+  if (hero) observer.observe(hero);
   for (const video of videos) {
     video.muted = true;
     video.addEventListener("playing", ready);
     video.addEventListener("ended", finish);
     observer.observe(video);
   }
+  host.addEventListener(heroWrittenEvent, update);
   reduced.addEventListener("change", update);
   document.addEventListener("visibilitychange", update);
   return () => {
     disposed = true;
     observer.disconnect();
+    host.removeEventListener(heroWrittenEvent, update);
     reduced.removeEventListener("change", update);
     document.removeEventListener("visibilitychange", update);
     for (const video of videos) {

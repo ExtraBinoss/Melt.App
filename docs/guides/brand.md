@@ -116,20 +116,38 @@ in [provenance](../legal/provenance.md).
 
 The landing hero owns a separate finite choreography in
 `components/projects/landing/hero/`. Its server-rendered `MeltMark` reserves the
-mascot artwork before the lazy SVG face engine loads. The original silhouette
+mascot artwork before hydration. The landing module includes its critical SVG
+face engine so it does not arrive after the now-cached title geometry. The original silhouette
 grows, holds and shrinks along the reference's continuous scale envelope. The
 face makes one complete 360-degree spherical turn without rolling the body.
-Mascot and title share a start epoch published after font preparation. Both finite
-clocks paint at the display's RAF cadence and release work after completion. Hidden
+Mascot and title share a start epoch published after font preparation and mascot
+surface readiness; aborted title owners release the readiness handshake. Both finite
+clocks follow elapsed foreground time at the display's RAF cadence; slow visible
+frames do not stretch the authored duration. They release work after completion. Hidden
 and offscreen states pause the clock; reduced motion skips the character intro.
 
 The choreography follows the supplied DevDay screen recording: scattered points
 settle onto curve endpoints, glyph contours trace, and whole letters fill in a
-left-to-right stagger. The exact shared display-font source is parsed lazily with
-the existing text shaper. Native ranges position shaped glyphs; the original font
-curves supply both outlines and control points. A retained SVG mask permits local
+left-to-right stagger. The known translated titles reuse generated UI glyph graphics
+from the exact shared display-font source at weights 650 and 700. Regenerate them
+with `bun scripts/brand/hero-font.ts` after changing the landing copy or font. The
+manifest records the source URL and font SHA-256; bounded JSON shards deduplicate
+glyphs across languages. Native ranges still position shaped glyphs, and original
+font curves supply both outlines and control points. Unknown text or weights use
+the existing lazy text shaper; known unsupported scripts select the native contour
+fallback without loading that parser. The browser waits for the specific display
+face rather than unrelated document fonts. A retained SVG mask, attached only while a hover pulse is active, permits local
 hover replays without splitting the native text or moving its layout. Font bytes
 are fetched from their existing UI source, rather than copied into document fonts.
+The closing headline prepares its hover geometry only near the viewport or on
+pointer intent, so it does not force offscreen layout during the hero entrance.
+Retained SVG painting skips unchanged attributes and completed glyphs. An active
+surface remains visible while replacement geometry is prepared; replacements
+resume stored foreground progress instead of elapsed wall time. Incidental scroll
+and font/layout adjustments do not cancel the writing entrance. Poster-first landing
+videos acquire their sources after writing settles while the hero is visible, so
+decoder startup does not compete with the mascot and glyphs. Leaving the intro
+admits visible feature videos; returning suspends them until writing completes. Reduced motion still keeps posters.
 The first run is neutral, the next green, and a third uses the brand violet; the
 palette repeats for additional runs. Outlines, points, fills and the final native
 text keep their run's color in both themes, without splitting shaped text.

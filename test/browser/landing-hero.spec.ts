@@ -20,7 +20,19 @@ for (const language of ["en", "fr"] as const) {
     await expect(page.locator(".landing-intro p")).toHaveCount(0);
     await expect(mascot).toHaveAttribute("data-face-ready");
     await expect(stage).toHaveAttribute("data-ink-pending");
+    await expect(page.locator("video[data-landing-video][src]")).toHaveCount(0);
     await expect(stage).toHaveAttribute("data-vector-ready");
+    // Readiness must precede the shared epoch: a fast cached title cannot consume the mascot intro.
+    expect(
+      await mascot.evaluate((node) => {
+        const epoch = Number(node.closest<HTMLElement>(".landing-title-block")!.dataset.heroEpoch);
+        return (
+          node.hasAttribute("data-face-ready") &&
+          epoch > 0 &&
+          !node.hasAttribute("data-mascot-finished")
+        );
+      }),
+    ).toBe(true);
     await expect(stage).toHaveAttribute("data-ink-auto");
     const chunks = stage.locator(".hero-chunk");
     const glyphs = stage.locator("[data-hero-glyph]");
@@ -54,6 +66,7 @@ for (const language of ["en", "fr"] as const) {
     await expect(stage).not.toHaveAttribute("data-ink-active");
     await expect(mascot).toBeHidden();
     await expect(mascot).toHaveAttribute("data-mascot-finished");
+    await expect(page.locator("video[data-landing-video][data-video-ready]").first()).toBeVisible();
     expect(await mascot.locator(".hero-mascot-face").innerHTML()).toBe("");
     await page.evaluate(() => document.fonts.ready);
     const colors = await chunks.evaluateAll((nodes) =>
@@ -172,16 +185,10 @@ test("hover repeats the same letter and recovers after a path rebuild without le
   await expect(stage).toHaveAttribute("data-ink-active");
   await expect(activePath).toHaveAttribute("fill-opacity", "0");
   await expect(stage).not.toHaveAttribute("data-ink-active");
-  const mask = await heading.evaluate((node) => node.style.maskImage);
+  await expect(heading).toHaveCSS("mask-image", "none");
+  const overlay = await stage.locator(".hero-glyph-overlay").elementHandle();
   await page.addStyleTag({ content: ".hero-type-stage { max-inline-size: 1080px; }" });
-  await expect
-    .poll(() =>
-      heading.evaluate(
-        (node, previous) => Boolean(node.style.maskImage && node.style.maskImage !== previous),
-        mask,
-      ),
-    )
-    .toBe(true);
+  await expect.poll(() => overlay!.evaluate((node) => !node.isConnected)).toBe(true);
   // The stationary pointer is handed to the new paths before another input event.
   await expect(stage).toHaveAttribute("data-ink-active");
   await expect(activePath).toHaveAttribute("fill-opacity", "0");

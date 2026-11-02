@@ -29,6 +29,8 @@
   backdrop-filter: blur(16px);
 }
 .site-header > nav {
+  /* Keep navigation metrics stable while the display and editor fonts load. */
+  font-family: system-ui, sans-serif;
   display: flex;
   align-items: center;
   gap: 24px;

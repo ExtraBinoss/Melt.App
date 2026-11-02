@@ -1,22 +1,15 @@
 import { useEffect, useRef } from "react";
 import { MeltMark } from "../../../../ui/brand/MeltMark";
+import { installHeroMascot } from "./mascot-playback";
 
-/** The native mark is present in server HTML; the face engine enhances it after hydration. */
+/** Critical hero playback is ready with the landing module; idle marks remain native. */
 export function HeroMascot() {
   const host = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const element = host.current!;
     const reduced = matchMedia("(prefers-reduced-motion: reduce)");
     if (reduced.matches) return;
-    let disposed = false;
-    let dispose: (() => void) | undefined;
-    void import("./mascot-playback").then(({ installHeroMascot }) => {
-      if (!disposed) dispose = installHeroMascot(element);
-    });
-    return () => {
-      disposed = true;
-      dispose?.();
-    };
+    return installHeroMascot(element);
   }, []);
   return (
     <div className="hero-mascot-stage" ref={host} aria-hidden>

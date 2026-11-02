@@ -1,4 +1,5 @@
 import { afterEach, expect, test, vi } from "vitest";
+import { finishHeroWriting } from "../../../../src/components/projects/landing/hero/choreography";
 import { installLandingVideos } from "../../../../src/components/projects/landing/media/playback";
 
 afterEach(() => {
@@ -246,4 +247,76 @@ test("an obsolete play rejection cannot replace the final decoded frame during t
   expect(video.currentTime).toBe(5);
   dispose();
   expect(vi.getTimerCount()).toBe(0);
+});
+
+test("visible videos keep posters until hero writing settles and disposal releases the admission listener", () => {
+  let intersect!: IntersectionObserverCallback;
+  vi.stubGlobal(
+    "IntersectionObserver",
+    class {
+      constructor(callback: IntersectionObserverCallback) {
+        intersect = callback;
+      }
+      observe() {}
+      disconnect() {}
+    },
+  );
+  const host = document.createElement("div");
+  host.innerHTML =
+    '<div class="landing-intro"><div class="hero-type-stage" data-ink-pending></div></div><video data-landing-video data-source="/clip.webm"></video>';
+  const stage = host.querySelector<HTMLElement>(".hero-type-stage")!;
+  const video = host.querySelector("video")!;
+  let paused = true;
+  vi.spyOn(video, "paused", "get").mockImplementation(() => paused);
+  const play = vi.spyOn(video, "play").mockImplementation(async () => {
+    paused = false;
+  });
+  vi.spyOn(video, "pause").mockImplementation(() => {
+    paused = true;
+  });
+  vi.spyOn(video, "load").mockImplementation(() => {});
+  const dispose = installLandingVideos(host);
+  intersect(
+    [
+      {
+        target: video,
+        isIntersecting: true,
+        intersectionRatio: 1,
+        boundingClientRect: video.getBoundingClientRect(),
+        intersectionRect: video.getBoundingClientRect(),
+        rootBounds: null,
+        time: 0,
+      },
+    ],
+    {} as IntersectionObserver,
+  );
+  expect(video).not.toHaveAttribute("src");
+  expect(play).not.toHaveBeenCalled();
+  const heroVisible = (isIntersecting: boolean) =>
+    intersect(
+      [
+        {
+          target: stage,
+          isIntersecting,
+          intersectionRatio: isIntersecting ? 1 : 0,
+          boundingClientRect: stage.getBoundingClientRect(),
+          intersectionRect: stage.getBoundingClientRect(),
+          rootBounds: null,
+          time: 0,
+        },
+      ],
+      {} as IntersectionObserver,
+    );
+  heroVisible(false);
+  expect(video).toHaveAttribute("src", "/clip.webm");
+  expect(play).toHaveBeenCalledOnce();
+  heroVisible(true);
+  expect(video.pause).toHaveBeenCalledOnce();
+  finishHeroWriting(stage);
+  expect(play).toHaveBeenCalledTimes(2);
+  dispose();
+  stage.setAttribute("data-ink-pending", "");
+  finishHeroWriting(stage);
+  expect(video).not.toHaveAttribute("src");
+  expect(play).toHaveBeenCalledTimes(2);
 });

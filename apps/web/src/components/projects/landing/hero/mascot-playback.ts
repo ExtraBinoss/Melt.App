@@ -1,6 +1,13 @@
 import { createDahliaEngine } from "../../../../ui/brand/dahlia";
 import { createMascotSurface } from "../../../../ui/brand/render-frame";
-import { heroTiming, mascotGaze, mascotScale, onHeroReady } from "./choreography";
+import {
+  heroTiming,
+  mascotGaze,
+  mascotScale,
+  onHeroReady,
+  signalMascotReady,
+  readHeroProgress,
+} from "./choreography";
 
 /** One continuous spherical gaze turn and size envelope, sampled together at display cadence. */
 export function installHeroMascot(host: HTMLElement) {
@@ -25,7 +32,7 @@ export function installHeroMascot(host: HTMLElement) {
   let blinked = false;
   engine.setLook(mascotGaze(0), -1, 0.001);
   landing.style.transform = "scale(0)";
-  host.setAttribute("data-face-ready", "");
+  signalMascotReady(host);
   function stop() {
     if (frame !== undefined) cancelAnimationFrame(frame);
     frame = undefined;
@@ -41,7 +48,7 @@ export function installHeroMascot(host: HTMLElement) {
   function tick(stamp: number) {
     frame = undefined;
     if (disposed || finished || !visible || document.hidden || reduced.matches) return;
-    elapsed += last === undefined ? 0 : Math.min(60, stamp - last);
+    elapsed += last === undefined ? 0 : Math.max(0, stamp - last);
     last = stamp;
     if (elapsed >= heroTiming.finish) {
       finish();
@@ -65,10 +72,10 @@ export function installHeroMascot(host: HTMLElement) {
     else if (started && !disposed && !finished && frame === undefined)
       frame = requestAnimationFrame(tick);
   }
-  const stopReady = onHeroReady(host, (epoch) => {
+  const stopReady = onHeroReady(host, () => {
     if (started || finished || disposed) return;
     started = true;
-    elapsed = Math.max(0, performance.now() - epoch);
+    elapsed = readHeroProgress(host);
     resume();
   });
   const observer = new IntersectionObserver(([entry]) => {

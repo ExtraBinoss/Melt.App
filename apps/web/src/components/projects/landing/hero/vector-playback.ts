@@ -1,6 +1,12 @@
 import type { GlyphGeometry } from "./glyph-geometry";
 import { createGlyphSurface } from "./glyph-surface";
-import { heroTiming, signalHeroReady } from "./choreography";
+import {
+  finishHeroWriting,
+  heroTiming,
+  readHeroProgress,
+  saveHeroProgress,
+  signalHeroReady,
+} from "./choreography";
 
 /** Reference choreography: point cloud → traced glyph → solid ink, with local hover replays. */
 export function installVectorHeadline(
@@ -12,7 +18,8 @@ export function installVectorHeadline(
   const surface = createGlyphSurface(stage, heading, glyphs);
   const reduced = matchMedia("(prefers-reduced-motion: reduce)");
   let intro = stage.hasAttribute("data-ink-pending");
-  let time = Math.max(0, performance.now() - signalHeroReady(stage));
+  let time = stage.hasAttribute("data-ink-pending") ? readHeroProgress(stage) : 0;
+  signalHeroReady(stage);
   let last: number | undefined;
   let frame: number | undefined;
   let visible = true;
@@ -30,7 +37,7 @@ export function installVectorHeadline(
     intro = false;
     pulses.clear();
     surface.clear();
-    stage.removeAttribute("data-ink-pending");
+    finishHeroWriting(stage);
     stage.removeAttribute("data-ink-active");
     stage.removeAttribute("data-ink-auto");
     stop();
@@ -40,7 +47,7 @@ export function installVectorHeadline(
     if (disposed || !visible || document.hidden || reduced.matches) return;
     // Read current geometry once for the coalesced input before touching SVG or styles.
     const bounds = pointerDirty && pointer && !intro ? stage.getBoundingClientRect() : undefined;
-    time += last === undefined ? 0 : Math.min(60, stamp - last);
+    time += last === undefined ? 0 : Math.max(0, stamp - last);
     last = stamp;
     if (bounds && pointer) {
       pointerDirty = false;
@@ -59,13 +66,14 @@ export function installVectorHeadline(
       const start = pulses.get(nearest);
       if (nearest >= 0 && (start === undefined || time - start >= hoverDuration)) {
         pulses.set(nearest, time);
-        stage.setAttribute("data-ink-active", "");
+        stage.toggleAttribute("data-ink-active", true);
       }
     }
     if (intro) {
+      saveHeroProgress(stage, time);
       if (time >= heroTiming.textAt) {
-        stage.setAttribute("data-ink-auto", "");
-        stage.setAttribute("data-ink-active", "");
+        stage.toggleAttribute("data-ink-auto", true);
+        stage.toggleAttribute("data-ink-active", true);
       }
       glyphs.forEach((_, index) =>
         surface.paint(
@@ -86,6 +94,7 @@ export function installVectorHeadline(
         if (progress >= 1) pulses.delete(index);
       }
       if (!pulses.size) {
+        surface.unmask();
         stage.removeAttribute("data-ink-active");
         last = undefined;
       }
@@ -116,7 +125,7 @@ export function installVectorHeadline(
   }
   function scroll() {
     leave();
-    clear();
+    if (!intro) clear();
   }
   const observer = new IntersectionObserver(([entry]) => {
     visible = Boolean(entry?.isIntersecting);

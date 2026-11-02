@@ -29,7 +29,8 @@ export function HeroHeadline({
     return () => document.removeEventListener("visibilitychange", sync);
   }, []);
   useEffect(
-    () => installHeadlineInteraction(stage.current!, element.current!),
+    () =>
+      installHeadlineInteraction(stage.current!, element.current!, { deferUntilVisible: !intro }),
     [phrase, level, intro],
   );
   return (

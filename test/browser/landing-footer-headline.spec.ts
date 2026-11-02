@@ -16,6 +16,7 @@ for (const language of ["fr", "en"] as const) {
       name: language === "fr" ? "À vous de jouer." : "Your turn.",
     });
     await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
+    await expect(stage).not.toHaveAttribute("data-vector-ready");
     await footer.scrollIntoViewIfNeeded();
     await expect(heading).toBeVisible();
     await expect(stage).not.toHaveAttribute("data-ink-pending");

@@ -1,4 +1,10 @@
-import { heroTiming, signalHeroReady } from "./choreography";
+import {
+  finishHeroWriting,
+  heroTiming,
+  readHeroProgress,
+  saveHeroProgress,
+  signalHeroReady,
+} from "./choreography";
 
 /** One finite contour sweep, then on-demand pointer lighting of the same native text. */
 export function installNativeHeadlineFallback(
@@ -15,11 +21,16 @@ export function installNativeHeadlineFallback(
   let pointer = initialPointer;
   let frame: number | undefined;
   let timer: ReturnType<typeof setTimeout> | undefined;
-  let delay = 350;
+  const previous = readHeroProgress(stage);
+  let delay = Math.max(0, heroTiming.textAt - previous);
   let scheduledAt = 0;
   let phase: "waiting" | "scanning" | "done" =
-    reduced.matches || !stage.hasAttribute("data-ink-pending") ? "done" : "waiting";
-  let elapsed = 0;
+    reduced.matches || !stage.hasAttribute("data-ink-pending")
+      ? "done"
+      : previous >= heroTiming.textAt
+        ? "scanning"
+        : "waiting";
+  let elapsed = Math.max(0, previous - heroTiming.textAt);
   let last: number | undefined;
   let visible = true;
   let disposed = false;
@@ -45,13 +56,14 @@ export function installNativeHeadlineFallback(
     clearTimeout(timer);
     timer = undefined;
     delay = Math.max(0, delay - (performance.now() - scheduledAt));
+    saveHeroProgress(stage, heroTiming.textAt - delay);
   }
   function clearLighting() {
     stage.removeAttribute("data-ink-active");
     stage.removeAttribute("data-ink-auto");
   }
   function reveal() {
-    stage.removeAttribute("data-ink-pending");
+    finishHeroWriting(stage);
     chunks.forEach((chunk) => chunk.removeAttribute("data-ink-writing"));
   }
   function paint(stamp: number) {
@@ -60,8 +72,9 @@ export function installNativeHeadlineFallback(
     if (dirty) measure();
     if (!bounds) return;
     if (phase === "scanning") {
-      elapsed += last === undefined ? 0 : Math.min(60, stamp - last);
+      elapsed += last === undefined ? 0 : Math.max(0, stamp - last);
       last = stamp;
+      saveHeroProgress(stage, heroTiming.textAt + elapsed);
       const progress = elapsed / (heroTiming.textFinish - heroTiming.textAt);
       if (progress >= 1) {
         phase = "done";
@@ -71,8 +84,8 @@ export function installNativeHeadlineFallback(
         if (pointer) queue();
         return;
       }
-      stage.setAttribute("data-ink-auto", "");
-      stage.setAttribute("data-ink-active", "");
+      stage.toggleAttribute("data-ink-auto", true);
+      stage.toggleAttribute("data-ink-active", true);
       lattice?.setAttribute("x", String(-(elapsed / 75) % 27));
       stage.style.setProperty(
         "--hero-ink",
@@ -96,7 +109,7 @@ export function installNativeHeadlineFallback(
     } else if (pointer) {
       const x = pointer.x - bounds.left;
       const y = pointer.y - bounds.top;
-      stage.setAttribute("data-ink-active", "");
+      stage.toggleAttribute("data-ink-active", true);
       lattice?.setAttribute("x", String((x * 0.08) % 27));
       const tone = Math.min(3, Math.floor(Math.max(0, x) / Math.max(1, bounds.width / 4)));
       stage.style.setProperty("--hero-ink", `var(--hero-tone-${tone})`);
@@ -127,6 +140,7 @@ export function installNativeHeadlineFallback(
       timer = setTimeout(() => {
         timer = undefined;
         phase = "scanning";
+        saveHeroProgress(stage, heroTiming.textAt);
         queue();
       }, delay);
     } else if (phase === "scanning" || pointer) queue();
@@ -151,9 +165,7 @@ export function installNativeHeadlineFallback(
     }
   }
   function scroll() {
-    phase = "done";
-    cancelTimer();
-    reveal();
+    dirty = true;
     leave();
   }
   function invalidate() {

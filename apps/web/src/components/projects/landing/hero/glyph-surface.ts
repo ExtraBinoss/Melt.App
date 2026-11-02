@@ -17,46 +17,54 @@ export function createGlyphSurface(
   heading: HTMLElement,
   glyphs: GlyphGeometry[],
 ) {
+  const values = new WeakMap<SVGElement, Map<string, string>>();
+  function attribute(element: SVGElement, name: string, value: string) {
+    let previous = values.get(element);
+    if (!previous) values.set(element, (previous = new Map()));
+    if (previous.get(name) === value) return;
+    previous.set(name, value);
+    element.setAttribute(name, value);
+  }
   const bounds = stage.getBoundingClientRect();
   const svg = document.createElementNS(ns, "svg");
   svg.classList.add("hero-glyph-overlay");
-  svg.setAttribute("aria-hidden", "true");
+  attribute(svg, "aria-hidden", "true");
   const defs = node("defs", svg);
   const mask = node("mask", defs);
   const id = `hero-letter-mask-${crypto.randomUUID()}`;
   mask.id = id;
-  mask.setAttribute("maskUnits", "userSpaceOnUse");
-  mask.setAttribute("x", "-10");
-  mask.setAttribute("y", "-10");
-  mask.setAttribute("width", String(bounds.width + 20));
-  mask.setAttribute("height", String(bounds.height + 20));
+  attribute(mask, "maskUnits", "userSpaceOnUse");
+  attribute(mask, "x", "-10");
+  attribute(mask, "y", "-10");
+  attribute(mask, "width", String(bounds.width + 20));
+  attribute(mask, "height", String(bounds.height + 20));
   const paper = node("rect", mask);
-  paper.setAttribute("x", "-10");
-  paper.setAttribute("y", "-10");
-  paper.setAttribute("width", String(bounds.width + 20));
-  paper.setAttribute("height", String(bounds.height + 20));
-  paper.setAttribute("fill", "white");
+  attribute(paper, "x", "-10");
+  attribute(paper, "y", "-10");
+  attribute(paper, "width", String(bounds.width + 20));
+  attribute(paper, "height", String(bounds.height + 20));
+  attribute(paper, "fill", "white");
   const items = glyphs.map((glyph, index) => {
     const hole = node("path", mask);
-    hole.setAttribute("d", glyph.d);
-    hole.setAttribute("fill", "black");
-    hole.setAttribute("stroke", "black");
-    hole.setAttribute("stroke-width", "1.5");
-    hole.setAttribute("opacity", "0");
+    attribute(hole, "d", glyph.d);
+    attribute(hole, "fill", "black");
+    attribute(hole, "stroke", "black");
+    attribute(hole, "stroke-width", "1.5");
+    attribute(hole, "opacity", "0");
     const group = node("g", svg);
-    group.setAttribute("data-hero-glyph", String(index));
-    group.setAttribute("data-hero-tone", String(glyph.tone ?? 0));
-    group.setAttribute("opacity", "0");
+    attribute(group, "data-hero-glyph", String(index));
+    attribute(group, "data-hero-tone", String(glyph.tone ?? 0));
+    attribute(group, "opacity", "0");
     group.style.color = `var(--hero-run-${glyph.tone ?? 0})`;
     const path = node("path", group);
-    path.setAttribute("d", glyph.d);
-    path.setAttribute("pathLength", "1");
-    path.setAttribute("stroke-dasharray", "1");
+    attribute(path, "d", glyph.d);
+    attribute(path, "pathLength", "1");
+    attribute(path, "stroke-dasharray", "1");
     const dots = glyph.points.map((point, pointIndex) => {
       const dot = node("circle", group);
-      dot.setAttribute("cx", String(point.x));
-      dot.setAttribute("cy", String(point.y));
-      dot.setAttribute("r", String(Math.max(1.8, Math.min(3, glyph.height * 0.022))));
+      attribute(dot, "cx", String(point.x));
+      attribute(dot, "cy", String(point.y));
+      attribute(dot, "r", String(Math.max(1.8, Math.min(3, glyph.height * 0.022))));
       const seed = (index + 1) * 97 + pointIndex * 31;
       const amplitude = Math.min(1, glyph.height / 120);
       return {
@@ -65,21 +73,35 @@ export function createGlyphSurface(
         dy: Math.cos(seed * 2.3) * 32 * amplitude,
       };
     });
-    return { hole, group, path, dots };
+    return { hole, group, path, dots, phase: "new", points: -1, cloud: -1 };
   });
   stage.append(svg);
-  heading.style.maskImage = `url(#${id})`;
+  let masked = false;
+  const unmask = () => {
+    if (!masked) return;
+    masked = false;
+    heading.style.removeProperty("mask-image");
+  };
   stage.setAttribute("data-vector-ready", "");
   return {
     paint(index: number, progress: number, intro: boolean) {
       const item = items[index]!;
       if (progress < 0 || progress >= 1) {
-        item.group.setAttribute("opacity", intro && progress >= 1 ? "1" : "0");
-        item.path.setAttribute("fill-opacity", "1");
-        item.path.setAttribute("stroke-opacity", "0");
-        item.dots.forEach(({ dot }) => dot.setAttribute("opacity", "0"));
-        item.hole.setAttribute("opacity", "0");
+        const phase = intro && progress >= 1 ? "filled" : "hidden";
+        if (item.phase === phase) return;
+        item.phase = phase;
+        attribute(item.group, "opacity", intro && progress >= 1 ? "1" : "0");
+        attribute(item.path, "fill-opacity", "1");
+        attribute(item.path, "stroke-opacity", "0");
+        item.points = 0;
+        item.dots.forEach(({ dot }) => attribute(dot, "opacity", "0"));
+        attribute(item.hole, "opacity", "0");
         return;
+      }
+      item.phase = "active";
+      if (!intro && !masked) {
+        masked = true;
+        heading.style.maskImage = `url(#${id})`;
       }
       const fill = intro
         ? ramp(progress, 0.5, 0.8)
@@ -88,23 +110,33 @@ export function createGlyphSurface(
         ramp(progress, intro ? 0.12 : 0.01, intro ? 0.3 : 0.1) * (1 - ramp(progress, 0.72, 1));
       const points = ramp(progress, 0, intro ? 0.12 : 0.04) * (1 - ramp(progress, 0.7, 1));
       const cloud = 1 - ramp(progress, 0, intro ? 0.36 : 0.12);
-      item.group.setAttribute("opacity", "1");
-      item.hole.setAttribute("opacity", intro ? "0" : "1");
-      item.path.setAttribute("fill-opacity", String(clamp(fill)));
-      item.path.setAttribute("stroke-opacity", String(outline));
-      item.path.setAttribute(
+      attribute(item.group, "opacity", "1");
+      attribute(item.hole, "opacity", intro ? "0" : "1");
+      attribute(item.path, "fill-opacity", String(clamp(fill)));
+      attribute(item.path, "stroke-opacity", String(outline));
+      attribute(
+        item.path,
         "stroke-dashoffset",
         intro ? String(1 - ramp(progress, 0.12, 0.55)) : "0",
       );
-      item.dots.forEach(({ dot, dx, dy }) => {
-        dot.setAttribute("opacity", String(points));
-        dot.setAttribute("transform", `translate(${dx * cloud} ${dy * cloud})`);
-      });
+      if (item.points !== points) {
+        item.points = points;
+        item.dots.forEach(({ dot }) => attribute(dot, "opacity", String(points)));
+      }
+      if (item.cloud !== cloud) {
+        item.cloud = cloud;
+        item.dots.forEach(({ dot, dx, dy }) =>
+          attribute(dot, "transform", `translate(${dx * cloud} ${dy * cloud})`),
+        );
+      }
     },
+    unmask,
     clear() {
-      items.forEach(({ group, hole }) => {
-        group.setAttribute("opacity", "0");
-        hole.setAttribute("opacity", "0");
+      unmask();
+      items.forEach((item) => {
+        item.phase = "hidden";
+        attribute(item.group, "opacity", "0");
+        attribute(item.hole, "opacity", "0");
       });
     },
     dispose() {

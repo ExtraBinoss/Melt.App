@@ -222,7 +222,7 @@ test("native hover coalesces input and reads current geometry without creating c
   f.parent.remove();
 });
 
-test("hidden automatic writing pauses, scrolling reveals immediately, and disposal cancels pending work", () => {
+test("hidden automatic writing pauses, incidental scrolling preserves the entrance, and disposal cancels pending work", () => {
   const f = headline();
   vi.advanceTimersByTime(100);
   hidden = true;
@@ -235,6 +235,8 @@ test("hidden automatic writing pauses, scrolling reveals immediately, and dispos
   step();
   expect(f.stage).toHaveAttribute("data-ink-auto");
   f.parent.dispatchEvent(new Event("scroll"));
+  expect(f.stage).toHaveAttribute("data-ink-pending");
+  step(1300);
   expect(f.stage).not.toHaveAttribute("data-ink-pending");
   expect(frames.size).toBe(0);
   f.stage.dispatchEvent(new PointerEvent("pointerenter"));
@@ -304,17 +306,26 @@ function pointerFixture(pending = false) {
   const bounds = vi
     .spyOn(stage, "getBoundingClientRect")
     .mockReturnValue(new DOMRect(0, 0, 200, 100));
-  const dispose = installVectorHeadline(stage, heading, [
-    {
-      d: "M0 10L60 10L60 80Z",
-      points: [{ x: 0, y: 10 }],
-      x: 0,
-      y: 0,
-      width: 60,
-      height: 100,
-    },
-  ]);
-  return { parent, stage, bounds, dispose, path: stage.querySelector("[data-hero-glyph] > path")! };
+  const install = () =>
+    installVectorHeadline(stage, heading, [
+      {
+        d: "M0 10L60 10L60 80Z",
+        points: [{ x: 0, y: 10 }],
+        x: 0,
+        y: 0,
+        width: 60,
+        height: 100,
+      },
+    ]);
+  const dispose = install();
+  return {
+    parent,
+    stage,
+    bounds,
+    dispose,
+    install,
+    path: stage.querySelector("[data-hero-glyph] > path")!,
+  };
 }
 
 test("pointermove works without enter, repeats a completed glyph and uses current geometry once per frame", () => {
@@ -370,5 +381,57 @@ test("fallback scripts also accept a first pointermove without pointerenter", ()
   expect(f.stage).toHaveAttribute("data-ink-active");
   f.dispose();
   expect(frames.size).toBe(0);
+  f.parent.remove();
+});
+
+test("slow foreground frames preserve the authored mascot duration instead of stretching it", () => {
+  const f = mascot();
+  step(0);
+  step(1000);
+  step(500);
+  expect(f.host).toHaveAttribute("data-mascot-finished");
+  expect(frames.size).toBe(0);
+  f.dispose();
+  f.parent.remove();
+});
+
+test("slow foreground frames complete native writing on time", () => {
+  const f = headline();
+  vi.advanceTimersByTime(350);
+  step(0);
+  step(1300);
+  expect(f.stage).not.toHaveAttribute("data-ink-pending");
+  expect(frames.size).toBe(0);
+  f.dispose();
+  f.parent.remove();
+});
+
+test("slow foreground frames complete vector writing on time", () => {
+  const f = pointerFixture(true);
+  step(0);
+  step(1600);
+  expect(f.stage).not.toHaveAttribute("data-ink-pending");
+  expect(frames.size).toBe(0);
+  f.dispose();
+  f.parent.remove();
+});
+
+test("vector rebuilds retain foreground progress across hidden wall time and incidental scroll", () => {
+  const f = pointerFixture(true);
+  step(0);
+  step(400);
+  f.parent.dispatchEvent(new Event("scroll"));
+  expect(f.stage).toHaveAttribute("data-ink-pending");
+  f.dispose();
+  vi.advanceTimersByTime(10000);
+  const dispose = f.install();
+  step(0);
+  expect(f.stage).toHaveAttribute("data-ink-pending");
+  expect(f.stage).toHaveAttribute("data-ink-auto");
+  step(100);
+  expect(f.stage).toHaveAttribute("data-ink-pending");
+  step(1100);
+  expect(f.stage).not.toHaveAttribute("data-ink-pending");
+  dispose();
   f.parent.remove();
 });
