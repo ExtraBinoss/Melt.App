@@ -61,6 +61,9 @@ export function paintSelectionHandleInk(
   page: Pick<Composition, "background">,
 ) {
   const ink = selectionHandleInk(layer, page);
-  node.style.setProperty("--canvas-handle-color", ink);
-  node.style.setProperty("--canvas-handle-outline", ink === "#ffffff" ? "#000000" : "#ffffff");
+  const outline = ink === "#ffffff" ? "#000000" : "#ffffff";
+  if (node.style.getPropertyValue("--canvas-handle-color") !== ink)
+    node.style.setProperty("--canvas-handle-color", ink);
+  if (node.style.getPropertyValue("--canvas-handle-outline") !== outline)
+    node.style.setProperty("--canvas-handle-outline", outline);
 }

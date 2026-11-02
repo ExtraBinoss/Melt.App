@@ -112,14 +112,17 @@ function DesktopNumberInput({
   const originalDisplay = () => (mixed ? "" : display(committed.current));
   useLayoutEffect(() => {
     committed.current = value;
-    if ((!gesture.current || gesture.current.origin !== origin) && field.current)
-      field.current.value = mixed ? "" : String(Math.round(value * precision) / precision);
+    const input = field.current;
+    const next = mixed ? "" : String(Math.round(value * precision) / precision);
+    if ((!gesture.current || gesture.current.origin !== origin) && input && input.value !== next)
+      input.value = next;
   }, [value, mixed, precision, origin]);
   useLayoutEffect(() => {
     if (!presentation) return;
     const update = () => {
       const next = presentation.read();
       if (next !== null && !Number.isFinite(next)) return;
+      // Publications invalidate a draft even when the displayed number is unchanged.
       const active = gesture.current;
       if (active || heldKey.current || typing.current) {
         gesture.current = null;
@@ -132,10 +135,12 @@ function DesktopNumberInput({
         cancelRef.current?.();
       }
       if (next !== null) committed.current = next;
-      if (field.current) {
-        field.current.value = next === null ? "" : String(Math.round(next * precision) / precision);
-        field.current.placeholder =
-          next === null ? t("layerControls:mixed", { defaultValue: "—" }) : "";
+      const input = field.current;
+      if (input) {
+        const value = next === null ? "" : String(Math.round(next * precision) / precision);
+        const placeholder = next === null ? t("layerControls:mixed", { defaultValue: "—" }) : "";
+        if (input.value !== value) input.value = value;
+        if (input.placeholder !== placeholder) input.placeholder = placeholder;
       }
     };
     const stop = presentation.subscribe(update);

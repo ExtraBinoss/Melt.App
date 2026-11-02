@@ -1,4 +1,4 @@
-import type { Command, EnginePort, Project, ReplaySpec } from "@musart/core";
+import type { Command, CommandCommitInfo, EnginePort, Project, ReplaySpec } from "@musart/core";
 import type { EditorServices } from "../../state/contracts";
 import { createMotionTransport } from "../motion/transport";
 import { getAnimationSession, type AnimationState } from "../animation/session";
@@ -15,6 +15,8 @@ export interface AutomationApi {
     canRedo: boolean;
   };
   snapshot(): ReturnType<EnginePort["getSnapshot"]>;
+  /** Synchronous revision-only probe; never clones documents during native input. */
+  subscribeCommits(listener: (revision: number) => void): () => void;
   execute(command: Command): void;
   transaction(commands: Command[]): void;
   select(ids: string[]): void;
@@ -42,6 +44,7 @@ declare global {
 }
 /** Opt-in local test/CLI port; it exposes the same validated commands as the editor. */
 export function attachAutomation(engine: EnginePort, services: EditorServices) {
+  const observers = new Set<() => void>();
   const api: AutomationApi = {
     session: () => {
       const state = engine.getSnapshot();
@@ -55,6 +58,20 @@ export function attachAutomation(engine: EnginePort, services: EditorServices) {
       };
     },
     snapshot: () => structuredClone(engine.getSnapshot()),
+    subscribeCommits: (listener) => {
+      const observed = engine as EnginePort & {
+        subscribeCommitInfo?: (listener: (info: CommandCommitInfo) => void) => () => void;
+      };
+      if (!observed.subscribeCommitInfo)
+        throw new Error("Commit revision observation is unavailable.");
+      const unsubscribe = observed.subscribeCommitInfo((info) => listener(info.snapshot.revision));
+      const stop = () => {
+        unsubscribe();
+        observers.delete(stop);
+      };
+      observers.add(stop);
+      return stop;
+    },
     execute: engine.execute,
     transaction: engine.transaction,
     select: engine.select,
@@ -109,6 +126,7 @@ export function attachAutomation(engine: EnginePort, services: EditorServices) {
   };
   window.musart = api;
   return () => {
+    for (const stop of observers) stop();
     if (window.musart === api) delete window.musart;
   };
 }

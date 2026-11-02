@@ -20,6 +20,7 @@ test("legacy timelapse previews and decoded exports work, while real corruption 
   await installReadbackProbe(page);
   await context.grantPermissions(["clipboard-read", "clipboard-write"]);
   await page.addInitScript(() => {
+    localStorage.setItem("musart.editor-tutorial.v1", "done");
     localStorage.setItem("musart.language", "fr");
     localStorage.setItem("musart.onboarding.v1", JSON.stringify({ version: 1, completed: true }));
   });

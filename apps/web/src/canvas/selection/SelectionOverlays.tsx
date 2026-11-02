@@ -10,6 +10,7 @@ import { SelectionEdges } from "./SelectionEdges";
 import { selectionSizeLabel } from "./size-label";
 import { sourceGeometry } from "./frame-geometry";
 import { selectionHandleInk } from "./handle-color";
+import { paintCanvasStyle } from "../shared/paint-style";
 
 interface Props {
   page: Composition;
@@ -67,10 +68,11 @@ function CollectiveFrame({
       previous = current.page;
       previousZoom = scale;
       previousPlayback = current.playback;
-      element.style.display = !Number.isFinite(left) ? "none" : "";
-      element.style.opacity = current.playback ? ".2" : "1";
+      const display = !Number.isFinite(left) ? "none" : "",
+        opacity = current.playback ? "0.2" : "1";
+      paintCanvasStyle(element, { display, opacity });
       if (!Number.isFinite(left)) return;
-      Object.assign(element.style, {
+      paintCanvasStyle(element, {
         left: `${left}px`,
         top: `${top}px`,
         width: `${right - left}px`,
@@ -78,7 +80,8 @@ function CollectiveFrame({
         borderWidth: `${1 / scale}px`,
       });
       const label = element.querySelector<HTMLElement>(".canvas-selection-size");
-      if (label) label.style.transform = `translateX(-50%) scale(${1 / scale})`;
+      const transform = `translateX(-50%) scale(${1 / scale})`;
+      if (label) paintCanvasStyle(label, { transform });
     };
     paint();
     const stopScene = controller.subscribe(paint),
@@ -124,15 +127,25 @@ export function SelectionOverlays({
       if (!node) return;
       const scale = viewSource.read().zoom;
       if (previousZoom !== scale) {
-        node.style.setProperty("--canvas-edge-hit", `${8 / scale}px`);
+        const hit = `${8 / scale}px`;
+        if (node.style.getPropertyValue("--canvas-edge-hit") !== hit)
+          node.style.setProperty("--canvas-edge-hit", hit);
         previousZoom = scale;
       }
       if (previous === playback) return;
       previous = playback;
-      node.dataset.playback = String(playback);
-      node.inert = playback;
-      for (const handle of node.querySelectorAll<HTMLButtonElement>(".canvas-handle"))
-        handle.disabled = playback;
+      const state = String(playback);
+      if (node.dataset.playback !== state) node.dataset.playback = state;
+      if (node.inert !== playback) node.inert = playback;
+      for (const overlay of node.querySelectorAll<HTMLElement>(".canvas-selection")) {
+        const blocked =
+          playback ||
+          overlay.inert ||
+          overlay.dataset.locked === "true" ||
+          overlay.style.display === "none";
+        for (const handle of overlay.querySelectorAll<HTMLButtonElement>(".canvas-handle"))
+          if (handle.disabled !== blocked) handle.disabled = blocked;
+      }
     };
     paint();
     const stopScene = controller.subscribe(paint),

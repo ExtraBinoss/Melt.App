@@ -1,10 +1,10 @@
-/** One cancellable job. Playing frames already follow the transport's RAF clock. */
+/** One cancellable job. Certified input and playback do not wait for a second RAF. */
 export class CanvasFrameScheduler {
   private cancellation: (() => void) | null = null;
   get pending(): boolean {
     return this.cancellation !== null;
   }
-  schedule(playback: boolean, callback: () => void): void {
+  schedule(urgent: boolean, callback: () => void): void {
     if (this.pending) return;
     let active = true;
     let frame: number | undefined;
@@ -18,7 +18,7 @@ export class CanvasFrameScheduler {
       active = false;
       if (frame !== undefined) cancelAnimationFrame(frame);
     };
-    if (playback) queueMicrotask(run);
+    if (urgent) queueMicrotask(run);
     else frame = requestAnimationFrame(run);
   }
   clear(): void {

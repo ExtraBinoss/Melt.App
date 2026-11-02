@@ -46,6 +46,7 @@ import type {
 import type { FontPresentationPublisher } from "../../state/session/font-presentation";
 import { canvasOwners } from "./canvas-owners";
 import { CanvasOpenDiagnostics } from "./open-diagnostics";
+import { abortSupersededPresentation, continuesPresentation } from "./presentation-lineage";
 /** Owns one display plane and a latest-only queue. GPU allocation begins at activation. */
 export class PlaneResources {
   readonly profile: SceneProfileSource;
@@ -241,6 +242,9 @@ export class PlaneResources {
       ...(presentation?.preview && !presentation.canonical && !playback
         ? { preview: presentation.preview }
         : {}),
+      ...(presentation?.continuation && presentation.canonical && !playback
+        ? { continuation: presentation.continuation }
+        : {}),
       immutableFrame,
       ...(fontTicket ? { fontTicket } : {}),
       ...(presentation ? { origin: presentation.origin } : {}),
@@ -253,8 +257,11 @@ export class PlaneResources {
         ? { ticket: this.presenter.request(presentation.origin, presentation.canonical) }
         : {}),
     };
-    // Playback applies bounded backpressure. Scrubs, edits and navigation supersede immediately.
-    if (this.activeRequest && !this.canPresent(this.activeRequest)) this.activeAbort?.abort();
+    const active = this.activeRequest;
+    if (active) {
+      const canPresent = () => this.canPresent(active);
+      abortSupersededPresentation(active, presentation, this.activeAbort, canPresent);
+    }
     this.renderer.domElement.dataset.rendererReady = "false";
     this.renderer.domElement.dataset.sceneRevision = String(this.revision);
     delete this.renderer.domElement.dataset.renderError;
@@ -277,6 +284,8 @@ export class PlaneResources {
     }
     if (this.profile.active) this.profile.begin(this.revision);
     const retained =
+      !presentation?.baseContinuation &&
+      !this.awaitingPresentation() &&
       this.users > 0 &&
       this.compiled &&
       this.compositor?.retainedFrame(page, assets, this.latest.scale, motionFrame, "display", true);
@@ -346,14 +355,12 @@ export class PlaneResources {
     )
       return;
     if (
-      (this.latest.playback || this.latest.preview) &&
-      this.prepared &&
-      this.preparedRequest &&
-      this.preparedRevision !== this.presentedRevision &&
-      this.canPresent(this.preparedRequest)
+      (this.latest.playback || this.latest.preview || this.latest.continuation) &&
+      this.awaitingPresentation()
     )
       return;
-    this.frameScheduler.schedule(this.latest.playback, () => {
+    const urgent = this.latest.playback || !!this.latest.continuation || !!this.latest.preview;
+    this.frameScheduler.schedule(urgent, () => {
       const request = this.latest;
       if (!request || !this.users || this.disposed || this.deviceLost) return;
       this.latest = null;
@@ -405,7 +412,8 @@ export class PlaneResources {
           name: request.page.name,
         });
     } catch (error) {
-      if (this.canPresent(request) && !abort.signal.aborted) {
+      const current = request.revision === this.revision && this.canPresent(request);
+      if (current && !abort.signal.aborted) {
         if (request.fontTicket) this.fontPresenter?.fail(request.fontTicket, error);
         if (request.origin) reportProjectRenderFailure(request.origin, request.page.id, error);
         this.report(error);
@@ -418,20 +426,14 @@ export class PlaneResources {
     if (!this.users || this.disposed || this.deviceLost || request.revision < this.preparedRevision)
       return false;
     if (request.revision === this.revision) return true;
-    const current = this.current;
+    return continuesPresentation(request, this.current);
+  }
+  private awaitingPresentation(): boolean {
     return Boolean(
-      current &&
-      ((request.playback && current.playback) ||
-        (request.preview &&
-          !current.playback &&
-          current.presentation?.canonical === false &&
-          request.preview === current.presentation.preview)) &&
-      request.page.id === current.page.id &&
-      request.assets === current.assets &&
-      request.origin &&
-      current.presentation &&
-      request.origin.projectId === current.presentation.origin.projectId &&
-      request.origin.revision === current.presentation.origin.revision,
+      this.prepared &&
+      this.preparedRequest &&
+      this.preparedRevision !== this.presentedRevision &&
+      this.canPresent(this.preparedRequest),
     );
   }
   private bindFrame(request: PreviewRequest, result: FrameTexture): void {

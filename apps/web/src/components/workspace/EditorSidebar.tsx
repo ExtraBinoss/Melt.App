@@ -3,18 +3,20 @@ import { PenTool } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import type { Composition, EnginePort, Project } from "@musart/core";
 import type { EditorServices } from "../../state/contracts";
-import { useEngine } from "../../state/session/editor";
+import { useSidebarSnapshot } from "./use-sidebar-snapshot";
 import { createRenderActivity } from "../../services/session/render-activity";
 import { ResizablePanel, ResizableHandle } from "../ui/resizable";
 import { ProjectPanelGroup } from "./ProjectPanelGroup";
 import { Inspector } from "../properties/Inspector";
 import { sameInspectorPage } from "../properties/inspector-scope";
-import { LayersPanel } from "../layers/LayersPanel";
+import { LayersPresentation } from "./LayersPresentation";
 import { layerSelection } from "../layers/menu/selection";
 import { ExportActions } from "../export/ExportActions";
 import type { TaskRunner } from "../projects/ProjectDialog";
 import { InspectorInteractionBoundary } from "./InspectorInteractionBoundary";
 import { useInspectorPresentation } from "./use-inspector-presentation";
+import { usePresentedHistory } from "./use-presented-history";
+import type { CanonicalOrigin } from "../../state/session/canonical-presentation";
 
 /** Selection-driven panels subscribe here, without rebuilding the workspace and toolbar. */
 export const EditorSidebar = memo(function EditorSidebar({
@@ -39,14 +41,39 @@ export const EditorSidebar = memo(function EditorSidebar({
   onExportOpenChange: (open: boolean) => void;
 }) {
   const { t } = useTranslation();
-  const snapshot = useEngine(engine);
+  const { snapshot, historyNavigation } = useSidebarSnapshot(engine);
   const page =
     snapshot.project.pages.find((item) => item.id === snapshot.pageId) ??
     snapshot.project.pages[0]!;
   const target = JSON.stringify([snapshot.project.id, page.id, snapshot.selection]);
   const properties = useMemo(
-    () => ({ target, page, selection: snapshot.selection, assets: snapshot.project.assets }),
-    [target, page, snapshot.selection, snapshot.project.assets],
+    () => ({
+      target,
+      page,
+      selection: snapshot.selection,
+      assets: snapshot.project.assets,
+      historyNavigation,
+      origin: { projectId: snapshot.project.id, revision: snapshot.revision },
+    }),
+    [
+      target,
+      page,
+      snapshot.selection,
+      snapshot.project.assets,
+      snapshot.project.id,
+      historyNavigation,
+      snapshot.revision,
+    ],
+  );
+  const layerModel = useMemo(
+    () => ({
+      page,
+      project: snapshot.project,
+      selection: snapshot.selection,
+      historyNavigation,
+      origin: properties.origin,
+    }),
+    [page, snapshot.project, snapshot.selection, historyNavigation, properties.origin],
   );
   const inspector = (
     <div className="inspector-tabs">
@@ -73,14 +100,7 @@ export const EditorSidebar = memo(function EditorSidebar({
     </div>
   );
   const layers = (
-    <LayersPanel
-      engine={engine}
-      services={services}
-      page={page}
-      project={snapshot.project}
-      selection={snapshot.selection}
-      run={run}
-    />
+    <LayersPresentation engine={engine} services={services} model={layerModel} run={run} />
   );
   if (mobilePanel) return mobilePanel === "properties" ? inspector : layers;
   return (
@@ -101,9 +121,18 @@ interface InspectorProperties {
   page: Composition;
   selection: string[];
   assets: Project["assets"];
+  historyNavigation: boolean;
+  origin: CanonicalOrigin;
 }
 function sameInspectorOwner(before: InspectorProperties, after: InspectorProperties) {
   return before.target === after.target && before.assets === after.assets;
+}
+function deferInspectorChange(before: InspectorProperties, after: InspectorProperties) {
+  return (
+    after.historyNavigation &&
+    sameInspectorOwner(before, after) &&
+    !sameInspectorPage(before.page, after.page)
+  );
 }
 
 /** Overlay ownership updates only this presentation boundary, not the sidebar's tabs and rows. */
@@ -116,7 +145,16 @@ const InspectorPresentation = memo(function InspectorPresentation({
   properties: InspectorProperties;
   run: (action: () => void) => void;
 }) {
-  const deferredProperties = useInspectorPresentation(properties, sameInspectorOwner);
+  const presentedProperties = usePresentedHistory(
+    engine,
+    properties,
+    properties.historyNavigation ? properties.origin : null,
+  );
+  const deferredProperties = useInspectorPresentation(
+    presentedProperties,
+    sameInspectorOwner,
+    deferInspectorChange,
+  );
   const [retained, setRetained] = useState(deferredProperties);
   const unchanged =
     retained.target === deferredProperties.target &&

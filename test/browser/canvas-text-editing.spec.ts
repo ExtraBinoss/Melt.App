@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { createLayer, createPage, createProject } from "@musart/core";
+import { zoomViewport } from "./support/viewport";
 
 test.beforeEach(async ({ page }) => {
   await page.routeWebSocket("**", () => {});
@@ -9,6 +10,7 @@ test("double-click edits GPU text live, commits once, and cancels the next draft
   page,
 }) => {
   await page.addInitScript(() => {
+    localStorage.setItem("musart.editor-tutorial.v1", "done");
     localStorage.setItem("musart.onboarding.v1", JSON.stringify({ version: 1, completed: true }));
     localStorage.setItem("musart.language", "en");
   });
@@ -239,6 +241,114 @@ test("double-click edits GPU text live, commits once, and cancels the next draft
     }, exported);
     expect(colors.red).toBeGreaterThan(30);
     expect(colors.blue).toBeGreaterThan(30);
+  } finally {
+    await decoder.close();
+  }
+});
+
+test("an initially outlined GPU text resets to identical fill pixels without rebuilding its resource", async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    localStorage.setItem("musart.editor-tutorial.v1", "done");
+    localStorage.setItem("musart.onboarding.v1", JSON.stringify({ version: 1, completed: true }));
+    localStorage.setItem("musart.language", "en");
+  });
+  await page.goto("/editor?automation=1");
+  await page.waitForFunction(() => Boolean(window.musart));
+  await page.evaluate(
+    (project) => window.musart!.load(project),
+    createProject({
+      id: "outlined-zero-native",
+      pages: [
+        createPage({
+          id: "zero-board",
+          width: 600,
+          height: 180,
+          layers: [0, 1].map((i) =>
+            createLayer("text", {
+              id: `zero-${i}`,
+              text: "M",
+              x: i * 300,
+              y: 20,
+              width: 260,
+              height: 140,
+              fontSize: 110,
+              fill: "#0000ff",
+              stroke: "#ff0000",
+              strokeWidth: i ? 0 : 6,
+            }),
+          ),
+        }),
+      ],
+    }),
+  );
+  const ready = () =>
+    page.waitForFunction(() => {
+      const data = document.querySelector<HTMLCanvasElement>(".editor-gpu-scene canvas")?.dataset;
+      return (
+        data?.projectId === "outlined-zero-native" &&
+        data.rendererReady === "true" &&
+        Number(data.canonicalRevision) === window.musart!.session().revision
+      );
+    });
+  await ready();
+  const box = (await page.getByTestId("artboard").boundingBox())!;
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+  await zoomViewport(page, 1);
+  await ready();
+  const inventory = () =>
+    page.evaluate(() => {
+      const data = document.querySelector<HTMLCanvasElement>(".editor-gpu-scene canvas")!.dataset;
+      return (JSON.parse(data.gpuStats!) as { text: { rebuilds: number; compilations: number } })
+        .text;
+    });
+  const before = await inventory();
+  await page.evaluate(() =>
+    window.musart!.execute({ type: "updateLayers", ids: ["zero-0"], patch: { strokeWidth: 0 } }),
+  );
+  await ready();
+  const after = await inventory();
+  expect(after.rebuilds).toBe(before.rebuilds);
+  expect(after.compilations).toBe(before.compilations);
+  await page.mouse.move(100, 100);
+  const rendered = (await page.locator(".editor-gpu-scene canvas").boundingBox())!;
+  expect(rendered.width).toBeCloseTo(600, 0);
+  // Locator screenshots round both fractional CSS edges outwards (600 -> 601).
+  // Compare a pixel-aligned interior so the two authored 300px halves stay aligned.
+  const png = await page.screenshot({
+    clip: { x: Math.ceil(rendered.x), y: Math.ceil(rendered.y), width: 600, height: 178 },
+  });
+  const decoder = await page.context().newPage();
+  try {
+    const pixels = await decoder.evaluate(
+      async (url) => {
+        const image = new Image();
+        image.src = url;
+        await image.decode();
+        const output = document.createElement("canvas");
+        output.width = image.width;
+        output.height = image.height;
+        const context = output.getContext("2d")!;
+        context.drawImage(image, 0, 0);
+        const bytes = context.getImageData(0, 0, image.width, image.height).data;
+        let difference = 0,
+          blue = 0;
+        for (let y = 0; y < image.height; y++)
+          for (let x = 0; x < image.width / 2; x++) {
+            const a = (y * image.width + x) * 4,
+              b = a + image.width * 2;
+            for (let c = 0; c < 4; c++)
+              difference = Math.max(difference, Math.abs(bytes[a + c]! - bytes[b + c]!));
+            if (bytes[a + 2]! > 180 && bytes[a]! < 70 && bytes[a + 1]! < 70) blue++;
+          }
+        return { width: image.width, difference, blue };
+      },
+      `data:image/png;base64,${png.toString("base64")}`,
+    );
+    expect(pixels.width).toBe(600);
+    expect(pixels.blue).toBeGreaterThan(100);
+    expect(pixels.difference).toBeLessThanOrEqual(1);
   } finally {
     await decoder.close();
   }

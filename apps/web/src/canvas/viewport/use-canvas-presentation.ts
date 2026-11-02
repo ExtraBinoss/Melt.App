@@ -1,11 +1,13 @@
 import { useEffect, useLayoutEffect, useMemo, type RefObject } from "react";
-import { createLayerGeometryIndex, type Composition } from "@musart/core";
+import type { Composition } from "@musart/core";
 import type { SceneController } from "../session/scene-controller";
 import type { WorkspaceSource } from "../artboards/workspace";
 import { paintArtboards } from "../artboards/presentation";
 import type { ViewMotion } from "./motion";
 import { selectionSizeLabel } from "../selection/size-label";
 import { paintSelectionHandleInk } from "../selection/handle-color";
+import { sourceGeometry } from "../selection/frame-geometry";
+import { paintCanvasStyle } from "../shared/paint-style";
 
 interface Options {
   controller: SceneController;
@@ -28,9 +30,12 @@ function createPresentation({ controller, workspace, motion, viewport, beforePai
     paintArtboards(root, workspace.read(), view);
     const artboard = root.querySelector<HTMLElement>('[data-testid="artboard"]');
     if (artboard) {
-      artboard.dataset.zoom = String(view.zoom);
-      artboard.dataset.panX = String(view.x);
-      artboard.dataset.panY = String(view.y);
+      const zoom = String(view.zoom),
+        panX = String(view.x),
+        panY = String(view.y);
+      if (artboard.dataset.zoom !== zoom) artboard.dataset.zoom = zoom;
+      if (artboard.dataset.panX !== panX) artboard.dataset.panX = panX;
+      if (artboard.dataset.panY !== panY) artboard.dataset.panY = panY;
       const moving = String(motion.isMoving());
       if (artboard.dataset.viewMoving !== moving) artboard.dataset.viewMoving = moving;
     }
@@ -47,35 +52,42 @@ function createPresentation({ controller, workspace, motion, viewport, beforePai
     previousPage = page;
     previousZoom = view.zoom;
     previousPlayback = frame.playback;
-    const index = createLayerGeometryIndex(page);
+    const index = sourceGeometry(controller);
     for (const overlay of root.querySelectorAll<HTMLElement>(".canvas-selection[data-layer-id]")) {
       const layer = index.byId.get(overlay.dataset.layerId!);
       const visible = layer && index.isVisible(layer.id) && !layer.maskSource;
-      overlay.style.display = visible ? "" : "none";
-      overlay.style.opacity = frame.playback ? ".2" : "1";
-      overlay.inert = Boolean(frame.playback || !visible || (layer && index.isLocked(layer.id)));
+      const display = visible ? "" : "none",
+        opacity = frame.playback ? "0.2" : "1",
+        inert = Boolean(frame.playback || !visible || (layer && index.isLocked(layer.id)));
+      // Inert changes can inspect focus/layout; do them before this surface’s style writes.
+      if (overlay.inert !== inert) overlay.inert = inert;
+      paintCanvasStyle(overlay, { display, opacity });
       if (!layer) continue;
       paintSelectionHandleInk(overlay, layer, page);
-      Object.assign(overlay.style, {
+      const world = index.worldMatrix(layer.id);
+      paintCanvasStyle(overlay, {
         width: `${layer.width}px`,
         height: `${layer.height}px`,
         borderWidth: `${1 / view.zoom}px`,
-        transform: `matrix(${index.worldMatrix(layer.id).join(",")})`,
+        transform: `matrix(${world.join(",")})`,
       });
       const size = overlay.querySelector<HTMLElement>(".canvas-selection-size");
       if (size) {
-        size.textContent = `${Math.round(layer.width)} × ${Math.round(layer.height)}`;
-        Object.assign(
-          size.style,
-          selectionSizeLabel(layer, index.worldMatrix(layer.id), view.zoom),
-        );
+        const label = `${Math.round(layer.width)} × ${Math.round(layer.height)}`;
+        if (size.textContent !== label) size.textContent = label;
+        paintCanvasStyle(size, {
+          ...selectionSizeLabel(layer, world, view.zoom),
+          transformOrigin: "0px 0px",
+        });
       }
       for (const handle of overlay.querySelectorAll<HTMLButtonElement>(".canvas-handle")) {
-        handle.style.transform = `scale(${1 / view.zoom})`;
-        handle.disabled = overlay.inert;
+        const transform = `scale(${1 / view.zoom})`;
+        paintCanvasStyle(handle, { transform });
+        if (handle.disabled !== inert) handle.disabled = inert;
       }
       const lock = overlay.querySelector<HTMLElement>(".canvas-layer-lock");
-      if (lock) lock.style.transform = `translate(-50%, -50%) scale(${1 / view.zoom})`;
+      const transform = `translate(-50%, -50%) scale(${1 / view.zoom})`;
+      if (lock) paintCanvasStyle(lock, { transform });
     }
   };
 }

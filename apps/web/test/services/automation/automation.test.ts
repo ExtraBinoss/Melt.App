@@ -53,6 +53,23 @@ describe("opt-in headless automation port", () => {
     detach();
     expect(window.musart).toBeUndefined();
   });
+  it("observes exact synchronous commit revisions and releases probes on unsubscribe or detach", () => {
+    const engine = new EditorEngine();
+    const detach = attachAutomation(engine, services());
+    const revisions: number[] = [];
+    const stop = window.musart!.subscribeCommits((revision) => revisions.push(revision));
+    engine.execute({ type: "renameProject", name: "First" });
+    expect(revisions).toEqual([1]);
+    stop();
+    engine.undo();
+    expect(revisions).toEqual([1]);
+    window.musart!.subscribeCommits((revision) => revisions.push(revision));
+    engine.redo();
+    expect(revisions).toEqual([1, 3]);
+    detach();
+    engine.undo();
+    expect(revisions).toEqual([1, 3]);
+  });
   it("renders the active composition through the shared export pipeline and explicit WebGL fallback", async () => {
     const engine = new EditorEngine();
     const detach = attachAutomation(engine, services());

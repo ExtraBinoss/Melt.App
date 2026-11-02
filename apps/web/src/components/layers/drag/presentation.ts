@@ -78,11 +78,11 @@ export function createLayerDragPresentation(engine: EnginePort) {
   ): boolean {
     const state = controller.read();
     if (!state) return false;
-    cueAt(row);
     if (
       state.pageId !== page.id ||
       engine.getSnapshot().project.pages.find((item) => item.id === state.pageId) !== page
     ) {
+      cueAt(row);
       previous = null;
       return controller.preview(page, layer, "before");
     }
@@ -98,20 +98,32 @@ export function createLayerDragPresentation(engine: EnginePort) {
       previous.top === top &&
       previous.left === left &&
       previous.viewport === viewport
-    )
+    ) {
+      cueAt(row);
       return previous.valid;
+    }
     const thumbnail = row.querySelector<HTMLElement>("[data-thumbnail-layer-id]");
     const position = getDropPosition(layer, input.y, bounds(row), input.alt, {
       clientX: input.x,
       ...(thumbnail ? { thumbnail: bounds(thumbnail) } : {}),
     });
+    cueAt(row);
     const valid = controller.preview(page, layer, position);
     previous = { point: input, top, left, viewport, valid, version, targetId: layer.id };
     return valid;
   }
   function hit() {
     if (!point || !controller.read()) return;
-    if (ghost) ghost.style.transform = `translate3d(${point.x + 12}px,${point.y + 12}px,0)`;
+    // Complete hit testing and cached geometry reads before moving the feedback DOM.
+    try {
+      hitTarget();
+    } finally {
+      if (ghost && point)
+        ghost.style.transform = `translate3d(${point.x + 12}px,${point.y + 12}px,0)`;
+    }
+  }
+  function hitTarget() {
+    if (!point) return;
     const row = document
       .elementFromPoint?.(point.x, point.y)
       ?.closest<HTMLElement>("[data-layer-drop-id]");
@@ -180,7 +192,7 @@ export function createLayerDragPresentation(engine: EnginePort) {
       document.documentElement.dataset.layerReorderActive = "true";
       documentOwners.set(document, lease);
       stopState = controller.subscribe(() => {
-        invalidate();
+        // Deferred rows do not move when only the accepted destination changes.
         if (!controller.read()) release(lease);
       });
       window.addEventListener("resize", invalidate);

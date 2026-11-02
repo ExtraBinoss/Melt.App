@@ -1,11 +1,11 @@
 import { expect, test, vi } from "vitest";
-import { act, fireEvent, screen, within } from "@testing-library/react";
+import { act, fireEvent, screen, waitFor, within } from "@testing-library/react";
 import { createEffect, createPage } from "@musart/core";
 import { EditorSidebar } from "../../../src/components/workspace/EditorSidebar";
 import { previewAtom } from "../../../src/state/session/editor";
 import { setup } from "../../support/ui";
 
-test("effect editing keeps the previous Inspector guarded and adopts current properties on dismissal", () => {
+test("effect editing keeps the previous Inspector guarded and adopts current properties on dismissal", async () => {
   const d = setup(),
     effect = createEffect("receipt");
   d.engine.execute({ type: "updateLayers", ids: [d.rectangle.id], patch: { effects: [effect] } });
@@ -42,7 +42,7 @@ test("effect editing keeps the previous Inspector guarded and adopts current pro
   );
   expect(inspector).toHaveAttribute("data-selected-layer-id", d.image.id);
   fireEvent.keyDown(screen.getByRole("dialog"), { key: "Escape" });
-  expect(inspector).toHaveAttribute("data-selected-layer-id", d.rectangle.id);
+  await waitFor(() => expect(inspector).toHaveAttribute("data-selected-layer-id", d.rectangle.id));
   expect(screen.getByLabelText("Largeur")).toHaveValue("321");
   expect(container.querySelector(".inspector-selection-boundary")).toHaveAttribute(
     "aria-busy",
@@ -50,7 +50,7 @@ test("effect editing keeps the previous Inspector guarded and adopts current pro
   );
 });
 
-test("sidebar follows selection and page changes and supplies current export scope", () => {
+test("sidebar follows selection and page changes and supplies current export scope", async () => {
   const d = setup();
   const onExportOpenChange = vi.fn();
   d.mount(
@@ -64,25 +64,29 @@ test("sidebar follows selection and page changes and supplies current export sco
     />,
   );
   act(() => d.engine.select([d.rectangle.id]));
-  expect(screen.getByRole("region", { name: "Propriétés" })).toHaveAttribute(
-    "data-selected-layer-id",
-    d.rectangle.id,
+  await waitFor(() =>
+    expect(screen.getByRole("region", { name: "Propriétés" })).toHaveAttribute(
+      "data-selected-layer-id",
+      d.rectangle.id,
+    ),
   );
   act(() => d.engine.select([d.image.id]));
-  expect(screen.getByRole("region", { name: "Propriétés" })).toHaveAttribute(
-    "data-selected-layer-id",
-    d.image.id,
+  await waitFor(() =>
+    expect(screen.getByRole("region", { name: "Propriétés" })).toHaveAttribute(
+      "data-selected-layer-id",
+      d.image.id,
+    ),
   );
   expect(screen.getByText("Design", { selector: ".inspector-design-label" })).toBeVisible();
   expect(screen.queryByRole("tab", { name: "Animation" })).not.toBeInTheDocument();
   const other = createPage({ name: "Other", width: 640, height: 480 });
   act(() => d.engine.execute({ type: "addPage", page: other }));
-  expect(screen.getByRole("textbox", { name: "Largeur" })).toHaveValue("640");
+  await waitFor(() => expect(screen.getByRole("textbox", { name: "Largeur" })).toHaveValue("640"));
   fireEvent.click(screen.getByRole("button", { name: "Exporter" }));
   expect(onExportOpenChange).toHaveBeenCalledWith(true);
 });
 
-test("selection handoffs stay guarded without inherited styles or ruler-only busy changes", () => {
+test("selection handoffs stay guarded without inherited styles or ruler-only busy changes", async () => {
   const d = setup();
   d.engine.select([d.rectangle.id]);
   const { container } = d.mount(
@@ -119,9 +123,11 @@ test("selection handoffs stay guarded without inherited styles or ruler-only bus
     ),
   ).toBe(false);
   expect(boundary.tagName).toBe("DIV");
-  expect(screen.getByRole("region", { name: "Propriétés" })).toHaveAttribute(
-    "data-selected-layer-id",
-    d.image.id,
+  await waitFor(() =>
+    expect(screen.getByRole("region", { name: "Propriétés" })).toHaveAttribute(
+      "data-selected-layer-id",
+      d.image.id,
+    ),
   );
   expect(screen.getByLabelText("X")).not.toBeDisabled();
 });
@@ -204,6 +210,63 @@ test("an effect commit cancels an active property preview before rebinding Inspe
   expect(screen.getByLabelText("X")).toHaveValue(String(d.rectangle.x));
   expect(d.engine.getSnapshot().project.pages[0]!.layers[0]!.x).toBe(d.rectangle.x);
   expect(d.engine.getSnapshot().project.pages[0]!.layers[0]!.effects[0]!.enabled).toBe(false);
+});
+
+test("actual undo and redo retain the urgent Inspector tree, cancel stale drafts and adopt exact restored values", () => {
+  const d = setup();
+  d.engine.select([d.rectangle.id]);
+  d.engine.execute({ type: "updateLayers", ids: [d.rectangle.id], patch: { x: 123 } });
+  const previousURL = location.href;
+  history.replaceState({}, "", "/?automation=1");
+  const mounted = d.mount(
+    <EditorSidebar
+      engine={d.engine}
+      services={d.services}
+      run={d.run}
+      onTask={d.onTask}
+      exportOpen={false}
+      onExportOpenChange={vi.fn()}
+    />,
+  );
+  try {
+    const inspector = screen.getByRole("region", { name: "Propriétés" });
+    const boundary = mounted.container.querySelector(".inspector-selection-boundary")!;
+    const urgentRenders: number[] = [];
+    const setAttribute = boundary.setAttribute.bind(boundary);
+    vi.spyOn(boundary, "setAttribute").mockImplementation((name, value) => {
+      if (name === "aria-busy" && String(value) === "true")
+        urgentRenders.push(Number(inspector.getAttribute("data-react-renders")));
+      setAttribute(name, value);
+    });
+    const restored = [d.rectangle.x, 123, d.rectangle.x, 123];
+    for (const [index, value] of restored.entries()) {
+      const renders = Number(inspector.getAttribute("data-react-renders"));
+      const count = urgentRenders.length;
+      act(() => {
+        if (index % 2 === 0) d.engine.undo();
+        else d.engine.redo();
+      });
+      expect(urgentRenders.length).toBeGreaterThan(count);
+      expect(urgentRenders[count]).toBe(renders);
+      expect(d.store.get(previewAtom)).toBeNull();
+      expect(screen.getByLabelText("X")).toHaveValue(String(value));
+      fireEvent.blur(screen.getByLabelText("X"));
+      expect(d.engine.getSnapshot().project.pages[0]!.layers[0]!.x).toBe(value);
+      expect(boundary).toHaveAttribute("aria-busy", "false");
+      expect(boundary).not.toHaveAttribute("disabled");
+      expect(boundary).not.toHaveAttribute("inert");
+    }
+    fireEvent.change(screen.getByLabelText("X"), { target: { value: "999" } });
+    expect(d.store.get(previewAtom)).not.toBeNull();
+    act(() => d.engine.undo());
+    expect(d.store.get(previewAtom)).toBeNull();
+    expect(screen.getByLabelText("X")).toHaveValue(String(d.rectangle.x));
+    fireEvent.blur(screen.getByLabelText("X"));
+    expect(d.engine.getSnapshot().project.pages[0]!.layers[0]!.x).toBe(d.rectangle.x);
+  } finally {
+    mounted.unmount();
+    history.replaceState({}, "", previousURL);
+  }
 });
 
 test("consecutive same-owner color gestures remain ready and each commit has one undo entry", () => {

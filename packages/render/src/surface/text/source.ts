@@ -70,7 +70,12 @@ export class TextResource implements GpuResource {
   private layoutKey: string;
   private readonly glyphIds: readonly number[];
 
-  constructor(layer: Layer, font: OutlineFont, layout: PlacedGlyph[] = layoutText(layer, font)) {
+  constructor(
+    layer: Layer,
+    font: OutlineFont,
+    layout: PlacedGlyph[] = layoutText(layer, font),
+    readonly supportsStroke = layer.strokeWidth > 0,
+  ) {
     this.layoutKey = textGeometryKey(layer);
     this.glyphIds = layout.map((item) => item.glyph.index);
     let atlas: CurveAtlas | undefined,
@@ -103,10 +108,9 @@ export class TextResource implements GpuResource {
       material.positionNode = vertex.position;
       const paint = textPaintNode(this.paint, vertex.pixel),
         coverage = glyphCoverage(atlas.texture, atlas.width, vertex.coordinate);
-      material.fragmentNode =
-        layer.strokeWidth > 0
-          ? strokedTextNode(atlas, vertex.coordinate, paint, coverage, this.paint)
-          : vec4(paint.rgb, paint.a.mul(coverage));
+      material.fragmentNode = supportsStroke
+        ? strokedTextNode(atlas, vertex.coordinate, paint, coverage, this.paint)
+        : vec4(paint.rgb, paint.a.mul(coverage));
       const mesh = new Mesh(geometry, material);
       mesh.frustumCulled = false;
       this.scene.add(mesh);
@@ -213,8 +217,9 @@ export class TextSources {
         if (layer.kind === "group") parents.push(layer.id);
         if (layer.kind !== "text" || layer.spatial?.enabled) continue;
         this.assertOpen();
-        const key = `text:${textResourceKey(layer)}`;
-        let resource = this.cache.get<TextResource | MorphResource>(key);
+        const entry = this.resourceEntry(layer),
+          key = entry.key;
+        let resource = entry.resource;
         if (resource?.matchesLayout(layer)) {
           this.diagnostics.cacheHits++;
           await prepareResource(resource);
@@ -301,7 +306,12 @@ export class TextSources {
         }
       } else {
         const atlasStarted = this.diagnostics.start();
-        resource = new TextResource(layer, lease.font, layout);
+        resource = new TextResource(
+          layer,
+          lease.font,
+          layout,
+          layer.strokeWidth > 0 || (existing instanceof TextResource && existing.supportsStroke),
+        );
         this.diagnostics.end("atlas", atlasStarted);
       }
       if (this.disposed) {
@@ -319,9 +329,20 @@ export class TextSources {
   private assertOpen(): void {
     if (this.disposed) throw new Error("Text source is disposed.");
   }
+  private resourceEntry(layer: Layer) {
+    const key = `text:${textResourceKey(layer)}`,
+      resource = this.cache.get<TextResource | MorphResource>(key);
+    if (resource || layer.strokeWidth > 0 || sourceMorph(layer)) return { key, resource };
+    // Reuse an already compiled outline graph without aliasing ownership in the cache.
+    const strokedKey = `text:${textResourceKey({ ...layer, strokeWidth: 1 })}`,
+      stroked = this.cache.get<TextResource>(strokedKey);
+    return stroked instanceof TextResource
+      ? { key: strokedKey, resource: stroked }
+      : { key, resource };
+  }
   render(layer: Layer, target: RenderTarget): void {
     this.assertOpen();
-    const resource = this.cache.get<TextResource | MorphResource>(`text:${textResourceKey(layer)}`);
+    const { resource } = this.resourceEntry(layer);
     if (!resource?.matchesLayout(layer)) throw new Error("Text outline source was not prepared.");
     const updateStarted = this.diagnostics.start();
     updateTextPaint(resource.paint, layer);

@@ -1,4 +1,13 @@
-import type { Layer } from "@musart/core";
+import {
+  captureSpatialReparent,
+  createLayerGeometryIndex,
+  IDENTITY,
+  invertMatrix,
+  multiplyMatrices,
+  setLayerTransform,
+  type Composition,
+  type Layer,
+} from "@musart/core";
 import { getDropCommand, type LayerDropPosition } from "../drop-target";
 
 function editable(id: string, layers: ReadonlyMap<string, Layer>): boolean {
@@ -66,4 +75,36 @@ export function projectLayerDrop(
   const next = layers.filter((layer) => layer.id !== sourceId);
   next.splice(command.index, 0, { ...source, parentId: command.parentId });
   return acyclic(next) ? next : null;
+}
+
+/** Reuse the same transform restoration as committed hierarchy edits, on private copies. */
+export function preserveDropWorldFrames(page: Composition, layers: Layer[], id: string): Layer[] {
+  const source = page.layers.find((layer) => layer.id === id)!;
+  const moved = layers.find((layer) => layer.id === id)!;
+  if (source.parentId === moved.parentId) return layers;
+  // Spatial restoration can update descendant bases; none may alias a portable document.
+  const draft = {
+    ...page,
+    layers: page.layers.map((layer) =>
+      layer.id === id || layer.spatial?.enabled
+        ? { ...layer, ...(layer.spatial ? { spatial: { ...layer.spatial } } : {}) }
+        : layer,
+    ),
+  };
+  const restoreSpatial = captureSpatialReparent(draft, [id]);
+  const geometry = createLayerGeometryIndex(page);
+  const local = multiplyMatrices(
+    invertMatrix(moved.parentId === null ? IDENTITY : geometry.worldMatrix(moved.parentId)),
+    geometry.worldMatrix(id),
+  );
+  const copy = draft.layers.find((layer) => layer.id === id)!;
+  setLayerTransform(copy, local, (Math.atan2(local[1], local[0]) * 180) / Math.PI);
+  copy.parentId = moved.parentId;
+  restoreSpatial();
+  const byId = new Map(draft.layers.map((layer) => [layer.id, layer]));
+  return layers.map((layer) => {
+    const copy = byId.get(layer.id)!;
+    const original = geometry.byId.get(layer.id)!;
+    return layer.id === id || copy.spatial?.basis !== original.spatial?.basis ? copy : original;
+  });
 }

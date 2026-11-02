@@ -2,9 +2,18 @@ import type { Composition, Project } from "@musart/core";
 import type { PreviewValue } from "../../state/session/preview-source";
 
 const pagePaint = new Set(["background", "backgroundGradient"]);
-const layerPaint = new Set(["fill", "stroke", "fillGradient"]);
+const layerPaint = new Set([
+  "fill",
+  "stroke",
+  "fillGradient",
+  "strokeWidth",
+  "opacity",
+  "visible",
+  "radius",
+  "effects",
+]);
 
-/** Certifies one contiguous paint gesture, never arbitrary still/structural previews. */
+/** Certifies one contiguous property gesture, never arbitrary still/structural previews. */
 export class PaintPreviewLineage {
   private current: {
     project: Project;

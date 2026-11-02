@@ -236,6 +236,21 @@ destination/error message and shared diagnostics for bounded, deduplicated
 input-specific capture and scrolling cleanup. Timeline time-edit gestures retain
 the separate validated preview/commit contract.
 
+The artwork canvas previews accepted stacking destinations through the imperative
+scene controller while the list rows retain canonical order. The preview preserves
+world transforms on reparenting and evaluated Motion poses on sibling reordering.
+It creates no document edits or history entries; cancellation, rejected destinations
+and stale origins restore the canonical artwork. Destination validation has a
+64-entry gesture cache, and changing a destination does not discard stationary row
+geometry. Hit testing completes before the drag ghost's DOM transform is written.
+
+A layer selected in the list retains its canvas drag target inside its exact
+visible geometry, including selected groups. Empty corners and clipped/hidden,
+locked or mask-source geometry retain ordinary paint-order picking. Double-clicking
+visible text opens the native inline editor; canvas and Inspector text inputs
+preview through the imperative GPU channel. Blur or Ctrl/Cmd+Enter commits once;
+Escape or a stale edit restores the original text without an undo entry.
+
 Successful drops use the same session completion callback to show a green halo
 for one second at the committed destination. Canvas lanes and canonical DOM rows
 share this feedback. Reduced-motion mode keeps the halo static; a new drag, a

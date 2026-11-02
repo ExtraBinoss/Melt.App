@@ -199,3 +199,90 @@ activation, attachment ownership and cleanup, numeric cancellation and exact
 history, mobile range/fallback behavior, and ruler-preview compatibility. The
 coordinator owns the integrated static and native checks; leaf render counters
 alone are not a responsiveness result.
+
+## History presentation follow-up (2026-11-02)
+
+Canonical engine publication and the scene subscription stay synchronous. Only the
+Inspector and Layers subtrees wait for the matching canonical renderer acknowledgment,
+then cross a bounded browser presentation boundary and adopt undo/redo snapshots
+through interruptible React transitions. Ordinary property gestures and selection
+retain their immediate controls; pending Inspector and layer controls preserve global
+Undo/Redo shortcuts.
+Sidebar snapshots pair history direction with synchronous commit metadata. Plain
+layer-row contents retain their children across unrelated historical page identities,
+while their parent rows refresh canonical action guards. Rapid visibility/lock actions
+read their live value and acknowledge only their own resulting page.
+
+The new native 200-layer cohort includes ten text and ten SVG layers, a first cold
+undo, eight undo inputs and eight redo inputs without waiting between them. It checks
+all restored values and records native event timestamps, canonical renderer revision
+and the second RAF. Full Playwright DOM snapshots are disabled in timing cohorts;
+optional CDP profiles are diagnostic runs. Development diagnostic failures are kept
+in `artifacts/editor-responsiveness/development-diagnostics/`; clean production
+measurements use `artifacts/editor-responsiveness/dist` and its source manifest.
+
+Certified consecutive history/scalar frames can finish while newer requests queue.
+Their actual revision remains attached to the draw: an older frame never releases
+latest-revision readiness, background GPU work or stale Inspector controls. Compatible
+property preview/commit handoffs preserve that progress without merging commands;
+cancelled previews reject presentation immediately. Certified input starts composition
+in a microtask instead of paying an additional RAF before the display draw.
+
+The native probes observe the actual canvas draw markers and register two later RAF
+opportunities directly. This avoids counting an extra polling frame as application
+latency. Both original limits remain unchanged: every dispatch-to-canonical sample
+must stay below 100 ms, and every generated-input-to-two-RAF sample below 150 ms.
+Exact final values, all applied revisions, undo restoration and readback counters are
+checked independently of that timing proxy.
+
+Profiling identified repeated number/placeholder writes, canvas chrome mutations and
+hard-shadow control deletion. Numeric updates still cancel invalid drafts before
+skipping unchanged native strings. Visited shadow controls remain mounted while
+hidden. Canvas writes compare native CSSOM serialization and repair external edits;
+selection painters preserve each other's visibility/lock state. An outlined text can
+reset to zero width using its existing compiled resource, with an exact fill-only
+shader branch; text that never used an outline keeps its lighter shader.
+
+The production follow-up used Chromium 156.0.8078.4 on Linux/Fedora 44, a real
+Intel `xe-lpg` WebGPU adapter, 1600 × 1000 at DPR 1, with 200% CPU,
+2200 MiB memory high / 2600 MiB maximum, zero swap and low process/I/O priority.
+The 200-layer native history run retained all 18 commands: median dispatch to
+canonical draw was 15.4 ms, maximum 42.1 ms; maximum generated input to two later
+RAF opportunities was 103.5 ms. Application GPU/WebGL/Canvas2D/VideoFrame reads
+were zero. These are submission and presentation proxies, not physical display
+latency or a guarantee on other hardware.
+
+The separate 50-image effect drag workload measured 40.3 ms at the 95th percentile
+from generated input to the second RAF, with unchanged effect-pass/upload counts,
+zero root canvas/Inspector React commits and zero GPU readbacks during the gesture.
+Exact world-space mask pixels, final values and the single undo entry were checked.
+Raw reports are retained in ignored `artifacts/editor-responsiveness/ninth-cohort/`
+(history) and `delivery-cohort/browser/` (effect drag), alongside source manifests.
+A native pixel comparison also verified that resetting an initially outlined text
+to zero produces the same fill pixels as ordinary text without another resource
+rebuild or shader compilation.
+
+The resumed scalar cohort stabilizes the layout-committed Motion field editor port
+and keys native subscriptions by their semantic target addresses. Unrelated
+canonical publications no longer propagate a new context into retained controls;
+a suspended render cannot replace the committed capture owner. Gesture cancellation
+and the optional start-to-begin fallback remain authoritative.
+
+The same 200-layer production workload retained all 33 canonical commands and 12
+preview samples, with exact final values, complete undo restoration and zero
+application pixel reads. All original 100/150 ms limits passed:
+
+| Input                    | Maximum dispatch to draw | Maximum generated input to two RAF opportunities |
+| ------------------------ | -----------------------: | -----------------------------------------------: |
+| Outline preview          |                  13.4 ms |                                          57.4 ms |
+| Outline commit/reset     |                  34.0 ms |                                          58.2 ms |
+| Hard-shadow toggle/reset |                  14.7 ms |                                          49.4 ms |
+| Opacity                  |                  47.0 ms |                                          83.4 ms |
+| Visibility               |                  16.1 ms |                                          59.1 ms |
+
+This cohort used the same browser, adapter, viewport and resource limits described
+above, with tracing disabled. The untraced report is
+`artifacts/editor-responsiveness/resume-cohort/property-report.json`; executable
+hashes and the source patch are `source-manifest-resume.json` and
+`source-resume.patch` in the parent directory. These remain local observations,
+not universal latency guarantees. Earlier failures remain archived separately.

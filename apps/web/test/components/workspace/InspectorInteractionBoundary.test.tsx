@@ -94,3 +94,36 @@ test("pending focus is rejected and blur cannot commit an old property", () => {
   });
   expect(blur).toHaveBeenCalledOnce();
 });
+
+test("pending Inspector controls preserve global history shortcuts while rejecting stale field actions", () => {
+  const keys = vi.fn(),
+    action = vi.fn();
+  const view = render(
+    <div onKeyDown={keys} onKeyUp={keys}>
+      <InspectorInteractionBoundary busy>
+        <button onClick={action}>Field action</button>
+      </InspectorInteractionBoundary>
+    </div>,
+  );
+  const button = screen.getByRole("button");
+  for (const modifiers of [
+    { key: "z", ctrlKey: true },
+    { key: "Z", metaKey: true, shiftKey: true },
+    { key: "y", ctrlKey: true },
+  ]) {
+    expect(fireEvent.keyDown(button, modifiers)).toBe(true);
+    expect(fireEvent.keyUp(button, modifiers)).toBe(true);
+  }
+  expect(keys).toHaveBeenCalledTimes(6);
+  expect(fireEvent.keyDown(button, { key: "Delete" })).toBe(false);
+  expect(keys).toHaveBeenCalledTimes(6);
+  fireEvent.click(button);
+  expect(action).not.toHaveBeenCalled();
+  view.rerender(
+    <InspectorInteractionBoundary busy={false}>
+      <button onClick={action}>Field action</button>
+    </InspectorInteractionBoundary>,
+  );
+  fireEvent.click(screen.getByRole("button"));
+  expect(action).toHaveBeenCalledOnce();
+});

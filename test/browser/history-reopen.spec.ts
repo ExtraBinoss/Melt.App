@@ -11,6 +11,7 @@ test("real persisted projects restore undo, redo cursors and branches across bro
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
   await page.addInitScript(() => {
+    localStorage.setItem("musart.editor-tutorial.v1", "done");
     localStorage.setItem("musart.language", "en");
     localStorage.setItem("musart.onboarding.v1", JSON.stringify({ version: 1, completed: true }));
   });

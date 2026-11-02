@@ -12,6 +12,7 @@ test("artboard footer edges follow zoom and pan, and hidden add controls relinqu
   });
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.addInitScript(() => {
+    localStorage.setItem("musart.editor-tutorial.v1", "done");
     localStorage.setItem("musart.language", "en");
     localStorage.setItem("musart.onboarding.v1", JSON.stringify({ version: 1, completed: true }));
   });

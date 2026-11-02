@@ -7,6 +7,7 @@ import { previewAtom } from "../../../src/state/session/editor";
 import { createPlaybackSource } from "../../../src/canvas/session/playback-source";
 import { createMotionTransport } from "../../../src/services/motion/transport";
 import { video } from "../../../../../packages/core/test/assets/fixtures";
+import { layerDragController } from "../../../src/components/layers/drag/controller";
 function fixture() {
   const layer = createLayer("rectangle", { width: 80, height: 60, fill: "#3366ff" });
   const engine = new EditorEngine(
@@ -16,6 +17,78 @@ function fixture() {
   const controller = new SceneController(engine, createPreviewSource(store));
   return { layer, engine, store, controller };
 }
+
+test("held layer reorder presents canvas order imperatively, keeps rows canonical and cancels cleanly", () => {
+  const d = fixture();
+  const text = createLayer("text", { id: "foreground-text" });
+  d.engine.execute({ type: "addLayers", layers: [text] });
+  const before = d.engine.getSnapshot();
+  const page = before.project.pages[0]!;
+  const drag = layerDragController(d.engine);
+  const changed = vi.fn();
+  const stop = d.controller.subscribe(changed);
+  drag.begin(Symbol("layers"), page, text.id, (action) => action());
+  expect(d.controller.read().presentation?.canonical).toBe(false);
+  expect(drag.preview(page, page.layers[0]!, "after")).toBe(true);
+  expect(d.controller.read().page.layers.map((layer) => layer.id)).toEqual([text.id, d.layer.id]);
+  expect(drag.read()?.layers).toBe(page.layers);
+  expect(d.engine.getSnapshot()).toBe(before);
+  const frame = d.controller.read();
+  const publications = changed.mock.calls.length;
+  drag.preview(page, page.layers[0]!, "after");
+  expect(d.controller.read()).toBe(frame);
+  expect(changed).toHaveBeenCalledTimes(publications);
+  drag.cancel();
+  expect(d.controller.read().page).toBe(page);
+  expect(d.controller.read().presentation?.canonical).toBe(true);
+  expect(d.engine.getSnapshot()).toBe(before);
+  stop();
+});
+
+test("canvas reorder commits once with undo and stale documents cannot retain a held projection", () => {
+  const d = fixture();
+  d.engine.execute({ type: "addLayers", layers: [createLayer("text", { id: "text" })] });
+  const before = d.engine.getSnapshot();
+  const page = before.project.pages[0]!;
+  const drag = layerDragController(d.engine);
+  const stop = d.controller.subscribe(() => {});
+  const execute = vi.spyOn(d.engine, "execute");
+  drag.begin(Symbol("layers"), page, "text", (action) => action());
+  drag.preview(page, page.layers[0]!, "after");
+  expect(drag.finish("text")).toBe(true);
+  expect(execute).toHaveBeenCalledOnce();
+  expect(d.controller.read().page.layers.map((layer) => layer.id)).toEqual(["text", d.layer.id]);
+  expect(d.controller.read().presentation?.canonical).toBe(true);
+  d.engine.undo();
+  expect(d.controller.read().page).toBe(page);
+  drag.begin(Symbol("replacement"), page, "text", (action) => action());
+  drag.preview(page, page.layers[0]!, "after");
+  d.engine.load(before.project);
+  expect(drag.read()).toBeNull();
+  expect(d.controller.read().page.layers.map((layer) => layer.id)).toEqual([d.layer.id, "text"]);
+  stop();
+});
+
+test("same-parent canvas ordering preserves the current evaluated Motion pose", () => {
+  const d = fixture();
+  d.engine.execute({ type: "addLayers", layers: [createLayer("text", { id: "text" })] });
+  d.engine.execute({ type: "setCompositionMode", mode: "motion" });
+  d.engine.execute({
+    type: "upsertMotionKeyframe",
+    target: { kind: "layer", layerId: "text", property: "x" },
+    time: { value: 0, rate: 1 },
+    value: 123,
+  });
+  const page = d.engine.getSnapshot().project.pages[0]!;
+  const stop = d.controller.subscribe(() => {});
+  const drag = layerDragController(d.engine);
+  drag.begin(Symbol("motion"), page, "text", (action) => action());
+  drag.preview(page, page.layers[0]!, "after");
+  expect(d.controller.read().page.layers[0]).toMatchObject({ id: "text", x: 123 });
+  drag.cancel();
+  stop();
+  createMotionTransport(d.engine).dispose();
+});
 test("paint presentation tokens follow one source/property scope and retire at cancel or selection", () => {
   const d = fixture();
   const stop = d.controller.subscribe(() => {});
@@ -54,6 +127,41 @@ test("mixed geometry, creation and flat-source gestures retire an otherwise unch
   expect(d.controller.read().presentation?.preview).toBeUndefined();
   d.controller.setFlatSource(null);
   expect(d.controller.read().presentation?.preview).toBeDefined();
+  stop();
+});
+test("held transforms retain one presentation lineage and retire it at cancel, replacement, commit or load", () => {
+  const d = fixture(),
+    owner = {},
+    replacement = {};
+  const stop = d.controller.subscribe(() => {});
+  const pose = (x: number, holder = owner) =>
+    d.controller.setGesture([{ layerId: d.layer.id, patch: { x } }], null, holder);
+  pose(10);
+  const first = d.controller.read().presentation?.preview;
+  expect(first).toBeDefined();
+  pose(20);
+  expect(d.controller.read().presentation?.preview).toBe(first);
+  pose(30);
+  expect(d.controller.read().presentation?.preview).toBe(first);
+  expect(d.controller.read().presentation?.canonical).toBe(false);
+  expect(d.engine.getSnapshot().project.pages[0]!.layers[0]!.x).not.toBe(30);
+  pose(40, replacement);
+  expect(d.controller.read().presentation?.preview).not.toBe(first);
+  d.controller.clearGesture(owner);
+  expect(d.controller.read().presentation?.preview).toBeDefined();
+  d.controller.clearGesture(replacement);
+  expect(d.controller.read().presentation).toMatchObject({ canonical: true });
+  expect(d.controller.read().presentation?.preview).toBeUndefined();
+  pose(50);
+  const cancelled = d.controller.read().presentation?.preview;
+  d.engine.execute({ type: "updateLayers", ids: [d.layer.id], patch: { x: 50 } });
+  expect(d.controller.read().presentation?.preview).toBeUndefined();
+  expect(d.controller.read().page.layers[0]!.x).toBe(50);
+  pose(60);
+  expect(d.controller.read().presentation?.preview).not.toBe(cancelled);
+  d.engine.load(d.engine.getSnapshot().project);
+  expect(d.controller.read().presentation?.preview).toBeUndefined();
+  expect(d.controller.read().page.layers[0]!.x).toBe(50);
   stop();
 });
 describe("stable imperative scene controller", () => {

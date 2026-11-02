@@ -10,6 +10,13 @@ export function InspectorInteractionBoundary({
 }) {
   function guard(event: SyntheticEvent) {
     if (!busy) return;
+    const native = event.nativeEvent;
+    if (
+      native instanceof KeyboardEvent &&
+      (native.ctrlKey || native.metaKey) &&
+      ["z", "y"].includes(native.key.toLowerCase())
+    )
+      return;
     event.preventDefault();
     event.stopPropagation();
   }

@@ -17,6 +17,7 @@ test("Layers-selected artwork keeps its canvas drag target through overlap with 
 }) => {
   await installReadbackProbe(page);
   await page.addInitScript(() => {
+    localStorage.setItem("musart.editor-tutorial.v1", "done");
     localStorage.setItem("musart.language", "en");
     localStorage.setItem("musart.onboarding.v1", JSON.stringify({ version: 1, completed: true }));
   });
@@ -151,6 +152,7 @@ test("a Layers-selected 3D mesh moves through 2D and nearer 3D foregrounds with 
 }) => {
   await installReadbackProbe(page);
   await page.addInitScript(() => {
+    localStorage.setItem("musart.editor-tutorial.v1", "done");
     localStorage.setItem("musart.language", "en");
     localStorage.setItem("musart.onboarding.v1", JSON.stringify({ version: 1, completed: true }));
     // This witness checks exact drag targeting. Projected sphere/box edges can

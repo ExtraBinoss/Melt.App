@@ -15,6 +15,9 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Prioritize canonical undo/redo presentation before interruptible Inspector and layer-list updates, retain unchanged plain layer-row contents and resolve rapid visibility/lock actions against live canonical values. Keep hard-shadow resets at zero blur, retain visited shadow controls and parameter bindings across toggles, stabilize committed Motion field ports and address subscriptions, skip redundant native scalar/canvas writes, reuse compiled text on zero-width outline resets and preserve gesture undo boundaries.
+- Reuse pre-mask effect textures and present completed frames during continuous object/property previews and certified scalar/history bursts without starving newer input. Preserve exact masks, bounded resources, gesture cancellation and one undo entry.
+- Preview layer stacking live on the artwork canvas during native or timeline reordering while list rows stay in canonical order. Cache accepted destinations and stationary row geometry, preserve world transforms and Motion poses, and restore cancelled or stale previews with one final undoable drop.
 - Build the landing Canvas, Agent and Export previews with shared themed React controls, loaded near the viewport with real artwork fallbacks. Keep preview interfaces in English, align rounded carousel bubbles and media, simplify the localized headline and feature copy, and stabilize mobile font loading. Record private production Lighthouse results of 99 desktop and 87 mobile in `docs/performance/landing-media-2026-11-02.md`.
 - Open landing carousel templates in their associated dashboard dialogs, retain native link dragging and hover-to-resume behavior, and share pointer-origin compositor navigation across Try Melt, free tools and converter Back links.
 

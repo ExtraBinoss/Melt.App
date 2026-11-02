@@ -46,6 +46,8 @@ export { createHistoryRestoration } from "./session/restored-history";
 export type { RestoredHistory } from "./session/restored-history";
 export { EngineError } from "./errors";
 export { assertMotionHierarchyChange } from "./motion/hierarchy";
+export { setLayerTransform } from "./layers/affine";
+export { captureSpatialReparent } from "./spatial/reparent";
 export type { EngineErrorCode } from "./errors";
 export { validateProject } from "./document/validation";
 export {

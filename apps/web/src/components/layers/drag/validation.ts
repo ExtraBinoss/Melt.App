@@ -4,7 +4,7 @@ import {
   type Composition,
   type Layer,
 } from "@musart/core";
-import { projectLayerDrop } from "./projection";
+import { preserveDropWorldFrames, projectLayerDrop } from "./projection";
 import { getDropCommand, type LayerDropPosition } from "../drop-target";
 
 export type LayerDropRejection =
@@ -35,5 +35,5 @@ export function validateLayerDrop(
       return { reason: "animatedHierarchy" };
     }
   }
-  return { layers };
+  return { layers: preserveDropWorldFrames(page, layers, id) };
 }

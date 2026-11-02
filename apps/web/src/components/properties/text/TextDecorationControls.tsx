@@ -1,3 +1,4 @@
+import { memo, useLayoutEffect, useMemo, useRef, useState, type ComponentProps } from "react";
 import {
   createEffect,
   createLayerGeometryIndex,
@@ -18,6 +19,63 @@ import "./decoration-controls.css";
 
 const hardShadowSettings = { offsetX: 8, offsetY: 8, radius: 0, shadowColor: "#000000" };
 const hardShadowDefaults = { amount: 1, settings: hardShadowSettings };
+const hardShadowParameterKeys = ["offsetX", "offsetY", "shadowColor", "amount"];
+const RetainedEffectParameters = memo(EffectParameters);
+
+function sameValues(
+  before?: Readonly<Record<string, unknown>>,
+  after?: Readonly<Record<string, unknown>>,
+) {
+  if (before === after) return true;
+  if (!before || !after) return false;
+  const keys = Object.keys(before);
+  return (
+    keys.length === Object.keys(after).length &&
+    keys.every((key) => Object.hasOwn(after, key) && Object.is(before[key], after[key]))
+  );
+}
+function sameParameters(before: Effect, after: Effect) {
+  const keys = new Set([...Object.keys(before), ...Object.keys(after)] as (keyof Effect)[]);
+  return [...keys].every((key) =>
+    key === "enabled"
+      ? true
+      : key === "settings" || key === "inputs"
+        ? sameValues(before[key], after[key])
+        : Object.is(before[key], after[key]),
+  );
+}
+
+/** Preserve visited controls across toggles; a disabled effect keeps its authored settings. */
+function HardShadowParameters(props: ComponentProps<typeof EffectParameters>) {
+  const [visited, setVisited] = useState(props.effect.enabled);
+  const [effect, setEffect] = useState(() => ({ ...props.effect, enabled: true }));
+  const latest = useRef(props);
+  useLayoutEffect(() => {
+    latest.current = props;
+  });
+  const callbacks = useMemo(
+    () => ({
+      onChange: (patch: Partial<Effect>, preview?: boolean) =>
+        latest.current.onChange(patch, preview),
+      onStart: () => latest.current.onStart?.(),
+      onCancel: () => latest.current.onCancel?.(),
+    }),
+    [],
+  );
+  if (props.effect.enabled && !visited) setVisited(true);
+  if (!sameParameters(effect, props.effect)) setEffect({ ...props.effect, enabled: true });
+  if (!visited && !props.effect.enabled) return null;
+  return (
+    <div className="text-hard-shadow-parameters" hidden={!props.effect.enabled}>
+      {/* Live fields retain canonical invalidation; the visible controls always edit an enabled effect. */}
+      <RetainedEffectParameters
+        {...props}
+        {...callbacks}
+        effect={props.engine ? effect : props.effect}
+      />
+    </div>
+  );
+}
 
 /** Portable text paint and the existing GPU shadow effect share normal property gestures. */
 export function TextDecorationControls({
@@ -114,13 +172,14 @@ export function TextDecorationControls({
           }}
         />
       </label>
-      {shadow?.enabled && (
-        <EffectParameters
+      {shadow && (
+        <HardShadowParameters
+          key={shadow.id}
           engine={engine}
           layerId={layer.id}
           effect={shadow}
           disabled={layer.locked}
-          parameterKeys={["offsetX", "offsetY", "shadowColor", "amount"]}
+          parameterKeys={hardShadowParameterKeys}
           resetDefaults={hardShadowDefaults}
           onChange={changeShadow}
           onCancel={cancel}

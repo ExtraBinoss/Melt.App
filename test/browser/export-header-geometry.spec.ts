@@ -14,6 +14,7 @@ test("the compact Export button stays inside header padding through real job pro
 }, testInfo) => {
   await page.routeWebSocket("**", () => {});
   await page.addInitScript(() => {
+    localStorage.setItem("musart.editor-tutorial.v1", "done");
     localStorage.setItem("musart.language", "en");
     localStorage.setItem("musart.onboarding.v1", JSON.stringify({ version: 1, completed: true }));
     const original = WeakMap.prototype.set;
@@ -142,6 +143,7 @@ test("the compact Export button stays inside header padding through real job pro
     const fresh = await browser.newContext({ viewport: { width: 1600, height: 620 } });
     try {
       await fresh.addInitScript(() => {
+        localStorage.setItem("musart.editor-tutorial.v1", "done");
         localStorage.setItem("musart.language", "en");
         localStorage.setItem(
           "musart.onboarding.v1",
@@ -199,6 +201,7 @@ test("mobile Export uses matching right and bottom spacing", async ({ page }) =>
   await page.routeWebSocket("**", () => {});
   await page.setViewportSize({ width: 390, height: 844 });
   await page.addInitScript(() => {
+    localStorage.setItem("musart.editor-tutorial.v1", "done");
     localStorage.setItem("musart.language", "en");
     localStorage.setItem("musart.onboarding.v1", JSON.stringify({ version: 1, completed: true }));
   });

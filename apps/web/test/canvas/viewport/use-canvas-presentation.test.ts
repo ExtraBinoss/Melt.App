@@ -111,3 +111,76 @@ it("allows an absent presentation surface without retaining scene listeners", ()
   unmount();
   motion.dispose();
 });
+
+it("leaves unchanged chrome and handle DOM untouched across unrelated visibility publications", () => {
+  const layer = createLayer("rectangle", {
+      id: "selected",
+      width: 80,
+      height: 50,
+      fill: "#ffffff",
+    }),
+    other = createLayer("rectangle", { id: "other" }),
+    engine = new EditorEngine(
+      createProject({ pages: [createPage({ width: 200, height: 160, layers: [layer, other] })] }),
+    ),
+    controller = new SceneController(engine, EMPTY_PREVIEW_SOURCE),
+    workspace = createWorkspace(engine, controller),
+    motion = new ViewMotion({
+      clock: { now: () => 0, request: () => 1, cancel: () => {} },
+      reduced: () => true,
+      constrain: (view) => view,
+    });
+  function Probe() {
+    const viewport = useRef<HTMLDivElement>(null);
+    useCanvasPresentation({ controller, workspace, motion, viewport, beforePaint: () => {} });
+    return createElement(
+      "div",
+      { ref: viewport },
+      createElement("div", {
+        "data-testid": "artboard",
+        "data-artboard-id": engine.getSnapshot().pageId,
+      }),
+      createElement("span", { className: "canvas-zoom" }),
+      createElement(
+        "div",
+        { className: "canvas-selection", "data-layer-id": layer.id },
+        createElement("button", { className: "canvas-handle" }),
+        createElement("span", { className: "canvas-selection-size" }),
+      ),
+    );
+  }
+  const { container, unmount } = render(createElement(Probe)),
+    overlay = container.querySelector<HTMLElement>(".canvas-selection")!,
+    handle = overlay.querySelector<HTMLButtonElement>("button")!,
+    label = overlay.querySelector("span")!,
+    text = label.firstChild,
+    disabled = vi.spyOn(handle, "disabled", "set"),
+    observer = new MutationObserver(() => {});
+  observer.observe(container, { attributes: true, childList: true, subtree: true });
+  act(() => controller.setGesture([{ layerId: other.id, patch: { visible: false } }]));
+  expect(observer.takeRecords()).toEqual([]);
+  expect(disabled).not.toHaveBeenCalled();
+  expect(label.firstChild).toBe(text);
+  act(() => controller.setGesture([{ layerId: layer.id, patch: { visible: false } }]));
+  expect(overlay).toHaveStyle({ display: "none" });
+  expect(overlay.inert).toBe(true);
+  expect(handle).toBeDisabled();
+  act(() => controller.setGesture([{ layerId: layer.id, patch: { locked: true } }]));
+  expect(overlay.style.display).toBe("");
+  expect(overlay.inert).toBe(true);
+  act(() => controller.setGesture([{ layerId: layer.id, patch: { maskSource: true } }]));
+  expect(overlay).toHaveStyle({ display: "none" });
+  act(() => controller.setGesture([{ layerId: layer.id, patch: { width: 120, fill: "#000000" } }]));
+  expect(overlay.style.display).toBe("");
+  expect(overlay).toHaveStyle({ width: "120px" });
+  expect(handle).toBeEnabled();
+  expect(overlay.style.getPropertyValue("--canvas-handle-color")).toBe("#ffffff");
+  expect(label).toHaveTextContent("120 × 50");
+  act(() => motion.jump({ x: 15, y: 20, zoom: 2 }, false));
+  expect(overlay.style.borderWidth).toBe("0.5px");
+  expect(handle).toHaveStyle({ transform: "scale(0.5)" });
+  observer.disconnect();
+  disabled.mockRestore();
+  unmount();
+  motion.dispose();
+});

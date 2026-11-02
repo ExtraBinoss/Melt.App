@@ -19,6 +19,7 @@ import { FontRepository, type FontLease } from "../../../src/surface/text/fonts"
 import * as atlasModule from "../../../src/surface/text/atlas";
 import * as geometryModule from "../../../src/surface/text/geometry";
 import * as paintModule from "../../../src/surface/text/paint";
+import * as strokeModule from "../../../src/surface/text/stroke";
 import { outlineFont } from "../../text-fixture";
 import { makeGpuRenderer } from "../../gpu-fixture";
 import { installCanvasMock } from "../../canvas-fixture";
@@ -316,6 +317,105 @@ it("retains atlas, material and GPU buffers across continuous layout animation",
   expect(build).toHaveBeenCalledTimes(1);
   expect(fake.compileAsync).toHaveBeenCalledTimes(1);
   expect((geometry.getAttribute("glyphPosition") as BufferAttribute).version).toBeGreaterThan(1);
+  sources.dispose();
+  cache.clear();
+  target.dispose();
+});
+
+it("reuses the compiled outlined resource through zero-width resets without duplicate ownership", async () => {
+  vi.spyOn(FontRepository.prototype, "acquire").mockResolvedValue(lease());
+  const { renderer, fake } = makeGpuRenderer(),
+    cache = new GpuResourceCache(),
+    sources = new TextSources(renderer, cache),
+    target = new RenderTarget(1, 1),
+    layer = createLayer("text", { text: "AV", strokeWidth: 4 });
+  await sources.prepare(createPage({ layers: [layer] }), { target });
+  const key = `text:${textResourceKey(layer)}`,
+    resource = cache.get<TextResource>(key)!,
+    { geometry, material, atlas } = resource,
+    stats = cache.stats(),
+    dispose = vi.spyOn(atlas.texture, "dispose");
+  for (const strokeWidth of [16, 0, 4]) {
+    const current = { ...layer, strokeWidth };
+    await sources.prepare(createPage({ layers: [current] }), { target });
+    sources.render(current, target);
+    expect(cache.get(key)).toBe(resource);
+    expect(resource.matchesLayout(current)).toBe(true);
+    expect(resource.paint.strokeWidth.value).toBe(strokeWidth);
+    expect(resource.geometry).toBe(geometry);
+    expect(resource.material).toBe(material);
+    expect(resource.atlas).toBe(atlas);
+    expect(cache.stats()).toEqual(stats);
+  }
+  expect(cache.get(`text:${textResourceKey({ ...layer, strokeWidth: 0 })}`)).toBeUndefined();
+  expect(sources.parses).toBe(1);
+  expect(fake.compileAsync).toHaveBeenCalledTimes(1);
+  sources.dispose();
+  cache.clear();
+  resource.dispose();
+  expect(dispose).toHaveBeenCalledOnce();
+  target.dispose();
+});
+
+it("keeps ordinary fill-only text cheap and prefers its existing resource after an outline reset", async () => {
+  vi.spyOn(FontRepository.prototype, "acquire").mockResolvedValue(lease());
+  const stroke = vi.spyOn(strokeModule, "strokedTextNode"),
+    { renderer, fake } = makeGpuRenderer(),
+    cache = new GpuResourceCache(),
+    sources = new TextSources(renderer, cache),
+    target = new RenderTarget(1, 1),
+    layer = createLayer("text", { text: "AV", strokeWidth: 0 });
+  await sources.prepare(createPage({ layers: [layer] }), { target });
+  const fillResource = cache.get<TextResource>(`text:${textResourceKey(layer)}`)!;
+  expect(fillResource.supportsStroke).toBe(false);
+  expect(stroke).not.toHaveBeenCalled();
+  const outlined = { ...layer, strokeWidth: 4 };
+  await sources.prepare(createPage({ layers: [outlined] }), { target });
+  const outlinedResource = cache.get<TextResource>(`text:${textResourceKey(outlined)}`)!;
+  expect(outlinedResource.supportsStroke).toBe(true);
+  expect(stroke).toHaveBeenCalledOnce();
+  await sources.prepare(createPage({ layers: [layer] }), { target });
+  sources.render(layer, target);
+  expect(fake.render).toHaveBeenLastCalledWith(fillResource.scene, fillResource.camera);
+  expect(fake.compileAsync).toHaveBeenCalledTimes(2);
+  expect(sources.parses).toBe(2);
+  expect(cache.stats().entries).toBe(2);
+  sources.dispose();
+  cache.clear();
+  target.dispose();
+});
+
+it("retains outline capability when a zero-width reset also changes glyph topology", async () => {
+  vi.spyOn(FontRepository.prototype, "acquire").mockResolvedValue(lease());
+  const { renderer, fake } = makeGpuRenderer(),
+    cache = new GpuResourceCache(),
+    sources = new TextSources(renderer, cache),
+    target = new RenderTarget(1, 1),
+    layer = createLayer("text", {
+      text: "A A A A",
+      strokeWidth: 4,
+      fontSize: 40,
+      width: 600,
+      height: 160,
+    });
+  await sources.prepare(createPage({ layers: [layer] }), { target });
+  const key = `text:${textResourceKey(layer)}`,
+    previous = cache.get<TextResource>(key)!,
+    dispose = vi.spyOn(previous, "dispose"),
+    reset = { ...layer, width: 30, height: 40, strokeWidth: 0 };
+  await sources.prepare(createPage({ layers: [reset] }), { target });
+  sources.render(reset, target);
+  const replacement = cache.get<TextResource>(key)!;
+  expect(replacement).not.toBe(previous);
+  expect(replacement.supportsStroke).toBe(true);
+  expect(dispose).toHaveBeenCalledOnce();
+  const restored = { ...reset, strokeWidth: 4 };
+  await sources.prepare(createPage({ layers: [restored] }), { target });
+  sources.render(restored, target);
+  expect(cache.get(key)).toBe(replacement);
+  expect(sources.parses).toBe(2);
+  expect(fake.compileAsync).toHaveBeenCalledTimes(2);
+  expect(cache.stats().entries).toBe(1);
   sources.dispose();
   cache.clear();
   target.dispose();

@@ -20,6 +20,8 @@ export interface LayerDragState {
   base: Layer[];
   id: string;
   layers: Layer[];
+  /** Canvas-only projection. Canonical row order remains in layers until drop. */
+  previewLayers: Layer[];
   target: LayerDragTarget | null;
   rejected: { id: string; reason: LayerDropRejection } | null;
 }
@@ -36,6 +38,7 @@ export class LayerDragController {
   private origin: Origin | null = null;
   private session = new DeferredDragSession<LayerDragState>();
   private stopEngine: (() => void) | null = null;
+  private readonly destinations = new Map<string, ReturnType<typeof validateLayerDrop>>();
   constructor(private readonly engine: EnginePort) {}
   private get state() {
     return this.session.read();
@@ -95,6 +98,7 @@ export class LayerDragController {
       base: page.layers,
       id,
       layers: page.layers,
+      previewLayers: page.layers,
       target: null,
       rejected: null,
     });
@@ -118,6 +122,7 @@ export class LayerDragController {
       base: origin.page.layers,
       id: origin.id,
       layers: origin.page.layers,
+      previewLayers: origin.page.layers,
       target: null,
       rejected: reason ?? null,
     });
@@ -140,7 +145,14 @@ export class LayerDragController {
     }
     if (this.state?.target?.id === target.id && this.state.target.position === position)
       return true;
-    const result = validateLayerDrop(origin.page, origin.id, target.id, position);
+    const key = JSON.stringify([target.id, position]);
+    let result = this.destinations.get(key);
+    if (!result) {
+      result = validateLayerDrop(origin.page, origin.id, target.id, position);
+      if (this.destinations.size === 64)
+        this.destinations.delete(this.destinations.keys().next().value!);
+      this.destinations.set(key, result);
+    }
     if ("reason" in result) {
       this.clear({ id: target.id, reason: result.reason });
       return false;
@@ -150,6 +162,7 @@ export class LayerDragController {
       base: page.layers,
       id: origin.id,
       layers: page.layers,
+      previewLayers: result.layers,
       target: { id: target.id, position },
       rejected: null,
     });
@@ -219,6 +232,7 @@ export class LayerDragController {
   cancel(owner?: symbol) {
     if (owner !== undefined && this.origin?.owner !== owner) return;
     this.origin = null;
+    this.destinations.clear();
     this.stopEngine?.();
     this.stopEngine = null;
     this.session.cancel();

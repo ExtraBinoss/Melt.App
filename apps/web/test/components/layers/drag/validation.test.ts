@@ -1,5 +1,13 @@
 import { expect, it } from "vitest";
-import { createLayer, createPage, createProject, EditorEngine } from "@musart/core";
+import {
+  createLayer,
+  createPage,
+  createProject,
+  createSpatialLayer,
+  EditorEngine,
+  getWorldMatrix,
+  SpatialGeometry,
+} from "@musart/core";
 import { validateLayerDrop } from "../../../../src/components/layers/drag/validation";
 
 it("uses the canonical core rule for animated hierarchy and retained Static animations", () => {
@@ -49,3 +57,54 @@ it("keeps ordinary reparenting and masks available, but rejects cycles, absent I
   page.layers[0]!.locked = true;
   expect(validateLayerDrop(page, "child", "other", "before")).toEqual({ reason: "locked" });
 });
+
+it.each([false, true])(
+  "previews the exact committed world frames for reparenting (spatial=%s)",
+  (spatial) => {
+    const engine = new EditorEngine(
+      createProject({
+        pages: [
+          createPage({
+            layers: [
+              createLayer("group", {
+                id: "group",
+                x: 110,
+                y: 80,
+                rotation: 23,
+                scaleX: 1.4,
+                ...(spatial ? { spatial: createSpatialLayer("group") } : {}),
+              }),
+              createLayer("text", {
+                id: "text",
+                x: 40,
+                y: 60,
+                rotation: -12,
+                ...(spatial ? { spatial: createSpatialLayer("extrude") } : {}),
+              }),
+            ],
+          }),
+        ],
+      }),
+    );
+    const before = engine.getSnapshot();
+    const page = before.project.pages[0]!;
+    const result = validateLayerDrop(page, "text", "group", "inside");
+    expect(result).toHaveProperty("layers");
+    if (!("layers" in result)) throw new Error("Expected a valid hierarchy preview");
+    const preview = { ...page, layers: result.layers };
+    expect(engine.getSnapshot()).toBe(before);
+    expect(page.layers.find((layer) => layer.id === "text")!.parentId).toBeNull();
+    engine.execute({ type: "reorderLayer", id: "text", index: 1, parentId: "group" });
+    const committed = engine.getSnapshot().project.pages[0]!;
+    expect(preview.layers.find((layer) => layer.id === "text")).toEqual(
+      committed.layers.find((layer) => layer.id === "text"),
+    );
+    const matrix = spatial
+      ? new SpatialGeometry(preview).worldMatrix("text")
+      : getWorldMatrix(preview, "text");
+    const original = spatial
+      ? new SpatialGeometry(page).worldMatrix("text")
+      : getWorldMatrix(page, "text");
+    matrix.forEach((value, index) => expect(value).toBeCloseTo(original[index]!));
+  },
+);

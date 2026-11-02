@@ -42,6 +42,7 @@ it("shares one semantic projection across views, commits once and preserves anim
   expect(d.controller.preview(d.page(), d.layer("b"), "before")).toBe(true);
   const projection = d.controller.read();
   expect(projection?.layers).toBe(d.page().layers);
+  expect(projection?.previewLayers.map((layer) => layer.id)).toEqual(["group", "b", "a"]);
   expect(d.controller.preview(d.page(), d.layer("b"), "before")).toBe(true);
   expect(d.controller.read()).toBe(projection);
   expect(updates).toHaveBeenCalledTimes(2);
@@ -167,7 +168,28 @@ it("returning to the stationary source clears the previous destination without c
   expect(d.controller.read()?.layers).toBe(d.page().layers);
   d.controller.preview(d.page(), d.layer("a"), "after");
   expect(d.controller.read()?.target).toBeNull();
+  expect(d.controller.read()?.previewLayers).toBe(d.page().layers);
   expect(d.controller.finish("a")).toBe(false);
   expect(d.engine.getSnapshot()).toBe(before);
   expect(execute).not.toHaveBeenCalled();
+});
+
+it("reuses validated canvas destinations within a gesture and retires them on document changes", () => {
+  const d = fixture();
+  d.controller.begin(d.owner, d.page(), "a", d.run);
+  d.controller.preview(d.page(), d.layer("b"), "before");
+  const first = d.controller.read()!.previewLayers;
+  d.controller.preview(d.page(), d.layer("b"), "after");
+  d.controller.preview(d.page(), d.layer("b"), "before");
+  expect(d.controller.read()!.previewLayers).toBe(first);
+  expect(d.controller.read()!.layers).toBe(d.page().layers);
+  d.engine.execute({ type: "updateLayers", ids: ["a"], patch: { fill: "#123456" } });
+  expect(d.controller.read()).toBeNull();
+  d.controller.begin(d.owner, d.page(), "a", d.run);
+  d.controller.preview(d.page(), d.layer("b"), "before");
+  expect(d.controller.read()!.previewLayers).not.toBe(first);
+  expect(d.controller.read()!.previewLayers.find((layer) => layer.id === "a")!.fill).toBe(
+    "#123456",
+  );
+  d.controller.cancel();
 });

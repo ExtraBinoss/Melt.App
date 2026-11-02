@@ -72,6 +72,10 @@ export const LayerRow = memo(
     if (page !== retainedPage) setRetainedPage(page);
     const hover = useLayerHover(engine, page.id, layer.id);
     const node = useRef<HTMLDivElement>(null);
+    const actionPage = useRef(page);
+    useLayoutEffect(() => {
+      actionPage.current = page;
+    }, [page]);
     useRowPosition(node, JSON.stringify([page.id, layer.id]), top, moving, reduced);
     const [editing, setEditing] = useState<{ page: Composition; id: string } | null>(null);
     const renaming = editing?.page === page && editing.id === layer.id;
@@ -116,23 +120,20 @@ export const LayerRow = memo(
           : [layer.id],
       );
     }
-    const rename = useCallback(
-      (name: string) => {
-        const valid = renaming;
-        setEditing(null);
-        const origin = resolveLayerPage(engine, page);
-        if (valid && origin && name.trim() && name.trim() !== layer.name)
-          run(() => {
-            if (canonical(origin))
-              engine.execute({
-                type: "updateLayers",
-                ids: [layer.id],
-                patch: { name: name.trim() },
-              });
-          });
-      },
-      [renaming, page, layer.id, layer.name, run, canonical, engine],
-    );
+    const rename = useRowAction((name: string) => {
+      const valid = renaming;
+      setEditing(null);
+      const origin = resolveLayerPage(engine, page);
+      if (valid && origin && name.trim() && name.trim() !== layer.name)
+        run(() => {
+          if (canonical(origin))
+            engine.execute({
+              type: "updateLayers",
+              ids: [layer.id],
+              patch: { name: name.trim() },
+            });
+        });
+    });
     const cancelRename = useCallback(() => setEditing(null), []);
     const toggle = useCallback(
       () => onToggle(layer.id, layer.kind === "group"),
@@ -141,32 +142,27 @@ export const LayerRow = memo(
     const expand = useCallback(() => {
       if (!expanded) toggle();
     }, [expanded, toggle]);
-    const toggleLock = useRowAction(() => {
-      if (!activateLayerPage(engine, page)) return;
-      const origin = resolveLayerPage(engine, page);
+    function toggleProperty(property: "locked" | "visible") {
+      if (!activateLayerPage(engine, actionPage.current)) return;
+      const origin = resolveLayerPage(engine, actionPage.current);
       if (!origin) return;
       run(() => {
-        if (canonical(origin))
-          engine.execute({
-            type: "updateLayers",
-            ids: [layer.id],
-            patch: { locked: !layer.locked },
-          });
+        if (!canonical(origin)) return;
+        const current = origin.layers.find((item) => item.id === layer.id);
+        if (!current) return;
+        engine.execute({
+          type: "updateLayers",
+          ids: [layer.id],
+          patch: { [property]: !current[property] },
+        });
+        // Native packets may arrive before React commits new row props. Only our
+        // own successful action advances this owner; unrelated edits still reject.
+        const snapshot = engine.getSnapshot();
+        actionPage.current = snapshot.project.pages.find((item) => item.id === origin.id)!;
       });
-    });
-    const toggleVisibility = useRowAction(() => {
-      if (!activateLayerPage(engine, page)) return;
-      const origin = resolveLayerPage(engine, page);
-      if (!origin) return;
-      run(() => {
-        if (canonical(origin))
-          engine.execute({
-            type: "updateLayers",
-            ids: [layer.id],
-            patch: { visible: !layer.visible },
-          });
-      });
-    });
+    }
+    const toggleLock = useRowAction(() => toggleProperty("locked"));
+    const toggleVisibility = useRowAction(() => toggleProperty("visible"));
     return (
       <div
         ref={node}

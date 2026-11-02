@@ -7,6 +7,7 @@ test("Open in Melt yields background video conversion until the canonical canvas
 }) => {
   await installReadbackProbe(page);
   await page.addInitScript(() => {
+    localStorage.setItem("musart.editor-tutorial.v1", "done");
     localStorage.setItem("musart.language", "en");
     localStorage.setItem("musart.onboarding.v1", JSON.stringify({ version: 1, completed: true }));
     const opening: Array<Record<string, unknown>> = [];

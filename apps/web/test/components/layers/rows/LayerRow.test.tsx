@@ -44,6 +44,46 @@ function fixture() {
   };
   return { ...d, props };
 }
+test("native visibility and lock bursts preserve every action before React adopts new props", () => {
+  const d = fixture();
+  d.mount(<LayerRow {...d.props} />);
+  const visibility = screen.getByLabelText("Masquer le calque · Rectangle bleu"),
+    lock = screen.getByLabelText("Verrouiller le calque · Rectangle bleu"),
+    revision = d.engine.getSnapshot().revision;
+  for (let index = 0; index < 6; index++) fireEvent.click(visibility);
+  for (let index = 0; index < 4; index++) fireEvent.click(lock);
+  expect(d.engine.getSnapshot().revision).toBe(revision + 10);
+  expect(d.engine.getSnapshot().project.pages[0]!.layers[0]).toMatchObject({
+    visible: true,
+    locked: false,
+  });
+  for (let index = 0; index < 10; index++) act(() => d.engine.undo());
+  expect(d.engine.getSnapshot().canUndo).toBe(false);
+});
+test("retained plain contents rename against the latest committed page and cancel drafts on a sibling replacement", () => {
+  const d = fixture();
+  const view = d.mount(<LayerRow {...d.props} />);
+  const update = () => {
+    const page = d.engine.getSnapshot().project.pages[0]!;
+    view.rerender(<LayerRow {...d.props} page={page} layer={page.layers[0]!} />);
+  };
+  act(() => d.engine.execute({ type: "updateLayers", ids: [d.text.id], patch: { x: 87 } }));
+  update();
+  fireEvent.keyDown(screen.getByRole("treeitem"), { key: "F2" });
+  fireEvent.change(screen.getByRole("textbox"), { target: { value: "Current owner" } });
+  fireEvent.keyDown(screen.getByRole("textbox"), { key: "Enter" });
+  expect(d.engine.getSnapshot().project.pages[0]!.layers[0]!.name).toBe("Current owner");
+  expect(d.engine.getSnapshot().project.pages[0]!.layers[1]!.x).toBe(87);
+  update();
+  fireEvent.keyDown(screen.getByRole("treeitem"), { key: "F2" });
+  fireEvent.change(screen.getByRole("textbox"), { target: { value: "Stale draft" } });
+  act(() => d.engine.execute({ type: "updateLayers", ids: [d.text.id], patch: { x: 91 } }));
+  const replaced = d.engine.getSnapshot();
+  update();
+  expect(screen.queryByRole("textbox")).toBeNull();
+  expect(d.engine.getSnapshot()).toBe(replaced);
+  expect(replaced.project.pages[0]!.layers[0]!.name).toBe("Current owner");
+});
 test("rebound row shells retain their buttons but release focus and never donate rename drafts", () => {
   const d = fixture(),
     view = d.mount(<LayerRow {...d.props} />);

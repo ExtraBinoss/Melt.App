@@ -183,3 +183,67 @@ it("mounts a newly selected paused media layer on its evaluated size and parent 
   stop();
   mount.unmount();
 });
+
+it("does not rewrite retained playback attributes or disabled handles when selection props refresh", () => {
+  const d = source(1),
+    onHandle = vi.fn(),
+    mount = render(
+      <SelectionOverlays {...d} selected={d.page.layers} zoom={1} onHandle={onHandle} />,
+    ),
+    handle = screen.getAllByRole("button")[0]! as HTMLButtonElement,
+    disabled = vi.spyOn(handle, "disabled", "set"),
+    observer = new MutationObserver(() => {});
+  observer.observe(mount.container, { attributes: true, childList: true, subtree: true });
+  mount.rerender(
+    <SelectionOverlays {...d} selected={[...d.page.layers]} zoom={1} onHandle={onHandle} />,
+  );
+  expect(observer.takeRecords()).toEqual([]);
+  expect(disabled).not.toHaveBeenCalled();
+  const overlay = handle.closest<HTMLElement>(".canvas-selection")!;
+  overlay.inert = true;
+  for (const control of overlay.querySelectorAll<HTMLButtonElement>(".canvas-handle"))
+    control.disabled = true;
+  disabled.mockClear();
+  observer.takeRecords();
+  mount.rerender(
+    <SelectionOverlays {...d} selected={[...d.page.layers]} zoom={1} onHandle={onHandle} />,
+  );
+  expect(handle).toBeDisabled();
+  expect(disabled).not.toHaveBeenCalled();
+  expect(observer.takeRecords()).toEqual([]);
+  overlay.inert = false;
+  handle.disabled = false;
+  act(() => createPlaybackSource(d.engine).set({ page: d.page, assets: {} }));
+  expect(handle).toBeDisabled();
+  expect(mount.container.querySelector(".canvas-selection-overlays")).toHaveAttribute(
+    "data-playback",
+    "true",
+  );
+  observer.disconnect();
+  disabled.mockRestore();
+  mount.unmount();
+});
+
+it("only repaints a collective frame when visibility changes its bounds or zoom changes", () => {
+  const d = source(65),
+    mount = render(
+      <SelectionOverlays {...d} selected={d.page.layers} zoom={1} onHandle={vi.fn()} />,
+    ),
+    frame = mount.container.querySelector<HTMLElement>(".canvas-selection-collective")!,
+    observer = new MutationObserver(() => {});
+  observer.observe(mount.container, { attributes: true, childList: true, subtree: true });
+  act(() =>
+    d.controller.setGesture([{ layerId: d.page.layers[20]!.id, patch: { visible: false } }]),
+  );
+  expect(frame).toHaveStyle({ width: "648px" });
+  expect(observer.takeRecords()).toEqual([]);
+  act(() =>
+    d.controller.setGesture([{ layerId: d.page.layers[64]!.id, patch: { visible: false } }]),
+  );
+  expect(frame).toHaveStyle({ width: "638px" });
+  act(() => d.setView({ x: 20, y: 30, zoom: 2 }));
+  expect(frame.style.borderWidth).toBe("0.5px");
+  expect(frame.querySelector("span")).toHaveStyle({ transform: "translateX(-50%) scale(0.5)" });
+  observer.disconnect();
+  mount.unmount();
+});

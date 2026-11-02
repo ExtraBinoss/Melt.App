@@ -5,7 +5,17 @@ import { LayerRow } from "../../../../src/components/layers/rows/LayerRow";
 import { setup } from "../../../support/ui";
 import { createEffect } from "@musart/core";
 
-const renders = vi.hoisted(() => ({ icon: vi.fn() }));
+const renders = vi.hoisted(() => ({ icon: vi.fn(), thumbnail: vi.fn() }));
+vi.mock("../../../../src/components/layers/rows/LayerThumbnail", async (original) => {
+  const module =
+    await original<typeof import("../../../../src/components/layers/rows/LayerThumbnail")>();
+  return {
+    LayerThumbnail: (props: Parameters<typeof module.LayerThumbnail>[0]) => {
+      renders.thumbnail();
+      return <module.LayerThumbnail {...props} />;
+    },
+  };
+});
 vi.mock("../../../../src/components/shared/IconButton", async (original) => {
   const module = await original<typeof import("../../../../src/components/shared/IconButton")>();
   return {
@@ -143,6 +153,7 @@ test("unrelated layer edits and history retain controls while actions use the la
     drag: { start: vi.fn(), over: vi.fn(), overTree: vi.fn(), drop: vi.fn() },
   };
   renders.icon.mockClear();
+  renders.thumbnail.mockClear();
   const view = d.mount(<LayerRow {...props} />);
   const visibility = screen.getByRole("button", { name: "Masquer le calque · Rectangle bleu" });
   visibility.focus();
@@ -157,6 +168,7 @@ test("unrelated layer edits and history retain controls while actions use the la
   act(() => d.engine.redo());
   update();
   expect(renders.icon).toHaveBeenCalledTimes(2);
+  expect(renders.thumbnail).toHaveBeenCalledOnce();
   expect(document.activeElement).toBe(visibility);
   expect(screen.getByRole("button", { name: "Masquer le calque · Rectangle bleu" })).toBe(
     visibility,
@@ -167,6 +179,7 @@ test("unrelated layer edits and history retain controls while actions use the la
   expect(d.engine.getSnapshot().project.pages[0]!.layers[1]!.x).toBe(73);
   update();
   expect(renders.icon).toHaveBeenCalledTimes(4);
+  expect(renders.thumbnail).toHaveBeenCalledTimes(2);
   act(() => d.engine.undo());
   expect(d.engine.getSnapshot().project.pages[0]!.layers[0]!.visible).toBe(true);
   expect(d.engine.getSnapshot().project.pages[0]!.layers[1]!.x).toBe(73);

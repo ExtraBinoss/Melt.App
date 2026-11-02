@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, type ReactNode } from "react";
+import { useLayoutEffect, useMemo, useRef, type ReactNode } from "react";
 import { getMotionOccurrenceAt, type EnginePort, type MotionPropertyTarget } from "@musart/core";
 import { useTranslation } from "react-i18next";
 import { createMotionTransport } from "../../../services/motion/transport";
@@ -28,33 +28,43 @@ export function MotionField({
   const { t } = useTranslation("motionProperties");
   const wrapper = useRef<HTMLFieldSetElement>(null);
   const input = useRef<HTMLDivElement>(null);
+  const addressKey = target ? JSON.stringify(targets ?? [target]) : null;
+  const addresses = useMemo(
+    () => (addressKey ? (JSON.parse(addressKey) as MotionPropertyTarget[]) : null),
+    [addressKey],
+  );
   useLayoutEffect(() => {
-    if (!engine || !target) return;
+    if (!engine || !addresses) return;
     const transport = createMotionTransport(engine);
-    let previous: boolean | undefined;
+    let previous: { blocked: boolean; absent: boolean } | undefined;
     const update = () => {
-      const snapshot = engine.getSnapshot(),
-        state = transport.read();
-      const page = snapshot.project.pages.find((page) => page.id === snapshot.pageId)!;
-      const absent =
-        state.mode === "motion" &&
-        (targets ?? [target]).some(
+      const state = transport.read();
+      let absent = false;
+      if (state.mode === "motion") {
+        const snapshot = engine.getSnapshot();
+        const page = snapshot.project.pages.find((page) => page.id === snapshot.pageId)!;
+        absent = addresses.some(
           (address) =>
             !getMotionOccurrenceAt(page, address.layerId, state.time, { terminalPreview: true }),
         );
-      const blocked = Boolean(disabled || absent);
-      if (blocked === previous) return;
-      previous = blocked;
-      if (wrapper.current) {
-        wrapper.current.disabled = blocked;
-        wrapper.current.setAttribute("aria-disabled", String(blocked));
-        wrapper.current.title = absent ? t("inactive") : "";
       }
-      if (input.current) input.current.inert = blocked;
+      const blocked = Boolean(disabled || absent);
+      if (previous && blocked === previous.blocked && absent === previous.absent) return;
+      previous = { blocked, absent };
+      const field = wrapper.current;
+      if (field) {
+        const ariaDisabled = String(blocked);
+        const title = absent ? t("inactive") : "";
+        if (field.disabled !== blocked) field.disabled = blocked;
+        if (field.getAttribute("aria-disabled") !== ariaDisabled)
+          field.setAttribute("aria-disabled", ariaDisabled);
+        if (field.title !== title) field.title = title;
+      }
+      if (input.current && input.current.inert !== blocked) input.current.inert = blocked;
     };
     update();
     return transport.subscribe(update);
-  }, [engine, target, targets, disabled, t]);
+  }, [engine, addresses, disabled, t]);
   if (!engine || !target) return children;
   return (
     <fieldset

@@ -164,6 +164,17 @@ it("refreshes row geometry on container ResizeObserver, then reuses it for subse
   expect(d.target.getBoundingClientRect).toHaveBeenCalledTimes(reads + 1);
 });
 
+it("keeps stationary row bounds cached across accepted destination changes", () => {
+  const d = fixture();
+  d.presentation.over(d.target, d.page.layers[1]!, d.page, { x: 100, y: 45, alt: false });
+  const reads = vi.mocked(d.target.getBoundingClientRect).mock.calls.length;
+  d.presentation.over(d.target, d.page.layers[1]!, d.page, { x: 100, y: 75, alt: false });
+  expect(d.controller.read()?.target?.position).toBe("after");
+  d.presentation.over(d.target, d.page.layers[1]!, d.page, { x: 100, y: 45, alt: false });
+  expect(d.controller.read()?.target?.position).toBe("before");
+  expect(d.target.getBoundingClientRect).toHaveBeenCalledTimes(reads);
+});
+
 it("retires invalid property targets, stale origins and old ghost leases without deleting replacements", () => {
   const d = fixture();
   d.target.dataset.layerDropKind = "property";

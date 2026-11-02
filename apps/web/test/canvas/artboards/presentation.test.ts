@@ -1,6 +1,10 @@
 import { expect, it } from "vitest";
 import { arrangeArtboards } from "../../../src/canvas/artboards/layout";
 import { artboardStyle, paintArtboards } from "../../../src/canvas/artboards/presentation";
+import {
+  artboardFooterPosition,
+  artboardPerformancePosition,
+} from "../../../src/canvas/artboards/footer-layout";
 
 it("imperatively positions active/inactive frames and unscaled headings from the same world pose", () => {
   const workspace = arrangeArtboards([
@@ -34,4 +38,36 @@ it("imperatively positions active/inactive frames and unscaled headings from the
   expect(artboardStyle(workspace.boards[0]!, workspace, view).transform).toBe(
     "translate3d(-418px, 20px, 0) scale(2)",
   );
+});
+
+it("skips repeated style and dataset writes while retaining heading and footer motion", () => {
+  const workspace = arrangeArtboards([{ id: "a", name: "A", width: 200, height: 160 }]),
+    view = { x: 10, y: 20, zoom: 2 },
+    root = document.createElement("div");
+  root.innerHTML =
+    '<div data-artboard-id="a"></div><div data-artboard-id="a" class="artboard-heading"></div><div data-artboard-id="a" class="artboard-mode-footer"></div><div data-artboard-id="a" class="artboard-performance-footer"></div>';
+  paintArtboards(root, workspace, view);
+  const observer = new MutationObserver(() => {});
+  observer.observe(root, { attributes: true, subtree: true });
+  paintArtboards(root, workspace, { ...view });
+  expect(observer.takeRecords()).toEqual([]);
+  const next = { x: 35, y: -10, zoom: 0.2 };
+  paintArtboards(root, workspace, next);
+  const board = workspace.boards[0]!;
+  expect(root.children[0]).toHaveStyle({
+    transform: artboardStyle(board, workspace, next).transform,
+  });
+  expect(root.children[2]).toHaveStyle({
+    transform: artboardFooterPosition(board, workspace, next),
+  });
+  expect(root.children[3]).toHaveStyle({
+    transform: artboardPerformancePosition(board, workspace, next),
+  });
+  expect(root.children[2]).toHaveAttribute("data-small", "true");
+  expect(root.children[3]).toHaveAttribute("data-compact", "true");
+  expect(root.children[1]).toHaveStyle({ width: "96px" });
+  expect(observer.takeRecords().length).toBeGreaterThan(0);
+  paintArtboards(root, workspace, next);
+  expect(observer.takeRecords()).toEqual([]);
+  observer.disconnect();
 });
