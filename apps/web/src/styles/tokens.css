@@ -61,7 +61,7 @@
   -webkit-font-smoothing: antialiased;
 }
 :root.dark {
-  --media-video: #a78bfa;
+  --media-video: #8b5cf6;
   --media-audio: #4ade80;
   --background: #222222;
   --foreground: #ffffff;

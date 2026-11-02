@@ -2,8 +2,8 @@ import { confirmExportLeave } from "../services/export/leave";
 import { hasActiveExports } from "../services/export/jobs";
 import { lazy, Suspense } from "react";
 import { useNavigate, useRouterState, useBlocker } from "@tanstack/react-router";
-import { useRestoreLocale } from "../state/i18n/use-locale";
 import { StudioPreparation } from "../bootstrap/StudioPreparation";
+import { useRestoreLocale } from "../state/i18n/use-locale";
 const Studio = lazy(() =>
   import("../bootstrap/Studio").then((module) => ({ default: module.Studio })),
 );

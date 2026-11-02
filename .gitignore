@@ -10,3 +10,6 @@ test-results/
 third_party/clone/
 
 .tanstack/
+
+# Generated promotional film renders and review stills.
+/films/*/out/

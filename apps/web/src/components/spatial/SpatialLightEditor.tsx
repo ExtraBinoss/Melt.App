@@ -69,11 +69,11 @@ export function SpatialLightEditor({
   }
   return (
     <div className="spatial-light-editor">
-      <SceneMotionField engine={engine} target={target("type")} label={t("lights")}>
+      <SceneMotionField engine={engine} target={target("type")} label={t("lightType")}>
         <SceneMotionValue engine={engine} target={target("type")} fallback={light.type}>
           {(value) => (
             <SelectField
-              label={t("lights")}
+              label={t("lightType")}
               value={value as typeof light.type}
               identity={light}
               options={(["directional", "point", "spot"] as const).map((value) => ({
