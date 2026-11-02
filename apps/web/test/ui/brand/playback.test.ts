@@ -203,3 +203,19 @@ test("a lively idle mascot blinks with the native engine and stops when hidden o
   expect(f.callbacks.size).toBe(0);
   f.playback.dispose();
 });
+
+test("the mascot itself morphs into a pointer with its eyes and returns to its brand silhouette", () => {
+  const f = fixture();
+  f.playback.setShape("mascot");
+  expect(f.callbacks.size).toBe(0);
+  f.playback.setShape("pointer");
+  for (let i = 0; i < 9; i++) f.step(100);
+  const pointer = f.surface.paint.mock.lastCall![0];
+  expect(pointer.eyes).toHaveLength(2);
+  expect(pointer.eyes.every((eye: { alpha: number }) => eye.alpha > 0)).toBe(true);
+  f.playback.setShape("mascot");
+  for (let i = 0; i < 9; i++) f.step(100);
+  expect(f.surface.paint.mock.lastCall![0].bodyPath).not.toBe(pointer.bodyPath);
+  expect(f.callbacks.size).toBe(0);
+  f.playback.dispose();
+});

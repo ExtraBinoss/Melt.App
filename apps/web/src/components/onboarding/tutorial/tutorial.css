@@ -65,10 +65,10 @@
 .tutorial-previous {
   padding-inline: 0;
 }
-.tutorial-pointer {
-  position: absolute;
-  top: 0;
-  left: 0;
+
+.tutorial-mascot {
+  width: 48px;
+  height: 48px;
+  flex: 0 0 48px;
   pointer-events: none;
-  overflow: visible;
 }

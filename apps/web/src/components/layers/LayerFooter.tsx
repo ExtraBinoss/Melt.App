@@ -1,4 +1,5 @@
-import { memo, useCallback, useMemo, useRef } from "react";
+import { registerEffectSurface } from "./menu/effect-surface";
+import { memo, useCallback, useMemo, useRef, useState, useEffect } from "react";
 import { Plus, ScanLine } from "lucide-react";
 import type { Composition, EnginePort } from "@musart/core";
 import { useTranslation } from "react-i18next";
@@ -36,6 +37,20 @@ export const LayerFooter = memo(
     const element = useRef<HTMLDivElement>(null);
     useRenderMetrics(element);
     const state = layerSelection(page, selection);
+    const [effectOpen, setEffectOpen] = useState(false);
+    const [libraryRequest, setLibraryRequest] = useState(0);
+    useEffect(
+      () =>
+        registerEffectSurface(engine, (surface) => {
+          const current = engine.getSnapshot();
+          const active = current.project.pages.find((item) => item.id === current.pageId);
+          if (!active || !layerSelection(active, current.selection).editable) return false;
+          setEffectOpen(true);
+          if (surface === "library") setLibraryRequest((value) => value + 1);
+          return true;
+        }),
+      [engine],
+    );
     const runCurrent = useCallback(
       (task: () => void) => {
         const port = attachmentSelection(engine),
@@ -62,14 +77,20 @@ export const LayerFooter = memo(
           role="group"
           aria-label={t("layerControls:createActions")}
         >
-          <DropdownMenu>
+          <DropdownMenu
+            open={effectOpen}
+            onOpenChange={(open) => {
+              setEffectOpen(open);
+              if (!open) setLibraryRequest(0);
+            }}
+          >
             <DropdownMenuTrigger asChild>
               <IconButton label={t("layerControls:add")} disabled={!state.editable}>
                 <Plus size={15} />
               </IconButton>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <EffectMenu onAdd={actions.effect} />
+              <EffectMenu onAdd={actions.effect} libraryRequest={libraryRequest} />
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 disabled={!state.editable || selection.length < 2 || Boolean(attachment)}

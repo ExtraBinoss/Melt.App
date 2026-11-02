@@ -1,3 +1,6 @@
+import { openEffectSurface } from "../../layers/menu/effect-surface";
+import { CLOSED_SURFACE } from "./surfaces";
+import { createViewportActions } from "../../../canvas/session/viewport-actions";
 import { useEffect, type RefObject } from "react";
 import type { EnginePort } from "@musart/core";
 import { steps } from "./content";
@@ -12,7 +15,8 @@ export function useStepSurface(
   useEffect(() => {
     const step = steps[index]!;
     const layerId = practice.current?.layerId;
-    if (!active || !("action" in step) || !["dither", "pop"].includes(step.action)) return;
+    if (!active || !("action" in step) || !["dither", "pop", "motion"].includes(step.action))
+      return;
     let frame = 0;
     let ready = false;
     let typing: ReturnType<typeof setTimeout> | undefined;
@@ -20,18 +24,24 @@ export function useStepSurface(
     const prepare = () => {
       frame = 0;
       if (ready) return;
-      if (step.action === "dither") {
+      if (step.action === "motion") {
+        const target = document.querySelector<HTMLElement>(
+          '.motion-mode [data-segmented-value="motion"]',
+        );
+        if (!target) return;
+        const box = target.getBoundingClientRect();
+        ready = createViewportActions(engine).focus({
+          x: box.x + box.width / 2,
+          y: box.y + box.height / 2,
+          factor: 1.4,
+        });
+      } else if (step.action === "dither") {
         const trigger = document.querySelector<HTMLButtonElement>(
           '.layer-create-actions button[aria-haspopup="menu"]',
         );
         if (!trigger) return;
         if (trigger.getAttribute("data-state") !== "open") {
-          trigger.dispatchEvent(
-            new PointerEvent("pointerdown", { bubbles: true, button: 0, pointerType: "mouse" }),
-          );
-          trigger.dispatchEvent(
-            new PointerEvent("pointerup", { bubbles: true, button: 0, pointerType: "mouse" }),
-          );
+          openEffectSurface(engine, "library");
           return;
         }
         const category = document.querySelector<HTMLElement>(
@@ -39,13 +49,13 @@ export function useStepSurface(
         );
         if (!category) return;
         if (category.getAttribute("aria-expanded") !== "true") {
-          category.click();
+          openEffectSurface(engine, "library");
           return;
         }
         const input = document.querySelector<HTMLInputElement>(
           '.effect-catalog[data-effect-category="effect"] input',
         );
-        if (!input || input.closest('[data-state="closed"]')) return;
+        if (!input || input.closest(CLOSED_SURFACE)) return;
         ready = true;
         input.focus({ preventScroll: true });
         const valueDescriptor = Object.getOwnPropertyDescriptor(

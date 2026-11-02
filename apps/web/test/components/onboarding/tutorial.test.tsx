@@ -28,6 +28,7 @@ test("tutorial helpers use real undoable document commands and sparse Pop contro
   engine.redo();
   engine.execute({ type: "setCompositionMode", mode: "motion" });
   addPop(engine, image.id);
+  addPop(engine, image.id);
   const track = engine
     .getSnapshot()
     .project.pages[0]!.motion!.tracks.find((track) => track.layerId === image.id)!;
@@ -71,4 +72,56 @@ test("missing practice assets and stale preparation never replace the active doc
     "The active project changed",
   );
   expect(d.services.createProject).not.toHaveBeenCalled();
+});
+
+test("pending tutorial actions release timers on cancellation and reject a changed project", async () => {
+  const { waitForTutorial } = await import("../../../src/components/onboarding/tutorial/actions");
+  const d = setup();
+  const context = {
+    engine: d.engine,
+    projectId: d.engine.getSnapshot().project.id,
+    layerId: d.engine.getSnapshot().project.pages[0]!.layers[0]!.id,
+  };
+  vi.useFakeTimers();
+  try {
+    const before = vi.getTimerCount();
+    const controller = new AbortController();
+    const condition = vi.fn(() => false);
+    const pending = waitForTutorial(context, condition, controller.signal);
+    controller.abort();
+    await expect(pending).rejects.toMatchObject({ name: "AbortError" });
+    const calls = condition.mock.calls.length;
+    vi.advanceTimersByTime(10000);
+    expect(condition).toHaveBeenCalledTimes(calls);
+    expect(vi.getTimerCount()).toBe(before);
+    await expect(
+      waitForTutorial(
+        { ...context, projectId: "other" },
+        () => false,
+        new AbortController().signal,
+      ),
+    ).rejects.toThrow("The active project changed");
+    expect(vi.getTimerCount()).toBe(before);
+  } finally {
+    vi.useRealTimers();
+  }
+});
+
+test("pending tutorial actions resolve only when the real document confirms the action", async () => {
+  const { waitForTutorial } = await import("../../../src/components/onboarding/tutorial/actions");
+  const d = setup();
+  const snapshot = d.engine.getSnapshot();
+  const context = {
+    engine: d.engine,
+    projectId: snapshot.project.id,
+    layerId: snapshot.project.pages[0]!.layers[0]!.id,
+  };
+  const pending = waitForTutorial(
+    context,
+    () => d.engine.getSnapshot().project.name === "Ready",
+    new AbortController().signal,
+  );
+  d.engine.execute({ type: "renameProject", name: "Ready" });
+  await pending;
+  expect(d.engine.getSnapshot().revision).toBe(snapshot.revision + 1);
 });

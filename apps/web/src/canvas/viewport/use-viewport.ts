@@ -16,6 +16,7 @@ import { createViewportMetrics } from "./viewport-metrics";
 import { ViewMotion } from "./motion";
 import type { ArtboardWorkspace } from "../artboards/layout";
 import {
+  zoomAt,
   constrainView,
   fitView,
   INITIAL_VIEW,
@@ -166,6 +167,22 @@ export function useViewport({
     });
     return () => cancelAnimationFrame(frame);
   }, [motion, metrics, projectId, workspace]);
+  useEffect(
+    () =>
+      actions.subscribeFocus((target) => {
+        clearPanIdle(panIdle);
+        resizeAnchor.cancel();
+        const rect = metrics.measure();
+        if (!rect) return;
+        const anchor = {
+          x: target.x - rect.left - rect.width / 2,
+          y: target.y - rect.top - rect.height / 2,
+        };
+        const next = zoomAt(motion.read(), target.factor, anchor);
+        motion.animateTo({ ...next, x: next.x - anchor.x, y: next.y - anchor.y }, true);
+      }),
+    [actions, metrics, motion, panIdle, resizeAnchor],
+  );
   useEffect(
     () =>
       actions.subscribe((action) => {

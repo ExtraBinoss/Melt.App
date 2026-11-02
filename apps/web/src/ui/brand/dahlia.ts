@@ -1,3 +1,4 @@
+import { profileFromPolygon } from "./engine/shape";
 import { BotEngine } from "./engine/engine";
 import type { StateId } from "./engine/bot-types";
 import { EXPRESSION_BY_ID } from "./engine/expressions";
@@ -22,4 +23,19 @@ export function createDahliaEngine(state: StateId = "idle"): BotEngine {
   );
   engine.setEyes(brand.mascot.eyes, -1);
   return engine;
+}
+
+export type MascotShape = "mascot" | "pointer";
+const pointerProfile = profileFromPolygon(
+  [
+    { x: -0.9, y: -0.85 },
+    { x: 1.12, y: 0 },
+    { x: -0.9, y: 0.85 },
+    { x: -0.48, y: 0 },
+  ],
+  0,
+  0,
+);
+export function mascotShape(shape: MascotShape): number[] {
+  return shape === "pointer" ? pointerProfile : SHAPE_BY_ID.get(brand.mascot.shape)!.radii;
 }

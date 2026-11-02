@@ -1,16 +1,16 @@
+import { performStep, stepDone, waitForTutorial } from "./actions";
 import { useStepSurface } from "./use-step-surface";
 import { useEffect, useRef, useState } from "react";
 import type { EnginePort } from "@musart/core";
 import type { EditorServices } from "../../../state/contracts";
 import { createMotionTransport } from "../../../services/motion/transport";
 import { getExportJobs } from "../../../services/export/jobs";
-import { requestCompositionExport } from "../../export/composition-request";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "../../ui/dialog";
 import { Button } from "../../ui/button";
 import { MeltLogo } from "../../../ui/brand/MeltLogo";
 import { Guide } from "./Guide";
 import { copy, steps } from "./content";
-import { addDither, addPop, createPracticeProject } from "./project";
+import { createPracticeProject } from "./project";
 import "./tutorial.css";
 
 export const TUTORIAL_KEY = "musart.editor-tutorial.v1";
@@ -21,24 +21,6 @@ function unseen() {
   } catch {
     return true;
   }
-}
-function click(selector: string) {
-  const element = document.querySelector<HTMLButtonElement>(selector);
-  if (!element || element.disabled)
-    throw new Error("This control is not ready yet. Please try again.");
-  if (element.tagName === "BUTTON" && element.getAttribute("aria-haspopup") === "menu") {
-    element.dispatchEvent(
-      new PointerEvent("pointerdown", {
-        bubbles: true,
-        button: 0,
-        pointerType: "mouse",
-        ctrlKey: false,
-      }),
-    );
-    element.dispatchEvent(
-      new PointerEvent("pointerup", { bubbles: true, button: 0, pointerType: "mouse" }),
-    );
-  } else element.click();
 }
 export function Tutorial({
   engine,
@@ -59,17 +41,32 @@ export function Tutorial({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const furthest = useRef(0);
+  const cursor = useRef(0);
+  const pending = useRef(0);
+  const running = useRef(false);
+  const operation = useRef<AbortController | null>(null);
+  const pinReady = useRef(-1);
   const practice = useRef<{ projectId: string; layerId: string } | null>(null);
   useStepSurface(engine, index, phase === "tour" && !hidden && !leave, practice);
   const alive = useRef(true);
   useEffect(() => {
+    if (hidden) {
+      pending.current = 0;
+      operation.current?.abort();
+    }
+  }, [hidden]);
+  useEffect(() => {
     alive.current = true;
     return () => {
       alive.current = false;
+      operation.current?.abort();
     };
   }, []);
   useEffect(() => {
     const replay = () => {
+      operation.current?.abort();
+      pending.current = 0;
+      cursor.current = 0;
       setPhase("invite");
       setIndex(0);
       setError("");
@@ -78,6 +75,8 @@ export function Tutorial({
     return () => window.removeEventListener(REPLAY_TUTORIAL, replay);
   }, []);
   function close() {
+    pending.current = 0;
+    operation.current?.abort();
     createMotionTransport(engine).pause();
     try {
       localStorage.setItem(TUTORIAL_KEY, "done");
@@ -87,13 +86,13 @@ export function Tutorial({
     setPhase("closed");
     setLeave(false);
   }
-  const advance = () => {
+  const advance = (expected: number) => {
+    if (cursor.current !== expected) return;
+    const next = Math.min(steps.length - 1, expected + 1);
+    cursor.current = next;
+    furthest.current = Math.max(furthest.current, next);
     setError("");
-    setIndex((value) => {
-      const next = Math.min(steps.length - 1, value + 1);
-      furthest.current = Math.max(furthest.current, next);
-      return next;
-    });
+    setIndex(next);
   };
   useEffect(() => {
     if (phase !== "tour" || hidden || leave || index < furthest.current) return;
@@ -101,15 +100,14 @@ export function Tutorial({
     const jobs = getExportJobs(engine);
     let completed = false;
     let pinPrepared = false;
+    let pinRequested = false;
     const check = () => {
-      if (completed) return;
+      if (completed || cursor.current !== index) return;
       const snapshot = engine.getSnapshot();
       if (snapshot.project.id !== practice.current?.projectId) {
         setPhase("closed");
         return;
       }
-      const page = snapshot.project.pages.find((page) => page.id === snapshot.pageId)!;
-      const layer = page.layers.find((layer) => layer.id === practice.current?.layerId);
       const action = "action" in steps[index]! ? steps[index]!.action : undefined;
       if (action === "pin" && !pinPrepared) {
         const pin = document.querySelector<HTMLButtonElement>(
@@ -117,45 +115,21 @@ export function Tutorial({
         );
         const dock = document.querySelector("[data-motion-pinned]");
         if (!dock) return;
+        if (pin) {
+          if (!pinRequested) {
+            pinRequested = true;
+            pin.click();
+          }
+          return;
+        }
         pinPrepared = true;
-        if (pin) pin.click();
+        pinReady.current = index;
         return;
       }
-      const done =
-        action === "select"
-          ? snapshot.selection.includes(practice.current.layerId)
-          : action === "effectMenu"
-            ? document
-                .querySelector('.layer-create-actions button[aria-haspopup="menu"]')
-                ?.getAttribute("data-state") === "open"
-            : action === "effectCategory"
-              ? !!document.querySelector('.effect-catalog[data-effect-category="effect"]')
-              : action === "dither"
-                ? layer?.effects.some((effect) => effect.type === "dither")
-                : action === "motion"
-                  ? page.motion?.mode === "motion"
-                  : action === "pin"
-                    ? !!document.querySelector('[data-motion-pinned="true"]')
-                    : action === "pop"
-                      ? page.motion?.tracks.some(
-                          (track) =>
-                            track.layerId === layer?.id &&
-                            track.animations?.some(
-                              (animation) => animation.preset.id === "scale-pop",
-                            ),
-                        )
-                      : action === "play"
-                        ? transport.read().playing
-                        : action === "export"
-                          ? !!document.querySelector(".export-dialog")
-                          : action === "video"
-                            ? !!document.querySelector(".motion-export-preview-surface")
-                            : action === "render"
-                              ? jobs.read()?.kind === "motion" && jobs.read()?.status === "complete"
-                              : false;
+      const done = action ? stepDone(action, { engine, ...practice.current! }) : false;
       if (done) {
         completed = true;
-        advance();
+        advance(index);
       }
     };
     const stop = engine.subscribe(check),
@@ -166,7 +140,7 @@ export function Tutorial({
       childList: true,
       subtree: true,
       attributes: true,
-      attributeFilter: ["data-motion-pinned", "data-state"],
+      attributeFilter: ["data-motion-pinned", "data-state", "aria-expanded"],
     });
     check();
     return () => {
@@ -184,6 +158,8 @@ export function Tutorial({
       if (alive.current) {
         onProjectCreated?.(practice.current.projectId);
         furthest.current = 0;
+        cursor.current = 0;
+        pinReady.current = -1;
         setIndex(0);
         setPhase("tour");
       }
@@ -193,64 +169,43 @@ export function Tutorial({
       if (alive.current) setBusy(false);
     }
   }
-  function skip() {
-    setError("");
+  async function skip() {
+    pending.current = Math.min(32, pending.current + 1);
+    if (running.current) return;
+    running.current = true;
+    const controller = new AbortController();
+    operation.current = controller;
     try {
-      if (index < furthest.current) {
-        advance();
-        return;
-      }
-      const step = steps[index]!;
-      if (index === steps.length - 1) {
-        close();
-        return;
-      }
-      if (!("action" in step)) {
-        advance();
-        return;
-      }
-      const id = practice.current!.layerId;
-      switch (step.action) {
-        case "select":
-          engine.select([id]);
+      while (pending.current > 0 && !controller.signal.aborted && alive.current) {
+        await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+        if (controller.signal.aborted) break;
+        pending.current--;
+        const expected = cursor.current;
+        const step = steps[expected]!;
+        if (expected === steps.length - 1) {
+          close();
           break;
-        case "effectMenu":
-          click('.layer-create-actions button[aria-haspopup="menu"]');
-          break;
-        case "effectCategory":
-          // The next surface opens the library even if clicking Next dismissed its parent menu.
-          advance();
-          break;
-        case "dither":
-          addDither(engine, id);
-          document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
-          break;
-        case "motion":
-          engine.execute({ type: "setCompositionMode", mode: "motion" });
-          break;
-        case "pin":
-          if (!document.querySelector('[data-motion-pinned="true"]'))
-            click('[data-tutorial="timeline-pin"][aria-pressed="false"]');
-          break;
-        case "pop":
-          addPop(engine, id);
-          document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
-          break;
-        case "play":
-          createMotionTransport(engine).play();
-          break;
-        case "export":
-          requestCompositionExport(engine, engine.getSnapshot().pageId);
-          break;
-        case "video":
-          click('.export-dialog button[data-segmented-value="motion"]');
-          break;
-        case "render":
-          click(".export-dialog .export-submit");
-          break;
+        }
+        if (expected >= furthest.current && "action" in step) {
+          const context = { engine, ...practice.current! };
+          if (step.action === "pin")
+            await waitForTutorial(context, () => pinReady.current === expected, controller.signal);
+          await performStep(step.action, context, controller.signal);
+          await waitForTutorial(
+            context,
+            () => cursor.current !== expected || stepDone(step.action, context),
+            controller.signal,
+          );
+        }
+        if (!controller.signal.aborted) advance(expected);
       }
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : copy.error);
+      pending.current = 0;
+      if (!controller.signal.aborted && alive.current)
+        setError(cause instanceof Error ? cause.message : copy.error);
+    } finally {
+      running.current = false;
+      if (operation.current === controller) operation.current = null;
     }
   }
   if (hidden || phase === "closed") return null;
@@ -262,12 +217,19 @@ export function Tutorial({
           engine={engine}
           busy={busy}
           error={error}
-          onSkip={skip}
+          onSkip={() => void skip()}
           onPrevious={() => {
+            pending.current = 0;
+            operation.current?.abort();
+            cursor.current = Math.max(0, cursor.current - 1);
             setError("");
-            setIndex((value) => Math.max(0, value - 1));
+            setIndex(cursor.current);
           }}
-          onExit={() => setLeave(true)}
+          onExit={() => {
+            pending.current = 0;
+            operation.current?.abort();
+            setLeave(true);
+          }}
         />
       )}
       <Dialog

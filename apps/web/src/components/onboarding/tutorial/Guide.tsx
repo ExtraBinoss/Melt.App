@@ -1,5 +1,5 @@
+import { visible as visibleSurface } from "./surfaces";
 import { Speech } from "./Speech";
-import { MorphPath } from "../../../ui/brand/morph/MorphPath";
 import { X } from "lucide-react";
 import { useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
@@ -48,32 +48,15 @@ export function Guide({
     let observed: Element | null = null;
     const measure = () => {
       frame = 0;
-      const visible = (selector: string) =>
-        Array.from(document.querySelectorAll<HTMLElement>(selector)).find((node) => {
-          if (
-            node.parentElement?.closest(
-              '[hidden],[inert],[aria-hidden="true"],[data-state="closed"]',
-            )
-          )
-            return false;
-          const box = node.getBoundingClientRect();
-          return (
-            box.width > 0 &&
-            box.height > 0 &&
-            box.bottom > 0 &&
-            box.right > 0 &&
-            box.x < innerWidth &&
-            box.y < innerHeight &&
-            getComputedStyle(node).visibility !== "hidden"
-          );
-        });
+      const visible = (selector: string) => visibleSurface(selector, true);
       const target =
         visible(step.target) ??
         ("action" in step && step.action === "dither"
           ? visible('.effect-catalog[data-effect-category="effect"] input')
           : null) ??
         ("action" in step && step.action === "pop" ? visible(".animation-picker") : null) ??
-        visible(".canvas-artboard");
+        visible(".canvas-artboard") ??
+        null;
       if (target !== observed) {
         if (observed) resize.unobserve(observed);
         if (target) resize.observe(target);
@@ -168,28 +151,6 @@ export function Guide({
           transition={{ duration: reduce ? 0 : 0.25 }}
         />
       )}
-      {index > 0 && "action" in step && rect.width > 0 && (
-        <motion.svg
-          className="tutorial-pointer"
-          aria-hidden="true"
-          width="36"
-          height="36"
-          viewBox="0 0 32 32"
-          initial={false}
-          animate={{
-            x: Math.max(0, Math.min(viewport.width - 36, rect.x - 30)),
-            y: Math.max(0, rect.y + rect.height / 2 - 18),
-          }}
-          transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 300, damping: 28 }}
-        >
-          <MorphPath
-            d={index % 2 ? "M4 3 L27 16 L17 19 L12 29 Z" : "M4 6 L29 16 L17 20 L10 29 Z"}
-            fill="var(--primary)"
-            stroke="var(--background)"
-            strokeWidth={2}
-          />
-        </motion.svg>
-      )}
       <motion.aside
         ref={card}
         role="region"
@@ -201,7 +162,22 @@ export function Guide({
         transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 340, damping: 32 }}
       >
         <header>
-          <MeltLogo size={48} lively />
+          <motion.div
+            className="tutorial-mascot"
+            initial={false}
+            animate={
+              "action" in step
+                ? {
+                    x: Math.max(-x + 8, Math.min(viewport.width - x - 72, rect.x - x - 72)),
+                    y: rect.y + rect.height / 2 - y - 42,
+                    scale: 1.25,
+                  }
+                : { x: 0, y: 0, scale: 1 }
+            }
+            transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 260, damping: 28 }}
+          >
+            <MeltLogo size={48} lively shape={"action" in step ? "pointer" : "mascot"} />
+          </motion.div>
           <span>
             {index + 1} / {steps.length}
           </span>

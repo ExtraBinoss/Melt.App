@@ -3,6 +3,7 @@ import {
   startTransition,
   useId,
   useLayoutEffect,
+  useEffect,
   useRef,
   useState,
   type PointerEvent,
@@ -26,11 +27,26 @@ import type { EffectCategory } from "./catalog/model";
 import { RetainedCatalogs } from "./catalog/RetainedCatalogs";
 
 /** One native submenu owns both catalogs, so changing category retains its surface and focus scope. */
-export function EffectMenu({ onAdd }: { onAdd: (type: EffectType) => void }) {
+export function EffectMenu({
+  onAdd,
+  libraryRequest = 0,
+}: {
+  onAdd: (type: EffectType) => void;
+  libraryRequest?: number;
+}) {
   const { t, i18n } = useTranslation();
   const [category, setCategory] = useState<EffectCategory>("effect");
   const [open, setOpen] = useState(false);
   const change = useOverlayEntrance(setOpen);
+  useEffect(() => {
+    if (libraryRequest <= 0) return;
+    // Root menu autofocus must finish before its submenu takes focus.
+    const frame = requestAnimationFrame(() => {
+      setCategory("effect");
+      change(true);
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [libraryRequest, change]);
   const trigger = useRef<HTMLDivElement>(null);
   const panel = useRef<HTMLDivElement>(null);
   const choices = useRef<HTMLDivElement>(null);

@@ -23,6 +23,7 @@ import { brand, MeltLogo, BrandStatus } from "@/ui/brand";
 <MeltLogo size={32} />                    // Decorative idle Dahlia; no RAF.
 <MeltLogo size={64} decorative={false} /> // Accessible name: Melt.
 <MeltLogo size={48} lively />            // Explicit idle animation and natural blinking.
+<MeltLogo size={48} lively shape="pointer" /> // The same face morphs into a pointer.
 <span>{brand.name}</span>
 {exportPending && <BrandStatus state="preparing" size={28} />}
 ```

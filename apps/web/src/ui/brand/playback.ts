@@ -1,4 +1,10 @@
-import { createDahliaEngine, brandStates, type BrandState } from "./dahlia";
+import {
+  createDahliaEngine,
+  brandStates,
+  mascotShape,
+  type MascotShape,
+  type BrandState,
+} from "./dahlia";
 import type { createMascotSurface } from "./render-frame";
 export interface BrandActivity {
   read(this: void): boolean;
@@ -31,6 +37,7 @@ export function createBrandPlayback(
     active = true,
     hovered = false,
     lively = false,
+    shape: MascotShape = "mascot",
     visible = true,
     disposed = false,
     frame: number | null = null,
@@ -105,6 +112,13 @@ export function createBrandPlayback(
   page.addEventListener("visibilitychange", environment);
   reduced.addEventListener("change", environment);
   return {
+    setShape(next: MascotShape) {
+      if (disposed || shape === next) return;
+      shape = next;
+      engine.setShape(mascotShape(next), time);
+      end = Math.max(end, time + 0.7);
+      resume();
+    },
     setLively(next: boolean) {
       if (disposed || next === lively) return;
       lively = next;

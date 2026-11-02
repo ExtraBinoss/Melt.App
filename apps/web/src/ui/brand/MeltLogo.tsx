@@ -2,7 +2,7 @@ import { memo, useId, useLayoutEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { createMascotSurface } from "./render-frame";
 import { createBrandPlayback, type BrandActivity } from "./playback";
-import type { BrandState } from "./dahlia";
+import type { BrandState, MascotShape } from "./dahlia";
 import { brand } from "./config";
 import "./messages";
 import "./brand.css";
@@ -15,6 +15,7 @@ export const MeltLogo = memo(function MeltLogo({
   className = "",
   interactive = false,
   lively = false,
+  shape = "mascot",
   onReady,
 }: {
   size?: number;
@@ -24,6 +25,7 @@ export const MeltLogo = memo(function MeltLogo({
   className?: string;
   interactive?: boolean;
   lively?: boolean;
+  shape?: MascotShape;
   onReady?: (ready: boolean) => void;
 }) {
   const { t } = useTranslation("brand"),
@@ -75,6 +77,9 @@ export const MeltLogo = memo(function MeltLogo({
     };
   }, [interactive]);
   useLayoutEffect(() => {
+    runtime.current?.setShape(shape);
+  }, [shape]);
+  useLayoutEffect(() => {
     runtime.current?.setLively(lively);
   }, [lively]);
   useLayoutEffect(() => {
@@ -109,6 +114,7 @@ export const MeltLogo = memo(function MeltLogo({
       aria-hidden={decorative || undefined}
       aria-label={decorative ? undefined : state === "idle" ? brand.name : t(state)}
       data-brand-state={state}
+      data-mascot-shape={shape}
     />
   );
 });

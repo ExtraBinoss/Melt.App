@@ -76,6 +76,7 @@ test("guided editor practice, automatic tasks, exit and editor-only replay", asy
   await expect(guide.getByRole("heading", { name: "Properties", exact: true })).toBeVisible();
   await guide.getByRole("button", { name: "Next", exact: true }).click();
   await expect(guide.getByRole("heading", { name: "Layers", exact: true })).toBeVisible();
+  let beforeMotionWidth = 0;
   for (const title of [
     "Open the effect menu",
     "Add an effect",
@@ -87,8 +88,10 @@ test("guided editor practice, automatic tasks, exit and editor-only replay", asy
     "Export",
     "Save your video",
   ]) {
-    if (title === "Make it move") await page.locator('[data-effect-catalog-item="dither"]').click();
-    else if (title === "Play") await page.locator('[data-preset-id="scale-pop"]').click();
+    if (title === "Make it move") {
+      beforeMotionWidth = (await page.getByTestId("artboard").boundingBox())!.width;
+      await page.locator('[data-effect-catalog-item="dither"]').click();
+    } else if (title === "Play") await page.locator('[data-preset-id="scale-pop"]').click();
     else if (title === "Add an effect")
       await page.locator('.layer-create-actions button[aria-haspopup="menu"]').click();
     else if (title === "Try Dither")
@@ -106,6 +109,12 @@ test("guided editor practice, automatic tasks, exit and editor-only replay", asy
       await page.screenshot({ path: "artifacts/tutorial/dither-guide.png" });
     }
     if (title === "Add a pop") await expect(page.locator(".animation-picker")).toBeVisible();
+    if (title === "Make it move") {
+      await expect
+        .poll(async () => (await page.getByTestId("artboard").boundingBox())!.width)
+        .toBeGreaterThan(beforeMotionWidth * 1.2);
+      await expectSpotlight(page, '.motion-mode [data-segmented-value="motion"]');
+    }
   }
   await expect(page.locator(".motion-export-preview-surface")).toBeVisible();
   await expect
@@ -177,4 +186,39 @@ test("Next opens the effect library after its parent menu dismisses", async ({ p
   await expectSpotlight(page, '[data-effect-catalog-item="dither"]');
   await guide.getByRole("button", { name: "Next", exact: true }).click();
   await expect(guide.getByRole("heading", { name: "Make it move" })).toBeVisible();
+});
+
+test("a burst of Next clicks runs each tutorial action once through Motion and Pop", async ({
+  page,
+}) => {
+  await page.addInitScript(() => localStorage.setItem("musart.language", "en"));
+  await page.goto("/editor?automation=1");
+  await page.getByRole("button", { name: "Yes, start tutorial" }).click({ timeout: 30000 });
+  const guide = page.getByRole("region", { name: "Melt tutorial" });
+  await expect(guide.getByRole("heading", { name: "Your canvas" })).toBeVisible({ timeout: 30000 });
+  await guide
+    .getByRole("button", { name: "Next", exact: true })
+    .evaluate((button: HTMLButtonElement) => {
+      for (let i = 0; i < 10; i++) button.click();
+    });
+  await expect(guide.getByRole("heading", { name: "Play", exact: true })).toBeVisible({
+    timeout: 20000,
+  });
+  await expect(guide.getByRole("alert")).toHaveCount(0);
+  await expect(page.locator('[data-motion-pinned="true"]')).toBeVisible();
+  await expect(guide.locator('svg[data-mascot-shape="pointer"]')).toHaveCount(1);
+  await expect(page.locator(".tutorial-pointer")).toHaveCount(0);
+  const result = await page.evaluate(() => {
+    const snapshot = window.musart!.snapshot();
+    const page = snapshot.project.pages[0]!;
+    const layer = page.layers.find((layer) => layer.name === "Lake")!;
+    return {
+      mode: page.motion?.mode,
+      dither: layer.effects.filter((effect) => effect.type === "dither").length,
+      pop: page.motion?.tracks
+        .find((track) => track.layerId === layer.id)
+        ?.animations?.filter((animation) => animation.preset.id === "scale-pop").length,
+    };
+  });
+  expect(result).toEqual({ mode: "motion", dither: 1, pop: 1 });
 });

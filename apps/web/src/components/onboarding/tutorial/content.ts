@@ -19,7 +19,7 @@ export const steps = [
   {
     title: "Your canvas",
     text: "This is your canvas. Add images, videos, text and objects here. We have loaded three images for you.",
-    target: ".canvas-artboard:not(.canvas-artboard-inactive)",
+    target: '.canvas-artboard-editor[data-active="true"]',
   },
   {
     title: "Your tools",
@@ -100,7 +100,7 @@ export const steps = [
   {
     title: "You're ready",
     text: "Your video is exported. Keep experimenting with this project, or create your own from Projects.",
-    target: ".canvas-artboard:not(.canvas-artboard-inactive)",
+    target: '.canvas-artboard-editor[data-active="true"]',
   },
 ] as const;
 export type TutorialAction =

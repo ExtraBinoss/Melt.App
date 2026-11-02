@@ -28,3 +28,19 @@ it("shares canvas actions per engine without queuing absent views or modifying d
   expect(port.run("reset")).toBe(false);
   expect(listener).toHaveBeenCalledTimes(5);
 });
+
+it("focuses a screen target through the mounted canvas and rejects invalid coordinates", () => {
+  const engine = new EditorEngine(),
+    port = createViewportActions(engine),
+    listener = vi.fn();
+  const before = engine.getSnapshot();
+  expect(port.focus({ x: 300, y: 500, factor: 1.4 })).toBe(false);
+  const stop = port.subscribeFocus(listener);
+  expect(port.focus({ x: NaN, y: 500, factor: 1.4 })).toBe(false);
+  expect(port.focus({ x: 300, y: 500, factor: 0 })).toBe(false);
+  expect(port.focus({ x: 300, y: 500, factor: 1.4 })).toBe(true);
+  expect(listener).toHaveBeenCalledExactlyOnceWith({ x: 300, y: 500, factor: 1.4 });
+  expect(engine.getSnapshot()).toBe(before);
+  stop();
+  expect(port.focus({ x: 300, y: 500, factor: 1.4 })).toBe(false);
+});

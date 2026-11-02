@@ -68,6 +68,7 @@ export function addPop(engine: EnginePort, layerId: string) {
     .find((page) => page.id === snapshot.pageId)
     ?.motion?.tracks.find((track) => track.layerId === layerId);
   if (!track) throw new Error("Select a Motion artboard first.");
+  if (track.animations?.some((animation) => animation.preset.id === "scale-pop")) return;
   engine.execute({
     type: "addMotionAnimation",
     trackId: track.id,
