@@ -1,3 +1,4 @@
+import { extractPixels } from "./extract";
 import { floodMask } from "../pixel-selection";
 import { selectionContour } from "./contours";
 import type { WandRequest, WandResponse, SelectionMode } from "./model";
@@ -96,6 +97,11 @@ export function createWandHost() {
         } else if (request.type === "invert") {
           accepted = accepted.map((value) => 255 - value);
           draft = null;
+        } else if (request.type === "extract") {
+          return {
+            id: request.id,
+            image: extractPixels(source.data, accepted, source.width, source.height),
+          };
         } else if (request.type === "export") {
           const data = new Uint8ClampedArray(accepted.length * 4);
           for (let index = 0; index < accepted.length; index++) {

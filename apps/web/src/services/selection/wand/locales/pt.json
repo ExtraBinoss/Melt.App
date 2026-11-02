@@ -44,5 +44,9 @@
   "objectError": "A seleção do objeto falhou. Tente novamente ou use a varinha mágica.",
   "objectDetails": "Detalhes técnicos",
   "objectCopy": "Copiar erro",
-  "previewFailed": "Falha na pré-visualização"
+  "previewFailed": "Falha na pré-visualização",
+  "layerViaCopy": "Nova camada por cópia",
+  "layerViaCopyHint": "Copia os píxeis selecionados para uma nova camada na mesma posição. Sem uma seleção de píxeis, duplica as camadas selecionadas sem as deslocar.",
+  "copySuffix": "cópia",
+  "copyEmpty": "A área selecionada não contém píxeis visíveis para copiar."
 }

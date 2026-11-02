@@ -3,6 +3,24 @@ import { EditorEngine, createLayer, createPage, createProject, createEffect } fr
 import { attachmentSelection } from "../../../src/state/selection/attachments";
 import { documentShortcut } from "../../../src/state/keybindings/document-actions";
 import { createClipboardController } from "../../../src/services/clipboard/controller";
+test("headless Layer via Copy duplicates in place instead of the existing offset duplicate", async () => {
+  const layer = createLayer("text", { id: "text", x: 13, y: 29, rotation: 18 });
+  const engine = new EditorEngine(createProject({ pages: [createPage({ layers: [layer] })] }));
+  engine.select([layer.id]);
+  const before = engine.getSnapshot().project;
+  await documentShortcut("action:layerViaCopy", {
+    engine,
+    save: vi.fn(async () => {}),
+    setTool: vi.fn(),
+  })!();
+  const after = engine.getSnapshot(),
+    clone = after.project.pages[0]!.layers[1]!;
+  expect(clone).toMatchObject({ kind: "text", x: 13, y: 29, rotation: 18 });
+  expect(after.selection).toEqual([clone.id]);
+  engine.undo();
+  expect(engine.getSnapshot().project).toEqual(before);
+  expect(engine.getSnapshot().canUndo).toBe(false);
+});
 test("headless clipboard shortcuts use the shared platform controller", async () => {
   const engine = new EditorEngine(createProject()),
     controller = createClipboardController(engine);

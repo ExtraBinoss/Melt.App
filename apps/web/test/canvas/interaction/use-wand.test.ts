@@ -35,6 +35,7 @@ function fixture() {
     }),
     cancel: vi.fn(),
     invert: vi.fn(async () => {}),
+    copyPixels: vi.fn(async () => {}),
     createMask: vi.fn(async () => {}),
     erase: vi.fn(async () => {}),
     deselect: vi.fn(),

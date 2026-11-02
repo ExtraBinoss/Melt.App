@@ -50,7 +50,7 @@ export function ObjectSelectionOptions({
       <Button
         variant="secondary"
         size="sm"
-        disabled={!target || state?.busy}
+        disabled={!target || state?.busy || state?.applying}
         onClick={() => {
           if (target) run(() => port.scan(target));
         }}
@@ -90,7 +90,7 @@ export function ObjectSelectionOptions({
               key={`${candidate.x}:${candidate.y}`}
               variant="outline"
               size="sm"
-              disabled={state?.busy}
+              disabled={state?.busy || state?.applying}
               aria-pressed={
                 state?.points[0]?.x === candidate.x && state?.points[0]?.y === candidate.y
               }
@@ -106,7 +106,7 @@ export function ObjectSelectionOptions({
           <Button
             variant="outline"
             size="sm"
-            disabled={state.busy}
+            disabled={state.busy || state.applying}
             onClick={() => run(() => port.removeLast())}
           >
             <Undo2 size={14} />

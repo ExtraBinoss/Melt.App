@@ -55,6 +55,61 @@ function fixture() {
   engine.select([layer.id]);
   return { engine, controller, pixels, encode, worker, data, host };
 }
+it("copies actual selected RGBA into a tight new image above the unchanged original in one undo step", async () => {
+  const d = fixture(),
+    before = d.engine.getSnapshot().project;
+  await d.controller.begin("image", 20, 0, 0);
+  await d.controller.accept();
+  await d.controller.copyPixels();
+  const after = d.engine.getSnapshot(),
+    page = after.project.pages[0]!,
+    copy = page.layers[1]!;
+  expect(page.layers[0]).toEqual(before.pages[0]!.layers[0]);
+  expect(copy).toMatchObject({ kind: "image", x: 100, y: 80, width: 10, height: 10, mask: null });
+  expect(after.selection).toEqual([copy.id]);
+  expect(after.project.assets[copy.assetId!]).toMatchObject({
+    width: 1,
+    height: 1,
+    mime: "image/png",
+  });
+  expect(d.encode.mock.lastCall![0]).toEqual(new Uint8ClampedArray([10, 10, 10, 255]));
+  expect(after.project.assets.original).toEqual(before.assets.original);
+  expect(d.controller.read()).toBeNull();
+  d.engine.undo();
+  expect(d.engine.getSnapshot().project).toEqual(before);
+  expect(d.engine.getSnapshot().canUndo).toBe(false);
+  d.engine.redo();
+  expect(d.engine.getSnapshot().project).toEqual(after.project);
+  expect(d.engine.getSnapshot().selection).toEqual([copy.id]);
+});
+it("reports empty copies without creating a layer, and rejects stale asynchronous extraction", async () => {
+  const d = fixture();
+  await d.controller.begin("image", 0, 0, 255);
+  await d.controller.accept();
+  await d.controller.invert();
+  await expect(d.controller.copyPixels()).rejects.toThrow("empty");
+  expect(d.engine.getSnapshot().canUndo).toBe(false);
+  await d.controller.begin("image", 0, 0, 0);
+  await d.controller.accept();
+  const send = vi.mocked(d.worker.postMessage).getMockImplementation()!;
+  let held = false;
+  vi.mocked(d.worker.postMessage).mockImplementation((request, transfer) => {
+    if (request.type === "extract") {
+      held = true;
+      return;
+    }
+    send(request, transfer);
+  });
+  const pending = d.controller.copyPixels(),
+    rejected = expect(pending).rejects.toMatchObject({ name: "AbortError" });
+  await vi.waitFor(() => expect(held).toBe(true));
+  d.engine.execute({ type: "renameProject", name: "Changed project" });
+  const afterEdit = d.engine.getSnapshot().project;
+  await rejected;
+  expect(d.engine.getSnapshot().project).toBe(afterEdit);
+  expect(Object.keys(afterEdit.assets)).toEqual(["original"]);
+  expect(d.controller.read()).toBeNull();
+});
 it("retries failed source preparation and holds imported mask actions until its producer settles", async () => {
   const d = fixture();
   d.pixels.mockRejectedValueOnce(Error("decode failed"));

@@ -1,3 +1,4 @@
+import "../../../services/selection/wand/messages";
 import "../../motion/messages";
 import type { SearchAction, SearchCategory } from "./model";
 
@@ -166,6 +167,15 @@ export const ACTIONS: readonly ActionDefinition[] = [
     category: "edit",
     label: "search:copyComposition",
     terms: "copy composition artboard page clipboard json share copier partager plan travail",
+  },
+  {
+    action: "layerViaCopy",
+    category: "edit",
+    label: "pixelSelection:layerViaCopy",
+    terms:
+      "layer via copy selection pixels duplicate in place photoshop calque par copie sélection nouveau calque",
+    shortcut: ["Mod", "J"],
+    gate: "editable",
   },
   {
     action: "duplicate",

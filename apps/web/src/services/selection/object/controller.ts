@@ -40,7 +40,11 @@ export class ObjectSelectionController implements ObjectSelectionPort {
     private readonly pixels: MaskSelectionPort,
   ) {
     this.stop = pixels.subscribe(() => {
-      if (this.state && !this.preparing && !pixels.read()) this.clear();
+      if (!this.state || this.preparing) return;
+      const selection = pixels.read();
+      if (!selection) this.clear();
+      else if (Boolean(this.state.applying) !== Boolean(selection.applying))
+        this.publish({ ...this.state, applying: Boolean(selection.applying) });
     });
   }
   read = () => this.state;
@@ -60,7 +64,7 @@ export class ObjectSelectionController implements ObjectSelectionPort {
     this.publish(this.state ? { ...this.state, mode } : null);
   };
   private attach(layerId: string) {
-    if (this.closed) throw abort();
+    if (this.closed || this.pixels.read()?.applying) throw abort();
     if (
       this.state?.layerId === layerId &&
       this.target &&
@@ -156,6 +160,7 @@ export class ObjectSelectionController implements ObjectSelectionPort {
     return this.request();
   }
   private remember() {
+    if (this.pixels.read()?.applying) throw abort();
     if (!this.state) return;
     this.history.push({
       points: this.state.points,
@@ -164,6 +169,7 @@ export class ObjectSelectionController implements ObjectSelectionPort {
     if (this.history.length > 64) this.history.shift();
   }
   async removeLast() {
+    if (this.pixels.read()?.applying) throw abort();
     if (!this.state) return;
     const previous = this.history.pop();
     if (!previous || (!previous.points.length && !previous.box)) {

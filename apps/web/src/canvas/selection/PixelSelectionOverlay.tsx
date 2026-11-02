@@ -7,7 +7,7 @@ import {
 } from "react";
 import { useTranslation } from "react-i18next";
 import { createLayerGeometryIndex } from "@musart/core";
-import { Blend, FlipVertical2, X, Eraser } from "lucide-react";
+import { Blend, FlipVertical2, X, Eraser, CopyPlus } from "lucide-react";
 import type { PixelSelectionPort } from "../../services/selection/wand/model";
 import type { SceneController } from "../session/scene-controller";
 import type { ViewSource } from "../viewport/motion";
@@ -15,7 +15,8 @@ import { Button } from "../../components/ui/button";
 import { ButtonGroup } from "../../components/ui/button-group";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../../components/ui/tooltip";
 import { Kbd, KbdGroup } from "../../components/ui/kbd";
-import { modifierLabel } from "../../components/search/shortcuts";
+import { useKeybindings } from "../../state/keybindings/use-keybindings";
+import { bindingLabel, modifierLabel } from "../../components/search/shortcuts";
 import { formatUiError } from "../../state/i18n/errors/format";
 import "../../services/selection/wand/messages";
 import "./pixel-selection.css";
@@ -126,6 +127,7 @@ export function PixelSelectionToolbar({
   onError?: (message: string) => void;
 }) {
   const { t } = useTranslation("pixelSelection"),
+    bindings = useKeybindings(),
     state = useSyncExternalStore(
       port?.subscribe ?? emptySubscribe,
       port?.read ?? emptyRead,
@@ -164,6 +166,19 @@ export function PixelSelectionToolbar({
               : t("selected", { count: state.selected })}
         </span>
       </div>
+      <ButtonGroup aria-label={t("layerViaCopy")}>
+        <SelectionAction
+          label={t("layerViaCopy")}
+          hint={t("layerViaCopyHint")}
+          shortcut={bindingLabel("action:layerViaCopy", bindings)}
+          disabled={busy || state.selected === 0}
+          onClick={() => {
+            void run(() => port!.copyPixels());
+          }}
+        >
+          <CopyPlus size={14} />
+        </SelectionAction>
+      </ButtonGroup>
       <ButtonGroup aria-label={t("title")}>
         <SelectionAction
           label={t("erase")}

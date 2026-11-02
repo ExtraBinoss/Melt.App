@@ -4,6 +4,7 @@ export interface ObjectSelectionState extends SelectionPrompt {
   width: number;
   height: number;
   busy: boolean;
+  applying?: boolean;
   scanning: boolean;
   candidates: readonly ObjectCandidate[];
   error: string;

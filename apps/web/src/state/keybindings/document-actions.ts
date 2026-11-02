@@ -1,3 +1,5 @@
+import type { PixelSelectionPort } from "../../services/selection/preview";
+import { layerViaCopy } from "../../services/selection/layer-via-copy";
 import { createMotionTransport } from "../../services/motion/transport";
 import { getAncestors, getWorldMatrix, invertMatrix, type EnginePort } from "@musart/core";
 import type { Tool } from "../../canvas/EditorCanvas";
@@ -8,6 +10,7 @@ import { createClipboardController } from "../../services/clipboard/controller";
 interface Context {
   engine: EnginePort;
   save: () => Promise<void>;
+  pixelSelection?: PixelSelectionPort;
   setTool: (tool: Tool) => void;
 }
 /** The headless document subset also works when the visual command surface is not mounted. */
@@ -50,6 +53,7 @@ export function documentShortcut(
     "action:undo": engine.undo,
     "action:redo": engine.redo,
     "action:duplicate": selected("duplicateLayers"),
+    "action:layerViaCopy": () => layerViaCopy(engine, context.pixelSelection),
     "action:group": selected("groupLayers"),
     "action:ungroup": selected("ungroupLayers"),
     "action:deselect": () => engine.select([]),

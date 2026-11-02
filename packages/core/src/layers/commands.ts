@@ -12,7 +12,6 @@ import { getLayer, assertEditable, selectedRoots, deleteLayerTree } from "./acce
 import { groupLayers, ungroupLayers } from "./grouping";
 import type { CommandHandler } from "../session/context";
 import { applyLayerPatches } from "./patches";
-import { duplicateMotionTracks } from "../motion/structure";
 import { assertMotionHierarchyChange } from "../motion/hierarchy";
 import { setLayerTransform } from "./affine";
 export const addLayers: CommandHandler<"addLayers"> = ({ project, page, pageId }, command) => {
@@ -46,42 +45,7 @@ export const deleteLayers: CommandHandler<"deleteLayers"> = ({ page, pageId }, c
   deleteLayerTree(page, command.ids);
   return { pageId, selection: [] };
 };
-export const duplicateLayers: CommandHandler<"duplicateLayers"> = (
-  { page, pageId, nextId },
-  command,
-) => {
-  const roots = selectedRoots(page, command.ids);
-  for (const layer of roots) assertEditable(page, layer);
-  const children = getDescendants(
-    page,
-    roots.map((layer) => layer.id),
-  );
-  const ids = new Map(children.map((layer) => [layer.id, nextId("layer")]));
-  const rootIds = new Set(roots.map((layer) => layer.id));
-  const effectIds = new Map<string, string>();
-  const clones = children.map((layer) => ({
-    ...layer,
-    id: ids.get(layer.id)!,
-    name: `${layer.name} copie`,
-    x: layer.x + (rootIds.has(layer.id) ? 24 : 0),
-    y: layer.y + (rootIds.has(layer.id) ? 24 : 0),
-    parentId: layer.parentId ? (ids.get(layer.parentId) ?? layer.parentId) : null,
-    effects: layer.effects.map((effect) => {
-      const id = nextId("effect");
-      effectIds.set(effect.id, id);
-      return { ...effect, id };
-    }),
-    ...(layer.guides
-      ? { guides: layer.guides.map((guide) => ({ ...guide, id: nextId("guide") })) }
-      : {}),
-    ...(layer.mask?.layerId
-      ? { mask: { ...layer.mask, layerId: ids.get(layer.mask.layerId) ?? layer.mask.layerId } }
-      : {}),
-  }));
-  page.layers.push(...clones);
-  duplicateMotionTracks(page, ids, effectIds, rootIds, nextId);
-  return { pageId, selection: roots.map((layer) => ids.get(layer.id)!) };
-};
+export { duplicateLayers } from "./duplicate";
 export const reorderLayer: CommandHandler<"reorderLayer"> = ({ page, pageId }, command) => {
   const layer = getLayer(page, command.id);
   assertEditable(page, layer);

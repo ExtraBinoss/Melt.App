@@ -44,5 +44,9 @@
   "objectError": "La sélection d’objet a échoué. Réessayez ou utilisez la baguette magique.",
   "objectDetails": "Détails techniques",
   "objectCopy": "Copier l’erreur",
-  "previewFailed": "Échec de l’aperçu"
+  "previewFailed": "Échec de l’aperçu",
+  "layerViaCopy": "Nouveau calque par copie",
+  "layerViaCopyHint": "Copier les pixels sélectionnés dans un nouveau calque au même endroit. Sans sélection de pixels, dupliquer les calques sélectionnés sur place.",
+  "copySuffix": "copie",
+  "copyEmpty": "La zone sélectionnée ne contient aucun pixel visible à copier."
 }

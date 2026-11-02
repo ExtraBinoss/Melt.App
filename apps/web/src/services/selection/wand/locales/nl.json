@@ -44,5 +44,9 @@
   "objectError": "Objectselectie is mislukt. Probeer het opnieuw of gebruik de toverstaf.",
   "objectDetails": "Technische details",
   "objectCopy": "Fout kopiëren",
-  "previewFailed": "Voorbeeld mislukt"
+  "previewFailed": "Voorbeeld mislukt",
+  "layerViaCopy": "Nieuwe laag via kopiëren",
+  "layerViaCopyHint": "Kopieer de geselecteerde pixels naar een nieuwe laag op dezelfde positie. Zonder pixelselectie worden de geselecteerde lagen op hun plaats gedupliceerd.",
+  "copySuffix": "kopie",
+  "copyEmpty": "Het geselecteerde gebied bevat geen zichtbare pixels om te kopiëren."
 }

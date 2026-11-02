@@ -44,5 +44,9 @@
   "objectError": "Zaznaczanie obiektu nie powiodło się. Spróbuj ponownie lub użyj różdżki.",
   "objectDetails": "Szczegóły techniczne",
   "objectCopy": "Kopiuj błąd",
-  "previewFailed": "Podgląd nie powiódł się"
+  "previewFailed": "Podgląd nie powiódł się",
+  "layerViaCopy": "Nowa warstwa przez kopiowanie",
+  "layerViaCopyHint": "Kopiuje zaznaczone piksele na nową warstwę w tym samym miejscu. Bez zaznaczenia pikseli powiela wybrane warstwy bez przesunięcia.",
+  "copySuffix": "kopia",
+  "copyEmpty": "Zaznaczony obszar nie zawiera widocznych pikseli do skopiowania."
 }

@@ -26,6 +26,7 @@ function fixture() {
       accept: vi.fn(async () => {}),
       cancel: vi.fn(),
       invert: vi.fn(async () => {}),
+      copyPixels: vi.fn(async () => {}),
       createMask: vi.fn(async () => {}),
       erase: vi.fn(async () => {}),
       deselect: vi.fn(() => {
@@ -45,6 +46,34 @@ function fixture() {
     },
   };
 }
+it("routes the configurable copy command to pixel extraction, consumes busy/repeated intent and leaves text editing alone", async () => {
+  const d = fixture(),
+    press = () => new KeyboardEvent("keydown", { key: "j", ctrlKey: true, cancelable: true });
+  const event = press();
+  expect(pixelSelectionShortcut(event, d.port, d.onTask, "action:layerViaCopy")).toBe(true);
+  expect(event.defaultPrevented).toBe(true);
+  expect(d.port.copyPixels).toHaveBeenCalledOnce();
+  d.publish({ ...d.port.read()!, busy: true });
+  expect(pixelSelectionShortcut(press(), d.port, d.onTask, "action:layerViaCopy")).toBe(true);
+  expect(d.port.copyPixels).toHaveBeenCalledOnce();
+  d.publish({ ...d.port.read()!, busy: false });
+  expect(
+    pixelSelectionShortcut(
+      new KeyboardEvent("keydown", { key: "j", ctrlKey: true, repeat: true }),
+      d.port,
+      d.onTask,
+      "action:layerViaCopy",
+    ),
+  ).toBe(true);
+  expect(d.port.copyPixels).toHaveBeenCalledOnce();
+  const input = document.createElement("input"),
+    typing = press();
+  input.dispatchEvent(typing);
+  expect(pixelSelectionShortcut(typing, d.port, d.onTask, "action:layerViaCopy")).toBe(false);
+  d.publish(null);
+  expect(pixelSelectionShortcut(press(), d.port, d.onTask, "action:layerViaCopy")).toBe(false);
+  await Promise.resolve();
+});
 it("gives pixel CtrlD and Delete priority while suppressing repeated or busy layer actions", async () => {
   const d = fixture(),
     erase = new KeyboardEvent("keydown", { key: "Delete", cancelable: true });

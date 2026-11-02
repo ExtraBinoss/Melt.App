@@ -31,8 +31,8 @@ temporary pixel-selection preview and explicit mask actions.
   proposal scan, not an exhaustive guarantee that every small object is found.
 - The marching-ants outline previews the detected region. **Keep area**, **Erase
   area**, **Invert selection** and **Deselect** use the exact same controller and
-  mask command planning as the wand, preserving an existing mask. Only Keep or
-  Erase publishes a document transaction and one undo entry. Corrective clicks,
+  mask command planning as the wand, preserving an existing mask. Only Keep, Erase or
+  New layer via copy publishes a document transaction and one undo entry. Corrective clicks,
   proposals, box previews and cancellation do not enter document history.
 - During inference, local status appears immediately and mask application is
   disabled. Errors expose technical details and a copy button; a failed preview
@@ -115,7 +115,7 @@ not a readback of the editor's render/composition textures. Source image
 preparation uses browser decoding and an OffscreenCanvas. Temporary input and
 output tensors are disposed after each request, including error paths.
 
-The client admits one operation and rejects stale responses. Explicit Keep/Erase
+The client admits one operation and rejects stale responses. Explicit Keep/Erase or Layer via Copy
 produces one validated undoable document transaction; inference alone never does. Preparation
 and inference can be cancelled. Removing cached model files terminates the
 worker, serializes against preparation with the existing named browser lock,

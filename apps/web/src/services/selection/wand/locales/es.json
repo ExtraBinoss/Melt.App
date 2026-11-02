@@ -44,5 +44,9 @@
   "objectError": "La selección de objetos ha fallado. Puedes reintentar o usar la varita mágica.",
   "objectDetails": "Detalles técnicos",
   "objectCopy": "Copiar error",
-  "previewFailed": "Error de vista previa"
+  "previewFailed": "Error de vista previa",
+  "layerViaCopy": "Nueva capa por copia",
+  "layerViaCopyHint": "Copia los píxeles seleccionados en una nueva capa en la misma posición. Sin una selección de píxeles, duplica las capas seleccionadas sin desplazarlas.",
+  "copySuffix": "copia",
+  "copyEmpty": "El área seleccionada no contiene píxeles visibles para copiar."
 }

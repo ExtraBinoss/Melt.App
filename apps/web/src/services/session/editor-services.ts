@@ -70,6 +70,8 @@ export function createEditorServices(
   const pixelSelection = new PixelSelectionController(engine, {
     pixels: async (asset) => (await renderer()).sourcePixels(asset),
     maskName: () => i18n.t("pixelSelection:maskName"),
+    copyName: (name) => `${name} ${i18n.t("pixelSelection:copySuffix")}`,
+    copyEmpty: () => i18n.t("pixelSelection:copyEmpty"),
   });
   const objectSelection = new ObjectSelectionController(engine, selection, pixelSelection);
   const mediaResolvers = new Map<string, import("@musart/render").MediaSourceResolver>();

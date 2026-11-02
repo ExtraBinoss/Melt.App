@@ -68,6 +68,21 @@ export function readBindings(serialized: string | null): BindingSnapshot {
     const known = Object.fromEntries(
       Object.entries(parsed.overrides).filter(([id]) => isCommandId(id)),
     );
+    // Profiles authored before Layer via Copy existed may already use Mod+J.
+    // Preserve that assignment instead of discarding the entire saved profile.
+    if (!Object.hasOwn(known, "action:layerViaCopy")) {
+      const defaults = BINDING_COMMANDS.find(
+        (command) => command.id === "action:layerViaCopy",
+      )!.defaults;
+      if (
+        Object.values(known).some((value) =>
+          chords(value).some((chord) =>
+            defaults.some((candidate) => chordKey(candidate) === chordKey(chord)),
+          ),
+        )
+      )
+        known["action:layerViaCopy"] = [];
+    }
     return bindingSnapshot(known);
   } catch {
     return bindingSnapshot();

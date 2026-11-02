@@ -38,6 +38,7 @@ test("routes pixel-region Delete and CtrlD before layer commands and respects at
     accept: vi.fn(async () => {}),
     cancel: vi.fn(),
     invert: vi.fn(async () => {}),
+    copyPixels: vi.fn(async () => {}),
     createMask: vi.fn(async () => {}),
     erase: vi.fn(async () => {}),
     deselect: vi.fn(() => {

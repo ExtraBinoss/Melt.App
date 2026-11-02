@@ -1,3 +1,4 @@
+import type { ExtractedImage, ExtractedPixels } from "./extract";
 import type { SelectionMode, SelectionPreview as WandPreview } from "../preview";
 export type {
   SelectionMode,
@@ -17,8 +18,9 @@ export type WandRequest =
       contiguous: boolean;
     }
   | { id: number; type: "mask"; data: Uint8ClampedArray; width: number; height: number }
-  | { id: number; type: "accept" | "invert" | "export" };
+  | { id: number; type: "accept" | "invert" | "export" | "extract" };
 export type WandResponse =
+  | { id: number; image: ExtractedPixels | ExtractedImage | null }
   | { id: number; preview: WandPreview }
   | { id: number; mask: { data: Uint8ClampedArray; width: number; height: number } }
   | { id: number; error: string };

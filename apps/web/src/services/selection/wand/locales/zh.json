@@ -44,5 +44,9 @@
   "objectError": "对象选择失败。请重试或使用魔棒工具。",
   "objectDetails": "技术详情",
   "objectCopy": "复制错误",
-  "previewFailed": "预览失败"
+  "previewFailed": "预览失败",
+  "layerViaCopy": "通过拷贝新建图层",
+  "layerViaCopyHint": "将所选像素复制到同一位置的新图层。没有像素选区时，原位复制所选图层。",
+  "copySuffix": "副本",
+  "copyEmpty": "所选区域没有可复制的可见像素。"
 }

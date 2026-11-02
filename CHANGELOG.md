@@ -6,6 +6,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Added
 
+- Add configurable Ctrl/Cmd+J Layer via Copy: extract selected original pixels into a tightly cropped PNG layer at the same canvas position, or duplicate whole layers/groups directly above their originals without offset. Preserve originals, nested transforms, existing clips, editable effects and unchanged motion-key positions, with atomic undo/redo, worker-side encoding, twelve-language controls and preservation of older custom Mod+J bindings.
+
 - Unify SAM and magic-wand selection previews behind a generic mask-selection port. Add cumulative foreground/background points, draggable rectangles, bounded image-wide object proposals, prompt undo, cancellable latest-intent inference, bilingual controls and copyable errors; apply Keep/Erase only as an explicit reversible transaction preserving existing masks.
 
 - Recreate the supplied DevDay reference choreography for the landing hero: a brief native mascot entrance, scattered points settling onto real glyph curve endpoints, traced contours and staggered solid letter fills, with individual hover replays. Parse the shared display font for exact paths, retain browser-shaped contours for fallback scripts, preserve selectable accessible text and reduced motion, and dispose completed animation clocks and SVG surfaces.

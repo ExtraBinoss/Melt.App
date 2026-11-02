@@ -38,6 +38,7 @@ export type SearchAction =
   | "undo"
   | "redo"
   | "duplicate"
+  | "layerViaCopy"
   | "copy"
   | "paste"
   | "copyComposition"

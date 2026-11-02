@@ -1,3 +1,4 @@
+import { layerViaCopy } from "../../services/selection/layer-via-copy";
 import type { Locale } from "../../state/i18n/locales";
 import { createMotionTransport } from "../../services/motion/transport";
 import { createEffect, createPage, createLayerGeometryIndex, type EnginePort } from "@musart/core";
@@ -93,6 +94,7 @@ export function createSearchActions(context: SearchActions) {
     paste: () => createClipboardController(engine).paste(),
     copyComposition: () => createClipboardController(engine).copy(true),
     duplicate: () => selectedCommand("duplicateLayers"),
+    layerViaCopy: () => layerViaCopy(engine, services.pixelSelection),
     delete: () => capturePresentationDelete(engine)(),
     group: () => selectedCommand("groupLayers"),
     ungroup: () => selectedCommand("ungroupLayers"),
@@ -185,6 +187,7 @@ export function executeSearchItem(item: SearchItem, context: SearchActions): voi
 const selectionActions = new Set<SearchAction>([
   "copy",
   "duplicate",
+  "layerViaCopy",
   "group",
   "ungroup",
   "deselect",
@@ -204,6 +207,10 @@ export function captureSearchItem(
       ? context.engine.getSnapshot()
       : null;
   const ids = new Set(origin?.selection);
+  const pixels =
+    target.kind === "action" && target.action === "layerViaCopy"
+      ? context.services.pixelSelection?.read()
+      : undefined;
   return () => {
     if (origin) {
       const current = context.engine.getSnapshot();
@@ -216,6 +223,12 @@ export function captureSearchItem(
       )
         throw new Error(context.t("keybindings:stale"));
     }
+    if (
+      target.kind === "action" &&
+      target.action === "layerViaCopy" &&
+      context.services.pixelSelection?.read() !== pixels
+    )
+      throw new Error(context.t("keybindings:stale"));
     return executeSearchItem(item, context);
   };
 }

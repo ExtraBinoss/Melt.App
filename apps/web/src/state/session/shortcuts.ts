@@ -80,7 +80,12 @@ export function useShortcuts(
         event.preventDefault();
         return;
       }
-      const fallback = documentShortcut(command, { engine, save: services.saveProject, setTool });
+      const fallback = documentShortcut(command, {
+        engine,
+        save: services.saveProject,
+        setTool,
+        pixelSelection: services.pixelSelection,
+      });
       if (command === "action:undo" || command === "action:redo" || command === "action:deselect")
         setPreview(null);
       if (command === "action:deselect") setTool("pointer");

@@ -46,6 +46,40 @@ The interaction follows the [official Affinity Flood Select Tool reference](http
 | Erase composition  | Erase inverts the new selection before the previous mask is applied; it does not discard the previous clip.                                                                                                                                                                   |
 | Undo               | One undo restores the preceding mask and removes the added source and asset.                                                                                                                                                                                                  |
 
+### Layer via Copy
+
+**Ctrl+J** on Windows/Linux and **Command+J** on macOS run the configurable
+**New layer via copy** command, also available in search and the contextual
+pixel-selection toolbar. The command has two behaviors:
+
+- With an accepted pixel selection, extract the selected original RGBA into a
+  tightly cropped PNG and create a new image layer directly above its source.
+  The original layer and asset remain unchanged. Source alpha and fractional
+  selection coverage are multiplied; holes and disconnected regions stay
+  transparent. Empty/transparent selections report an error instead of copying
+  the whole layer. Successful extraction selects the new layer and clears the
+  temporary pixel selection.
+- Without a pixel selection, duplicate the selected layers and groups in place,
+  directly above their originals. Local transforms, effect identities, mask
+  references and motion tracks follow the normal duplication contract, with no
+  position offset or motion-key offset. Existing **Duplicate** keeps its 24 px
+  offset so saved commands and shortcuts retain their established behavior.
+
+A crop's local transform includes its original pixel offset; nested rotation,
+scale, reflection and shear preserve its exact canvas position. Editable effects
+receive new IDs. Existing masks and rounded-frame clips remain aligned through
+an independent GPU clip carrier in the original world frame; parent opacity is
+not applied twice. Each operation is one validated undoable transaction, including
+its assets and any clip carrier. Undo restores the original selection and removes
+the copied assets; redo restores the created layer and selects it.
+
+Extraction and PNG encoding run in the existing selection worker, using its
+retained original source and accepted coverage. No editor GPU pixels are read
+back. Async responses recheck the document origin and selection before publishing.
+Busy/repeated shortcut intent is consumed without duplicating an entire layer;
+editable fields and modal controls keep their native keys. Existing customized
+Mod+J assignments survive the introduction of this new default binding.
+
 ### Keyboard ownership
 
 | Selection topic     | Behavior                                                                                                                                 |
@@ -73,7 +107,7 @@ Inverting or deselecting a selection changes presentation state rather than docu
 - The current source limit is 16,777,216 pixels. Larger originals fail explicitly before image preparation instead of allocating an unbounded flood queue.
 - Preview messages contain bounded vector outline geometry. The help explains that highly detailed boundaries may use a simpler outline; accepted coverage and exported masks retain full source resolution. The main toolbar does not present approximation as a separate action or status.
 - The SVG outline lives in viewport coordinates outside the scaled artboard, with a single non-scaling one-pixel stroke. World/layer transforms move its geometry while the dash length and speed remain in screen pixels. Its imperative subscriptions and viewport observer are released on unmount; moving tolerance does not rerender App, Inspector, CanvasArea, EditorCanvas or EditorScene. CSS animates only dash offset and respects reduced motion.
-- Cancellation, project replacement and runtime disposal release the worker, listeners and request timer. No selection data enters the project journal until Keep or Erase.
+- Cancellation, project replacement and runtime disposal release the worker, listeners and request timer. No selection data enters the project journal until Keep, Erase or Layer via Copy.
 
 ## Verification
 

@@ -17,10 +17,16 @@ export function pixelSelectionShortcut(
       !event.altKey &&
       event.key.toLowerCase() === "d",
     erase = event.key === "Delete" || event.key === "Backspace" || command === "action:delete";
-  if (!deselect && !erase && command !== "action:duplicate") return false;
+  const copy = command === "action:layerViaCopy";
+  if (!deselect && !erase && !copy && command !== "action:duplicate") return false;
   event.preventDefault();
   if (event.repeat) return true;
   if (deselect) port.deselect();
+  else if (copy && !state.busy && !state.dragging && !state.error)
+    void onTask(async () => {
+      if (port.read() !== state) throw new DOMException("Pixel selection changed.", "AbortError");
+      await port.copyPixels();
+    });
   else if (erase && !state.busy && !state.dragging && !state.error && state.selected > 0)
     void onTask(async () => {
       if (port.read() !== state) throw new DOMException("Pixel selection changed.", "AbortError");

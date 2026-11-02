@@ -14,6 +14,7 @@ export interface PixelSelectionState extends SelectionPreview {
   contiguous: boolean;
   busy: boolean;
   dragging: boolean;
+  applying?: boolean;
   replacesMask?: boolean;
   error?: string;
 }
@@ -33,6 +34,7 @@ export interface PixelSelectionPort {
   cancel(): void;
   invert(): Promise<void>;
   createMask(): Promise<void>;
+  copyPixels(): Promise<void>;
   erase(): Promise<void>;
   deselect(): void;
   dispose(): void;

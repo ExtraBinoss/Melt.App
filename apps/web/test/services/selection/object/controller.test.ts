@@ -79,6 +79,22 @@ function fixture() {
   });
   return { engine, objects, pixels, client, worker };
 }
+it("does not let new model prompts overwrite an explicit pixel-copy transaction", async () => {
+  const d = fixture();
+  await d.objects.point("image", 5, 5, true);
+  const pending = d.pixels.copyPixels();
+  expect(d.pixels.read()?.applying).toBe(true);
+  expect(d.objects.read()?.applying).toBe(true);
+  await expect(d.objects.point("image", 15, 5, false)).rejects.toMatchObject({
+    name: "AbortError",
+  });
+  expect(d.client.prompt).toHaveBeenCalledOnce();
+  await pending;
+  expect(
+    d.engine.getSnapshot().project.pages[0]!.layers.filter((layer) => layer.kind === "image"),
+  ).toHaveLength(2);
+  expect(d.objects.read()).toBeNull();
+});
 it("shares an explicit mask preview with the wand, retains original bytes, and commits once with exact undo/redo", async () => {
   const d = fixture(),
     before = d.engine.getSnapshot().project;

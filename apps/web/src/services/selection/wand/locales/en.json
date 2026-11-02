@@ -44,5 +44,9 @@
   "objectError": "Object selection failed. You can retry or use the magic wand.",
   "objectDetails": "Technical details",
   "objectCopy": "Copy error",
-  "previewFailed": "Preview failed"
+  "previewFailed": "Preview failed",
+  "layerViaCopy": "New layer via copy",
+  "layerViaCopyHint": "Copy the selected pixels to a new layer in the same position. Without a pixel selection, duplicate the selected layers in place.",
+  "copySuffix": "copy",
+  "copyEmpty": "The selected area contains no visible pixels to copy."
 }

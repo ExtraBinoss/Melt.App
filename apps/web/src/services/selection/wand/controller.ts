@@ -1,3 +1,5 @@
+import { readDataUrl } from "../../assets/imports";
+import { copySelectionCommands } from "./copy-commands";
 import type { MaskSelectionPort } from "../preview";
 import type { MaskResult } from "../selection";
 import { createLayerGeometryIndex, isImageAsset, type Asset, type EnginePort } from "@musart/core";
@@ -16,6 +18,8 @@ interface Dependencies {
   client?(): WandClient;
   encode?: typeof maskToDataUrl;
   maskName?(): string;
+  copyName?(sourceName: string): string;
+  copyEmpty?(): string;
 }
 interface Target {
   origin: GestureOrigin;
@@ -203,7 +207,7 @@ export class PixelSelectionController implements MaskSelectionPort {
       }),
     );
     this.requireControl(generation, version);
-    this.accepted = { ...this.state!, ...preview, busy: false, dragging: false };
+    this.accepted = { ...this.state!, ...preview, busy: false, dragging: false, applying: false };
     this.publish(holdBusy ? { ...this.accepted, busy: true } : this.accepted);
   }
   update = (tolerance: number): Promise<void> => {
@@ -306,7 +310,7 @@ export class PixelSelectionController implements MaskSelectionPort {
         if (this.controlling === pending) this.controlling = null;
       });
     this.controlling = pending;
-    this.publish({ ...this.state!, busy: true });
+    this.publish({ ...this.state!, busy: true, applying: true });
     return pending;
   }
   async invert() {
@@ -314,7 +318,7 @@ export class PixelSelectionController implements MaskSelectionPort {
     return this.control(async (generation, gesture) => {
       const preview = this.preview(await this.client!.request({ type: "invert" }));
       this.requireControl(generation, gesture);
-      this.accepted = { ...this.state!, ...preview, busy: false, dragging: false };
+      this.accepted = { ...this.state!, ...preview, busy: false, dragging: false, applying: false };
       this.publish(this.accepted);
     });
   }
@@ -323,6 +327,46 @@ export class PixelSelectionController implements MaskSelectionPort {
   }
   async erase() {
     return this.applyMask(true);
+  }
+  async copyPixels() {
+    if (!this.state || this.state.busy || this.state.dragging || this.state.error) return;
+    const empty = () => Error(this.dependencies.copyEmpty?.() ?? "The selected area is empty.");
+    if (!this.state.selected) throw empty();
+    return this.control(async (generation, gesture) => {
+      const state = this.state!,
+        response = await this.client!.request({ type: "extract" });
+      this.requireControl(generation, gesture);
+      if (!("image" in response)) throw Error("Copied selection pixels are missing.");
+      if (!response.image) throw empty();
+      const image = response.image;
+      const dataUrl =
+        "blob" in image
+          ? await readDataUrl(image.blob)
+          : (this.dependencies.encode ?? maskToDataUrl)(image.data, image.width, image.height);
+      this.requireControl(generation, gesture);
+      const snapshot = this.engine.getSnapshot(),
+        page = snapshot.project.pages.find((item) => item.id === snapshot.pageId)!,
+        original = createLayerGeometryIndex(page).get(this.target!.layerId),
+        name = this.dependencies.copyName?.(original.name) ?? `${original.name} copy`;
+      this.engine.transaction(
+        copySelectionCommands(
+          page,
+          original.id,
+          {
+            id: crypto.randomUUID(),
+            name,
+            mime: "image/png",
+            width: image.width,
+            height: image.height,
+            dataUrl,
+          },
+          { x: image.x, y: image.y, sourceWidth: state.width, sourceHeight: state.height },
+          name,
+          this.dependencies.maskName?.() ?? "Selection mask",
+        ),
+      );
+      this.deselect();
+    });
   }
   private async applyMask(erase: boolean) {
     if (!this.state?.selected || this.state.busy || this.state.dragging || this.state.error) return;

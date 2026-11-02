@@ -193,7 +193,7 @@ export type Command =
   | { type: "updateLayers"; ids: string[]; patch: Partial<Layer> }
   | { type: "updateLayerPatches"; patches: { id: string; patch: Partial<Layer> }[] }
   | { type: "deleteLayers"; ids: string[] }
-  | { type: "duplicateLayers"; ids: string[] }
+  | { type: "duplicateLayers"; ids: string[]; inPlace?: boolean; nameSuffix?: string }
   | { type: "reorderLayer"; id: string; index: number; parentId?: string | null }
   | { type: "groupLayers"; ids: string[] }
   | { type: "ungroupLayers"; ids: string[] }

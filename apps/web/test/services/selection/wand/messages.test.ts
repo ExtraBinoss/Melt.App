@@ -13,8 +13,9 @@ it.each(supportedLocales.map(({ code }) => code))(
       ["localModel", modelMessages],
     ] as const) {
       expect(Object.keys(resources[lng]!).sort()).toEqual(Object.keys(resources.en).sort());
+      const localized: Record<string, unknown> = resources[lng]!;
       for (const [key, original] of Object.entries(resources.en)) {
-        const value = resources[lng]![key];
+        const value = localized[key];
         expect(typeof value).toBe("string");
         expect(String(value).trim().length).toBeGreaterThan(0);
         expect(placeholders(String(value))).toEqual(placeholders(original));

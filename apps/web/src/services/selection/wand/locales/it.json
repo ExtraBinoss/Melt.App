@@ -44,5 +44,9 @@
   "objectError": "La selezione dell’oggetto non è riuscita. Riprova o usa la bacchetta magica.",
   "objectDetails": "Dettagli tecnici",
   "objectCopy": "Copia errore",
-  "previewFailed": "Anteprima non riuscita"
+  "previewFailed": "Anteprima non riuscita",
+  "layerViaCopy": "Nuovo livello tramite copia",
+  "layerViaCopyHint": "Copia i pixel selezionati in un nuovo livello nella stessa posizione. Senza una selezione di pixel, duplica i livelli selezionati senza spostarli.",
+  "copySuffix": "copia",
+  "copyEmpty": "L’area selezionata non contiene pixel visibili da copiare."
 }

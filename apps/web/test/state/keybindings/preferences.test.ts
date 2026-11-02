@@ -6,6 +6,14 @@ import {
   serializeBindings,
 } from "../../../src/state/keybindings/preferences";
 const custom = { key: "p", mod: true, shift: false, alt: true };
+test("adds configurable Ctrl/Cmd+J without stealing an older custom assignment", () => {
+  const chord = { key: "j", mod: true, shift: false, alt: false };
+  expect(bindingSnapshot().bindings.get("action:layerViaCopy")).toEqual([chord]);
+  const old = readBindings(JSON.stringify({ version: 1, overrides: { "action:save": [chord] } }));
+  expect(old.bindings.get("action:save")).toEqual([chord]);
+  expect(old.bindings.get("action:layerViaCopy")).toEqual([]);
+  expect(old.bindings.get("action:undo")).toEqual(bindingSnapshot().bindings.get("action:undo"));
+});
 test("validates every override, rejects collisions including defaults and keeps disabled bindings explicit", () => {
   const snapshot = bindingSnapshot({ "action:save": [custom], "action:delete": [] });
   expect(snapshot.bindings.get("action:save")).toEqual([custom]);
