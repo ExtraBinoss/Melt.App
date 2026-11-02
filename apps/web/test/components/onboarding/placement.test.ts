@@ -60,3 +60,13 @@ test("a displaced control moves its card rather than keeping a distant previous 
   expect(card.x).toBeGreaterThan(850);
   expect(card.y).toBeGreaterThan(500);
 });
+
+test("small target movements update coordinates immediately while retaining the free side", () => {
+  const viewport = { width: 1200, height: 800 };
+  const anchor = { x: 450, y: 200, width: 200, height: 200 };
+  const previous = { x: 722, y: 166 };
+  expect(placeGuide({ ...anchor, x: 454, y: 203 }, viewport, 330, 268, previous)).toEqual({
+    x: 726,
+    y: 169,
+  });
+});

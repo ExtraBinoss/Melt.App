@@ -192,11 +192,12 @@ test("guided editor practice, automatic tasks, exit and editor-only replay", asy
       await expectSpotlight(page, '[data-tutorial="add-transition"]');
       const before = (await guide.boundingBox())!;
       await page.keyboard.press("Escape");
-      await expect(page.locator('[data-tutorial="add-transition"]')).toBeHidden();
+      await expect(page.locator('[data-tutorial="add-transition"]')).toBeVisible();
       const after = (await guide.boundingBox())!;
       expect(Math.abs(after.x - before.x)).toBeLessThan(3);
       expect(Math.abs(after.y - before.y)).toBeLessThan(3);
       const box = (await page.getByTestId("artboard").boundingBox())!;
+      // Once open, repeated canvas clicks cannot dismiss or replace this menu.
       await page.mouse.click(box.x + box.width / 2, box.y + box.height * 0.46, { button: "right" });
       await expect(page.locator('[data-tutorial="add-transition"]')).toBeVisible();
     }

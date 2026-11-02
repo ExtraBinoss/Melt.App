@@ -73,8 +73,35 @@ Forward preparation never clears a picker already opened by queued Next requests
 
 Card placement is computed from the current step's measured target, viewport and
 card height in one geometry pass. Cards prefer the free left/right side with
-centered alignment, falling above or below when those sides are obstructed. Only
-a nearby retained position can stabilize a reopened menu; an old unobstructed
-position elsewhere in the editor cannot override the current target. The copy
+centered alignment, falling above or below when those sides are obstructed. A free
+placement side can stabilize a reopened menu, while coordinates follow every
+target/viewport change without a movement threshold. The copy
 uses native Kbd groups and matching UI icons for mouse, effect, animation, pin,
 playback and export controls, retaining those components during text reveal.
+
+## Guided input boundary
+
+While the exercise is visible, a scoped window-capture boundary admits native
+input only on its current action and the guide's navigation. The Layers action
+allows Lake selection without its Lock/Hide controls. The image context action
+accepts a right-click inside Lake. Timeline resizing remains available during
+the pin/timeline lessons. Outside clicks, sibling actions, wheel gestures, Escape
+and unrelated shortcuts cannot dismiss a required popup or edit the document.
+Tab cycles through the current action and guide buttons; Enter/Space activate
+them. Guide presses do not reach Radix outside-pointer/focus dismissal. No body
+styles, inherited modal defaults or editor interaction rules are changed.
+
+Listeners disappear before exit confirmation and on tutorial closure/unmount.
+Keep going restores a previously acquired popup through its actual UI owner.
+Recovery observes surface availability, cancels on navigation and distinguishes
+the deliberate image-menu-to-animation-picker handoff from unexpected dismissal.
+A missing target parks Melt in the card and retains background dimming. Native
+browser regressions cover dismissal attempts, unrelated commands, keyboard
+access, exit/resume, handoffs and complete interaction cleanup after exit.
+
+Popup geometry is measured in the positioning wrapper's final bounds, excluding
+content entrance scale/translation. Screen coordinates are mapped back through
+the overlay's scale when the export dialog enters. ResizeObserver, visual
+viewport events and a bounded RAF follow active ancestor/camera animations;
+stationary surfaces do not retain a polling clock. All reads precede local guide
+state updates, and movement remains on Motion transforms.

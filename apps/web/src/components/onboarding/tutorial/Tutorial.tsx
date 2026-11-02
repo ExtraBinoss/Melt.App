@@ -40,6 +40,7 @@ export function Tutorial({
   const [leave, setLeave] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [layerId, setLayerId] = useState<string>();
   const furthest = useRef(0);
   const cursor = useRef(0);
   const pending = useRef(0);
@@ -156,6 +157,7 @@ export function Tutorial({
     try {
       practice.current = await createPracticeProject(engine, services);
       if (alive.current) {
+        setLayerId(practice.current.layerId);
         onProjectCreated?.(practice.current.projectId);
         furthest.current = 0;
         cursor.current = 0;
@@ -215,6 +217,7 @@ export function Tutorial({
         <Guide
           index={index}
           engine={engine}
+          layerId={layerId}
           busy={busy}
           error={error}
           onSkip={() => void skip()}

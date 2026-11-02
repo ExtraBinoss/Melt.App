@@ -6,6 +6,7 @@ import { createViewportActions } from "../../../canvas/session/viewport-actions"
 import { useEffect, useRef, type RefObject } from "react";
 import type { EnginePort } from "@musart/core";
 import { steps } from "./content";
+import { useSurfaceRecovery } from "./use-surface-recovery";
 
 /** Open the actual editor surface before asking the learner to use its controls. */
 export function useStepSurface(
@@ -15,6 +16,7 @@ export function useStepSurface(
   practice: RefObject<{ projectId: string; layerId: string } | null>,
   onError: (message: string) => void,
 ) {
+  useSurfaceRecovery(engine, index, active, practice, onError);
   const previousIndex = useRef(index);
   useEffect(() => {
     const reviewing = index < previousIndex.current;

@@ -1,4 +1,6 @@
 import { placeGuide } from "./placement";
+import { useInteractionGuard } from "./use-interaction-guard";
+import { isGeometryMoving, measureGuideBox, relativeGuideBox } from "./geometry";
 import { visible as visibleSurface } from "./surfaces";
 import { Speech } from "./Speech";
 import { X } from "lucide-react";
@@ -13,6 +15,7 @@ import { copy, steps } from "./content";
 export function Guide({
   index,
   engine,
+  layerId,
   busy,
   error,
   onSkip,
@@ -21,6 +24,7 @@ export function Guide({
 }: {
   index: number;
   engine: EnginePort;
+  layerId?: string;
   busy: boolean;
   error: string;
   onSkip: () => void;
@@ -28,6 +32,7 @@ export function Guide({
   onPrevious: () => void;
 }) {
   const step = steps[index]!;
+  useInteractionGuard(index, layerId);
   const last = index === steps.length - 1;
   const reduce = useReducedMotion();
   const [rect, setRect] = useState({ x: 20, y: 20, width: 0, height: 0 });
@@ -73,33 +78,24 @@ export function Guide({
             : "action" in step && step.action === "transition"
               ? primary?.closest<HTMLElement>('[role="menu"]')
               : target;
-      const anchorBox = surface?.getBoundingClientRect();
-      const rawBox = target?.getBoundingClientRect();
+      const anchorBox = surface ? measureGuideBox(surface) : undefined;
+      const rawBox = target ? measureGuideBox(target) : undefined;
       const dialog = document.querySelector<HTMLElement>(".export-dialog");
       const frameBox = overlay.current?.getBoundingClientRect();
-      const cardHeight = card.current?.getBoundingClientRect().height ?? 280;
+      const frameWidth = overlay.current?.clientWidth ?? innerWidth;
+      const frameHeight = overlay.current?.clientHeight ?? innerHeight;
+      const frameScaleY = frameBox?.height && frameHeight ? frameBox.height / frameHeight : 1;
+      const cardHeight = (card.current?.getBoundingClientRect().height ?? 280) / frameScaleY;
       const bounds = {
         width: dialog?.clientWidth ?? innerWidth,
         height: dialog?.clientHeight ?? innerHeight,
         offsetX: dialog?.scrollLeft ?? 0,
         offsetY: dialog?.scrollTop ?? 0,
       };
-      const box = rawBox
-        ? {
-            x: rawBox.x - (frameBox?.x ?? 0),
-            y: rawBox.y - (frameBox?.y ?? 0),
-            width: rawBox.width,
-            height: rawBox.height,
-          }
-        : undefined;
+      const box = rawBox ? relativeGuideBox(rawBox, frameBox, frameWidth, frameHeight) : undefined;
       setCardHeight(cardHeight);
       if (anchorBox) {
-        const next = {
-          x: anchorBox.x - (frameBox?.x ?? 0),
-          y: anchorBox.y - (frameBox?.y ?? 0),
-          width: anchorBox.width,
-          height: anchorBox.height,
-        };
+        const next = relativeGuideBox(anchorBox, frameBox, frameWidth, frameHeight);
         setPosition((old) => {
           const nextPosition = placeGuide(
             { ...next, x: next.x - bounds.offsetX, y: next.y - bounds.offsetY },
@@ -133,12 +129,14 @@ export function Guide({
               offsetY: dialog?.scrollTop ?? 0,
             },
       );
+      if (isGeometryMoving(target) || isGeometryMoving(surface ?? null)) schedule();
     };
     const schedule = () => {
       if (!frame) frame = requestAnimationFrame(measure);
     };
     const resize = new ResizeObserver(schedule);
     if (card.current) resize.observe(card.current);
+    if (overlay.current) resize.observe(overlay.current);
     const mutations = new MutationObserver((records) => {
       if (
         records.some(
@@ -152,13 +150,15 @@ export function Guide({
       childList: true,
       subtree: true,
       attributes: true,
-      attributeFilter: ["style", "class", "data-state", "aria-expanded"],
+      attributeFilter: ["style", "class", "data-state", "aria-expanded", "data-view-moving"],
     });
     const stop = engine.subscribe(schedule);
     document.addEventListener("animationend", schedule, true);
     document.addEventListener("transitionend", schedule, true);
     window.addEventListener("resize", schedule);
     window.addEventListener("scroll", schedule, true);
+    window.visualViewport?.addEventListener("resize", schedule);
+    window.visualViewport?.addEventListener("scroll", schedule);
     measure();
     return () => {
       cancelAnimationFrame(frame);
@@ -169,6 +169,8 @@ export function Guide({
       document.removeEventListener("transitionend", schedule, true);
       window.removeEventListener("resize", schedule);
       window.removeEventListener("scroll", schedule, true);
+      window.visualViewport?.removeEventListener("resize", schedule);
+      window.visualViewport?.removeEventListener("scroll", schedule);
     };
   }, [step, engine, index]);
   const width = Math.min(330, viewport.width - 24);
@@ -179,6 +181,7 @@ export function Guide({
   const x = placement.x + viewport.offsetX,
     y = placement.y + viewport.offsetY;
   const pointsRight = x + width / 2 < rect.x + rect.width / 2;
+  const pointing = "action" in step && rect.width > 0;
   return createPortal(
     <div
       ref={overlay}
@@ -192,6 +195,7 @@ export function Guide({
           transition={{ duration: reduce ? 0 : 0.25 }}
         />
       )}
+      {!last && rect.width === 0 && <div className="tutorial-scrim" />}
       <motion.aside
         ref={card}
         role="region"
@@ -210,7 +214,7 @@ export function Guide({
               className="tutorial-mascot"
               initial={false}
               animate={
-                "action" in step
+                pointing
                   ? {
                       x: Math.max(
                         -x + 8,
@@ -229,7 +233,7 @@ export function Guide({
                 reduce ? { duration: 0 } : { type: "spring", stiffness: 260, damping: 28 }
               }
             >
-              <MeltLogo size={48} lively shape={"action" in step ? "pointer" : "mascot"} />
+              <MeltLogo size={48} lively shape={pointing ? "pointer" : "mascot"} />
             </motion.div>
           )}
           <span>

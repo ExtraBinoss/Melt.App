@@ -27,10 +27,7 @@ export function placeGuide(
     Math.max(0, Math.min(point.x + width, anchor.x + anchor.width) - Math.max(point.x, anchor.x)) *
     Math.max(0, Math.min(point.y + height, anchor.y + anchor.height) - Math.max(point.y, anchor.y));
   const distance = (point: { x: number; y: number }) =>
-    Math.hypot(
-      point.x + width / 2 - anchor.x - anchor.width / 2,
-      point.y + height / 2 - anchor.y - anchor.height / 2,
-    );
+    previous ? Math.hypot(point.x - previous.x, point.y - previous.y) : 0;
   const collisions = (point: { x: number; y: number }) => {
     const clearance =
       Math.max(
@@ -47,17 +44,15 @@ export function placeGuide(
   const best = positions.reduce((best, point) =>
     collisions(point) < collisions(best) ? point : best,
   );
-  // Small menu movements can keep a nearby card still. An old step's position
-  // must never win merely because it happens to be somewhere unobstructed.
-  if (
-    previous &&
-    previous.x >= 12 &&
-    previous.y >= 12 &&
-    previous.x + width <= viewport.width - 12 &&
-    previous.y + height <= viewport.height - 12 &&
-    collisions(previous) <= collisions(best) &&
-    distance(previous) <= distance(best) + 24
-  )
-    return previous;
-  return best;
+  // Retain a free side, never old coordinates. Even a one-pixel viewport or
+  // target movement produces an updated position instead of a deferred jump.
+  return previous
+    ? positions.reduce(
+        (nearest, point) =>
+          collisions(point) === collisions(best) && distance(point) < distance(nearest)
+            ? point
+            : nearest,
+        best,
+      )
+    : best;
 }

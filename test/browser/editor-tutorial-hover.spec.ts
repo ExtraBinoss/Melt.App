@@ -68,10 +68,11 @@ for (const width of [1000, 1280]) {
     expect(Math.abs(after!.x - before!.x)).toBeLessThan(2);
     expect(Math.abs(after!.y - before!.y)).toBeLessThan(2);
     await page.screenshot({ path: `artifacts/tutorial/french-hover-${width}.png` });
-    // A deliberate outside click can close the menu; reopening must keep its real query.
+    // Guide and outside clicks leave the guided library and its real query intact.
     await guide.getByRole("heading", { name: "Try Dither" }).click();
-    await expect(search).toBeHidden();
-    await page.locator('.layer-create-actions button[aria-haspopup="menu"]').click();
+    await page.mouse.click(4, 400);
+    await page.keyboard.press("Escape");
+    await expect(search).toBeVisible();
     await category.hover();
     await expect(search).toHaveValue("dither");
     await expect(dither).toBeVisible();

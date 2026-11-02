@@ -27,6 +27,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Keep the editor tutorial on its guided path: accept native input only on the current lesson control and guide navigation, block outside dismissal, sibling actions, scrolling and unrelated shortcuts, and retain keyboard access through Tab and Enter. Restore acquired effect, animation and export surfaces after exit confirmation or owner dismissal without interrupting menu-to-picker handoffs; keep Melt inside the card while a target is unavailable. Recompute placement without dead zones, normalize popup entrance transforms and scaled dialog coordinates, and follow live viewport/ancestor animation bounds.
+
 - Refresh the README around the landing headline, real editable template previews, live effects, typography, 3D, interactive selections, Motion, audio, timelapses and portable projects. Keep performance claims tied to documented integrated-graphics workloads and point the GitHub presentation to melt.plinka.eu.
 
 - Anchor every tutorial card to its current UI target, center it along the available side and reject distant retained positions. Keep popup reopening stable, follow changing card heights and render real control icons and OS-aware keyboard components throughout the guided copy.
