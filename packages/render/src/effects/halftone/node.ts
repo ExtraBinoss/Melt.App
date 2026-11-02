@@ -1,3 +1,5 @@
+import { Fn, If } from "three/tsl";
+import { circularHalftone } from "./pattern";
 import { sampleEffect, type EffectNodeContext } from "../shared/context";
 import { clamp, dot, floor, fract, length, mix, smoothstep, sqrt, uv, vec3, vec4 } from "three/tsl";
 export function halftoneNode({ source, controls }: EffectNodeContext) {
@@ -15,5 +17,14 @@ export function halftoneNode({ source, controls }: EffectNodeContext) {
   ).oneMinus();
   const mono = vec3(ink.oneMinus());
   const colored = mix(vec3(1), blocked.rgb, ink);
-  return vec4(mix(s.rgb, mix(mono, colored, controls.color), controls.amount), s.a);
+  const legacy = vec4(mix(s.rgb, mix(mono, colored, controls.color), controls.amount), s.a);
+  return Fn(() => {
+    const result = s.toVar();
+    If(controls.parameters.pattern!.greaterThan(0.5), () => {
+      result.assign(circularHalftone({ source, controls }));
+    }).Else(() => {
+      result.assign(legacy);
+    });
+    return result;
+  })();
 }

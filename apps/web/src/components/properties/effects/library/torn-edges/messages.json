@@ -1,0 +1,58 @@
+{
+  "en": {
+    "name": "Torn Edges",
+    "parameter": {
+      "technique": "Technique",
+      "balance": "Tone balance",
+      "contrast": "Contrast",
+      "roughness": "Tear roughness",
+      "textureScale": "Texture size",
+      "detail": "Fine fibers",
+      "smoothing": "Source smoothing",
+      "tearWidth": "Tear depth",
+      "edgeWidth": "Paper edge width",
+      "feather": "Edge feather",
+      "ink": "Ink color",
+      "paper": "Paper color",
+      "edgeColor": "Torn edge color",
+      "backgroundOpacity": "Paper opacity",
+      "sourceColor": "Original color",
+      "tearTop": "Tear top",
+      "tearBottom": "Tear bottom",
+      "tearLeft": "Tear left",
+      "tearRight": "Tear right"
+    },
+    "choice": {
+      "graphic": "Torn graphic",
+      "paper": "Torn paper silhouette"
+    }
+  },
+  "fr": {
+    "name": "Bords déchirés",
+    "parameter": {
+      "technique": "Technique",
+      "balance": "Équilibre des tons",
+      "contrast": "Contraste",
+      "roughness": "Irrégularité de déchirure",
+      "textureScale": "Taille de texture",
+      "detail": "Fibres fines",
+      "smoothing": "Lissage de la source",
+      "tearWidth": "Profondeur de déchirure",
+      "edgeWidth": "Largeur du bord papier",
+      "feather": "Adoucissement des bords",
+      "ink": "Couleur d’encre",
+      "paper": "Couleur du papier",
+      "edgeColor": "Couleur du bord déchiré",
+      "backgroundOpacity": "Opacité du papier",
+      "sourceColor": "Couleur originale",
+      "tearTop": "Déchirer en haut",
+      "tearBottom": "Déchirer en bas",
+      "tearLeft": "Déchirer à gauche",
+      "tearRight": "Déchirer à droite"
+    },
+    "choice": {
+      "graphic": "Graphisme déchiré",
+      "paper": "Silhouette de papier déchiré"
+    }
+  }
+}

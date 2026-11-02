@@ -379,3 +379,7 @@ export {
 } from "./motion/scene/animations/extract";
 
 export { effectAssetIds, validateEffectInputs } from "./effects/inputs";
+
+export { MAX_LIQUIFY_DABS, validateLiquifyDabs } from "./effects/liquify/strokes";
+export type { LiquifyDab } from "./effects/liquify/strokes";
+export { LIQUIFY_MODES } from "./effects/liquify/definition";

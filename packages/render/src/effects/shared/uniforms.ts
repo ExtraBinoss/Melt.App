@@ -1,3 +1,4 @@
+import { createLiquifyUniforms } from "../liquify/uniforms";
 import { createWindowTrailsLayout } from "../window-trails/layout";
 import { EFFECT_COMPOSITE_MODES, type Effect } from "@musart/core";
 import { blendModeId } from "../../compositing/blends/registry";
@@ -16,7 +17,10 @@ export function createEffectUniforms(
   const parameters = createParameterUniforms(effect);
   const windowTrails = effect.type === "window-trails" ? createWindowTrailsLayout() : null;
   windowTrails?.update(parameters.parameters, effect.time ?? 0, logical.width, logical.height);
+  const liquify = effect.type === "liquify" ? createLiquifyUniforms() : null;
+  liquify?.update(effect);
   return {
+    liquify,
     ...parameters,
     windowTrails,
     time: uniform(effect.time ?? 0),
@@ -61,6 +65,7 @@ export function updateEffectUniforms(
   logical: EffectDimensions = { width, height },
 ): void {
   updateParameterUniforms(controls, effect);
+  controls.liquify?.update(effect);
   controls.windowTrails?.update(
     controls.parameters,
     effect.time ?? 0,

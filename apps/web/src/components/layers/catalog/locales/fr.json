@@ -34,7 +34,7 @@
     "threshold": "Séparer les pixels clairs et foncés avec un seuil binaire réglable.",
     "posterize": "Réduire les couleurs en paliers de tonalité et en aplats.",
     "grain": "Ajouter un grain de pellicule fin ou grossier avec une graine reproductible.",
-    "halftone": "Reproduire les ombrages avec une trame de points imprimés.",
+    "halftone": "Impression classique, grilles de points ronds séparés et mosaïques rondes en couleur, avec rotation et fond transparent.",
     "vignette": "Assombrir les coins extérieurs autour du centre de l'image.",
     "gradient": "Construire des champs de couleurs procéduraux, des dégradés fluides et des motifs.",
     "ripple": "Déformer l'image avec des ondes de réfraction concentriques autour d'un centre déplaçable.",
@@ -49,7 +49,9 @@
     "receipt": "Imprimer l'image comme un ticket de caisse sur papier thermique.",
     "pink-phosphor": "Recréer un écran à phosphore rose avec une texture lumineuse.",
     "shadow": "Projeter une silhouette décalée avec douceur, étalement et couleur réglables.",
-    "transition": "Révéler ou masquer l'image avec des fondus, des volets et d'autres motifs de transition."
+    "transition": "Révéler ou masquer l'image avec des fondus, des volets et d'autres motifs de transition.",
+    "liquify": "Peindre des déformations réversibles au pinceau rond : pousser, pincer, gonfler et tourbillonner.",
+    "torn-edges": "Créer un graphisme déchiré ou une silhouette de papier avec fibres et couleurs réglables."
   },
   "family": {
     "tone": "Lumière et tonalité",

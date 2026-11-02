@@ -31,3 +31,15 @@
 .effect-gizmo-handle:focus-visible + .effect-gizmo-knob {
   fill: #2b72b8;
 }
+
+.liquify-brush-hit {
+  fill: transparent;
+  pointer-events: all;
+  cursor: crosshair;
+  touch-action: none;
+}
+.liquify-brush-ring {
+  fill: none;
+  stroke: var(--primary);
+  pointer-events: none;
+}

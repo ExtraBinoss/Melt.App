@@ -4,6 +4,7 @@ import { getEffectParameter } from "../effects/parameters";
 import { EFFECT_MOTION_PROPERTIES, readEffectMotionValue } from "../motion/properties/effect";
 import { type HistoryContext } from "./collector";
 import type { HistoryPropertyTarget } from "./model";
+import { sameLiquifyDabs } from "../effects/liquify/strokes";
 import { sameMorph } from "./structural";
 
 export function captureEffects(
@@ -56,6 +57,7 @@ export function captureEffects(
         () => read().inputs?.[input.key],
         effect.inputs?.[input.key],
       );
+    if (!sameLiquifyDabs(old.liquify, effect.liquify)) context.history.action("geometry", owner);
     if (!sameMorph(old.shapeMorph, effect.shapeMorph)) context.history.action("geometry", owner);
   }
   for (const [effectId, effect] of next)

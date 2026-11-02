@@ -1,0 +1,52 @@
+{
+  "en": {
+    "name": "Halftone",
+    "parameter": {
+      "pattern": "Pattern",
+      "rotation": "Grid rotation",
+      "dotSize": "Circle size",
+      "softness": "Edge softness",
+      "gamma": "Tone gamma",
+      "offsetX": "Grid offset X",
+      "offsetY": "Grid offset Y",
+      "ink": "Dot color",
+      "paper": "Background color",
+      "backgroundOpacity": "Background opacity",
+      "sourceColor": "Use source colors",
+      "cyanAngle": "Cyan screen angle",
+      "magentaAngle": "Magenta screen angle",
+      "yellowAngle": "Yellow screen angle"
+    },
+    "choice": {
+      "legacy": "Classic print",
+      "circle-grid": "Circle dot grid",
+      "round-mosaic": "Round color mosaic",
+      "color-screen": "Color channel screens"
+    }
+  },
+  "fr": {
+    "name": "Trame",
+    "parameter": {
+      "pattern": "Motif",
+      "rotation": "Rotation de grille",
+      "dotSize": "Taille des cercles",
+      "softness": "Douceur des bords",
+      "gamma": "Gamma des tons",
+      "offsetX": "Décalage X",
+      "offsetY": "Décalage Y",
+      "ink": "Couleur des points",
+      "paper": "Couleur du fond",
+      "backgroundOpacity": "Opacité du fond",
+      "sourceColor": "Utiliser les couleurs de la source",
+      "cyanAngle": "Angle de trame cyan",
+      "magentaAngle": "Angle de trame magenta",
+      "yellowAngle": "Angle de trame jaune"
+    },
+    "choice": {
+      "legacy": "Impression classique",
+      "circle-grid": "Grille de points ronds",
+      "round-mosaic": "Mosaïque ronde en couleur",
+      "color-screen": "Trames des canaux couleur"
+    }
+  }
+}

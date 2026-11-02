@@ -1,3 +1,6 @@
+import halftone from "./library/halftone/messages.json";
+import liquify from "./library/liquify/messages.json";
+import tornEdges from "./library/torn-edges/messages.json";
 import terminal from "./library/terminal/messages.json";
 import inkBleed from "./library/ink-bleed/messages.json";
 import pixelSort from "./library/pixel-sort/messages.json";
@@ -28,6 +31,9 @@ import pinkPhosphor from "./library/pink-phosphor/messages.json";
 /** UI resources stay on the web side; the core catalog only contains stable label keys. */
 export const libraryMessages = {
   terminal,
+  halftone,
+  liquify,
+  "torn-edges": tornEdges,
   "ink-bleed": inkBleed,
   "pixel-sort": pixelSort,
   "edge-detect": edgeDetect,

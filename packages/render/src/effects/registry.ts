@@ -1,3 +1,5 @@
+import { liquifyNode } from "./liquify/node";
+import { tornEdgesNode } from "./torn-edges/node";
 import { terminalNode } from "./terminal/node";
 import { inkBleedNode } from "./ink-bleed/node";
 import { pixelSortFinishNode } from "./pixel-sort/node";
@@ -49,6 +51,8 @@ export const EFFECT_NODES: Readonly<
   >
 > = Object.freeze({
   terminal: terminalNode,
+  liquify: liquifyNode,
+  "torn-edges": tornEdgesNode,
   "ink-bleed": inkBleedNode,
   "pixel-sort": pixelSortFinishNode,
   "edge-detect": edgeDetectNode,

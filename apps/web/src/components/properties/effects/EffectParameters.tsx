@@ -1,3 +1,4 @@
+import { LiquifyControls } from "./LiquifyControls";
 import { EffectImageInputs } from "./inputs/EffectImageInputs";
 import "./gradient-messages";
 import "./messages";
@@ -129,6 +130,9 @@ export function EffectParameters({
       className="effect-controls reset-feedback"
       data-effect-parameter-count={parameters.length}
     >
+      {effect.type === "liquify" && (
+        <LiquifyControls engine={engine} layerId={ownLayerId} effect={effect} onChange={onChange} />
+      )}
       <EffectImageInputs engine={engine} layerId={ownLayerId} effect={effect} disabled={disabled} />
       <div className="effect-controls-actions">
         <IconButton

@@ -21,7 +21,11 @@ import type { ApplyMotionTransitionCommand } from "../motion/transitions/model";
 /** Portable document contract. No browser, React or renderer dependencies. */
 export const FORMAT_VERSION = 1 as const;
 export type LayerKind = "rectangle" | "ellipse" | "text" | "image" | "video" | "group" | "vector";
+import type { LiquifyDab } from "../effects/liquify/strokes";
+
 export type EffectType =
+  | "liquify"
+  | "torn-edges"
   | "terminal"
   | "ink-bleed"
   | "pixel-sort"
@@ -72,6 +76,7 @@ export interface Effect {
   /** Named immutable image assets owned by the portable project. */
   inputs?: Readonly<Record<string, string>>;
   shapeMorph?: ShapeMorph;
+  liquify?: readonly LiquifyDab[];
   id: string;
   type: EffectType;
   enabled: boolean;

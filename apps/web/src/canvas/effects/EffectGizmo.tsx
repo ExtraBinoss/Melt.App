@@ -1,3 +1,4 @@
+import { LiquifyBrush } from "./LiquifyBrush";
 import {
   useCallback,
   useEffect,
@@ -51,7 +52,17 @@ export function EffectGizmo(props: Props) {
     page = snapshot.project.pages.find((p) => p.id === target.pageId)!;
   const layer = page.layers.find((item) => item.id === target.layerId);
   const effect = layer?.effects.find((item) => item.id === target.effectId);
-  if (!layer || !effect || !radialGeometry(page, layer, effect)) return null;
+  if (!layer || !effect) return null;
+  if (effect.type === "liquify")
+    return (
+      <LiquifyBrush
+        key={`${target.pageId}:${layer.id}:${effect.id}`}
+        {...props}
+        layerId={layer.id}
+        effect={effect}
+      />
+    );
+  if (!radialGeometry(page, layer, effect)) return null;
   return (
     <RadialGizmo
       key={`${target.pageId}:${target.layerId}:${target.effectId}`}

@@ -35,7 +35,11 @@ it("avoids duplicating Gradient's existing uniforms and leaves legacy effects un
   const controls = createParameterUniforms(createEffect("gradient"));
   updateParameterUniforms(controls, createEffect("gradient"));
   expect(controls).toEqual({ parameters: {}, colors: {} });
-  expect(createParameterUniforms(createEffect("dither"))).toEqual(controls);
+  expect(createParameterUniforms(createEffect("brightness"))).toEqual(controls);
+  const dither = createParameterUniforms(createEffect("dither"));
+  expect(dither.parameters.method!.value).toBe(0);
+  expect(dither.parameters.threshold!.value).toBe(0.5);
+  expect(dither.colors.foreground!.value.toArray()).toEqual([0, 0, 0]);
 });
 
 it("reports malformed settings instead of creating invalid GPU values", () => {

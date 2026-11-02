@@ -1,0 +1,46 @@
+{
+  "en": {
+    "name": "Liquify",
+    "parameter": {
+      "brushMode": "Brush mode",
+      "brushRadius": "Brush radius",
+      "brushStrength": "Brush strength",
+      "brushHardness": "Brush hardness",
+      "stylusPressure": "Use pen pressure"
+    },
+    "choice": {
+      "push": "Push",
+      "pinch": "Pinch",
+      "bloat": "Inflate",
+      "twirl-cw": "Twirl clockwise",
+      "twirl-ccw": "Twirl counterclockwise",
+      "restore": "Reconstruct"
+    },
+    "brushHint": "Draw on the layer with the round brush. Escape cancels the current stroke; Undo restores the previous deformation. Outside a stroke, Escape exits painting.",
+    "clear": "Reset deformation",
+    "capacity": "This Liquify effect has reached its brush capacity. Undo or reset the deformation, or add another Liquify effect.",
+    "spatialHint": "Paint on a 2D layer or a flattened composition."
+  },
+  "fr": {
+    "name": "Fluidité",
+    "parameter": {
+      "brushMode": "Mode du pinceau",
+      "brushRadius": "Rayon du pinceau",
+      "brushStrength": "Force du pinceau",
+      "brushHardness": "Dureté du pinceau",
+      "stylusPressure": "Utiliser la pression du stylet"
+    },
+    "choice": {
+      "push": "Pousser",
+      "pinch": "Pincer",
+      "bloat": "Gonfler",
+      "twirl-cw": "Tourbillon horaire",
+      "twirl-ccw": "Tourbillon antihoraire",
+      "restore": "Reconstruire"
+    },
+    "brushHint": "Dessinez sur le calque avec le pinceau rond. Échap annule le trait en cours ; Annuler restaure la déformation précédente. Hors d’un trait, Échap quitte la peinture.",
+    "clear": "Réinitialiser la déformation",
+    "capacity": "Cet effet Fluidité a atteint sa capacité de peinture. Annulez ou réinitialisez la déformation, ou ajoutez un autre effet Fluidité.",
+    "spatialHint": "Peignez sur un calque 2D ou une composition aplatie."
+  }
+}

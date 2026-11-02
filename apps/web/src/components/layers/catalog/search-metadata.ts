@@ -4,6 +4,9 @@ import type { EffectType } from "@musart/core";
  * Descriptions live in the catalog locales; selectable techniques are indexed from their definitions.
  */
 export const EFFECT_SEARCH_ALIASES = {
+  liquify:
+    "liquify fluidite fluidité brush pinceau warp push pinch bloat twirl déformation peinture",
+  "torn-edges": "torn edges paper tear ripped déchiré papier photoshop fibres graphic",
   terminal: "typewriter typing cursor caret terminal console machine écrire frappe curseur",
   "ink-bleed": "ink bleed bleeding watercolor watercolour encre bavure aquarelle papier",
   "pixel-sort": "pixel sorting pixels tri traînées glitch",
@@ -32,7 +35,8 @@ export const EFFECT_SEARCH_ALIASES = {
   threshold: "threshold binary cutoff seuil binaire noir blanc",
   posterize: "posterize posterise posterization quantization postérisation aplats paliers",
   grain: "grain film analog argentique pellicule",
-  halftone: "halftone print dots comic demi teinte trame points impression bande dessinée",
+  halftone:
+    "halftone print dots circle grid mosaic round photoshop grille cercles mosaique mosaïque ronds comic demi teinte trame points impression bande dessinée",
   vignette: "vignette vignetting dark corners assombrir coins vignettage",
   gradient: "gradient ramp duotone dégradé bichromie",
   ripple: "ripple wave water refraction ondulation onde eau réfraction",

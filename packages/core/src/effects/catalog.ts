@@ -1,3 +1,6 @@
+import { HALFTONE_DEFINITION } from "./halftone/definition";
+import { TORN_EDGES_DEFINITION } from "./torn-edges/definition";
+import { LIQUIFY_DEFINITION } from "./liquify/definition";
 import { TERMINAL_DEFINITION } from "./terminal/definition";
 import { INK_BLEED_DEFINITION } from "./ink-bleed/definition";
 import { PIXEL_SORT_DEFINITION } from "./pixel-sort/definition";
@@ -42,6 +45,8 @@ import { DITHER_DEFINITION } from "./dither/definition";
 /** Portable effect metadata shared by factories, validation and client controls. */
 export const EFFECT_CATALOG: Readonly<Record<EffectType, EffectDefinition>> = Object.freeze({
   terminal: TERMINAL_DEFINITION,
+  "torn-edges": TORN_EDGES_DEFINITION,
+  liquify: LIQUIFY_DEFINITION,
   "ink-bleed": INK_BLEED_DEFINITION,
   "pixel-sort": PIXEL_SORT_DEFINITION,
   "edge-detect": EDGE_DETECT_DEFINITION,
@@ -70,7 +75,7 @@ export const EFFECT_CATALOG: Readonly<Record<EffectType, EffectDefinition>> = Ob
   threshold: defineEffect("threshold", { amount: 0.5 }, [AMOUNT], "adjustment"),
   posterize: defineEffect("posterize", { levels: 6 }, [AMOUNT, LEVELS], "adjustment"),
   grain: defineEffect("grain", { amount: 0.2, scale: 1 }, [AMOUNT, SCALE, COLOR, SEED]),
-  halftone: defineEffect("halftone", { scale: 8 }, [AMOUNT, SCALE, COLOR]),
+  halftone: HALFTONE_DEFINITION,
   vignette: defineEffect("vignette", { amount: 0.5, scale: 2 }, [
     AMOUNT,
     { ...SCALE, labelKey: "effectControls:falloff", unit: "×" },

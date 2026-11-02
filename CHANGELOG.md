@@ -19,6 +19,7 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Add circular Halftone grids, round color mosaics and independently angled source-color channel screens while preserving classic documents, configurable Torn Edges graphic/paper treatments, and reversible GPU Liquify strokes with a round canvas brush, per-stroke undo, cancellation and reset.
 - Replace the landing headline with the Melt-inspired “Design that melts social feeds” tagline across all twelve languages, remove the remaining introductory description, and resume the showcase immediately after hover without extending the manual interaction cooldown. Keep animated contour points on visible glyph boundaries when font components overlap.
 
 - Match the hero mascot's reference scale envelope and complete spherical eye turn at display cadence, with a shared mascot/title start instead of independent CSS animations. Keep neutral, green and violet text-run colors consistent across glyph outlines, control points, fills, native text and fallback scripts.
