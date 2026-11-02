@@ -52,16 +52,21 @@ export function Guide({
   useLayoutEffect(() => {
     let frame = 0;
     let observed: Element | null = null;
+    let acquired = false;
     const measure = () => {
       frame = 0;
       const visible = (selector: string) => visibleSurface(selector, true);
+      const primary = visible(step.target);
+      const transientMenu = "action" in step && ["transition", "pop"].includes(step.action);
+      if (!primary && acquired && transientMenu) return;
+      if (primary) acquired = true;
       const target =
-        visible(step.target) ??
+        primary ??
         ("action" in step && step.action === "dither"
           ? visible('.effect-catalog[data-effect-category="effect"] input')
           : null) ??
         ("action" in step && step.action === "pop" ? visible(".animation-picker") : null) ??
-        visible(".canvas-artboard") ??
+        (!("action" in step) ? visible(".canvas-artboard") : null) ??
         null;
       if (target !== observed) {
         if (observed) resize.unobserve(observed);
@@ -69,7 +74,13 @@ export function Guide({
         observed = target;
       }
       const surface =
-        "action" in step && step.action === "dither" ? visible(".effect-catalog-menu") : target;
+        "action" in step && step.action === "dither"
+          ? visible(".effect-catalog-menu")
+          : "action" in step && step.action === "pop"
+            ? visible(".motion-animation-popover")
+            : "action" in step && step.action === "transition"
+              ? primary?.closest<HTMLElement>('[role="menu"]')
+              : target;
       const anchorBox = surface?.getBoundingClientRect();
       const rawBox = target?.getBoundingClientRect();
       const dialog = document.querySelector<HTMLElement>(".export-dialog");
@@ -156,15 +167,33 @@ export function Guide({
     };
   }, [step, engine]);
   const width = Math.min(330, viewport.width - 24);
+  const [placementHistory, setPlacementHistory] = useState({
+    index: -1,
+    anchor,
+    viewport,
+    cardHeight,
+    position: { x: 12, y: 12 },
+  });
+  let position = placementHistory.position;
+  if (
+    placementHistory.index !== index ||
+    placementHistory.anchor !== anchor ||
+    placementHistory.viewport !== viewport ||
+    placementHistory.cardHeight !== cardHeight
+  ) {
+    position = placeGuide(
+      { ...anchor, x: anchor.x - viewport.offsetX, y: anchor.y - viewport.offsetY },
+      viewport,
+      width,
+      cardHeight,
+      placementHistory.index === index ? placementHistory.position : undefined,
+    );
+    setPlacementHistory({ index, anchor, viewport, cardHeight, position });
+  }
   const placement =
     index === 0 || last
       ? { x: (viewport.width - width) / 2, y: Math.max(12, (viewport.height - cardHeight) / 2) }
-      : placeGuide(
-          { ...anchor, x: anchor.x - viewport.offsetX, y: anchor.y - viewport.offsetY },
-          viewport,
-          width,
-          cardHeight,
-        );
+      : position;
   const x = placement.x + viewport.offsetX,
     y = placement.y + viewport.offsetY;
   const pointsRight = x + width / 2 < rect.x + rect.width / 2;

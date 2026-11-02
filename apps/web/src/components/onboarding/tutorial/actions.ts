@@ -45,7 +45,11 @@ export function stepDone(
     video: () => !!visible(".motion-export-preview-surface"),
     render: () => {
       const job = getExportJobs(engine).read();
-      return job?.projectId === projectId && job.kind === "motion" && job.status === "complete";
+      return (
+        job?.projectId === projectId &&
+        job.kind === "motion" &&
+        (job.status === "running" || job.status === "complete")
+      );
     },
   };
   return tests[action]();
@@ -160,7 +164,10 @@ export async function performStep(
         signal,
       );
     },
-    transition: () => control(context, '[data-tutorial="add-transition"]', signal),
+    transition: async () => {
+      if (!visible('[data-tutorial="add-transition"]')) await handlers.context();
+      await control(context, '[data-tutorial="add-transition"]', signal);
+    },
     pin: () => control(context, '[data-tutorial="timeline-pin"]', signal),
     pop: () => {
       addPop(engine, layerId);
@@ -188,7 +195,7 @@ export async function performStep(
           return stepDone("render", context);
         },
         signal,
-        120000,
+        5000,
       );
     },
   };

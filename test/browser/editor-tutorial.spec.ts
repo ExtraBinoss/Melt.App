@@ -115,7 +115,7 @@ test("guided editor practice, automatic tasks, exit and editor-only replay", asy
         button: "right",
       });
     } else if (title === "Add a pop")
-      await page.locator('[data-tutorial="add-transition"]').click();
+      await guide.getByRole("button", { name: "Next", exact: true }).click();
     else if (title === "Pin the timeline")
       await page.locator('[data-preset-id="scale-pop"]').click();
     else await guide.getByRole("button", { name: "Next", exact: true }).click();
@@ -123,6 +123,43 @@ test("guided editor practice, automatic tasks, exit and editor-only replay", asy
     if (title === "Try Dither") {
       await expect(page.locator(".effect-catalog input")).toHaveValue("dither");
       await expectSpotlight(page, '[data-effect-catalog-item="dither"]');
+    }
+    if (title === "Add a transition") {
+      await expectSpotlight(page, '[data-tutorial="add-transition"]');
+      const before = (await guide.boundingBox())!;
+      await page.keyboard.press("Escape");
+      await expect(page.locator('[data-tutorial="add-transition"]')).toBeHidden();
+      const after = (await guide.boundingBox())!;
+      expect(Math.abs(after.x - before.x)).toBeLessThan(3);
+      expect(Math.abs(after.y - before.y)).toBeLessThan(3);
+      const box = (await page.getByTestId("artboard").boundingBox())!;
+      await page.mouse.click(box.x + box.width / 2, box.y + box.height * 0.46, { button: "right" });
+      await expect(page.locator('[data-tutorial="add-transition"]')).toBeVisible();
+    }
+    if (title === "Add a pop") {
+      const popup = (await page.locator(".motion-animation-popover").boundingBox())!;
+      await expect
+        .poll(async () => {
+          const box = (await guide.boundingBox())!;
+          return (
+            box.x >= popup.x + popup.width ||
+            box.x + box.width <= popup.x ||
+            box.y >= popup.y + popup.height ||
+            box.y + box.height <= popup.y
+          );
+        })
+        .toBe(true);
+    }
+    if (title === "Add a pop") {
+      await guide.getByRole("button", { name: "Previous" }).click();
+      await expect(
+        guide.getByRole("heading", { name: "Add a transition", exact: true }),
+      ).toBeVisible();
+      await expect(page.locator(".motion-animation-popover")).toHaveCount(0);
+      await expect(page.locator('[data-tutorial="add-transition"]')).toBeVisible();
+      await guide.getByRole("button", { name: "Next", exact: true }).click();
+      await expect(guide.getByRole("heading", { name: "Add a pop", exact: true })).toBeVisible();
+      await expect(page.locator('[data-preset-id="scale-pop"]')).toBeVisible();
     }
     if (title === "Your timeline") {
       await guide.getByRole("button", { name: "Previous" }).click();
@@ -132,6 +169,14 @@ test("guided editor practice, automatic tasks, exit and editor-only replay", asy
       await expectSpotlight(page, '[data-tutorial="timeline-pin"]');
       await guide.getByRole("button", { name: "Next", exact: true }).click();
       await expect(guide.getByRole("heading", { name: "Your timeline" })).toBeVisible();
+    }
+    if (title === "The export window") {
+      await guide.getByRole("button", { name: "Previous" }).click();
+      await expect(page.locator(".export-dialog")).toHaveCount(0);
+      await expect(guide.getByRole("heading", { name: "Export", exact: true })).toBeVisible();
+      await expectSpotlight(page, "[data-inspector-export-trigger]");
+      await guide.getByRole("button", { name: "Next", exact: true }).click();
+      await expect(guide.getByRole("heading", { name: "The export window" })).toBeVisible();
     }
     if (title === "Play")
       await expect
@@ -166,12 +211,12 @@ test("guided editor practice, automatic tasks, exit and editor-only replay", asy
   expect(guideBox.y + guideBox.height).toBeLessThanOrEqual(exportBox.y + exportBox.height);
   const downloading = page.waitForEvent("download");
   await guide.getByRole("button", { name: "Next", exact: true }).click();
+  await expect(guide.getByRole("heading", { name: "You're ready" })).toBeVisible({
+    timeout: 10000,
+  });
   const download = await downloading;
   expect(download.suggestedFilename()).toMatch(/\.(mp4|webm)$/);
   await download.saveAs("artifacts/tutorial/practice-video.mp4");
-  await expect(guide.getByRole("heading", { name: "You're ready" })).toBeVisible({
-    timeout: 30000,
-  });
   const finalCard = (await guide.boundingBox())!;
   expect(finalCard.y + finalCard.height).toBeLessThanOrEqual(exportBox.y + exportBox.height);
   await page.screenshot({ path: "artifacts/tutorial/final-ready.png" });

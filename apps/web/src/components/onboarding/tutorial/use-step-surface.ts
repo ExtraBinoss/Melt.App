@@ -1,7 +1,9 @@
+import { getTransitionRequests } from "../../motion/transitions/requests";
+import { visible } from "./surfaces";
 import { acquireEffectGuide } from "../../layers/menu/effect-surface";
-import { waitForTutorial } from "./actions";
+import { performStep, waitForTutorial } from "./actions";
 import { createViewportActions } from "../../../canvas/session/viewport-actions";
-import { useEffect, type RefObject } from "react";
+import { useEffect, useRef, type RefObject } from "react";
 import type { EnginePort } from "@musart/core";
 import { steps } from "./content";
 
@@ -13,10 +15,34 @@ export function useStepSurface(
   practice: RefObject<{ projectId: string; layerId: string } | null>,
   onError: (message: string) => void,
 ) {
+  const previousIndex = useRef(index);
   useEffect(() => {
+    const reviewing = index < previousIndex.current;
+    previousIndex.current = index;
     const step = steps[index]!;
     const layerId = practice.current?.layerId;
     if (!active) return;
+    if ("action" in step && step.action === "transition") {
+      // Only Previous restores the parent. A queued Next may already be opening
+      // the picker when this effect commits; clearing it would cancel that action.
+      if (!reviewing) return;
+      getTransitionRequests(engine).clear();
+      const controller = new AbortController();
+      const frame = requestAnimationFrame(() => {
+        if (practice.current && !visible('[data-tutorial="add-transition"]')) {
+          void performStep("context", { engine, ...practice.current }, controller.signal).catch(
+            (error: unknown) => {
+              if (!controller.signal.aborted)
+                onError(error instanceof Error ? error.message : "Could not open the image menu.");
+            },
+          );
+        }
+      });
+      return () => {
+        cancelAnimationFrame(frame);
+        controller.abort();
+      };
+    }
     if ("action" in step && step.action === "export") {
       engine.select([]);
       return;
@@ -26,7 +52,11 @@ export function useStepSurface(
       step.title === "Static and Motion" ||
       ("action" in step && step.action === "context")
     ) {
-      if (layerId && "action" in step) engine.select([layerId]);
+      if (layerId && "action" in step) {
+        getTransitionRequests(engine).clear();
+        document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+        engine.select([layerId]);
+      }
       document
         .querySelector<HTMLButtonElement>('[data-tutorial="timeline-pin"][aria-pressed="true"]')
         ?.click();

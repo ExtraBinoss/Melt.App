@@ -20,3 +20,16 @@ test("a wide popup leaves room for the card above it when both sides are crowded
   expect(card.y + 268).toBeLessThanOrEqual(anchor.y);
   expect(card.x).toBeGreaterThanOrEqual(12);
 });
+
+test("a reopened nearby menu keeps the current card position while it still fits", () => {
+  const previous = { x: 800, y: 200 };
+  expect(
+    placeGuide(
+      { x: 450, y: 200, width: 200, height: 200 },
+      { width: 1200, height: 800 },
+      330,
+      268,
+      previous,
+    ),
+  ).toEqual(previous);
+});

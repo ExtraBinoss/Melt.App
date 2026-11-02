@@ -186,9 +186,9 @@ export function Tutorial({
           close();
           break;
         }
-        if (expected >= furthest.current && "action" in step) {
+        if ("action" in step) {
           const context = { engine, ...practice.current! };
-          if (step.action === "pin")
+          if (step.action === "pin" && expected >= furthest.current)
             await waitForTutorial(context, () => pinReady.current === expected, controller.signal);
           await performStep(step.action, context, controller.signal);
           await waitForTutorial(
@@ -222,6 +222,13 @@ export function Tutorial({
             pending.current = 0;
             operation.current?.abort();
             cursor.current = Math.max(0, cursor.current - 1);
+            const exportIndex = steps.findIndex(
+              (step) => "action" in step && step.action === "export",
+            );
+            if (cursor.current <= exportIndex)
+              document
+                .querySelector<HTMLButtonElement>('.export-dialog [data-slot="dialog-close"]')
+                ?.click();
             setError("");
             setIndex(cursor.current);
           }}

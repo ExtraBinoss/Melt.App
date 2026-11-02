@@ -109,7 +109,7 @@ export const steps = [
   {
     title: "Export",
     text: "Open Export at the top right. We will export the motion as a video.",
-    target: ".export-actions",
+    target: "[data-inspector-export-trigger]",
     action: "export",
   },
   {
@@ -125,13 +125,13 @@ export const steps = [
   },
   {
     title: "Save your video",
-    text: "Click Export video. Melt will render the actual animation and download it. Keep this window open until it finishes.",
+    text: "Click Export video. Melt will render the actual animation and download it. The render and download continue independently.",
     target: ".export-submit",
     action: "render",
   },
   {
     title: "You're ready",
-    text: "Your video is exported. Keep experimenting with this project, or create your own from Projects.",
+    text: "You've completed the tutorial. Melt handles the video render and download in the background; you can keep working.",
     target: ".export-dialog-header",
   },
 ] as const;

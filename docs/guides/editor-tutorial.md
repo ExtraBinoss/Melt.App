@@ -5,8 +5,9 @@ creates and saves a separate `Learning with Melt` project after saving the curre
 project. It never adds practice assets to the user's current document.
 
 The guide observes real editor commands and export jobs. Its helper buttons perform
-the corresponding action; the export step completes only after a successful Motion
-export. Each document action uses the engine command boundary and remains undoable.
+the corresponding action; the tutorial finishes once a real Motion export starts.
+Its export job owns progress, failure reporting and delivery after the guide closes.
+Each document action uses the engine command boundary and remains undoable.
 Closing the tutorial leaves the practice project available. Editor preferences offer
 Replay onboarding; dashboard preferences do not.
 
@@ -63,3 +64,9 @@ and choosing Add animation, then Pop. Timeline pinning and its controls follow
 animation authoring. The export lesson presents the settings and preview before
 exporting the full composition. Cards remeasure their height when moving into
 the export dialog, and the mascot faces the highlighted control.
+
+Popup-based cards retain their last valid geometry while a menu retires and
+reopens. The Pop lesson places the card outside the full picker. Previous closes
+the animation picker or export dialog before returning to its parent step, and
+Next reopens the actual surface even when reviewing a previously completed step.
+Forward preparation never clears a picker already opened by queued Next requests.

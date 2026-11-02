@@ -125,3 +125,36 @@ test("pending tutorial actions resolve only when the real document confirms the 
   await pending;
   expect(d.engine.getSnapshot().revision).toBe(snapshot.revision + 1);
 });
+
+test("tutorial completion follows export start without waiting for the render", async () => {
+  const { stepDone } = await import("../../../src/components/onboarding/tutorial/actions");
+  const { getExportJobs } = await import("../../../src/services/export/jobs");
+  const d = setup();
+  const snapshot = d.engine.getSnapshot();
+  const context = {
+    engine: d.engine,
+    projectId: snapshot.project.id,
+    layerId: snapshot.project.pages[0]!.layers[0]!.id,
+  };
+  let finish!: () => void;
+  const rendering = new Promise<void>((resolve) => {
+    finish = resolve;
+  });
+  expect(stepDone("render", context)).toBe(false);
+  const jobs = getExportJobs(d.engine);
+  jobs.start({ kind: "motion", projectId: context.projectId, name: "Practice" }, async () => {
+    await rendering;
+  });
+  expect(jobs.pending).toBe(true);
+  expect(stepDone("render", context)).toBe(true);
+  const done = new Promise<void>((resolve) => {
+    const stop = jobs.subscribe(() => {
+      if (!jobs.pending) {
+        stop();
+        resolve();
+      }
+    });
+  });
+  finish();
+  await done;
+});
