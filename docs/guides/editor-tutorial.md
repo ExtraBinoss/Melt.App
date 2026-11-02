@@ -24,7 +24,7 @@ and animation tasks open their actual editor pickers.
 
 The effect lesson follows three real controls: +, Add effect, then standard Dither.
 Menu state and document changes advance the lesson automatically. The effect
-search is typed on entry. Shortcut hints use shared Kbd components and the current
+search is initialized directly in React state on entry. Shortcut hints use shared Kbd components and the current
 OS modifier. Exit confirmation hides the guide so the modal remains reachable.
 
 Next requests are bounded and processed in order. The cursor advances once for
@@ -50,3 +50,9 @@ Unsplash photographs. No third-party image requests are needed during the tutori
 The source image identifiers are also retained in the original images.unsplash.com
 URLs: `photo-1464822759023-fed622ff2c3b`, `photo-1470770841072-f978cf4d019e`,
 and `photo-1441974231531-c6227db76b6e` (640px, quality 75).
+
+During the Dither task, a scoped guide lease holds the effect category open across
+hover transitions. Leaving the task releases the lease and closes that surface.
+The catalog is initialized with its query before it becomes interactive; no
+synthetic input events or timed typing control the search. Card placement uses
+the full popup bounds and chooses a free side, above or below it.

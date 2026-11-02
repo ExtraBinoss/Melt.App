@@ -7,8 +7,11 @@ export function RetainedCatalogs(props: ComponentProps<typeof EffectCatalog>) {
   const [visited, setVisited] = useState<EffectCategory[]>([props.category]);
   if (!visited.includes(props.category)) setVisited([...visited, props.category]);
   return visited.map((category) => (
-    <Activity key={category} mode={category === props.category ? "visible" : "hidden"}>
-      <EffectCatalog category={category} onAdd={props.onAdd} />
+    <Activity
+      key={`${category}:${props.initialQuery ?? ""}`}
+      mode={category === props.category ? "visible" : "hidden"}
+    >
+      <EffectCatalog category={category} onAdd={props.onAdd} initialQuery={props.initialQuery} />
     </Activity>
   ));
 }

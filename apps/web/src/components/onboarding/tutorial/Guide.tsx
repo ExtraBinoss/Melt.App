@@ -1,3 +1,4 @@
+import { placeGuide } from "./placement";
 import { visible as visibleSurface } from "./surfaces";
 import { Speech } from "./Speech";
 import { X } from "lucide-react";
@@ -29,6 +30,7 @@ export function Guide({
   const step = steps[index]!;
   const reduce = useReducedMotion();
   const [rect, setRect] = useState({ x: 20, y: 20, width: 0, height: 0 });
+  const [anchor, setAnchor] = useState({ x: 20, y: 20, width: 0, height: 0 });
   const [viewport, setViewport] = useState({
     width: window.innerWidth,
     height: window.innerHeight,
@@ -62,6 +64,9 @@ export function Guide({
         if (target) resize.observe(target);
         observed = target;
       }
+      const surface =
+        "action" in step && step.action === "dither" ? visible(".effect-catalog-menu") : target;
+      const anchorBox = surface?.getBoundingClientRect();
       const rawBox = target?.getBoundingClientRect();
       const dialog = document.querySelector(".export-dialog")?.getBoundingClientRect();
       const box = rawBox
@@ -72,6 +77,22 @@ export function Guide({
             height: rawBox.height,
           }
         : undefined;
+      if (anchorBox) {
+        const next = {
+          x: anchorBox.x - (dialog?.x ?? 0),
+          y: anchorBox.y - (dialog?.y ?? 0),
+          width: anchorBox.width,
+          height: anchorBox.height,
+        };
+        setAnchor((old) =>
+          old.x === next.x &&
+          old.y === next.y &&
+          old.width === next.width &&
+          old.height === next.height
+            ? old
+            : next,
+        );
+      }
       if (!box) setRect((old) => (old.width ? { x: 0, y: 0, width: 0, height: 0 } : old));
       if (box)
         setRect((old) =>
@@ -123,22 +144,11 @@ export function Guide({
     };
   }, [step, engine]);
   const width = Math.min(330, viewport.width - 24);
-  const x =
+  const placement =
     index === 0
-      ? (viewport.width - width) / 2
-      : Math.max(
-          12,
-          Math.min(
-            viewport.width - width - 12,
-            rect.x > viewport.width / 2
-              ? rect.x - width - 22
-              : rect.x + Math.min(rect.width, 320) + 22,
-          ),
-        );
-  const y =
-    index === 0
-      ? Math.max(12, (viewport.height - cardHeight) / 2)
-      : Math.max(12, Math.min(viewport.height - cardHeight - 12, rect.y + 24));
+      ? { x: (viewport.width - width) / 2, y: Math.max(12, (viewport.height - cardHeight) / 2) }
+      : placeGuide(anchor, viewport, width, cardHeight);
+  const { x, y } = placement;
   return createPortal(
     <div
       className="tutorial-overlay"

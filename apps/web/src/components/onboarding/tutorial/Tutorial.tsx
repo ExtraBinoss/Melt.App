@@ -47,7 +47,7 @@ export function Tutorial({
   const operation = useRef<AbortController | null>(null);
   const pinReady = useRef(-1);
   const practice = useRef<{ projectId: string; layerId: string } | null>(null);
-  useStepSurface(engine, index, phase === "tour" && !hidden && !leave, practice);
+  useStepSurface(engine, index, phase === "tour" && !hidden && !leave, practice, setError);
   const alive = useRef(true);
   useEffect(() => {
     if (hidden) {

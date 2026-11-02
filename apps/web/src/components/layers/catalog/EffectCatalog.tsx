@@ -21,12 +21,14 @@ import "./catalog.css";
 export const EffectCatalog = memo(function EffectCatalog({
   category,
   onAdd,
+  initialQuery = "",
 }: {
   category: EffectCategory;
+  initialQuery?: string;
   onAdd(this: void, type: EffectType): void;
 }) {
   const { t, i18n } = useTranslation();
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState(initialQuery);
   const [family, setFamily] = useState<EffectFamily | "all">("all");
   const list = useRef<CatalogRowsHandle>(null);
   const entries = useMemo(

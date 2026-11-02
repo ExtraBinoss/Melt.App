@@ -17,6 +17,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Keep the tutorial Dither library stable while hovering its category and reading the guide. Seed the actual React search state, hold the guided submenu open, and place the card clear of the whole popup. Verify French hover navigation in narrow and wide editor windows.
+
 - Refine the shared loading-text shimmer with a soft violet halo, a narrow luminous highlight, continuous steady motion. Retain the existing mascot, layout and reduced-motion behavior.
 
 - Serialize rapid tutorial Next clicks and confirm each real action before advancing. Open effect menus through their mounted owner, focus and zoom the canvas toward Static/Motion, and morph Melt itself into an eyed pointer using its native SVG silhouette engine. Prevent duplicate effects and Pop animations.

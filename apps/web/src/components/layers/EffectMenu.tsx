@@ -30,9 +30,11 @@ import { RetainedCatalogs } from "./catalog/RetainedCatalogs";
 export function EffectMenu({
   onAdd,
   libraryRequest = 0,
+  guidedQuery = null,
 }: {
   onAdd: (type: EffectType) => void;
   libraryRequest?: number;
+  guidedQuery?: string | null;
 }) {
   const { t, i18n } = useTranslation();
   const [category, setCategory] = useState<EffectCategory>("effect");
@@ -54,6 +56,10 @@ export function EffectMenu({
   const focus = useRef<{ category: EffectCategory; intent: "trigger" | "content" } | null>(null);
   const hover = useHoverDismiss(open, () => change(false), trigger, panel);
   const panelId = useId();
+  const cancelHover = hover.cancel;
+  useEffect(() => {
+    if (guidedQuery !== null) cancelHover();
+  }, [guidedQuery, cancelHover]);
   useLayoutEffect(() => {
     if (!open) {
       pointerKind.current = null;
@@ -94,6 +100,10 @@ export function EffectMenu({
   function point(kind: EffectCategory, event: PointerEvent<HTMLDivElement>) {
     hover.enter(event);
     if (event.pointerType !== "mouse" || event.buttons > 1) return;
+    if (guidedQuery !== null) {
+      if (kind === "effect" && !open) change(true);
+      return;
+    }
     mode("pointer");
     // Native move is authoritative even if a concurrent trigger replacement swallowed enter.
     // Deduplicate observed intent, not the possibly older category currently rendered by React.
@@ -110,7 +120,12 @@ export function EffectMenu({
     show(kind, "trigger");
   }
   return (
-    <DropdownMenuSub open={open} onOpenChange={setOpen}>
+    <DropdownMenuSub
+      open={open}
+      onOpenChange={(next) => {
+        if (next || guidedQuery === null) setOpen(next);
+      }}
+    >
       <DropdownMenuGroup
         ref={choices}
         className="effect-menu-choices"
@@ -129,7 +144,7 @@ export function EffectMenu({
             "aria-controls": open && current ? panelId : undefined,
             onPointerEnter: (event: PointerEvent<HTMLDivElement>) => point(kind, event),
             onPointerLeave: (event: PointerEvent<HTMLDivElement>) => {
-              hover.leave(event);
+              if (guidedQuery === null) hover.leave(event);
               // This menu owns pointer intent. Native leave would focus the parent using
               // a diagonal corridor whose delayed pointer tracking we bypass above.
               if (event.pointerType === "mouse" && event.buttons <= 1) event.preventDefault();
@@ -176,10 +191,10 @@ export function EffectMenu({
             hover.enter(event);
             focus.current = null;
           }}
-          onPointerLeave={hover.leave}
+          onPointerLeave={guidedQuery === null ? hover.leave : undefined}
           onKeyDownCapture={keyboard}
         >
-          <RetainedCatalogs category={category} onAdd={onAdd} />
+          <RetainedCatalogs category={category} onAdd={onAdd} initialQuery={guidedQuery ?? ""} />
         </DropdownMenuSubContent>
       </DropdownMenuPortal>
     </DropdownMenuSub>

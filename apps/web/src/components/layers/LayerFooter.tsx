@@ -39,16 +39,26 @@ export const LayerFooter = memo(
     const state = layerSelection(page, selection);
     const [effectOpen, setEffectOpen] = useState(false);
     const [libraryRequest, setLibraryRequest] = useState(0);
+    const [guidedQuery, setGuidedQuery] = useState<string | null>(null);
     useEffect(
       () =>
-        registerEffectSurface(engine, (surface) => {
-          const current = engine.getSnapshot();
-          const active = current.project.pages.find((item) => item.id === current.pageId);
-          if (!active || !layerSelection(active, current.selection).editable) return false;
-          setEffectOpen(true);
-          if (surface === "library") setLibraryRequest((value) => value + 1);
-          return true;
-        }),
+        registerEffectSurface(
+          engine,
+          (surface) => {
+            const current = engine.getSnapshot();
+            const active = current.project.pages.find((item) => item.id === current.pageId);
+            if (!active || !layerSelection(active, current.selection).editable) return false;
+            setEffectOpen(true);
+            if (surface === "library") setLibraryRequest((value) => value + 1);
+            return true;
+          },
+          (query) => {
+            setGuidedQuery(query);
+            setEffectOpen(query !== null);
+            if (query !== null) setLibraryRequest((value) => value + 1);
+            else setLibraryRequest(0);
+          },
+        ),
       [engine],
     );
     const runCurrent = useCallback(
@@ -90,7 +100,11 @@ export const LayerFooter = memo(
               </IconButton>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <EffectMenu onAdd={actions.effect} libraryRequest={libraryRequest} />
+              <EffectMenu
+                onAdd={actions.effect}
+                libraryRequest={libraryRequest}
+                guidedQuery={guidedQuery}
+              />
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 disabled={!state.editable || selection.length < 2 || Boolean(attachment)}

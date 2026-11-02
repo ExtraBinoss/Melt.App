@@ -1,5 +1,5 @@
-import { openEffectSurface } from "../../layers/menu/effect-surface";
-import { CLOSED_SURFACE } from "./surfaces";
+import { acquireEffectGuide } from "../../layers/menu/effect-surface";
+import { waitForTutorial } from "./actions";
 import { createViewportActions } from "../../../canvas/session/viewport-actions";
 import { useEffect, type RefObject } from "react";
 import type { EnginePort } from "@musart/core";
@@ -10,16 +10,36 @@ export function useStepSurface(
   engine: EnginePort,
   index: number,
   active: boolean,
-  practice: RefObject<{ layerId: string } | null>,
+  practice: RefObject<{ projectId: string; layerId: string } | null>,
+  onError: (message: string) => void,
 ) {
   useEffect(() => {
     const step = steps[index]!;
     const layerId = practice.current?.layerId;
     if (!active || !("action" in step) || !["dither", "pop", "motion"].includes(step.action))
       return;
+    if (step.action === "dither") {
+      const controller = new AbortController();
+      let release: (() => void) | undefined;
+      if (!practice.current) return;
+      void waitForTutorial(
+        { engine, ...practice.current },
+        () => {
+          release = acquireEffectGuide(engine, "dither");
+          return !!release;
+        },
+        controller.signal,
+      ).catch((error: unknown) => {
+        if (!controller.signal.aborted)
+          onError(error instanceof Error ? error.message : "Could not open the effect library.");
+      });
+      return () => {
+        controller.abort();
+        release?.();
+      };
+    }
     let frame = 0;
     let ready = false;
-    let typing: ReturnType<typeof setTimeout> | undefined;
     if (step.action === "pop" && layerId) engine.select([layerId]);
     const prepare = () => {
       frame = 0;
@@ -35,42 +55,6 @@ export function useStepSurface(
           y: box.y + box.height / 2,
           factor: 1.4,
         });
-      } else if (step.action === "dither") {
-        const trigger = document.querySelector<HTMLButtonElement>(
-          '.layer-create-actions button[aria-haspopup="menu"]',
-        );
-        if (!trigger) return;
-        if (trigger.getAttribute("data-state") !== "open") {
-          openEffectSurface(engine, "library");
-          return;
-        }
-        const category = document.querySelector<HTMLElement>(
-          '[data-effect-menu-category="effect"]',
-        );
-        if (!category) return;
-        if (category.getAttribute("aria-expanded") !== "true") {
-          openEffectSurface(engine, "library");
-          return;
-        }
-        const input = document.querySelector<HTMLInputElement>(
-          '.effect-catalog[data-effect-category="effect"] input',
-        );
-        if (!input || input.closest(CLOSED_SURFACE)) return;
-        ready = true;
-        input.focus({ preventScroll: true });
-        const valueDescriptor = Object.getOwnPropertyDescriptor(
-          HTMLInputElement.prototype,
-          "value",
-        )!;
-        let count = 0;
-        const type = () => {
-          if (!input.isConnected) return;
-          count++;
-          valueDescriptor.set?.call(input, "dither".slice(0, count));
-          input.dispatchEvent(new Event("input", { bubbles: true }));
-          if (count < 6) typing = setTimeout(type, 35);
-        };
-        type();
       } else {
         if (document.querySelector(".animation-picker")) {
           document.querySelector<HTMLButtonElement>('[data-animation-category="scale"]')?.click();
@@ -98,9 +82,8 @@ export function useStepSurface(
     });
     schedule();
     return () => {
-      clearTimeout(typing);
       observer.disconnect();
       cancelAnimationFrame(frame);
     };
-  }, [engine, index, active, practice]);
+  }, [engine, index, active, practice, onError]);
 }

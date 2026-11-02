@@ -11,14 +11,14 @@ import { choose } from "../../../support/select";
 import { i18n } from "../../../../src/state/i18n";
 vi.mock("motion/react", () => ({ useReducedMotion: () => true }));
 
-function mount(category: "effect" | "adjustment" = "effect") {
+function mount(category: "effect" | "adjustment" = "effect", initialQuery = "") {
   const d = setup(),
     add = vi.fn();
   d.mount(
     <DropdownMenu defaultOpen modal={false}>
       <DropdownMenuTrigger>Open</DropdownMenuTrigger>
       <DropdownMenuContent className="effect-catalog-menu">
-        <EffectCatalog category={category} onAdd={add} />
+        <EffectCatalog category={category} onAdd={add} initialQuery={initialQuery} />
       </DropdownMenuContent>
     </DropdownMenu>,
   );
@@ -112,3 +112,15 @@ test.each([
     }
   },
 );
+
+test("a seeded tutorial query is real editable catalog state from first mount", () => {
+  const d = mount("effect", "dither");
+  const before = d.engine.getSnapshot();
+  const search = screen.getByRole("searchbox");
+  expect(search).toHaveValue("dither");
+  expect(screen.getByRole("menuitem", { name: "Dither" })).toBeVisible();
+  expect(screen.queryByRole("menuitem", { name: "Flou" })).toBeNull();
+  fireEvent.change(search, { target: { value: "flou" } });
+  expect(screen.getByRole("menuitem", { name: "Flou" })).toBeVisible();
+  expect(d.engine.getSnapshot()).toBe(before);
+});
