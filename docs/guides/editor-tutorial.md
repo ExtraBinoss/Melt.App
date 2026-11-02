@@ -70,3 +70,11 @@ reopens. The Pop lesson places the card outside the full picker. Previous closes
 the animation picker or export dialog before returning to its parent step, and
 Next reopens the actual surface even when reviewing a previously completed step.
 Forward preparation never clears a picker already opened by queued Next requests.
+
+Card placement is computed from the current step's measured target, viewport and
+card height in one geometry pass. Cards prefer the free left/right side with
+centered alignment, falling above or below when those sides are obstructed. Only
+a nearby retained position can stabilize a reopened menu; an old unobstructed
+position elsewhere in the editor cannot override the current target. The copy
+uses native Kbd groups and matching UI icons for mouse, effect, animation, pin,
+playback and export controls, retaining those components during text reveal.

@@ -22,7 +22,7 @@ test("a wide popup leaves room for the card above it when both sides are crowded
 });
 
 test("a reopened nearby menu keeps the current card position while it still fits", () => {
-  const previous = { x: 800, y: 200 };
+  const previous = { x: 722, y: 166 };
   expect(
     placeGuide(
       { x: 450, y: 200, width: 200, height: 200 },
@@ -32,4 +32,31 @@ test("a reopened nearby menu keeps the current card position while it still fits
       previous,
     ),
   ).toEqual(previous);
+});
+
+test.each([
+  ["toolbar", { x: 18, y: 80, width: 48, height: 640 }, { x: 1450, y: 12 }, "right"],
+  ["centered toolbar", { x: 18, y: 324, width: 42, height: 490 }, { x: 1450, y: 12 }, "right"],
+  ["properties", { x: 1490, y: 50, width: 420, height: 440 }, { x: 120, y: 240 }, "left"],
+  ["layers", { x: 1490, y: 550, width: 420, height: 280 }, { x: 120, y: 240 }, "left"],
+] as const)(
+  "%s stays next to its target despite an unobstructed stale position",
+  (_, anchor, previous, side) => {
+    const card = placeGuide(anchor, { width: 1920, height: 840 }, 330, 268, previous);
+    if (side === "right") expect(card.x - anchor.x - anchor.width).toBe(72);
+    else expect(anchor.x - card.x - 330).toBe(72);
+    expect(card.y + 134).toBeCloseTo(anchor.y + anchor.height / 2);
+  },
+);
+
+test("a displaced control moves its card rather than keeping a distant previous position", () => {
+  const card = placeGuide(
+    { x: 1300, y: 800, width: 150, height: 36 },
+    { width: 1600, height: 1000 },
+    330,
+    268,
+    { x: 12, y: 12 },
+  );
+  expect(card.x).toBeGreaterThan(850);
+  expect(card.y).toBeGreaterThan(500);
 });

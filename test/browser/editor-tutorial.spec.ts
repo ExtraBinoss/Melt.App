@@ -1,10 +1,63 @@
 import { expect, test, type Page } from "@playwright/test";
+import { steps } from "../../apps/web/src/components/onboarding/tutorial/content";
 
-async function expectSpotlight(page: Page, selector: string) {
+async function expectNearby(page: Page, title: string) {
+  const step = steps.find((step) => step.title === title)!;
+  // Picker cards sit beside the complete popup, rather than over neighboring
+  // results just to be closer to the highlighted row.
+  const target = page
+    .locator(
+      title === "Add a pop"
+        ? ".motion-animation-popover"
+        : title === "Try Dither"
+          ? ".effect-catalog-menu"
+          : step.target,
+    )
+    .first();
+  const guide = page.getByRole("region", { name: "Melt tutorial" });
+  await expectHighlight(page, step.target);
+  await expect
+    .poll(async () => {
+      const box = await target.boundingBox(),
+        card = await guide.boundingBox();
+      if (!box || !card) return false;
+      const viewport = page.viewportSize()!;
+      const gap = Math.hypot(
+        Math.max(0, box.x - card.x - card.width, card.x - box.x - box.width),
+        Math.max(0, box.y - card.y - card.height, card.y - box.y - box.height),
+      );
+      return (
+        gap <= 100 &&
+        card.x >= 0 &&
+        card.y >= 0 &&
+        card.x + card.width <= viewport.width &&
+        card.y + card.height <= viewport.height
+      );
+    })
+    .toBe(true);
+  await expect
+    .poll(() =>
+      guide
+        .locator('p[aria-hidden="true"]')
+        .evaluate((node) =>
+          Array.from(node.children).every((part) =>
+            part.hasAttribute("data-speech-cue")
+              ? getComputedStyle(part).visibility !== "hidden"
+              : part.textContent === part.getAttribute("data-speech-text"),
+          ),
+        ),
+    )
+    .toBe(true);
+  await page.screenshot({
+    path: `artifacts/tutorial/alignment/${title.toLowerCase().replaceAll(" ", "-")}.png`,
+  });
+}
+
+async function expectHighlight(page: Page, selector: string) {
   await expect
     .poll(async () => {
       const highlight = await page.locator(".tutorial-highlight").boundingBox();
-      const target = await page.locator(selector).boundingBox();
+      const target = await page.locator(selector).first().boundingBox();
       if (!highlight || !target) return 999;
       return Math.max(
         Math.abs(highlight.x - target.x + 4),
@@ -14,6 +67,10 @@ async function expectSpotlight(page: Page, selector: string) {
       );
     })
     .toBeLessThan(3);
+}
+
+async function expectSpotlight(page: Page, selector: string) {
+  await expectHighlight(page, selector);
   const target = await page.locator(selector).boundingBox();
   const guide = await page.getByRole("region", { name: "Melt tutorial" }).boundingBox();
   expect(
@@ -67,6 +124,13 @@ test("guided editor practice, automatic tasks, exit and editor-only replay", asy
   for (const title of ["Your tools", "Properties", "Layers"]) {
     await guide.getByRole("button", { name: "Next", exact: true }).click();
     await expect(guide.getByRole("heading", { name: title, exact: true })).toBeVisible();
+    await expectNearby(page, title);
+    const card = (await guide.boundingBox())!;
+    const target = (await page
+      .locator(steps.find((step) => step.title === title)!.target)
+      .boundingBox())!;
+    if (title === "Your tools") expect(card.x).toBeGreaterThan(target.x + target.width);
+    else expect(card.x + card.width).toBeLessThan(target.x);
     if (title === "Your tools") {
       await expect(guide.locator('[data-slot="kbd"]').first()).toHaveText("Ctrl");
       await expect(guide.locator('[data-slot="kbd"]').last()).toHaveText("Wheel");
@@ -194,6 +258,7 @@ test("guided editor practice, automatic tasks, exit and editor-only replay", asy
         .toBeGreaterThan(beforeMotionWidth * 1.2);
       await expectSpotlight(page, '.motion-mode [data-segmented-value="motion"]');
     }
+    await expectNearby(page, title);
   }
   await expect(page.locator(".motion-export-preview-surface")).toBeVisible();
   await expect

@@ -1,15 +1,74 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
+import { ChevronRight, Download, Mouse, Pin, Play, Plus, Sparkles } from "lucide-react";
 import { useReducedMotion } from "motion/react";
 import { Kbd, KbdGroup } from "../../ui/kbd";
 import { modifierLabel } from "../../search/shortcuts";
+
+function speechCues(modifier: string): Record<string, { label: string; content: ReactNode }> {
+  const control = (label: string, icon?: ReactNode) => ({
+    label,
+    content: (
+      <span className="tutorial-control">
+        {icon}
+        {label}
+      </span>
+    ),
+  });
+  return {
+    "{zoom}": {
+      label: `${modifier} + wheel`,
+      content: (
+        <KbdGroup>
+          <Kbd>{modifier}</Kbd>
+          <Kbd>Wheel</Kbd>
+        </KbdGroup>
+      ),
+    },
+    "{rightClick}": {
+      label: "Right-click",
+      content: (
+        <Kbd>
+          <Mouse size={13} />
+          Right-click
+        </Kbd>
+      ),
+    },
+    "{add}": {
+      label: "Add (+)",
+      content: (
+        <span className="tutorial-control">
+          <Plus size={13} />
+        </span>
+      ),
+    },
+    "{effects}": {
+      label: "Add effect",
+      content: (
+        <span className="tutorial-control">
+          Add effect
+          <ChevronRight size={13} />
+        </span>
+      ),
+    },
+    "{dither}": control("Dither"),
+    "{static}": control("Static"),
+    "{motion}": control("Motion"),
+    "{animation}": control("Add motion", <Sparkles size={13} />),
+    "{pop}": control("Pop"),
+    "{pin}": control("Pin", <Pin size={13} />),
+    "{play}": control("Play", <Play size={13} />),
+    "{export}": control("Export", <Download size={13} />),
+    "{video}": control("Motion video"),
+    "{exportVideo}": control("Export video", <Download size={13} />),
+  };
+}
 
 /** Reveal text without replacing the native shortcut components. */
 export function Speech({ text }: { text: string }) {
   const host = useRef<HTMLParagraphElement>(null);
   const reduce = useReducedMotion();
   const modifier = modifierLabel();
-  const shortcut = text.includes("{rightClick}") ? "Right-click" : modifier;
-  const token = text.includes("{rightClick}") ? "{rightClick}" : "{zoom}";
+  const cues = speechCues(modifier);
   useEffect(() => {
     const node = host.current;
     if (!node) return;
@@ -19,7 +78,7 @@ export function Speech({ text }: { text: string }) {
     }));
     if (reduce) {
       for (const part of parts) {
-        if (part.element.hasAttribute("data-shortcut")) part.element.style.visibility = "visible";
+        if (part.element.hasAttribute("data-speech-cue")) part.element.style.visibility = "visible";
         else part.element.textContent = part.text;
       }
       return;
@@ -30,7 +89,7 @@ export function Speech({ text }: { text: string }) {
       let offset = 0;
       for (const part of parts) {
         const visible = Math.max(0, count - offset);
-        if (part.element.hasAttribute("data-shortcut"))
+        if (part.element.hasAttribute("data-speech-cue"))
           part.element.style.visibility = visible ? "visible" : "hidden";
         else part.element.textContent = part.text.slice(0, visible);
         offset += part.text.length;
@@ -44,30 +103,24 @@ export function Speech({ text }: { text: string }) {
     }, 12);
     return () => clearInterval(timer);
   }, [text, modifier, reduce]);
-  const parts = text.split(token);
+  const parts = text.split(/(\{[a-zA-Z]+\})/g);
   return (
     <>
       <p ref={host} aria-hidden="true" key={text}>
-        <span data-speech-text={parts[0]}>{parts[0]}</span>
-        {parts.length > 1 && (
-          <>
-            <span data-shortcut>
-              <KbdGroup>
-                <Kbd>{shortcut}</Kbd>
-                {token === "{zoom}" && (
-                  <>
-                    <span>+</span>
-                    <Kbd>Wheel</Kbd>
-                  </>
-                )}
-              </KbdGroup>
+        {parts.map((part, index) =>
+          cues[part] ? (
+            <span key={index} data-speech-cue data-speech-text={cues[part].label}>
+              {cues[part].content}
             </span>
-            <span data-speech-text={parts[1]}>{parts[1]}</span>
-          </>
+          ) : (
+            <span key={index} data-speech-text={part}>
+              {part}
+            </span>
+          ),
         )}
       </p>
       <p className="sr-only" aria-live="polite">
-        {text.replace(token, token === "{zoom}" ? `${modifier} + wheel` : "Right-click")}
+        {parts.map((part) => cues[part]?.label ?? part).join("")}
       </p>
     </>
   );

@@ -31,7 +31,7 @@ export function Guide({
   const last = index === steps.length - 1;
   const reduce = useReducedMotion();
   const [rect, setRect] = useState({ x: 20, y: 20, width: 0, height: 0 });
-  const [anchor, setAnchor] = useState({ x: 20, y: 20, width: 0, height: 0 });
+  const [position, setPosition] = useState({ index: -1, x: 12, y: 12 });
   const [viewport, setViewport] = useState({
     width: window.innerWidth,
     height: window.innerHeight,
@@ -41,14 +41,6 @@ export function Guide({
   const card = useRef<HTMLElement>(null);
   const overlay = useRef<HTMLDivElement>(null);
   const [cardHeight, setCardHeight] = useState(280);
-  useLayoutEffect(() => {
-    const node = card.current;
-    if (!node) return;
-    const observer = new ResizeObserver(() => setCardHeight(node.getBoundingClientRect().height));
-    observer.observe(node);
-    setCardHeight(node.getBoundingClientRect().height);
-    return () => observer.disconnect();
-  }, [index]);
   useLayoutEffect(() => {
     let frame = 0;
     let observed: Element | null = null;
@@ -85,6 +77,13 @@ export function Guide({
       const rawBox = target?.getBoundingClientRect();
       const dialog = document.querySelector<HTMLElement>(".export-dialog");
       const frameBox = overlay.current?.getBoundingClientRect();
+      const cardHeight = card.current?.getBoundingClientRect().height ?? 280;
+      const bounds = {
+        width: dialog?.clientWidth ?? innerWidth,
+        height: dialog?.clientHeight ?? innerHeight,
+        offsetX: dialog?.scrollLeft ?? 0,
+        offsetY: dialog?.scrollTop ?? 0,
+      };
       const box = rawBox
         ? {
             x: rawBox.x - (frameBox?.x ?? 0),
@@ -93,6 +92,7 @@ export function Guide({
             height: rawBox.height,
           }
         : undefined;
+      setCardHeight(cardHeight);
       if (anchorBox) {
         const next = {
           x: anchorBox.x - (frameBox?.x ?? 0),
@@ -100,14 +100,18 @@ export function Guide({
           width: anchorBox.width,
           height: anchorBox.height,
         };
-        setAnchor((old) =>
-          old.x === next.x &&
-          old.y === next.y &&
-          old.width === next.width &&
-          old.height === next.height
+        setPosition((old) => {
+          const nextPosition = placeGuide(
+            { ...next, x: next.x - bounds.offsetX, y: next.y - bounds.offsetY },
+            bounds,
+            Math.min(330, bounds.width - 24),
+            cardHeight,
+            old.index === index ? old : undefined,
+          );
+          return old.index === index && old.x === nextPosition.x && old.y === nextPosition.y
             ? old
-            : next,
-        );
+            : { index, ...nextPosition };
+        });
       }
       if (!box) setRect((old) => (old.width ? { x: 0, y: 0, width: 0, height: 0 } : old));
       if (box)
@@ -134,6 +138,7 @@ export function Guide({
       if (!frame) frame = requestAnimationFrame(measure);
     };
     const resize = new ResizeObserver(schedule);
+    if (card.current) resize.observe(card.current);
     const mutations = new MutationObserver((records) => {
       if (
         records.some(
@@ -165,31 +170,8 @@ export function Guide({
       window.removeEventListener("resize", schedule);
       window.removeEventListener("scroll", schedule, true);
     };
-  }, [step, engine]);
+  }, [step, engine, index]);
   const width = Math.min(330, viewport.width - 24);
-  const [placementHistory, setPlacementHistory] = useState({
-    index: -1,
-    anchor,
-    viewport,
-    cardHeight,
-    position: { x: 12, y: 12 },
-  });
-  let position = placementHistory.position;
-  if (
-    placementHistory.index !== index ||
-    placementHistory.anchor !== anchor ||
-    placementHistory.viewport !== viewport ||
-    placementHistory.cardHeight !== cardHeight
-  ) {
-    position = placeGuide(
-      { ...anchor, x: anchor.x - viewport.offsetX, y: anchor.y - viewport.offsetY },
-      viewport,
-      width,
-      cardHeight,
-      placementHistory.index === index ? placementHistory.position : undefined,
-    );
-    setPlacementHistory({ index, anchor, viewport, cardHeight, position });
-  }
   const placement =
     index === 0 || last
       ? { x: (viewport.width - width) / 2, y: Math.max(12, (viewport.height - cardHeight) / 2) }
