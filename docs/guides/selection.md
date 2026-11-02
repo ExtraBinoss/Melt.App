@@ -30,7 +30,7 @@ The interaction follows the [official Affinity Flood Select Tool reference](http
 | Worker requests  | Pointer movement coalesces requests to one worker.                                                                                         |
 | Accept selection | Pointer release accepts the selection and keeps its marching-ants outline; it does not execute a document command or create an undo entry. |
 | Cancel           | Cancel restores the preceding accepted selection.                                                                                          |
-| Deselect         | Deselect releases the source and worker.                                                                                                   |
+| Deselect         | Deselect saves one bounded alpha checkpoint, then releases the source and worker.                                                          |
 
 ### Mask actions
 
@@ -80,6 +80,34 @@ Busy/repeated shortcut intent is consumed without duplicating an entire layer;
 editable fields and modal controls keep their native keys. Existing customized
 Mod+J assignments survive the introduction of this new default binding.
 
+### Cut, invert and reselect
+
+**Ctrl/Cmd+Shift+J** runs Layer via Cut against the same accepted pixel selection.
+One transaction creates the cropped image and an inverse editable selection mask
+on the original. Previous masks, original bytes and affine placement survive;
+one undo restores the whole operation. Without accepted pixels it does not
+cut or duplicate entire layers.
+
+**Ctrl/Cmd+Shift+I** inverts accepted coverage. **Ctrl/Cmd+D** explicitly deselects
+and stores one alpha checkpoint (at most 16 MiB), then releases the worker.
+**Ctrl/Cmd+Shift+D** restores that coverage, tolerance and selection mode without
+creating document history. Checkpoints are local to the original project/page,
+image and immutable original asset; loading a replacement project, replacing the
+original or disposing the controller prevents stale restoration. Automatic
+invalidation does not overwrite the last explicit checkpoint.
+
+### Layer stacking and clipping
+
+**Ctrl/Cmd+[** and **Ctrl/Cmd+]** shift selected sibling blocks one step. Groups
+keep their children; selected block order and transforms stay unchanged.
+**Ctrl/Cmd+Alt+G** toggles an explicit clipping link to the base below. The base
+remains visible; its filtered alpha clips each linked layer after that layer's
+independent mask. A shared parent's opacity is applied once. Links survive layer
+reordering, duplication, portable serialization, isolated export and clipboard
+remapping. Deleting a base releases its links atomically; locked edits and graph
+cycles reject without changing the document. Treated groups cannot be dissolved
+in a way that silently loses clipping.
+
 ### Keyboard ownership
 
 | Selection topic     | Behavior                                                                                                                                 |
@@ -107,7 +135,7 @@ Inverting or deselecting a selection changes presentation state rather than docu
 - The current source limit is 16,777,216 pixels. Larger originals fail explicitly before image preparation instead of allocating an unbounded flood queue.
 - Preview messages contain bounded vector outline geometry. The help explains that highly detailed boundaries may use a simpler outline; accepted coverage and exported masks retain full source resolution. The main toolbar does not present approximation as a separate action or status.
 - The SVG outline lives in viewport coordinates outside the scaled artboard, with a single non-scaling one-pixel stroke. World/layer transforms move its geometry while the dash length and speed remain in screen pixels. Its imperative subscriptions and viewport observer are released on unmount; moving tolerance does not rerender App, Inspector, CanvasArea, EditorCanvas or EditorScene. CSS animates only dash offset and respects reduced motion.
-- Cancellation, project replacement and runtime disposal release the worker, listeners and request timer. No selection data enters the project journal until Keep, Erase or Layer via Copy.
+- Cancellation, project replacement and runtime disposal release the worker, listeners and request timer. No selection data enters the project journal until Keep, Erase, Layer via Copy or Layer via Cut.
 
 ## Verification
 
@@ -118,5 +146,20 @@ Inverting or deselecting a selection changes presentation state rather than docu
 | Authored browser scenarios | The authored native `test/browser/pixel-selection.spec.ts` checks retained dotted outlines, drag tolerance, modifiers, cancellation, explicit Keep/Erase, Ctrl/Cmd+D, nested transforms and stroke screenshots at 25%, 100%, 200% and 400%. |
 | Export inspection          | Exports are decoded in a separate inspector page; source preparation is distinguished from forbidden GPU readbacks.                                                                                                                         |
 | Execution status           | These latest UI/erase/zoom additions still require the coordinated frozen-candidate run.                                                                                                                                                    |
+
+The native `photoshop-shortcuts.spec.ts` scenarios verify inversion, explicit
+reselection, cut pixels decoded from a real PNG, one-step undo/redo, sibling
+stacking, independent masks with clipping in WebGPU and forced WebGL exports,
+shared parent opacity, rebinding,
+English/French description search and visible key separators. The focused
+`clipping-load.spec.ts` run exercises 50 real image layers with 100 effects:
+clipping changes only the intended image region, and undo restores the decoded
+render exactly. On Linux, Chromium 156, WebGPU, 1600×1000 and DPR 1, retained
+cache allocation stayed at 244,875,404 bytes under the 402,653,184-byte limit;
+clipping and undo retained 100 effect passes and 97 source uploads. Instrumented
+GPU, WebGL and Canvas2D readback counts stayed at zero. This development-server
+run is a functional/resource witness, not a latency benchmark; adapter identity
+was not captured. Logs and the resource witness are kept in the ignored
+`artifacts/photoshop-shortcuts/` directory.
 
 Run checks serially under the resource limits in [the performance protocol](../performance/protocol.md). Newly written scenarios are not evidence of a passing browser run until executed against a frozen candidate.

@@ -17,9 +17,11 @@ export type WandRequest =
       mode: SelectionMode;
       contiguous: boolean;
     }
+  | { id: number; type: "restore"; alpha: Uint8Array }
   | { id: number; type: "mask"; data: Uint8ClampedArray; width: number; height: number }
-  | { id: number; type: "accept" | "invert" | "export" | "extract" };
+  | { id: number; type: "accept" | "invert" | "export" | "extract" | "snapshot" };
 export type WandResponse =
+  | { id: number; selection: Uint8Array }
   | { id: number; image: ExtractedPixels | ExtractedImage | null }
   | { id: number; preview: WandPreview }
   | { id: number; mask: { data: Uint8ClampedArray; width: number; height: number } }

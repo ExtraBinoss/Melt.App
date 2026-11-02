@@ -48,5 +48,17 @@
   "layerViaCopy": "Nieuwe laag via kopiëren",
   "layerViaCopyHint": "Kopieer de geselecteerde pixels naar een nieuwe laag op dezelfde positie. Zonder pixelselectie worden de geselecteerde lagen op hun plaats gedupliceerd.",
   "copySuffix": "kopie",
-  "copyEmpty": "Het geselecteerde gebied bevat geen zichtbare pixels om te kopiëren."
+  "copyEmpty": "Het geselecteerde gebied bevat geen zichtbare pixels om te kopiëren.",
+  "layerViaCut": "Nieuwe laag via knippen",
+  "cutHint": "Verplaats geselecteerde pixels naar een nieuwe laag en verwijder dat gebied uit het origineel in één ongedaan-maakstap.",
+  "invertHint": "Selecteer alles buiten de huidige pixelselectie.",
+  "reselect": "Opnieuw selecteren",
+  "reselectHint": "Herstel het laatst gedeselecteerde pixelgebied op de oorspronkelijke afbeelding.",
+  "reselectEmpty": "Er is geen eerdere pixelselectie beschikbaar voor deze afbeelding.",
+  "bringForward": "Naar voren",
+  "forwardHint": "Zet geselecteerde lagen één stap naar voren zonder ze te verplaatsen.",
+  "sendBackward": "Naar achteren",
+  "backwardHint": "Zet geselecteerde lagen één stap naar achteren zonder ze te verplaatsen.",
+  "toggleClipping": "Uitknipmasker maken/opheffen",
+  "clippingHint": "Beperk geselecteerde lagen tot het alfasilhouet van de laag eronder of hef het uitknipmasker op. De basis blijft zichtbaar."
 }

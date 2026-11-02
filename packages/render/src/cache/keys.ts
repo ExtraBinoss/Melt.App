@@ -105,6 +105,17 @@ export function createSourceKeys(
               resolve(maskSource),
             ]
           : null;
+        const clip = layer.clipping ? geometry.byId.get(layer.clipping.layerId) : undefined;
+        const clipKey = clip
+          ? [
+              geometry.worldMatrix(layer.id),
+              geometry.worldMatrix(clip.id),
+              clip.opacity,
+              clip.visible,
+              geometry.ancestors(clip.id).map((node) => [node.visible, node.opacity]),
+              resolve(clip),
+            ]
+          : null;
         const key = sourceIdentities.intern(
           JSON.stringify([
             {
@@ -123,6 +134,7 @@ export function createSourceKeys(
               ? assetIdentity(assets[page.spatial.environment.assetId])
               : null,
             maskKey,
+            clipKey,
             assetIdentity(layer.assetId ? assets[layer.assetId] : undefined),
             layer.kind === "video" ? (options.videoStamp?.(layer.id) ?? null) : null,
             assetIdentity(layer.mask?.assetId ? assets[layer.mask.assetId] : undefined),
@@ -176,6 +188,21 @@ export function createSourceKeys(
                   emit(mask.visible);
                   emit(mask.opacity);
                   emit(resolve(mask));
+                }
+                const clip = layer.clipping ? geometry.byId.get(layer.clipping.layerId) : undefined;
+                emit(!!clip);
+                if (clip) {
+                  for (const value of geometry.worldMatrix(layer.id)) emit(value);
+                  for (const value of geometry.worldMatrix(clip.id)) emit(value);
+                  emit(clip.opacity);
+                  emit(clip.visible);
+                  const ancestors = geometry.ancestors(clip.id);
+                  emit(ancestors.length);
+                  for (const node of ancestors) {
+                    emit(node.visible);
+                    emit(node.opacity);
+                  }
+                  emit(resolve(clip));
                 }
                 const children = geometry.children(layer.id);
                 emit(children.length);

@@ -22,6 +22,32 @@ function keys(page: Composition, cache?: SourceKeyCache, assets: Record<string, 
   const resolve = createSourceKeys(page, assets, 1, { cache });
   return page.layers.map(resolve);
 }
+it("invalidates retained clipping pixels when its base, transforms or ancestor visibility change", () => {
+  const group = createLayer("group", { id: "group" }),
+    base = createLayer("ellipse", { id: "base", parentId: group.id }),
+    target = createLayer("rectangle", {
+      id: "target",
+      parentId: group.id,
+      clipping: { layerId: base.id },
+    }),
+    f = fixture([group, base, target]),
+    cache = new SourceKeyCache();
+  const initial = keys(f.page(), cache);
+  for (const [id, patch] of [
+    [base.id, { x: 12 }],
+    [base.id, { fill: "#ff0000" }],
+    [base.id, { opacity: 0.4 }],
+    [group.id, { visible: false }],
+    [target.id, { x: 30 }],
+  ] as const) {
+    f.engine.execute({ type: "updateLayers", ids: [id], patch });
+    const changed = keys(f.page(), cache);
+    expect(changed).toEqual(keys(f.page()));
+    expect(changed[2]).not.toBe(initial[2]);
+    f.engine.undo();
+    expect(keys(f.page(), cache)).toEqual(initial);
+  }
+});
 
 it("reuses unchanged certified sources and transform-only clones without serializing signatures", () => {
   const f = fixture([createLayer("text", { id: "a" }), createLayer("text", { id: "b" })]);

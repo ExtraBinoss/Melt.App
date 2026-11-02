@@ -160,7 +160,9 @@ export class SpatialSources {
     }));
     const density = Math.max(
       scale,
-      ...layers.map((l) => (l.effects.some((e) => e.enabled) || l.mask?.enabled ? 1 : scale)),
+      ...layers.map((l) =>
+        l.effects.some((e) => e.enabled) || l.mask?.enabled || l.clipping ? 1 : scale,
+      ),
     );
     this.cache.ensureCapacity(
       stageKey,

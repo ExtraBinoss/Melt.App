@@ -1,3 +1,4 @@
+import { SelectionCheckpoint } from "./checkpoint";
 import { readDataUrl } from "../../assets/imports";
 import { copySelectionCommands } from "./copy-commands";
 import type { MaskSelectionPort } from "../preview";
@@ -20,6 +21,7 @@ interface Dependencies {
   maskName?(): string;
   copyName?(sourceName: string): string;
   copyEmpty?(): string;
+  reselectEmpty?(): string;
 }
 interface Target {
   origin: GestureOrigin;
@@ -46,10 +48,13 @@ export class PixelSelectionController implements MaskSelectionPort {
   private controlling: Promise<void> | null = null;
   private wanted: number | null = null;
   private closed = false;
+  private readonly checkpoint: SelectionCheckpoint;
   constructor(
     private readonly engine: EnginePort,
     private readonly dependencies: Dependencies,
-  ) {}
+  ) {
+    this.checkpoint = new SelectionCheckpoint(engine);
+  }
   read = () => this.state;
   subscribe = (listener: () => void) => {
     this.listeners.add(listener);
@@ -120,7 +125,7 @@ export class PixelSelectionController implements MaskSelectionPort {
       this.engine.getSnapshot().pageId !== snapshot.pageId
     )
       throw cancelled();
-    if (!this.current(this.generation) || this.target?.layerId !== layerId) this.deselect();
+    if (!this.current(this.generation) || this.target?.layerId !== layerId) this.deselect(false);
     const generation = this.generation;
     this.gestureVersion++;
     this.target = {
@@ -147,7 +152,7 @@ export class PixelSelectionController implements MaskSelectionPort {
     });
     if (!this.stop)
       this.stop = this.engine.subscribe(() => {
-        if (!this.current(this.generation)) this.deselect();
+        if (!this.current(this.generation)) this.deselect(false);
       });
     if (!this.client) {
       const client = this.dependencies.client ? this.dependencies.client() : new WandClient();
@@ -328,7 +333,37 @@ export class PixelSelectionController implements MaskSelectionPort {
   async erase() {
     return this.applyMask(true);
   }
+  async reselect() {
+    if (this.state) return;
+    const saved = await this.checkpoint.read();
+    if (this.state) return;
+    if (!saved)
+      throw Error(
+        this.dependencies.reselectEmpty?.() ?? "No previous pixel selection is available.",
+      );
+    const generation = this.generation;
+    this.engine.select([saved.layerId]);
+    if (generation !== this.generation || this.state) return;
+    await this.prepareMask(saved.layerId);
+    const current = this.generation;
+    const response = await this.client!.request({ type: "restore", alpha: saved.alpha.slice() });
+    this.requireCurrent(current);
+    this.accepted = {
+      ...saved.state,
+      ...this.preview(response),
+      busy: false,
+      dragging: false,
+      applying: false,
+    };
+    this.publish(this.accepted);
+  }
   async copyPixels() {
+    return this.extract(false);
+  }
+  async cutPixels() {
+    return this.extract(true);
+  }
+  private async extract(cut: boolean) {
     if (!this.state || this.state.busy || this.state.dragging || this.state.error) return;
     const empty = () => Error(this.dependencies.copyEmpty?.() ?? "The selected area is empty.");
     if (!this.state.selected) throw empty();
@@ -348,24 +383,49 @@ export class PixelSelectionController implements MaskSelectionPort {
         page = snapshot.project.pages.find((item) => item.id === snapshot.pageId)!,
         original = createLayerGeometryIndex(page).get(this.target!.layerId),
         name = this.dependencies.copyName?.(original.name) ?? `${original.name} copy`;
-      this.engine.transaction(
-        copySelectionCommands(
-          page,
-          original.id,
-          {
-            id: crypto.randomUUID(),
-            name,
-            mime: "image/png",
-            width: image.width,
-            height: image.height,
-            dataUrl,
-          },
-          { x: image.x, y: image.y, sourceWidth: state.width, sourceHeight: state.height },
+      const commands = copySelectionCommands(
+        page,
+        original.id,
+        {
+          id: crypto.randomUUID(),
           name,
-          this.dependencies.maskName?.() ?? "Selection mask",
-        ),
+          mime: "image/png",
+          width: image.width,
+          height: image.height,
+          dataUrl,
+        },
+        { x: image.x, y: image.y, sourceWidth: state.width, sourceHeight: state.height },
+        name,
+        this.dependencies.maskName?.() ?? "Selection mask",
       );
-      this.deselect();
+      if (cut) {
+        const mask = await this.client!.request({ type: "export" });
+        this.requireControl(generation, gesture);
+        if (!("mask" in mask)) throw Error("Selection mask is missing.");
+        const dataUrl = (this.dependencies.encode ?? maskToDataUrl)(
+          mask.mask.data,
+          mask.mask.width,
+          mask.mask.height,
+        );
+        commands.unshift(
+          ...selectionMaskCommands(
+            page,
+            original.id,
+            {
+              id: crypto.randomUUID(),
+              name: this.dependencies.maskName?.() ?? "Selection mask",
+              mime: "image/png",
+              width: mask.mask.width,
+              height: mask.mask.height,
+              dataUrl,
+            },
+            true,
+          ),
+        );
+      }
+      this.requireControl(generation, gesture);
+      this.engine.transaction(commands);
+      this.deselect(false);
     });
   }
   private async applyMask(erase: boolean) {
@@ -402,14 +462,18 @@ export class PixelSelectionController implements MaskSelectionPort {
       this.deselect();
     });
   }
-  deselect = () => {
+  deselect = (remember = true) => {
+    const previous = this.accepted,
+      client = this.client;
+    if (remember && previous && client)
+      this.checkpoint.save(client, previous, [this.running, this.accepting, this.controlling]);
     this.generation++;
     this.wanted = null;
     this.running = null;
     this.accepting = null;
     this.controlling = null;
     this.loading = Promise.resolve();
-    this.client?.dispose();
+    if (!remember || !previous) client?.dispose();
     this.client = null;
     this.stop?.();
     this.stop = null;
@@ -420,7 +484,8 @@ export class PixelSelectionController implements MaskSelectionPort {
   dispose = () => {
     if (this.closed) return;
     this.closed = true;
-    this.deselect();
+    this.deselect(false);
+    this.checkpoint.dispose();
     this.listeners.clear();
   };
 }

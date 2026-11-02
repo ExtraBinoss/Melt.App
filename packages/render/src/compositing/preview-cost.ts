@@ -82,7 +82,7 @@ export function estimatePreviewCost(
     }
   }
   function layer(l: Layer, density: number, fixed: boolean, parent?: Bounds) {
-    const reference = l.effects.some(hasEffectTreatment) || !!l.mask?.enabled;
+    const reference = l.effects.some(hasEffectTreatment) || !!l.mask?.enabled || !!l.clipping;
     if (reference) {
       density = 1;
       fixed = true;
@@ -139,6 +139,11 @@ export function estimatePreviewCost(
         if (source && maskLayerMapping(page, l, source, false).opacity > 0)
           layer(source, density, fixed);
       }
+    }
+    if (l.clipping) {
+      target(w, h, fixed);
+      const base = geometry.byId.get(l.clipping.layerId);
+      if (base?.visible && base.opacity > 0) layer(base, density, fixed);
     }
     if (reference) target(w, h, true, true);
   }

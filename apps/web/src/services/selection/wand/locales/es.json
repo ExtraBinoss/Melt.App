@@ -48,5 +48,17 @@
   "layerViaCopy": "Nueva capa por copia",
   "layerViaCopyHint": "Copia los píxeles seleccionados en una nueva capa en la misma posición. Sin una selección de píxeles, duplica las capas seleccionadas sin desplazarlas.",
   "copySuffix": "copia",
-  "copyEmpty": "El área seleccionada no contiene píxeles visibles para copiar."
+  "copyEmpty": "El área seleccionada no contiene píxeles visibles para copiar.",
+  "layerViaCut": "Nueva capa por corte",
+  "cutHint": "Mueve los píxeles seleccionados a una capa nueva y elimina esa zona del original en un solo paso de deshacer.",
+  "invertHint": "Selecciona todo lo que queda fuera de la selección de píxeles actual.",
+  "reselect": "Volver a seleccionar",
+  "reselectHint": "Restaura la última región de píxeles deseleccionada en su imagen original.",
+  "reselectEmpty": "No hay una selección de píxeles anterior disponible para esta imagen.",
+  "bringForward": "Traer adelante",
+  "forwardHint": "Adelanta las capas seleccionadas un nivel sin cambiar su posición.",
+  "sendBackward": "Enviar atrás",
+  "backwardHint": "Retrasa las capas seleccionadas un nivel sin cambiar su posición.",
+  "toggleClipping": "Crear/liberar máscara de recorte",
+  "clippingHint": "Recorta las capas seleccionadas según la silueta alfa de la capa inferior o libera el recorte. La capa base permanece visible."
 }

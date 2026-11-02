@@ -48,5 +48,17 @@
   "layerViaCopy": "Nuovo livello tramite copia",
   "layerViaCopyHint": "Copia i pixel selezionati in un nuovo livello nella stessa posizione. Senza una selezione di pixel, duplica i livelli selezionati senza spostarli.",
   "copySuffix": "copia",
-  "copyEmpty": "L’area selezionata non contiene pixel visibili da copiare."
+  "copyEmpty": "L’area selezionata non contiene pixel visibili da copiare.",
+  "layerViaCut": "Nuovo livello tramite taglio",
+  "cutHint": "Sposta i pixel selezionati in un nuovo livello e rimuovi quell’area dall’originale con un solo passaggio di annullamento.",
+  "invertHint": "Seleziona tutto ciò che si trova fuori dalla selezione di pixel corrente.",
+  "reselect": "Riseleziona",
+  "reselectHint": "Ripristina l’ultima regione di pixel deselezionata nell’immagine originale.",
+  "reselectEmpty": "Nessuna selezione di pixel precedente disponibile per questa immagine.",
+  "bringForward": "Porta avanti",
+  "forwardHint": "Porta i livelli selezionati avanti di un livello senza spostarli.",
+  "sendBackward": "Porta indietro",
+  "backwardHint": "Porta i livelli selezionati indietro di un livello senza spostarli.",
+  "toggleClipping": "Crea/rilascia maschera di ritaglio",
+  "clippingHint": "Ritaglia i livelli selezionati sulla sagoma alfa del livello sottostante o rilascia il ritaglio. Il livello base rimane visibile."
 }

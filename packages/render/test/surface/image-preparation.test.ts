@@ -42,6 +42,13 @@ test("uses the largest rendered plane across image instances, while preserving m
   expect(imageDimension(4096, 2048, null)).toBeUndefined();
   expect(imageFootprints([plain])).toEqual(new Map());
 });
+test("keeps authored image pixels for both clipped layers and their visible silhouette bases", () => {
+  const base = createLayer("image", { id: "base", assetId: "base-image", width: 80, height: 60 }),
+    top = createLayer("image", { assetId: "top-image", clipping: { layerId: base.id } });
+  const footprints = imageFootprints([base, top], 0.25);
+  expect(footprints.get("base-image")).toBeNull();
+  expect(footprints.get("top-image")).toBeNull();
+});
 
 test("cancellation closes the original and resized native bitmaps before they enter the cache", async () => {
   const controller = new AbortController(),

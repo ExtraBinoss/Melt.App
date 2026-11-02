@@ -45,6 +45,9 @@ export const duplicateLayers: CommandHandler<"duplicateLayers"> = (
     ...(layer.guides
       ? { guides: layer.guides.map((guide) => ({ ...guide, id: nextId("guide") })) }
       : {}),
+    ...(layer.clipping
+      ? { clipping: { layerId: ids.get(layer.clipping.layerId) ?? layer.clipping.layerId } }
+      : {}),
     ...(layer.mask?.layerId
       ? { mask: { ...layer.mask, layerId: ids.get(layer.mask.layerId) ?? layer.mask.layerId } }
       : {}),

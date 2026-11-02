@@ -1,3 +1,4 @@
+import { shiftLayers, toggleClipping } from "../layers/stacking";
 import * as animations from "../motion/animations/commands";
 import * as layers from "../layers/commands";
 import * as pages from "../pages/commands";
@@ -27,6 +28,8 @@ export const COMMAND_HANDLERS: CommandHandlers = Object.freeze({
   deleteLayers: layers.deleteLayers,
   duplicateLayers: layers.duplicateLayers,
   reorderLayer: layers.reorderLayer,
+  shiftLayers,
+  toggleClipping,
   groupLayers: layers.createGroup,
   ungroupLayers: layers.removeGroup,
   addPage: pages.addPage,

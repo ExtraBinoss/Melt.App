@@ -82,6 +82,7 @@ export function ungroupLayers(page: Composition, ids: string[]): string[] {
     ensure(
       group.effects.length === 0 &&
         group.mask === null &&
+        !group.clipping &&
         !group.maskSource &&
         group.opacity === 1 &&
         group.blendMode === "normal",

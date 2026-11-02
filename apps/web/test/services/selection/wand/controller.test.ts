@@ -197,7 +197,7 @@ it("reuses the original source, restores an accepted selection on cancellation a
   expect(d.pixels).toHaveBeenCalledOnce();
   expect(d.engine.getSnapshot().canUndo).toBe(false);
   d.controller.deselect();
-  expect(d.worker.terminate).toHaveBeenCalledOnce();
+  await vi.waitFor(() => expect(d.worker.terminate).toHaveBeenCalledOnce());
   await d.controller.createMask();
   expect(d.engine.getSnapshot().canUndo).toBe(false);
 });
@@ -355,5 +355,59 @@ it("cancels an in-flight mask export before encoding or publishing any document 
   expect(d.encode).not.toHaveBeenCalled();
   expect(d.engine.getSnapshot().project).toBe(original);
   expect(d.engine.getSnapshot().canUndo).toBe(false);
+  expect(d.controller.read()).toBeNull();
+});
+it("cuts selected pixels and restores the original plus copied assets with one undo", async () => {
+  const d = fixture(),
+    before = d.engine.getSnapshot().project;
+  await d.controller.begin("image", 20, 0, 0);
+  await d.controller.accept();
+  await d.controller.cutPixels();
+  const after = d.engine.getSnapshot();
+  expect(after.project.pages[0]!.layers).toHaveLength(2);
+  expect(after.project.pages[0]!.layers[0]!.mask).toMatchObject({
+    mode: "luminance",
+    inverted: true,
+  });
+  expect(after.project.assets.original).toEqual(before.assets.original);
+  expect(d.encode.mock.calls[0]![0]).toEqual(new Uint8ClampedArray([10, 10, 10, 255]));
+  d.engine.undo();
+  expect(d.engine.getSnapshot().project).toEqual(before);
+  expect(d.engine.getSnapshot().canUndo).toBe(false);
+  d.engine.redo();
+  expect(d.engine.getSnapshot().project).toEqual(after.project);
+});
+it("restores one deselected selection without a document edit and rejects a different project", async () => {
+  const d = fixture(),
+    before = d.engine.getSnapshot().project;
+  await d.controller.begin("image", 20, 0, 0);
+  await d.controller.accept();
+  const selected = d.controller.read()!;
+  d.controller.deselect();
+  expect(d.controller.read()).toBeNull();
+  await d.controller.reselect();
+  expect(d.controller.read()).toMatchObject({
+    selected: selected.selected,
+    path: selected.path,
+    tolerance: 0,
+  });
+  expect(d.engine.getSnapshot().project).toBe(before);
+  expect(d.engine.getSnapshot().canUndo).toBe(false);
+  d.controller.deselect();
+  await vi.waitFor(() => expect(d.worker.terminate).toHaveBeenCalledTimes(2));
+  d.engine.load(createProject());
+  await expect(d.controller.reselect()).rejects.toThrow("previous");
+  expect(d.controller.read()).toBeNull();
+});
+
+it("does not restore a selection into a reloaded project even when its IDs and bytes match", async () => {
+  const d = fixture();
+  await d.controller.begin("image", 20, 0, 0);
+  await d.controller.accept();
+  d.controller.deselect();
+  await vi.waitFor(() => expect(d.worker.terminate).toHaveBeenCalledOnce());
+  d.engine.load(d.engine.getSnapshot().project);
+  d.engine.select(["image"]);
+  await expect(d.controller.reselect()).rejects.toThrow("previous");
   expect(d.controller.read()).toBeNull();
 });

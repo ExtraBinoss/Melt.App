@@ -139,6 +139,10 @@ export function validateLayer(
     );
   }
   if (value.mask !== null) validateMaskSource(value.mask, assets);
+  if (value.clipping !== undefined) {
+    assertRecord(value.clipping);
+    assertText(value.clipping.layerId);
+  }
   if (value.maskSource !== undefined) assertBoolean(value.maskSource);
   if (value.spatialContext !== undefined) assertBoolean(value.spatialContext);
   if (value.kind === "vector") validateVector(value.vector);

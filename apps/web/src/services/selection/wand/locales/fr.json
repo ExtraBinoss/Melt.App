@@ -48,5 +48,17 @@
   "layerViaCopy": "Nouveau calque par copie",
   "layerViaCopyHint": "Copier les pixels sélectionnés dans un nouveau calque au même endroit. Sans sélection de pixels, dupliquer les calques sélectionnés sur place.",
   "copySuffix": "copie",
-  "copyEmpty": "La zone sélectionnée ne contient aucun pixel visible à copier."
+  "copyEmpty": "La zone sélectionnée ne contient aucun pixel visible à copier.",
+  "layerViaCut": "Nouveau calque par couper",
+  "cutHint": "Déplacer les pixels sélectionnés dans un nouveau calque et retirer cette zone de l’original en une étape d’annulation.",
+  "invertHint": "Sélectionner tout ce qui se trouve à l’extérieur de la sélection de pixels actuelle.",
+  "reselect": "Resélectionner",
+  "reselectHint": "Restaurer la dernière zone de pixels désélectionnée sur son image d’origine.",
+  "reselectEmpty": "Aucune sélection de pixels précédente n’est disponible pour cette image.",
+  "bringForward": "Avancer",
+  "forwardHint": "Avancer les calques sélectionnés d’un cran sans changer leur position.",
+  "sendBackward": "Reculer",
+  "backwardHint": "Reculer les calques sélectionnés d’un cran sans changer leur position.",
+  "toggleClipping": "Créer/libérer le masque d’écrêtage",
+  "clippingHint": "Écrêter les calques sélectionnés selon la silhouette alpha du calque inférieur, ou libérer leur écrêtage. Le calque de base reste visible."
 }

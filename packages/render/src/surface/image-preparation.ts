@@ -12,6 +12,9 @@ export function imageFootprints(layers: readonly Layer[], scale?: number) {
   const footprints = new Map<string, ImageFootprint | null>();
   if (scale === undefined) return footprints;
   if (!Number.isFinite(scale) || scale <= 0) throw new RangeError("Invalid image source scale.");
+  const clippingSources = new Set(
+    layers.flatMap((layer) => (layer.clipping ? [layer.clipping.layerId] : [])),
+  );
   for (const layer of layers) {
     for (const id of [
       layer.mask?.enabled ? layer.mask.assetId : null,
@@ -23,6 +26,8 @@ export function imageFootprints(layers: readonly Layer[], scale?: number) {
       layer.kind !== "image" ||
       layer.spatial?.enabled ||
       layer.mask?.enabled ||
+      layer.clipping ||
+      clippingSources.has(layer.id) ||
       layer.effects.some(hasEffectTreatment)
     ) {
       footprints.set(layer.assetId, null);

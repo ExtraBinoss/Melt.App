@@ -14,6 +14,28 @@ test("adds configurable Ctrl/Cmd+J without stealing an older custom assignment",
   expect(old.bindings.get("action:layerViaCopy")).toEqual([]);
   expect(old.bindings.get("action:undo")).toEqual(bindingSnapshot().bindings.get("action:undo"));
 });
+test("preserves older custom assignments for every new Photoshop-style default", () => {
+  for (const id of [
+    "layerViaCut",
+    "invertSelection",
+    "reselectSelection",
+    "bringForward",
+    "sendBackward",
+    "toggleClipping",
+  ] as const) {
+    const action = `action:${id}` as const,
+      chord = bindingSnapshot().bindings.get(action)![0]!;
+    const restored = readBindings(
+      JSON.stringify({ version: 1, overrides: { "action:save": [chord] } }),
+    );
+    expect(restored.bindings.get("action:save")).toEqual([chord]);
+    expect(restored.bindings.get(action)).toEqual([]);
+    expect(restored.bindings.get("action:undo")).toEqual(
+      bindingSnapshot().bindings.get("action:undo"),
+    );
+  }
+  expect(bindingSnapshot().bindings.get("action:toggleClipping")![0]!.alt).toBe(true);
+});
 test("validates every override, rejects collisions including defaults and keeps disabled bindings explicit", () => {
   const snapshot = bindingSnapshot({ "action:save": [custom], "action:delete": [] });
   expect(snapshot.bindings.get("action:save")).toEqual([custom]);

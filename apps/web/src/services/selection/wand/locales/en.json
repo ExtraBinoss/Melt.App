@@ -48,5 +48,17 @@
   "layerViaCopy": "New layer via copy",
   "layerViaCopyHint": "Copy the selected pixels to a new layer in the same position. Without a pixel selection, duplicate the selected layers in place.",
   "copySuffix": "copy",
-  "copyEmpty": "The selected area contains no visible pixels to copy."
+  "copyEmpty": "The selected area contains no visible pixels to copy.",
+  "layerViaCut": "New layer via cut",
+  "cutHint": "Move selected pixels to a new layer and remove that area from the original in one undo step.",
+  "invertHint": "Select everything outside the current pixel selection.",
+  "reselect": "Reselect",
+  "reselectHint": "Restore the last deselected pixel region on its original image.",
+  "reselectEmpty": "No previous pixel selection is available for this image.",
+  "bringForward": "Bring forward",
+  "forwardHint": "Move selected layers one step forward without changing their position.",
+  "sendBackward": "Send backward",
+  "backwardHint": "Move selected layers one step backward without changing their position.",
+  "toggleClipping": "Create/release clipping mask",
+  "clippingHint": "Clip selected layers to the alpha silhouette of the layer below, or release their clipping. The base stays visible."
 }

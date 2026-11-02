@@ -1,3 +1,9 @@
+import {
+  shortcutQuery,
+  shortcutTerms,
+  isShortcutQuery,
+  shortcutTokenMatch,
+} from "./shortcut-search";
 import type { SearchFilter, SearchItem } from "./model";
 const prepared = new WeakMap<SearchItem, { label: string; terms: string }>();
 
@@ -6,7 +12,9 @@ function prepareItem(item: SearchItem) {
   if (!index) {
     index = {
       label: normalizeSearch(item.label),
-      terms: normalizeSearch(`${item.label} ${item.terms}`),
+      terms: normalizeSearch(
+        `${item.label} ${item.englishLabel ?? ""} ${item.description ?? ""} ${item.englishDescription ?? ""} ${item.terms} ${item.shortcutSearch ?? shortcutTerms(item.shortcut ?? [])}`,
+      ),
     };
     prepared.set(item, index);
   }
@@ -18,7 +26,7 @@ export function prepareSearchItems(items: readonly SearchItem[]): void {
 }
 
 export function normalizeSearch(value: string): string {
-  return value
+  return shortcutQuery(value)
     .normalize("NFKD")
     .replace(/\p{M}/gu, "")
     .toLocaleLowerCase("en")
@@ -74,6 +82,7 @@ function retain(heap: RankedItem[], entry: RankedItem) {
 /** Score cached normalized terms once; only the best 80 rows are retained/sorted, regardless of project size. */
 export function searchItems(items: readonly SearchItem[], query: string, category: SearchFilter) {
   const words = normalizeSearch(query).split(" ").filter(Boolean);
+  const byShortcut = isShortcutQuery(query);
   const browsing = !words.length && category === "all";
   const counts = new Map<SearchItem["category"], number>();
   const visible: SearchItem[] = [],
@@ -87,6 +96,19 @@ export function searchItems(items: readonly SearchItem[], query: string, categor
       const count = counts.get(item.category) ?? 0;
       counts.set(item.category, count + 1);
       if (visible.length < RESULT_LIMIT && (!browsing || count < 2)) visible.push(item);
+      continue;
+    }
+    if (byShortcut) {
+      const score = Math.max(
+        0,
+        ...(item.shortcuts ?? [item.shortcut ?? []]).map((tokens) =>
+          shortcutTokenMatch(tokens, query),
+        ),
+      );
+      if (score) {
+        total++;
+        retain(heap, { item, order, score });
+      }
       continue;
     }
     const { label, terms } = prepareItem(item);

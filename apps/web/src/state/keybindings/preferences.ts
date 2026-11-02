@@ -68,12 +68,18 @@ export function readBindings(serialized: string | null): BindingSnapshot {
     const known = Object.fromEntries(
       Object.entries(parsed.overrides).filter(([id]) => isCommandId(id)),
     );
-    // Profiles authored before Layer via Copy existed may already use Mod+J.
-    // Preserve that assignment instead of discarding the entire saved profile.
-    if (!Object.hasOwn(known, "action:layerViaCopy")) {
-      const defaults = BINDING_COMMANDS.find(
-        (command) => command.id === "action:layerViaCopy",
-      )!.defaults;
+    // New defaults must not discard custom chords from profiles saved before those actions existed.
+    for (const id of [
+      "action:layerViaCopy",
+      "action:layerViaCut",
+      "action:invertSelection",
+      "action:reselectSelection",
+      "action:bringForward",
+      "action:sendBackward",
+      "action:toggleClipping",
+    ] as const) {
+      if (Object.hasOwn(known, id)) continue;
+      const defaults = BINDING_COMMANDS.find((command) => command.id === id)!.defaults;
       if (
         Object.values(known).some((value) =>
           chords(value).some((chord) =>
@@ -81,7 +87,7 @@ export function readBindings(serialized: string | null): BindingSnapshot {
           ),
         )
       )
-        known["action:layerViaCopy"] = [];
+        known[id] = [];
     }
     return bindingSnapshot(known);
   } catch {

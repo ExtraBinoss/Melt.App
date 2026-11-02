@@ -56,7 +56,13 @@ export function createWandHost() {
         draft = null;
       } else {
         if (!source) throw Error("Pixel selection source is missing.");
-        if (request.type === "mask") {
+        if (request.type === "snapshot") return { id: request.id, selection: accepted.slice() };
+        if (request.type === "restore") {
+          if (request.alpha.length !== source.width * source.height)
+            throw Error("Invalid saved selection dimensions.");
+          accepted = request.alpha;
+          draft = null;
+        } else if (request.type === "mask") {
           if (
             request.width !== source.width ||
             request.height !== source.height ||

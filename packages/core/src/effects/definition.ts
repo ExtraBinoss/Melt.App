@@ -61,6 +61,7 @@ export type EffectParameter =
   | ColorEffectParameter
   | TextEffectParameter;
 export interface EffectDefinition {
+  readonly descriptionKey?: string;
   /** Validation-only compatibility; excluded from authoring and rendering. */
   readonly retired?: boolean;
   /** Amount zero leaves the source unchanged unless explicit compositing overrides it. */
@@ -157,6 +158,7 @@ export function defineEffect(
     ...options,
     type,
     nameKey: type,
+    descriptionKey: `search:effectDescriptions.${type}`,
     category,
     coverage,
     defaults: Object.freeze({

@@ -1,3 +1,5 @@
+import { i18n } from "../../../state/i18n";
+import { shortcutTerms, commandDescription, effectSearchTerms } from "./shortcut-search";
 import { supportedLocales } from "../../../state/i18n/locales";
 import { EFFECT_CATALOG, type SessionSnapshot } from "@musart/core";
 import { layerSelection } from "../../layers/menu/selection";
@@ -47,6 +49,13 @@ export function createSearchCommandItems(
     id: `action:${item.action}`,
     category: item.category,
     label: t(item.label),
+    englishLabel: String(i18n.t(item.label, { lng: "en" })),
+    description: commandDescription(item.action, undefined, item.descriptionKey),
+    englishDescription: commandDescription(item.action, "en", item.descriptionKey),
+    shortcuts: (bindings.bindings.get(`action:${item.action}`) ?? []).map(chordTokens),
+    shortcutSearch: (bindings.bindings.get(`action:${item.action}`) ?? [])
+      .map((chord) => shortcutTerms(chordTokens(chord)))
+      .join(" "),
     terms: `${item.terms} ${t(`search:${item.category}`)}`,
     shortcut: shortcut(`action:${item.action}`),
     disabled: item.gate ? disabled[item.gate] : undefined,
@@ -57,8 +66,17 @@ export function createSearchCommandItems(
     .map((effect) => ({
       id: `effect:${effect.type}`,
       label: t(effect.nameKey),
+      englishLabel: String(i18n.t(effect.nameKey, { lng: "en" })),
+      description: effect.descriptionKey ? t(effect.descriptionKey) : "",
+      englishDescription: effect.descriptionKey
+        ? String(i18n.t(effect.descriptionKey, { lng: "en" }))
+        : "",
+      shortcuts: (bindings.bindings.get(`effect:${effect.type}`) ?? []).map(chordTokens),
+      shortcutSearch: (bindings.bindings.get(`effect:${effect.type}`) ?? [])
+        .map((chord) => shortcutTerms(chordTokens(chord)))
+        .join(" "),
       category: effect.category === "effect" ? "effects" : "adjustments",
-      terms: `${effect.type} effect effet adjustment correction couleur color`,
+      terms: `${effect.type} effect effet adjustment correction couleur color ${effectSearchTerms(effect.type)}`,
       detail: t("search:applyToSelection"),
       disabled: disabled.editable,
       shortcut: shortcut(`effect:${effect.type}`),

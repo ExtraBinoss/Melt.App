@@ -1,5 +1,6 @@
+import "../../../services/selection/wand/messages";
 import { memo, type RefObject } from "react";
-import { ChevronRight, ScanLine } from "lucide-react";
+import { ChevronRight, ScanLine, CornerDownRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import {
   getEffectDefinition,
@@ -111,6 +112,15 @@ export const LayerRowContents = memo(
           />
         ) : (
           <span className="layer-name">{layer.name}</span>
+        )}
+        {layer.clipping && (
+          <span
+            className="mask-indicator"
+            title={t("pixelSelection:clippingHint")}
+            aria-label={t("pixelSelection:toggleClipping")}
+          >
+            <CornerDownRight size={12} />
+          </span>
         )}
         {layer.maskSource && (
           <span className="mask-indicator" aria-label={t("maskSource")}>

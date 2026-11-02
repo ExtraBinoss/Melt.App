@@ -7,6 +7,7 @@ export interface ActionDefinition {
   category: SearchCategory;
   label: string;
   terms: string;
+  descriptionKey?: string;
   shortcut?: string[];
   gate?: "selection" | "editable" | "group" | "ungroup" | "undo" | "redo" | "motion";
 }
@@ -169,7 +170,60 @@ export const ACTIONS: readonly ActionDefinition[] = [
     terms: "copy composition artboard page clipboard json share copier partager plan travail",
   },
   {
+    action: "layerViaCut",
+    category: "edit",
+    label: "pixelSelection:layerViaCut",
+    descriptionKey: "pixelSelection:cutHint",
+    terms: "layer cut pixels couper sélection",
+    shortcut: ["Mod", "Shift", "J"],
+    gate: "editable",
+  },
+  {
+    action: "invertSelection",
+    category: "edit",
+    label: "pixelSelection:invert",
+    descriptionKey: "pixelSelection:invertHint",
+    terms: "inverse invert selection inverser extérieur",
+    shortcut: ["Mod", "Shift", "I"],
+  },
+  {
+    action: "reselectSelection",
+    category: "edit",
+    label: "pixelSelection:reselect",
+    descriptionKey: "pixelSelection:reselectHint",
+    terms: "reselect restore previous selection récupérer",
+    shortcut: ["Mod", "Shift", "D"],
+  },
+  {
+    action: "bringForward",
+    category: "layers",
+    label: "pixelSelection:bringForward",
+    descriptionKey: "pixelSelection:forwardHint",
+    terms: "layer stack forward above monter devant",
+    shortcut: ["Mod", "]"],
+    gate: "editable",
+  },
+  {
+    action: "sendBackward",
+    category: "layers",
+    label: "pixelSelection:sendBackward",
+    descriptionKey: "pixelSelection:backwardHint",
+    terms: "layer stack backward below descendre derrière",
+    shortcut: ["Mod", "["],
+    gate: "editable",
+  },
+  {
+    action: "toggleClipping",
+    category: "layers",
+    label: "pixelSelection:toggleClipping",
+    descriptionKey: "pixelSelection:clippingHint",
+    terms: "clipping mask alpha silhouette écrêtage",
+    shortcut: ["Mod", "Alt", "G"],
+    gate: "editable",
+  },
+  {
     action: "layerViaCopy",
+    descriptionKey: "pixelSelection:layerViaCopyHint",
     category: "edit",
     label: "pixelSelection:layerViaCopy",
     terms:

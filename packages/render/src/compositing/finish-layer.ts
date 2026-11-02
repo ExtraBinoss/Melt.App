@@ -27,6 +27,17 @@ interface Context {
 }
 const translate = (x: number, y: number): Matrix => [1, 0, 0, 1, x, y];
 
+/** Effect pixels precede both masks; moving either mask must not invalidate those pixels. */
+export function layerEffectCache(
+  layer: Layer,
+  entry: LayerTargets,
+  keyFor: (source: Layer) => string,
+): Pick<Context, "effectCache"> {
+  if (!layer.effects.some(hasEffectTreatment)) return {};
+  const { clipping: _clipping, ...source } = layer;
+  return { effectCache: { entry, signature: keyFor({ ...source, mask: null }) } };
+}
+
 /** Finish source-local effects, masks and reference filtering with an explicit transport rectangle. */
 export function finishLayerSource(
   layer: Layer,
@@ -100,9 +111,15 @@ export function finishLayerSource(
       };
   }
   const { width, height } = source;
-  if (layer.mask?.enabled) {
-    const target = context.target("mask", width, height),
-      mask = layer.mask;
+  const masks = [
+    layer.mask,
+    layer.clipping
+      ? { layerId: layer.clipping.layerId, enabled: true, inverted: false, mode: "alpha" as const }
+      : undefined,
+  ];
+  for (const [index, mask] of masks.entries()) {
+    if (!mask?.enabled) continue;
+    const target = context.target(index ? "clipping" : "mask", width, height);
     if (mask.assetId) {
       context.passes.maskTo(source, context.image(mask.assetId), mask.inverted, target, {
         luminance: mask.mode === "luminance",
@@ -116,6 +133,10 @@ export function finishLayerSource(
     } else if (mask.layerId) {
       const maskLayer = context.mask(mask.layerId);
       const mapping = maskLayerMapping(page, layer, maskLayer, false);
+      if (index) {
+        mapping.luminance = false;
+        mapping.opacity = mapping.opacity > 0 ? maskLayer.opacity : 0;
+      }
       const content = mapping.opacity > 0 ? context.maskSource(maskLayer) : source;
       mapping.premultiplied = content.premultiplied;
       const maskBounds = content.bounds;
@@ -131,7 +152,7 @@ export function finishLayerSource(
     } else throw new Error("Source de masque absente.");
     source = { ...source, texture: target.texture };
   }
-  if (enabled || layer.mask?.enabled) {
+  if (enabled || layer.mask?.enabled || layer.clipping) {
     const filtered = context.target("reference", width, height, true);
     context.passes.copyTo(source, filtered, false, !source.premultiplied);
     source = { ...source, texture: filtered.texture, premultiplied: true };

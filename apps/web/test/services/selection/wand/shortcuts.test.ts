@@ -26,6 +26,8 @@ function fixture() {
       accept: vi.fn(async () => {}),
       cancel: vi.fn(),
       invert: vi.fn(async () => {}),
+      cutPixels: vi.fn(async () => {}),
+      reselect: vi.fn(async () => {}),
       copyPixels: vi.fn(async () => {}),
       createMask: vi.fn(async () => {}),
       erase: vi.fn(async () => {}),
@@ -128,3 +130,33 @@ it("preserves input/modal editing and rejects a queued erase after its pixel reg
   await expect(pending()).rejects.toMatchObject({ name: "AbortError" });
   expect(d.port.erase).not.toHaveBeenCalled();
 });
+it.each(["action:layerViaCut", "action:invertSelection"] as const)(
+  "guards busy, repeated and stale queued %s intent",
+  async (command) => {
+    const d = fixture(),
+      press = (repeat = false) =>
+        new KeyboardEvent("keydown", {
+          key: command.endsWith("Cut") ? "j" : "i",
+          ctrlKey: true,
+          shiftKey: true,
+          repeat,
+        });
+    const run = command === "action:layerViaCut" ? d.port.cutPixels : d.port.invert;
+    expect(pixelSelectionShortcut(press(), d.port, d.onTask, command)).toBe(true);
+    expect(run).toHaveBeenCalledOnce();
+    d.publish({ ...d.port.read()!, busy: true });
+    expect(pixelSelectionShortcut(press(), d.port, d.onTask, command)).toBe(true);
+    d.publish({ ...d.port.read()!, busy: false });
+    expect(pixelSelectionShortcut(press(true), d.port, d.onTask, command)).toBe(true);
+    expect(run).toHaveBeenCalledOnce();
+    let pending!: () => void | Promise<void>;
+    d.onTask.mockImplementationOnce(async (action) => {
+      pending = action;
+      return true;
+    });
+    pixelSelectionShortcut(press(), d.port, d.onTask, command);
+    d.publish(null);
+    await expect(pending()).rejects.toMatchObject({ name: "AbortError" });
+    expect(run).toHaveBeenCalledOnce();
+  },
+);

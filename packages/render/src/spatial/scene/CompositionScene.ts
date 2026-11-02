@@ -178,7 +178,9 @@ export class CompositionScene implements GpuResource {
     const density = Math.max(
       scale,
       ...sources.map((s) =>
-        s.layer.effects.some((e) => e.enabled) || s.layer.mask?.enabled ? 1 : scale,
+        s.layer.effects.some((e) => e.enabled) || s.layer.mask?.enabled || s.layer.clipping
+          ? 1
+          : scale,
       ),
     );
     const depthWidth = Math.max(1, Math.ceil(page.width * density)),
@@ -198,7 +200,8 @@ export class CompositionScene implements GpuResource {
         .invert()
         .multiply(this.camera.projectionMatrix);
       this.projection.set(layer.id, crop);
-      const reference = layer.effects.some((e) => e.enabled) || layer.mask?.enabled;
+      const reference =
+        layer.effects.some((e) => e.enabled) || layer.mask?.enabled || layer.clipping;
       assertTextureSize(
         Math.max(1, Math.ceil(bounds.width * (reference ? 1 : scale))),
         Math.max(1, Math.ceil(bounds.height * (reference ? 1 : scale))),

@@ -6,20 +6,26 @@ These tables list MusArt's **default shortcuts**. They cover familiar creative-e
 
 ## Everyday editing
 
-| Action                | Default shortcut           | What it does                                                                                                                                         |
-| --------------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Undo                  | `Ctrl+Z`                   | Undo the last document edit.                                                                                                                         |
-| Redo                  | `Ctrl+Shift+Z` or `Ctrl+Y` | Restore an undone edit.                                                                                                                              |
-| Copy selected items   | `Ctrl+C`                   | Copy editable layers, groups, effects, masks and their original images. See [sharing artwork](#copy-paste-and-share-artwork).                        |
-| Paste                 | `Ctrl+V`                   | Paste copied MusArt artwork, import clipboard images, or create a text layer from plain text.                                                        |
-| Select all            | `Ctrl+A`                   | Select all layers in the active artboard.                                                                                                            |
-| Duplicate             | `Ctrl+D`                   | Duplicate selected layers. With an active pixel selection, this clears the pixel selection instead.                                                  |
-| Deselect              | `Escape`                   | Clear the layer selection and return to the pointer tool.                                                                                            |
-| Delete                | `Delete` or `Backspace`    | Delete selected layers, or the selected effect/mask attachment. With an active pixel selection, hide the selected image area using an editable mask. |
-| Group                 | `Ctrl+G`                   | Group selected layers.                                                                                                                               |
-| Ungroup               | `Ctrl+Shift+G`             | Ungroup selected groups.                                                                                                                             |
-| Move selection        | `←` `→` `↑` `↓`            | Move unlocked selected items by 1 document pixel.                                                                                                    |
-| Move selection faster | `Shift` + arrow key        | Move unlocked selected items by 10 document pixels.                                                                                                  |
+| Action                        | Default shortcut           | What it does                                                                                                                                         |
+| ----------------------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Undo                          | `Ctrl+Z`                   | Undo the last document edit.                                                                                                                         |
+| Redo                          | `Ctrl+Shift+Z` or `Ctrl+Y` | Restore an undone edit.                                                                                                                              |
+| Copy selected items           | `Ctrl+C`                   | Copy editable layers, groups, effects, masks and their original images. See [sharing artwork](#copy-paste-and-share-artwork).                        |
+| Paste                         | `Ctrl+V`                   | Paste copied MusArt artwork, import clipboard images, or create a text layer from plain text.                                                        |
+| Select all                    | `Ctrl+A`                   | Select all layers in the active artboard.                                                                                                            |
+| Duplicate                     | `Ctrl+D`                   | Duplicate selected layers. With an active pixel selection, this clears the pixel selection instead.                                                  |
+| Layer via Copy                | `Ctrl+J`                   | Copy selected pixels to an aligned layer, or duplicate whole layers in place without a pixel selection.                                              |
+| Layer via Cut                 | `Ctrl+Shift+J`             | Move selected pixels to an aligned layer and hide that region of the original; one undo restores both.                                               |
+| Invert pixels                 | `Ctrl+Shift+I`             | Invert the accepted image selection without editing the document.                                                                                    |
+| Reselect pixels               | `Ctrl+Shift+D`             | Restore the last explicitly deselected image selection in this project.                                                                              |
+| Bring forward / Send backward | `Ctrl+]` / `Ctrl+[`        | Move selected sibling blocks one step while preserving their internal order.                                                                         |
+| Create / release clipping     | `Ctrl+Alt+G`               | Clip selected layers to the silhouette below while keeping the base and existing masks.                                                              |
+| Deselect                      | `Escape`                   | Clear the layer selection and return to the pointer tool.                                                                                            |
+| Delete                        | `Delete` or `Backspace`    | Delete selected layers, or the selected effect/mask attachment. With an active pixel selection, hide the selected image area using an editable mask. |
+| Group                         | `Ctrl+G`                   | Group selected layers.                                                                                                                               |
+| Ungroup                       | `Ctrl+Shift+G`             | Ungroup selected groups.                                                                                                                             |
+| Move selection                | `←` `→` `↑` `↓`            | Move unlocked selected items by 1 document pixel.                                                                                                    |
+| Move selection faster         | `Shift` + arrow key        | Move unlocked selected items by 10 document pixels.                                                                                                  |
 
 For Photoshop users: check the MusArt defaults before relying on muscle memory. In particular, **`Ctrl+D` duplicates layers** unless a pixel selection is active, and **`Ctrl+S` saves to this browser**. Download an editable `.musart` backup through the project menu or Magic Search.
 
@@ -134,3 +140,11 @@ Click a property's diamond in the inspector to create its first key at the curre
 Changes are saved in this browser and update command search, tooltips and key hints. Conflicting assignments are reported so you can resolve them. Preferences are separate from project files.
 
 Effects, adjustments and actions such as **Copy composition as editable JSON**, **Download project**, **Add artboard**, **Recenter**, **Toggle visibility**, **Toggle lock**, **Design**, **Animate** and **Enable/Disable snapping** have no default binding. Run them through Magic Search, pin them to the dock or assign keys in preferences.
+
+## Finding commands
+
+Magic Search and the shortcut editor match current-language and English names,
+command descriptions, effect parameter/algorithm names and actual configured
+bindings. `ctrl j`, `ctrl+j`, `cmd j` and `⌘J` all find Layer via Copy; rebinding
+a command updates its search keys. Keycaps use visible **+** separators between
+keys. Existing custom assignments take priority over newly introduced defaults.

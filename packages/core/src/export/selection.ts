@@ -54,6 +54,8 @@ function maskDependencies(painted: ReadonlySet<string>, geometry: LayerGeometryI
   for (const id of painted) {
     const source = geometry.get(id).mask?.layerId;
     if (source) pending.push(source);
+    const clip = geometry.get(id).clipping?.layerId;
+    if (clip) pending.push(clip);
   }
   while (pending.length) {
     const root = pending.pop()!;
@@ -66,6 +68,7 @@ function maskDependencies(painted: ReadonlySet<string>, geometry: LayerGeometryI
       included.add(id);
       const layer = geometry.get(id);
       if (layer.mask?.layerId) pending.push(layer.mask.layerId);
+      if (layer.clipping) pending.push(layer.clipping.layerId);
       for (const child of geometry.children(id)) descendants.push(child.id);
     }
     let ancestor = geometry.get(root).parentId;
@@ -74,6 +77,7 @@ function maskDependencies(painted: ReadonlySet<string>, geometry: LayerGeometryI
       included.add(ancestor);
       const layer = geometry.get(ancestor);
       if (layer.mask?.layerId) pending.push(layer.mask.layerId);
+      if (layer.clipping) pending.push(layer.clipping.layerId);
       ancestor = layer.parentId;
     }
   }
@@ -112,6 +116,7 @@ function dependencyCopies(
     id: ids.get(layer.id)!,
     parentId: layer.parentId ? ids.get(layer.parentId)! : null,
     ...(!layer.parentId ? { maskSource: true } : {}),
+    ...(layer.clipping ? { clipping: { layerId: ids.get(layer.clipping.layerId)! } } : {}),
     mask: layer.mask?.layerId
       ? { ...layer.mask, layerId: ids.get(layer.mask.layerId)! }
       : layer.mask,
@@ -164,16 +169,22 @@ export function selectionComposition(
     bottom = pixelEdge(maxY, Math.ceil);
   const originals = page.layers
     .filter((layer) => painted.has(layer.id) || context.has(layer.id))
-    .map((layer): Layer => ({
-      ...layer,
-      ...(!painted.has(layer.id) ? { spatialContext: true, effects: [], mask: null } : {}),
-      ...(paths.has(layer.id) && layer.maskSource ? { maskSource: false } : {}),
-      mask: !painted.has(layer.id)
-        ? null
-        : layer.mask?.layerId
-          ? { ...layer.mask, layerId: dependencies.ids.get(layer.mask.layerId)! }
-          : layer.mask,
-    }));
+    .map((layer): Layer => {
+      const { clipping, ...source } = layer;
+      return {
+        ...source,
+        ...(!painted.has(layer.id) ? { spatialContext: true, effects: [], mask: null } : {}),
+        ...(paths.has(layer.id) && layer.maskSource ? { maskSource: false } : {}),
+        ...(clipping && painted.has(layer.id)
+          ? { clipping: { layerId: dependencies.ids.get(clipping.layerId)! } }
+          : {}),
+        mask: !painted.has(layer.id)
+          ? null
+          : layer.mask?.layerId
+            ? { ...layer.mask, layerId: dependencies.ids.get(layer.mask.layerId)! }
+            : layer.mask,
+      };
+    });
   const centered = options.centerInArtboard === true && selected.size === 1;
   const offsetX = centered ? (minX + maxX - page.width) / 2 : left;
   const offsetY = centered ? (minY + maxY - page.height) / 2 : top;

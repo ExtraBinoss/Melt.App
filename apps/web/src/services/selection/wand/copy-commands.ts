@@ -36,6 +36,7 @@ export function copySelectionCommands(
     scaleY: original.scaleY,
     opacity: original.opacity,
     blendMode: original.blendMode,
+    ...(original.clipping ? { clipping: { ...original.clipping } } : {}),
     effects: original.effects.map((effect) => ({ ...effect, id: crypto.randomUUID() })),
   });
   const matrix = multiplyMatrices(layerTransform(original), [1, 0, 0, 1, crop.x * sx, crop.y * sy]);

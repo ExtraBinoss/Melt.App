@@ -68,3 +68,33 @@ it("retains effect pixels while moving masked artwork, but updates its world mas
   }
   expect(graph.stats().targets).toBe(0);
 });
+it("retains effect pixels across clipping moves and combines clipping after an independent mask", async () => {
+  installCanvasMock();
+  const { renderer } = makeGpuRenderer(),
+    graph = new GpuCompositor(renderer);
+  const base = createLayer("ellipse", { id: "base", opacity: 0.7 }),
+    mask = createLayer("rectangle", { id: "mask", maskSource: true }),
+    artwork = createLayer("rectangle", {
+      id: "artwork",
+      effects: [createEffect("blur")],
+      mask: { layerId: mask.id, enabled: true, inverted: false, mode: "alpha" },
+      clipping: { layerId: base.id },
+    }),
+    page = createPage({ layers: [base, mask, artwork] });
+  const mapping = vi.spyOn(GpuPasses.prototype, "maskTo");
+  try {
+    await graph.render(page, {});
+    const before = graph.stats();
+    expect(mapping.mock.calls.slice(-2).map((call) => call[4]?.opacity)).toEqual([1, 0.7]);
+    const moved = { ...artwork, x: 20 };
+    await graph.render({ ...page, layers: [base, mask, moved] }, {});
+    expect(graph.stats().effectPasses).toBe(before.effectPasses);
+    await graph.render({ ...page, layers: [{ ...base, x: 45 }, mask, moved] }, {});
+    expect(graph.stats().effectPasses).toBe(before.effectPasses);
+    expect(mapping).toHaveBeenCalledTimes(6);
+    expect(mapping.mock.calls[1]![3]).not.toBe(mapping.mock.calls[0]![3]);
+  } finally {
+    await graph.dispose();
+  }
+  expect(graph.stats().targets).toBe(0);
+});

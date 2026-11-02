@@ -95,6 +95,23 @@ export function createSearchActions(context: SearchActions) {
     copyComposition: () => createClipboardController(engine).copy(true),
     duplicate: () => selectedCommand("duplicateLayers"),
     layerViaCopy: () => layerViaCopy(engine, services.pixelSelection),
+    layerViaCut: () => services.pixelSelection?.cutPixels(),
+    invertSelection: () => services.pixelSelection?.invert(),
+    reselectSelection: () => services.pixelSelection?.reselect(),
+    bringForward: () =>
+      engine.execute({
+        type: "shiftLayers",
+        ids: engine.getSnapshot().selection,
+        direction: "forward",
+      }),
+    sendBackward: () =>
+      engine.execute({
+        type: "shiftLayers",
+        ids: engine.getSnapshot().selection,
+        direction: "backward",
+      }),
+    toggleClipping: () =>
+      engine.execute({ type: "toggleClipping", ids: engine.getSnapshot().selection }),
     delete: () => capturePresentationDelete(engine)(),
     group: () => selectedCommand("groupLayers"),
     ungroup: () => selectedCommand("ungroupLayers"),
@@ -188,6 +205,10 @@ const selectionActions = new Set<SearchAction>([
   "copy",
   "duplicate",
   "layerViaCopy",
+  "layerViaCut",
+  "bringForward",
+  "sendBackward",
+  "toggleClipping",
   "group",
   "ungroup",
   "deselect",
@@ -208,7 +229,8 @@ export function captureSearchItem(
       : null;
   const ids = new Set(origin?.selection);
   const pixels =
-    target.kind === "action" && target.action === "layerViaCopy"
+    target.kind === "action" &&
+    ["layerViaCopy", "layerViaCut", "invertSelection"].includes(target.action)
       ? context.services.pixelSelection?.read()
       : undefined;
   return () => {
@@ -225,7 +247,7 @@ export function captureSearchItem(
     }
     if (
       target.kind === "action" &&
-      target.action === "layerViaCopy" &&
+      ["layerViaCopy", "layerViaCut", "invertSelection"].includes(target.action) &&
       context.services.pixelSelection?.read() !== pixels
     )
       throw new Error(context.t("keybindings:stale"));

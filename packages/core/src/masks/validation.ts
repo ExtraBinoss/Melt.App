@@ -52,6 +52,14 @@ export function validateMaskGraph(layers: unknown[]): void {
     if (layer.kind === "group")
       for (const childId of children.get(id) ?? [])
         remaining = Math.max(remaining, 1 + visit(childId, depth + 1));
+    if (layer.clipping !== undefined) {
+      assertRecord(layer.clipping);
+      assertText(layer.clipping.layerId);
+      const base = nodes.get(layer.clipping.layerId);
+      ensure(base && base.id !== id, "INVALID_HIERARCHY", "Clipping requires a different base.");
+      // Links remain valid while moving a clipped layer; the explicit base identity is durable.
+      remaining = Math.max(remaining, 1 + visit(layer.clipping.layerId, depth + 1));
+    }
     if (layer.mask !== null) {
       assertRecord(layer.mask);
       if (layer.mask.layerId !== undefined) {

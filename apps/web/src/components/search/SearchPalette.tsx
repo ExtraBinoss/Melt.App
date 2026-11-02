@@ -343,7 +343,9 @@ const ResultRow = memo(
             <Icon size={16} strokeWidth={1.6} />
             <span className="magic-search-item-copy">
               <span>{item.label}</span>
-              {(item.disabled || item.detail) && <small>{item.disabled || item.detail}</small>}
+              {(item.disabled || item.description || item.detail) && (
+                <small>{item.disabled || item.description || item.detail}</small>
+              )}
             </span>
             {item.shortcut && (
               <KbdGroup>

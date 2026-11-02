@@ -54,6 +54,23 @@ export function documentShortcut(
     "action:redo": engine.redo,
     "action:duplicate": selected("duplicateLayers"),
     "action:layerViaCopy": () => layerViaCopy(engine, context.pixelSelection),
+    "action:layerViaCut": () => context.pixelSelection?.cutPixels(),
+    "action:invertSelection": () => context.pixelSelection?.invert(),
+    "action:reselectSelection": () => context.pixelSelection?.reselect(),
+    "action:bringForward": () =>
+      engine.execute({
+        type: "shiftLayers",
+        ids: engine.getSnapshot().selection,
+        direction: "forward",
+      }),
+    "action:sendBackward": () =>
+      engine.execute({
+        type: "shiftLayers",
+        ids: engine.getSnapshot().selection,
+        direction: "backward",
+      }),
+    "action:toggleClipping": () =>
+      engine.execute({ type: "toggleClipping", ids: engine.getSnapshot().selection }),
     "action:group": selected("groupLayers"),
     "action:ungroup": selected("ungroupLayers"),
     "action:deselect": () => engine.select([]),

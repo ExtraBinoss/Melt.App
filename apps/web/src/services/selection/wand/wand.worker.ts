@@ -21,7 +21,14 @@ export function processWand(request: WandRequest): WandResponse | Promise<WandRe
     }));
 }
 function post(result: WandResponse) {
-  scope.postMessage(result, "mask" in result ? [result.mask.data.buffer as ArrayBuffer] : []);
+  scope.postMessage(
+    result,
+    "selection" in result
+      ? [result.selection.buffer as ArrayBuffer]
+      : "mask" in result
+        ? [result.mask.data.buffer as ArrayBuffer]
+        : [],
+  );
 }
 scope.onmessage = ({ data }) => {
   const result = processWand(data);

@@ -6,6 +6,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Added
 
+- Add configurable Photoshop-style Layer via Cut (Ctrl/Cmd+Shift+J), selection inversion (Ctrl/Cmd+Shift+I), bounded last-selection recovery (Ctrl/Cmd+Shift+D), sibling stacking (Ctrl/Cmd+[ / ]) and independent GPU alpha clipping (Ctrl/Cmd+Alt+G). Preserve originals, existing masks, affine placement, visible bases, atomic undo/redo, portable and clipboard references, and older custom shortcut assignments. Add twelve-language action labels/help, generic English/current-language description and configured-chord search in both command surfaces, effect-algorithm indexing and shared plus-separated keycaps.
+
 - Add six contrast-checked interface accent palettes to Appearance preferences, with localized color names, light/dark previews, keyboard and pointer selection, persistent validated preferences, cross-tab updates and matching dashboard/editor controls. Keep brand artwork, media semantics and document colors independent.
 
 - Add configurable Ctrl/Cmd+J Layer via Copy: extract selected original pixels into a tightly cropped PNG layer at the same canvas position, or duplicate whole layers/groups directly above their originals without offset. Preserve originals, nested transforms, existing clips, editable effects and unchanged motion-key positions, with atomic undo/redo, worker-side encoding, twelve-language controls and preservation of older custom Mod+J bindings.

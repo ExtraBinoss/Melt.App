@@ -31,11 +31,19 @@ export function deleteLayerTree(page: Composition, ids: string[]): void {
       assertEditable(page, layer);
       layer.mask = null;
     }
+  for (const layer of page.layers)
+    if (layer.clipping && removed.has(layer.clipping.layerId)) {
+      assertEditable(page, layer);
+      delete layer.clipping;
+    }
   releaseUnusedMaskSources(page);
 }
 export function releaseUnusedMaskSources(page: Composition): void {
   const used = new Set(
-    page.layers.flatMap((layer) => (layer.mask?.layerId ? [layer.mask.layerId] : [])),
+    page.layers.flatMap((layer) => [
+      ...(layer.mask?.layerId ? [layer.mask.layerId] : []),
+      ...(layer.clipping ? [layer.clipping.layerId] : []),
+    ]),
   );
   for (const layer of page.layers)
     if (layer.maskSource && !used.has(layer.id)) layer.maskSource = false;

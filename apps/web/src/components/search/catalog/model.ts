@@ -39,6 +39,12 @@ export type SearchAction =
   | "redo"
   | "duplicate"
   | "layerViaCopy"
+  | "layerViaCut"
+  | "invertSelection"
+  | "reselectSelection"
+  | "bringForward"
+  | "sendBackward"
+  | "toggleClipping"
   | "copy"
   | "paste"
   | "copyComposition"
@@ -80,6 +86,11 @@ export interface SearchItem {
   category: SearchCategory;
   target: SearchTarget;
   terms: string;
+  description?: string;
+  englishLabel?: string;
+  englishDescription?: string;
+  shortcutSearch?: string;
+  shortcuts?: readonly (readonly string[])[];
   detail?: string;
   shortcut?: string[];
   disabled?: string;

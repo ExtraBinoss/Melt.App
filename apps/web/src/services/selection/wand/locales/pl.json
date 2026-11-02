@@ -48,5 +48,17 @@
   "layerViaCopy": "Nowa warstwa przez kopiowanie",
   "layerViaCopyHint": "Kopiuje zaznaczone piksele na nową warstwę w tym samym miejscu. Bez zaznaczenia pikseli powiela wybrane warstwy bez przesunięcia.",
   "copySuffix": "kopia",
-  "copyEmpty": "Zaznaczony obszar nie zawiera widocznych pikseli do skopiowania."
+  "copyEmpty": "Zaznaczony obszar nie zawiera widocznych pikseli do skopiowania.",
+  "layerViaCut": "Nowa warstwa przez wycięcie",
+  "cutHint": "Przenieś zaznaczone piksele na nową warstwę i usuń ten obszar z oryginału w jednym kroku cofania.",
+  "invertHint": "Zaznacz wszystko poza bieżącym zaznaczeniem pikseli.",
+  "reselect": "Zaznacz ponownie",
+  "reselectHint": "Przywróć ostatnio odznaczony obszar pikseli na oryginalnym obrazie.",
+  "reselectEmpty": "Brak poprzedniego zaznaczenia pikseli dla tego obrazu.",
+  "bringForward": "Przesuń do przodu",
+  "forwardHint": "Przesuń wybrane warstwy o jeden poziom do przodu bez zmiany ich położenia.",
+  "sendBackward": "Przesuń do tyłu",
+  "backwardHint": "Przesuń wybrane warstwy o jeden poziom do tyłu bez zmiany ich położenia.",
+  "toggleClipping": "Utwórz/zwolnij maskę przycinającą",
+  "clippingHint": "Przytnij wybrane warstwy do sylwetki alfa warstwy poniżej lub zwolnij przycięcie. Warstwa bazowa pozostaje widoczna."
 }

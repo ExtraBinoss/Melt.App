@@ -1,4 +1,5 @@
 // shadcn/ui, MIT. Source: https://ui.shadcn.com/r/styles/new-york-v4/kbd.json
+import { Children, Fragment } from "react";
 import { cn } from "./utils";
 
 function Kbd({ className, ...props }: React.ComponentProps<"kbd">) {
@@ -15,13 +16,30 @@ function Kbd({ className, ...props }: React.ComponentProps<"kbd">) {
   );
 }
 
-function KbdGroup({ className, ...props }: React.ComponentProps<"div">) {
+function KbdGroup({ className, children, ...props }: React.ComponentProps<"div">) {
   return (
     <kbd
       data-slot="kbd-group"
       className={cn("inline-flex items-center gap-1", className)}
       {...props}
-    />
+    >
+      {Children.toArray(children)
+        .filter(Boolean)
+        .map((child, index) => (
+          <Fragment key={index}>
+            {index > 0 && (
+              <span
+                data-slot="kbd-separator"
+                aria-hidden="true"
+                className="text-muted-foreground text-[10px]"
+              >
+                +
+              </span>
+            )}
+            {child}
+          </Fragment>
+        ))}
+    </kbd>
   );
 }
 

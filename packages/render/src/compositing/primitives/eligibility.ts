@@ -7,6 +7,7 @@ export function isInstancedPrimitive(layer: Layer): boolean {
     (layer.kind === "rectangle" || layer.kind === "ellipse") &&
     layer.blendMode === "normal" &&
     !layer.mask?.enabled &&
+    !layer.clipping &&
     !layer.maskSource &&
     !layer.fillGradient &&
     !layer.effects.some(hasEffectTreatment)

@@ -3,6 +3,7 @@ import {
   createLayer,
   createLayerGeometryIndex,
   transformPoint,
+  setLayerTransform,
   type Asset,
   type Command,
   type Composition,
@@ -44,6 +45,7 @@ export function selectionMaskCommands(
       mask: { ...layer.mask },
       effects: erase ? [createEffect("invert", { id: crypto.randomUUID() })] : [],
     });
+  setLayerTransform(source, matrix, source.rotation);
   commands.push(
     { type: "addLayers", layers: [source] },
     {

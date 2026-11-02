@@ -193,6 +193,7 @@ export function pasteContent(
       x: layer.x + (layer.parentId ? 0 : dx),
       y: layer.y + (layer.parentId ? 0 : dy),
       assetId: layer.assetId ? ids.get(layer.assetId)! : null,
+      ...(layer.clipping ? { clipping: { layerId: ids.get(layer.clipping.layerId)! } } : {}),
       mask: layer.mask
         ? {
             ...layer.mask,

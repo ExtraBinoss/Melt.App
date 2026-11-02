@@ -7,6 +7,8 @@ export interface BindingCommand {
   readonly id: CommandId;
   readonly label: string;
   readonly category: SearchCategory;
+  readonly descriptionKey?: string;
+  readonly terms?: string;
   readonly defaults: readonly KeyChord[];
 }
 const key = (key: string, mod = false, shift = false, alt = false): KeyChord => ({
@@ -40,10 +42,21 @@ export const BINDING_COMMANDS: readonly BindingCommand[] = Object.freeze([
     return {
       id,
       label: action.label,
+      descriptionKey: action.descriptionKey,
+      terms: action.terms,
       category: action.category,
       defaults:
         extraDefaults[id] ??
-        (normalized ? [key(normalized, tokens!.includes("Mod"), tokens!.includes("Shift"))] : []),
+        (normalized
+          ? [
+              key(
+                normalized,
+                tokens!.includes("Mod"),
+                tokens!.includes("Shift"),
+                tokens!.includes("Alt"),
+              ),
+            ]
+          : []),
     };
   }),
   ...Object.values(EFFECT_CATALOG)
@@ -51,6 +64,7 @@ export const BINDING_COMMANDS: readonly BindingCommand[] = Object.freeze([
     .map((effect): BindingCommand => ({
       id: `effect:${effect.type}`,
       label: effect.nameKey,
+      descriptionKey: effect.descriptionKey,
       category: effect.category === "effect" ? "effects" : "adjustments",
       defaults: [],
     })),

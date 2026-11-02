@@ -35,6 +35,8 @@ export interface PixelSelectionPort {
   invert(): Promise<void>;
   createMask(): Promise<void>;
   copyPixels(): Promise<void>;
+  cutPixels(): Promise<void>;
+  reselect(): Promise<void>;
   erase(): Promise<void>;
   deselect(): void;
   dispose(): void;

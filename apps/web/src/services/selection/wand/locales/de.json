@@ -48,5 +48,17 @@
   "layerViaCopy": "Neue Ebene durch Kopieren",
   "layerViaCopyHint": "Kopiert die ausgewählten Pixel an derselben Position auf eine neue Ebene. Ohne Pixelauswahl werden die ausgewählten Ebenen an Ort und Stelle dupliziert.",
   "copySuffix": "Kopie",
-  "copyEmpty": "Der ausgewählte Bereich enthält keine sichtbaren Pixel zum Kopieren."
+  "copyEmpty": "Der ausgewählte Bereich enthält keine sichtbaren Pixel zum Kopieren.",
+  "layerViaCut": "Neue Ebene durch Ausschneiden",
+  "cutHint": "Ausgewählte Pixel in eine neue Ebene verschieben und im Original entfernen; mit einem Schritt rückgängig machen.",
+  "invertHint": "Alles außerhalb der aktuellen Pixelauswahl auswählen.",
+  "reselect": "Erneut auswählen",
+  "reselectHint": "Den zuletzt abgewählten Pixelbereich im ursprünglichen Bild wiederherstellen.",
+  "reselectEmpty": "Für dieses Bild ist keine vorherige Pixelauswahl verfügbar.",
+  "bringForward": "Nach vorne",
+  "forwardHint": "Ausgewählte Ebenen eine Stufe nach vorne bringen, ohne sie zu verschieben.",
+  "sendBackward": "Nach hinten",
+  "backwardHint": "Ausgewählte Ebenen eine Stufe nach hinten bringen, ohne sie zu verschieben.",
+  "toggleClipping": "Schnittmaske erstellen/aufheben",
+  "clippingHint": "Ausgewählte Ebenen auf die Alpha-Silhouette der unteren Ebene begrenzen oder die Schnittmaske aufheben. Die Basis bleibt sichtbar."
 }

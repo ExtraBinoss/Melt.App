@@ -1,3 +1,11 @@
+import {
+  commandDescription,
+  shortcutMatches,
+  effectSearchTerms,
+  textMatches,
+  isShortcutQuery,
+} from "../catalog/shortcut-search";
+import { i18n } from "../../../state/i18n";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { RotateCcw } from "lucide-react";
@@ -8,7 +16,7 @@ import { BINDING_COMMANDS } from "../../../state/keybindings/registry";
 import { keybindings } from "../../../state/keybindings/store";
 import { useKeybindings } from "../../../state/keybindings/use-keybindings";
 import { BindingList } from "./BindingList";
-import { CANVAS_GESTURES, modifierLabel, bindingLabel } from "../shortcuts";
+import { CANVAS_GESTURES, modifierLabel } from "../shortcuts";
 import "../messages";
 import "./messages";
 import "./bindings.css";
@@ -25,11 +33,17 @@ export function ShortcutSettings() {
     const needle = normalize(query.trim());
     return !needle
       ? BINDING_COMMANDS
-      : BINDING_COMMANDS.filter((command) =>
-          normalize(
-            `${t(command.label)} ${t(`search:${command.category}`)} ${bindingLabel(command.id, snapshot)}`,
-          ).includes(needle),
-        );
+      : BINDING_COMMANDS.filter((command) => {
+          const chordMatch = shortcutMatches(snapshot.bindings.get(command.id) ?? [], query);
+          if (isShortcutQuery(query)) return chordMatch;
+          return (
+            chordMatch ||
+            textMatches(
+              `${t(command.label)} ${i18n.t(command.label, { lng: "en" })} ${commandDescription(command.id.slice(7), undefined, command.descriptionKey)} ${commandDescription(command.id.slice(7), "en", command.descriptionKey)} ${command.terms ?? ""} ${command.id.startsWith("effect:") ? effectSearchTerms(command.id.slice(7)) : ""}`,
+              query,
+            )
+          );
+        });
   }, [query, snapshot, t]);
   return (
     <div className="shortcut-settings">

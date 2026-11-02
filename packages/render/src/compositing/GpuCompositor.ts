@@ -23,7 +23,7 @@ import { gpuTextureLimit } from "../cache/texture-limits";
 import { frameSourceKeys, referenceDensity } from "./frame-source-keys";
 import { SourceKeyCache } from "../cache/source-key-cache";
 import { sameCompositionInput } from "../cache/composition-input";
-import { finishLayerSource } from "./finish-layer";
+import { finishLayerSource, layerEffectCache } from "./finish-layer";
 import { EffectResources } from "./effect-resources";
 import { VectorSources } from "../surface/vector/source";
 import { TextureSources } from "../surface/TextureSources";
@@ -342,7 +342,8 @@ export class GpuCompositor {
     return target;
   }
   private layer(layer: Layer, frame: RenderFrame, parentViewport?: Bounds): FrameTexture {
-    const reference = layer.effects.some(hasEffectTreatment) || !!layer.mask?.enabled;
+    const reference =
+      layer.effects.some(hasEffectTreatment) || !!layer.mask?.enabled || !!layer.clipping;
     // Exact frames retain authored references; previews may request bounded raster density.
     if (reference && (frame.scale !== frame.referenceScale || frame.vectorAntialias))
       frame = {
@@ -403,9 +404,7 @@ export class GpuCompositor {
         passes: this.passes!,
         effects: this.effects!,
         cache: this.cache,
-        ...(layer.effects.some(hasEffectTreatment)
-          ? { effectCache: { entry, signature: keyFor({ ...layer, mask: null }) } }
-          : {}),
+        ...layerEffectCache(layer, entry, keyFor),
         image: (id) => this.sources.image(id),
         maskSource: (maskLayer) => this.layer(maskLayer, frame),
         mask: (id) => {

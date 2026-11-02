@@ -48,5 +48,17 @@
   "layerViaCopy": "通过拷贝新建图层",
   "layerViaCopyHint": "将所选像素复制到同一位置的新图层。没有像素选区时，原位复制所选图层。",
   "copySuffix": "副本",
-  "copyEmpty": "所选区域没有可复制的可见像素。"
+  "copyEmpty": "所选区域没有可复制的可见像素。",
+  "layerViaCut": "通过剪切新建图层",
+  "cutHint": "将所选像素移到新图层，并从原图层移除该区域。一次撤销即可恢复。",
+  "invertHint": "选择当前像素选区以外的所有区域。",
+  "reselect": "重新选择",
+  "reselectHint": "在原始图像上恢复最近取消的像素选区。",
+  "reselectEmpty": "此图像没有可恢复的先前像素选区。",
+  "bringForward": "上移一层",
+  "forwardHint": "保持位置不变，将所选图层的叠放顺序上移一级。",
+  "sendBackward": "下移一层",
+  "backwardHint": "保持位置不变，将所选图层的叠放顺序下移一级。",
+  "toggleClipping": "创建/释放剪贴蒙版",
+  "clippingHint": "按下方图层的 Alpha 轮廓裁切所选图层，或解除裁切。基础图层仍保持可见。"
 }

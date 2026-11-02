@@ -10,6 +10,8 @@ const commandTypes = [
   "deleteLayers",
   "duplicateLayers",
   "reorderLayer",
+  "shiftLayers",
+  "toggleClipping",
   "groupLayers",
   "ungroupLayers",
   "addPage",

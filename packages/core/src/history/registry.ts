@@ -1,3 +1,4 @@
+import { selectedRoots } from "../layers/access";
 import type { Command } from "../document/model";
 import type { HistoryContext, HistoryHandlers, HistoryCapture } from "./collector";
 import { layerOwner, motionOwner } from "./collector";
@@ -21,6 +22,19 @@ export const HISTORY_HANDLERS: HistoryHandlers = {
   },
   duplicateLayers: (context, command) => {
     for (const id of command.ids) context.history.action("duplicate", layerOwner(context.page, id));
+  },
+  shiftLayers: (context, command) => {
+    for (const id of command.ids) context.history.action("reorder", layerOwner(context.page, id));
+  },
+  toggleClipping: (context, command) => {
+    const roots = selectedRoots(context.page, command.ids),
+      action = roots.every((layer) => layer.clipping) ? "delete" : "add";
+    for (const layer of roots)
+      context.history.action(action, {
+        kind: "mask",
+        compositionId: context.page.id,
+        layerId: layer.id,
+      });
   },
   reorderLayer: (context, command) => {
     context.history.action("reorder", layerOwner(context.page, command.id));
