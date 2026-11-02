@@ -15,6 +15,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Refine the shared loading-text shimmer with a soft violet halo, a narrow luminous highlight, continuous steady motion. Retain the existing mascot, layout and reduced-motion behavior.
+
 - Serialize rapid tutorial Next clicks and confirm each real action before advancing. Open effect menus through their mounted owner, focus and zoom the canvas toward Static/Motion, and morph Melt itself into an eyed pointer using its native SVG silhouette engine. Prevent duplicate effects and Pop animations.
 
 - Prioritize canonical undo/redo presentation before interruptible Inspector and layer-list updates, retain unchanged plain layer-row contents and resolve rapid visibility/lock actions against live canonical values. Keep hard-shadow resets at zero blur, retain visited shadow controls and parameter bindings across toggles, stabilize committed Motion field ports and address subscriptions, skip redundant native scalar/canvas writes, reuse compiled text on zero-width outline resets and preserve gesture undo boundaries.
@@ -449,6 +451,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 - Locked artwork remains inspectable on the canvas with a constant-size lock badge and no editing handles. Layer rows expose persistent protection indicators, while the inspector and effect/mask popovers identify blocking parent locks and unlock only that chain in one undoable transaction.
 
 ### Fixed
+
+- Restore the original shared loading-text shimmer from Git, with its moving gray/violet gradient, instead of a whole-label color pulse. Keep the violet mascot and its blinking unchanged.
 
 - Pulse shared loading text smoothly from gray to violet while preserving the centered violet mascot and its existing blinking animation; remove the unintended grayscale mascot pulse.
 

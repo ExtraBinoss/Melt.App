@@ -79,13 +79,14 @@ Neither final cold Lighthouse trace requested the Studio, App, EditorCanvas,
 Three.js or product-panel Illustrations chunks.
 
 Opening your studio uses the existing shared `Throbber`, with its 80 px violet
-mascot and label below it. A follow-up correction places the smooth gray-to-violet
-pulse on the **text only**; the mascot retains its existing animated SVG and
-blinking. The shared stylesheet uses theme colors and pauses or disables the text
-pulse for inactive and reduced-motion states. A native browser test holds the real
-Studio request, inspects the actual loading surface, checks both text-color
-endpoints and an interpolated midpoint, and confirms the mascot has no tint
-filter or CSS pulse. This replaces the earlier, incorrect mascot-tint witness.
+mascot and label below it. The text uses the **original moving gray/violet
+shimmer**, restored from Git after the incorrect mascot-tint and whole-label
+pulse changes. A requested visual refinement adds softer violet shoulders and a
+narrow luminous highlight, with continuous steady travel. The mascot retains its existing animated SVG and
+blinking. Inactive and reduced-motion rules retain their original behavior. A
+native browser test holds the real Studio request, checks the gradient clipped
+to transparent text at different background positions, and confirms the mascot
+has no tint filter or CSS pulse.
 
 The GitHub repository is now [ExtraBinoss/Melt.App](https://github.com/ExtraBinoss/Melt.App),
 and the local origin fetch/push URLs use that name. Portable-format, package and
@@ -137,9 +138,8 @@ hashes, dimensions and byte budgets. The production Vite build passed.
 Nine integrated native Chrome cases passed for decoded playback and budgets,
 timelapse hold, native links, compositor reveal, template dialog to editor,
 drag/pause/resume, real feature panels, first-paint locales and all converter Back
-links. Follow-up native checks passed for the corrected gray/violet **text** pulse,
-its interpolated midpoint, the centered mascot retaining its color, reduced
-motion and the final reveal. The shared Throbber unit and a fresh production build
+links. Follow-up native checks verify the restored moving text shimmer,
+the centered mascot retaining its color, reduced motion and the final reveal. The shared Throbber unit and a fresh production build
 also passed. Captures include both text phases and the real feature panels in
 light/dark themes and on mobile. No repository-wide coverage or complete release
 gate is claimed.

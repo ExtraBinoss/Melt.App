@@ -27,8 +27,21 @@
   color: var(--brand-primary);
 }
 .ui-throbber[data-variant="shimmer"] .ui-throbber-label {
-  color: var(--muted-foreground);
-  animation: melt-text-throb 2.8s ease-in-out infinite;
+  background: linear-gradient(
+    105deg,
+    var(--muted-foreground) 35%,
+    color-mix(in srgb, var(--muted-foreground) 55%, var(--brand-primary)) 43%,
+    var(--brand-primary) 49%,
+    color-mix(in srgb, var(--brand-primary) 78%, var(--primary-foreground)) 50%,
+    var(--brand-primary) 51%,
+    color-mix(in srgb, var(--muted-foreground) 55%, var(--brand-primary)) 59%,
+    var(--muted-foreground) 67%
+  );
+  background-size: 260% 100%;
+  background-clip: text;
+  color: transparent;
+  font-weight: 500;
+  animation: melt-text-shimmer 3s linear infinite;
 }
 .ui-throbber-dots {
   display: flex;
@@ -51,13 +64,12 @@
 .ui-throbber[data-active="false"] * {
   animation-play-state: paused;
 }
-@keyframes melt-text-throb {
-  0%,
-  100% {
-    color: var(--muted-foreground);
+@keyframes melt-text-shimmer {
+  from {
+    background-position: 120% 0;
   }
-  50% {
-    color: var(--brand-primary);
+  to {
+    background-position: -120% 0;
   }
 }
 @keyframes melt-dot-pulse {

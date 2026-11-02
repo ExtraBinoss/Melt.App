@@ -152,7 +152,7 @@ test("Try Melt reveals the dashboard from the native pointer using transform ani
   await expect(surface.locator(".ui-throbber-mark")).toHaveCSS("filter", "none");
   await expect(surface.locator(".ui-throbber-label")).toHaveCSS(
     "animation-name",
-    "melt-text-throb",
+    "melt-text-shimmer",
   );
   const properties = await surface
     .locator(".project-opening-circle")
@@ -288,7 +288,7 @@ test("feature illustrations are native themed artwork and the supplied effects i
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(390);
 });
 
-test("shared loading text pulses gray to violet while the centered mascot keeps its color", async ({
+test("shared loading text shimmers continuously while the mascot keeps its color", async ({
   page,
 }) => {
   let release!: () => void;
@@ -312,19 +312,29 @@ test("shared loading text pulses gray to violet while the centered mascot keeps 
     });
     expect(colors.gray).not.toBe(colors.violet);
     const mark = surface.locator(".ui-throbber-mark");
+    const positions: string[] = [];
     for (const [time, phase] of [
-      [0, "gray"],
-      [1400, "violet"],
+      [0, "start"],
+      [1400, "middle"],
     ] as const) {
       await label.evaluate((node, currentTime) => {
         const pulse = node
           .getAnimations()
-          .find((animation) => (animation as CSSAnimation).animationName === "melt-text-throb");
-        if (!pulse) throw Error("Shared loading text pulse is missing.");
+          .find((animation) => (animation as CSSAnimation).animationName === "melt-text-shimmer");
+        if (!pulse) throw Error("Original loading text shimmer is missing.");
         pulse.pause();
         pulse.currentTime = currentTime;
       }, time);
-      await expect(label).toHaveCSS("color", colors[phase]);
+      await expect(label).toHaveCSS("color", "rgba(0, 0, 0, 0)");
+      await expect(label).toHaveCSS("background-clip", "text");
+      const paint = await label.evaluate((node) => {
+        const style = getComputedStyle(node);
+        return { gradient: style.backgroundImage, position: style.backgroundPositionX };
+      });
+      expect(paint.gradient).toContain("linear-gradient");
+      expect(paint.gradient).toContain(colors.gray);
+      expect(paint.gradient).toContain(colors.violet);
+      positions.push(paint.position);
       await expect(mark).toHaveCSS("color", colors.violet);
       await expect(mark).toHaveCSS("filter", "none");
       await expect(mark).toHaveCSS("animation-name", "none");
@@ -332,13 +342,15 @@ test("shared loading text pulses gray to violet while the centered mascot keeps 
         .locator(".ui-throbber")
         .screenshot({ path: test.info().outputPath(`loading-${phase}.png`) });
     }
-    const midway = await label.evaluate((node) => {
-      const pulse = node.getAnimations()[0]!;
-      pulse.currentTime = 700;
-      return getComputedStyle(node).color;
+    expect(positions[0]).not.toBe(positions[1]);
+    const rest = await label.evaluate((node) => {
+      const animation = node.getAnimations()[0]!;
+      animation.currentTime = 2400;
+      const end = getComputedStyle(node).backgroundPositionX;
+      animation.currentTime = 2900;
+      return { end, rest: getComputedStyle(node).backgroundPositionX };
     });
-    expect(midway).not.toBe(colors.gray);
-    expect(midway).not.toBe(colors.violet);
+    expect(rest.end).not.toBe(rest.rest);
     const geometry = await surface.locator(".ui-throbber").evaluate((host) => {
       const mark = host.querySelector(".ui-throbber-mark")!.getBoundingClientRect(),
         label = host.querySelector(".ui-throbber-label")!.getBoundingClientRect();
@@ -353,6 +365,7 @@ test("shared loading text pulses gray to violet while the centered mascot keeps 
     await page.emulateMedia({ reducedMotion: "reduce" });
     await expect(label).toHaveCSS("animation-name", "none");
     await expect(label).toHaveCSS("color", colors.gray);
+    await expect(label).toHaveCSS("background-image", "none");
     release();
     await expect(page.locator(".project-dashboard")).toBeVisible();
     await expect(surface).toHaveCount(0);
