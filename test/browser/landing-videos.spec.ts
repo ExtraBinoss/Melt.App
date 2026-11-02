@@ -149,21 +149,11 @@ test("Try Melt reveals the dashboard from the native pointer using transform ani
   });
   expect(throbber.size).toBe(80);
   expect(throbber.gap).toBeGreaterThanOrEqual(18);
-  const tint = await surface.locator(".ui-throbber-mark").evaluate((mark) => {
-    const pulse = mark
-      .getAnimations()
-      .find((animation) => (animation as CSSAnimation).animationName === "melt-mark-throb");
-    if (!pulse) throw Error("Shared mascot loading pulse is missing.");
-    pulse.pause();
-    pulse.currentTime = 0;
-    const purple = getComputedStyle(mark).filter;
-    pulse.currentTime = 700;
-    const gray = getComputedStyle(mark).filter;
-    pulse.play();
-    return { purple, gray };
-  });
-  expect(tint.purple).toBe("grayscale(0)");
-  expect(tint.gray).toBe("grayscale(1)");
+  await expect(surface.locator(".ui-throbber-mark")).toHaveCSS("filter", "none");
+  await expect(surface.locator(".ui-throbber-label")).toHaveCSS(
+    "animation-name",
+    "melt-text-throb",
+  );
   const properties = await surface
     .locator(".project-opening-circle")
     .evaluate((node) =>
@@ -298,7 +288,7 @@ test("feature illustrations are native themed artwork and the supplied effects i
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(390);
 });
 
-test("shared loading mascot visibly switches from purple to gray while studio code is pending", async ({
+test("shared loading text pulses gray to violet while the centered mascot keeps its color", async ({
   page,
 }) => {
   let release!: () => void;
@@ -315,22 +305,54 @@ test("shared loading mascot visibly switches from purple to gray while studio co
     const surface = page.locator('[data-opening-phase="navigation"]');
     await expect(surface.locator(".project-opening-body")).toHaveCSS("opacity", "1");
     await expect(surface.locator('.melt-mark[data-ready="true"]')).toBeVisible();
+    const label = surface.locator(".ui-throbber-label");
+    const colors = await surface.locator(".ui-throbber").evaluate((host) => {
+      const mark = host.querySelector(".ui-throbber-mark")!;
+      return { gray: getComputedStyle(host).color, violet: getComputedStyle(mark).color };
+    });
+    expect(colors.gray).not.toBe(colors.violet);
     const mark = surface.locator(".ui-throbber-mark");
-    for (const [time, color, filter] of [
-      [0, "purple", "grayscale(0)"],
-      [700, "gray", "grayscale(1)"],
+    for (const [time, phase] of [
+      [0, "gray"],
+      [1400, "violet"],
     ] as const) {
-      await mark.evaluate((node, currentTime) => {
+      await label.evaluate((node, currentTime) => {
         const pulse = node
           .getAnimations()
-          .find((animation) => (animation as CSSAnimation).animationName === "melt-mark-throb");
-        if (!pulse) throw Error("Shared loading tint is not animated.");
+          .find((animation) => (animation as CSSAnimation).animationName === "melt-text-throb");
+        if (!pulse) throw Error("Shared loading text pulse is missing.");
         pulse.pause();
         pulse.currentTime = currentTime;
       }, time);
-      await expect(mark).toHaveCSS("filter", filter);
-      await mark.screenshot({ path: test.info().outputPath(`mascot-${color}.png`) });
+      await expect(label).toHaveCSS("color", colors[phase]);
+      await expect(mark).toHaveCSS("color", colors.violet);
+      await expect(mark).toHaveCSS("filter", "none");
+      await expect(mark).toHaveCSS("animation-name", "none");
+      await surface
+        .locator(".ui-throbber")
+        .screenshot({ path: test.info().outputPath(`loading-${phase}.png`) });
     }
+    const midway = await label.evaluate((node) => {
+      const pulse = node.getAnimations()[0]!;
+      pulse.currentTime = 700;
+      return getComputedStyle(node).color;
+    });
+    expect(midway).not.toBe(colors.gray);
+    expect(midway).not.toBe(colors.violet);
+    const geometry = await surface.locator(".ui-throbber").evaluate((host) => {
+      const mark = host.querySelector(".ui-throbber-mark")!.getBoundingClientRect(),
+        label = host.querySelector(".ui-throbber-label")!.getBoundingClientRect();
+      return {
+        center: mark.x + mark.width / 2,
+        viewport: innerWidth / 2,
+        gap: label.top - mark.bottom,
+      };
+    });
+    expect(geometry.center).toBeCloseTo(geometry.viewport, 0);
+    expect(geometry.gap).toBeGreaterThanOrEqual(18);
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await expect(label).toHaveCSS("animation-name", "none");
+    await expect(label).toHaveCSS("color", colors.gray);
     release();
     await expect(page.locator(".project-dashboard")).toBeVisible();
     await expect(surface).toHaveCount(0);

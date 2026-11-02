@@ -26,31 +26,9 @@
   flex-shrink: 0;
   color: var(--brand-primary);
 }
-/* Shared loading tint also covers the initial raster while the animated SVG prepares. */
-.ui-throbber-mark {
-  animation: melt-mark-throb 1.4s ease-in-out infinite;
-}
-@keyframes melt-mark-throb {
-  0%,
-  100% {
-    filter: grayscale(0);
-  }
-  50% {
-    filter: grayscale(1);
-  }
-}
 .ui-throbber[data-variant="shimmer"] .ui-throbber-label {
-  background: linear-gradient(
-    110deg,
-    var(--muted-foreground) 30%,
-    var(--brand-primary) 48%,
-    var(--foreground) 52%,
-    var(--muted-foreground) 70%
-  );
-  background-size: 260% 100%;
-  background-clip: text;
-  color: transparent;
-  animation: melt-text-shimmer 2.8s ease-in-out infinite;
+  color: var(--muted-foreground);
+  animation: melt-text-throb 2.8s ease-in-out infinite;
 }
 .ui-throbber-dots {
   display: flex;
@@ -73,12 +51,13 @@
 .ui-throbber[data-active="false"] * {
   animation-play-state: paused;
 }
-@keyframes melt-text-shimmer {
-  from {
-    background-position: 120% 0;
+@keyframes melt-text-throb {
+  0%,
+  100% {
+    color: var(--muted-foreground);
   }
-  to {
-    background-position: -120% 0;
+  50% {
+    color: var(--brand-primary);
   }
 }
 @keyframes melt-dot-pulse {

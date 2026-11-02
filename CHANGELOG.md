@@ -445,6 +445,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Fixed
 
+- Pulse shared loading text smoothly from gray to violet while preserving the centered violet mascot and its existing blinking animation; remove the unintended grayscale mascot pulse.
+
 - Restore the shared mascot Throbber on the project-opening surface, with its label below and a visible violet-to-gray pulse defined in the shared component stylesheet. Respect inactive and reduced-motion states.
 
 - Prevented a blank editor when switching between desktop and mobile by waiting for the resizable-panel registry before restoring a layout, preserving desktop proportions and keeping responsive changes out of saved user resizes.

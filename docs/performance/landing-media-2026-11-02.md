@@ -78,12 +78,14 @@ remains available until then, and the preview frame reserves its dimensions.
 Neither final cold Lighthouse trace requested the Studio, App, EditorCanvas,
 Three.js or product-panel Illustrations chunks.
 
-Opening your studio uses the existing shared `Throbber`, with its 80 px mascot and
-label below it. Violet-to-gray pulsation belongs to the shared throbber stylesheet
-and covers both its initial raster and ready animated SVG. Existing inactive and
-reduced-motion rules pause or disable it. A native browser test held the real
-Studio module request, inspected the actual loading surface and captured the
-mascot at the violet and gray phases. No substitute loading component was used.
+Opening your studio uses the existing shared `Throbber`, with its 80 px violet
+mascot and label below it. A follow-up correction places the smooth gray-to-violet
+pulse on the **text only**; the mascot retains its existing animated SVG and
+blinking. The shared stylesheet uses theme colors and pauses or disables the text
+pulse for inactive and reduced-motion states. A native browser test holds the real
+Studio request, inspects the actual loading surface, checks both text-color
+endpoints and an interpolated midpoint, and confirms the mascot has no tint
+filter or CSS pulse. This replaces the earlier, incorrect mascot-tint witness.
 
 The GitHub repository is now [ExtraBinoss/Melt.App](https://github.com/ExtraBinoss/Melt.App),
 and the local origin fetch/push URLs use that name. Portable-format, package and
@@ -135,10 +137,12 @@ hashes, dimensions and byte budgets. The production Vite build passed.
 Nine integrated native Chrome cases passed for decoded playback and budgets,
 timelapse hold, native links, compositor reveal, template dialog to editor,
 drag/pause/resume, real feature panels, first-paint locales and all converter Back
-links. Two subsequent native checks passed after restoring the shared throbber,
-then two passed for its violet/gray phases and final reveal. Captures include the
-real feature panels in light/dark themes and on mobile. No repository-wide
-coverage or complete release gate is claimed.
+links. Follow-up native checks passed for the corrected gray/violet **text** pulse,
+its interpolated midpoint, the centered mascot retaining its color, reduced
+motion and the final reveal. The shared Throbber unit and a fresh production build
+also passed. Captures include both text phases and the real feature panels in
+light/dark themes and on mobile. No repository-wide coverage or complete release
+gate is claimed.
 
 Ignored evidence lives under `artifacts/landing-videos/` (source hashes, logs,
 browser captures) and `artifacts/lighthouse/landing-media-delivery/` (HTML/JSON
