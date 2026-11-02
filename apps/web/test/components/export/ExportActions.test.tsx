@@ -32,6 +32,12 @@ test("uses one full Export button and selects Timelapse inside the shared output
     );
   }
   d.mount(<Harness />);
+  expect(screen.getAllByRole("button")).toHaveLength(1);
+  expect(screen.getByRole("button", { name: "Exporter" })).toHaveAttribute(
+    "data-variant",
+    "default",
+  );
+  expect(screen.queryByRole("group")).toBeNull();
   expect(screen.queryByRole("button", { name: "Options d’export" })).toBeNull();
   fireEvent.click(screen.getByRole("button", { name: "Exporter" }));
   expect(screen.getByRole("dialog", { name: "Exporter la composition" })).toBeVisible();

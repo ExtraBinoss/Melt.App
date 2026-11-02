@@ -1,5 +1,4 @@
 import { memo, useCallback, useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
 import type { EnginePort } from "@musart/core";
 import { ExportPopover } from "./ExportPopover";
 import type { ExportPopoverProps } from "./model";
@@ -19,7 +18,6 @@ export const ExportActions = memo(
     timelapseOpen: boolean;
     onTimelapseOpenChange: (open: boolean) => void;
   }) {
-    const { t } = useTranslation("timelapse");
     const { onOpenChange } = props;
     const [requested, setRequested] = useState<string | undefined>();
     const changeOpen = useCallback(
@@ -43,16 +41,14 @@ export const ExportActions = memo(
       [engine, changeOpen],
     );
     return (
-      <div className="export-actions" role="group" aria-label={t("exportActions")}>
-        <ExportPopover
-          {...props}
-          engine={engine}
-          open={props.open || timelapseOpen}
-          initialKind={timelapseOpen ? "timelapse" : props.initialKind}
-          initialCompositionId={requested}
-          onOpenChange={changeOpen}
-        />
-      </div>
+      <ExportPopover
+        {...props}
+        engine={engine}
+        open={props.open || timelapseOpen}
+        initialKind={timelapseOpen ? "timelapse" : props.initialKind}
+        initialCompositionId={requested}
+        onOpenChange={changeOpen}
+      />
     );
   },
   (before, after) =>

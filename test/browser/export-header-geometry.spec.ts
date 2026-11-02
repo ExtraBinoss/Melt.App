@@ -64,6 +64,9 @@ test("the compact Export button stays inside header padding through real job pro
         panelWidth: parent.width,
         headerHeight: parent.height,
         rightPadding: parent.right - bounds.right,
+        topPadding: bounds.top - parent.top,
+        direct: element.parentElement === header,
+        variant: element.getAttribute("data-variant"),
         bottomPadding: parent.bottom - bounds.bottom - parseFloat(headerStyle.borderBottomWidth),
         gap: bounds.left - previous.right,
         position: style.position,
@@ -165,9 +168,12 @@ test("the compact Export button stays inside header padding through real job pro
     });
     for (const sample of [...samples, ...resizeSamples]) {
       expect(sample.height).toBe(32);
+      expect(sample.direct).toBe(true);
+      expect(sample.variant).toBe("default");
+      expect(sample.topPadding).toBe(8);
       expect(sample.rightPadding).toBe(8);
       expect(Math.abs(sample.rightPadding - sample.bottomPadding)).toBeLessThanOrEqual(0.5);
-      expect(sample.gap).toBeGreaterThanOrEqual(8);
+      expect(sample.gap).toBe(8);
       expect(sample.position).toBe("relative");
       expect([sample.iconWidth, sample.iconHeight]).toEqual([14, 14]);
     }
@@ -215,11 +221,73 @@ test("mobile Export uses matching right and bottom spacing", async ({ page }) =>
         parent = header.getBoundingClientRect(),
         style = getComputedStyle(header);
       return {
+        top: bounds.top - parent.top,
+        gap: bounds.left - header.firstElementChild!.getBoundingClientRect().right,
+        direct: button.parentElement === header,
         right: parent.right - bounds.right,
         bottom: parent.bottom - bounds.bottom - parseFloat(style.borderBottomWidth),
         start: parseFloat(style.paddingLeft),
         height: bounds.height,
       };
     });
-  expect(spacing).toEqual({ right: 12, bottom: 12, start: 20, height: 32 });
+  expect(spacing).toEqual({
+    top: 12,
+    gap: 12,
+    direct: true,
+    right: 12,
+    bottom: 12,
+    start: 20,
+    height: 32,
+  });
+});
+
+test("French Export stays inside every visible panel edge at narrow sidebar widths", async ({
+  page,
+  context,
+  baseURL,
+}, info) => {
+  await context.addCookies([{ name: "musart.language", value: "fr", url: baseURL! }]);
+  await page.addInitScript(() => {
+    localStorage.setItem("musart.editor-tutorial.v1", "done");
+    localStorage.setItem("musart.language", "fr");
+    localStorage.setItem("musart.onboarding.v1", JSON.stringify({ version: 1, completed: true }));
+  });
+  await page.setViewportSize({ width: 1280, height: 720 });
+  await page.goto("/editor?automation=1");
+  const button = page
+    .locator(".inspector-header")
+    .getByRole("button", { name: "Exporter", exact: true });
+  await expect(button).toBeVisible();
+  const measure = () =>
+    button.evaluate((node) => {
+      const box = node.getBoundingClientRect();
+      let edge = innerWidth;
+      for (let parent = node.parentElement; parent; parent = parent.parentElement) {
+        const style = getComputedStyle(parent),
+          bounds = parent.getBoundingClientRect();
+        if (/hidden|clip|auto|scroll/.test(style.overflowX))
+          edge = Math.min(edge, bounds.left + parent.clientLeft + parent.clientWidth);
+      }
+      return {
+        visibleGap: edge - box.right,
+        direct: node.parentElement?.classList.contains("inspector-header"),
+      };
+    });
+  const before = await measure();
+  expect(before.direct).toBe(true);
+  expect(Math.abs(before.visibleGap - 8)).toBeLessThan(1);
+  const divider = (await page.locator(".sidebar-resize").boundingBox())!;
+  await page.mouse.move(divider.x + divider.width / 2, divider.y + divider.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(1000, divider.y + divider.height / 2, { steps: 4 });
+  await page.mouse.up();
+  const after = await measure();
+  expect(Math.abs(after.visibleGap - 8)).toBeLessThan(1);
+  await page
+    .locator(".inspector-header")
+    .screenshot({ path: info.outputPath("exporter-padding-fr.png") });
+  await info.attach("visible-boundary", {
+    body: JSON.stringify({ before, after }),
+    contentType: "application/json",
+  });
 });

@@ -94,7 +94,8 @@
   padding: 16px 20px;
 }
 .mobile-sheet .inspector-header {
-  padding: 0 12px 12px 20px;
+  gap: 12px;
+  padding: 12px 12px 12px 20px;
 }
 .mobile-sheet .properties-grid {
   gap: 16px 20px;

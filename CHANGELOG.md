@@ -456,6 +456,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Fixed
 
+- Render inspector Export as one primary button without a split-action wrapper or obsolete split styles. Keep equal outer spacing above, below, to the right and beside Design, including on mobile and before the export workspace loads.
+
 - Style the dashboard Custom canvas split action from the route-critical dashboard stylesheet using the shared ButtonGroup. Remove its export-style dependency so its layout and joined corners are correct before studio hydration and remain stable when export styles load.
 
 - Label the animated spatial light-type field with its existing localized type name, and align the dark-theme video accent with the brand violet.
