@@ -23,5 +23,6 @@
   "new": "Nouveau projet",
   "download": "Télécharger le projet .musart",
   "createHint": "Donnez-lui un nom et choisissez un format. Vous pourrez ajouter d’autres plans de travail.",
-  "previewCount": "{{current}} plans de travail sur {{total}}"
+  "previewCount": "{{current}} plans de travail sur {{total}}",
+  "downloadZip": "Télécharger le projet ZIP"
 }

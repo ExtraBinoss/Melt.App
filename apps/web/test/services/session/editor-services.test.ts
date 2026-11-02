@@ -201,16 +201,16 @@ describe("project platform commands", () => {
     );
     class BrokenReader {
       onerror: (() => void) | null = null;
-      readAsText() {
+      readAsArrayBuffer() {
         this.onerror?.();
       }
     }
     vi.stubGlobal("FileReader", BrokenReader);
     await expect(services.openPortable(new File([""], "broken.musart"))).rejects.toThrow("Lecture");
     class MalformedReader {
-      result = new ArrayBuffer(4);
+      result = 42;
       onload: (() => void) | null = null;
-      readAsText() {
+      readAsArrayBuffer() {
         this.onload?.();
       }
     }

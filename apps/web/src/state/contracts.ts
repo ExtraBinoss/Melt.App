@@ -162,7 +162,7 @@ export interface EditorServices {
       timing?: ProjectTiming;
     },
   ): Promise<void>;
-  exportProject(this: void): Promise<void>;
+  exportProject(this: void, format?: "musart" | "zip"): Promise<void>;
   exportImage(this: void, options: ExportOptions, scope?: ExportScope): Promise<void>;
   selectImagePoint(
     this: void,

@@ -459,7 +459,7 @@ function ProjectDashboard({
             ref={fileRef}
             className="sr-only"
             type="file"
-            accept=".musart,.json,application/json"
+            accept=".musart,.zip,.json,application/json,application/zip"
             aria-label={t("dashboard:import")}
             onChange={(event) => {
               const file = event.target.files?.[0];

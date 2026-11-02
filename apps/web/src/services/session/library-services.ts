@@ -71,7 +71,7 @@ export function createLibraryServices(
     clearHistory: async (...args) => (await runtime()).services.clearHistory(...args),
     flushThumbnails: async () => (await runtime()).services.flushThumbnails(),
     importFiles: async (...args) => (await runtime()).services.importFiles(...args),
-    exportProject: async () => (await runtime()).services.exportProject(),
+    exportProject: async (format) => (await runtime()).services.exportProject(format),
     exportImage: async (...args) => (await runtime()).services.exportImage(...args),
     selectImagePoint: async (...args) => (await runtime()).services.selectImagePoint(...args),
     prepareSegmentation: async () => (await runtime()).services.prepareSegmentation(),

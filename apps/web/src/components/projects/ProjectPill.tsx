@@ -115,6 +115,16 @@ export function ProjectPill({
           <Download size={14} />
           {t("dashboard:download")}
         </Button>
+        <Button
+          variant="ghost"
+          className="menu-item"
+          onClick={() => {
+            void onTask(() => services.exportProject("zip"));
+          }}
+        >
+          <Download size={14} />
+          {t("dashboard:downloadZip")}
+        </Button>
       </PopoverContent>
     </Popover>
   );

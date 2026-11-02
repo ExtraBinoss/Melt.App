@@ -23,5 +23,6 @@
   "new": "New project",
   "download": "Download .musart project",
   "createHint": "Give it a name and choose a canvas size. You can add more artboards later.",
-  "previewCount": "{{current}} of {{total}} artboards"
+  "previewCount": "{{current}} of {{total}} artboards",
+  "downloadZip": "Download project ZIP"
 }

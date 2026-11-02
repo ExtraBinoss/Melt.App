@@ -318,7 +318,7 @@ export function MagicSearch({
         ref={portableInput}
         className="sr-only"
         type="file"
-        accept=".musart,.json,application/json"
+        accept=".musart,.zip,.json,application/json,application/zip"
         aria-label={t("search:openPortable")}
         onChange={(event) => {
           const file = event.target.files?.[0];

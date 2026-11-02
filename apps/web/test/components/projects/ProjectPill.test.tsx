@@ -21,6 +21,8 @@ test("one project-name button opens a rename field above divided save/download a
   expect(d.services.saveProject).toHaveBeenCalledOnce();
   fireEvent.click(screen.getByRole("button", { name: "Télécharger le projet .musart" }));
   expect(d.services.exportProject).toHaveBeenCalledOnce();
+  fireEvent.click(screen.getByRole("button", { name: "Télécharger le projet ZIP" }));
+  expect(d.services.exportProject).toHaveBeenLastCalledWith("zip");
 });
 test("Escape dismisses the name popover without committing its draft", () => {
   const d = setup();

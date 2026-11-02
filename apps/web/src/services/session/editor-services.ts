@@ -1,4 +1,8 @@
 import { confirmExportLeave, ExportLeaveCancelled } from "../export/leave";
+import { remapPortableProject } from "../projects/portable/identity";
+import { portableAssets } from "../projects/portable/assets";
+import { projectArchive } from "../projects/portable/client";
+import { readPortable } from "../projects/portable/read";
 import { beginProjectTiming } from "../performance/project-timing";
 import {
   createId,
@@ -8,7 +12,6 @@ import {
   createLayer,
   createPage,
   createProject,
-  parseProject,
   serializeProject,
   selectionComposition,
   type EnginePort,
@@ -140,16 +143,17 @@ export function createEditorServices(
       throw error;
     }
   };
+  const openMediaProject = createMediaProjectOpener(engine, {
+    store,
+    flush: switchReady,
+    schedule: (project) => thumbnails?.schedule(project),
+  });
   return {
     exportComposition,
     projectPreferences: store.preferences,
     pixelSelection,
     mediaResolverFor,
-    openMediaProject: createMediaProjectOpener(engine, {
-      store,
-      flush: switchReady,
-      schedule: (project) => thumbnails?.schedule(project),
-    }),
+    openMediaProject,
     ...(thumbnails
       ? {
           previewExport: createPreviewExport(engine, thumbnails, mediaResolverFor),
@@ -294,36 +298,46 @@ export function createEditorServices(
       const timing = beginProjectTiming("Import project", { file: file.name });
       try {
         timing?.stage("Read portable file");
-        if (file.size > 200 * 1024 * 1024)
-          throw new Error("Projet trop volumineux (maximum 200 Mo).");
-        const text = await new Promise<string>((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = () => {
-            if (typeof reader.result === "string") resolve(reader.result);
-            else reject(new Error("Contenu du fichier invalide."));
-          };
-          reader.onerror = () => reject(new Error("Lecture du projet impossible."));
-          reader.readAsText(file);
-        });
-        timing?.stage("Parse + validate document");
-        const parsed = parseProject(text);
-        timing?.identify(parsed.name);
+        const origin = engine.getSnapshot();
+        const assertOrigin = () => {
+          if (engine.getSnapshot() !== origin)
+            throw new DOMException("The project changed during import.", "AbortError");
+        };
+        const decoded = await readPortable(file);
+        let parsed = decoded.project;
+        const originals = decoded.originals;
         const exists = (await store.list()).some((item) => item.id === parsed.id);
         const deleted = await store.isDeleted(parsed.id);
-        let project = exists || deleted ? { ...parsed, id: crypto.randomUUID() } : parsed;
+        if (exists || deleted) parsed = remapPortableProject(parsed, crypto.randomUUID());
+        assertOrigin();
+        if (originals.length) {
+          await openMediaProject(parsed, originals, {
+            timing,
+            expectedOrigin: {
+              projectId: origin.project.id,
+              pageId: origin.pageId,
+              revision: origin.revision,
+            },
+          });
+          return;
+        }
+        timing?.identify(parsed.name);
+        let project = parsed;
         timing?.stage("Wait for previous project saves");
         await switchReady();
         timing?.stage("Persist imported project");
+        assertOrigin();
         try {
           project = await store.create(project);
         } catch (error) {
           // Another session can retire the identity after the import's initial read.
           if (!(error instanceof DeletedProjectError)) throw error;
-          project = { ...project, id: crypto.randomUUID() };
+          project = remapPortableProject(project, crypto.randomUUID());
           project = await store.create(project);
         }
         thumbnails?.schedule(project);
         timing?.stage("Publish document");
+        assertOrigin();
         engine.load(project);
         timing?.waitForFrame(engine.getSnapshot());
       } catch (error) {
@@ -331,13 +345,28 @@ export function createEditorServices(
         throw error;
       }
     },
-    async exportProject() {
+    async exportProject(format = "musart") {
       freezeEffectPreviews(engine);
       const project = engine.getSnapshot().project;
-      if (Object.values(project.assets).some(isOriginalMediaAsset))
-        throw Error(
-          "Media projects require a binary portable archive; JSON export is unavailable until archive support is installed.",
-        );
+      if (format === "zip" || Object.keys(project.assets).length || project.replay) {
+        const originals = [];
+        const seen = new Set<string>();
+        for (const asset of portableAssets(project).flatMap((assets) => Object.values(assets))) {
+          if (!isOriginalMediaAsset(asset)) continue;
+          const key = JSON.stringify([asset.originalId, asset.contentRevision]);
+          if (seen.has(key)) continue;
+          seen.add(key);
+          originals.push({
+            originalId: asset.originalId,
+            contentRevision: asset.contentRevision,
+            blob: await store.loadMediaOriginal(project.id, asset),
+          });
+        }
+        const result = await projectArchive({ kind: "encode", project, originals });
+        if (!("blob" in result)) throw Error("Invalid archive response.");
+        download(result.blob, `${safeName(project.name)}.${format}`);
+        return;
+      }
       download(
         new Blob([serializeProject(project)], { type: "application/json" }),
         `${safeName(project.name)}.musart`,
