@@ -66,7 +66,11 @@ export function CanvasMenuItems({
   const actions = layerActions(engine, page, run);
   return (
     <>
-      <DropdownMenuItem disabled={!state.editable || selection.length !== 1} onSelect={motion}>
+      <DropdownMenuItem
+        data-tutorial="add-transition"
+        disabled={!state.editable || selection.length !== 1}
+        onSelect={motion}
+      >
         <Sparkles size={14} />
         {animation("add")}
       </DropdownMenuItem>

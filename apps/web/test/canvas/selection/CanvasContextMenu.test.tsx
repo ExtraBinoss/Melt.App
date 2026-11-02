@@ -146,7 +146,7 @@ it("hands a captured canvas action to the real persistent host after focus-scope
   expect(screen.queryByRole("menu")).toBeNull();
   expect(requests.getTransitionRequests(d.engine).read()?.origin.trackId).toBe(track.id);
   expect(d.engine.getSnapshot().project).toBe(before);
-  fireEvent.change(screen.getByRole("textbox", { name: "Rechercher une animation…" }), {
+  fireEvent.change(screen.getByRole("searchbox", { name: "Rechercher une animation…" }), {
     target: { value: "Fade" },
   });
   fireEvent.click(screen.getByRole("button", { name: "Fade" }));

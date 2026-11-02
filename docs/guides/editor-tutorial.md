@@ -56,3 +56,10 @@ hover transitions. Leaving the task releases the lease and closes that surface.
 The catalog is initialized with its query before it becomes interactive; no
 synthetic input events or timed typing control the search. Card placement uses
 the full popup bounds and chooses a free side, above or below it.
+
+After Dither the camera fits the composition, explains Static/Motion at that scale,
+and focuses its switch in the next step. It fits again before right-clicking Lake
+and choosing Add animation, then Pop. Timeline pinning and its controls follow
+animation authoring. The export lesson presents the settings and preview before
+exporting the full composition. Cards remeasure their height when moving into
+the export dialog, and the mascot faces the highlighted control.

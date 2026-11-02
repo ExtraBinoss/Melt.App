@@ -28,14 +28,18 @@ export function Guide({
   onPrevious: () => void;
 }) {
   const step = steps[index]!;
+  const last = index === steps.length - 1;
   const reduce = useReducedMotion();
   const [rect, setRect] = useState({ x: 20, y: 20, width: 0, height: 0 });
   const [anchor, setAnchor] = useState({ x: 20, y: 20, width: 0, height: 0 });
   const [viewport, setViewport] = useState({
     width: window.innerWidth,
     height: window.innerHeight,
+    offsetX: 0,
+    offsetY: 0,
   });
   const card = useRef<HTMLElement>(null);
+  const overlay = useRef<HTMLDivElement>(null);
   const [cardHeight, setCardHeight] = useState(280);
   useLayoutEffect(() => {
     const node = card.current;
@@ -44,7 +48,7 @@ export function Guide({
     observer.observe(node);
     setCardHeight(node.getBoundingClientRect().height);
     return () => observer.disconnect();
-  }, []);
+  }, [index]);
   useLayoutEffect(() => {
     let frame = 0;
     let observed: Element | null = null;
@@ -68,19 +72,20 @@ export function Guide({
         "action" in step && step.action === "dither" ? visible(".effect-catalog-menu") : target;
       const anchorBox = surface?.getBoundingClientRect();
       const rawBox = target?.getBoundingClientRect();
-      const dialog = document.querySelector(".export-dialog")?.getBoundingClientRect();
+      const dialog = document.querySelector<HTMLElement>(".export-dialog");
+      const frameBox = overlay.current?.getBoundingClientRect();
       const box = rawBox
         ? {
-            x: rawBox.x - (dialog?.x ?? 0),
-            y: rawBox.y - (dialog?.y ?? 0),
+            x: rawBox.x - (frameBox?.x ?? 0),
+            y: rawBox.y - (frameBox?.y ?? 0),
             width: rawBox.width,
             height: rawBox.height,
           }
         : undefined;
       if (anchorBox) {
         const next = {
-          x: anchorBox.x - (dialog?.x ?? 0),
-          y: anchorBox.y - (dialog?.y ?? 0),
+          x: anchorBox.x - (frameBox?.x ?? 0),
+          y: anchorBox.y - (frameBox?.y ?? 0),
           width: anchorBox.width,
           height: anchorBox.height,
         };
@@ -101,10 +106,17 @@ export function Guide({
             : { x: box.x, y: box.y, width: box.width, height: box.height },
         );
       setViewport((old) =>
-        old.width === (dialog?.width ?? innerWidth) &&
-        old.height === (dialog?.height ?? innerHeight)
+        old.width === (dialog?.clientWidth ?? innerWidth) &&
+        old.height === (dialog?.clientHeight ?? innerHeight) &&
+        old.offsetX === (dialog?.scrollLeft ?? 0) &&
+        old.offsetY === (dialog?.scrollTop ?? 0)
           ? old
-          : { width: dialog?.width ?? innerWidth, height: dialog?.height ?? innerHeight },
+          : {
+              width: dialog?.clientWidth ?? innerWidth,
+              height: dialog?.clientHeight ?? innerHeight,
+              offsetX: dialog?.scrollLeft ?? 0,
+              offsetY: dialog?.scrollTop ?? 0,
+            },
       );
     };
     const schedule = () => {
@@ -145,16 +157,24 @@ export function Guide({
   }, [step, engine]);
   const width = Math.min(330, viewport.width - 24);
   const placement =
-    index === 0
+    index === 0 || last
       ? { x: (viewport.width - width) / 2, y: Math.max(12, (viewport.height - cardHeight) / 2) }
-      : placeGuide(anchor, viewport, width, cardHeight);
-  const { x, y } = placement;
+      : placeGuide(
+          { ...anchor, x: anchor.x - viewport.offsetX, y: anchor.y - viewport.offsetY },
+          viewport,
+          width,
+          cardHeight,
+        );
+  const x = placement.x + viewport.offsetX,
+    y = placement.y + viewport.offsetY;
+  const pointsRight = x + width / 2 < rect.x + rect.width / 2;
   return createPortal(
     <div
+      ref={overlay}
       className="tutorial-overlay"
       style={document.querySelector(".export-dialog") ? { position: "absolute" } : undefined}
     >
-      {rect.width > 0 && (
+      {!last && rect.width > 0 && (
         <motion.div
           className="tutorial-highlight"
           animate={{ x: rect.x - 4, y: rect.y - 4, width: rect.width + 8, height: rect.height + 8 }}
@@ -172,22 +192,35 @@ export function Guide({
         transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 340, damping: 32 }}
       >
         <header>
-          <motion.div
-            className="tutorial-mascot"
-            initial={false}
-            animate={
-              "action" in step
-                ? {
-                    x: Math.max(-x + 8, Math.min(viewport.width - x - 72, rect.x - x - 72)),
-                    y: rect.y + rect.height / 2 - y - 42,
-                    scale: 1.25,
-                  }
-                : { x: 0, y: 0, scale: 1 }
-            }
-            transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 260, damping: 28 }}
-          >
-            <MeltLogo size={48} lively shape={"action" in step ? "pointer" : "mascot"} />
-          </motion.div>
+          {last ? (
+            <MeltLogo size={48} lively />
+          ) : (
+            <motion.div
+              className="tutorial-mascot"
+              initial={false}
+              animate={
+                "action" in step
+                  ? {
+                      x: Math.max(
+                        -x + 8,
+                        Math.min(
+                          viewport.width - x - 72,
+                          pointsRight ? rect.x - x - 72 : rect.x + rect.width - x + 8,
+                        ),
+                      ),
+                      y: rect.y + rect.height / 2 - y - 42,
+                      scale: 1.25,
+                      rotate: pointsRight ? 0 : 180,
+                    }
+                  : { x: 0, y: 0, scale: 1, rotate: 0 }
+              }
+              transition={
+                reduce ? { duration: 0 } : { type: "spring", stiffness: 260, damping: 28 }
+              }
+            >
+              <MeltLogo size={48} lively shape={"action" in step ? "pointer" : "mascot"} />
+            </motion.div>
+          )}
           <span>
             {index + 1} / {steps.length}
           </span>

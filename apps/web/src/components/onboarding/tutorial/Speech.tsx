@@ -8,6 +8,8 @@ export function Speech({ text }: { text: string }) {
   const host = useRef<HTMLParagraphElement>(null);
   const reduce = useReducedMotion();
   const modifier = modifierLabel();
+  const shortcut = text.includes("{rightClick}") ? "Right-click" : modifier;
+  const token = text.includes("{rightClick}") ? "{rightClick}" : "{zoom}";
   useEffect(() => {
     const node = host.current;
     if (!node) return;
@@ -42,7 +44,7 @@ export function Speech({ text }: { text: string }) {
     }, 12);
     return () => clearInterval(timer);
   }, [text, modifier, reduce]);
-  const parts = text.split("{zoom}");
+  const parts = text.split(token);
   return (
     <>
       <p ref={host} aria-hidden="true" key={text}>
@@ -51,9 +53,13 @@ export function Speech({ text }: { text: string }) {
           <>
             <span data-shortcut>
               <KbdGroup>
-                <Kbd>{modifier}</Kbd>
-                <span>+</span>
-                <Kbd>Wheel</Kbd>
+                <Kbd>{shortcut}</Kbd>
+                {token === "{zoom}" && (
+                  <>
+                    <span>+</span>
+                    <Kbd>Wheel</Kbd>
+                  </>
+                )}
               </KbdGroup>
             </span>
             <span data-speech-text={parts[1]}>{parts[1]}</span>
@@ -61,7 +67,7 @@ export function Speech({ text }: { text: string }) {
         )}
       </p>
       <p className="sr-only" aria-live="polite">
-        {text.replace("{zoom}", `${modifier} + wheel`)}
+        {text.replace(token, token === "{zoom}" ? `${modifier} + wheel` : "Right-click")}
       </p>
     </>
   );

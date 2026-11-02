@@ -56,22 +56,49 @@ export const steps = [
     action: "dither",
   },
   {
+    title: "Back to your canvas",
+    text: "Dither is applied. We have zoomed out and recentered the canvas so you can see the whole composition.",
+    target: '.canvas-artboard-editor[data-active="true"]',
+  },
+  {
+    title: "Static and Motion",
+    text: "Static is for still compositions. Motion adds animation and video playback. The switch lives below your artboard.",
+    target: ".motion-mode",
+  },
+  {
     title: "Make it move",
-    text: "Switch the artboard from Static to Motion to reveal the timeline.",
+    text: "We have zoomed in on the switch. Click Motion to enable animation. We will look at the timeline after adding a transition.",
     target: '.motion-mode [data-segmented-value="motion"]',
     action: "motion",
   },
   {
+    title: "Right-click your image",
+    text: "The canvas is centered again. Use {rightClick} on the middle image, Lake, to open its actions.",
+    target: '.canvas-selection[data-layer-kind="image"]',
+    action: "context",
+  },
+  {
+    title: "Add a transition",
+    text: "Choose Add animation in this context menu to open the animation library.",
+    target: '[data-tutorial="add-transition"]',
+    action: "transition",
+  },
+  {
+    title: "Add a pop",
+    text: "Click Pop in the Scale category to give the image a short pop-in entrance.",
+    target: '[data-preset-id="scale-pop"]',
+    action: "pop",
+  },
+  {
     title: "Pin the timeline",
-    text: "Pin the timeline so it stays open while you work.",
+    text: "Pin the timeline to keep it open. You can resize it; the guide will follow the controls.",
     target: '[data-tutorial="timeline-pin"]',
     action: "pin",
   },
   {
-    title: "Add a pop",
-    text: "Click Pop in the open animation picker. This creates a short pop-in animation.",
-    target: '[data-preset-id="scale-pop"]',
-    action: "pop",
+    title: "Your timeline",
+    text: "Each row represents a layer. The clips show when it appears, and the Pop clip is its animation. Drag the playhead to inspect a moment; the controls on the left set playback and duration.",
+    target: '.motion-timeline-dock[data-motion-pinned="true"]',
   },
   {
     title: "Play",
@@ -84,6 +111,11 @@ export const steps = [
     text: "Open Export at the top right. We will export the motion as a video.",
     target: ".export-actions",
     action: "export",
+  },
+  {
+    title: "The export window",
+    text: "Choose your artboard and output on the left. Preview the result on the right. Resolution and format control the file you download.",
+    target: ".export-workspace",
   },
   {
     title: "Motion video",
@@ -100,7 +132,7 @@ export const steps = [
   {
     title: "You're ready",
     text: "Your video is exported. Keep experimenting with this project, or create your own from Projects.",
-    target: '.canvas-artboard-editor[data-active="true"]',
+    target: ".export-dialog-header",
   },
 ] as const;
 export type TutorialAction =
@@ -109,6 +141,8 @@ export type TutorialAction =
   | "effectCategory"
   | "dither"
   | "motion"
+  | "context"
+  | "transition"
   | "pin"
   | "pop"
   | "play"

@@ -76,7 +76,7 @@ for (const width of [1000, 1280]) {
     await expect(search).toHaveValue("dither");
     await expect(dither).toBeVisible();
     await dither.click();
-    await expect(guide.getByRole("heading", { name: "Make it move" })).toBeVisible();
+    await expect(guide.getByRole("heading", { name: "Back to your canvas" })).toBeVisible();
     expect(
       await page.evaluate(
         () =>

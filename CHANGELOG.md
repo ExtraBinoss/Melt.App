@@ -17,6 +17,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Rework the tutorial after Dither: recenter the canvas, explain Static/Motion before zooming to its control, author Pop through the image context menu, then introduce and pin the timeline. Explain the export window, export the full composition, keep guide cards inside its bounds and turn the mascot toward its target.
+
 - Restore portable project export for video/audio projects with versioned binary `.musart` archives and an explicit ZIP download. Store deduplicated originals as relative asset files, import both archive extensions atomically, retain legacy JSON imports and reject missing, damaged, oversized or unsafe archive entries. Encode/decode away from the UI thread.
 - Keep the tutorial Dither library stable while hovering its category and reading the guide. Seed the actual React search state, hold the guided submenu open, and place the card clear of the whole popup. Verify French hover navigation in narrow and wide editor windows.
 

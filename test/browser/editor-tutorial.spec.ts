@@ -28,7 +28,7 @@ async function expectSpotlight(page: Page, selector: string) {
 
 test("guided editor practice, automatic tasks, exit and editor-only replay", async ({ page }) => {
   await page.addInitScript(() => localStorage.setItem("musart.language", "en"));
-  await page.goto("/editor");
+  await page.goto("/editor?automation=1");
   await expect(
     page.getByRole("heading", { name: "Do you want to start a quick tutorial?" }),
   ).toBeVisible({ timeout: 30000 });
@@ -81,34 +81,68 @@ test("guided editor practice, automatic tasks, exit and editor-only replay", asy
     "Open the effect menu",
     "Add an effect",
     "Try Dither",
+    "Back to your canvas",
+    "Static and Motion",
     "Make it move",
-    "Pin the timeline",
+    "Right-click your image",
+    "Add a transition",
     "Add a pop",
+    "Pin the timeline",
+    "Your timeline",
     "Play",
     "Export",
+    "The export window",
     "Save your video",
   ]) {
-    if (title === "Make it move") {
-      beforeMotionWidth = (await page.getByTestId("artboard").boundingBox())!.width;
+    if (title === "Back to your canvas")
       await page.locator('[data-effect-catalog-item="dither"]').click();
-    } else if (title === "Play") await page.locator('[data-preset-id="scale-pop"]').click();
     else if (title === "Add an effect")
       await page.locator('.layer-create-actions button[aria-haspopup="menu"]').click();
     else if (title === "Try Dither")
       await page.locator('[data-effect-menu-category="effect"]').click();
+    else if (title === "Add a transition") {
+      await expect(page.getByTestId("artboard")).toHaveAttribute("data-view-moving", "false");
+      const box = (await page.getByTestId("artboard").boundingBox())!;
+      const point = await page.evaluate(() => {
+        const p = window.musart!.snapshot().project.pages[0]!;
+        const layer = p.layers.find((item) => item.name === "Lake")!;
+        return {
+          x: (layer.x + layer.width / 2) / p.width,
+          y: (layer.y + layer.height / 2) / p.height,
+        };
+      });
+      await page.mouse.click(box.x + box.width * point.x, box.y + box.height * point.y, {
+        button: "right",
+      });
+    } else if (title === "Add a pop")
+      await page.locator('[data-tutorial="add-transition"]').click();
+    else if (title === "Pin the timeline")
+      await page.locator('[data-preset-id="scale-pop"]').click();
     else await guide.getByRole("button", { name: "Next", exact: true }).click();
     await expect(guide.getByRole("heading", { name: title, exact: true })).toBeVisible();
-    if (title === "Try Dither")
-      await expect(page.locator('.effect-catalog[data-effect-category="effect"]')).toBeVisible();
     if (title === "Try Dither") {
-      await expect(
-        page.locator('.effect-catalog[data-effect-category="effect"] input'),
-      ).toHaveValue("dither");
-      await expect(page.locator('[data-effect-catalog-item="dither"]')).toBeVisible();
+      await expect(page.locator(".effect-catalog input")).toHaveValue("dither");
       await expectSpotlight(page, '[data-effect-catalog-item="dither"]');
-      await page.screenshot({ path: "artifacts/tutorial/dither-guide.png" });
     }
-    if (title === "Add a pop") await expect(page.locator(".animation-picker")).toBeVisible();
+    if (title === "Your timeline") {
+      await guide.getByRole("button", { name: "Previous" }).click();
+      await expect(guide.getByRole("heading", { name: "Pin the timeline" })).toBeVisible();
+      await page.locator(".motion-resize").press("ArrowUp");
+      await page.locator(".motion-resize").press("ArrowUp");
+      await expectSpotlight(page, '[data-tutorial="timeline-pin"]');
+      await guide.getByRole("button", { name: "Next", exact: true }).click();
+      await expect(guide.getByRole("heading", { name: "Your timeline" })).toBeVisible();
+    }
+    if (title === "Play")
+      await expect
+        .poll(() =>
+          guide
+            .locator(".tutorial-mascot")
+            .evaluate((node) => new DOMMatrixReadOnly(getComputedStyle(node).transform).a),
+        )
+        .toBeLessThan(0);
+    if (title === "Static and Motion")
+      beforeMotionWidth = (await page.getByTestId("artboard").boundingBox())!.width;
     if (title === "Make it move") {
       await expect
         .poll(async () => (await page.getByTestId("artboard").boundingBox())!.width)
@@ -126,6 +160,10 @@ test("guided editor practice, automatic tasks, exit and editor-only replay", asy
     })
     .toBeLessThan(3);
   await page.screenshot({ path: "artifacts/tutorial/export-guide.png" });
+  const exportBox = (await page.locator(".export-dialog").boundingBox())!;
+  const guideBox = (await guide.boundingBox())!;
+  expect(guideBox.y).toBeGreaterThanOrEqual(exportBox.y);
+  expect(guideBox.y + guideBox.height).toBeLessThanOrEqual(exportBox.y + exportBox.height);
   const downloading = page.waitForEvent("download");
   await guide.getByRole("button", { name: "Next", exact: true }).click();
   const download = await downloading;
@@ -134,6 +172,9 @@ test("guided editor practice, automatic tasks, exit and editor-only replay", asy
   await expect(guide.getByRole("heading", { name: "You're ready" })).toBeVisible({
     timeout: 30000,
   });
+  const finalCard = (await guide.boundingBox())!;
+  expect(finalCard.y + finalCard.height).toBeLessThanOrEqual(exportBox.y + exportBox.height);
+  await page.screenshot({ path: "artifacts/tutorial/final-ready.png" });
   await guide.getByRole("button", { name: "Exit tutorial" }).click();
   await expect(page.getByRole("heading", { name: "Leave the tutorial?" })).toBeVisible();
   await expect(guide).toHaveCount(0);
@@ -164,7 +205,7 @@ test("guided editor practice, automatic tasks, exit and editor-only replay", asy
 
 test("Next opens the effect library after its parent menu dismisses", async ({ page }) => {
   await page.addInitScript(() => localStorage.setItem("musart.language", "en"));
-  await page.goto("/editor");
+  await page.goto("/editor?automation=1");
   await page.getByRole("button", { name: "Yes, start tutorial" }).click({ timeout: 30000 });
   const guide = page.getByRole("region", { name: "Melt tutorial" });
   await expect(guide.getByRole("heading", { name: "Your canvas" })).toBeVisible({ timeout: 30000 });
@@ -185,7 +226,7 @@ test("Next opens the effect library after its parent menu dismisses", async ({ p
   await expect(page.locator('[data-effect-catalog-item="dither"]')).toBeVisible();
   await expectSpotlight(page, '[data-effect-catalog-item="dither"]');
   await guide.getByRole("button", { name: "Next", exact: true }).click();
-  await expect(guide.getByRole("heading", { name: "Make it move" })).toBeVisible();
+  await expect(guide.getByRole("heading", { name: "Back to your canvas" })).toBeVisible();
 });
 
 test("a burst of Next clicks runs each tutorial action once through Motion and Pop", async ({
@@ -199,7 +240,7 @@ test("a burst of Next clicks runs each tutorial action once through Motion and P
   await guide
     .getByRole("button", { name: "Next", exact: true })
     .evaluate((button: HTMLButtonElement) => {
-      for (let i = 0; i < 10; i++) button.click();
+      for (let i = 0; i < 15; i++) button.click();
     });
   await expect(guide.getByRole("heading", { name: "Play", exact: true })).toBeVisible({
     timeout: 20000,

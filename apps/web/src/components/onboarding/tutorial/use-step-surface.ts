@@ -16,8 +16,24 @@ export function useStepSurface(
   useEffect(() => {
     const step = steps[index]!;
     const layerId = practice.current?.layerId;
-    if (!active || !("action" in step) || !["dither", "pop", "motion"].includes(step.action))
+    if (!active) return;
+    if ("action" in step && step.action === "export") {
+      engine.select([]);
       return;
+    }
+    if (
+      step.title === "Back to your canvas" ||
+      step.title === "Static and Motion" ||
+      ("action" in step && step.action === "context")
+    ) {
+      if (layerId && "action" in step) engine.select([layerId]);
+      document
+        .querySelector<HTMLButtonElement>('[data-tutorial="timeline-pin"][aria-pressed="true"]')
+        ?.click();
+      createViewportActions(engine).run("fit");
+      return;
+    }
+    if (!("action" in step) || !["dither", "pop", "motion"].includes(step.action)) return;
     if (step.action === "dither") {
       const controller = new AbortController();
       let release: (() => void) | undefined;
@@ -60,13 +76,6 @@ export function useStepSurface(
           document.querySelector<HTMLButtonElement>('[data-animation-category="scale"]')?.click();
           ready = true;
           return;
-        }
-        const trigger = document.querySelector<HTMLButtonElement>(
-          ".layer-animations .section-title button",
-        );
-        if (trigger && trigger.getAttribute("data-state") !== "open") {
-          trigger.scrollIntoView({ block: "nearest" });
-          trigger.click();
         }
       }
     };

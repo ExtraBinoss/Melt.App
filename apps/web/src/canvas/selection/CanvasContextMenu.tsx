@@ -1,5 +1,6 @@
+import { registerCanvasMenu } from "./context-requests";
 import { CanvasMenuItems } from "./CanvasMenuItems";
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useCallback, useRef, useState, type ReactNode } from "react";
 import {
   getMotionOccurrenceAt,
   type EnginePort,
@@ -77,39 +78,42 @@ export function CanvasContextMenu({
       current.selection.every((id) => scope.selection.includes(id))
     );
   }
-  function open(
-    point: Point,
-    scope: Pick<SessionSnapshot, "project" | "revision"> = engine.getSnapshot(),
-  ) {
-    const current = engine.getSnapshot();
-    if (current.project !== scope.project || current.revision !== scope.revision) return;
-    const target = resolveTarget(point);
-    const transport = createMotionTransport(engine);
-    transport.pause();
-    const compositionId = target?.compositionId ?? current.pageId;
-    if (current.pageId !== compositionId) engine.setPage(compositionId);
-    const page = current.project.pages.find((page) => page.id === compositionId);
-    const trackId =
-      target && page?.motion?.mode === "motion"
-        ? getMotionOccurrenceAt(page, target.layerId, transport.read().time, {
-            terminalPreview: true,
-          })?.id
-        : undefined;
-    attachmentSelection(engine).clear();
-    const selected = engine.getSnapshot().selection;
-    engine.select(target ? (selected.includes(target.layerId) ? selected : [target.layerId]) : []);
-    pending.current = null;
-    setMenu({
-      engine,
-      project: current.project,
-      revision: current.revision,
-      point,
-      target,
-      compositionId,
-      selection: [...engine.getSnapshot().selection],
-      trackId,
-    });
-  }
+  const open = useCallback(
+    (point: Point, scope: Pick<SessionSnapshot, "project" | "revision"> = engine.getSnapshot()) => {
+      const current = engine.getSnapshot();
+      if (current.project !== scope.project || current.revision !== scope.revision) return;
+      const target = resolveTarget(point);
+      const transport = createMotionTransport(engine);
+      transport.pause();
+      const compositionId = target?.compositionId ?? current.pageId;
+      if (current.pageId !== compositionId) engine.setPage(compositionId);
+      const page = current.project.pages.find((page) => page.id === compositionId);
+      const trackId =
+        target && page?.motion?.mode === "motion"
+          ? getMotionOccurrenceAt(page, target.layerId, transport.read().time, {
+              terminalPreview: true,
+            })?.id
+          : undefined;
+      attachmentSelection(engine).clear();
+      const selected = engine.getSnapshot().selection;
+      engine.select(
+        target ? (selected.includes(target.layerId) ? selected : [target.layerId]) : [],
+      );
+      pending.current = null;
+      setMenu({
+        engine,
+        project: current.project,
+        revision: current.revision,
+        point,
+        target,
+        compositionId,
+        selection: [...engine.getSnapshot().selection],
+        trackId,
+      });
+    },
+    [engine, resolveTarget],
+  );
+  useEffect(() => registerCanvasMenu(engine, open), [engine, open]);
   return (
     <div
       style={{ display: "contents" }}

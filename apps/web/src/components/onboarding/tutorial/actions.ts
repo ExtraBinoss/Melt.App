@@ -1,3 +1,4 @@
+import { requestCanvasMenu } from "../../../canvas/selection/context-requests";
 import { openEffectSurface } from "../../layers/menu/effect-surface";
 import { visible } from "./surfaces";
 import type { EnginePort } from "@musart/core";
@@ -30,6 +31,8 @@ export function stepDone(
       visible('[data-effect-menu-category="effect"]')?.getAttribute("aria-expanded") === "true",
     dither: () => !!layer?.effects.some((effect) => effect.type === "dither"),
     motion: () => page.motion?.mode === "motion",
+    context: () => !!visible('[data-tutorial="add-transition"]'),
+    transition: () => !!visible(".animation-picker"),
     pin: () => !!visible('[data-motion-pinned="true"]'),
     pop: () =>
       !!page.motion?.tracks.some(
@@ -110,7 +113,9 @@ async function control(context: TutorialContext, selector: string, signal: Abort
   if (signal.aborted || context.engine.getSnapshot().project.id !== context.projectId)
     throw new DOMException("Tutorial action cancelled", "AbortError");
   const node = visible(selector)!;
-  node.scrollIntoView({ block: "nearest", inline: "nearest" });
+  const box = node.getBoundingClientRect();
+  if (box.x < 0 || box.y < 0 || box.right > innerWidth || box.bottom > innerHeight)
+    node.scrollIntoView({ block: "nearest", inline: "nearest" });
   node.click();
 }
 export async function performStep(
@@ -134,6 +139,28 @@ export async function performStep(
       dismiss();
       await control(context, '.motion-mode [data-segmented-value="motion"]', signal);
     },
+    context: async () => {
+      engine.select([layerId]);
+      await waitForTutorial(
+        context,
+        () => !!visible('.canvas-artboard-editor[data-active="true"][data-view-moving="false"]'),
+        signal,
+      );
+      const snapshot = engine.getSnapshot(),
+        page = snapshot.project.pages.find((item) => item.id === snapshot.pageId)!;
+      const layer = page.layers.find((item) => item.id === layerId)!;
+      const box = visible('.canvas-artboard-editor[data-active="true"]')!.getBoundingClientRect();
+      await waitForTutorial(
+        context,
+        () =>
+          requestCanvasMenu(engine, {
+            x: box.x + ((layer.x + layer.width / 2) / page.width) * box.width,
+            y: box.y + ((layer.y + layer.height / 2) / page.height) * box.height,
+          }),
+        signal,
+      );
+    },
+    transition: () => control(context, '[data-tutorial="add-transition"]', signal),
     pin: () => control(context, '[data-tutorial="timeline-pin"]', signal),
     pop: () => {
       addPop(engine, layerId);
@@ -145,6 +172,7 @@ export async function performStep(
     },
     export: () => {
       dismiss();
+      engine.select([]);
       requestCompositionExport(engine, engine.getSnapshot().pageId);
     },
     video: () => control(context, '.export-dialog [data-segmented-value="motion"]', signal),
