@@ -1,6 +1,7 @@
 import { ChevronDown, Plus, Upload } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "../../ui/button";
+import { ButtonGroup } from "../../ui/button-group";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -8,7 +9,6 @@ import {
   DropdownMenuTrigger,
 } from "../../ui/dropdown-menu";
 import "./messages";
-import "../../export/export.css";
 
 /** One creation action with a separate, accessible portable-import menu. */
 export function ProjectCreateActions({
@@ -24,12 +24,8 @@ export function ProjectCreateActions({
 }) {
   const { t } = useTranslation();
   return (
-    <div
-      className="export-actions dashboard-create-group"
-      role="group"
-      aria-label={t("dashboard:createActions")}
-    >
-      <Button className="export-trigger" size="sm" disabled={disabled} onClick={onCreate}>
+    <ButtonGroup className="dashboard-create-group" aria-label={t("dashboard:createActions")}>
+      <Button className="dashboard-create-primary" size="sm" disabled={disabled} onClick={onCreate}>
         <Plus size={14} />
         {label}
       </Button>
@@ -37,7 +33,7 @@ export function ProjectCreateActions({
         <DropdownMenuTrigger asChild>
           <Button
             size="icon-sm"
-            className="export-options dashboard-create-options"
+            className="dashboard-create-options"
             disabled={disabled}
             aria-label={t("dashboard:createActions")}
           >
@@ -51,6 +47,6 @@ export function ProjectCreateActions({
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-    </div>
+    </ButtonGroup>
   );
 }

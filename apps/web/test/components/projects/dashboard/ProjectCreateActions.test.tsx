@@ -15,6 +15,10 @@ test("keeps creating separate from the portable import menu", async () => {
       onImport={importProject}
     />,
   );
+  expect(screen.getByRole("group", { name: "Options de création" })).toHaveAttribute(
+    "data-slot",
+    "button-group",
+  );
   fireEvent.click(screen.getByRole("button", { name: "Canvas personnalisé" }));
   expect(create).toHaveBeenCalledOnce();
   fireEvent.pointerDown(screen.getByRole("button", { name: "Options de création" }), {

@@ -30,10 +30,6 @@
 .export-trigger-caption[data-pending="true"] .export-trigger-percent {
   display: inline-block;
 }
-.dashboard-create-group .export-trigger {
-  border-top-right-radius: 0;
-  border-bottom-right-radius: 0;
-}
 .export-actions:not(.dashboard-create-group) .export-trigger {
   width: 100%;
 }

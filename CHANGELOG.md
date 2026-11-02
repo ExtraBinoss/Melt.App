@@ -453,6 +453,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Fixed
 
+- Style the dashboard Custom canvas split action from the route-critical dashboard stylesheet using the shared ButtonGroup. Remove its export-style dependency so its layout and joined corners are correct before studio hydration and remain stable when export styles load.
+
 - Label the animated spatial light-type field with its existing localized type name, and align the dark-theme video accent with the brand violet.
 
 - Restore the original shared loading-text shimmer from Git, with its moving gray/violet gradient, instead of a whole-label color pulse. Keep the violet mascot and its blinking unchanged.
