@@ -93,10 +93,16 @@ export async function prepareHeroGlyphs(
             };
           return { type: command.type, ...end };
         });
-        const ends = commands.filter((command) => command.type !== "Z");
+        const d = commands.map(serialize).join("");
+        const outline = new Path2D(d);
+        // Variable fonts can retain overlapping contours inside the filled glyph.
+        // Probe vector geometry so only visible boundary endpoints receive dots.
+        const ends = commands
+          .filter((command) => command.type !== "Z")
+          .filter((command) => onBoundary(context, outline, command.x, command.y));
         const stride = Math.max(1, Math.ceil(ends.length / 16));
         glyphs.push({
-          d: commands.map(serialize).join(""),
+          d,
           points: ends.filter((_, index) => index % stride === 0).map(({ x, y }) => ({ x, y })),
           x: rect.left - bounds.left,
           y: rect.top - bounds.top,
@@ -110,6 +116,27 @@ export async function prepareHeroGlyphs(
     }
   }
   return glyphs.length ? glyphs : undefined;
+}
+function onBoundary(
+  context: CanvasRenderingContext2D,
+  outline: Path2D,
+  x: number,
+  y: number,
+): boolean {
+  let inside = false;
+  let outside = false;
+  for (let i = 0; i < 8; i++) {
+    const angle = (i * Math.PI) / 4;
+    const filled = context.isPointInPath(
+      outline,
+      x + Math.cos(angle) * 0.75,
+      y + Math.sin(angle) * 0.75,
+    );
+    inside ||= filled;
+    outside ||= !filled;
+    if (inside && outside) return true;
+  }
+  return false;
 }
 function serialize(command: PathCommand): string {
   const n = (value: number) => Number(value.toFixed(3));

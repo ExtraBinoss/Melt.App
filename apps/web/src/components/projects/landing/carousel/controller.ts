@@ -428,7 +428,6 @@ export function installCarouselPan(
   }
   function leave() {
     hovered = false;
-    quiet();
     queueAuto();
   }
   function pointerCapability() {

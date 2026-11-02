@@ -209,3 +209,23 @@ test.describe("touch rail", () => {
     await cdp.detach();
   });
 });
+
+test("hover leave resumes visible carousel movement without a hover cooldown", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto("/");
+  const rail = page.locator("[data-carousel]");
+  await rail.scrollIntoViewIfNeeded();
+  await expect(rail).toHaveAttribute("data-carousel-auto");
+  for (let repeat = 0; repeat < 2; repeat++) {
+    await rail.hover();
+    await expect(rail).not.toHaveAttribute("data-carousel-auto");
+    const stopped = await position(rail);
+    await page.waitForTimeout(150);
+    expect(await position(rail)).toBe(stopped);
+    await page.mouse.move(10, 20);
+    await expect(rail).toHaveAttribute("data-carousel-auto", "", { timeout: 400 });
+    await expect
+      .poll(() => position(rail), { intervals: [16, 32], timeout: 500 })
+      .not.toBe(stopped);
+  }
+});

@@ -1,10 +1,9 @@
 {
   "create": "創作をはじめる",
   "try": "{{brandName}} を試す",
-  "titleFirst": "つくって、",
-  "titleSecond": "動かす。",
+  "titleFirst": "タイムラインを",
+  "titleSecond": "とろけさせるデザイン。",
   "creativity": "テンプレートからでも、自分の発想からでも。",
-  "description": "自由に構成することも、テンプレートを作り替えることも。プロジェクトは端末に保存でき、ファイルとして持ち運べます。アカウントは不要です。",
   "showcase": "創作のヒントを見つけよう",
   "showcaseHint": "ドラッグやスワイプでテンプレートを見てみましょう。",
   "features": "{{brandName}} でつくる",

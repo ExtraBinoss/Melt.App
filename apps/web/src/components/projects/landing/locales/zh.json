@@ -1,10 +1,9 @@
 {
   "create": "开始创作",
   "try": "体验 {{brandName}}",
-  "titleFirst": "让设计",
-  "titleSecond": "动起来。",
+  "titleFirst": "让社交动态",
+  "titleSecond": "融化的设计。",
   "creativity": "从模板开始，也可以自由创作。",
-  "description": "自行构图，或重新演绎模板。项目保存在你的设备上，也能打包成文件随身携带。无需账号。",
   "showcase": "从这些灵感开始",
   "showcaseHint": "拖动或滑动以浏览模板。",
   "features": "用 {{brandName}} 创作",

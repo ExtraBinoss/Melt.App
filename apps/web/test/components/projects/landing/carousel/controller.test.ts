@@ -244,9 +244,8 @@ test("automatic drift advances with a gentle ramp, owns one frame and pauses for
   f.elapse(5000);
   expect(f.api.position()).toBe(stopped);
   f.node.dispatchEvent(new Event("pointerleave"));
-  f.elapse(1199);
-  expect(f.frames.size).toBe(0);
-  f.elapse(1);
+  expect(vi.getTimerCount()).toBe(0);
+  expect(f.node).toHaveAttribute("data-carousel-auto");
   expect(f.frames.size).toBe(1);
   f.frame(f.time() + 16);
   expect(f.api.position() - stopped).toBeGreaterThan(0);
@@ -327,7 +326,8 @@ test("automatic ownership releases all observers, media listeners, timers and la
   const f = fixture({ autoScroll: true });
   f.node.dispatchEvent(new Event("pointerenter"));
   f.node.dispatchEvent(new Event("pointerleave"));
-  expect(vi.getTimerCount()).toBe(1);
+  expect(vi.getTimerCount()).toBe(0);
+  expect(f.frames.size).toBe(1);
   f.dispose();
   expect(f.frames.size).toBe(0);
   expect(vi.getTimerCount()).toBe(0);

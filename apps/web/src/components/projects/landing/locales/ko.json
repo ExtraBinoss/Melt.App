@@ -1,10 +1,9 @@
 {
   "create": "만들기 시작",
   "try": "{{brandName}} 사용해 보기",
-  "titleFirst": "디자인에",
-  "titleSecond": "움직임을.",
+  "titleFirst": "피드를 녹이는",
+  "titleSecond": "디자인.",
   "creativity": "템플릿으로 시작하거나 직접 만들어보세요.",
-  "description": "직접 구성을 만들거나 템플릿을 새롭게 바꿔보세요. 프로젝트는 기기에 저장하고 파일로 옮길 수 있습니다. 계정은 필요 없습니다.",
   "showcase": "시작을 위한 작은 영감",
   "showcaseHint": "드래그하거나 스와이프해 템플릿을 살펴보세요.",
   "features": "{{brandName}}로 만들기",

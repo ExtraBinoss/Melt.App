@@ -58,7 +58,6 @@ export function LandingPage({
       <ShowcaseCarousel onChoose={onTemplate ?? onCreate} busy={busy} />
       <section className="landing-creativity">
         <h2>{t("creativity")}</h2>
-        <p>{t("description")}</p>
         <NavigationButton
           className="landing-cta"
           href={dashboardHref}

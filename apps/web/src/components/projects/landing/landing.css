@@ -207,13 +207,8 @@
   letter-spacing: -0.02em;
   text-wrap: balance;
 }
-.landing-creativity p {
-  max-width: 530px;
-  margin: 28px auto 30px;
-  color: var(--muted-foreground);
-  font-size: 17px;
-  line-height: 1.7;
-  text-wrap: balance;
+.landing-creativity .landing-cta {
+  margin-top: 30px;
 }
 .landing-features {
   display: grid;
@@ -327,9 +322,8 @@
   .landing-footer h2 {
     font-size: clamp(46px, 12vw, 68px);
   }
-  .landing-creativity p {
-    font-size: 14px;
-    margin: 22px auto 26px;
+  .landing-creativity .landing-cta {
+    margin-top: 26px;
   }
   .landing-features {
     grid-template-columns: 1fr;

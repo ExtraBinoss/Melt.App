@@ -28,8 +28,10 @@ test("shows the animated headline, real templates and six deliberate video slots
     create = vi.fn(),
     choose = vi.fn();
   d.mount(<LandingPage onCreate={create} onTemplate={choose} />);
-  expect(screen.getByRole("heading", { level: 1, name: "Créez et animez." })).toBeVisible();
-  expect(document.querySelector(".landing-intro p")).toBeNull();
+  expect(
+    screen.getByRole("heading", { level: 1, name: "Du design à faire fondre les feeds." }),
+  ).toBeVisible();
+  expect(document.querySelector(".landing-intro p, .landing-creativity p")).toBeNull();
   expect(screen.queryByText("Aperçu vidéo à venir")).toBeNull();
   expect(document.querySelectorAll("[data-feature-ui]")).toHaveLength(3);
   expect(
@@ -52,12 +54,14 @@ test("shows the animated headline, real templates and six deliberate video slots
 test("all landing copy follows the selected interface language", async () => {
   const d = setup();
   d.mount(<LandingPage onCreate={vi.fn()} />);
-  expect(screen.getByRole("heading", { name: "Créez et animez." })).toBeVisible();
+  expect(
+    screen.getByRole("heading", { name: "Du design à faire fondre les feeds." }),
+  ).toBeVisible();
   await act(async () => {
     await i18n.changeLanguage("en");
   });
-  expect(screen.getByRole("heading", { name: "Design and animate." })).toBeVisible();
-  expect(document.querySelector(".landing-intro p")).toBeNull();
+  expect(screen.getByRole("heading", { name: "Design that melts social feeds." })).toBeVisible();
+  expect(document.querySelector(".landing-intro p, .landing-creativity p")).toBeNull();
   expect(
     screen.getByRole("heading", { name: "Start with a template or make it your own." }),
   ).toBeVisible();

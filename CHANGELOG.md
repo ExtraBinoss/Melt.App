@@ -19,6 +19,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Replace the landing headline with the Melt-inspired “Design that melts social feeds” tagline across all twelve languages, remove the remaining introductory description, and resume the showcase immediately after hover without extending the manual interaction cooldown. Keep animated contour points on visible glyph boundaries when font components overlap.
+
 - Match the hero mascot's reference scale envelope and complete spherical eye turn at display cadence, with a shared mascot/title start instead of independent CSS animations. Keep neutral, green and violet text-run colors consistent across glyph outlines, control points, fills, native text and fallback scripts.
 
 - Rework the tutorial after Dither: recenter the canvas, explain Static/Motion before zooming to its control, author Pop through the image context menu, then introduce and pin the timeline. Explain the export window, export the full composition, keep guide cards inside its bounds and turn the mascot toward its target.

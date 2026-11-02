@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { readFileSync, readdirSync } from "node:fs";
 import { measureHeroContourPoints } from "./support/hero-contours";
 
 for (const language of ["en", "fr"] as const) {
@@ -82,7 +83,9 @@ for (const language of ["en", "fr"] as const) {
       stage.locator('.hero-glyph-overlay > g[opacity="1"] > path').first(),
     ).toHaveAttribute("fill-opacity", "0");
     expect(await stage.locator(".hero-glyph-overlay circle").count()).toBeGreaterThan(30);
-    expect(await chunks.first().textContent()).toBe(language === "fr" ? "Créez et" : "Design and");
+    expect(await chunks.first().textContent()).toBe(
+      language === "fr" ? "Du design à" : "Design that",
+    );
     await page
       .locator(".landing-intro")
       .screenshot({ path: info.outputPath("hero-hover-light.png") });
@@ -106,7 +109,7 @@ test("reduced motion skips the mascot and writing sequence with immediately read
 }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
-  const heading = page.getByRole("heading", { level: 1, name: "Design and animate." });
+  const heading = page.getByRole("heading", { level: 1, name: "Design that melts social feeds." });
   await expect(heading).toBeVisible();
   await expect(page.locator(".hero-mascot-stage")).toBeHidden();
   await heading.hover();
@@ -196,11 +199,60 @@ test("the complete native heading remains available without JavaScript", async (
     const page = await context.newPage();
     await page.goto(baseURL!);
     await expect(
-      page.getByRole("heading", { level: 1, name: "Design and animate." }),
+      page.getByRole("heading", { level: 1, name: "Design that melts social feeds." }),
     ).toBeVisible();
     await expect(page.locator(".hero-chunk").first()).not.toHaveCSS("color", "rgba(0, 0, 0, 0)");
     await expect(page.locator(".landing-intro .landing-cta")).toBeVisible();
   } finally {
     await context.close();
+  }
+});
+
+test("localized social-feed headlines fit desktop and mobile with a direct creation action", async ({
+  page,
+  context,
+  baseURL,
+}, info) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  const locales = new URL(
+    "../../apps/web/src/components/projects/landing/locales/",
+    import.meta.url,
+  );
+  for (const file of readdirSync(locales).filter((name) => name.endsWith(".json"))) {
+    const language = file.slice(0, -5);
+    const copy = JSON.parse(readFileSync(new URL(file, locales), "utf8")) as {
+      titleFirst: string;
+      titleSecond: string;
+    };
+    await context.addCookies([{ name: "musart.language", value: language, url: baseURL! }]);
+    await page.goto("/");
+    const heading = page.getByRole("heading", {
+      level: 1,
+      name: `${copy.titleFirst} ${copy.titleSecond}`,
+    });
+    await expect(heading).toBeVisible();
+    await expect(page.locator(".landing-intro p, .landing-creativity p")).toHaveCount(0);
+    const create = page.locator(".landing-intro .landing-cta");
+    await expect(create).toBeVisible();
+    for (const width of [1600, 390]) {
+      await page.setViewportSize({ width, height: 1000 });
+      await page.evaluate(() => document.fonts.ready);
+      const bounds = await heading.evaluate((node) => {
+        const range = document.createRange();
+        range.selectNodeContents(node);
+        return [...range.getClientRects()].map((rect) => ({ left: rect.left, right: rect.right }));
+      });
+      expect(
+        bounds.every(({ left, right }) => left >= 0 && right <= width),
+        `${language} at ${width}`,
+      ).toBe(true);
+      const action = await create.boundingBox();
+      expect(action!.y + action!.height, `${language} at ${width}`).toBeLessThan(1000);
+      if (["en", "fr", "ar", "ja"].includes(language)) {
+        await page
+          .locator(".landing-intro")
+          .screenshot({ path: info.outputPath(`headline-${language}-${width}.png`) });
+      }
+    }
   }
 });
