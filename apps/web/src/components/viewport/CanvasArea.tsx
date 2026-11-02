@@ -1,3 +1,4 @@
+import type { EditorServices } from "../../state/contracts";
 import { CanvasPreparation } from "../../canvas/render/CanvasPreparation";
 import { lazy, memo, Suspense, useMemo, useRef } from "react";
 import { useAtomValue, useStore } from "jotai";
@@ -23,7 +24,7 @@ export const CanvasArea = memo(function CanvasArea({
   engine: EnginePort;
   fontResolver?: FontResolver;
   services?: ArtboardServices &
-    Pick<import("../../state/contracts").EditorServices, "pixelSelection" | "mediaResolverFor">;
+    Pick<EditorServices, "pixelSelection" | "objectSelection" | "mediaResolverFor">;
   onError(this: void, message: string, details?: string): void;
   onDropFiles(this: void, files: File[]): void;
   onImagePoint(this: void, layerId: string, x: number, y: number): void;

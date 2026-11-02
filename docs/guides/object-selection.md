@@ -5,7 +5,49 @@ on the device. Its encoder runs once for the current source; subsequent clicks
 reuse three GPU-resident embedding tensors and run only the decoder. Changing
 sources releases the previous embedding. Cancellation terminates the worker,
 releasing its model sessions, tensors and pending work. The magic wand remains
-an independent connected flood fill.
+an independent connected flood fill; both algorithms now publish to the same
+temporary pixel-selection preview and explicit mask actions.
+
+## Interactive selection
+
+- Select **Object selection** and click an unlocked 2D image. Left-click adds a
+  foreground point; right-click adds a background point. Points remain visible
+  over the image and every prediction includes the full current prompt set.
+- Drag a rectangle to guide detection, or choose **Rectangle** in the local
+  selector. Subsequent points refine that rectangle's prediction. Reverse drags
+  and transformed/nested image coordinates are supported. A simple click in
+  Rectangle mode does not submit a zero-area box.
+- **Remove last hint** restores the preceding prompt set, including its box.
+  Prompt history and point counts are bounded to 64 entries. **Clear** discards
+  the temporary selection. Escape cancels a box/selection without editing the
+  document. Leaving the tool cancels inference and retains the last accepted
+  pixel selection so it can be refined with the magic wand.
+- **Detect objects** samples a 4×4 image-wide grid with real decoder predictions,
+  reusing the same encoded source. Proposals below 0.7 predicted IoU, almost-empty
+  masks and masks covering over 90% of the image are rejected. A bounded 64×64
+  coverage signature suppresses duplicate proposals above 0.85 mask IoU. The
+  highest-scoring retained object appears first; numbered buttons select the
+  other detected objects as editable point prompts. This is a bounded automatic
+  proposal scan, not an exhaustive guarantee that every small object is found.
+- The marching-ants outline previews the detected region. **Keep area**, **Erase
+  area**, **Invert selection** and **Deselect** use the exact same controller and
+  mask command planning as the wand, preserving an existing mask. Only Keep or
+  Erase publishes a document transaction and one undo entry. Corrective clicks,
+  proposals, box previews and cancellation do not enter document history.
+- During inference, local status appears immediately and mask application is
+  disabled. Errors expose technical details and a copy button; a failed preview
+  cannot apply an older mask under the failed prompt set.
+
+The algorithm-independent `MaskSelectionPort` in `services/selection/preview.ts`
+accepts source-sized alpha coverage. `PixelSelectionController` owns the worker,
+preview contours and explicit mask actions; `ObjectSelectionController` owns
+only SAM prompts, proposal selection and inference admission. This boundary can
+accept other selection producers without adding tool-specific document commands.
+The worker retains the exact alpha mask, while the main thread receives bounded
+vector preview geometry. There is one model request in flight and one replaceable
+latest prompt intent; intermediate clicks do not create an unbounded GPU queue.
+Project/page/document/target changes, deselection and disposal invalidate pending
+work. Rectangle movement writes its retained SVG directly without React updates.
 
 ## Model and runtime
 
@@ -50,7 +92,11 @@ must still be measured by the native browser gate.
 ## Geometry and resource ownership
 
 SAM 2 stretches the image to 512 × 512, normalizes ImageNet RGB values and uses
-independent x/y scale factors for point coordinates. It does not use SAM 1's
+independent x/y scale factors for point and box coordinates. Foreground/background
+labels are 1/0; box corners use labels 2/3, following the
+[official SAM 2 image predictor](https://github.com/facebookresearch/sam2/blob/main/sam2/sam2_image_predictor.py).
+Point-only prompts include a -1 padding point. The pinned decoder accepts dynamic
+`[1,1,N,2]` point coordinates and `[1,1,N]` labels, as documented in its model card. It does not use SAM 1's
 longest-edge padding. Decoder logits are interpolated to original image
 coordinates before thresholding, and the decoder chooses its candidate inside the graph using SAM 2 video predictor
 selection and returns that real mask and IoU. Only this mask is resized. Output
@@ -64,8 +110,8 @@ not a readback of the editor's render/composition textures. Source image
 preparation uses browser decoding and an OffscreenCanvas. Temporary input and
 output tensors are disposed after each request, including error paths.
 
-The client admits one operation and rejects stale responses. One completed
-selection produces one validated undoable document transaction. Preparation
+The client admits one operation and rejects stale responses. Explicit Keep/Erase
+produces one validated undoable document transaction; inference alone never does. Preparation
 and inference can be cancelled. Removing cached model files terminates the
 worker, serializes against preparation with the existing named browser lock,
 and preserves shared runtime and unrelated model files. Previous SlimSAM
@@ -77,6 +123,13 @@ Focused tests cover GPU-only configuration, capability errors before download,
 verified cache reuse, corrupted/truncated downloads, point transforms,
 highest-IoU reconstruction, single-image embedding reuse and tensor cleanup.
 These tests use runtime doubles and do not establish GPU inference correctness.
+The interactive controller tests also cover prompt accumulation, latest-intent
+coalescing, cancellation, failed previews, bounds and shared undo/redo. The native
+`test/browser/object-selection.spec.ts` exercises real pointer input, exclusion
+without context menus, rectangle preview/cancellation, proposal selection, shared
+contours, decoded GPU exports and document undo/redo. Its deterministic model
+worker double tests integration without downloading or claiming real inference.
+Actual model execution remains a separate manual/native-model check.
 
 Run the dedicated `bun scripts/verify-segmentation.ts` browser harness for actual
 model inference, PNG validation, adapter details and native input-to-RAF

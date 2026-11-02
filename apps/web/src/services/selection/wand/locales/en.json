@@ -27,5 +27,22 @@
   "helpChoose": "Select an area, then erase it or keep it with an editable mask. Original pixels stay intact.",
   "helpOutline": "The moving dashed line marks the selected area. Very detailed outlines use a simpler preview; the mask retains the exact selection.",
   "adjacent": "Adjacent pixels only",
-  "adjacentHint": "Match a connected region. Turn this off to match the color across the image."
+  "adjacentHint": "Match a connected region. Turn this off to match the color across the image.",
+  "objectTitle": "Object selection",
+  "objectMode": "Selection tool",
+  "objectPoints": "Points",
+  "objectBox": "Rectangle",
+  "objectHint": "Left-click includes; right-click excludes. Add points to refine, or drag a rectangle around an object. Use Keep or Erase only when the preview is ready.",
+  "objectDetect": "Detect objects",
+  "objectDetectHint": "Scans the image with 16 sample points. Choose a detected object, then refine it. Small objects may need a click.",
+  "objectScanning": "Detecting objects…",
+  "objectCancel": "Cancel selection",
+  "objectCandidates": "Detected objects",
+  "objectCandidate": "Object {{number}}",
+  "objectRemove": "Remove last hint",
+  "objectReset": "Clear",
+  "objectError": "Object selection failed. You can retry or use the magic wand.",
+  "objectDetails": "Technical details",
+  "objectCopy": "Copy error",
+  "previewFailed": "Preview failed"
 }

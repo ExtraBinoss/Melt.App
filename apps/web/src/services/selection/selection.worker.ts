@@ -29,6 +29,17 @@ export async function processSelection(
       await prepareSam(onProgress);
       return { id: request.id, result: null };
     }
+    if (request.type === "prompt") {
+      const { segmentPrompt } = await import("./sam");
+      return {
+        id: request.id,
+        result: await segmentPrompt(request.dataUrl, request.prompt, onProgress),
+      };
+    }
+    if (request.type === "scan") {
+      const { scanObjects } = await import("./websam/scan");
+      return { id: request.id, result: await scanObjects(request.dataUrl, onProgress) };
+    }
     const mask = onProgress
       ? await segmentObject(request.dataUrl, request.x, request.y, onProgress)
       : await segmentObject(request.dataUrl, request.x, request.y);

@@ -7,7 +7,6 @@ import { beginProjectTiming } from "../performance/project-timing";
 import {
   createId,
   isOriginalMediaAsset,
-  isImageAsset,
   PRESETS,
   createLayer,
   createPage,
@@ -38,6 +37,7 @@ import { createPreviewExport } from "./previews";
 import { importMediaFiles } from "../assets/media-import";
 import { importBatch, readDataUrl } from "../assets/imports";
 import { downloadBlob, safeName } from "../files/download";
+import { ObjectSelectionController } from "../selection/object/controller";
 import { SelectionClient } from "../selection/selection";
 import { PixelSelectionController } from "../selection/wand/controller";
 import { i18n } from "../../state/i18n";
@@ -71,6 +71,7 @@ export function createEditorServices(
     pixels: async (asset) => (await renderer()).sourcePixels(asset),
     maskName: () => i18n.t("pixelSelection:maskName"),
   });
+  const objectSelection = new ObjectSelectionController(engine, selection, pixelSelection);
   const mediaResolvers = new Map<string, import("@musart/render").MediaSourceResolver>();
   const mediaResolverFor = (projectId: string) => {
     let resolver = mediaResolvers.get(projectId);
@@ -152,6 +153,7 @@ export function createEditorServices(
     exportComposition,
     projectPreferences: store.preferences,
     pixelSelection,
+    objectSelection,
     mediaResolverFor,
     openMediaProject,
     ...(thumbnails
@@ -432,43 +434,7 @@ export function createEditorServices(
         await pixelSelection.accept();
         return;
       }
-      const snapshot = engine.getSnapshot(),
-        page = activePage(),
-        layer = page.layers.find((layer) => layer.id === layerId);
-      const asset = layer?.assetId ? snapshot.project.assets[layer.assetId] : undefined;
-      if (!layer || layer.kind !== "image" || !asset || !isImageAsset(asset))
-        throw new Error("Sélectionnez un calque image.");
-      if (layer.locked) throw new Error("Le calque est verrouillé.");
-      const sx = Math.max(0, Math.min(asset.width - 1, (x / layer.width) * asset.width)),
-        sy = Math.max(0, Math.min(asset.height - 1, (y / layer.height) * asset.height));
-      const generation = selection.generation;
-      const result = await selection.segmentEncoded(asset.dataUrl, sx, sy);
-      const dataUrl = await readDataUrl(result.blob);
-      if (generation !== selection.generation)
-        throw new DOMException("Sélection annulée.", "AbortError");
-      const latest = engine.getSnapshot();
-      if (
-        latest.project.id !== snapshot.project.id ||
-        latest.pageId !== snapshot.pageId ||
-        activePage().layers.find((l) => l.id === layerId)?.assetId !== asset.id
-      )
-        throw new Error("La cible a changé. Le masque a été abandonné.");
-      const mask = {
-        id: crypto.randomUUID(),
-        name: `Masque — ${layer.name}`,
-        mime: "image/png",
-        width: result.width,
-        height: result.height,
-        dataUrl,
-      };
-      engine.transaction([
-        { type: "addAssets", assets: [mask] },
-        {
-          type: "updateLayers",
-          ids: [layerId],
-          patch: { mask: { assetId: mask.id, enabled: true, inverted: false } },
-        },
-      ]);
+      await objectSelection.point(layerId, x, y, true);
     },
     segmentationModel: selection.model,
     prepareSegmentation: () => (selection.model ? selection.model.prepare() : selection.prepare()),

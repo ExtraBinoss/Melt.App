@@ -45,13 +45,40 @@ function fixture() {
   const controller = new PixelSelectionController(engine, {
     pixels,
     encode,
-    client: () => new WandClient(worker),
+    client: () => {
+      disposed = false; // Each factory call represents a fresh worker connection.
+      return new WandClient(worker);
+    },
     maskName: () => "Selected mask",
   });
   controllers.push(controller);
   engine.select([layer.id]);
   return { engine, controller, pixels, encode, worker, data, host };
 }
+it("retries failed source preparation and holds imported mask actions until its producer settles", async () => {
+  const d = fixture();
+  d.pixels.mockRejectedValueOnce(Error("decode failed"));
+  await expect(d.controller.prepareMask("image")).rejects.toThrow("decode failed");
+  expect(d.controller.read()).toBeNull();
+  await d.controller.prepareMask("image");
+  await d.controller.previewMask(
+    {
+      width: 3,
+      height: 1,
+      data: new Uint8ClampedArray([255, 255, 255, 0, 255, 255, 255, 255, 255, 255, 255, 0]),
+    },
+    true,
+  );
+  expect(d.controller.read()).toMatchObject({ selected: 1, busy: true });
+  await d.controller.createMask();
+  expect(d.engine.getSnapshot().canUndo).toBe(false);
+  d.controller.setBusy(false);
+  await d.controller.createMask();
+  expect(d.engine.getSnapshot().canUndo).toBe(true);
+  expect(d.encode.mock.lastCall![0]).toEqual(
+    new Uint8ClampedArray([0, 0, 0, 255, 255, 255, 255, 255, 0, 0, 0, 255]),
+  );
+});
 it("accepts visible selections without document edits and creates an explicit reversible luminance mask", async () => {
   const d = fixture(),
     before = d.engine.getSnapshot().project,

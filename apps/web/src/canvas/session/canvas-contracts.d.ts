@@ -6,7 +6,8 @@ import type { Tool } from "../interaction/gestures";
 import type { ArtboardServices } from "../artboards/use-previews";
 export interface EditorCanvasProps {
   fontResolver?: FontResolver;
-  services?: ArtboardServices & Pick<EditorServices, "pixelSelection" | "mediaResolverFor">;
+  services?: ArtboardServices &
+    Pick<EditorServices, "pixelSelection" | "objectSelection" | "mediaResolverFor">;
   engine: EnginePort;
   tool: Tool;
   previewSource?: PreviewSource;

@@ -121,7 +121,7 @@ export function CanvasContextMenu({
         if (
           event.button !== 2 ||
           !event.currentTarget.contains(event.target as Node) ||
-          (event.target as HTMLElement).closest("[data-canvas-control]")
+          (event.target as HTMLElement).closest("[data-canvas-control], .object-selection-surface")
         )
           return;
         const scope = engine.getSnapshot();
@@ -163,7 +163,7 @@ export function CanvasContextMenu({
       onContextMenu={(event) => {
         if (
           !event.currentTarget.contains(event.target as Node) ||
-          (event.target as HTMLElement).closest("[data-canvas-control]")
+          (event.target as HTMLElement).closest("[data-canvas-control], .object-selection-surface")
         )
           return;
         event.preventDefault();

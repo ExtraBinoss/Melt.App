@@ -1,0 +1,52 @@
+.object-selection-options {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+.object-selection-options p,
+.object-selection-options small {
+  margin: 0;
+  font-size: 11px;
+  color: var(--muted-foreground);
+}
+.object-selection-options small {
+  font-size: 10px;
+}
+.object-selection-working,
+.object-selection-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.object-selection-candidates {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  max-height: 140px;
+  overflow-y: auto;
+}
+.object-selection-error {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+.object-selection-error p {
+  color: var(--destructive);
+}
+.object-selection-error details {
+  font-size: 11px;
+}
+.object-selection-error pre {
+  max-height: 110px;
+  overflow: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.object-selection-candidates button[aria-pressed="true"] {
+  border-color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 10%, var(--background));
+}

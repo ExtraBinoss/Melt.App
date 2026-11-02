@@ -27,5 +27,22 @@
   "helpChoose": "Sélectionnez une zone, puis effacez-la ou gardez-la avec un masque éditable. Les pixels originaux restent intacts.",
   "helpOutline": "Les pointillés indiquent la zone sélectionnée. Les contours très détaillés utilisent un aperçu allégé ; le masque conserve la sélection exacte.",
   "adjacent": "Pixels voisins uniquement",
-  "adjacentHint": "Sélectionner une région connectée. Désactivez cette option pour chercher la couleur dans toute l’image."
+  "adjacentHint": "Sélectionner une région connectée. Désactivez cette option pour chercher la couleur dans toute l’image.",
+  "objectTitle": "Sélection d’objet",
+  "objectMode": "Outil de sélection",
+  "objectPoints": "Points",
+  "objectBox": "Rectangle",
+  "objectHint": "Clic gauche pour inclure ; clic droit pour exclure. Ajoutez des points pour affiner, ou tracez un rectangle autour d’un objet. Validez avec Garder ou Effacer lorsque l’aperçu vous convient.",
+  "objectDetect": "Détecter les objets",
+  "objectDetectHint": "Analyse l’image avec 16 points. Choisissez un objet détecté, puis affinez-le. Les petits objets peuvent nécessiter un clic.",
+  "objectScanning": "Détection des objets…",
+  "objectCancel": "Annuler la sélection",
+  "objectCandidates": "Objets détectés",
+  "objectCandidate": "Objet {{number}}",
+  "objectRemove": "Retirer le dernier repère",
+  "objectReset": "Effacer les repères",
+  "objectError": "La sélection d’objet a échoué. Réessayez ou utilisez la baguette magique.",
+  "objectDetails": "Détails techniques",
+  "objectCopy": "Copier l’erreur",
+  "previewFailed": "Échec de l’aperçu"
 }

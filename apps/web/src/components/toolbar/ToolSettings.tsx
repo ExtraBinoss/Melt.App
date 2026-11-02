@@ -1,3 +1,5 @@
+import type { EnginePort } from "@musart/core";
+import { ObjectSelectionOptions } from "./segmentation/ObjectSelectionOptions";
 import { useAtomValue } from "jotai";
 import { useTranslation } from "react-i18next";
 import { toolAtom } from "../../state/session/editor";
@@ -8,9 +10,11 @@ import { SegmentationModel } from "./segmentation/SegmentationModel";
 
 export function ToolSettings({
   services,
+  engine,
   onTask,
 }: {
   services: EditorServices;
+  engine?: EnginePort;
   onTask: TaskRunner;
 }) {
   const { t } = useTranslation(),
@@ -21,7 +25,12 @@ export function ToolSettings({
       {tool === "wand" ? (
         <WandOptions />
       ) : (
-        <SegmentationModel services={services} onTask={onTask} />
+        <div>
+          <SegmentationModel services={services} onTask={onTask} />
+          {services.objectSelection && (
+            <ObjectSelectionOptions port={services.objectSelection} engine={engine} />
+          )}
+        </div>
       )}
     </aside>
   );

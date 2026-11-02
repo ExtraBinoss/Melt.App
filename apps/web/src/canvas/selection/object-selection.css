@@ -1,0 +1,31 @@
+.object-selection-surface {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 5;
+  pointer-events: none;
+}
+.object-selection-hit {
+  fill: transparent;
+}
+.object-selection-box {
+  fill: color-mix(in srgb, var(--primary) 12%, transparent);
+  stroke: var(--primary);
+  stroke-width: 1;
+  stroke-dasharray: 4 3;
+  pointer-events: none;
+}
+.object-selection-points {
+  pointer-events: none;
+}
+.object-selection-points circle {
+  stroke: white;
+  stroke-width: 1.5;
+}
+.object-point-positive {
+  fill: var(--primary);
+}
+.object-point-negative {
+  fill: var(--destructive);
+}

@@ -1,3 +1,4 @@
+import type { MaskSelectionPort } from "../../../src/services/selection/preview";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { Blob as NodeBlob } from "node:buffer";
 import {
@@ -53,6 +54,8 @@ async function setup(project = createProject(), databaseName = crypto.randomUUID
   await store.save(project);
   const selection = {
     segmentEncoded: vi.fn(),
+    prompt: vi.fn(),
+    cancel: vi.fn(),
     wand: vi.fn(),
     prepare: vi.fn(async () => {}),
     dispose: vi.fn(),
@@ -267,32 +270,15 @@ describe("asset and mask orchestration", () => {
     release({ type: "addLayers", layers: [] });
     await expect(pendingPage).rejects.toThrow("composition a changé");
   });
-  it("prepares segmentation explicitly and applies an alpha mask with a single undoable transaction", async () => {
+  it("prepares segmentation explicitly and forwards points to the shared preview without an automatic mask", async () => {
     const { engine, services, selection } = await setup(sourceProject());
     await services.prepareSegmentation();
     expect(selection.prepare).toHaveBeenCalledTimes(1);
-    selection.segmentEncoded.mockResolvedValue({
-      blob: new Blob(["mask"], { type: "image/png" }),
-      width: 2,
-      height: 1,
-    });
+    const point = vi.spyOn(services.objectSelection!, "point").mockResolvedValue();
     await services.selectImagePoint("image", 100, -20, "segment", 16);
-    expect(selection.segmentEncoded).toHaveBeenCalledWith("data:image/png;base64,original", 50, 0);
-    const snapshot = engine.getSnapshot();
-    const mask = snapshot.project.pages[0]!.layers[0]!.mask;
-    expect(mask).toMatchObject({ enabled: true, inverted: false });
-    expect(mask!.assetId).toMatch(
-      /^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i,
-    );
-    expect(snapshot.project.assets[mask!.assetId!]).toMatchObject({
-      name: "Masque — Image",
-      width: 2,
-      height: 1,
-      mime: "image/png",
-    });
-    engine.undo();
+    expect(point).toHaveBeenCalledWith("image", 100, -20, true);
     expect(engine.getSnapshot().project.pages[0]!.layers[0]!.mask).toBeNull();
-    expect(Object.keys(engine.getSnapshot().project.assets)).toEqual(["source"]);
+    expect(engine.getSnapshot().canUndo).toBe(false);
   });
   it("accepts a persistent wand selection without applying an automatic mask", async () => {
     const { services, engine } = await setup(sourceProject());
@@ -306,30 +292,35 @@ describe("asset and mask orchestration", () => {
   it("rejects non-image or locked targets before running models and discards stale masks", async () => {
     const { engine, services, selection } = await setup(sourceProject());
     await expect(services.selectImagePoint("missing", 0, 0, "segment", 16)).rejects.toThrow(
-      "calque image",
+      "unlocked 2D image",
     );
     const rectangle = createLayer("rectangle");
     engine.execute({ type: "addLayers", layers: [rectangle] });
     await expect(services.selectImagePoint(rectangle.id, 0, 0, "segment", 16)).rejects.toThrow(
-      "calque image",
+      "unlocked 2D image",
     );
     engine.execute({ type: "updateLayers", ids: ["image"], patch: { locked: true } });
     await expect(services.selectImagePoint("image", 0, 0, "segment", 16)).rejects.toThrow(
-      "verrouillé",
+      "unlocked 2D image",
     );
-    expect(selection.segmentEncoded).not.toHaveBeenCalled();
+    expect(selection.prompt).not.toHaveBeenCalled();
     engine.execute({ type: "updateLayers", ids: ["image"], patch: { locked: false } });
-    let release!: (mask: { blob: Blob; width: number; height: number }) => void;
-    selection.segmentEncoded.mockImplementationOnce(
+    const pixels = services.pixelSelection as MaskSelectionPort;
+    vi.spyOn(pixels, "prepareMask").mockResolvedValue();
+    const preview = vi.spyOn(pixels, "previewMask").mockResolvedValue();
+    let release!: (mask: { data: Uint8ClampedArray; width: number; height: number }) => void;
+    selection.prompt.mockImplementationOnce(
       () =>
         new Promise((resolve) => {
           release = resolve;
         }),
     );
     const pending = services.selectImagePoint("image", 0, 0, "segment", 16);
+    await vi.waitFor(() => expect(selection.prompt).toHaveBeenCalledOnce());
     engine.execute({ type: "deleteLayers", ids: ["image"] });
-    release({ blob: new Blob(["mask"], { type: "image/png" }), width: 1, height: 1 });
-    await expect(pending).rejects.toThrow("cible a changé");
+    release({ data: new Uint8ClampedArray(4), width: 1, height: 1 });
+    await expect(pending).rejects.toThrow("cancelled");
+    expect(preview).not.toHaveBeenCalled();
   });
 });
 describe("high-resolution file export", () => {

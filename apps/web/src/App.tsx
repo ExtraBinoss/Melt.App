@@ -266,7 +266,9 @@ export function App({ engine, services, welcome = false, routing }: AppProps) {
                           />
                         </Suspense>
                       )}
-                      {!mobile && <ToolSettings services={services} onTask={onTask} />}
+                      {!mobile && (
+                        <ToolSettings engine={engine} services={services} onTask={onTask} />
+                      )}
                       {processing && (
                         <div className="processing-notice floating-panel" role="status">
                           <Throbber label={t("processing")} delayMs={0} variant="shimmer" />
@@ -337,7 +339,7 @@ export function App({ engine, services, welcome = false, routing }: AppProps) {
                                   onImport={onImport}
                                 />
                               </Suspense>
-                              <ToolSettings services={services} onTask={onTask} />
+                              <ToolSettings engine={engine} services={services} onTask={onTask} />
                             </>
                           }
                         />

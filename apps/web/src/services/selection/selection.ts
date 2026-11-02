@@ -1,8 +1,11 @@
+import type { SelectionPrompt, ObjectCandidate } from "./prompts";
 import { LocalModelManager } from "./model/manager";
 import type { ModelDownloadEvent } from "./model/contract";
 
 export type SelectionRequest =
   | { id: number; type: "prepare" }
+  | { id: number; type: "prompt"; dataUrl: string; prompt: SelectionPrompt }
+  | { id: number; type: "scan"; dataUrl: string }
   | { id: number; type: "segment"; dataUrl: string; x: number; y: number; encode?: boolean }
   | {
       id: number;
@@ -15,6 +18,8 @@ export type SelectionRequest =
       tolerance: number;
     };
 export interface MaskResult {
+  candidates?: ObjectCandidate[];
+  score?: number;
   data: Uint8ClampedArray;
   width: number;
   height: number;
@@ -132,6 +137,19 @@ export class SelectionClient {
     });
     if (!result || !("blob" in result)) throw new Error("Masque absent.");
     return result;
+  }
+  async prompt(dataUrl: string, prompt: SelectionPrompt): Promise<MaskResult> {
+    const result = await this.request({ id: ++this.nextId, type: "prompt", dataUrl, prompt });
+    if (!result || !("data" in result)) throw Error("Object selection mask is missing.");
+    return result;
+  }
+  async scan(dataUrl: string): Promise<MaskResult> {
+    const result = await this.request({ id: ++this.nextId, type: "scan", dataUrl });
+    if (!result || !("data" in result)) throw Error("Object detection mask is missing.");
+    return result;
+  }
+  cancel() {
+    this.model.cancel();
   }
   async wand(
     pixels: Uint8ClampedArray,

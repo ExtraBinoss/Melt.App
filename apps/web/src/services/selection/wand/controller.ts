@@ -1,3 +1,5 @@
+import type { MaskSelectionPort } from "../preview";
+import type { MaskResult } from "../selection";
 import { createLayerGeometryIndex, isImageAsset, type Asset, type EnginePort } from "@musart/core";
 import {
   captureGestureOrigin,
@@ -8,13 +10,7 @@ import { maskToDataUrl } from "../pixel-selection";
 import { WandClient } from "./client";
 import { MAX_SELECTION_PIXELS } from "./worker-host";
 import { selectionMaskCommands } from "./mask-commands";
-import type {
-  PixelSelectionPort,
-  PixelSelectionState,
-  SelectionMode,
-  WandPreview,
-  WandResponse,
-} from "./model";
+import type { PixelSelectionState, SelectionMode, WandPreview, WandResponse } from "./model";
 interface Dependencies {
   pixels(asset: Asset): Promise<ImageData>;
   client?(): WandClient;
@@ -31,7 +27,7 @@ interface Target {
 }
 const cancelled = () => new DOMException("Pixel selection cancelled.", "AbortError");
 /** Selection is presentation state. Explicit Keep/Erase publishes one document transaction. */
-export class PixelSelectionController implements PixelSelectionPort {
+export class PixelSelectionController implements MaskSelectionPort {
   private readonly listeners = new Set<() => void>();
   private state: PixelSelectionState | null = null;
   private accepted: PixelSelectionState | null = null;
@@ -79,13 +75,14 @@ export class PixelSelectionController implements PixelSelectionPort {
     if (!("preview" in response)) throw Error("Pixel selection preview is missing.");
     return response.preview;
   }
-  async begin(
+  private async prepareTarget(
     layerId: string,
     x: number,
     y: number,
     tolerance: number,
     mode: SelectionMode = "new",
     contiguous = true,
+    dragging = true,
   ) {
     if (this.closed) throw cancelled();
     const enteredGeneration = this.generation,
@@ -141,7 +138,7 @@ export class PixelSelectionController implements PixelSelectionPort {
       mode,
       contiguous,
       busy: true,
-      dragging: true,
+      dragging,
       replacesMask: Boolean(layer.mask),
     });
     if (!this.stop)
@@ -163,7 +160,51 @@ export class PixelSelectionController implements PixelSelectionPort {
         this.requireCurrent(generation);
       })();
     }
+    return generation;
+  }
+  async begin(
+    layerId: string,
+    x: number,
+    y: number,
+    tolerance: number,
+    mode: SelectionMode = "new",
+    contiguous = true,
+  ) {
+    await this.prepareTarget(layerId, x, y, tolerance, mode, contiguous);
     await this.update(tolerance);
+  }
+  /** Shared import boundary for ML, color selection and future selection algorithms. */
+  async prepareMask(layerId: string) {
+    const generation = await this.prepareTarget(layerId, 0, 0, 32, "new", true, false);
+    try {
+      await this.loading;
+      this.requireCurrent(generation);
+    } catch (error) {
+      if (generation === this.generation) this.deselect();
+      throw error;
+    }
+  }
+  setBusy(busy: boolean) {
+    if (this.state) this.publish({ ...this.state, busy, ...(busy ? { error: undefined } : {}) });
+  }
+  failMask(error: string) {
+    if (this.state) this.publish({ ...this.state, busy: false, error });
+  }
+  async previewMask(mask: MaskResult, holdBusy = false) {
+    const generation = this.generation,
+      version = this.gestureVersion;
+    this.requireControl(generation, version);
+    const preview = this.preview(
+      await this.client!.request({
+        type: "mask",
+        data: mask.data,
+        width: mask.width,
+        height: mask.height,
+      }),
+    );
+    this.requireControl(generation, version);
+    this.accepted = { ...this.state!, ...preview, busy: false, dragging: false };
+    this.publish(holdBusy ? { ...this.accepted, busy: true } : this.accepted);
   }
   update = (tolerance: number): Promise<void> => {
     if (!this.target || !this.state?.dragging || this.closed) return Promise.reject(cancelled());
@@ -269,7 +310,7 @@ export class PixelSelectionController implements PixelSelectionPort {
     return pending;
   }
   async invert() {
-    if (!this.state || this.state.busy || this.state.dragging) return;
+    if (!this.state || this.state.busy || this.state.dragging || this.state.error) return;
     return this.control(async (generation, gesture) => {
       const preview = this.preview(await this.client!.request({ type: "invert" }));
       this.requireControl(generation, gesture);
@@ -284,7 +325,7 @@ export class PixelSelectionController implements PixelSelectionPort {
     return this.applyMask(true);
   }
   private async applyMask(erase: boolean) {
-    if (!this.state?.selected || this.state.busy || this.state.dragging) return;
+    if (!this.state?.selected || this.state.busy || this.state.dragging || this.state.error) return;
     return this.control(async (generation, gesture) => {
       const response = await this.client!.request({ type: "export" });
       this.requireControl(generation, gesture);

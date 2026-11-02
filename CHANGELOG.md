@@ -6,6 +6,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Added
 
+- Unify SAM and magic-wand selection previews behind a generic mask-selection port. Add cumulative foreground/background points, draggable rectangles, bounded image-wide object proposals, prompt undo, cancellable latest-intent inference, bilingual controls and copyable errors; apply Keep/Erase only as an explicit reversible transaction preserving existing masks.
+
 - Recreate the supplied DevDay reference choreography for the landing hero: a brief native mascot entrance, scattered points settling onto real glyph curve endpoints, traced contours and staggered solid letter fills, with individual hover replays. Parse the shared display font for exact paths, retain browser-shaped contours for fallback scripts, preserve selectable accessible text and reduced motion, and dispose completed animation clocks and SVG surfaces.
 
 - Add seven lightweight, poster-first landing template recordings and the supplied timelapse and effects feature media. Bound native playback to two visible players and three retained sources, hold the timelapse endpoint for two seconds, and stop hidden or reduced-motion playback.

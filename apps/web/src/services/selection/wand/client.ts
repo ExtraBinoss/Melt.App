@@ -53,7 +53,9 @@ export class WandClient {
       try {
         this.worker.postMessage(
           message,
-          message.type === "source" ? [message.data.buffer as ArrayBuffer] : [],
+          message.type === "source" || message.type === "mask"
+            ? [message.data.buffer as ArrayBuffer]
+            : [],
         );
       } catch (error) {
         clearTimeout(this.timer);

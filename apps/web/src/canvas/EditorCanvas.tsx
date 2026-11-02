@@ -1,3 +1,4 @@
+import { SelectionTools, PixelSelectionToolbar } from "./selection/SelectionTools";
 import {
   useCallback,
   useEffect,
@@ -68,7 +69,6 @@ import { useCanvasPresentation } from "./viewport/use-canvas-presentation";
 import { CanvasRulers } from "./guides/CanvasRulers";
 import { Measurements } from "./guides/Measurements";
 import { useWand } from "./interaction/use-wand";
-import { PixelSelectionOverlay, PixelSelectionToolbar } from "./selection/PixelSelectionOverlay";
 import { attachmentSelection } from "../state/selection/attachments";
 import { useTransformSnapping } from "./interaction/snapping/use-transform-snapping";
 import { CanvasMarquee } from "./selection/CanvasMarquee";
@@ -545,8 +545,8 @@ export function EditorCanvas({
             />
             <EffectGizmo {...gizmoProps} />
           </div>
-          <PixelSelectionOverlay
-            port={services?.pixelSelection}
+          <SelectionTools
+            {...{ engine, services, tool, onError }}
             controller={controller}
             viewSource={pageViewSource}
             viewport={viewport}

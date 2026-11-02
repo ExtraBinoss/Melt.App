@@ -21,7 +21,7 @@ export function pixelSelectionShortcut(
   event.preventDefault();
   if (event.repeat) return true;
   if (deselect) port.deselect();
-  else if (erase && !state.busy && !state.dragging && state.selected > 0)
+  else if (erase && !state.busy && !state.dragging && !state.error && state.selected > 0)
     void onTask(async () => {
       if (port.read() !== state) throw new DOMException("Pixel selection changed.", "AbortError");
       await port.erase();

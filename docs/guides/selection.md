@@ -1,5 +1,13 @@
 # Pixel selection and explicit masks
 
+## Shared selection producers
+
+Object selection (SAM) and the magic wand share a temporary pixel-selection
+preview and the same explicit Keep/Erase actions. SAM adds foreground/background
+points, boxes and bounded automatic object proposals; see
+[interactive object selection](object-selection.md). Algorithms publish coverage
+through `MaskSelectionPort`; none applies document edits just by detecting pixels.
+
 ## Wand controls
 
 | Selection topic         | Behavior                                                                                                                        |

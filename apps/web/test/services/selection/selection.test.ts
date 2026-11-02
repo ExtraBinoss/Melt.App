@@ -15,6 +15,28 @@ function reply(port: WorkerPort, data: SelectionResponse) {
 const mask: MaskResult = { data: new Uint8ClampedArray([255, 255, 255, 255]), width: 1, height: 1 };
 afterEach(() => vi.unstubAllGlobals());
 describe("bounded selection worker client", () => {
+  it("transports rich prompts and cancellation resets model readiness", async () => {
+    const port = worker(),
+      client = new SelectionClient(() => port);
+    const prompt = {
+      points: [{ x: 1, y: 1, label: 0 as const }],
+      box: { x: 0, y: 0, right: 2, bottom: 2 },
+    };
+    const pending = client.prompt("a", prompt);
+    expect(port.postMessage).toHaveBeenLastCalledWith(
+      { id: 1, type: "prompt", dataUrl: "a", prompt },
+      [],
+    );
+    reply(port, { id: 1, result: mask });
+    await pending;
+    expect(client.model.read().phase).toBe("ready");
+    const scan = client.scan("a");
+    client.cancel();
+    await expect(scan).rejects.toThrow("annulée");
+    expect(client.model.read().phase).toBe("idle");
+    expect(port.terminate).toHaveBeenCalledOnce();
+    client.dispose();
+  });
   it("requests worker PNG encoding and returns its blob without transferring RGBA to the editor", async () => {
     const port = worker(),
       client = new SelectionClient(() => port);

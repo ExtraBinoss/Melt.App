@@ -1,3 +1,4 @@
+import { promptTensors, type SelectionPrompt } from "./prompts";
 import type { Tensor } from "onnxruntime-web";
 import type { ModelDownloadEvent } from "./model/contract";
 import type { LoadedSam } from "./websam/runtime";
@@ -28,18 +29,24 @@ export async function segmentObject(
 ) {
   if (!Number.isFinite(x) || !Number.isFinite(y) || x < 0 || y < 0)
     throw new Error("Invalid selection position.");
+  return segmentPrompt(url, { points: [{ x, y, label: 1 }] }, onProgress);
+}
+export async function segmentPrompt(
+  url: string,
+  prompt: SelectionPrompt,
+  onProgress?: (event: ModelDownloadEvent) => void,
+) {
   if (selecting) throw new Error("Object selection is already running.");
   selecting = true;
   try {
-    return await runSelection(url, x, y, onProgress);
+    return await runSelection(url, prompt, onProgress);
   } finally {
     selecting = false;
   }
 }
 async function runSelection(
   url: string,
-  x: number,
-  y: number,
+  prompt: SelectionPrompt,
   onProgress?: (event: ModelDownloadEvent) => void,
 ) {
   const { ort, encoder, decoder } = await prepareSam(onProgress);
@@ -66,15 +73,10 @@ async function runSelection(
     }
   }
   const { width, height, embeddings } = cached;
-  if (x < 0 || x >= width || y < 0 || y >= height)
-    throw new Error("Selection position is outside the image.");
+  const inputs = promptTensors(prompt, width, height, INPUT_SIZE);
   const temporary: Record<string, Tensor> = {
-    input_points: new ort.Tensor(
-      "float32",
-      new Float32Array([(x * INPUT_SIZE) / width, (y * INPUT_SIZE) / height, 0, 0]),
-      [1, 1, 2, 2],
-    ),
-    input_labels: new ort.Tensor("int32", new Int32Array([1, -1]), [1, 1, 2]),
+    input_points: new ort.Tensor("float32", inputs.coordinates, [1, 1, inputs.count, 2]),
+    input_labels: new ort.Tensor("int32", inputs.labels, [1, 1, inputs.count]),
   };
   let outputs: Record<string, Tensor> | undefined;
   try {
@@ -103,6 +105,7 @@ async function runSelection(
       ),
       width,
       height,
+      score: Number(outputs.iou.data[0]),
     };
   } finally {
     disposeTensors(temporary);

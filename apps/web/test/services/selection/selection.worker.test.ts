@@ -4,12 +4,38 @@ import {
   processSelection,
   handleSelection,
 } from "../../../src/services/selection/selection.worker";
-const sam = vi.hoisted(() => ({ prepareSam: vi.fn(), segmentObject: vi.fn() }));
+const sam = vi.hoisted(() => ({
+  prepareSam: vi.fn(),
+  segmentObject: vi.fn(),
+  segmentPrompt: vi.fn(),
+}));
+const scan = vi.hoisted(() => vi.fn());
 vi.mock("../../../src/services/selection/sam", () => sam);
+vi.mock("../../../src/services/selection/websam/scan", () => ({ scanObjects: scan }));
 afterEach(() => {
   vi.unstubAllGlobals();
 });
 describe("selection worker protocol", () => {
+  it("forwards rich prompts and automatic proposals through the shared mask transport", async () => {
+    const mask = { data: new Uint8ClampedArray(4), width: 1, height: 1 };
+    const prompt = { points: [{ x: 0, y: 0, label: 0 as const }] };
+    sam.segmentPrompt.mockResolvedValue(mask);
+    expect(await processSelection({ id: 30, type: "prompt", dataUrl: "source", prompt })).toEqual({
+      id: 30,
+      result: mask,
+    });
+    expect(sam.segmentPrompt).toHaveBeenCalledWith("source", prompt, undefined);
+    scan.mockResolvedValue({ ...mask, candidates: [{ x: 0, y: 0, score: 0.9 }] });
+    expect(await processSelection({ id: 31, type: "scan", dataUrl: "source" })).toMatchObject({
+      id: 31,
+      result: { candidates: [{ score: 0.9 }] },
+    });
+    scan.mockRejectedValueOnce(Error("scan failed"));
+    expect(await processSelection({ id: 32, type: "scan", dataUrl: "source" })).toEqual({
+      id: 32,
+      error: "scan failed",
+    });
+  });
   it("encodes PNGs off the main thread, posts only the blob and releases canvas memory on success/error", async () => {
     const putImageData = vi.fn(),
       convertToBlob = vi.fn(async () => new Blob(["png"], { type: "image/png" }));

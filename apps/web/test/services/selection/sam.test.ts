@@ -50,6 +50,22 @@ beforeEach(() => {
 });
 afterEach(() => vi.unstubAllGlobals());
 describe("SAM 2 worker inference", () => {
+  it("feeds multiple inclusion/exclusion points and box corners to the dynamic decoder", async () => {
+    const { segmentPrompt } = await import("../../../src/services/selection/sam");
+    await segmentPrompt("a", {
+      points: [
+        { x: 1, y: 1, label: 1 },
+        { x: 2, y: 1, label: 0 },
+      ],
+      box: { x: 0, y: 0, right: 3, bottom: 1 },
+    });
+    const feeds = fake.decode.mock.calls[0]![0];
+    expect(feeds.input_points.dims).toEqual([1, 1, 4, 2]);
+    expect(feeds.input_labels.dims).toEqual([1, 1, 4]);
+    expect(Array.from(feeds.input_labels.data)).toEqual([2, 3, 1, 0]);
+    expect(Array.from(feeds.input_points.data)).toEqual([0, 0, 384, 256, 128, 256, 256, 256]);
+    expect(fake.tensors.every((value) => value.dispose.mock.calls.length === 1)).toBe(true);
+  });
   it("shares lazy preparation, forwards progress and retries failures", async () => {
     const { prepareSam } = await import("../../../src/services/selection/sam");
     const progress = vi.fn();

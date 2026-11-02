@@ -55,7 +55,17 @@ export function createWandHost() {
         draft = null;
       } else {
         if (!source) throw Error("Pixel selection source is missing.");
-        if (request.type === "preview") {
+        if (request.type === "mask") {
+          if (
+            request.width !== source.width ||
+            request.height !== source.height ||
+            request.data.length !== source.width * source.height * 4
+          )
+            throw Error("Object selection mask dimensions do not match the source.");
+          accepted = new Uint8Array(source.width * source.height);
+          for (let i = 0; i < accepted.length; i++) accepted[i] = request.data[i * 4 + 3]!;
+          draft = null;
+        } else if (request.type === "preview") {
           if (
             ![request.x, request.y, request.tolerance].every(Number.isFinite) ||
             !MODES.includes(request.mode) ||

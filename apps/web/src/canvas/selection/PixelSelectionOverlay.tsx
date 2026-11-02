@@ -132,7 +132,7 @@ export function PixelSelectionToolbar({
       emptyRead,
     );
   if (!state) return null;
-  const busy = state.busy || state.dragging;
+  const busy = state.busy || state.dragging || Boolean(state.error);
   async function run(action: () => Promise<void>) {
     try {
       await action();
@@ -156,7 +156,13 @@ export function PixelSelectionToolbar({
     >
       <div className="pixel-selection-status">
         <strong>{t("title")}</strong>
-        <span>{busy ? t("working") : t("selected", { count: state.selected })}</span>
+        <span>
+          {state.error
+            ? t("previewFailed")
+            : busy
+              ? t("working")
+              : t("selected", { count: state.selected })}
+        </span>
       </div>
       <ButtonGroup aria-label={t("title")}>
         <SelectionAction
