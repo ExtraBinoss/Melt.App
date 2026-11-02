@@ -44,7 +44,6 @@ export function LandingPage({
           <HeroMascot />
           <HeroHeadline lines={[t("titleFirst"), t("titleSecond")]} />
         </div>
-        <p className="landing-intro-description">{t("heroDescription")}</p>
         <NavigationButton
           className="landing-cta"
           href={dashboardHref}

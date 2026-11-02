@@ -29,11 +29,7 @@ test("shows the animated headline, real templates and six deliberate video slots
     choose = vi.fn();
   d.mount(<LandingPage onCreate={create} onTemplate={choose} />);
   expect(screen.getByRole("heading", { level: 1, name: "Créez et animez." })).toBeVisible();
-  expect(
-    screen.getByText(
-      "Un outil simple pour créer des visuels fixes ou animés. Combinez images, vidéos et 3D avec des réglages en temps réel.",
-    ),
-  ).toBeVisible();
+  expect(document.querySelector(".landing-intro p")).toBeNull();
   expect(screen.queryByText("Aperçu vidéo à venir")).toBeNull();
   expect(document.querySelectorAll("[data-feature-ui]")).toHaveLength(3);
   expect(
@@ -61,11 +57,7 @@ test("all landing copy follows the selected interface language", async () => {
     await i18n.changeLanguage("en");
   });
   expect(screen.getByRole("heading", { name: "Design and animate." })).toBeVisible();
-  expect(
-    screen.getByText(
-      "Create still or animated visuals in one simple tool. Combine images, video and 3D with real-time controls.",
-    ),
-  ).toBeVisible();
+  expect(document.querySelector(".landing-intro p")).toBeNull();
   expect(
     screen.getByRole("heading", { name: "Start with a template or make it your own." }),
   ).toBeVisible();

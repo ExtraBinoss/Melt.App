@@ -24,6 +24,5 @@
   "timelapse": "Erstelle einen Zeitraffer.",
   "timelapseHint": "Mach aus deinem Bearbeitungsverlauf einen Zeitraffer. Der Verlauf speichert standardmäßig 10.000 Schritte.",
   "export": "Exportiere Bilder und Videos.",
-  "exportHint": "Wähle eine Auflösung und prüfe die Vorschau in Echtzeit. Exportiere Bilder, Zeitraffer oder MP4/WebM-Videos mit Ton.",
-  "heroDescription": "Erstelle statische oder animierte Designs mit einem einfachen Werkzeug. Verbinde Bilder, Video und 3D mit Anpassungen in Echtzeit."
+  "exportHint": "Wähle eine Auflösung und prüfe die Vorschau in Echtzeit. Exportiere Bilder, Zeitraffer oder MP4/WebM-Videos mit Ton."
 }

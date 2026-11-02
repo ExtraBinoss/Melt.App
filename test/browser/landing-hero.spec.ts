@@ -16,6 +16,7 @@ for (const language of ["en", "fr"] as const) {
     await page.goto("/");
     const mascot = page.locator(".hero-mascot-stage");
     const stage = page.locator(".hero-type-stage");
+    await expect(page.locator(".landing-intro p")).toHaveCount(0);
     await expect(mascot).toHaveAttribute("data-face-ready");
     await expect(stage).toHaveAttribute("data-ink-pending");
     await expect(stage).toHaveAttribute("data-vector-ready");
@@ -116,6 +117,74 @@ test("reduced motion skips the mascot and writing sequence with immediately read
       .evaluate((node) => node.getAnimations({ subtree: true }).length),
   ).toBe(0);
   await expect(page.locator(".landing-intro .landing-cta")).toHaveCSS("opacity", "1");
+  // Paths can be acquired while the pointer already remains inside the heading.
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  const stage = page.locator(".hero-type-stage");
+  await expect(stage).toHaveAttribute("data-vector-ready");
+  const target = await heading
+    .locator(".hero-chunk")
+    .nth(1)
+    .evaluate((node) => {
+      const range = document.createRange();
+      range.setStart(node.firstChild!, 2);
+      range.setEnd(node.firstChild!, 3);
+      const rect = range.getBoundingClientRect();
+      return { x: rect.x + rect.width / 2, y: rect.y + rect.height / 2 };
+    });
+  await page.mouse.move(target.x, target.y);
+  await expect(stage).toHaveAttribute("data-ink-active");
+  await expect(
+    stage.locator('.hero-glyph-overlay > g[opacity="1"] > path').first(),
+  ).toHaveAttribute("fill-opacity", "0");
+});
+
+test("hover repeats the same letter and recovers after a path rebuild without leaving the heading", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const stage = page.locator(".hero-type-stage");
+  const heading = page.getByRole("heading", { level: 1 });
+  await expect(stage).toHaveAttribute("data-vector-ready");
+  await expect(stage).not.toHaveAttribute("data-ink-pending");
+  const target = () =>
+    heading
+      .locator(".hero-chunk")
+      .nth(1)
+      .evaluate((node) => {
+        const range = document.createRange();
+        range.setStart(node.firstChild!, 2);
+        range.setEnd(node.firstChild!, 3);
+        const rect = range.getBoundingClientRect();
+        return { x: rect.x + rect.width / 2, y: rect.y + rect.height / 2 };
+      });
+  let point = await target();
+  await page.mouse.move(point.x, point.y);
+  const activePath = stage.locator('.hero-glyph-overlay > g[opacity="1"] > path').first();
+  await expect(activePath).toHaveAttribute("fill-opacity", "0");
+  await expect(stage).not.toHaveAttribute("data-ink-active");
+  // This move stays on the same glyph and delivers no pointerenter.
+  await page.mouse.move(point.x + 1, point.y);
+  await expect(stage).toHaveAttribute("data-ink-active");
+  await expect(activePath).toHaveAttribute("fill-opacity", "0");
+  await expect(stage).not.toHaveAttribute("data-ink-active");
+  const mask = await heading.evaluate((node) => node.style.maskImage);
+  await page.addStyleTag({ content: ".hero-type-stage { max-inline-size: 1080px; }" });
+  await expect
+    .poll(() =>
+      heading.evaluate(
+        (node, previous) => Boolean(node.style.maskImage && node.style.maskImage !== previous),
+        mask,
+      ),
+    )
+    .toBe(true);
+  // The stationary pointer is handed to the new paths before another input event.
+  await expect(stage).toHaveAttribute("data-ink-active");
+  await expect(activePath).toHaveAttribute("fill-opacity", "0");
+  await expect(stage).not.toHaveAttribute("data-ink-active");
+  point = await target();
+  await page.mouse.move(point.x, point.y);
+  await expect(stage).toHaveAttribute("data-ink-active");
+  await expect(activePath).toHaveAttribute("fill-opacity", "0");
 });
 
 test("the complete native heading remains available without JavaScript", async ({

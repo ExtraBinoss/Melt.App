@@ -198,7 +198,7 @@ test("the native fallback writes sequentially, then native text returns to norma
   f.parent.remove();
 });
 
-test("hover coalesces input and reuses geometry without creating character nodes or readbacks", () => {
+test("native hover coalesces input and reads current geometry without creating character nodes or readbacks", () => {
   const f = headline();
   completeWriting();
   const measured = f.reads[0]!.mock.calls.length;
@@ -211,7 +211,7 @@ test("hover coalesces input and reuses geometry without creating character nodes
   expect(f.reads[0]).toHaveBeenCalledTimes(measured + 1);
   f.stage.dispatchEvent(new PointerEvent("pointermove", { clientX: 120, clientY: 60 }));
   step();
-  expect(f.reads[0]).toHaveBeenCalledTimes(measured + 1);
+  expect(f.reads[0]).toHaveBeenCalledTimes(measured + 2);
   expect(f.heading.children).toHaveLength(2);
   f.stage.dispatchEvent(new PointerEvent("pointerleave"));
   expect(f.stage).not.toHaveAttribute("data-ink-active");
@@ -295,4 +295,80 @@ test("real curve endpoints coalesce, each glyph traces before filling, and hover
   expect(heading.style.maskImage).toBe("");
   expect(preferenceListeners.size).toBe(0);
   parent.remove();
+});
+
+function pointerFixture(pending = false) {
+  const parent = fixture(`<div ${pending ? 'data-ink-pending=""' : ""}><h1>A</h1></div>`);
+  const stage = parent.firstElementChild as HTMLElement;
+  const heading = stage.firstElementChild as HTMLElement;
+  const bounds = vi
+    .spyOn(stage, "getBoundingClientRect")
+    .mockReturnValue(new DOMRect(0, 0, 200, 100));
+  const dispose = installVectorHeadline(stage, heading, [
+    {
+      d: "M0 10L60 10L60 80Z",
+      points: [{ x: 0, y: 10 }],
+      x: 0,
+      y: 0,
+      width: 60,
+      height: 100,
+    },
+  ]);
+  return { parent, stage, bounds, dispose, path: stage.querySelector("[data-hero-glyph] > path")! };
+}
+
+test("pointermove works without enter, repeats a completed glyph and uses current geometry once per frame", () => {
+  const f = pointerFixture();
+  const reads = f.bounds.mock.calls.length;
+  for (let i = 0; i < 12; i++)
+    f.stage.dispatchEvent(new PointerEvent("pointermove", { clientX: 30 + i / 10, clientY: 40 }));
+  expect(frames.size).toBe(1);
+  step();
+  expect(f.bounds).toHaveBeenCalledTimes(reads + 1);
+  for (let i = 0; i < 10; i++) step();
+  expect(f.path).toHaveAttribute("fill-opacity", "0");
+  for (let i = 0; i < 30; i++) step();
+  expect(frames.size).toBe(0);
+  expect(f.stage).not.toHaveAttribute("data-ink-active");
+  // Stay on the same letter: a completed pulse must not suppress the next native move.
+  f.stage.dispatchEvent(new PointerEvent("pointermove", { clientX: 31, clientY: 40 }));
+  for (let i = 0; i < 10; i++) step();
+  expect(f.path).toHaveAttribute("fill-opacity", "0");
+  expect(f.stage).toHaveAttribute("data-ink-active");
+  for (let i = 0; i < 30; i++) step();
+  // A translated surface does not necessarily receive another pointerenter.
+  f.bounds.mockReturnValue(new DOMRect(100, 100, 200, 100));
+  f.stage.dispatchEvent(new PointerEvent("pointermove", { clientX: 131, clientY: 140 }));
+  for (let i = 0; i < 10; i++) step();
+  expect(f.path).toHaveAttribute("fill-opacity", "0");
+  expect(f.stage).toHaveAttribute("data-ink-active");
+  f.dispose();
+  expect(frames.size).toBe(0);
+  f.parent.remove();
+});
+
+test("a pointer already over the letters when the entrance ends receives its hover replay", () => {
+  const f = pointerFixture(true);
+  f.stage.dispatchEvent(new PointerEvent("pointermove", { clientX: 30, clientY: 40 }));
+  for (let i = 0; i < 54; i++) step();
+  expect(f.stage).not.toHaveAttribute("data-ink-pending");
+  expect(f.stage).toHaveAttribute("data-ink-active");
+  expect(f.path).toHaveAttribute("fill-opacity", "0");
+  f.stage.dispatchEvent(new PointerEvent("pointerleave"));
+  for (let i = 0; i < 40; i++) step();
+  expect(frames.size).toBe(0);
+  expect(f.stage).not.toHaveAttribute("data-ink-active");
+  f.dispose();
+  f.parent.remove();
+});
+
+test("fallback scripts also accept a first pointermove without pointerenter", () => {
+  const f = headline();
+  completeWriting();
+  f.stage.dispatchEvent(new PointerEvent("pointermove", { clientX: 60, clientY: 40 }));
+  step();
+  expect(f.stage).toHaveAttribute("data-ink-active");
+  f.dispose();
+  expect(frames.size).toBe(0);
+  f.parent.remove();
 });

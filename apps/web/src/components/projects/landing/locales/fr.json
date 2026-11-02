@@ -24,6 +24,5 @@
   "timelapse": "Créez un timelapse.",
   "timelapseHint": "Transformez l’historique de votre création en timelapse. Il conserve 10 000 étapes par défaut.",
   "export": "Exportez images et vidéos.",
-  "exportHint": "Choisissez la résolution et vérifiez l’aperçu en temps réel. Exportez des images, des timelapses ou des vidéos MP4/WebM avec son.",
-  "heroDescription": "Un outil simple pour créer des visuels fixes ou animés. Combinez images, vidéos et 3D avec des réglages en temps réel."
+  "exportHint": "Choisissez la résolution et vérifiez l’aperçu en temps réel. Exportez des images, des timelapses ou des vidéos MP4/WebM avec son."
 }

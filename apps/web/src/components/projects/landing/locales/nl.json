@@ -24,6 +24,5 @@
   "timelapse": "Maak een timelapse.",
   "timelapseHint": "Maak van je bewerkingsgeschiedenis een timelapse. Je geschiedenis bewaart standaard 10.000 stappen.",
   "export": "Exporteer afbeeldingen en video.",
-  "exportHint": "Kies een resolutie en controleer de voorvertoning in realtime. Exporteer afbeeldingen, timelapses of MP4/WebM-video’s met geluid.",
-  "heroDescription": "Maak stilstaande of geanimeerde ontwerpen met één eenvoudige tool. Combineer afbeeldingen, video en 3D met aanpassingen in realtime."
+  "exportHint": "Kies een resolutie en controleer de voorvertoning in realtime. Exporteer afbeeldingen, timelapses of MP4/WebM-video’s met geluid."
 }

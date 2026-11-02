@@ -28,14 +28,6 @@
   padding: 76px 24px 90px;
   text-align: center;
 }
-.landing-intro-description {
-  max-width: 530px;
-  margin: -14px auto 28px;
-  color: var(--muted-foreground);
-  font-size: 15px;
-  line-height: 1.7;
-  text-wrap: balance;
-}
 .landing-cta[data-slot="button"] {
   height: 58px;
   padding: 0 28px;
@@ -300,9 +292,6 @@
 @media (max-width: 700px) {
   .landing-intro {
     padding: 66px 20px 70px;
-  }
-  .landing-intro-description {
-    font-size: 14px;
   }
   .landing-cta[data-slot="button"] {
     height: 52px;

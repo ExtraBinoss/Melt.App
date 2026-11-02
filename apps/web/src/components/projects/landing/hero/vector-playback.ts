@@ -7,6 +7,7 @@ export function installVectorHeadline(
   stage: HTMLElement,
   heading: HTMLElement,
   glyphs: GlyphGeometry[],
+  initialPointer?: { x: number; y: number },
 ) {
   const surface = createGlyphSurface(stage, heading, glyphs);
   const reduced = matchMedia("(prefers-reduced-motion: reduce)");
@@ -16,9 +17,10 @@ export function installVectorHeadline(
   let frame: number | undefined;
   let visible = true;
   let disposed = false;
-  let hovered = -1;
-  let bounds: DOMRect | undefined;
+  let pointer = initialPointer;
+  let pointerDirty = Boolean(initialPointer);
   const pulses = new Map<number, number>();
+  const hoverDuration = 1100;
   function stop() {
     if (frame !== undefined) cancelAnimationFrame(frame);
     frame = undefined;
@@ -36,8 +38,30 @@ export function installVectorHeadline(
   function tick(stamp: number) {
     frame = undefined;
     if (disposed || !visible || document.hidden || reduced.matches) return;
+    // Read current geometry once for the coalesced input before touching SVG or styles.
+    const bounds = pointerDirty && pointer && !intro ? stage.getBoundingClientRect() : undefined;
     time += last === undefined ? 0 : Math.min(60, stamp - last);
     last = stamp;
+    if (bounds && pointer) {
+      pointerDirty = false;
+      const x = pointer.x - bounds.left;
+      const y = pointer.y - bounds.top;
+      let nearest = -1;
+      let distance = Infinity;
+      glyphs.forEach((glyph, index) => {
+        const value = Math.hypot(glyph.x + glyph.width / 2 - x, glyph.y + glyph.height / 2 - y);
+        if (value < distance && value < glyph.height * 0.75) {
+          nearest = index;
+          distance = value;
+        }
+      });
+      // The pulse map is the active state: a finished glyph can always be played again.
+      const start = pulses.get(nearest);
+      if (nearest >= 0 && (start === undefined || time - start >= hoverDuration)) {
+        pulses.set(nearest, time);
+        stage.setAttribute("data-ink-active", "");
+      }
+    }
     if (intro) {
       if (time >= heroTiming.textAt) {
         stage.setAttribute("data-ink-auto", "");
@@ -51,10 +75,13 @@ export function installVectorHeadline(
           true,
         ),
       );
-      if (time >= heroTiming.textFinish) clear();
+      if (time >= heroTiming.textFinish) {
+        clear();
+        pointerDirty = Boolean(pointer);
+      }
     } else {
       for (const [index, start] of pulses) {
-        const progress = (time - start) / 1100;
+        const progress = (time - start) / hoverDuration;
         surface.paint(index, progress, false);
         if (progress >= 1) pulses.delete(index);
       }
@@ -63,44 +90,32 @@ export function installVectorHeadline(
         last = undefined;
       }
     }
-    if (intro || pulses.size) frame = requestAnimationFrame(tick);
+    if (intro || pulses.size || pointerDirty) frame = requestAnimationFrame(tick);
   }
   function resume() {
     const paused = !visible || document.hidden || reduced.matches;
     stage.toggleAttribute("data-paused", paused);
-    if (reduced.matches) clear();
+    if (reduced.matches) {
+      pointer = undefined;
+      pointerDirty = false;
+      clear();
+    }
     if (paused) stop();
-    else if (!disposed && (intro || pulses.size) && frame === undefined)
+    else if (!disposed && (intro || pulses.size || pointerDirty) && frame === undefined)
       frame = requestAnimationFrame(tick);
   }
   function move(event: PointerEvent) {
-    if (intro || event.pointerType === "touch" || reduced.matches || !bounds) return;
-    const x = event.clientX - bounds.left;
-    const y = event.clientY - bounds.top;
-    let nearest = -1;
-    let distance = Infinity;
-    glyphs.forEach((glyph, index) => {
-      const value = Math.hypot(glyph.x + glyph.width / 2 - x, glyph.y + glyph.height / 2 - y);
-      if (value < distance && value < glyph.height * 0.75) {
-        nearest = index;
-        distance = value;
-      }
-    });
-    if (nearest < 0 || nearest === hovered) return;
-    hovered = nearest;
-    pulses.set(nearest, time);
-    stage.setAttribute("data-ink-active", "");
+    if (event.pointerType === "touch" || reduced.matches) return;
+    pointer = { x: event.clientX, y: event.clientY };
+    pointerDirty = true;
     resume();
   }
-  function enter(event: PointerEvent) {
-    bounds = stage.getBoundingClientRect();
-    move(event);
-  }
   function leave() {
-    hovered = -1;
+    pointer = undefined;
+    pointerDirty = false;
   }
   function scroll() {
-    hovered = -1;
+    leave();
     clear();
   }
   const observer = new IntersectionObserver(([entry]) => {
@@ -108,7 +123,7 @@ export function installVectorHeadline(
     resume();
   });
   observer.observe(stage);
-  stage.addEventListener("pointerenter", enter);
+  stage.addEventListener("pointerenter", move);
   stage.addEventListener("pointermove", move);
   stage.addEventListener("pointerleave", leave);
   stage.addEventListener("pointercancel", leave);
@@ -120,7 +135,7 @@ export function installVectorHeadline(
     disposed = true;
     stop();
     observer.disconnect();
-    stage.removeEventListener("pointerenter", enter);
+    stage.removeEventListener("pointerenter", move);
     stage.removeEventListener("pointermove", move);
     stage.removeEventListener("pointerleave", leave);
     stage.removeEventListener("pointercancel", leave);

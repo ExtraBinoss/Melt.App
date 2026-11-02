@@ -24,6 +24,5 @@
   "timelapse": "Crea un timelapse.",
   "timelapseHint": "Trasforma la cronologia delle modifiche in un timelapse. La cronologia conserva 10.000 passaggi per impostazione predefinita.",
   "export": "Esporta immagini e video.",
-  "exportHint": "Scegli la risoluzione e controlla l’anteprima in tempo reale. Esporta immagini, timelapse o video MP4/WebM con audio.",
-  "heroDescription": "Uno strumento semplice per creare progetti statici o animati. Combina immagini, video e 3D con controlli in tempo reale."
+  "exportHint": "Scegli la risoluzione e controlla l’anteprima in tempo reale. Esporta immagini, timelapse o video MP4/WebM con audio."
 }

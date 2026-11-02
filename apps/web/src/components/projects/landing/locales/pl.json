@@ -24,6 +24,5 @@
   "timelapse": "Utwórz timelapse.",
   "timelapseHint": "Zmień historię edycji w timelapse. Historia domyślnie przechowuje 10 000 kroków.",
   "export": "Eksportuj obrazy i filmy.",
-  "exportHint": "Wybierz rozdzielczość i sprawdź podgląd w czasie rzeczywistym. Eksportuj obrazy, timelapse lub filmy MP4/WebM z dźwiękiem.",
-  "heroDescription": "Proste narzędzie do tworzenia statycznych i animowanych projektów. Łącz obrazy, wideo i 3D, dostosowując je w czasie rzeczywistym."
+  "exportHint": "Wybierz rozdzielczość i sprawdź podgląd w czasie rzeczywistym. Eksportuj obrazy, timelapse lub filmy MP4/WebM z dźwiękiem."
 }

@@ -113,6 +113,11 @@ are fetched from their existing UI source, rather than copied into document font
 The first run is neutral, the next green, and a third uses the brand violet; the
 palette repeats for additional runs. Outlines, points, fills and the final native
 text keep their run's color in both themes, without splitting shaped text.
+Hover packets coalesce into a single frame that reads current surface geometry
+before SVG writes. Replay depends on active pulses rather than a remembered
+letter: the same glyph remains replayable after completion, and pointer movement
+works when paths are rebuilt underneath an already hovered heading. A pointer
+retained during the entrance starts its hover replay when the entrance finishes.
 
 If the display font does not cover a script, browser-shaped text and a native
 contour filter retain its actual fallback glyphs, Arabic shaping and CJK wrapping.

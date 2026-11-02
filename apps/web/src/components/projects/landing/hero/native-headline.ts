@@ -1,14 +1,18 @@
 import { heroTiming, signalHeroReady } from "./choreography";
 
 /** One finite contour sweep, then on-demand pointer lighting of the same native text. */
-export function installNativeHeadlineFallback(stage: HTMLElement, heading: HTMLElement) {
+export function installNativeHeadlineFallback(
+  stage: HTMLElement,
+  heading: HTMLElement,
+  initialPointer?: { x: number; y: number },
+) {
   signalHeroReady(stage);
   const reduced = matchMedia("(prefers-reduced-motion: reduce)");
   const chunks = [...heading.querySelectorAll<HTMLElement>(".hero-chunk")];
   const lattice = stage.querySelector("feImage");
   let origins: { x: number; y: number; width: number }[] = [];
   let bounds: DOMRect | undefined;
-  let pointer: { x: number; y: number } | undefined;
+  let pointer = initialPointer;
   let frame: number | undefined;
   let timer: ReturnType<typeof setTimeout> | undefined;
   let delay = 350;
@@ -134,8 +138,9 @@ export function installNativeHeadlineFallback(stage: HTMLElement, heading: HTMLE
     if (phase === "done") queue();
   }
   function move(event: PointerEvent) {
-    if (!pointer || reduced.matches) return;
+    if (event.pointerType === "touch" || reduced.matches) return;
     pointer = { x: event.clientX, y: event.clientY };
+    dirty = true;
     if (phase === "done") queue();
   }
   function leave() {

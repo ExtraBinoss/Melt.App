@@ -44,9 +44,6 @@
 .hero-mascot-stage[data-mascot-finished] {
   visibility: hidden;
 }
-.landing-intro-description {
-  animation: hero-support-in 500ms ease 1550ms both;
-}
 .landing-intro > .landing-cta {
   animation: hero-support-in 500ms ease 1650ms both;
 }
@@ -69,7 +66,6 @@
   .hero-mascot-stage {
     display: none;
   }
-  .landing-intro-description,
   .landing-intro > .landing-cta {
     animation: none;
   }
