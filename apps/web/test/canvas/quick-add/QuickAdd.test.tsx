@@ -21,7 +21,10 @@ const render = (node: ReactNode, options?: RenderOptions) =>
     ...options,
     wrapper: ({ children }) => <TooltipProvider>{children}</TooltipProvider>,
   });
-vi.mock("react-i18next", () => ({ useTranslation: () => ({ t: (key: string) => key }) }));
+vi.mock("react-i18next", async (original) => ({
+  ...(await original<typeof import("react-i18next")>()),
+  useTranslation: () => ({ t: (key: string) => key, i18n: { dir: () => "ltr" } }),
+}));
 afterEach(() => vi.restoreAllMocks());
 
 function fixture() {
@@ -86,7 +89,11 @@ it("opens only in empty world space, inserts real text/primitives in the active 
     const input = screen.getByRole("combobox", { name: "quickAdd:title" });
     await waitFor(() => expect(input).toHaveFocus());
     fireEvent.change(input, { target: { value: query } });
-    fireEvent.click(screen.getByRole("option", { name: query }));
+    fireEvent.click(
+      screen.getByRole("option", {
+        name: `search:commandLabels.tool${kind[0]!.toUpperCase()}${kind.slice(1)}`,
+      }),
+    );
     expect(d.engine.getSnapshot().project.pages[0]!.layers[0]).toEqual(
       expect.objectContaining({ kind }),
     );
@@ -105,28 +112,28 @@ it("uses the shared command port synchronously for file imports, artboard creati
     library = vi.fn(),
     stopLibrary = createLibraryActions(d.engine).subscribe(library);
   d.open();
-  fireEvent.click(screen.getByRole("option", { name: "addPage" }));
+  fireEvent.click(screen.getByRole("option", { name: "search:commandLabels.addPage" }));
   expect(run).toHaveBeenLastCalledWith("action:addPage");
   d.open();
   fireEvent.click(screen.getByRole("button", { name: "search:files" }));
-  fireEvent.click(screen.getByRole("option", { name: "import" }));
+  fireEvent.click(screen.getByRole("option", { name: "search:commandLabels.importImages" }));
   expect(run).toHaveBeenLastCalledWith("action:importImages");
   d.open();
   fireEvent.change(screen.getByRole("combobox"), { target: { value: "svg" } });
-  fireEvent.click(screen.getByRole("option", { name: "search:importSvg" }));
+  fireEvent.click(screen.getByRole("option", { name: "search:commandLabels.importSvg" }));
   expect(run).toHaveBeenLastCalledWith("action:importSvg");
   d.open();
-  fireEvent.click(screen.getByRole("option", { name: "search:shape" }));
+  fireEvent.click(screen.getByRole("option", { name: "search:commandLabels.toolShape" }));
   expect(run).toHaveBeenLastCalledWith("action:toolShape");
   expect(library).toHaveBeenCalledOnce();
   await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
   stopLibrary();
   d.open();
-  fireEvent.click(screen.getByRole("option", { name: "search:shape" }));
+  fireEvent.click(screen.getByRole("option", { name: "search:commandLabels.toolShape" }));
   expect(d.onError).toHaveBeenCalledWith("quickAdd:unavailable");
   stop();
   d.open();
-  fireEvent.click(screen.getByRole("option", { name: "import" }));
+  fireEvent.click(screen.getByRole("option", { name: "search:commandLabels.importImages" }));
   expect(d.onError).toHaveBeenCalledWith("quickAdd:unavailable");
   d.view.unmount();
   d.viewport.current?.remove();
@@ -147,7 +154,7 @@ it("cancels stale/wheel/playback sessions, reports command rejection and cleans 
   const execute = vi.spyOn(d.engine, "execute").mockImplementationOnce(() => {
     throw new Error("Command rejected");
   });
-  fireEvent.click(screen.getByRole("option", { name: "text" }));
+  fireEvent.click(screen.getByRole("option", { name: "search:commandLabels.toolText" }));
   expect(d.onError).toHaveBeenCalledWith("Command rejected");
   execute.mockRestore();
   d.open();
@@ -162,7 +169,7 @@ it("cancels stale/wheel/playback sessions, reports command rejection and cleans 
   fireEvent.click(screen.getByTestId("canvas-add-artboard"));
   expect(d.engine.getSnapshot().project.pages).toHaveLength(1);
   d.open();
-  fireEvent.click(screen.getByRole("option", { name: "import" }));
+  fireEvent.click(screen.getByRole("option", { name: "search:commandLabels.importImages" }));
   expect(d.onError).toHaveBeenCalledWith("quickAdd:unavailable");
   const remove = vi.spyOn(d.viewport.current!, "removeEventListener");
   d.view.unmount();
@@ -194,7 +201,7 @@ it("does no catalog construction or search normalization while closed through do
     expect(score).toHaveBeenCalled();
     expect(build).toHaveBeenCalled();
     fireEvent.change(screen.getByRole("combobox"), { target: { value: "rectangle" } });
-    fireEvent.click(screen.getByRole("option", { name: "rectangle" }));
+    fireEvent.click(screen.getByRole("option", { name: "search:commandLabels.toolRectangle" }));
     expect(d.engine.getSnapshot().project.pages[0]!.layers[0]!.kind).toBe("rectangle");
     score.mockClear();
     build.mockClear();

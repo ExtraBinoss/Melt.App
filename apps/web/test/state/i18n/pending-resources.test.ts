@@ -21,12 +21,19 @@ test("retains every early namespace registration and accepts additional locale c
   instance.isInitialized = true;
   flush();
   expect(instance.addResourceBundle.mock.calls).toEqual([
-    ["en", "deferred", first.en, true, true],
+    ["en", "deferred", { ...first.en, ...second.en }, true, true],
     ["fr", "deferred", first.fr, true, true],
-    ["en", "deferred", second.en, true, true],
     ["ja", "deferred", second.ja, true, true],
   ]);
-  expect(instance.off).toHaveBeenCalledWith("initialized", flush);
+  instance.addResourceBundle.mockClear();
+  flush();
+  expect(instance.addResourceBundle).toHaveBeenCalledWith(
+    "en",
+    "deferred",
+    { ...first.en, ...second.en },
+    true,
+    true,
+  );
   registerFeatureTranslations("live", { ar: { action: "إنشاء" } });
   expect(instance.addResourceBundle).toHaveBeenLastCalledWith(
     "ar",

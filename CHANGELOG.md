@@ -487,6 +487,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Fixed
 
+- Align CI regressions with the current SSR routes, export surface, virtualized catalogs, fonts, command labels and immutable preview scopes. Exercise complete primary-pointer selection, first-run tutorial isolation, fresh worker lifetimes, native-media test fixtures and both TSL function/conditional branches without weakening coverage or deployment gates.
+
 - Disable transparent canvas edge-resize controls alongside visible handles during playback. Reject queued mask actions after any intervening engine publication while keeping open mask controls aligned with the current page.
 
 - Complete 66 missing performance-diagnostic labels and Terminal Signal template copy in ten additional locales. Validate legitimate French CLDR plural forms while retaining required translation keys and interpolation checks.

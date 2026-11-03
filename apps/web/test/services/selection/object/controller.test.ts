@@ -43,22 +43,27 @@ function fixture() {
       assets: { original: asset },
     }),
   );
-  const host = createWandHost();
-  const worker: WandWorkerPort = {
-    onmessage: null,
-    onerror: null,
-    onmessageerror: null,
-    terminate: vi.fn(),
-    postMessage(request) {
-      const response = host(request);
-      queueMicrotask(() => worker.onmessage?.({ data: response } as MessageEvent));
-    },
+  const workers: WandWorkerPort[] = [];
+  const workerClient = () => {
+    const host = createWandHost();
+    const worker: WandWorkerPort = {
+      onmessage: null,
+      onerror: null,
+      onmessageerror: null,
+      terminate: vi.fn(),
+      postMessage(request) {
+        const response = host(request);
+        queueMicrotask(() => worker.onmessage?.({ data: response } as MessageEvent));
+      },
+    };
+    workers.push(worker);
+    return new WandClient(worker);
   };
   const pixels = new PixelSelectionController(engine, {
     pixels: async () =>
       ({ width: 3, height: 3, data: new Uint8ClampedArray(36).fill(255) }) as ImageData,
     encode: () => "data:image/png;base64,BBBB",
-    client: () => new WandClient(worker),
+    client: workerClient,
   });
   const client = {
     prompt: vi.fn(async (_url: string, _prompt: SelectionPrompt) => mask()),
@@ -77,7 +82,7 @@ function fixture() {
     objects.dispose();
     pixels.dispose();
   });
-  return { engine, objects, pixels, client, worker };
+  return { engine, objects, pixels, client, workers };
 }
 it("does not let new model prompts overwrite an explicit pixel-copy transaction", async () => {
   const d = fixture();
@@ -168,6 +173,7 @@ it("invalidates pending work on deselection or document changes and releases the
   d.engine.execute({ type: "updateLayers", ids: ["image"], patch: { opacity: 0.5 } });
   expect(d.pixels.read()).toBeNull();
   expect(d.objects.read()).toBeNull();
+  expect(d.workers[0]!.terminate).toHaveBeenCalledOnce();
   await d.objects.point("image", 1, 5, true);
   d.pixels.deselect();
   expect(d.objects.read()).toBeNull();

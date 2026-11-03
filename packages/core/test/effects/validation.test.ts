@@ -17,7 +17,7 @@ it("accepts backward-compatible optional extension data and rejects malformed po
     { opacity: 2 },
     { time: -1 },
     { composite: "wat" },
-    { type: "dither", settings: {} },
+    { type: "brightness", settings: {} },
     { type: "gradient", settings: null },
     { type: "gradient", settings: { wat: 1 } },
     { type: "gradient", settings: { colorCount: 3.5 } },

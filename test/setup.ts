@@ -40,6 +40,36 @@ class Observer {
   disconnect() {}
 }
 globalThis.ResizeObserver = Observer;
+// JSDOM has no layout engine; visibility-specific tests replace this visible-viewport fixture.
+globalThis.IntersectionObserver = class implements IntersectionObserver {
+  readonly root = null;
+  readonly rootMargin = "0px";
+  readonly scrollMargin = "0px";
+  readonly thresholds = [0];
+  constructor(private readonly callback: IntersectionObserverCallback) {}
+  observe(target: Element) {
+    const bounds = target.getBoundingClientRect();
+    this.callback(
+      [
+        {
+          target,
+          isIntersecting: true,
+          intersectionRatio: 1,
+          time: performance.now(),
+          boundingClientRect: bounds,
+          intersectionRect: bounds,
+          rootBounds: null,
+        },
+      ],
+      this,
+    );
+  }
+  unobserve() {}
+  disconnect() {}
+  takeRecords(): IntersectionObserverEntry[] {
+    return [];
+  }
+};
 Object.defineProperty(window, "matchMedia", {
   writable: true,
   value: vi.fn((query: string) => ({
@@ -58,3 +88,8 @@ Element.prototype.scrollIntoView = vi.fn();
 Element.prototype.hasPointerCapture = () => false;
 Element.prototype.setPointerCapture = () => {};
 Element.prototype.releasePointerCapture = () => {};
+
+// Media transport is exercised in real browsers; JSDOM supplies no playback implementation.
+HTMLMediaElement.prototype.play = vi.fn(async () => {});
+HTMLMediaElement.prototype.pause = vi.fn();
+HTMLMediaElement.prototype.load = vi.fn();

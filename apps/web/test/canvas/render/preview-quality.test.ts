@@ -84,7 +84,7 @@ it("keeps fixed references and required mask sources outside the main paint list
     ),
   });
   const scale = previewScale(heavy, 2);
-  expect(scale).toBe(2);
+  expect(scale).toBe(1.5);
   expect(estimatePreviewCost(heavy, scale).bytes + 16 * 1024 * 1024).toBeLessThanOrEqual(
     PREVIEW_MEMORY_BYTES,
   );

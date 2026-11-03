@@ -427,7 +427,9 @@ describe("canvas input and renderer integration", () => {
     expect(prompt).toHaveBeenCalledWith(layer.id, 20, 20);
     rerender(<EditorCanvas engine={engine} tool="segment" onImagePoint={prompt} onError={error} />);
     fireEvent.pointerDown(canvas(), point(180, 140));
-    expect(error).toHaveBeenCalledWith("Cliquez sur une image pour créer son masque.");
+    expect(error).toHaveBeenCalledWith(
+      "Cliquez sur une image déverrouillée pour commencer une sélection.",
+    );
   });
   it("resizes and rotates through preview patches and commits on release", async () => {
     const layer = rectangle();

@@ -58,7 +58,9 @@ test("releases the pending gate and reports a rejecting task runner without simu
     />,
   );
   fireEvent.click(screen.getByRole("button", { name: "Exporter l’image" }));
-  await waitFor(() => expect(screen.getByRole("alert")).toHaveTextContent("L’export a échoué"));
+  expect(
+    (await screen.findByText("L’export a échoué. Réessayez.")).closest('[role="alert"]'),
+  ).toBeVisible();
   expect(pending.current).toBe(false);
   expect(change).not.toHaveBeenCalled();
 });

@@ -11,7 +11,9 @@ import { MAX_DOCK_COMMANDS } from "../../../../src/components/toolbar/dock/prefe
 
 test("pins real commands, reorders and unpins accessibly, searches and bounds preference size", () => {
   const d = setup();
-  const commands = createSearchCommandItems(d.engine.getSnapshot(), (key) => key);
+  const commands = createSearchCommandItems(d.engine.getSnapshot(), (key) =>
+    key.replace(/^search:commandLabels\./, ""),
+  );
   function Live() {
     const [ids, setIds] = useState(["action:addPage", "missing"]);
     return (
@@ -45,10 +47,13 @@ test("available unpinned entries are disabled once twelve shortcuts are present"
   d.mount(
     <DockCustomizer
       ids={SEARCH_COMMAND_IDS.slice(0, MAX_DOCK_COMMANDS)}
-      commands={createSearchCommandItems(d.engine.getSnapshot(), (key) => key)}
+      commands={createSearchCommandItems(d.engine.getSnapshot(), (key) =>
+        key.replace(/^search:commandLabels\./, ""),
+      )}
       onChange={() => undefined}
     />,
   );
   fireEvent.click(screen.getByLabelText("Personnaliser le dock"));
-  expect(screen.getByRole("button", { name: "Épingler saveAs" })).toBeDisabled();
+  fireEvent.change(screen.getByRole("searchbox"), { target: { value: "duplicate" } });
+  expect(screen.getByRole("button", { name: "Épingler duplicate" })).toBeDisabled();
 });

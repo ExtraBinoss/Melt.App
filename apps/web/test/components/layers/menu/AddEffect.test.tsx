@@ -34,14 +34,22 @@ test.each(["effect", "adjustment"] as const)(
         await act(async () => {
           await i18n.changeLanguage(language);
         });
-        const items = await screen.findAllByRole("menuitem");
-        const labels = items.map((node) => node.textContent!.trim());
-        expect(labels).toHaveLength(
-          Object.values(EFFECT_CATALOG).filter((e) => e.category === category && !e.source).length,
+        const search = screen.getByRole("searchbox");
+        const definitions = Object.values(EFFECT_CATALOG).filter(
+          (effect) => effect.category === category && !effect.source && !effect.retired,
         );
+        for (const effect of definitions) {
+          const label = i18n.t(effect.nameKey);
+          fireEvent.change(search, { target: { value: label } });
+          expect(await screen.findByRole("menuitem", { name: label })).toHaveAttribute(
+            "data-effect-catalog-item",
+            effect.type,
+          );
+        }
+        fireEvent.change(search, { target: { value: "" } });
         for (const group of screen.getAllByRole("group")) {
           const grouped = within(group)
-            .getAllByRole("menuitem")
+            .queryAllByRole("menuitem")
             .map((node) => node.textContent!.trim());
           expect(grouped).toEqual(
             [...grouped].sort((a, b) =>
@@ -81,6 +89,7 @@ test("visible effect and correction buttons list real categories and apply to ac
   );
   expect(screen.getByLabelText("Ajouter un réglage")).toBeDisabled();
   fireEvent.pointerDown(screen.getByLabelText("Ajouter un effet"), { button: 0, ctrlKey: false });
+  fireEvent.change(screen.getByRole("searchbox"), { target: { value: "Flou" } });
   expect(await screen.findByRole("menuitem", { name: "Flou" })).toBeVisible();
   expect(screen.queryByRole("menuitem", { name: "Luminosité" })).toBeNull();
   fireEvent.click(screen.getByRole("menuitem", { name: "Flou" }));
@@ -194,6 +203,7 @@ test("closed catalog skips option translation and opens with fresh page, selecti
     expect(screen.getByLabelText("Add effect")).toBeEnabled();
     expect(optionCalls()).toHaveLength(0);
     fireEvent.pointerDown(screen.getByLabelText("Add effect"), { button: 0, ctrlKey: false });
+    fireEvent.change(screen.getByRole("searchbox"), { target: { value: "Blur" } });
     fireEvent.click(await screen.findByRole("menuitem", { name: "Blur" }));
     expect(optionCalls().length).toBeGreaterThan(0);
     expect(run).toHaveBeenCalledOnce();

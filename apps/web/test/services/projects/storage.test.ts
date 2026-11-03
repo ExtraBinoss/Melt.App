@@ -48,6 +48,7 @@ describe("local project storage", () => {
         id: project.id,
         name: "Poster",
         mode: "static",
+        tags: ["feature:blank"],
         pages: project.pages.map((page) => ({
           id: page.id,
           name: page.name,
@@ -215,7 +216,7 @@ describe("separate immutable originals and lightweight manifests", () => {
     const loaded = await db.load(project.id);
     expect(loaded).toEqual(project);
     const connection = await openDB(name);
-    expect(connection.version).toBe(7);
+    expect(connection.version).toBe(8);
     expect(await connection.count("assets")).toBe(0);
     expect((await connection.get("projects", project.id)).storageVersion).toBeUndefined();
     await db.save(loaded);

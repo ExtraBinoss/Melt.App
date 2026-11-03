@@ -35,6 +35,7 @@ class GraphBuilder extends NodeBuilder {}
 export function graphNodes(node: Node): Set<Node> {
   const builder = new GraphBuilder();
   const nodes = new Set<Node>();
+  const invoked = new Set<object>();
   const pending = [node];
   while (pending.length) {
     const current = pending.pop()!;
@@ -44,9 +45,25 @@ export function graphNodes(node: Node): Set<Node> {
     const call = current as Node & {
       isShaderCallNodeInternal?: boolean;
       getOutputNode?: (builder: NodeBuilder) => Node;
+      shaderNode?: Node & { layout?: unknown };
+      jsFunc?: unknown;
+      call?: () => Node;
     };
-    if (call.isShaderCallNodeInternal && call.getOutputNode)
-      pending.push(call.getOutputNode(builder));
+    // If/Else branches are bare ShaderNodes, unlike parameterized Fn calls.
+    if (typeof call.jsFunc === "function" && call.call && !invoked.has(current))
+      pending.push(call.call());
+    if (call.isShaderCallNodeInternal && call.getOutputNode) {
+      // Inspect TSL function dependencies inline; compiling a layout requires an actual renderer.
+      const shader = call.shaderNode,
+        layout = shader?.layout;
+      if (shader) invoked.add(shader);
+      try {
+        if (shader) shader.layout = null;
+        pending.push(call.getOutputNode(builder));
+      } finally {
+        if (shader) shader.layout = layout;
+      }
+    }
   }
   return nodes;
 }

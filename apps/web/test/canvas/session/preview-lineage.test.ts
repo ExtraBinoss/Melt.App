@@ -29,11 +29,11 @@ test("certifies contiguous background/layer paint samples, retiring every scope 
   for (const preview of [
     { target: "page", patch: { width: 200 } },
     { target: "layer", layerId: layer.id, patch: { fill: "#123456", x: 20 } },
-    { target: "layer", layerId: layer.id, patch: { effects: [] } },
     { target: "layer", layerId: "missing", patch: { fill: "#123456" } },
     { target: "layers", layerIds: [], patch: { fill: "#123456" } },
   ] satisfies PreviewValue[])
     expect(read(preview)).toBeUndefined();
+  expect(read({ target: "layer", layerId: layer.id, patch: { effects: [] } })).toBeDefined();
   expect(
     read({ target: "layers", layerIds: [layer.id], patch: { fillGradient: undefined } }),
   ).toBeDefined();

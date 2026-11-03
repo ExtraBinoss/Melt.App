@@ -19,8 +19,10 @@ test("the row menu closes while its single permanent host keeps the transition e
     fireEvent.click(screen.getByRole("menuitem", { name: "Ajouter une animation" }));
   });
   expect(screen.queryByRole("menu")).toBeNull();
-  expect(screen.getByRole("dialog", { name: "Ajouter une animation" })).toBeVisible();
-  fireEvent.click(screen.getByRole("button", { name: "Annuler" }));
+  expect(await screen.findByRole("dialog", { name: "Ajouter une animation" })).toBeVisible();
+  fireEvent.keyDown(screen.getByRole("dialog", { name: "Ajouter une animation" }), {
+    key: "Escape",
+  });
   expect(screen.queryByRole("dialog")).toBeNull();
 });
 test("an open stale row menu cannot convert or edit a same-ID replacement", async () => {

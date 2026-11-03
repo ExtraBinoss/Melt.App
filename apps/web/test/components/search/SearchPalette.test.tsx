@@ -251,9 +251,9 @@ test("deferred category and empty results report only displayed criteria while t
     ]),
   );
   expect(screen.getByRole("listbox")).toHaveAttribute("data-search-category", "layers");
-  expect(screen.getAllByRole("option")).toHaveLength(3);
+  expect(screen.getAllByRole("option")).toHaveLength(6);
   fireEvent.change(d.input, { target: { value: "zzzzz-none" } });
-  expect(pending).toContainEqual({ category: "layers", query: "", selected: "Calques", count: 3 });
+  expect(pending).toContainEqual({ category: "layers", query: "", selected: "Calques", count: 6 });
   expect(screen.getByRole("listbox")).toHaveAttribute("data-search-query", "zzzzz-none");
   expect(screen.getByRole("listbox")).toHaveAttribute("data-search-pending", "false");
   expect(screen.queryAllByRole("option")).toHaveLength(0);

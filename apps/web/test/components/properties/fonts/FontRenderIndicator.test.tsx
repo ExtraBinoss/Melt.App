@@ -1,10 +1,11 @@
 import { render, screen } from "@testing-library/react";
 import { expect, test } from "vitest";
 import { FontRenderIndicator } from "../../../../src/components/properties/fonts/FontRenderIndicator";
-import "../../../../src/state/i18n";
+import { i18n } from "../../../../src/state/i18n";
 import type { FontRenderState } from "../../../../src/state/session/font-presentation";
 
-test("shows a discreet accessible indicator only while rendering or after failure", () => {
+test("shows a discreet accessible indicator only while rendering or after failure", async () => {
+  await i18n.changeLanguage("fr");
   const state: FontRenderState & { label: string } = {
     available: true,
     status: "pending",

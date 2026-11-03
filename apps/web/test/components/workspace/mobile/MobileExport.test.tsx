@@ -1,5 +1,5 @@
 import { expect, test, vi } from "vitest";
-import { fireEvent, screen, waitFor } from "@testing-library/react";
+import { fireEvent, screen, waitFor, within } from "@testing-library/react";
 import type { EditorServices } from "../../../../src/state/contracts";
 import { MobileExport } from "../../../../src/components/workspace/mobile/MobileExport";
 import { setup } from "../../../support/ui";
@@ -40,8 +40,12 @@ test("mobile failures retain the real cause, leave the dialog open and allow clo
   d.services.exportComposition = vi.fn().mockRejectedValue(new Error("Encoding failed"));
   d.mount(<MobileExport engine={d.engine} services={d.services} onClose={close} />);
   fireEvent.click(screen.getByRole("button", { name: "Exporter l’image" }));
-  expect(await screen.findByRole("alert")).toHaveTextContent("Encoding failed");
+  expect((await screen.findByText("Encoding failed")).closest('[role="alert"]')).toBeVisible();
   expect(close).not.toHaveBeenCalled();
-  fireEvent.click(document.querySelector(".export-footer-actions button")!);
+  fireEvent.click(
+    within(document.querySelector(".export-footer-actions") as HTMLElement).getByRole("button", {
+      name: "Fermer",
+    }),
+  );
   expect(close).toHaveBeenCalledOnce();
 });

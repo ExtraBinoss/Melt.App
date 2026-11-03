@@ -57,7 +57,7 @@ test("uses delayed decorative branded feedback and retires it when the actual th
     vi.advanceTimersByTime(160);
   });
   expect(loading).toHaveAttribute("data-visible", "true");
-  expect(loading.querySelector("svg")).not.toBeNull();
+  expect(loading.querySelector(".melt-mark")).not.toBeNull();
   expect(screen.getByRole("button", { name: "Ouvrir Study" })).toBeEnabled();
   const held = lease();
   await act(async () => resolve(held));
@@ -93,7 +93,7 @@ test("hands pending motion feedback to native preparation and leaves settled pla
   expect(loading).toHaveAttribute("data-active", "true");
   view.rerender(placeholder(false));
   expect(view.container.querySelector(".ui-throbber")).toBeNull();
-  expect(view.container.querySelector("svg")).not.toBeNull();
+  expect(view.container.querySelector(".melt-mark")).not.toBeNull();
   view.unmount();
 });
 test("cycles only on hover, exposes no manual carousel controls and releases replaced URLs", async () => {

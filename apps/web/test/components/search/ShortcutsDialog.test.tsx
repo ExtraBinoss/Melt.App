@@ -10,7 +10,14 @@ test("shows genuine themed keycaps for tools, document and canvas shortcuts", ()
   expect(screen.getByRole("dialog")).toHaveAccessibleName("Raccourcis clavier");
   expect(screen.getByRole("region", { name: "Navigation du canvas" })).toBeInTheDocument();
   expect(screen.getByText("Zoomer autour du pointeur")).toBeInTheDocument();
-  expect(document.querySelectorAll('[data-slot="kbd"]').length).toBeGreaterThan(25);
+  fireEvent.change(screen.getByRole("searchbox"), { target: { value: "Enregistrer" } });
+  const row = screen.getByRole("listitem");
+  expect(row).toHaveAttribute("data-binding-command", "action:save");
+  const caps = row.querySelectorAll('[data-slot="kbd"]');
+  expect([...caps].map((node) => [node.tagName, node.textContent])).toEqual([
+    ["KBD", "Ctrl"],
+    ["KBD", "S"],
+  ]);
   fireEvent.click(screen.getByRole("button", { name: "Fermer" }));
   expect(onClose).toHaveBeenCalledOnce();
 });

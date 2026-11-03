@@ -33,6 +33,7 @@ test("adds a clipped effect, previews numbers without document changes, commits 
   fireEvent.keyDown(await screen.findByRole("menuitem", { name: "Ajouter un effet" }), {
     key: "ArrowRight",
   });
+  fireEvent.change(await screen.findByRole("searchbox"), { target: { value: "Flou" } });
   fireEvent.click(await screen.findByRole("menuitem", { name: "Flou" }));
   expect(data.engine.getSnapshot().project.pages[0]!.layers[0]!.effects).toHaveLength(4);
   function card() {
@@ -42,7 +43,7 @@ test("adds a clipped effect, previews numbers without document changes, commits 
   }
   for (const [label, value] of [
     ["Intensité", "60"],
-    ["Taille du motif", "4"],
+    ["Taille des cellules", "4"],
     ["Niveaux", "4"],
   ]) {
     const input = card().getByRole("textbox", { name: label });
@@ -55,7 +56,7 @@ test("adds a clipped effect, previews numbers without document changes, commits 
     scale: 4,
     levels: 4,
   });
-  fireEvent.click(card().getByRole("switch", { name: "Couleur" }));
+  fireEvent.click(card().getByRole("switch", { name: "Couleurs source" }));
   fireEvent.click(card().getByRole("switch", { name: "Désactiver l’effet" }));
   expect(data.engine.getSnapshot().project.pages[0]!.layers[0]!.effects[0]!.enabled).toBe(false);
   fireEvent.click(card().getByRole("switch", { name: "Activer l’effet" }));

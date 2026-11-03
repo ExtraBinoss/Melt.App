@@ -14,7 +14,7 @@ import { createAngelWindows } from "../../../apps/web/src/services/projects/temp
 import { parseMotionTemplateManifest } from "../../../apps/web/src/services/projects/templates/motion/loader";
 import { prepareAngel, ANGEL_SOURCE } from "../../../scripts/templates/angel-windows/source";
 
-const root = "apps/web/public/templates/motion/angel-windows";
+const root = "apps/web/public/templates/motion/angel-windows/angel-windows";
 test("ships an editable 1080p native template with one shared angel and replayable sparse animation", async () => {
   const bundle = parseMotionTemplateManifest(
     JSON.parse(await readFile(`${root}.json`, "utf8")),

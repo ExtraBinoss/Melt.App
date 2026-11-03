@@ -249,7 +249,7 @@ test("browses categories, reports empty searches and disables commands requiring
   fireEvent.click(duplicate);
   expect(d.engine.getSnapshot().revision).toBe(0);
   fireEvent.click(screen.getByRole("button", { name: "Calques" }));
-  expect(screen.getAllByRole("option")).toHaveLength(3);
+  expect(screen.getAllByRole("option")).toHaveLength(6);
   fireEvent.change(input, { target: { value: "zzzz-nothing" } });
   expect(
     await screen.findByText("Aucun résultat. Essayez un autre mot ou une autre catégorie."),

@@ -1,3 +1,4 @@
+import { layerDragController } from "../../../src/components/layers/drag/controller";
 import { expect, test, vi } from "vitest";
 import { act, screen, fireEvent, createEvent, within } from "@testing-library/react";
 import { createLayer, createPage, createEffect } from "@musart/core";
@@ -344,7 +345,7 @@ test("keeps keyboard actions on row controls from changing layer selection", () 
   expect(d.engine.getSnapshot().selection).toEqual([d.rectangle.id]);
 });
 
-test("previews inside collapsed groups without removing the dragged row and supports Alt-mask drop", () => {
+test("marks collapsed receiving groups without moving canonical rows and supports Alt-mask drop", () => {
   const d = renderLayers(),
     group = createLayer("group", { name: "Closed group" });
   act(() => d.engine.execute({ type: "addLayers", layers: [group] }));
@@ -367,8 +368,15 @@ test("previews inside collapsed groups without removing the dragged row and supp
   fireEvent.dragStart(within(tree).getByText(d.rectangle.name).closest("[role=treeitem]")!, {
     dataTransfer: transfer,
   });
-  fireEvent.dragOver(folder, { dataTransfer: transfer });
-  expect(folder).toHaveAttribute("aria-expanded", "true");
+  vi.spyOn(folder, "getBoundingClientRect").mockReturnValue(new DOMRect(0, 0, 200, 30));
+  const overGroup = createEvent.dragOver(folder, { dataTransfer: transfer });
+  Object.defineProperties(overGroup, { clientX: { value: 100 }, clientY: { value: 15 } });
+  fireEvent(folder, overGroup);
+  expect(folder).toHaveAttribute("aria-expanded", "false");
+  expect(layerDragController(d.engine).read()?.target).toEqual({
+    id: group.id,
+    position: "inside",
+  });
   expect(within(tree).getByText(d.rectangle.name)).toBeInTheDocument();
   expect(
     d.engine.getSnapshot().project.pages[0]!.layers.find((layer) => layer.id === d.rectangle.id)!

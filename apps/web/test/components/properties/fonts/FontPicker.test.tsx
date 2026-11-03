@@ -128,11 +128,17 @@ test("filters full virtual catalogs by category and installed state without load
     library = platform({ catalog: vi.fn().mockResolvedValue([...FONT_CATALOG, ...remote]) });
   const data = mount(false, library);
   open();
-  await screen.findByText("2020");
+  await screen.findByText(String(2000 + FONT_CATALOG.length));
   expect(screen.getAllByRole("option")).toHaveLength(8);
   fireEvent.click(screen.getByRole("button", { name: "Serif" }));
   expect(
-    screen.getAllByRole("option").every((option) => option.getAttribute("aria-setsize") === "1004"),
+    screen
+      .getAllByRole("option")
+      .every(
+        (option) =>
+          option.getAttribute("aria-setsize") ===
+          String(1000 + FONT_CATALOG.filter((font) => font.category === "serif").length),
+      ),
   ).toBe(true);
   fireEvent.click(screen.getByRole("button", { name: "Installées" }));
   search("Remote");
@@ -273,8 +279,13 @@ test("previews filtered keyboard choices, wraps across virtual rows and commits 
   open();
   const field = screen.getByRole("combobox", { name: "Rechercher une police" });
   fireEvent.keyDown(field, { key: "ArrowUp" });
-  expect(data.store.get(previewAtom)).toMatchObject({ patch: { fontFamily: "Pacifico" } });
-  expect(screen.getByRole("option", { name: "Pacifico" })).toHaveAttribute("aria-selected", "true");
+  expect(data.store.get(previewAtom)).toMatchObject({
+    patch: { fontFamily: FONT_CATALOG.at(-1)!.family },
+  });
+  expect(screen.getByRole("option", { name: FONT_CATALOG.at(-1)!.family })).toHaveAttribute(
+    "aria-selected",
+    "true",
+  );
   expect(screen.queryByRole("option", { name: "Inter" })).toBeNull();
   fireEvent.keyDown(field, { key: "ArrowDown" });
   expect(data.store.get(previewAtom)).toMatchObject({ patch: { fontFamily: "Inter" } });

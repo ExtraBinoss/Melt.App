@@ -87,9 +87,9 @@ test("reports real codec errors, cancels export and ignores a late completed res
     await waitFor(() => expect(button).toBeEnabled());
     vi.mocked(exportReplayVideo).mockRejectedValueOnce(new VideoExportError("noCodec"));
     fireEvent.click(button);
-    await screen.findByRole("alert");
-    fireEvent.click(screen.getByRole("button", { name: "L’export n’a pas pu aboutir." }));
-    expect(await screen.findByRole("tooltip")).toHaveTextContent("Ce navigateur");
+    expect(
+      (await screen.findByText(/Ce navigateur ne peut pas encoder/)).closest('[role="alert"]'),
+    ).toBeVisible();
     let options!: VideoExportOptions;
     let finish!: (blob: Blob) => void;
     vi.mocked(exportReplayVideo).mockImplementationOnce((_spec, next) => {
@@ -124,7 +124,8 @@ test("rejects empty history and invalidates prepared history after a document ed
     const view = d.mount(
       <TimelapseDialog engine={d.engine} services={d.services} onClose={vi.fn()} />,
     );
-    expect(await screen.findByRole("alert")).toHaveTextContent("Faites quelques modifications");
+    for (const message of await screen.findAllByText(/Faites quelques modifications/))
+      expect(message.closest('[role="alert"]')).toBeVisible();
     expect(screen.getByRole("button", { name: "Exporter la vidéo" })).toBeDisabled();
     view.unmount();
     act(() => d.engine.execute({ type: "renameProject", name: "Changed" }));
@@ -136,7 +137,8 @@ test("rejects empty history and invalidates prepared history after a document ed
       expect(screen.getByRole("button", { name: "Exporter la vidéo" })).toBeEnabled(),
     );
     act(() => d.engine.execute({ type: "renameProject", name: "Changed again" }));
-    expect(screen.getByRole("alert")).toHaveTextContent("Le document a changé");
+    for (const message of screen.getAllByText(/Le document a changé/))
+      expect(message.closest('[role="alert"]')).toBeVisible();
     expect(screen.getByRole("button", { name: "Exporter la vidéo" })).toBeDisabled();
     next.unmount();
   } finally {

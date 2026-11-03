@@ -38,13 +38,13 @@ test("retains unchanged diamond/tooltips through history while its binding follo
     );
   }
   const view = d.mount(<Harness />);
-  const initial = renders.mock.calls.length;
-  const node = document.querySelector<HTMLButtonElement>("[data-motion-diamond]")!;
+  const hiddenRenders = renders.mock.calls.length;
+  expect(document.querySelector("[data-motion-diamond]")).toBeNull();
   act(() => d.engine.execute({ type: "updateLayers", ids: [d.rectangle.id], patch: { y: 57 } }));
   act(() => d.engine.undo());
   act(() => d.engine.redo());
-  expect(renders).toHaveBeenCalledTimes(initial);
-  expect(document.querySelector("[data-motion-diamond]")).toBe(node);
+  expect(renders).toHaveBeenCalledTimes(hiddenRenders);
+  expect(document.querySelector("[data-motion-diamond]")).toBeNull();
   act(() =>
     d.engine.execute({
       type: "setCompositionMode",
@@ -52,7 +52,9 @@ test("retains unchanged diamond/tooltips through history while its binding follo
       plan: planMotionInitialization(d.engine.getSnapshot()),
     }),
   );
-  expect(node.hidden).toBe(false);
+  const node = document.querySelector<HTMLButtonElement>("[data-motion-diamond]")!;
+  const initial = renders.mock.calls.length;
+  expect(node).not.toBeNull();
   fireEvent.click(node);
   expect(node).toHaveAttribute("data-current", "true");
   expect(renders).toHaveBeenCalledTimes(initial);
@@ -81,8 +83,8 @@ test("retains unchanged diamond/tooltips through history while its binding follo
       }),
     ),
   );
-  expect(renders).toHaveBeenCalledTimes(initial + 2);
-  expect(node.hidden).toBe(true);
+  expect(renders).toHaveBeenCalledTimes(initial + 1);
+  expect(document.querySelector("[data-motion-diamond]")).toBeNull();
   expect(screen.queryByRole("tooltip")).toBeNull();
   view.unmount();
 });

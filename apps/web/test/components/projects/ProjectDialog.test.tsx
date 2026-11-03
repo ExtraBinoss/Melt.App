@@ -15,7 +15,7 @@ vi.mock("../../../src/components/projects/opening/controller", () => ({
   currentProjectOpening: () => undefined,
 }));
 test("editor creation Escape closes without mounting the library or editing the document", async () => {
-  const d = setup(),
+  const d = setup({ reducedMotion: true }),
     close = vi.fn();
   d.mount(
     <ProjectDialog
@@ -34,7 +34,7 @@ test("editor creation Escape closes without mounting the library or editing the 
   expect(d.services.createProject).not.toHaveBeenCalled();
 });
 test("shares a clean two-section dashboard between welcome and open-project states", async () => {
-  const d = setup(),
+  const d = setup({ reducedMotion: true }),
     close = vi.fn();
   d.mount(
     <ProjectDialog services={d.services} projectName="Atelier" onClose={close} onTask={d.onTask} />,
@@ -60,7 +60,7 @@ test("shares a clean two-section dashboard between welcome and open-project stat
   expect(close).toHaveBeenCalledOnce();
 });
 test("imports a real portable file once and closes only after successful completion", async () => {
-  const d = setup(),
+  const d = setup({ reducedMotion: true }),
     close = vi.fn();
   let resolve!: () => void;
   vi.mocked(d.services.openPortable).mockImplementationOnce(
@@ -90,7 +90,7 @@ test("imports a real portable file once and closes only after successful complet
   expect(close).toHaveBeenCalledOnce();
 });
 test("template choices use the real creation API and preserve failure state", async () => {
-  const d = setup(),
+  const d = setup({ reducedMotion: true }),
     close = vi.fn();
   vi.mocked(d.services.createProject).mockRejectedValueOnce(new Error("Quota exceeded"));
   d.mount(
@@ -113,7 +113,7 @@ test("template choices use the real creation API and preserve failure state", as
   );
 });
 test("welcome cannot be dismissed and custom creation remains available without a saved project", async () => {
-  const d = setup(),
+  const d = setup({ reducedMotion: true }),
     close = vi.fn();
   d.mount(
     <ProjectDialog
@@ -132,7 +132,7 @@ test("welcome cannot be dismissed and custom creation remains available without 
   expect(screen.queryByRole("button", { name: "Fermer" })).toBeNull();
 });
 test("late work cannot dismiss a replacement dashboard after unmount", async () => {
-  const d = setup(),
+  const d = setup({ reducedMotion: true }),
     close = vi.fn();
   let resolve!: () => void;
   vi.mocked(d.services.createProject).mockImplementationOnce(
@@ -155,7 +155,7 @@ test("late work cannot dismiss a replacement dashboard after unmount", async () 
   expect(close).not.toHaveBeenCalled();
 });
 test("captures template origin before download, prevents duplicate opening, and aborts on scope replacement or unmount", async () => {
-  const d = setup(),
+  const d = setup({ reducedMotion: true }),
     close = vi.fn();
   let finish!: () => void;
   const create = vi
@@ -202,7 +202,7 @@ test("captures template origin before download, prevents duplicate opening, and 
   expect(close).not.toHaveBeenCalled();
 });
 test("preferences requested by search open in a separate dialog rather than a dashboard tab", async () => {
-  const d = setup(),
+  const d = setup({ reducedMotion: true }),
     close = vi.fn();
   d.mount(
     <ProjectDialog
@@ -220,7 +220,7 @@ test("preferences requested by search open in a separate dialog rather than a da
   await waitFor(() => expect(close).toHaveBeenCalled());
 });
 test("the search editor route opens snapping preferences directly without loading the project gallery", async () => {
-  const d = setup();
+  const d = setup({ reducedMotion: true });
   d.mount(
     <ProjectDialog
       initialView="settingsEditor"
@@ -238,7 +238,7 @@ test("the search editor route opens snapping preferences directly without loadin
 });
 
 test("one shared import/open gate disables tabs and card mutations until the real operation finishes", async () => {
-  const d = setup(),
+  const d = setup({ reducedMotion: true }),
     close = vi.fn();
   vi.mocked(d.services.listProjectPage).mockResolvedValue({
     projects: [projectSummary(), projectSummary("b", "Second")],
@@ -273,7 +273,7 @@ test("one shared import/open gate disables tabs and card mutations until the rea
   expect(close).toHaveBeenCalledOnce();
 });
 test("a pending gallery open cannot race a second open or import, and cannot close after unmount", async () => {
-  const d = setup(),
+  const d = setup({ reducedMotion: true }),
     close = vi.fn();
   vi.mocked(d.services.listProjectPage).mockResolvedValue({
     projects: [projectSummary(), projectSummary("b", "Second")],
@@ -300,7 +300,7 @@ test("a pending gallery open cannot race a second open or import, and cannot clo
   expect(close).not.toHaveBeenCalled();
 });
 test("dashboard settings are an accessory that returns to the same two-section workspace", async () => {
-  const d = setup(),
+  const d = setup({ reducedMotion: true }),
     close = vi.fn();
   d.mount(<ProjectDialog services={d.services} onClose={close} onTask={d.onTask} />);
   await screen.findByText("Aucun projet enregistré.");
@@ -317,10 +317,10 @@ test("dashboard settings are an accessory that returns to the same two-section w
 });
 
 test("welcome opens the landing page and enters the library without creating a document", async () => {
-  const d = setup(),
+  const d = setup({ reducedMotion: true }),
     close = vi.fn();
   d.mount(<ProjectDialog welcome services={d.services} onClose={close} onTask={d.onTask} />);
-  expect(await screen.findByRole("heading", { name: "Créez et animez." })).toBeVisible();
+  expect(await screen.findByRole("heading", { name: /faire fondre les feeds/ })).toBeVisible();
   expect(d.services.listProjectPage).not.toHaveBeenCalled();
   fireEvent.click(screen.getAllByRole("button", { name: "Commencer à créer" })[0]!);
   await screen.findByRole("dialog", { name: "Tableau de bord Melt" });
@@ -330,7 +330,7 @@ test("welcome opens the landing page and enters the library without creating a d
 });
 
 test("landing template selection uses the same guarded loader and aborts stale work", async () => {
-  const d = setup(),
+  const d = setup({ reducedMotion: true }),
     close = vi.fn();
   let finish!: () => void;
   const create = vi
@@ -371,18 +371,18 @@ test("landing template selection uses the same guarded loader and aborts stale w
 });
 
 test("the library brand returns to landing without modifying the open document", async () => {
-  const d = setup();
+  const d = setup({ reducedMotion: true });
   d.mount(<ProjectDialog services={d.services} onClose={vi.fn()} onTask={d.onTask} />);
   await screen.findByText("Aucun projet enregistré.");
   fireEvent.click(screen.getByRole("button", { name: "Accueil Melt" }));
-  expect(await screen.findByRole("heading", { name: "Créez et animez." })).toBeVisible();
+  expect(await screen.findByRole("heading", { name: /faire fondre les feeds/ })).toBeVisible();
   expect(d.services.createProject).not.toHaveBeenCalled();
   fireEvent.click(screen.getByRole("button", { name: "Try Melt" }));
   expect(screen.getByRole("dialog", { name: "Tableau de bord Melt" })).toBeVisible();
 });
 
 test("recent project shortcuts share the library mutation gate", async () => {
-  const d = setup(),
+  const d = setup({ reducedMotion: true }),
     close = vi.fn();
   vi.mocked(d.services.listProjectPage).mockResolvedValue({
     projects: [projectSummary()],
@@ -407,7 +407,7 @@ test("recent project shortcuts share the library mutation gate", async () => {
 });
 
 test("a recent-metadata failure reports once without acquiring or looping the mutation gate", async () => {
-  const d = setup();
+  const d = setup({ reducedMotion: true });
   vi.mocked(d.services.listProjectPage).mockImplementation(async (options) => {
     if (options?.limit === 5) throw new Error("Recent metadata unavailable");
     return { projects: [], before: null };
@@ -438,7 +438,7 @@ test("a recent-metadata failure reports once without acquiring or looping the mu
 });
 
 test("section changes retain header, creation controls and one search input with independent drafts", async () => {
-  const d = setup();
+  const d = setup({ reducedMotion: true });
   d.mount(
     <ProjectDialog
       projectName="Atelier"
@@ -475,10 +475,13 @@ test("section changes retain header, creation controls and one search input with
   ).toBe(create);
 });
 
-beforeEach(() => localStorage.removeItem(LIBRARY_MODE_KEY));
+beforeEach(() => {
+  localStorage.removeItem(LIBRARY_MODE_KEY);
+  history.replaceState(null, "", "/");
+});
 
 test("prepares editor code alongside an explicit template open and waits for both before navigation", async () => {
-  const d = setup(),
+  const d = setup({ reducedMotion: true }),
     close = vi.fn();
   let finishInstall!: () => void, finishEditor!: () => void;
   const install = vi.spyOn(templates, "createProjectFromTemplate").mockImplementation(

@@ -52,6 +52,7 @@ it("keeps typography edits on the text object, commits delay/intensity once, and
   });
   d.mount(<LayerAnimations engine={d.engine} layerId={d.text.id} />);
   const before = d.engine.getSnapshot().revision;
+  fireEvent.click(screen.getByRole("button", { name: "Détails · Inflate" }));
   const stagger = screen.getByRole("textbox", { name: "Décalage" });
   fireEvent.change(stagger, { target: { value: "35" } });
   fireEvent.blur(stagger);
@@ -63,11 +64,13 @@ it("keeps typography edits on the text object, commits delay/intensity once, and
   expect(
     current().layers.find((layer) => layer.id === d.text.id)!.effects[0]!.settings!.stagger,
   ).toBe(0.45);
+  fireEvent.click(screen.getByRole("button", { name: "Détails · Inflate" }));
   const intensity = screen.getByRole("textbox", { name: "Intensité" });
   expect(intensity).toHaveValue("65");
   fireEvent.change(intensity, { target: { value: "40" } });
   fireEvent.blur(intensity);
   expect(current().layers.find((layer) => layer.id === d.text.id)!.effects[0]!.amount).toBe(0.4);
+  fireEvent.click(screen.getByRole("button", { name: "Détails · Inflate" }));
   fireEvent.click(screen.getByRole("button", { name: "Dupliquer l’animation" }));
   const copy = current().motion!.tracks.find((t) => t.id === track.id)!.animations![1]!;
   expect(copy.preset.effects[0]!.amount).toBe(0.4);

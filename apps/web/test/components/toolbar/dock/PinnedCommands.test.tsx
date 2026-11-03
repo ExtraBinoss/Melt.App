@@ -16,7 +16,9 @@ function fixture() {
     run = vi.fn();
   d.mount(
     <PinnedCommands
-      commands={createSearchCommandItems(d.engine.getSnapshot(), (key) => key)}
+      commands={createSearchCommandItems(d.engine.getSnapshot(), (key) =>
+        key.replace(/^search:commandLabels\./, ""),
+      )}
       run={run}
     />,
   );

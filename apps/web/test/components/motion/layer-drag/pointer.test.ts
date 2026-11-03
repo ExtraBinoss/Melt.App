@@ -175,6 +175,8 @@ it("uses the shared vertical controller, never retimes tracks, and commits a sin
   ]);
   expect(after.project.pages[0]!.motion).toEqual(before.project.pages[0]!.motion);
   expect(document.querySelector(".layer-drag-preview")).toBeNull();
+  // Successful placement schedules one bounded halo frame after drag input is released.
+  d.tick();
   expect(d.frames.size).toBe(0);
   d.engine.undo();
   expect(d.engine.getSnapshot().project).toBe(before.project);

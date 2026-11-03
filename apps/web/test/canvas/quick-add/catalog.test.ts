@@ -15,7 +15,6 @@ it("uses the shared registry's addable items without project navigation, layers,
     "action:importImages",
     "action:importSvg",
     "action:addPage",
-    "action:addTechnoArtboard",
   ]);
   for (const item of items) expect(item).toEqual(registry.find((entry) => entry.id === item.id));
 });

@@ -16,7 +16,7 @@ async function action(project: string, label: string) {
   await act(async () => fireEvent.click(item));
 }
 test("loads bounded pages, mutates inactive projects and confirms history clearing separately from deleting", async () => {
-  const d = setup(),
+  const d = setup({ reducedMotion: true }),
     open = vi.fn(),
     create = vi.fn(),
     a = projectSummary(),
@@ -69,7 +69,7 @@ test("loads bounded pages, mutates inactive projects and confirms history cleari
   await waitFor(() => expect(open).toHaveBeenCalledOnce());
 });
 test("recovers local listing failures and exposes real project creation when empty", async () => {
-  const d = setup(),
+  const d = setup({ reducedMotion: true }),
     create = vi.fn();
   vi.mocked(d.services.listProjectPage)
     .mockRejectedValueOnce(new Error("disk"))
@@ -90,7 +90,7 @@ test("recovers local listing failures and exposes real project creation when emp
 });
 
 test("guards two concurrent opens and suppresses completion callbacks after unmount", async () => {
-  const d = setup(),
+  const d = setup({ reducedMotion: true }),
     open = vi.fn();
   vi.mocked(d.services.listProjectPage).mockResolvedValue({
     projects: [projectSummary(), projectSummary("b", "Second")],
@@ -122,7 +122,7 @@ test("guards two concurrent opens and suppresses completion callbacks after unmo
 });
 
 test("search filters loaded metadata and still allows bounded pagination for absent results", async () => {
-  const d = setup(),
+  const d = setup({ reducedMotion: true }),
     open = vi.fn();
   vi.mocked(d.services.listProjectPage)
     .mockResolvedValueOnce({ projects: [projectSummary()], before: ["2026", "a"] })
@@ -147,7 +147,7 @@ test("search filters loaded metadata and still allows bounded pagination for abs
 });
 
 test("external query filtering reuses bounded metadata and can hide the gallery-owned search", async () => {
-  const d = setup(),
+  const d = setup({ reducedMotion: true }),
     loaded = vi.fn();
   vi.mocked(d.services.listProjectPage).mockResolvedValue({
     projects: [projectSummary(), projectSummary("b", "Second")],
@@ -179,7 +179,7 @@ test("external query filtering reuses bounded metadata and can hide the gallery-
 beforeEach(() => localStorage.removeItem(LIBRARY_MODE_KEY));
 
 test("filters loaded project metadata, remembers the user choice and keeps legacy projects Static", async () => {
-  const d = setup();
+  const d = setup({ reducedMotion: true });
   const still = projectSummary("still", "Static study");
   const motion = projectSummary("motion", "Motion study");
   motion.pages[1]!.mode = "motion";

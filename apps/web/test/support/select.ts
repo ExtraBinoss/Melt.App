@@ -1,8 +1,8 @@
-import { fireEvent, screen } from "@testing-library/react";
-/** Drive the real Radix Select through its accessible trigger and option. */
+import { screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+/** Drive selection with a complete primary-pointer sequence, including focus and release. */
 export async function choose(label: string, option: string) {
-  const trigger = screen.getByRole("combobox", { name: label });
-  fireEvent.pointerDown(trigger, { button: 0, ctrlKey: false, pointerType: "mouse" });
-  const item = await screen.findByRole("option", { name: option });
-  fireEvent.click(item);
+  const user = userEvent.setup();
+  await user.click(screen.getByRole("combobox", { name: label }));
+  await user.click(await screen.findByRole("option", { name: option }));
 }

@@ -1,3 +1,4 @@
+import { TUTORIAL_KEY } from "../src/components/onboarding/tutorial/Tutorial";
 import { canvasContext } from "./components/motion/canvas/support";
 import { beforeAll, beforeEach, expect, test, vi } from "vitest";
 import { screen, fireEvent, waitFor, act, within } from "@testing-library/react";
@@ -8,6 +9,14 @@ import { toolAtom } from "../src/state/session/editor";
 import { createEffect, createProject } from "@musart/core";
 import { createMotionTransport } from "../src/services/motion/transport";
 import { requestLayerTransition } from "../src/components/motion/transitions/requests";
+vi.mock("../src/components/projects/opening/controller", () => ({
+  beginProjectOpening: vi.fn(() => ({
+    painted: () => Promise.resolve(),
+    installed() {},
+    close() {},
+  })),
+  currentProjectOpening: () => undefined,
+}));
 // These behavior checks exercise the assembled editor; cold chunk loading is covered in Chrome.
 beforeAll(async () => {
   await Promise.all([
@@ -17,10 +26,12 @@ beforeAll(async () => {
   ]);
 });
 beforeEach(() => {
+  localStorage.setItem(TUTORIAL_KEY, "done");
+  history.replaceState(null, "", "/");
   vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockReturnValue(canvasContext() as never);
 });
 test("keeps a cancellable shared throbber during segmentation and ignores additional clicks until it settles", async () => {
-  const d = setup();
+  const d = setup({ reducedMotion: true });
   let reject!: (error: Error) => void;
   vi.mocked(d.services.selectImagePoint).mockImplementation(
     () =>
@@ -84,7 +95,7 @@ vi.mock("../src/canvas/EditorCanvas", () => ({
   ),
 }));
 test("the app owns one persistent transition editor for requests originating outside Layers", async () => {
-  const d = setup();
+  const d = setup({ reducedMotion: true });
   d.mount(<App engine={d.engine} services={d.services} />);
   await screen.findByTestId("canvas");
   await act(async () => {
@@ -93,7 +104,7 @@ test("the app owns one persistent transition editor for requests originating out
   expect(await screen.findByRole("dialog", { name: "Ajouter une animation" })).toBeVisible();
 });
 test("opening an effect on an unselected layer leaves the app shell untouched", async () => {
-  const d = setup();
+  const d = setup({ reducedMotion: true });
   const locationBefore = location.href;
   history.replaceState(null, "", "?automation=1");
   try {
@@ -132,7 +143,7 @@ test("opening an effect on an unselected layer leaves the app shell untouched", 
   }
 });
 test("assembles the pinned inspector, layers, project menu, export and import actions", async () => {
-  const d = setup();
+  const d = setup({ reducedMotion: true });
   d.mount(<App engine={d.engine} services={d.services} />);
   await screen.findByTestId("canvas");
   expect(await screen.findByRole("region", { name: "Propriétés" })).toBeInTheDocument();
@@ -181,7 +192,7 @@ test("assembles the pinned inspector, layers, project menu, export and import ac
   expect(d.engine.getSnapshot().project.pages[0]!.layers[0]!.x).toBe(99);
 });
 test("surfaces renderer and service errors and routes local image selection using the active tool", async () => {
-  const d = setup();
+  const d = setup({ reducedMotion: true });
   d.mount(<App engine={d.engine} services={d.services} />);
   await screen.findByTestId("canvas");
   fireEvent.click(screen.getByText("Canvas error"));
@@ -203,7 +214,7 @@ test("surfaces renderer and service errors and routes local image selection usin
   await waitFor(() => expect(screen.getByRole("alert")).toHaveTextContent("Quota exceeded"));
 });
 test("localizes stale project-write failures at the editor task boundary", async () => {
-  const d = setup();
+  const d = setup({ reducedMotion: true });
   vi.mocked(d.services.saveProject).mockRejectedValueOnce(
     Object.assign(new Error("raw storage diagnostic"), { code: "STALE_PROJECT_WRITE" }),
   );
@@ -221,7 +232,7 @@ test("localizes stale project-write failures at the editor task boundary", async
   );
 });
 test("pauses failed Motion playback without changing the document or preventing a retry", async () => {
-  const d = setup();
+  const d = setup({ reducedMotion: true });
   d.engine.execute({ type: "setCompositionMode", mode: "motion" });
   d.mount(<App engine={d.engine} services={d.services} />);
   await screen.findByTestId("canvas");
@@ -243,7 +254,7 @@ test("pauses failed Motion playback without changing the document or preventing 
   act(() => transport.pause());
 });
 test("undoes and redoes Motion keys from timeline focus while keeping native field undo and save", async () => {
-  const d = setup();
+  const d = setup({ reducedMotion: true });
   d.engine.execute({ type: "setCompositionMode", mode: "motion" });
   const before = d.engine.getSnapshot().project;
   d.engine.execute({
@@ -273,7 +284,7 @@ test("undoes and redoes Motion keys from timeline focus while keeping native fie
   expect(d.services.saveProject).toHaveBeenCalledOnce();
 });
 test("opens the real project/export dialogs and switches panel modes through command search", async () => {
-  const d = setup();
+  const d = setup({ reducedMotion: true });
   d.mount(<App engine={d.engine} services={d.services} />);
   await screen.findByTestId("canvas");
   async function search(query: string, label: RegExp) {
@@ -289,7 +300,8 @@ test("opens the real project/export dialogs and switches panel modes through com
   fireEvent.click(within(creation).getByRole("button", { name: "Fermer" }));
   expect(screen.queryByRole("dialog", { name: "Tableau de bord Melt" })).toBeNull();
   await search("animate", /Exporter un timelapse/);
-  expect(await screen.findByRole("dialog", { name: "Timelapse" })).toBeVisible();
+  expect(await screen.findByRole("dialog", { name: "Exporter la composition" })).toBeVisible();
+  expect(screen.getByRole("radio", { name: "Timelapse" })).toHaveAttribute("aria-checked", "true");
   expect(screen.queryByRole("tab", { name: "Animation" })).toBeNull();
   fireEvent.click(screen.getByRole("button", { name: "Annuler" }));
   await search("png", /Exporter/);
@@ -297,13 +309,13 @@ test("opens the real project/export dialogs and switches panel modes through com
 });
 test("starts with the shared empty dashboard and mounts the editor only after choosing a real project", async () => {
   localStorage.removeItem("musart.onboarding.v1");
-  const d = setup();
+  const d = setup({ reducedMotion: true });
   vi.mocked(d.services.createProject).mockImplementation(async () => {
     d.engine.load(createProject({ id: "chosen-project", name: "TikTok video" }));
   });
   d.mount(<App engine={d.engine} services={d.services} welcome />);
   expect(screen.queryByTestId("canvas")).not.toBeInTheDocument();
-  expect(await screen.findByRole("heading", { name: "Créez et animez." })).toBeVisible();
+  expect(await screen.findByRole("heading", { name: /faire fondre les feeds/ })).toBeVisible();
   fireEvent.click(screen.getAllByRole("button", { name: "Commencer à créer" })[0]!);
   expect(
     await screen.findByRole("heading", { name: "Quel projet voulez-vous créer ?" }),
@@ -329,7 +341,7 @@ test("welcome preview can reopen the already restored project without replacing 
   const previous = location.href;
   history.replaceState(null, "", "?welcome=1");
   try {
-    const d = setup();
+    const d = setup({ reducedMotion: true });
     vi.mocked(d.services.listProjectPage).mockResolvedValue({
       projects: [projectSummary(d.project.id, d.project.name)],
       before: null,
@@ -349,7 +361,7 @@ test("welcome preview can reopen the already restored project without replacing 
 });
 
 test("routed library navigation retains the mounted editor and browser Back hides library state", async () => {
-  const d = setup(),
+  const d = setup({ reducedMotion: true }),
     navigate = vi.fn();
   const routing = { view: "editor" as const, navigate };
   const view = d.mount(<App engine={d.engine} services={d.services} routing={routing} />);
@@ -370,7 +382,7 @@ test("export visibility updates its local owner without rebuilding App on open, 
   const previous = location.href;
   history.replaceState(null, "", "?automation=1");
   try {
-    const d = setup();
+    const d = setup({ reducedMotion: true });
     d.mount(<App engine={d.engine} services={d.services} />);
     await screen.findByTestId("canvas");
     const root = document.querySelector(".musart-app")!;

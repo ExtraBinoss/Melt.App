@@ -17,6 +17,7 @@ vi.mock("../../apps/web/src/canvas/render/EditorScene", () => ({ EditorScene: ()
 vi.mock("react-i18next", async (original) => ({
   ...(await original<typeof import("react-i18next")>()),
   useTranslation: () => ({
+    i18n: { dir: () => "ltr" },
     t: (key: string, options?: { defaultValue?: string }) => options?.defaultValue ?? key,
   }),
 }));

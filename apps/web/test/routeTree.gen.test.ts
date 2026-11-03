@@ -3,7 +3,11 @@ import { routeTree } from "../src/routeTree.gen";
 
 test("the generated tree has one public landing and one shared workspace with both destinations", () => {
   const children = routeTree.children!;
-  expect(Object.keys(children)).toHaveLength(3);
+  expect(
+    Object.values(children)
+      .map((route) => route.options.id)
+      .sort(),
+  ).toEqual(["/", "/_workspace", "/ssr", "/tools"]);
   const workspace = Object.values(children).find((route) => route.options.id === "/_workspace");
   expect(
     (Object.values(workspace!.children!) as { options: { path: string } }[]).map(

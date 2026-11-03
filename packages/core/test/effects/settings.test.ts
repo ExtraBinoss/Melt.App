@@ -22,5 +22,5 @@ it("retains Gradient's complete preset resolution and supports effects without c
   );
   expect(gradient.style).toBe("radial");
   expect(gradient.preset).toBe("citrus");
-  expect(resolveEffectSettings(createEffect("dither"))).toEqual({});
+  expect(resolveEffectSettings(createEffect("brightness"))).toEqual({});
 });

@@ -16,7 +16,7 @@ test("the persistent host opens without a toolbar trigger, closes cleanly and cr
     await requestLayerTransition(d.engine, d.page.id, d.rectangle.id, { x: 40, y: 90 });
   });
   expect(screen.getByRole("dialog", { name: "Ajouter une animation" })).toBeVisible();
-  fireEvent.change(screen.getByRole("textbox", { name: "Rechercher une animation…" }), {
+  fireEvent.change(await screen.findByRole("searchbox", { name: "Rechercher une animation…" }), {
     target: { value: "Fade" },
   });
   fireEvent.click(screen.getByRole("button", { name: "Fade" }));

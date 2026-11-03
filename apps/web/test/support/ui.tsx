@@ -7,7 +7,15 @@ import { TooltipProvider } from "../../src/components/ui/tooltip";
 import type { EditorServices } from "../../src/state/contracts";
 import { i18n } from "../../src/state/i18n";
 
-export function setup() {
+export function setup(options: { reducedMotion?: boolean } = {}) {
+  if (options.reducedMotion !== undefined) {
+    const media = window.matchMedia("");
+    vi.spyOn(window, "matchMedia").mockImplementation((query) => ({
+      ...media,
+      media: query,
+      matches: options.reducedMotion === true && query.includes("prefers-reduced-motion"),
+    }));
+  }
   void i18n.changeLanguage("fr");
   const rectangle = createLayer("rectangle", {
     name: "Rectangle bleu",
