@@ -93,3 +93,12 @@ panel exit grace, the handle corridor, owned portals, keyboard focus and pinning
 retain their existing behavior. Cached geometry is measured on entry/layout only;
 movement sampling and admission stay imperative without per-move layout reads or
 React state updates.
+
+## Layer-list clearance below the unpinned transport
+
+The 32-pixel transport strip overlays the sidebar as well as the canvas. Only the
+Layers panel reserves that hidden strip internally, so its native tree viewport,
+scroll extent, selection reveal and scroll shadows end above the transport. The
+Properties panel, sidebar splitter and canvas keep their existing geometry. A
+pinned timeline already reserves workspace height and gets no extra clearance;
+Static mode and an outgoing dock also clear the internal reservation.

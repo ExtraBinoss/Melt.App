@@ -489,6 +489,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Fixed
 
+- Keep the complete final layer reachable above the unpinned Motion transport. Reserve its 32-pixel overlap inside Layers only, preserving canvas and sidebar-divider geometry; remove the clearance for pinned timelines and Static mode. Verify native wheel scrolling and row clicks at three viewport heights.
+
 - Use an explicit route comparator and complete MediaQueryList test fixtures to satisfy type-aware CI linting without spreading native class instances.
 
 - Type Halftone GPU graph assignment introspection through runtime-checked node metadata, accommodating the installed Three.js declarations during clean CI typechecking.
