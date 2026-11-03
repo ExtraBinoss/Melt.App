@@ -5,14 +5,7 @@ import {
   type Composition,
   type Layer,
 } from "@musart/core";
-const ACCEPTED = new Set([
-  "image/png",
-  "image/jpeg",
-  "image/webp",
-  "image/avif",
-  "image/gif",
-  "image/svg+xml",
-]);
+import { normalizeImageFile, ImageImportError } from "./image-format";
 export function readDataUrl(file: Blob): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -63,9 +56,24 @@ export async function importImage(
   file: File,
   reader: ImageReader = defaultReader,
 ): Promise<ImageAsset> {
-  if (!ACCEPTED.has(file.type)) throw new Error(`${file.name}: format non pris en charge.`);
-  if (file.size > 50 * 1024 * 1024) throw new Error(`${file.name}: limite de 50 Mo dépassée.`);
-  const dataUrl = await reader.dataUrl(file);
+  if (file.size > 50 * 1024 * 1024)
+    throw new ImageImportError(
+      "IMAGE_TOO_LARGE",
+      file.name,
+      "Image exceeds the 50 MiB import limit.",
+    );
+  file = await normalizeImageFile(file);
+  let dataUrl: string;
+  try {
+    dataUrl = await reader.dataUrl(file);
+  } catch (cause) {
+    throw new ImageImportError(
+      "IMAGE_READ_FAILED",
+      file.name,
+      "The file could not be read. Try selecting it again.",
+      cause,
+    );
+  }
   if (file.type === "image/svg+xml") {
     const text = await new Promise<string>((resolve, reject) => {
       const r = new FileReader();
@@ -78,7 +86,18 @@ export async function importImage(
     });
     assertSafeSvg(text);
   }
-  const { width, height } = await reader.dimensions(dataUrl);
+  let dimensions: { width: number; height: number };
+  try {
+    dimensions = await reader.dimensions(dataUrl);
+  } catch (cause) {
+    throw new ImageImportError(
+      "IMAGE_DECODE_FAILED",
+      file.name,
+      "The image is damaged or cannot be decoded by this browser. Save a new JPEG, PNG or WebP copy and retry.",
+      cause,
+    );
+  }
+  const { width, height } = dimensions;
   if (
     !Number.isInteger(width) ||
     !Number.isInteger(height) ||
@@ -86,7 +105,11 @@ export async function importImage(
     height <= 0 ||
     width * height > 64 * 1024 * 1024
   )
-    throw new Error(`${file.name}: dimensions invalides ou supérieures à 64 mégapixels.`);
+    throw new ImageImportError(
+      "IMAGE_DIMENSIONS_INVALID",
+      file.name,
+      "Invalid image dimensions or image exceeds 64 megapixels.",
+    );
   return { id: crypto.randomUUID(), name: file.name, mime: file.type, width, height, dataUrl };
 }
 export async function importBatch(

@@ -2,6 +2,11 @@ import { i18n } from "..";
 import "./messages";
 
 const platformCodes = {
+  IMAGE_FORMAT_UNSUPPORTED: "imageFormatUnsupported",
+  IMAGE_TOO_LARGE: "imageTooLarge",
+  IMAGE_DIMENSIONS_INVALID: "imageDimensionsInvalid",
+  IMAGE_READ_FAILED: "imageReadFailed",
+  IMAGE_DECODE_FAILED: "imageDecodeFailed",
   ANIMATED_SPATIAL_GROUP: "animatedSpatialGroup",
   PROJECT_PREFERENCES_LOAD_FAILED: "projectPreferencesLoadFailed",
   PROJECT_PREFERENCES_SAVE_FAILED: "projectPreferencesSaveFailed",
@@ -80,7 +85,9 @@ export function formatUiError(error: unknown): string {
     typeof error.code === "string" &&
     Object.hasOwn(platformCodes, error.code)
   )
-    return i18n.t(`errors:${platformCodes[error.code as keyof typeof platformCodes]}`);
+    return i18n.t(`errors:${platformCodes[error.code as keyof typeof platformCodes]}`, {
+      fileName: "fileName" in error && typeof error.fileName === "string" ? error.fileName : "",
+    });
   if (
     typeof error === "object" &&
     error !== null &&

@@ -1,3 +1,8 @@
 {
-  "animatedSpatialGroup": "此组的变换或布局包含动画。请先移除该动画，再取消编组。"
+  "animatedSpatialGroup": "此组的变换或布局包含动画。请先移除该动画，再取消编组。",
+  "imageFormatUnsupported": "{{fileName}}: 无法识别图像格式。请选择 JPEG、PNG、WebP、AVIF、GIF 或 SVG。重命名不会转换文件格式。",
+  "imageTooLarge": "{{fileName}}: 图像超过 50 MiB。请选择较小的图像。",
+  "imageDimensionsInvalid": "{{fileName}}: 图像尺寸无效或超过 6400 万像素。请缩小图像后重试。",
+  "imageReadFailed": "{{fileName}}: 无法读取文件。请重新选择后重试。",
+  "imageDecodeFailed": "{{fileName}}: 图像已损坏或此浏览器无法解码。请另存为新的 JPEG、PNG 或 WebP 文件后重试。"
 }

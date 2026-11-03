@@ -1,3 +1,8 @@
 {
-  "animatedSpatialGroup": "Deze groep heeft een geanimeerde transformatie of indeling. Verwijder die animatie voordat je de groep opheft."
+  "animatedSpatialGroup": "Deze groep heeft een geanimeerde transformatie of indeling. Verwijder die animatie voordat je de groep opheft.",
+  "imageFormatUnsupported": "{{fileName}}: Onbekend afbeeldingsformaat. Kies JPEG, PNG, WebP, AVIF, GIF of SVG. Een andere naam converteert het bestand niet.",
+  "imageTooLarge": "{{fileName}}: De afbeelding is groter dan 50 MiB. Kies een kleinere afbeelding.",
+  "imageDimensionsInvalid": "{{fileName}}: Ongeldige afmetingen of meer dan 64 megapixels. Verklein de afbeelding en probeer opnieuw.",
+  "imageReadFailed": "{{fileName}}: Het bestand kon niet worden gelezen. Selecteer het opnieuw.",
+  "imageDecodeFailed": "{{fileName}}: De afbeelding is beschadigd of kan niet worden gedecodeerd. Sla een nieuwe JPEG-, PNG- of WebP-kopie op."
 }

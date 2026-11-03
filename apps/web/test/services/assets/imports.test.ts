@@ -67,7 +67,7 @@ describe("original image imports", () => {
     await expect(importImage(file("x.txt", "text/plain"), reader())).rejects.toThrow("format");
     const huge = file();
     Object.defineProperty(huge, "size", { value: 50 * 1024 * 1024 + 1 });
-    await expect(importImage(huge, reader())).rejects.toThrow("50 Mo");
+    await expect(importImage(huge, reader())).rejects.toMatchObject({ code: "IMAGE_TOO_LARGE" });
     for (const [width, height] of [
       [0, 1],
       [1, -2],

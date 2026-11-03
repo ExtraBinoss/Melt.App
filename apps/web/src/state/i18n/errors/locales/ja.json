@@ -1,3 +1,8 @@
 {
-  "animatedSpatialGroup": "このグループの変形またはレイアウトにアニメーションがあります。グループ解除の前にそのアニメーションを削除してください。"
+  "animatedSpatialGroup": "このグループの変形またはレイアウトにアニメーションがあります。グループ解除の前にそのアニメーションを削除してください。",
+  "imageFormatUnsupported": "{{fileName}}: 画像形式を認識できません。JPEG、PNG、WebP、AVIF、GIF、SVGを選択してください。名前を変えても形式は変換されません。",
+  "imageTooLarge": "{{fileName}}: 画像が50 MiBを超えています。小さい画像を選択してください。",
+  "imageDimensionsInvalid": "{{fileName}}: 画像の寸法が無効か、6400万画素を超えています。サイズを小さくして再試行してください。",
+  "imageReadFailed": "{{fileName}}: ファイルを読み取れませんでした。もう一度選択してください。",
+  "imageDecodeFailed": "{{fileName}}: 画像が破損しているか、このブラウザーでデコードできません。JPEG、PNG、WebPの新しいコピーを保存してください。"
 }

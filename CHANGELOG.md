@@ -489,6 +489,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Fixed
 
+- Recognize extensionless image files and generic MIME headers from bounded file signatures, preserving original bytes and native decode validation. Report actionable, filename-specific image format, read, decode, size and dimension failures in all twelve languages, with technical causes retained.
+
 - Clarify object selection in all twelve languages with separate mark/refine/mask steps, mouse-input badges, explicit Keep/Erase outcomes, responsive spacing and a bounded scrolling panel. Use a full-width mode field; reveal clipped shared-select labels on hover/focus with overflow-only motion, reduced-motion tooltips and logical RTL alignment.
 
 - Keep the complete final layer reachable above the unpinned Motion transport. Reserve its 32-pixel overlap inside Layers only, preserving canvas and sidebar-divider geometry; remove the clearance for pinned timelines and Static mode. Verify native wheel scrolling and row clicks at three viewport heights.

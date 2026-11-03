@@ -25,5 +25,10 @@
   "videoBudgetExceeded": "L’aperçu vidéo a atteint sa limite mémoire ou de décodage. Réduisez les calques vidéo actifs ou la taille de la source d’aperçu.",
   "videoDecodeFailed": "Une image vidéo n’a pas pu être décodée. Rouvrez le clip ; si le problème persiste, réencodez la source ou remplacez le fichier endommagé.",
   "videoBusy": "Le décodeur vidéo termine une autre demande. Patientez un instant, puis réessayez.",
-  "animatedSpatialGroup": "Ce groupe ou ses positions 2D sont animés. Retirez ces animations avant de dégrouper."
+  "animatedSpatialGroup": "Ce groupe ou ses positions 2D sont animés. Retirez ces animations avant de dégrouper.",
+  "imageFormatUnsupported": "{{fileName}}: Format d’image non reconnu. Choisissez JPEG, PNG, WebP, AVIF, GIF ou SVG. Renommer un fichier ne le convertit pas.",
+  "imageTooLarge": "{{fileName}}: L’image dépasse 50 Mio. Choisissez une image plus petite.",
+  "imageDimensionsInvalid": "{{fileName}}: Les dimensions sont invalides ou dépassent 64 mégapixels. Redimensionnez l’image puis réessayez.",
+  "imageReadFailed": "{{fileName}}: Le fichier n’a pas pu être lu. Sélectionnez-le à nouveau puis réessayez.",
+  "imageDecodeFailed": "{{fileName}}: L’image est endommagée ou illisible par ce navigateur. Enregistrez une nouvelle copie JPEG, PNG ou WebP puis réessayez."
 }

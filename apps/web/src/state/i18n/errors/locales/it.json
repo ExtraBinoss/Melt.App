@@ -1,3 +1,8 @@
 {
-  "animatedSpatialGroup": "Questo gruppo ha una trasformazione o disposizione animata. Rimuovi questa animazione prima di separare il gruppo."
+  "animatedSpatialGroup": "Questo gruppo ha una trasformazione o disposizione animata. Rimuovi questa animazione prima di separare il gruppo.",
+  "imageFormatUnsupported": "{{fileName}}: Formato immagine non riconosciuto. Scegli JPEG, PNG, WebP, AVIF, GIF o SVG. Rinominare il file non lo converte.",
+  "imageTooLarge": "{{fileName}}: L’immagine supera 50 MiB. Scegli un’immagine più piccola.",
+  "imageDimensionsInvalid": "{{fileName}}: Dimensioni non valide o superiori a 64 megapixel. Ridimensiona l’immagine e riprova.",
+  "imageReadFailed": "{{fileName}}: Impossibile leggere il file. Selezionalo di nuovo.",
+  "imageDecodeFailed": "{{fileName}}: L’immagine è danneggiata o non decodificabile dal browser. Salva una nuova copia JPEG, PNG o WebP."
 }

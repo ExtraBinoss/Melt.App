@@ -1,3 +1,8 @@
 {
-  "animatedSpatialGroup": "이 그룹의 변형 또는 레이아웃에 애니메이션이 있습니다. 그룹을 해제하기 전에 해당 애니메이션을 제거하세요."
+  "animatedSpatialGroup": "이 그룹의 변형 또는 레이아웃에 애니메이션이 있습니다. 그룹을 해제하기 전에 해당 애니메이션을 제거하세요.",
+  "imageFormatUnsupported": "{{fileName}}: 이미지 형식을 인식할 수 없습니다. JPEG, PNG, WebP, AVIF, GIF 또는 SVG를 선택하세요. 이름 변경은 형식을 변환하지 않습니다.",
+  "imageTooLarge": "{{fileName}}: 이미지가 50 MiB를 초과합니다. 더 작은 이미지를 선택하세요.",
+  "imageDimensionsInvalid": "{{fileName}}: 이미지 크기가 잘못되었거나 6400만 화소를 초과합니다. 크기를 줄이고 다시 시도하세요.",
+  "imageReadFailed": "{{fileName}}: 파일을 읽을 수 없습니다. 다시 선택하세요.",
+  "imageDecodeFailed": "{{fileName}}: 이미지가 손상되었거나 브라우저에서 디코딩할 수 없습니다. JPEG, PNG 또는 WebP로 새 사본을 저장하세요."
 }

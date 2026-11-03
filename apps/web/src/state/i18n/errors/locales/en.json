@@ -25,5 +25,10 @@
   "videoBudgetExceeded": "Video preview reached its memory or decoder limit. Reduce active video layers or use a smaller preview source.",
   "videoDecodeFailed": "A video frame could not be decoded. Reopen the clip; if it persists, re-encode the source or replace a damaged file.",
   "videoBusy": "The video decoder is still finishing another request. Wait a moment, then retry.",
-  "animatedSpatialGroup": "This group has an animated transform or layout. Remove that animation before ungrouping."
+  "animatedSpatialGroup": "This group has an animated transform or layout. Remove that animation before ungrouping.",
+  "imageFormatUnsupported": "{{fileName}}: Unrecognized image format. Choose JPEG, PNG, WebP, AVIF, GIF or SVG. Renaming a file does not convert it.",
+  "imageTooLarge": "{{fileName}}: Image exceeds 50 MiB. Choose a smaller image.",
+  "imageDimensionsInvalid": "{{fileName}}: Image dimensions are invalid or exceed 64 megapixels. Resize the image and retry.",
+  "imageReadFailed": "{{fileName}}: The file could not be read. Select it again and retry.",
+  "imageDecodeFailed": "{{fileName}}: The image is damaged or cannot be decoded by this browser. Save a new JPEG, PNG or WebP copy and retry."
 }
