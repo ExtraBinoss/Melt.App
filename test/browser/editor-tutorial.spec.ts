@@ -1,8 +1,9 @@
+import en from "../../apps/web/src/components/onboarding/tutorial/locales/en.json" with { type: "json" };
 import { expect, test, type Page } from "@playwright/test";
 import { steps } from "../../apps/web/src/components/onboarding/tutorial/content";
 
 async function expectNearby(page: Page, title: string) {
-  const step = steps.find((step) => step.title === title)!;
+  const step = steps.find((step) => en.steps[step.id].title === title)!;
   // Picker cards sit beside the complete popup, rather than over neighboring
   // results just to be closer to the highlighted row.
   const target = page
@@ -127,7 +128,7 @@ test("guided editor practice, automatic tasks, exit and editor-only replay", asy
     await expectNearby(page, title);
     const card = (await guide.boundingBox())!;
     const target = (await page
-      .locator(steps.find((step) => step.title === title)!.target)
+      .locator(steps.find((step) => en.steps[step.id].title === title)!.target)
       .boundingBox())!;
     if (title === "Your tools") expect(card.x).toBeGreaterThan(target.x + target.width);
     else expect(card.x + card.width).toBeLessThan(target.x);

@@ -1,3 +1,4 @@
+import { tutorialError } from "./errors";
 import { requestCanvasMenu } from "../../../canvas/selection/context-requests";
 import { openEffectSurface } from "../../layers/menu/effect-surface";
 import { visible } from "./surfaces";
@@ -18,7 +19,7 @@ export function stepDone(
   { engine, projectId, layerId }: TutorialContext,
 ): boolean {
   const snapshot = engine.getSnapshot();
-  if (snapshot.project.id !== projectId) throw new Error("The active project changed.");
+  if (snapshot.project.id !== projectId) throw tutorialError("activeProject");
   const page = snapshot.project.pages.find((page) => page.id === snapshot.pageId)!;
   const layer = page.layers.find((layer) => layer.id === layerId);
   const tests: Record<TutorialAction, () => boolean> = {
@@ -77,13 +78,13 @@ export function waitForTutorial(
       try {
         if (signal.aborted) abort();
         else if (context.engine.getSnapshot().project.id !== context.projectId)
-          end(new Error("The active project changed."));
+          end(tutorialError("activeProject"));
         else if (test()) end();
       } catch (error) {
         end(error);
       }
     };
-    const abort = () => end(new DOMException("Tutorial action cancelled", "AbortError"));
+    const abort = () => end(new DOMException(tutorialError("cancelled").message, "AbortError"));
     const observer = new MutationObserver(check);
     observer.observe(document.body, {
       childList: true,
@@ -97,10 +98,7 @@ export function waitForTutorial(
       getExportJobs(context.engine).subscribe(check),
     ];
     const timer = setInterval(check, 40);
-    const deadline = setTimeout(
-      () => end(new Error("This control is not ready. Try Next again.")),
-      timeout,
-    );
+    const deadline = setTimeout(() => end(tutorialError("notReady")), timeout);
     signal.addEventListener("abort", abort, { once: true });
     check();
   });
@@ -115,7 +113,7 @@ async function control(context: TutorialContext, selector: string, signal: Abort
     signal,
   );
   if (signal.aborted || context.engine.getSnapshot().project.id !== context.projectId)
-    throw new DOMException("Tutorial action cancelled", "AbortError");
+    throw new DOMException(tutorialError("cancelled").message, "AbortError");
   const node = visible(selector)!;
   const box = node.getBoundingClientRect();
   if (box.x < 0 || box.y < 0 || box.right > innerWidth || box.bottom > innerHeight)
@@ -191,7 +189,7 @@ export async function performStep(
         () => {
           const job = jobs.read();
           if (job?.status === "failed" || job?.status === "cancelled")
-            throw new Error("Video export did not complete. Try exporting again.");
+            throw tutorialError("exportFailed");
           return stepDone("render", context);
         },
         signal,

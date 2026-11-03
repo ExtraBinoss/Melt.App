@@ -1,3 +1,4 @@
+import fr from "../../../src/components/onboarding/tutorial/locales/fr.json";
 import { expect, test, vi } from "vitest";
 import { fireEvent, screen } from "@testing-library/react";
 import {
@@ -49,11 +50,11 @@ test("tutorial helpers use real undoable document commands and sparse Pop contro
 test("replay is available only with an editor callback", () => {
   const d = setup();
   const view = d.mount(<Preferences initialSection="editor" />);
-  expect(screen.queryByRole("button", { name: "Replay onboarding" })).toBeNull();
+  expect(screen.queryByRole("button", { name: fr.replay })).toBeNull();
   view.unmount();
   const replay = vi.fn();
   d.mount(<Preferences initialSection="editor" onReplayTutorial={replay} />);
-  fireEvent.click(screen.getByRole("button", { name: "Replay onboarding" }));
+  fireEvent.click(screen.getByRole("button", { name: fr.replay }));
   expect(replay).toHaveBeenCalledOnce();
 });
 
@@ -61,16 +62,14 @@ test("missing practice assets and stale preparation never replace the active doc
   const d = setup();
   vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response("missing", { status: 404 }));
   await expect(createPracticeProject(d.engine, d.services)).rejects.toThrow(
-    "Could not load tutorial image",
+    fr.errors.imageLoad.replace("{{name}}", fr.project.mountains),
   );
   expect(d.services.createProject).not.toHaveBeenCalled();
   vi.mocked(fetch).mockImplementation(async () => {
     d.engine.execute({ type: "renameProject", name: "Changed while loading" });
     return new Response(new Blob(["image"], { type: "image/jpeg" }));
   });
-  await expect(createPracticeProject(d.engine, d.services)).rejects.toThrow(
-    "The active project changed",
-  );
+  await expect(createPracticeProject(d.engine, d.services)).rejects.toThrow(fr.errors.changedStart);
   expect(d.services.createProject).not.toHaveBeenCalled();
 });
 
@@ -100,7 +99,7 @@ test("pending tutorial actions release timers on cancellation and reject a chang
         () => false,
         new AbortController().signal,
       ),
-    ).rejects.toThrow("The active project changed");
+    ).rejects.toThrow(fr.errors.activeProject);
     expect(vi.getTimerCount()).toBe(before);
   } finally {
     vi.useRealTimers();

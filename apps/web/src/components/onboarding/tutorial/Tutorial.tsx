@@ -1,3 +1,5 @@
+import { useTranslation } from "react-i18next";
+import "./messages";
 import { performStep, stepDone, waitForTutorial } from "./actions";
 import { useStepSurface } from "./use-step-surface";
 import { useEffect, useRef, useState } from "react";
@@ -9,7 +11,7 @@ import { Dialog, DialogContent, DialogTitle, DialogDescription } from "../../ui/
 import { Button } from "../../ui/button";
 import { MeltLogo } from "../../../ui/brand/MeltLogo";
 import { Guide } from "./Guide";
-import { copy, steps } from "./content";
+import { steps } from "./content";
 import { createPracticeProject } from "./project";
 import "./tutorial.css";
 
@@ -33,6 +35,7 @@ export function Tutorial({
   hidden: boolean;
   onProjectCreated?: (id: string) => void;
 }) {
+  const { t, i18n } = useTranslation("editorTutorial");
   const [phase, setPhase] = useState<"invite" | "tour" | "closed">(() =>
     unseen() ? "invite" : "closed",
   );
@@ -166,7 +169,7 @@ export function Tutorial({
         setPhase("tour");
       }
     } catch (cause) {
-      if (alive.current) setError(cause instanceof Error ? cause.message : copy.error);
+      if (alive.current) setError(cause instanceof Error ? cause.message : t("error"));
     } finally {
       if (alive.current) setBusy(false);
     }
@@ -204,7 +207,7 @@ export function Tutorial({
     } catch (cause) {
       pending.current = 0;
       if (!controller.signal.aborted && alive.current)
-        setError(cause instanceof Error ? cause.message : copy.error);
+        setError(cause instanceof Error ? cause.message : t("error"));
     } finally {
       running.current = false;
       if (operation.current === controller) operation.current = null;
@@ -253,12 +256,13 @@ export function Tutorial({
       >
         <DialogContent
           className="tutorial-invite"
+          dir={i18n.dir()}
           showCloseButton={false}
           onInteractOutside={(event) => event.preventDefault()}
         >
           <MeltLogo size={80} lively />
-          <DialogTitle>{leave ? copy.leave : copy.invite}</DialogTitle>
-          <DialogDescription>{leave ? copy.leaveDetail : copy.detail}</DialogDescription>
+          <DialogTitle>{leave ? t("leave") : t("invite")}</DialogTitle>
+          <DialogDescription>{leave ? t("leaveDetail") : t("detail")}</DialogDescription>
           {error && <p role="alert">{error}</p>}
           <footer>
             <Button
@@ -266,10 +270,10 @@ export function Tutorial({
               disabled={busy}
               onClick={() => (leave ? setLeave(false) : close())}
             >
-              {leave ? copy.stay : copy.no}
+              {leave ? t("stay") : t("no")}
             </Button>
             <Button disabled={busy} onClick={() => (leave ? close() : void start())}>
-              {leave ? copy.exit : busy ? "Loading…" : copy.yes}
+              {leave ? t("exit") : busy ? t("loading") : t("yes")}
             </Button>
           </footer>
         </DialogContent>

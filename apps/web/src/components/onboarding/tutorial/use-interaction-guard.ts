@@ -28,7 +28,7 @@ export function useInteractionGuard(index: number, layerId?: string) {
     };
     const inResize = (target: EventTarget | null) =>
       ["pin", undefined].includes(action) &&
-      (action === "pin" || step.title === "Your timeline") &&
+      (action === "pin" || step.id === "timeline") &&
       target instanceof Element &&
       !!target.closest(".motion-resize");
     const stop = (event: Event) => {

@@ -1,0 +1,139 @@
+{
+  "invite": "要开始一个简短的教程吗？",
+  "detail": "在 {{brandName}} 中制作一个小作品，从添加第一个效果到导出视频。系统会打开一个独立的练习项目。",
+  "yes": "是，开始教程",
+  "no": "不了，谢谢",
+  "next": "下一步",
+  "previous": "上一步",
+  "exit": "退出教程",
+  "leave": "要退出教程吗？",
+  "leaveDetail": "练习项目会保留。你可以在编辑器偏好设置中重新开始教程。",
+  "stay": "继续",
+  "finish": "完成",
+  "replay": "重放入门教程",
+  "error": "操作失败，请重试。",
+  "loading": "正在加载…",
+  "region": "{{brandName}} 教程",
+  "progress": "第 {{current}} 步，共 {{total}} 步",
+  "project": {
+    "name": "学习 {{brandName}}",
+    "mountains": "山脉",
+    "lake": "湖泊",
+    "forest": "森林"
+  },
+  "controls": {
+    "wheel": "滚轮",
+    "rightClick": "右键单击",
+    "add": "添加（+）",
+    "effects": "添加效果",
+    "dither": "Dither",
+    "static": "静态",
+    "motion": "动画",
+    "animation": "添加动画",
+    "pop": "Pop",
+    "pin": "固定",
+    "play": "播放",
+    "export": "导出",
+    "video": "动效视频",
+    "exportVideo": "导出视频"
+  },
+  "errors": {
+    "activeProject": "当前项目已更改。",
+    "changedStart": "当前项目已更改，请重新开始教程。",
+    "imageLoad": "无法加载教程图片：{{name}}",
+    "imagesImport": "无法导入教程图片。",
+    "motionFirst": "请先选择动画模式的画板。",
+    "notReady": "此控件尚未就绪，请再次点击下一步。",
+    "exportFailed": "视频导出失败，请重新导出。",
+    "imageMenu": "无法打开图片菜单。",
+    "effectLibrary": "无法打开效果库。",
+    "restoreSurface": "无法恢复教程界面。",
+    "cancelled": "教程操作已取消。"
+  },
+  "steps": {
+    "canvas": {
+      "title": "你的画布",
+      "text": "这是你的画布。你可以在这里添加图片、视频、文字和对象。我们已为你加载三张图片。"
+    },
+    "tools": {
+      "title": "你的工具",
+      "text": "使用工具栏进行选择、移动、绘制和添加内容。用触控板平移视图，用 {zoom} 围绕指针缩放。"
+    },
+    "properties": {
+      "title": "属性",
+      "text": "在右侧可以修改所选对象的尺寸、外观和效果。"
+    },
+    "layers": {
+      "title": "图层",
+      "text": "图层决定叠放顺序。请在此列表中选择中间的图片“{{lake}}”。"
+    },
+    "effectMenu": {
+      "title": "打开效果菜单",
+      "text": "点击图层面板顶部的 {add}，向导会带你进入效果菜单。"
+    },
+    "effectCategory": {
+      "title": "添加效果",
+      "text": "点击此菜单中的 {effects}，打开效果库。"
+    },
+    "dither": {
+      "title": "试用 Dither",
+      "text": "搜索已准备好。点击 {dither}，将图片转换为点状图案。"
+    },
+    "recenter": {
+      "title": "返回画布",
+      "text": "Dither 已应用。我们已缩小视图并将画布居中，以显示整个作品。"
+    },
+    "modes": {
+      "title": "静态与动画",
+      "text": "{static} 用于静止的作品，{motion} 可添加动画和视频播放。切换控件位于画板下方。"
+    },
+    "motion": {
+      "title": "让作品动起来",
+      "text": "我们已放大切换控件。点击 {motion} 启用动画。添加过渡后，我们再查看时间轴。"
+    },
+    "context": {
+      "title": "右键单击图片",
+      "text": "画布已重新居中。在中间的图片“{{lake}}”上使用 {rightClick}，打开操作菜单。"
+    },
+    "transition": {
+      "title": "添加过渡",
+      "text": "在此右键菜单中选择 {animation}，打开动画库。"
+    },
+    "pop": {
+      "title": "添加 Pop",
+      "text": "点击 Scale 分类中的 {pop}，为图片添加简短的弹入动画。"
+    },
+    "pin": {
+      "title": "固定时间轴",
+      "text": "点击 {pin}，让时间轴保持打开。你可以调整它的大小，向导会跟随控件移动。"
+    },
+    "timeline": {
+      "title": "你的时间轴",
+      "text": "每一行代表一个图层。片段表示它出现的时间，Pop 片段就是它的动画。拖动播放头可查看任意时刻；左侧控件用于设置播放和时长。"
+    },
+    "play": {
+      "title": "播放",
+      "text": "点击时间轴中的 {play}，预览动画。"
+    },
+    "export": {
+      "title": "导出",
+      "text": "打开右上角的 {export}。我们将把动画导出为视频。"
+    },
+    "exportWindow": {
+      "title": "导出窗口",
+      "text": "在左侧选择画板和输出类型，在右侧预览结果。分辨率和格式决定下载的文件。"
+    },
+    "video": {
+      "title": "动效视频",
+      "text": "在导出窗口中选择 {video}，保留默认视频设置。"
+    },
+    "render": {
+      "title": "保存视频",
+      "text": "点击 {exportVideo}。{{brandName}} 将渲染动画并下载。渲染和下载会独立继续进行。"
+    },
+    "ready": {
+      "title": "一切就绪",
+      "text": "你已完成教程。{{brandName}} 会在后台渲染和下载视频，你可以继续创作。"
+    }
+  }
+}

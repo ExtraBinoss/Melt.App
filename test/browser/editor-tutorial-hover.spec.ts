@@ -1,3 +1,5 @@
+import fr from "../../apps/web/src/components/onboarding/tutorial/locales/fr.json" with { type: "json" };
+import { brand } from "../../apps/web/src/ui/brand/config";
 import { expect, test } from "@playwright/test";
 
 for (const width of [1000, 1280]) {
@@ -7,20 +9,29 @@ for (const width of [1000, 1280]) {
     await page.setViewportSize({ width, height: 800 });
     await page.addInitScript(() => localStorage.setItem("musart.language", "fr"));
     await page.goto("/editor?automation=1");
-    await page.getByRole("button", { name: "Yes, start tutorial" }).click({ timeout: 30000 });
-    const guide = page.getByRole("region", { name: "Melt tutorial" });
-    await expect(guide.getByRole("heading", { name: "Your canvas" })).toBeVisible({
+    await page.getByRole("button", { name: fr.yes }).click({ timeout: 30000 });
+    const guide = page.getByRole("region", {
+      name: fr.region.replace("{{brandName}}", brand.name),
+    });
+    await expect(guide.getByRole("heading", { name: fr.steps.canvas.title })).toBeVisible({
       timeout: 30000,
     });
-    for (const title of ["Your tools", "Properties", "Layers", "Open the effect menu"]) {
-      await guide.getByRole("button", { name: "Next", exact: true }).click();
+    for (const title of [
+      fr.steps.tools.title,
+      fr.steps.properties.title,
+      fr.steps.layers.title,
+      fr.steps.effectMenu.title,
+    ]) {
+      await guide.getByRole("button", { name: fr.next, exact: true }).click();
       await expect(guide.getByRole("heading", { name: title, exact: true })).toBeVisible();
     }
     await page.locator('.layer-create-actions button[aria-haspopup="menu"]').click();
-    await expect(guide.getByRole("heading", { name: "Add an effect", exact: true })).toBeVisible();
+    await expect(
+      guide.getByRole("heading", { name: fr.steps.effectCategory.title, exact: true }),
+    ).toBeVisible();
     const category = page.locator('[data-effect-menu-category="effect"]');
     await category.hover();
-    await expect(guide.getByRole("heading", { name: "Try Dither" })).toBeVisible();
+    await expect(guide.getByRole("heading", { name: fr.steps.dither.title })).toBeVisible();
     const search = page.locator('.effect-catalog[data-effect-category="effect"] input');
     const dither = page.locator('[data-effect-catalog-item="dither"]');
     await expect(search).toHaveValue("dither");
@@ -58,7 +69,7 @@ for (const width of [1000, 1280]) {
       await category.hover();
       await page.locator('[data-effect-menu-category="adjustment"]').hover();
       await search.hover();
-      await guide.getByRole("heading", { name: "Try Dither" }).hover();
+      await guide.getByRole("heading", { name: fr.steps.dither.title }).hover();
       // Cross the menu's 200ms exit grace while the learner reads the card.
       await page.waitForTimeout(350);
       await expect(search).toHaveValue("dither");
@@ -69,7 +80,7 @@ for (const width of [1000, 1280]) {
     expect(Math.abs(after!.y - before!.y)).toBeLessThan(2);
     await page.screenshot({ path: `artifacts/tutorial/french-hover-${width}.png` });
     // Guide and outside clicks leave the guided library and its real query intact.
-    await guide.getByRole("heading", { name: "Try Dither" }).click();
+    await guide.getByRole("heading", { name: fr.steps.dither.title }).click();
     await page.mouse.click(4, 400);
     await page.keyboard.press("Escape");
     await expect(search).toBeVisible();
@@ -77,14 +88,15 @@ for (const width of [1000, 1280]) {
     await expect(search).toHaveValue("dither");
     await expect(dither).toBeVisible();
     await dither.click();
-    await expect(guide.getByRole("heading", { name: "Back to your canvas" })).toBeVisible();
+    await expect(guide.getByRole("heading", { name: fr.steps.recenter.title })).toBeVisible();
     expect(
       await page.evaluate(
-        () =>
+        (lake) =>
           window
             .musart!.snapshot()
-            .project.pages[0]!.layers.find((layer) => layer.name === "Lake")!
+            .project.pages[0]!.layers.find((layer) => layer.name === lake)!
             .effects.filter((effect) => effect.type === "dither").length,
+        fr.project.lake,
       ),
     ).toBe(1);
   });

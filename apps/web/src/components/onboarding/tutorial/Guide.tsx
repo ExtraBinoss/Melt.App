@@ -1,3 +1,5 @@
+import { useTranslation } from "react-i18next";
+import "./messages";
 import { placeGuide } from "./placement";
 import { useInteractionGuard } from "./use-interaction-guard";
 import { isGeometryMoving, measureGuideBox, relativeGuideBox } from "./geometry";
@@ -10,7 +12,7 @@ import { motion, useReducedMotion } from "motion/react";
 import type { EnginePort } from "@musart/core";
 import { MeltLogo } from "../../../ui/brand/MeltLogo";
 import { Button } from "../../ui/button";
-import { copy, steps } from "./content";
+import { steps } from "./content";
 
 export function Guide({
   index,
@@ -31,7 +33,14 @@ export function Guide({
   onExit: () => void;
   onPrevious: () => void;
 }) {
+  const { t, i18n } = useTranslation("editorTutorial");
+  const language = i18n.resolvedLanguage;
   const step = steps[index]!;
+  const snapshot = engine.getSnapshot();
+  const lake =
+    snapshot.project.pages
+      .find((page) => page.id === snapshot.pageId)
+      ?.layers.find((layer) => layer.id === layerId)?.name ?? t("project.lake");
   useInteractionGuard(index, layerId);
   const last = index === steps.length - 1;
   const reduce = useReducedMotion();
@@ -172,7 +181,7 @@ export function Guide({
       window.visualViewport?.removeEventListener("resize", schedule);
       window.visualViewport?.removeEventListener("scroll", schedule);
     };
-  }, [step, engine, index]);
+  }, [step, engine, index, language]);
   const width = Math.min(330, viewport.width - 24);
   const placement =
     index === 0 || last
@@ -182,6 +191,7 @@ export function Guide({
     y = placement.y + viewport.offsetY;
   const pointsRight = x + width / 2 < rect.x + rect.width / 2;
   const pointing = "action" in step && rect.width > 0;
+  const mascotRtlOffset = i18n.dir() === "rtl" ? width - 84 : 0;
   return createPortal(
     <div
       ref={overlay}
@@ -199,7 +209,8 @@ export function Guide({
       <motion.aside
         ref={card}
         role="region"
-        aria-label="Melt tutorial"
+        aria-label={t("region")}
+        dir={i18n.dir()}
         className="tutorial-card"
         style={{ width }}
         initial={false}
@@ -216,13 +227,14 @@ export function Guide({
               animate={
                 pointing
                   ? {
-                      x: Math.max(
-                        -x + 8,
-                        Math.min(
-                          viewport.width - x - 72,
-                          pointsRight ? rect.x - x - 72 : rect.x + rect.width - x + 8,
-                        ),
-                      ),
+                      x:
+                        Math.max(
+                          -x + 8,
+                          Math.min(
+                            viewport.width - x - 72,
+                            pointsRight ? rect.x - x - 72 : rect.x + rect.width - x + 8,
+                          ),
+                        ) - mascotRtlOffset,
                       y: rect.y + rect.height / 2 - y - 42,
                       scale: 1.25,
                       rotate: pointsRight ? 0 : 180,
@@ -236,15 +248,17 @@ export function Guide({
               <MeltLogo size={48} lively shape={pointing ? "pointer" : "mascot"} />
             </motion.div>
           )}
-          <span>
-            {index + 1} / {steps.length}
+          <span aria-label={t("progress", { current: index + 1, total: steps.length })}>
+            <bdi dir="ltr">
+              {index + 1} / {steps.length}
+            </bdi>
           </span>
-          <Button variant="ghost" size="icon-sm" aria-label={copy.exit} onClick={onExit}>
+          <Button variant="ghost" size="icon-sm" aria-label={t("exit")} onClick={onExit}>
             <X size={16} />
           </Button>
         </header>
-        <h2>{step.title}</h2>
-        <Speech text={step.text} />
+        <h2>{t(`steps.${step.id}.title`)}</h2>
+        <Speech text={t(`steps.${step.id}.text`, { lake })} />
         {error && <p role="alert">{error}</p>}
         <footer>
           <Button
@@ -253,10 +267,10 @@ export function Guide({
             disabled={busy || index === 0}
             onClick={onPrevious}
           >
-            {copy.previous}
+            {t("previous")}
           </Button>
           <Button disabled={busy} onClick={onSkip}>
-            {index === steps.length - 1 ? copy.finish : copy.next}
+            {index === steps.length - 1 ? t("finish") : t("next")}
           </Button>
         </footer>
       </motion.aside>

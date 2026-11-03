@@ -1,0 +1,139 @@
+{
+  "invite": "Do you want to start a quick tutorial?",
+  "detail": "Make a small composition with {{brandName}}, from your first effect to a video export. A separate practice project will open.",
+  "yes": "Yes, start tutorial",
+  "no": "No, thanks",
+  "next": "Next",
+  "previous": "Previous",
+  "exit": "Exit tutorial",
+  "leave": "Leave the tutorial?",
+  "leaveDetail": "Your practice project will stay available. You can replay the tutorial from editor preferences.",
+  "stay": "Keep going",
+  "finish": "Finish",
+  "replay": "Replay onboarding",
+  "error": "This action failed. Please try again.",
+  "loading": "Loading…",
+  "region": "{{brandName}} tutorial",
+  "progress": "Step {{current}} of {{total}}",
+  "project": {
+    "name": "Learning with {{brandName}}",
+    "mountains": "Mountains",
+    "lake": "Lake",
+    "forest": "Forest"
+  },
+  "controls": {
+    "wheel": "Wheel",
+    "rightClick": "Right-click",
+    "add": "Add (+)",
+    "effects": "Add effect",
+    "dither": "Dither",
+    "static": "Static",
+    "motion": "Motion",
+    "animation": "Add motion",
+    "pop": "Pop",
+    "pin": "Pin",
+    "play": "Play",
+    "export": "Export",
+    "video": "Motion video",
+    "exportVideo": "Export video"
+  },
+  "errors": {
+    "activeProject": "The active project changed.",
+    "changedStart": "The active project changed. Start the tutorial again.",
+    "imageLoad": "Could not load tutorial image: {{name}}",
+    "imagesImport": "The tutorial images could not be imported.",
+    "motionFirst": "Select a Motion artboard first.",
+    "notReady": "This control is not ready. Try Next again.",
+    "exportFailed": "Video export did not complete. Try exporting again.",
+    "imageMenu": "Could not open the image menu.",
+    "effectLibrary": "Could not open the effect library.",
+    "restoreSurface": "Could not restore the tutorial surface.",
+    "cancelled": "Tutorial action cancelled"
+  },
+  "steps": {
+    "canvas": {
+      "title": "Your canvas",
+      "text": "This is your canvas. Add images, videos, text and objects here. We have loaded three images for you."
+    },
+    "tools": {
+      "title": "Your tools",
+      "text": "Use the toolbar to select, move, draw and add content. You can also pan with your trackpad and zoom around the pointer with {zoom}."
+    },
+    "properties": {
+      "title": "Properties",
+      "text": "On the right, change the selected object's size, appearance and effects."
+    },
+    "layers": {
+      "title": "Layers",
+      "text": "Layers control the stacking order. Select the middle image, {{lake}}, in this list."
+    },
+    "effectMenu": {
+      "title": "Open the effect menu",
+      "text": "Click {add} at the top of Layers. The guide will follow you into the effect menu."
+    },
+    "effectCategory": {
+      "title": "Add an effect",
+      "text": "Click {effects} in this menu to open the effect library."
+    },
+    "dither": {
+      "title": "Try Dither",
+      "text": "The search is ready. Click {dither} to turn the image into a pattern of dots."
+    },
+    "recenter": {
+      "title": "Back to your canvas",
+      "text": "Dither is applied. We have zoomed out and recentered the canvas so you can see the whole composition."
+    },
+    "modes": {
+      "title": "Static and Motion",
+      "text": "{static} is for still compositions. {motion} adds animation and video playback. The switch lives below your artboard."
+    },
+    "motion": {
+      "title": "Make it move",
+      "text": "We have zoomed in on the switch. Click {motion} to enable animation. We will look at the timeline after adding a transition."
+    },
+    "context": {
+      "title": "Right-click your image",
+      "text": "The canvas is centered again. Use {rightClick} on the middle image, {{lake}}, to open its actions."
+    },
+    "transition": {
+      "title": "Add a transition",
+      "text": "Choose {animation} in this context menu to open the animation library."
+    },
+    "pop": {
+      "title": "Add a pop",
+      "text": "Click {pop} in the Scale category to give the image a short pop-in entrance."
+    },
+    "pin": {
+      "title": "Pin the timeline",
+      "text": "Click {pin} to keep the timeline open. You can resize it; the guide will follow the controls."
+    },
+    "timeline": {
+      "title": "Your timeline",
+      "text": "Each row represents a layer. The clips show when it appears, and the Pop clip is its animation. Drag the playhead to inspect a moment; the controls on the left set playback and duration."
+    },
+    "play": {
+      "title": "Play",
+      "text": "Press {play} in the timeline to preview your animation."
+    },
+    "export": {
+      "title": "Export",
+      "text": "Open {export} at the top right. We will export the motion as a video."
+    },
+    "exportWindow": {
+      "title": "The export window",
+      "text": "Choose your artboard and output on the left. Preview the result on the right. Resolution and format control the file you download."
+    },
+    "video": {
+      "title": "Motion video",
+      "text": "Choose {video} in the export window. Keep the default video settings."
+    },
+    "render": {
+      "title": "Save your video",
+      "text": "Click {exportVideo}. {{brandName}} will render the actual animation and download it. The render and download continue independently."
+    },
+    "ready": {
+      "title": "You're ready",
+      "text": "You've completed the tutorial. {{brandName}} handles the video render and download in the background; you can keep working."
+    }
+  }
+}

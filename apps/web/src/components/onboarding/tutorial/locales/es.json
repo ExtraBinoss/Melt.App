@@ -1,0 +1,139 @@
+{
+  "invite": "¿Quieres empezar un tutorial rápido?",
+  "detail": "Crea una pequeña composición con {{brandName}}, desde el primer efecto hasta la exportación de vídeo. Se abrirá un proyecto de práctica independiente.",
+  "yes": "Sí, empezar",
+  "no": "No, gracias",
+  "next": "Siguiente",
+  "previous": "Anterior",
+  "exit": "Salir del tutorial",
+  "leave": "¿Salir del tutorial?",
+  "leaveDetail": "Tu proyecto de práctica seguirá disponible. Puedes repetir el tutorial desde las preferencias del editor.",
+  "stay": "Continuar",
+  "finish": "Terminar",
+  "replay": "Repetir la introducción",
+  "error": "La acción ha fallado. Inténtalo de nuevo.",
+  "loading": "Cargando…",
+  "region": "Tutorial de {{brandName}}",
+  "progress": "Paso {{current}} de {{total}}",
+  "project": {
+    "name": "Aprender con {{brandName}}",
+    "mountains": "Montañas",
+    "lake": "Lago",
+    "forest": "Bosque"
+  },
+  "controls": {
+    "wheel": "Rueda",
+    "rightClick": "Clic derecho",
+    "add": "Añadir (+)",
+    "effects": "Añadir efecto",
+    "dither": "Dither",
+    "static": "Estático",
+    "motion": "Animación",
+    "animation": "Añadir animación",
+    "pop": "Pop",
+    "pin": "Fijar",
+    "play": "Reproducir",
+    "export": "Exportar",
+    "video": "Vídeo Motion",
+    "exportVideo": "Exportar vídeo"
+  },
+  "errors": {
+    "activeProject": "El proyecto activo ha cambiado.",
+    "changedStart": "El proyecto activo ha cambiado. Vuelve a iniciar el tutorial.",
+    "imageLoad": "No se pudo cargar la imagen del tutorial: {{name}}",
+    "imagesImport": "No se pudieron importar las imágenes del tutorial.",
+    "motionFirst": "Selecciona primero una mesa de trabajo en modo Animación.",
+    "notReady": "Este control aún no está listo. Vuelve a pulsar Siguiente.",
+    "exportFailed": "La exportación de vídeo ha fallado. Intenta exportarlo de nuevo.",
+    "imageMenu": "No se pudo abrir el menú de la imagen.",
+    "effectLibrary": "No se pudo abrir la biblioteca de efectos.",
+    "restoreSurface": "No se pudo restaurar la interfaz del tutorial.",
+    "cancelled": "Acción del tutorial cancelada."
+  },
+  "steps": {
+    "canvas": {
+      "title": "Tu lienzo",
+      "text": "Este es tu lienzo. Aquí puedes añadir imágenes, vídeos, texto y objetos. Hemos cargado tres imágenes para ti."
+    },
+    "tools": {
+      "title": "Tus herramientas",
+      "text": "Usa la barra de herramientas para seleccionar, mover, dibujar y añadir contenido. Desplaza la vista con el panel táctil y amplía alrededor del puntero con {zoom}."
+    },
+    "properties": {
+      "title": "Propiedades",
+      "text": "A la derecha puedes cambiar el tamaño, la apariencia y los efectos del objeto seleccionado."
+    },
+    "layers": {
+      "title": "Capas",
+      "text": "Las capas controlan el orden de superposición. Selecciona en esta lista la imagen central, {{lake}}."
+    },
+    "effectMenu": {
+      "title": "Abrir el menú de efectos",
+      "text": "Haz clic en {add} en la parte superior de Capas. El guía te acompañará al menú de efectos."
+    },
+    "effectCategory": {
+      "title": "Añadir un efecto",
+      "text": "Haz clic en {effects} en este menú para abrir la biblioteca de efectos."
+    },
+    "dither": {
+      "title": "Probar Dither",
+      "text": "La búsqueda está preparada. Haz clic en {dither} para convertir la imagen en una trama de puntos."
+    },
+    "recenter": {
+      "title": "Volver al lienzo",
+      "text": "Dither está aplicado. Hemos alejado y centrado el lienzo para que veas toda la composición."
+    },
+    "modes": {
+      "title": "Estático y Animación",
+      "text": "{static} sirve para composiciones fijas. {motion} añade animación y reproducción de vídeo. El selector está debajo de tu mesa de trabajo."
+    },
+    "motion": {
+      "title": "Animar la composición",
+      "text": "Hemos acercado el selector. Haz clic en {motion} para activar la animación. Veremos la línea de tiempo después de añadir una transición."
+    },
+    "context": {
+      "title": "Clic derecho en la imagen",
+      "text": "El lienzo está centrado de nuevo. Usa {rightClick} en la imagen central, {{lake}}, para abrir sus acciones."
+    },
+    "transition": {
+      "title": "Añadir una transición",
+      "text": "Elige {animation} en este menú contextual para abrir la biblioteca de animaciones."
+    },
+    "pop": {
+      "title": "Añadir Pop",
+      "text": "Haz clic en {pop} en la categoría Scale para dar a la imagen una breve animación de entrada."
+    },
+    "pin": {
+      "title": "Fijar la línea de tiempo",
+      "text": "Haz clic en {pin} para mantener abierta la línea de tiempo. Puedes cambiar su tamaño; el guía seguirá sus controles."
+    },
+    "timeline": {
+      "title": "Tu línea de tiempo",
+      "text": "Cada fila representa una capa. Los clips indican cuándo aparece y el clip Pop es su animación. Arrastra el cabezal para explorar un instante; los controles de la izquierda ajustan la reproducción y la duración."
+    },
+    "play": {
+      "title": "Reproducir",
+      "text": "Pulsa {play} en la línea de tiempo para previsualizar tu animación."
+    },
+    "export": {
+      "title": "Exportar",
+      "text": "Abre {export} arriba a la derecha. Exportaremos la animación como vídeo."
+    },
+    "exportWindow": {
+      "title": "La ventana de exportación",
+      "text": "Elige la mesa de trabajo y el tipo de salida a la izquierda. Previsualiza el resultado a la derecha. La resolución y el formato determinan el archivo que descargas."
+    },
+    "video": {
+      "title": "Vídeo Motion",
+      "text": "Elige {video} en la ventana de exportación. Conserva los ajustes de vídeo predeterminados."
+    },
+    "render": {
+      "title": "Guardar tu vídeo",
+      "text": "Haz clic en {exportVideo}. {{brandName}} renderizará la animación y la descargará. El renderizado y la descarga continuarán de forma independiente."
+    },
+    "ready": {
+      "title": "Todo listo",
+      "text": "Has terminado el tutorial. {{brandName}} renderiza y descarga el vídeo en segundo plano; puedes seguir trabajando."
+    }
+  }
+}

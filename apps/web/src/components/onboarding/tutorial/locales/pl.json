@@ -1,0 +1,139 @@
+{
+  "invite": "Czy chcesz rozpocząć krótki samouczek?",
+  "detail": "Utwórz małą kompozycję w {{brandName}} — od pierwszego efektu po eksport wideo. Otworzy się osobny projekt ćwiczeniowy.",
+  "yes": "Tak, rozpocznij",
+  "no": "Nie, dziękuję",
+  "next": "Dalej",
+  "previous": "Wstecz",
+  "exit": "Zakończ samouczek",
+  "leave": "Zakończyć samouczek?",
+  "leaveDetail": "Twój projekt ćwiczeniowy pozostanie dostępny. Samouczek można uruchomić ponownie w preferencjach edytora.",
+  "stay": "Kontynuuj",
+  "finish": "Gotowe",
+  "replay": "Powtórz wprowadzenie",
+  "error": "Ta czynność nie powiodła się. Spróbuj ponownie.",
+  "loading": "Wczytywanie…",
+  "region": "Samouczek {{brandName}}",
+  "progress": "Krok {{current}} z {{total}}",
+  "project": {
+    "name": "Nauka z {{brandName}}",
+    "mountains": "Góry",
+    "lake": "Jezioro",
+    "forest": "Las"
+  },
+  "controls": {
+    "wheel": "Kółko myszy",
+    "rightClick": "Prawy przycisk myszy",
+    "add": "Dodaj (+)",
+    "effects": "Dodaj efekt",
+    "dither": "Dither",
+    "static": "Statyczny",
+    "motion": "Animacja",
+    "animation": "Dodaj animację",
+    "pop": "Pop",
+    "pin": "Przypnij",
+    "play": "Odtwórz",
+    "export": "Eksportuj",
+    "video": "Wideo Motion",
+    "exportVideo": "Eksportuj wideo"
+  },
+  "errors": {
+    "activeProject": "Aktywny projekt uległ zmianie.",
+    "changedStart": "Aktywny projekt uległ zmianie. Uruchom samouczek ponownie.",
+    "imageLoad": "Nie udało się wczytać obrazu samouczka: {{name}}",
+    "imagesImport": "Nie udało się zaimportować obrazów samouczka.",
+    "motionFirst": "Najpierw wybierz obszar roboczy w trybie Animacja.",
+    "notReady": "Ten element nie jest jeszcze gotowy. Kliknij ponownie Dalej.",
+    "exportFailed": "Eksport wideo nie powiódł się. Spróbuj wyeksportować ponownie.",
+    "imageMenu": "Nie udało się otworzyć menu obrazu.",
+    "effectLibrary": "Nie udało się otworzyć biblioteki efektów.",
+    "restoreSurface": "Nie udało się przywrócić interfejsu samouczka.",
+    "cancelled": "Czynność samouczka anulowana."
+  },
+  "steps": {
+    "canvas": {
+      "title": "Twoje płótno",
+      "text": "To jest Twoje płótno. Możesz dodawać tu obrazy, filmy, tekst i obiekty. Wczytaliśmy dla Ciebie trzy obrazy."
+    },
+    "tools": {
+      "title": "Twoje narzędzia",
+      "text": "Pasek narzędzi służy do zaznaczania, przesuwania, rysowania i dodawania treści. Przesuwaj widok gładzikiem, a {zoom} powiększy go wokół wskaźnika."
+    },
+    "properties": {
+      "title": "Właściwości",
+      "text": "Po prawej zmienisz rozmiar, wygląd i efekty zaznaczonego obiektu."
+    },
+    "layers": {
+      "title": "Warstwy",
+      "text": "Warstwy określają kolejność nakładania. Wybierz na tej liście środkowy obraz: {{lake}}."
+    },
+    "effectMenu": {
+      "title": "Otwórz menu efektów",
+      "text": "Kliknij {add} u góry panelu warstw. Przewodnik przeprowadzi Cię przez menu efektów."
+    },
+    "effectCategory": {
+      "title": "Dodaj efekt",
+      "text": "Kliknij {effects} w tym menu, aby otworzyć bibliotekę efektów."
+    },
+    "dither": {
+      "title": "Wypróbuj Dither",
+      "text": "Wyszukiwanie jest gotowe. Kliknij {dither}, aby zamienić obraz we wzór z kropek."
+    },
+    "recenter": {
+      "title": "Powrót do płótna",
+      "text": "Efekt Dither został zastosowany. Oddaliliśmy i wyśrodkowaliśmy płótno, aby pokazać całą kompozycję."
+    },
+    "modes": {
+      "title": "Statyczny i Animacja",
+      "text": "{static} służy do nieruchomych kompozycji. {motion} dodaje animację i odtwarzanie wideo. Przełącznik znajduje się pod obszarem roboczym."
+    },
+    "motion": {
+      "title": "Animuj kompozycję",
+      "text": "Przybliżyliśmy przełącznik. Kliknij {motion}, aby włączyć animację. Oś czasu omówimy po dodaniu przejścia."
+    },
+    "context": {
+      "title": "Kliknij obraz prawym przyciskiem",
+      "text": "Płótno jest ponownie wyśrodkowane. Otwórz działania środkowego obrazu, {{lake}}: {rightClick}."
+    },
+    "transition": {
+      "title": "Dodaj przejście",
+      "text": "Wybierz {animation} w tym menu kontekstowym, aby otworzyć bibliotekę animacji."
+    },
+    "pop": {
+      "title": "Dodaj Pop",
+      "text": "Kliknij {pop} w kategorii Scale, aby obraz pojawił się z krótką animacją wejścia."
+    },
+    "pin": {
+      "title": "Przypnij oś czasu",
+      "text": "Kliknij {pin}, aby oś czasu pozostała otwarta. Możesz zmieniać jej rozmiar; przewodnik będzie podążał za jej elementami."
+    },
+    "timeline": {
+      "title": "Twoja oś czasu",
+      "text": "Każdy wiersz reprezentuje warstwę. Klipy pokazują, kiedy się pojawia, a klip Pop odpowiada jej animacji. Przesuń głowicę, aby obejrzeć dany moment; po lewej ustawisz odtwarzanie i czas trwania."
+    },
+    "play": {
+      "title": "Odtwórz animację",
+      "text": "Naciśnij {play} na osi czasu, aby obejrzeć podgląd animacji."
+    },
+    "export": {
+      "title": "Eksportuj",
+      "text": "Otwórz {export} w prawym górnym rogu. Wyeksportujemy animację jako wideo."
+    },
+    "exportWindow": {
+      "title": "Okno eksportu",
+      "text": "Po lewej wybierz obszar roboczy i typ eksportu. Po prawej zobaczysz podgląd. Rozdzielczość i format określają pobierany plik."
+    },
+    "video": {
+      "title": "Wideo Motion",
+      "text": "Wybierz {video} w oknie eksportu. Zachowaj domyślne ustawienia wideo."
+    },
+    "render": {
+      "title": "Zapisz wideo",
+      "text": "Kliknij {exportVideo}. {{brandName}} wyrenderuje animację i ją pobierze. Renderowanie i pobieranie będą kontynuowane niezależnie."
+    },
+    "ready": {
+      "title": "Wszystko gotowe",
+      "text": "Samouczek został ukończony. {{brandName}} renderuje i pobiera wideo w tle; możesz pracować dalej."
+    }
+  }
+}

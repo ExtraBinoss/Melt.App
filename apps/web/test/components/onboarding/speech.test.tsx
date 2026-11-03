@@ -1,6 +1,11 @@
-import { expect, test, vi } from "vitest";
+import { i18n } from "../../../src/state/i18n";
+import { beforeEach, expect, test, vi } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import { Speech } from "../../../src/components/onboarding/tutorial/Speech";
+
+beforeEach(async () => {
+  await i18n.changeLanguage("en");
+});
 
 for (const [platform, modifier] of [
   ["MacIntel", "⌘"],

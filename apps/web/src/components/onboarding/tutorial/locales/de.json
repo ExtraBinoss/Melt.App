@@ -1,0 +1,139 @@
+{
+  "invite": "Möchtest du ein kurzes Tutorial starten?",
+  "detail": "Erstelle eine kleine Komposition mit {{brandName}} – vom ersten Effekt bis zum Videoexport. Ein separates Übungsprojekt wird geöffnet.",
+  "yes": "Ja, Tutorial starten",
+  "no": "Nein danke",
+  "next": "Weiter",
+  "previous": "Zurück",
+  "exit": "Tutorial verlassen",
+  "leave": "Tutorial verlassen?",
+  "leaveDetail": "Dein Übungsprojekt bleibt erhalten. Du kannst das Tutorial in den Editor-Einstellungen erneut starten.",
+  "stay": "Fortfahren",
+  "finish": "Fertig",
+  "replay": "Einführung erneut starten",
+  "error": "Diese Aktion ist fehlgeschlagen. Bitte versuche es erneut.",
+  "loading": "Wird geladen…",
+  "region": "{{brandName}}-Tutorial",
+  "progress": "Schritt {{current}} von {{total}}",
+  "project": {
+    "name": "Lernen mit {{brandName}}",
+    "mountains": "Berge",
+    "lake": "See",
+    "forest": "Wald"
+  },
+  "controls": {
+    "wheel": "Mausrad",
+    "rightClick": "Rechtsklick",
+    "add": "Hinzufügen (+)",
+    "effects": "Effekt hinzufügen",
+    "dither": "Dither",
+    "static": "Statisch",
+    "motion": "Bewegung",
+    "animation": "Animation hinzufügen",
+    "pop": "Pop",
+    "pin": "Anheften",
+    "play": "Wiedergabe",
+    "export": "Exportieren",
+    "video": "Motion-Video",
+    "exportVideo": "Video exportieren"
+  },
+  "errors": {
+    "activeProject": "Das aktive Projekt hat sich geändert.",
+    "changedStart": "Das aktive Projekt hat sich geändert. Starte das Tutorial erneut.",
+    "imageLoad": "Tutorialbild konnte nicht geladen werden: {{name}}",
+    "imagesImport": "Die Tutorialbilder konnten nicht importiert werden.",
+    "motionFirst": "Wähle zuerst eine Zeichenfläche im Bewegungsmodus.",
+    "notReady": "Dieses Steuerelement ist noch nicht bereit. Klicke erneut auf Weiter.",
+    "exportFailed": "Der Videoexport ist fehlgeschlagen. Versuche den Export erneut.",
+    "imageMenu": "Das Bildmenü konnte nicht geöffnet werden.",
+    "effectLibrary": "Die Effektbibliothek konnte nicht geöffnet werden.",
+    "restoreSurface": "Die Tutorialoberfläche konnte nicht wiederhergestellt werden.",
+    "cancelled": "Tutorialaktion abgebrochen."
+  },
+  "steps": {
+    "canvas": {
+      "title": "Deine Arbeitsfläche",
+      "text": "Das ist deine Arbeitsfläche. Hier kannst du Bilder, Videos, Text und Objekte hinzufügen. Wir haben drei Bilder für dich geladen."
+    },
+    "tools": {
+      "title": "Deine Werkzeuge",
+      "text": "Mit der Werkzeugleiste kannst du auswählen, verschieben, zeichnen und Inhalte hinzufügen. Mit dem Trackpad verschiebst du die Ansicht; mit {zoom} zoomst du um den Zeiger."
+    },
+    "properties": {
+      "title": "Eigenschaften",
+      "text": "Rechts änderst du Größe, Aussehen und Effekte des ausgewählten Objekts."
+    },
+    "layers": {
+      "title": "Ebenen",
+      "text": "Ebenen bestimmen die Stapelreihenfolge. Wähle in dieser Liste das mittlere Bild, {{lake}}."
+    },
+    "effectMenu": {
+      "title": "Effektmenü öffnen",
+      "text": "Klicke oben bei den Ebenen auf {add}. Der Guide begleitet dich ins Effektmenü."
+    },
+    "effectCategory": {
+      "title": "Effekt hinzufügen",
+      "text": "Klicke in diesem Menü auf {effects}, um die Effektbibliothek zu öffnen."
+    },
+    "dither": {
+      "title": "Dither ausprobieren",
+      "text": "Die Suche ist vorbereitet. Klicke auf {dither}, um das Bild in ein Punktraster umzuwandeln."
+    },
+    "recenter": {
+      "title": "Zurück zur Arbeitsfläche",
+      "text": "Dither ist angewendet. Wir haben herausgezoomt und die Arbeitsfläche zentriert, damit du die ganze Komposition siehst."
+    },
+    "modes": {
+      "title": "Statisch und Bewegung",
+      "text": "{static} ist für unbewegte Kompositionen. {motion} ergänzt Animation und Videowiedergabe. Der Umschalter liegt unter deiner Zeichenfläche."
+    },
+    "motion": {
+      "title": "Komposition animieren",
+      "text": "Wir haben den Umschalter herangezoomt. Klicke auf {motion}, um Animation zu aktivieren. Die Zeitleiste sehen wir uns nach dem Hinzufügen eines Übergangs an."
+    },
+    "context": {
+      "title": "Rechtsklick auf dein Bild",
+      "text": "Die Arbeitsfläche ist wieder zentriert. Öffne mit {rightClick} auf dem mittleren Bild, {{lake}}, dessen Aktionen."
+    },
+    "transition": {
+      "title": "Übergang hinzufügen",
+      "text": "Wähle in diesem Kontextmenü {animation}, um die Animationsbibliothek zu öffnen."
+    },
+    "pop": {
+      "title": "Pop hinzufügen",
+      "text": "Klicke in der Kategorie Scale auf {pop}, damit das Bild mit einer kurzen Pop-Animation erscheint."
+    },
+    "pin": {
+      "title": "Zeitleiste anheften",
+      "text": "Klicke auf {pin}, um die Zeitleiste geöffnet zu halten. Du kannst ihre Größe ändern; der Guide folgt den Steuerelementen."
+    },
+    "timeline": {
+      "title": "Deine Zeitleiste",
+      "text": "Jede Zeile steht für eine Ebene. Die Clips zeigen, wann sie erscheint; der Pop-Clip ist ihre Animation. Ziehe den Abspielkopf zu einem Zeitpunkt. Links steuerst du Wiedergabe und Dauer."
+    },
+    "play": {
+      "title": "Animation abspielen",
+      "text": "Drücke in der Zeitleiste {play}, um deine Animation anzusehen."
+    },
+    "export": {
+      "title": "Exportieren",
+      "text": "Öffne oben rechts {export}. Wir exportieren die Animation als Video."
+    },
+    "exportWindow": {
+      "title": "Das Exportfenster",
+      "text": "Wähle links die Zeichenfläche und die Ausgabe. Rechts siehst du die Vorschau. Auflösung und Format bestimmen die heruntergeladene Datei."
+    },
+    "video": {
+      "title": "Motion-Video",
+      "text": "Wähle im Exportfenster {video}. Behalte die Standard-Videoeinstellungen bei."
+    },
+    "render": {
+      "title": "Video speichern",
+      "text": "Klicke auf {exportVideo}. {{brandName}} rendert die Animation und lädt sie herunter. Rendering und Download laufen unabhängig weiter."
+    },
+    "ready": {
+      "title": "Du bist bereit",
+      "text": "Du hast das Tutorial abgeschlossen. {{brandName}} rendert und lädt das Video im Hintergrund herunter; du kannst weiterarbeiten."
+    }
+  }
+}

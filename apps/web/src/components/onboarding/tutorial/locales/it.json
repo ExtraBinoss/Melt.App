@@ -1,0 +1,139 @@
+{
+  "invite": "Vuoi iniziare un breve tutorial?",
+  "detail": "Crea una piccola composizione con {{brandName}}, dal primo effetto all’esportazione video. Si aprirà un progetto di esercitazione separato.",
+  "yes": "Sì, inizia",
+  "no": "No, grazie",
+  "next": "Avanti",
+  "previous": "Indietro",
+  "exit": "Esci dal tutorial",
+  "leave": "Uscire dal tutorial?",
+  "leaveDetail": "Il progetto di esercitazione resterà disponibile. Puoi ripetere il tutorial dalle preferenze dell’editor.",
+  "stay": "Continua",
+  "finish": "Fine",
+  "replay": "Ripeti l’introduzione",
+  "error": "L’azione non è riuscita. Riprova.",
+  "loading": "Caricamento…",
+  "region": "Tutorial di {{brandName}}",
+  "progress": "Passaggio {{current}} di {{total}}",
+  "project": {
+    "name": "Imparare con {{brandName}}",
+    "mountains": "Montagne",
+    "lake": "Lago",
+    "forest": "Foresta"
+  },
+  "controls": {
+    "wheel": "Rotellina",
+    "rightClick": "Clic destro",
+    "add": "Aggiungi (+)",
+    "effects": "Aggiungi effetto",
+    "dither": "Dither",
+    "static": "Statico",
+    "motion": "Animazione",
+    "animation": "Aggiungi animazione",
+    "pop": "Pop",
+    "pin": "Fissa",
+    "play": "Riproduci",
+    "export": "Esporta",
+    "video": "Video Motion",
+    "exportVideo": "Esporta video"
+  },
+  "errors": {
+    "activeProject": "Il progetto attivo è cambiato.",
+    "changedStart": "Il progetto attivo è cambiato. Riavvia il tutorial.",
+    "imageLoad": "Impossibile caricare l’immagine del tutorial: {{name}}",
+    "imagesImport": "Impossibile importare le immagini del tutorial.",
+    "motionFirst": "Seleziona prima una tavola da disegno in modalità Animazione.",
+    "notReady": "Questo comando non è ancora pronto. Premi di nuovo Avanti.",
+    "exportFailed": "L’esportazione video non è riuscita. Riprova a esportare.",
+    "imageMenu": "Impossibile aprire il menu dell’immagine.",
+    "effectLibrary": "Impossibile aprire la libreria degli effetti.",
+    "restoreSurface": "Impossibile ripristinare l’interfaccia del tutorial.",
+    "cancelled": "Azione del tutorial annullata."
+  },
+  "steps": {
+    "canvas": {
+      "title": "La tua area di lavoro",
+      "text": "Questa è la tua area di lavoro. Qui puoi aggiungere immagini, video, testo e oggetti. Abbiamo caricato tre immagini per te."
+    },
+    "tools": {
+      "title": "I tuoi strumenti",
+      "text": "La barra degli strumenti permette di selezionare, spostare, disegnare e aggiungere contenuti. Sposta la vista con il trackpad e ingrandisci intorno al puntatore con {zoom}."
+    },
+    "properties": {
+      "title": "Proprietà",
+      "text": "A destra puoi modificare dimensioni, aspetto ed effetti dell’oggetto selezionato."
+    },
+    "layers": {
+      "title": "Livelli",
+      "text": "I livelli determinano l’ordine di sovrapposizione. Seleziona l’immagine centrale, {{lake}}, in questo elenco."
+    },
+    "effectMenu": {
+      "title": "Aprire il menu degli effetti",
+      "text": "Fai clic su {add} sopra i livelli. La guida ti accompagnerà nel menu degli effetti."
+    },
+    "effectCategory": {
+      "title": "Aggiungere un effetto",
+      "text": "Fai clic su {effects} in questo menu per aprire la libreria degli effetti."
+    },
+    "dither": {
+      "title": "Provare Dither",
+      "text": "La ricerca è pronta. Fai clic su {dither} per trasformare l’immagine in una trama di punti."
+    },
+    "recenter": {
+      "title": "Tornare all’area di lavoro",
+      "text": "Dither è applicato. Abbiamo ridotto lo zoom e centrato l’area di lavoro per mostrare tutta la composizione."
+    },
+    "modes": {
+      "title": "Statico e Animazione",
+      "text": "{static} serve per le composizioni fisse. {motion} aggiunge animazione e riproduzione video. Il selettore si trova sotto la tavola da disegno."
+    },
+    "motion": {
+      "title": "Animare la composizione",
+      "text": "Abbiamo ingrandito il selettore. Fai clic su {motion} per attivare l’animazione. Vedremo la timeline dopo aver aggiunto una transizione."
+    },
+    "context": {
+      "title": "Clic destro sull’immagine",
+      "text": "L’area di lavoro è di nuovo centrata. Usa {rightClick} sull’immagine centrale, {{lake}}, per aprire le sue azioni."
+    },
+    "transition": {
+      "title": "Aggiungere una transizione",
+      "text": "Scegli {animation} in questo menu contestuale per aprire la libreria delle animazioni."
+    },
+    "pop": {
+      "title": "Aggiungere Pop",
+      "text": "Fai clic su {pop} nella categoria Scale per dare all’immagine una breve animazione di comparsa."
+    },
+    "pin": {
+      "title": "Fissare la timeline",
+      "text": "Fai clic su {pin} per mantenere aperta la timeline. Puoi ridimensionarla; la guida seguirà i suoi comandi."
+    },
+    "timeline": {
+      "title": "La tua timeline",
+      "text": "Ogni riga rappresenta un livello. Le clip mostrano quando appare e la clip Pop è la sua animazione. Trascina la testina per esplorare un istante; i comandi a sinistra regolano riproduzione e durata."
+    },
+    "play": {
+      "title": "Riprodurre",
+      "text": "Premi {play} nella timeline per vedere un’anteprima dell’animazione."
+    },
+    "export": {
+      "title": "Esportare",
+      "text": "Apri {export} in alto a destra. Esporteremo l’animazione come video."
+    },
+    "exportWindow": {
+      "title": "La finestra di esportazione",
+      "text": "Scegli la tavola da disegno e il tipo di esportazione a sinistra. Guarda l’anteprima a destra. Risoluzione e formato determinano il file scaricato."
+    },
+    "video": {
+      "title": "Video Motion",
+      "text": "Scegli {video} nella finestra di esportazione. Mantieni le impostazioni video predefinite."
+    },
+    "render": {
+      "title": "Salvare il video",
+      "text": "Fai clic su {exportVideo}. {{brandName}} elaborerà l’animazione e la scaricherà. Il rendering e il download continueranno in modo indipendente."
+    },
+    "ready": {
+      "title": "Tutto pronto",
+      "text": "Hai completato il tutorial. {{brandName}} gestisce il rendering e il download del video in background; puoi continuare a lavorare."
+    }
+  }
+}

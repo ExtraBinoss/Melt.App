@@ -1,0 +1,139 @@
+{
+  "invite": "Quer iniciar um tutorial rápido?",
+  "detail": "Crie uma pequena composição com o {{brandName}}, do primeiro efeito à exportação de vídeo. Será aberto um projeto de prática separado.",
+  "yes": "Sim, começar",
+  "no": "Não, obrigado",
+  "next": "Seguinte",
+  "previous": "Anterior",
+  "exit": "Sair do tutorial",
+  "leave": "Sair do tutorial?",
+  "leaveDetail": "O seu projeto de prática continuará disponível. Pode repetir o tutorial nas preferências do editor.",
+  "stay": "Continuar",
+  "finish": "Concluir",
+  "replay": "Repetir a introdução",
+  "error": "A ação falhou. Tente novamente.",
+  "loading": "A carregar…",
+  "region": "Tutorial do {{brandName}}",
+  "progress": "Passo {{current}} de {{total}}",
+  "project": {
+    "name": "Aprender com o {{brandName}}",
+    "mountains": "Montanhas",
+    "lake": "Lago",
+    "forest": "Floresta"
+  },
+  "controls": {
+    "wheel": "Roda",
+    "rightClick": "Clique direito",
+    "add": "Adicionar (+)",
+    "effects": "Adicionar efeito",
+    "dither": "Dither",
+    "static": "Estático",
+    "motion": "Animação",
+    "animation": "Adicionar animação",
+    "pop": "Pop",
+    "pin": "Fixar",
+    "play": "Reproduzir",
+    "export": "Exportar",
+    "video": "Vídeo Motion",
+    "exportVideo": "Exportar vídeo"
+  },
+  "errors": {
+    "activeProject": "O projeto ativo mudou.",
+    "changedStart": "O projeto ativo mudou. Reinicie o tutorial.",
+    "imageLoad": "Não foi possível carregar a imagem do tutorial: {{name}}",
+    "imagesImport": "Não foi possível importar as imagens do tutorial.",
+    "motionFirst": "Selecione primeiro uma prancheta no modo Animação.",
+    "notReady": "Este controlo ainda não está disponível. Clique novamente em Seguinte.",
+    "exportFailed": "A exportação do vídeo falhou. Tente exportar novamente.",
+    "imageMenu": "Não foi possível abrir o menu da imagem.",
+    "effectLibrary": "Não foi possível abrir a biblioteca de efeitos.",
+    "restoreSurface": "Não foi possível restaurar a interface do tutorial.",
+    "cancelled": "Ação do tutorial cancelada."
+  },
+  "steps": {
+    "canvas": {
+      "title": "A sua área de trabalho",
+      "text": "Esta é a sua área de trabalho. Adicione imagens, vídeos, texto e objetos aqui. Carregámos três imagens para si."
+    },
+    "tools": {
+      "title": "As suas ferramentas",
+      "text": "Use a barra de ferramentas para selecionar, mover, desenhar e adicionar conteúdo. Desloque a vista com o trackpad e amplie em torno do ponteiro com {zoom}."
+    },
+    "properties": {
+      "title": "Propriedades",
+      "text": "À direita, altere o tamanho, o aspeto e os efeitos do objeto selecionado."
+    },
+    "layers": {
+      "title": "Camadas",
+      "text": "As camadas definem a ordem de sobreposição. Selecione a imagem do meio, {{lake}}, nesta lista."
+    },
+    "effectMenu": {
+      "title": "Abrir o menu de efeitos",
+      "text": "Clique em {add} no topo das camadas. O guia irá acompanhá-lo ao menu de efeitos."
+    },
+    "effectCategory": {
+      "title": "Adicionar um efeito",
+      "text": "Clique em {effects} neste menu para abrir a biblioteca de efeitos."
+    },
+    "dither": {
+      "title": "Experimentar Dither",
+      "text": "A pesquisa está pronta. Clique em {dither} para transformar a imagem numa trama de pontos."
+    },
+    "recenter": {
+      "title": "Voltar à área de trabalho",
+      "text": "Dither foi aplicado. Reduzimos o zoom e centrámos a área de trabalho para mostrar toda a composição."
+    },
+    "modes": {
+      "title": "Estático e Animação",
+      "text": "{static} serve para composições fixas. {motion} acrescenta animação e reprodução de vídeo. O seletor está por baixo da prancheta."
+    },
+    "motion": {
+      "title": "Animar a composição",
+      "text": "Aproximámos o seletor. Clique em {motion} para ativar a animação. Veremos a linha de tempo depois de adicionar uma transição."
+    },
+    "context": {
+      "title": "Clique direito na imagem",
+      "text": "A área de trabalho está novamente centrada. Use {rightClick} na imagem do meio, {{lake}}, para abrir as respetivas ações."
+    },
+    "transition": {
+      "title": "Adicionar uma transição",
+      "text": "Escolha {animation} neste menu de contexto para abrir a biblioteca de animações."
+    },
+    "pop": {
+      "title": "Adicionar Pop",
+      "text": "Clique em {pop} na categoria Scale para dar à imagem uma breve animação de entrada."
+    },
+    "pin": {
+      "title": "Fixar a linha de tempo",
+      "text": "Clique em {pin} para manter a linha de tempo aberta. Pode redimensioná-la; o guia seguirá os controlos."
+    },
+    "timeline": {
+      "title": "A sua linha de tempo",
+      "text": "Cada linha representa uma camada. Os clipes mostram quando aparece e o clipe Pop é a sua animação. Arraste a cabeça de reprodução para explorar um instante; os controlos à esquerda ajustam a reprodução e a duração."
+    },
+    "play": {
+      "title": "Reproduzir",
+      "text": "Prima {play} na linha de tempo para pré-visualizar a animação."
+    },
+    "export": {
+      "title": "Exportar",
+      "text": "Abra {export} no canto superior direito. Vamos exportar a animação como vídeo."
+    },
+    "exportWindow": {
+      "title": "A janela de exportação",
+      "text": "Escolha a prancheta e o tipo de exportação à esquerda. Pré-visualize o resultado à direita. A resolução e o formato determinam o ficheiro transferido."
+    },
+    "video": {
+      "title": "Vídeo Motion",
+      "text": "Escolha {video} na janela de exportação. Mantenha as definições de vídeo padrão."
+    },
+    "render": {
+      "title": "Guardar o vídeo",
+      "text": "Clique em {exportVideo}. O {{brandName}} irá renderizar a animação e transferi-la. A renderização e a transferência continuarão de forma independente."
+    },
+    "ready": {
+      "title": "Tudo pronto",
+      "text": "Concluiu o tutorial. O {{brandName}} trata da renderização e da transferência do vídeo em segundo plano; pode continuar a trabalhar."
+    }
+  }
+}

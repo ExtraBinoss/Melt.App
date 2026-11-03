@@ -1,0 +1,139 @@
+{
+  "invite": "Voulez-vous suivre un tutoriel rapide ?",
+  "detail": "Créez une petite composition avec {{brandName}}, du premier effet à l’export vidéo. Un projet d’exercice séparé va s’ouvrir.",
+  "yes": "Oui, commencer",
+  "no": "Non merci",
+  "next": "Suivant",
+  "previous": "Précédent",
+  "exit": "Quitter le tutoriel",
+  "leave": "Quitter le tutoriel ?",
+  "leaveDetail": "Votre projet d’exercice restera disponible. Vous pourrez relancer le tutoriel dans les préférences de l’éditeur.",
+  "stay": "Continuer",
+  "finish": "Terminer",
+  "replay": "Rejouer l’onboarding",
+  "error": "Cette action a échoué. Veuillez réessayer.",
+  "loading": "Chargement…",
+  "region": "Tutoriel {{brandName}}",
+  "progress": "Étape {{current}} sur {{total}}",
+  "project": {
+    "name": "Apprendre avec {{brandName}}",
+    "mountains": "Montagnes",
+    "lake": "Lac",
+    "forest": "Forêt"
+  },
+  "controls": {
+    "wheel": "Molette",
+    "rightClick": "Clic droit",
+    "add": "Ajouter (+)",
+    "effects": "Ajouter un effet",
+    "dither": "Dither",
+    "static": "Statique",
+    "motion": "Motion",
+    "animation": "Ajouter une animation",
+    "pop": "Pop",
+    "pin": "Épingler",
+    "play": "Lecture",
+    "export": "Exporter",
+    "video": "Vidéo Motion",
+    "exportVideo": "Exporter la vidéo"
+  },
+  "errors": {
+    "activeProject": "Le projet actif a changé.",
+    "changedStart": "Le projet actif a changé. Relancez le tutoriel.",
+    "imageLoad": "Impossible de charger l’image du tutoriel : {{name}}",
+    "imagesImport": "Les images du tutoriel n’ont pas pu être importées.",
+    "motionFirst": "Sélectionnez d’abord un plan de travail en mode Motion.",
+    "notReady": "Cette commande n’est pas encore disponible. Cliquez à nouveau sur Suivant.",
+    "exportFailed": "L’export vidéo a échoué. Réessayez de l’exporter.",
+    "imageMenu": "Impossible d’ouvrir le menu de l’image.",
+    "effectLibrary": "Impossible d’ouvrir la bibliothèque d’effets.",
+    "restoreSurface": "Impossible de restaurer l’interface du tutoriel.",
+    "cancelled": "Action du tutoriel annulée."
+  },
+  "steps": {
+    "canvas": {
+      "title": "Votre canvas",
+      "text": "Voici votre canvas. Ajoutez-y des images, vidéos, textes et objets. Nous avons chargé trois images pour vous."
+    },
+    "tools": {
+      "title": "Vos outils",
+      "text": "La barre d’outils permet de sélectionner, déplacer, dessiner et ajouter du contenu. Le pavé tactile déplace la vue ; {zoom} zoome autour du pointeur."
+    },
+    "properties": {
+      "title": "Propriétés",
+      "text": "À droite, modifiez la taille, l’apparence et les effets de l’objet sélectionné."
+    },
+    "layers": {
+      "title": "Calques",
+      "text": "Les calques définissent l’ordre de superposition. Sélectionnez l’image du milieu, {{lake}}, dans cette liste."
+    },
+    "effectMenu": {
+      "title": "Ouvrir le menu des effets",
+      "text": "Cliquez sur {add} en haut des calques. Le guide vous accompagnera dans le menu des effets."
+    },
+    "effectCategory": {
+      "title": "Ajouter un effet",
+      "text": "Cliquez sur {effects} dans ce menu pour ouvrir la bibliothèque d’effets."
+    },
+    "dither": {
+      "title": "Essayer Dither",
+      "text": "La recherche est prête. Cliquez sur {dither} pour transformer l’image en une trame de points."
+    },
+    "recenter": {
+      "title": "Retour au canvas",
+      "text": "Dither est appliqué. Nous avons dézoomé et recentré le canvas pour afficher toute la composition."
+    },
+    "modes": {
+      "title": "Statique et Motion",
+      "text": "{static} sert aux compositions fixes. {motion} ajoute l’animation et la lecture vidéo. Le sélecteur se trouve sous le plan de travail."
+    },
+    "motion": {
+      "title": "Animer la composition",
+      "text": "Nous avons zoomé sur le sélecteur. Cliquez sur {motion} pour activer l’animation. Nous verrons la timeline après l’ajout d’une transition."
+    },
+    "context": {
+      "title": "Clic droit sur l’image",
+      "text": "Le canvas est à nouveau centré. Faites un {rightClick} sur l’image du milieu, {{lake}}, pour ouvrir ses actions."
+    },
+    "transition": {
+      "title": "Ajouter une transition",
+      "text": "Choisissez {animation} dans ce menu contextuel pour ouvrir la bibliothèque d’animations."
+    },
+    "pop": {
+      "title": "Ajouter Pop",
+      "text": "Cliquez sur {pop} dans la catégorie Scale pour donner à l’image une courte animation d’apparition."
+    },
+    "pin": {
+      "title": "Épingler la timeline",
+      "text": "Cliquez sur {pin} pour garder la timeline ouverte. Vous pouvez la redimensionner ; le guide suivra ses commandes."
+    },
+    "timeline": {
+      "title": "Votre timeline",
+      "text": "Chaque ligne représente un calque. Les clips indiquent quand il apparaît ; le clip Pop correspond à son animation. Déplacez la tête de lecture pour explorer un instant. À gauche, réglez la lecture et la durée."
+    },
+    "play": {
+      "title": "Lire l’animation",
+      "text": "Appuyez sur {play} dans la timeline pour prévisualiser votre animation."
+    },
+    "export": {
+      "title": "Exporter",
+      "text": "Ouvrez {export} en haut à droite. Nous allons exporter l’animation en vidéo."
+    },
+    "exportWindow": {
+      "title": "La fenêtre d’export",
+      "text": "Choisissez le plan de travail et le type d’export à gauche. Prévisualisez le résultat à droite. La résolution et le format définissent le fichier téléchargé."
+    },
+    "video": {
+      "title": "Vidéo Motion",
+      "text": "Choisissez {video} dans la fenêtre d’export. Gardez les réglages vidéo par défaut."
+    },
+    "render": {
+      "title": "Enregistrer la vidéo",
+      "text": "Cliquez sur {exportVideo}. {{brandName}} va calculer l’animation et la télécharger. Le rendu et le téléchargement continueront indépendamment."
+    },
+    "ready": {
+      "title": "C’est terminé",
+      "text": "Vous avez terminé le tutoriel. {{brandName}} gère le rendu et le téléchargement de la vidéo en arrière-plan ; vous pouvez continuer à créer."
+    }
+  }
+}

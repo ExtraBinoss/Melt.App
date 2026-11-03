@@ -1,3 +1,4 @@
+import { tutorialError } from "./errors";
 import { getTransitionRequests } from "../../motion/transitions/requests";
 import { visible } from "./surfaces";
 import { acquireEffectGuide } from "../../layers/menu/effect-surface";
@@ -35,7 +36,9 @@ export function useStepSurface(
           void performStep("context", { engine, ...practice.current }, controller.signal).catch(
             (error: unknown) => {
               if (!controller.signal.aborted)
-                onError(error instanceof Error ? error.message : "Could not open the image menu.");
+                onError(
+                  error instanceof Error ? error.message : tutorialError("imageMenu").message,
+                );
             },
           );
         }
@@ -50,8 +53,8 @@ export function useStepSurface(
       return;
     }
     if (
-      step.title === "Back to your canvas" ||
-      step.title === "Static and Motion" ||
+      step.id === "recenter" ||
+      step.id === "modes" ||
       ("action" in step && step.action === "context")
     ) {
       if (layerId && "action" in step) {
@@ -79,7 +82,7 @@ export function useStepSurface(
         controller.signal,
       ).catch((error: unknown) => {
         if (!controller.signal.aborted)
-          onError(error instanceof Error ? error.message : "Could not open the effect library.");
+          onError(error instanceof Error ? error.message : tutorialError("effectLibrary").message);
       });
       return () => {
         controller.abort();

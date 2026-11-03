@@ -1,3 +1,4 @@
+import { tutorialError } from "./errors";
 import { useEffect, useRef, type RefObject } from "react";
 import type { EnginePort } from "@musart/core";
 import { performStep, stepDone, waitForTutorial } from "./actions";
@@ -29,7 +30,7 @@ export function useSurfaceRecovery(
     if (action === "transition")
       parent = { selector: '[data-tutorial="add-transition"]', action: "context" };
     if (action === "pop") parent = { selector: ".animation-picker", action: "transition" };
-    if (step.title === "The export window" || action === "video" || action === "render")
+    if (step.id === "exportWindow" || action === "video" || action === "render")
       parent = { selector: '.export-dialog[data-state="open"]', action: "export" };
     if (!parent) return;
     const surface = parent;
@@ -73,7 +74,7 @@ export function useSurfaceRecovery(
         .catch((error: unknown) => {
           if (!controller.signal.aborted)
             onError(
-              error instanceof Error ? error.message : "Could not restore the tutorial surface.",
+              error instanceof Error ? error.message : tutorialError("restoreSurface").message,
             );
         })
         .finally(() => {

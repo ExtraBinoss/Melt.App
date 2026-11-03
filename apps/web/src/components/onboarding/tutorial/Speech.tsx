@@ -1,10 +1,15 @@
+import { useTranslation } from "react-i18next";
+import "./messages";
 import { useEffect, useRef, type ReactNode } from "react";
 import { ChevronRight, Download, Mouse, Pin, Play, Plus, Sparkles } from "lucide-react";
 import { useReducedMotion } from "motion/react";
 import { Kbd, KbdGroup } from "../../ui/kbd";
 import { modifierLabel } from "../../search/shortcuts";
 
-function speechCues(modifier: string): Record<string, { label: string; content: ReactNode }> {
+function speechCues(
+  modifier: string,
+  label: (key: string) => string,
+): Record<string, { label: string; content: ReactNode }> {
   const control = (label: string, icon?: ReactNode) => ({
     label,
     content: (
@@ -16,25 +21,25 @@ function speechCues(modifier: string): Record<string, { label: string; content: 
   });
   return {
     "{zoom}": {
-      label: `${modifier} + wheel`,
+      label: `${modifier} + ${label("wheel")}`,
       content: (
-        <KbdGroup>
+        <KbdGroup dir="ltr">
           <Kbd>{modifier}</Kbd>
-          <Kbd>Wheel</Kbd>
+          <Kbd>{label("wheel")}</Kbd>
         </KbdGroup>
       ),
     },
     "{rightClick}": {
-      label: "Right-click",
+      label: label("rightClick"),
       content: (
         <Kbd>
           <Mouse size={13} />
-          Right-click
+          {label("rightClick")}
         </Kbd>
       ),
     },
     "{add}": {
-      label: "Add (+)",
+      label: label("add"),
       content: (
         <span className="tutorial-control">
           <Plus size={13} />
@@ -42,33 +47,35 @@ function speechCues(modifier: string): Record<string, { label: string; content: 
       ),
     },
     "{effects}": {
-      label: "Add effect",
+      label: label("effects"),
       content: (
         <span className="tutorial-control">
-          Add effect
+          {label("effects")}
           <ChevronRight size={13} />
         </span>
       ),
     },
-    "{dither}": control("Dither"),
-    "{static}": control("Static"),
-    "{motion}": control("Motion"),
-    "{animation}": control("Add motion", <Sparkles size={13} />),
-    "{pop}": control("Pop"),
-    "{pin}": control("Pin", <Pin size={13} />),
-    "{play}": control("Play", <Play size={13} />),
-    "{export}": control("Export", <Download size={13} />),
-    "{video}": control("Motion video"),
-    "{exportVideo}": control("Export video", <Download size={13} />),
+    "{dither}": control(label("dither")),
+    "{static}": control(label("static")),
+    "{motion}": control(label("motion")),
+    "{animation}": control(label("animation"), <Sparkles size={13} />),
+    "{pop}": control(label("pop")),
+    "{pin}": control(label("pin"), <Pin size={13} />),
+    "{play}": control(label("play"), <Play size={13} />),
+    "{export}": control(label("export"), <Download size={13} />),
+    "{video}": control(label("video")),
+    "{exportVideo}": control(label("exportVideo"), <Download size={13} />),
   };
 }
 
 /** Reveal text without replacing the native shortcut components. */
 export function Speech({ text }: { text: string }) {
+  const { t, i18n } = useTranslation("editorTutorial");
+  const language = i18n.resolvedLanguage;
   const host = useRef<HTMLParagraphElement>(null);
   const reduce = useReducedMotion();
   const modifier = modifierLabel();
-  const cues = speechCues(modifier);
+  const cues = speechCues(modifier, (key) => t(`controls.${key}`));
   useEffect(() => {
     const node = host.current;
     if (!node) return;
@@ -102,11 +109,11 @@ export function Speech({ text }: { text: string }) {
       if (count >= total) clearInterval(timer);
     }, 12);
     return () => clearInterval(timer);
-  }, [text, modifier, reduce]);
+  }, [text, modifier, reduce, language]);
   const parts = text.split(/(\{[a-zA-Z]+\})/g);
   return (
     <>
-      <p ref={host} aria-hidden="true" key={text}>
+      <p ref={host} aria-hidden="true" key={`${language}:${text}`}>
         {parts.map((part, index) =>
           cues[part] ? (
             <span key={index} data-speech-cue data-speech-text={cues[part].label}>

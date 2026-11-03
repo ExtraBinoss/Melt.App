@@ -13,8 +13,14 @@ Replay onboarding; dashboard preferences do not.
 
 The browser preference `musart.editor-tutorial.v1` records dismissal or completion.
 If browser storage is unavailable, dismissal still works for the current session.
-The tutorial copy is intentionally English pending product review. Motion respects
-the system reduced-motion preference. A fast text reveal is confined to the guide.
+The tutorial follows the application locale in all twelve supported languages:
+English, French, German, Spanish, Italian, Portuguese, Dutch, Polish, Japanese,
+Korean, Simplified Chinese and Arabic. Its dialogs, 21 lessons, inline controls,
+keyboard labels, errors, replay action and practice-project names use the
+`editorTutorial` feature namespace. Stable step IDs own behavior independently
+of translated titles. Descriptions show the actual practice-layer name. Arabic
+uses RTL cards and dialogs, with LTR shortcut groups and progress counts.
+Motion respects the system reduced-motion preference. A fast text reveal is confined to the guide.
 The shared SVG mascot uses opt-in lively idle playback for natural blinking; hidden and reduced-motion instances
 stop their animation clock. The first card is centered and the surrounding UI is
 dimmed around the active target. Previous reviews completed steps without

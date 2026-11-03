@@ -1,5 +1,5 @@
 import { Button } from "../../ui/button";
-import { copy } from "../../onboarding/tutorial/content";
+import "../../onboarding/tutorial/messages";
 import { useState, type ReactNode } from "react";
 import { useAtom } from "jotai";
 import { useTranslation } from "react-i18next";
@@ -154,7 +154,7 @@ export function Preferences({
           {onReplayTutorial && (
             <div className="preferences-card">
               <Button variant="outline" onClick={onReplayTutorial}>
-                {copy.replay}
+                {t("editorTutorial:replay")}
               </Button>
             </div>
           )}

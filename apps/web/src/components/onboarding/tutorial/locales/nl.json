@@ -1,0 +1,139 @@
+{
+  "invite": "Wil je een korte tutorial starten?",
+  "detail": "Maak een kleine compositie met {{brandName}}, van je eerste effect tot een video-export. Er wordt een apart oefenproject geopend.",
+  "yes": "Ja, starten",
+  "no": "Nee, bedankt",
+  "next": "Volgende",
+  "previous": "Vorige",
+  "exit": "Tutorial verlaten",
+  "leave": "Tutorial verlaten?",
+  "leaveDetail": "Je oefenproject blijft beschikbaar. Je kunt de tutorial opnieuw starten via de editorvoorkeuren.",
+  "stay": "Doorgaan",
+  "finish": "Afronden",
+  "replay": "Introductie opnieuw afspelen",
+  "error": "Deze actie is mislukt. Probeer het opnieuw.",
+  "loading": "Laden…",
+  "region": "{{brandName}}-tutorial",
+  "progress": "Stap {{current}} van {{total}}",
+  "project": {
+    "name": "Leren met {{brandName}}",
+    "mountains": "Bergen",
+    "lake": "Meer",
+    "forest": "Bos"
+  },
+  "controls": {
+    "wheel": "Muiswiel",
+    "rightClick": "Rechtsklik",
+    "add": "Toevoegen (+)",
+    "effects": "Effect toevoegen",
+    "dither": "Dither",
+    "static": "Statisch",
+    "motion": "Animatie",
+    "animation": "Animatie toevoegen",
+    "pop": "Pop",
+    "pin": "Vastzetten",
+    "play": "Afspelen",
+    "export": "Exporteren",
+    "video": "Motion-video",
+    "exportVideo": "Video exporteren"
+  },
+  "errors": {
+    "activeProject": "Het actieve project is gewijzigd.",
+    "changedStart": "Het actieve project is gewijzigd. Start de tutorial opnieuw.",
+    "imageLoad": "De tutorialafbeelding kon niet worden geladen: {{name}}",
+    "imagesImport": "De tutorialafbeeldingen konden niet worden geïmporteerd.",
+    "motionFirst": "Selecteer eerst een tekengebied in de animatiemodus.",
+    "notReady": "Dit bedieningselement is nog niet klaar. Klik opnieuw op Volgende.",
+    "exportFailed": "De video-export is mislukt. Probeer opnieuw te exporteren.",
+    "imageMenu": "Het afbeeldingsmenu kon niet worden geopend.",
+    "effectLibrary": "De effectenbibliotheek kon niet worden geopend.",
+    "restoreSurface": "De tutorialinterface kon niet worden hersteld.",
+    "cancelled": "Tutorialactie geannuleerd."
+  },
+  "steps": {
+    "canvas": {
+      "title": "Je canvas",
+      "text": "Dit is je canvas. Voeg hier afbeeldingen, video's, tekst en objecten toe. We hebben drie afbeeldingen voor je geladen."
+    },
+    "tools": {
+      "title": "Je gereedschappen",
+      "text": "Gebruik de werkbalk om te selecteren, verplaatsen, tekenen en inhoud toe te voegen. Verschuif de weergave met je trackpad en zoom rond de aanwijzer met {zoom}."
+    },
+    "properties": {
+      "title": "Eigenschappen",
+      "text": "Rechts wijzig je de grootte, het uiterlijk en de effecten van het geselecteerde object."
+    },
+    "layers": {
+      "title": "Lagen",
+      "text": "Lagen bepalen de stapelvolgorde. Selecteer in deze lijst de middelste afbeelding, {{lake}}."
+    },
+    "effectMenu": {
+      "title": "Het effectenmenu openen",
+      "text": "Klik op {add} bovenaan bij Lagen. De gids volgt je naar het effectenmenu."
+    },
+    "effectCategory": {
+      "title": "Een effect toevoegen",
+      "text": "Klik in dit menu op {effects} om de effectenbibliotheek te openen."
+    },
+    "dither": {
+      "title": "Dither proberen",
+      "text": "De zoekopdracht staat klaar. Klik op {dither} om je afbeelding in een patroon van punten om te zetten."
+    },
+    "recenter": {
+      "title": "Terug naar je canvas",
+      "text": "Dither is toegepast. We hebben uitgezoomd en het canvas gecentreerd zodat je de hele compositie ziet."
+    },
+    "modes": {
+      "title": "Statisch en Animatie",
+      "text": "{static} is voor stilstaande composities. {motion} voegt animatie en videoweergave toe. De schakelaar staat onder je tekengebied."
+    },
+    "motion": {
+      "title": "Je compositie animeren",
+      "text": "We hebben ingezoomd op de schakelaar. Klik op {motion} om animatie in te schakelen. We bekijken de tijdlijn nadat we een overgang hebben toegevoegd."
+    },
+    "context": {
+      "title": "Rechtsklik op je afbeelding",
+      "text": "Het canvas is weer gecentreerd. Gebruik {rightClick} op de middelste afbeelding, {{lake}}, om de acties te openen."
+    },
+    "transition": {
+      "title": "Een overgang toevoegen",
+      "text": "Kies {animation} in dit contextmenu om de animatiebibliotheek te openen."
+    },
+    "pop": {
+      "title": "Pop toevoegen",
+      "text": "Klik op {pop} in de categorie Scale om de afbeelding kort te laten binnenkomen met een pop-animatie."
+    },
+    "pin": {
+      "title": "De tijdlijn vastzetten",
+      "text": "Klik op {pin} om de tijdlijn open te houden. Je kunt het formaat wijzigen; de gids volgt de bedieningselementen."
+    },
+    "timeline": {
+      "title": "Je tijdlijn",
+      "text": "Elke rij stelt een laag voor. Clips tonen wanneer die verschijnt en de Pop-clip is de animatie. Sleep de afspeelkop om een moment te bekijken; links stel je de weergave en duur in."
+    },
+    "play": {
+      "title": "Afspelen",
+      "text": "Druk op {play} in de tijdlijn om je animatie te bekijken."
+    },
+    "export": {
+      "title": "Exporteren",
+      "text": "Open rechtsboven {export}. We exporteren de animatie als video."
+    },
+    "exportWindow": {
+      "title": "Het exportvenster",
+      "text": "Kies links je tekengebied en uitvoertype. Bekijk rechts het resultaat. Resolutie en formaat bepalen het bestand dat je downloadt."
+    },
+    "video": {
+      "title": "Motion-video",
+      "text": "Kies {video} in het exportvenster. Behoud de standaardvideo-instellingen."
+    },
+    "render": {
+      "title": "Je video opslaan",
+      "text": "Klik op {exportVideo}. {{brandName}} rendert de animatie en downloadt deze. Het renderen en downloaden gaan onafhankelijk verder."
+    },
+    "ready": {
+      "title": "Je bent klaar",
+      "text": "Je hebt de tutorial afgerond. {{brandName}} rendert en downloadt de video op de achtergrond; je kunt verder werken."
+    }
+  }
+}
