@@ -487,6 +487,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Fixed
 
+- Use an explicit route comparator and complete MediaQueryList test fixtures to satisfy type-aware CI linting without spreading native class instances.
+
 - Type Halftone GPU graph assignment introspection through runtime-checked node metadata, accommodating the installed Three.js declarations during clean CI typechecking.
 
 - Align CI regressions with the current SSR routes, export surface, virtualized catalogs, fonts, command labels and immutable preview scopes. Exercise complete primary-pointer selection, first-run tutorial isolation, fresh worker lifetimes, native-media test fixtures and both TSL function/conditional branches without weakening coverage or deployment gates.

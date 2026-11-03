@@ -6,7 +6,7 @@ test("the generated tree has one public landing and one shared workspace with bo
   expect(
     Object.values(children)
       .map((route) => route.options.id)
-      .sort(),
+      .sort((left, right) => String(left).localeCompare(String(right), "en")),
   ).toEqual(["/", "/_workspace", "/ssr", "/tools"]);
   const workspace = Object.values(children).find((route) => route.options.id === "/_workspace");
   expect(

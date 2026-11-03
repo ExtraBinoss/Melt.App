@@ -9,10 +9,14 @@ import { i18n } from "../../src/state/i18n";
 
 export function setup(options: { reducedMotion?: boolean } = {}) {
   if (options.reducedMotion !== undefined) {
-    const media = window.matchMedia("");
     vi.spyOn(window, "matchMedia").mockImplementation((query) => ({
-      ...media,
       media: query,
+      onchange: null,
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      dispatchEvent: vi.fn(() => true),
       matches: options.reducedMotion === true && query.includes("prefers-reduced-motion"),
     }));
   }

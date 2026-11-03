@@ -34,10 +34,14 @@ vi.mock("../../src/components/projects/landing/LandingPage", () => ({
 }));
 import { LandingRoute } from "../../src/routing/LandingRoute";
 test("Try Melt is the sole library entry and choosing a template opens its library preview", async () => {
-  const media = window.matchMedia("");
   vi.mocked(window.matchMedia).mockImplementation((query) => ({
-    ...media,
     media: query,
+    onchange: null,
+    addListener: vi.fn(),
+    removeListener: vi.fn(),
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    dispatchEvent: vi.fn(() => true),
     matches: query.includes("prefers-reduced-motion"),
   }));
   render(<LandingRoute />);
