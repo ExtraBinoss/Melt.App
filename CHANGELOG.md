@@ -489,6 +489,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Fixed
 
+- Log failed editor actions to the console using the same bounded, credential-redacted diagnostics as the error notice and copy button. Verify extensionless JPEG imports and failed-file reporting through the real file picker.
+
 - Recognize extensionless image files and generic MIME headers from bounded file signatures, preserving original bytes and native decode validation. Report actionable, filename-specific image format, read, decode, size and dimension failures in all twelve languages, with technical causes retained.
 
 - Clarify object selection in all twelve languages with separate mark/refine/mask steps, mouse-input badges, explicit Keep/Erase outcomes, responsive spacing and a bounded scrolling panel. Use a full-width mode field; reveal clipped shared-select labels on hover/focus with overflow-only motion, reduced-motion tooltips and logical RTL alignment.

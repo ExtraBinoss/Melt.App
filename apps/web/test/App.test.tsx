@@ -215,6 +215,7 @@ test("surfaces renderer and service errors and routes local image selection usin
 });
 test("localizes stale project-write failures at the editor task boundary", async () => {
   const d = setup({ reducedMotion: true });
+  const log = vi.spyOn(console, "error").mockImplementation(() => {});
   vi.mocked(d.services.saveProject).mockRejectedValueOnce(
     Object.assign(new Error("raw storage diagnostic"), { code: "STALE_PROJECT_WRITE" }),
   );
@@ -230,6 +231,11 @@ test("localizes stale project-write failures at the editor task boundary", async
   expect(notice.querySelector("pre")).toHaveTextContent(
     "Error [STALE_PROJECT_WRITE]: raw storage diagnostic",
   );
+  expect(log).toHaveBeenCalledWith(
+    "[Melt] Editor action failed.",
+    "Error [STALE_PROJECT_WRITE]: raw storage diagnostic",
+  );
+  log.mockRestore();
 });
 test("pauses failed Motion playback without changing the document or preventing a retry", async () => {
   const d = setup({ reducedMotion: true });

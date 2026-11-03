@@ -122,7 +122,9 @@ export function App({ engine, services, welcome = false, routing }: AppProps) {
         return true;
       } catch (error) {
         if (error instanceof ExportLeaveCancelled) return false;
-        setNotice({ message: formatUiError(error), details: errorDiagnostics(error), error: true });
+        const details = errorDiagnostics(error);
+        console.error("[Melt] Editor action failed.", details);
+        setNotice({ message: formatUiError(error), details, error: true });
         return false;
       }
     },
