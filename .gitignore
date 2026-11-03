@@ -10,6 +10,8 @@ test-results/
 third_party/clone/
 
 .tanstack/
+.wrangler/
+.dev.vars*
 
 # Generated promotional film renders and review stills.
 /films/*/out/

@@ -66,26 +66,31 @@ Portable `.musart` JSON includes the document and its original image assets. Fon
 
 Vitest covers document behavior and module contracts. Playwright exercises native browser interactions, GPU output and decoded exports. Oxlint, ESLint, Oxfmt and TypeScript provide static checks. The [contribution rules](../../AGENTS.md) define which checks a change requires; the [performance runbooks](../performance/README.md) define measured workloads.
 
-## GitHub Pages
+## Cloudflare production
 
-The [Quality workflow](../../.github/workflows/quality.yml) runs `bun run check-ci` before its Pages build and deployment jobs. This checks versions, repository rules, types, lint, formatting, full Vitest coverage, coverage-aware rules and the production build, without installing Chromium or running Playwright. Browser scenarios remain available through `bun run test:browser` and the complete `bun run check` release gate; they do not block automatic Pages publication.
+The [Quality workflow](../../.github/workflows/quality.yml) verifies owner-triggered
+pushes to `main` and manual runs in `ExtraBinoss/Melt.App`. Original actor ID
+`113912449`, login `ExtraBinoss`, triggering actor and immutable repository ID are
+checked independently of Git commit author strings. External PRs do not trigger
+this workflow; an owner can manually verify a repository branch without deploying it.
 
-Deployment is restricted to `ExtraBinoss/MusArt`, the `main` branch, and push/manual runs whose original actor and triggering actor are both `ExtraBinoss`. Pull requests and forks run verification without publishing the site.
+Production requires a successful complete quality gate, local Cloudflare HTTP/WASM
+checks, the exact verified artifact, a current `main` commit and approval by the
+sole `ExtraBinoss` reviewer in the protected `cloudflare-production` environment.
+The existing owner-review ruleset remains active. Environment secrets are exposed
+only to the final publish step; no GitHub personal token is required.
 
-In repository **Settings → Pages**, select **GitHub Actions** as the source. The workflow deploys through the `github-pages` environment to `https://extrabinoss.github.io/MusArt/`; the URL becomes available after the first successful deployment.
+TanStack Start prerenders public pages, `/dashboard`, `/editor` and `/ssr` into
+`dist/client`. Cloudflare serves those assets directly at `https://melt.plinka.eu`.
+A small streaming Worker transparently serves the oversized ONNX runtime through
+lossless gzip transport; it does not run the application or store project data.
+Only the separate prepared client package is published, with source maps omitted.
 
-Keep `github-pages` restricted to `main`, with `ExtraBinoss` as its sole required reviewer and administrator bypass disabled. Self-review must remain allowed so the owner can approve their own deployment. The `main` ruleset requires pull requests, owner review, resolved conversations and the `verify` check; its only bypass is the `ExtraBinoss` user. These controls are configured in GitHub settings separately from the workflow and [CODEOWNERS](../../.github/CODEOWNERS) files.
-
-TanStack Start prerenders `/`, `/dashboard`, `/editor` and `/ssr` into `dist/client`. The landing contains real HTML and SEO metadata; the library and GPU editor use a shared client-only layout and are marked `noindex`. The editor accepts `?project=<durable-id>` and landing templates use `?template=<catalogue-id>`. Project selection replaces that transient template query with the saved project ID. Dashboard/editor navigation retains the runtime, undo history and an already mounted canvas; refresh restores the URL target from IndexedDB. The Pages workflow publishes only `dist/client`.
-
-Vite reads `MUSART_BASE_PATH` for the hosted path. The workflow obtains it from GitHub's Pages configuration; local development defaults to `/`. To preview the project path locally:
-
-```sh
-MUSART_BASE_PATH=/MusArt/ bun run build
-MUSART_BASE_PATH=/MusArt/ bun run preview
-```
-
-Open `http://localhost:6100/MusArt/`. Projects and installed fonts belong to the browser origin: data saved on localhost is separate from data on the hosted site. Download a `.musart` file to move a project, and install its custom fonts separately.
+Vite's `MUSART_BASE_PATH` defaults to `/` for this custom domain. Project and font
+storage belongs to the browser origin: data on localhost or the former GitHub Pages
+origin is separate. Download a `.musart` file to move a project, and install its
+custom fonts separately. The [Cloudflare deployment runbook](../deployment/cloudflare.md)
+records permissions, first-deployment token rotation and local-only validation.
 
 ## Attribution
 

@@ -1,0 +1,32 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "melt-local",
+  "main": "./apps/web/src/platform/cloudflare/worker.ts",
+  "compatibility_date": "2026-11-03",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": { "enabled": true, "head_sampling_rate": 0.1 },
+  "workers_dev": false,
+  "preview_urls": false,
+  "assets": {
+    "binding": "ASSETS",
+    "run_worker_first": ["/assets/*.wasm"],
+    "directory": "./artifacts/cloudflare/site",
+    "html_handling": "drop-trailing-slash",
+    "not_found_handling": "none",
+  },
+  "env": {
+    "production": {
+      "name": "melt-plinka",
+      "workers_dev": false,
+      "preview_urls": false,
+      "routes": [{ "pattern": "melt.plinka.eu", "custom_domain": true }],
+      "assets": {
+        "binding": "ASSETS",
+        "run_worker_first": ["/assets/*.wasm"],
+        "directory": "./artifacts/cloudflare/site",
+        "html_handling": "drop-trailing-slash",
+        "not_found_handling": "none",
+      },
+    },
+  },
+}
