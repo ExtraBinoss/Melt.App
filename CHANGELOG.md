@@ -487,6 +487,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Fixed
 
+- Disable transparent canvas edge-resize controls alongside visible handles during playback. Reject queued mask actions after any intervening engine publication while keeping open mask controls aligned with the current page.
+
 - Complete 66 missing performance-diagnostic labels and Terminal Signal template copy in ten additional locales. Validate legitimate French CLDR plural forms while retaining required translation keys and interpolation checks.
 
 - Fix CI lint checks for the virtual effect catalog by preserving repeated-letter typeahead without string spreading and explicitly naming its mutable viewport ref. Exclude Wrangler-generated declarations from React linting while retaining the generated-binding consistency check. Format existing motion documentation/tests and leave the automatically regenerated TanStack route tree out of formatting checks.

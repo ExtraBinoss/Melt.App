@@ -55,9 +55,10 @@ export function MaskPopover({
     if (ownerOpen && !currentPage) setOwnerOpen(false);
   }, [ownerOpen, setOwnerOpen, currentPage]);
   const runCurrent = (task: () => void) => {
+    const snapshot = engine.getSnapshot();
     if (isCurrent())
       run(() => {
-        if (isCurrent()) task();
+        if (isCurrent() && engine.getSnapshot() === snapshot) task();
       });
   };
   return (
@@ -130,9 +131,10 @@ function MaskDetails({
 }) {
   const { t } = useTranslation();
   const runCurrent = (task: () => void) => {
+    const snapshot = engine.getSnapshot();
     if (isCurrent())
       run(() => {
-        if (isCurrent()) task();
+        if (isCurrent() && engine.getSnapshot() === snapshot) task();
       });
   };
   const resolve = useCallback(() => resolvePageEditingScope(engine, page), [engine, page]);

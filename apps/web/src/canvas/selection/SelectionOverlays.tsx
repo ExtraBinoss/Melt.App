@@ -143,7 +143,9 @@ export function SelectionOverlays({
           overlay.inert ||
           overlay.dataset.locked === "true" ||
           overlay.style.display === "none";
-        for (const handle of overlay.querySelectorAll<HTMLButtonElement>(".canvas-handle"))
+        for (const handle of overlay.querySelectorAll<HTMLButtonElement>(
+          ".canvas-handle, .canvas-resize-edge",
+        ))
           if (handle.disabled !== blocked) handle.disabled = blocked;
       }
     };

@@ -201,7 +201,9 @@ it("does not rewrite retained playback attributes or disabled handles when selec
   expect(disabled).not.toHaveBeenCalled();
   const overlay = handle.closest<HTMLElement>(".canvas-selection")!;
   overlay.inert = true;
-  for (const control of overlay.querySelectorAll<HTMLButtonElement>(".canvas-handle"))
+  for (const control of overlay.querySelectorAll<HTMLButtonElement>(
+    ".canvas-handle, .canvas-resize-edge",
+  ))
     control.disabled = true;
   disabled.mockClear();
   observer.takeRecords();
