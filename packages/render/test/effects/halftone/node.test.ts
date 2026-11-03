@@ -1,17 +1,16 @@
 import { expect, it } from "vitest";
-import { AssignNode, JoinNode, VarNode } from "three/webgpu";
+import { AssignNode, JoinNode, VarNode, type Node } from "three/webgpu";
 import { halftoneNode } from "../../../src/effects/halftone/node";
 import { expectSourceAlpha, nodeFixture, graphNodes } from "../node-fixture";
 it("preserves legacy source alpha and keeps transparent-paper controls as stable GPU uniforms", () => {
   const fixture = nodeFixture("halftone");
   const node = halftoneNode(fixture);
   const graph = graphNodes(node);
-  const legacy = [...graph].filter(
-    (entry): entry is AssignNode =>
-      entry instanceof AssignNode &&
-      (entry.sourceNode instanceof VarNode ? entry.sourceNode.node : entry.sourceNode) instanceof
-        JoinNode,
-  );
+  const legacy = [...graph].filter((entry): entry is AssignNode & { sourceNode: Node } => {
+    if (!(entry instanceof AssignNode) || !("sourceNode" in entry)) return false;
+    const source = entry.sourceNode;
+    return (source instanceof VarNode ? source.node : source) instanceof JoinNode;
+  });
   expect(legacy).toHaveLength(1);
   expectSourceAlpha(legacy[0]!.sourceNode, fixture.input);
   expect(graph.has(fixture.controls.parameters.backgroundOpacity!)).toBe(true);
