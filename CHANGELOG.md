@@ -487,6 +487,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Fixed
 
+- Fix clean CI installs by declaring the root print-proof script's ImageMagick dependency explicitly. Pin the runner to Ubuntu 26.04, update pinned GitHub actions to Node 24 runtimes, and upload coverage reports only after a report exists. Preserve owner-only deployment guards and protected production approval.
+
 - Make the landing hero faster and reliable in Firefox with precomputed localized glyph outlines, coordinated mascot readiness, foreground progress preserved across geometry replacement, and hover-only SVG masks. Prioritize the visible entrance over video decoding, admit feature clips when leaving the intro, preserve native fallback scripts and reduced motion, and stabilize navigation labels during font loading. Record production Lighthouse and native-browser measurements in `docs/performance/landing-hero-firefox-2026-11-02.md`.
 
 - Complete command/effect names, descriptions, search controls and shortcut settings in all twelve interface languages. Index English together with the active locale, refresh cached catalogs on language changes, remove forced French aliases from other locales and preserve localized plural forms and shortcut matching. Keep key combinations left-to-right and mirror dialog alignment/close controls in RTL interfaces. Add complete-resource and bilingual search regressions for every supported locale.
