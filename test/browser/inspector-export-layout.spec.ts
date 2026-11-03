@@ -13,7 +13,7 @@ test("a normally opened template keeps Export aligned with the visible inspector
   await expect(page).toHaveURL(/\/editor\?.*project=/);
   await expect(page.locator('.canvas-artboard canvas[data-renderer-ready="true"]')).toBeVisible();
   const button = page.locator(".inspector-header [data-inspector-export-trigger]");
-  const measurements = [];
+  const measurements: Record<string, unknown>[] = [];
   async function capture(name: string) {
     await expect(button).toBeVisible();
     await expect

@@ -31,9 +31,9 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 - Translate the complete editor tutorial into all twelve application languages, including dialogs, 21 lessons, inline controls and keyboard hints, errors, editor-only replay and practice-project names. Use locale-independent step IDs, keep displayed layer names consistent with the document, and support Arabic RTL while preserving icons, shortcut order and typewriter behavior.
 
-- Keep the editor tutorial on its guided path: accept native input only on the current lesson control and guide navigation, block outside dismissal, sibling actions, scrolling and unrelated shortcuts, and retain keyboard access through Tab and Enter. Restore acquired effect, animation and export surfaces after exit confirmation or owner dismissal without interrupting menu-to-picker handoffs; keep Melt inside the card while a target is unavailable. Recompute placement without dead zones, normalize popup entrance transforms and scaled dialog coordinates, and follow live viewport/ancestor animation bounds.
-
 - Refresh the README around the landing headline, real editable template previews, live effects, typography, 3D, interactive selections, Motion, audio, timelapses and portable projects. Keep performance claims tied to documented integrated-graphics workloads and point the GitHub presentation to melt.plinka.eu.
+
+- Keep the editor tutorial on its guided path: accept native input only on the current lesson control and guide navigation, block outside dismissal, sibling actions, scrolling and unrelated shortcuts, and retain keyboard access through Tab and Enter. Restore acquired effect, animation and export surfaces after exit confirmation or owner dismissal without interrupting menu-to-picker handoffs; keep Melt inside the card while a target is unavailable. Recompute placement without dead zones, normalize popup entrance transforms and scaled dialog coordinates, and follow live viewport/ancestor animation bounds.
 
 - Anchor every tutorial card to its current UI target, center it along the available side and reject distant retained positions. Keep popup reopening stable, follow changing card heights and render real control icons and OS-aware keyboard components throughout the guided copy.
 
@@ -41,9 +41,9 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 - Reuse the native glyph contour and point hover animation on the localized closing landing headline, with immediate readable text, a green hover accent matching the hero in light and dark themes, semantic heading levels and reduced-motion support.
 
-- Add circular Halftone grids, round color mosaics and independently angled source-color channel screens while preserving classic documents, configurable Torn Edges graphic/paper treatments, and reversible GPU Liquify strokes with a round canvas brush, per-stroke undo, cancellation and reset.
 - Replace the landing headline with the Melt-inspired “Design that melts social feeds” tagline across all twelve languages, remove the remaining introductory description, and resume the showcase immediately after hover without extending the manual interaction cooldown. Keep animated contour points on visible glyph boundaries when font components overlap.
 
+- Add circular Halftone grids, round color mosaics and independently angled source-color channel screens while preserving classic documents, configurable Torn Edges graphic/paper treatments, and reversible GPU Liquify strokes with a round canvas brush, per-stroke undo, cancellation and reset.
 - Match the hero mascot's reference scale envelope and complete spherical eye turn at display cadence, with a shared mascot/title start instead of independent CSS animations. Keep neutral, green and violet text-run colors consistent across glyph outlines, control points, fills, native text and fallback scripts.
 
 - Rework the tutorial after Dither: recenter the canvas, explain Static/Motion before zooming to its control, author Pop through the image context menu, then introduce and pin the timeline. Explain the export window, export the full composition, keep guide cards inside its bounds and turn the mascot toward its target.

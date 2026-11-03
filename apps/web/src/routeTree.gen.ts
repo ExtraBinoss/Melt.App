@@ -84,7 +84,14 @@ export interface FileRoutesById {
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath;
-  fullPaths: "/" | "/ssr" | "/tools" | "/dashboard" | "/editor" | "/tools/$tool" | "/tools/";
+  fullPaths:
+    | "/"
+    | "/ssr"
+    | "/tools"
+    | "/dashboard"
+    | "/editor"
+    | "/tools/$tool"
+    | "/tools/";
   fileRoutesByTo: FileRoutesByTo;
   to: "/" | "/ssr" | "/dashboard" | "/editor" | "/tools/$tool" | "/tools";
   id:
@@ -177,7 +184,9 @@ const WorkspaceRouteChildren: WorkspaceRouteChildren = {
   WorkspaceEditorRoute: WorkspaceEditorRoute,
 };
 
-const WorkspaceRouteWithChildren = WorkspaceRoute._addFileChildren(WorkspaceRouteChildren);
+const WorkspaceRouteWithChildren = WorkspaceRoute._addFileChildren(
+  WorkspaceRouteChildren,
+);
 
 interface ToolsRouteChildren {
   ToolsToolRoute: typeof ToolsToolRoute;
