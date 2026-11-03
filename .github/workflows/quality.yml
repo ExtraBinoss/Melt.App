@@ -29,20 +29,40 @@ jobs:
           bun-version: 1.4.4
       - name: Validate authenticated CI identity
         run: bun scripts/deploy/policy.ts
-      - name: Install template video metadata tools
-        run: |
-          sudo apt-get update
-          sudo apt-get install --no-install-recommends --yes ffmpeg
-          ffprobe -version
+      - name: Restore Bun package cache
+        id: bun_cache
+        continue-on-error: true
+        timeout-minutes: 2
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.bun/install/cache
+          key: bun-${{ runner.os }}-${{ runner.arch }}-1.4.4-${{ hashFiles('bun.lock', 'patches/**') }}
+          restore-keys: bun-${{ runner.os }}-${{ runner.arch }}-1.4.4-
       - run: bun install --frozen-lockfile
+      - name: Retain installed packages before later checks
+        if: steps.bun_cache.outputs.cache-hit != 'true' && steps.bun_cache.outputs.cache-primary-key != ''
+        continue-on-error: true
+        timeout-minutes: 2
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.bun/install/cache
+          key: ${{ steps.bun_cache.outputs.cache-primary-key }}
       - name: Check generated Worker bindings
         run: |
           mkdir -p artifacts/cloudflare/site
           bunx --no-install wrangler types apps/web/src/platform/cloudflare/worker-configuration.d.ts --env production --include-runtime false
           bunx oxfmt apps/web/src/platform/cloudflare/worker-configuration.d.ts
           git diff --exit-code -- apps/web/src/platform/cloudflare/worker-configuration.d.ts
-      - name: Verify without browser scenarios
-        run: bun run check-ci
+      - name: Verify versions and contribution rules
+        run: bun run version:check && bun run check:rules
+      - name: Typecheck
+        run: bun run typecheck
+      - name: Lint
+        run: bun run lint
+      - name: Check formatting
+        run: bun run format:check
+      - name: Build and prerender production pages
+        run: bunx --no-install vite build
       - name: Prepare Cloudflare static package
         run: bun run deploy:prepare
       - name: Validate Cloudflare configuration without publishing
@@ -66,12 +86,6 @@ jobs:
           include-hidden-files: true
           if-no-files-found: error
           compression-level: 0
-          retention-days: 7
-      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
-        if: always() && hashFiles('coverage/coverage-summary.json') != ''
-        with:
-          name: quality-reports
-          path: coverage/
           retention-days: 7
 
   deploy:
@@ -106,6 +120,14 @@ jobs:
       - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
         with:
           bun-version: 1.4.4
+      - name: Restore Bun package cache
+        continue-on-error: true
+        timeout-minutes: 2
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.bun/install/cache
+          key: bun-${{ runner.os }}-${{ runner.arch }}-1.4.4-${{ hashFiles('bun.lock', 'patches/**') }}
+          restore-keys: bun-${{ runner.os }}-${{ runner.arch }}-1.4.4-
       - run: bun install --frozen-lockfile
       - name: Validate authenticated production identity
         run: bun scripts/deploy/policy.ts --production

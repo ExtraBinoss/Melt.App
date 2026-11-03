@@ -29,6 +29,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Shorten owner-controlled production CI to named static checks, build, Cloudflare configuration and native HTTP/WASM delivery checks. Move full unit tests and coverage enforcement out of the deployment workflow while preserving the explicit full quality command and existing thresholds. Reuse a bounded Bun download cache across jobs, save it before later failures, and remove test-only FFmpeg installation; retain all production identity, approval and artifact-integrity guards.
+
 - Translate the complete editor tutorial into all twelve application languages, including dialogs, 21 lessons, inline controls and keyboard hints, errors, editor-only replay and practice-project names. Use locale-independent step IDs, keep displayed layer names consistent with the document, and support Arabic RTL while preserving icons, shortcut order and typewriter behavior.
 
 - Refresh the README around the landing headline, real editable template previews, live effects, typography, 3D, interactive selections, Motion, audio, timelapses and portable projects. Keep performance claims tied to documented integrated-graphics workloads and point the GitHub presentation to melt.plinka.eu.

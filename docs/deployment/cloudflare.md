@@ -20,9 +20,21 @@ External pull requests do not automatically run this workflow. The owner can run
 verification manually on a repository branch; that does not publish a non-main ref.
 Fork copies do not satisfy the repository-ID guard.
 
-Verification performs the existing complete `bun run check-ci` gate, checks
-Wrangler-generated bindings, prepares the static package, runs a non-publishing
-Wrangler dry run, and verifies actual local Cloudflare delivery in Chromium.
+Deployment verification checks versions, contribution rules, TypeScript, lint,
+formatting and Wrangler-generated bindings before building the production pages.
+It prepares the static package, runs a non-publishing Wrangler dry run, and verifies
+actual local Cloudflare delivery in Chromium. Each stage has its own CI step.
+The complete unit suite and coverage enforcement are intentionally outside this
+publication workflow; run `bun run check-ci` for the full quality gate before a
+release or when requested. Removing them here does not change coverage thresholds
+or claim that the full suite passed.
+
+Bun's package download cache is shared between verification and production, keyed
+by platform, Bun version, lockfile and dependency patches. Verification saves it
+immediately after a successful frozen installation, even if a later check fails.
+Cache errors have a bounded timeout and do not block publication. Credentials,
+`node_modules`, build outputs and test results are never cached. FFmpeg setup is
+unnecessary for this deployment path; it belongs to template-generation tests.
 Production downloads that same workflow run's immutable artifact, validates its
 commit and per-file SHA-256 hashes, then rejects a commit superseded on `main`.
 Deployments are serialized and the account credential is exposed only to the final
