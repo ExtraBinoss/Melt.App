@@ -16,15 +16,14 @@ original headless desktop probe reported no hover, incorrectly exercising touch
 autoplay; `baseline-pointer` is the corrected desktop comparison. Mobile uses the
 original `baseline` reports. No audit runtime errors or run warnings were recorded.
 
-| Page / device | Performance /100 | Total blocking time (ms) | Modeled LCP (s) | Transfer (KiB) |
-| --- | --- | --- | --- | --- |
-| Landing / desktop | 99 → 99 | 14 → 0 | 0.89 → 0.88 | 839 → 514 |
-| Dashboard / desktop | 85 → 94 | 253 → 20 | 1.55 → 1.65 | 2085 → 970 |
-| Landing / mobile | 71 → 84 | 519 → 74 | 4.40 → 4.40 | 839 → 514 |
-| Dashboard / mobile | 41 → 59 | 2865 → 555 | 7.17 → 7.54 | 6637 → 1314 |
+| Page / device       | Performance /100 | Total blocking time (ms) | Modeled LCP (s) | Transfer (KiB) |
+| ------------------- | ---------------- | ------------------------ | --------------- | -------------- |
+| Landing / desktop   | 99 → 99          | 14 → 0                   | 0.89 → 0.88     | 839 → 514      |
+| Dashboard / desktop | 85 → 94          | 253 → 20                 | 1.55 → 1.65     | 2085 → 970     |
+| Landing / mobile    | 71 → 84          | 519 → 74                 | 4.40 → 4.40     | 839 → 514      |
+| Dashboard / mobile  | 41 → 59          | 2865 → 555               | 7.17 → 7.54     | 6637 → 1314    |
 
-All four final accessibility and best-practices scores are **100**. Landing SEO is
-100. Dashboard SEO remains 66 because its `noindex, nofollow`/robots exclusion is
+All four final accessibility and best-practices scores are **100**. Landing SEO is 100. Dashboard SEO remains 66 because its `noindex, nofollow`/robots exclusion is
 intentional and is preserved.
 
 ## Changes and evidence

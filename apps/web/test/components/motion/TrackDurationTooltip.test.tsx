@@ -65,7 +65,9 @@ it("a simple click and sub-threshold hold never mount a duration popup or publis
     act(() => pointer(button, "pointerdown", 10));
     expect(count()).toBe(initial);
     act(() => pointer(button, "pointermove", 15));
-    act(() => { vi.advanceTimersByTime(350); });
+    act(() => {
+      vi.advanceTimersByTime(350);
+    });
     expect(screen.queryByRole("tooltip")).toBeNull();
     expect(document.querySelector('[data-slot="tooltip-content"]')).toBeNull();
     expect(document.querySelector("[data-radix-popper-content-wrapper]")).toBeNull();

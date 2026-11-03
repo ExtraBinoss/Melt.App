@@ -8,6 +8,7 @@ export default [
       "coverage/**",
       "artifacts/**",
       "third_party/clone/**",
+      "apps/web/src/platform/cloudflare/worker-configuration.d.ts",
     ],
   },
   {

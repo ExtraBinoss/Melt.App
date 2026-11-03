@@ -26,16 +26,16 @@ The web catalog indexes localized names, families, internal descriptions and bil
 
 ### Radial gizmos
 
-| Authoring topic    | Contract                                                                                                                                                                      |
-| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Metadata           | An optional radial gizmo describes normalized center keys, an outer radius, an optional protected radius, radius units and optional ellipse aspect/rotation keys.             |
-| Derived geometry   | The canvas derives its geometry from that metadata, including nested owner transforms, without an effect-type switch.                                                         |
-| Preview and commit | Handles publish imperative layer previews; a completed drag commits one validated command.                                                                                    |
-| Cancel             | Escape, pointer cancellation and stale document/selection guards restore the original.                                                                                        |
-| Keyboard steps     | Arrow keys move handles by one document pixel; Shift uses ten.                                                                                                                |
-| Overlap resolution | Fixed-size pointer handles resolve overlaps by screen-space proximity, including nested transforms; the center takes exact ties and every handle remains keyboard accessible. |
-| Pointer tolerance | Transparent hit radius is `14 / zoom` around the existing `6 / zoom` knob. Preserve the grab offset so near-edge clicks and drags do not jump; interactions retain the owning effect popover. |
-| Handle help | Shared Radix tooltips wait 500 ms on every hover, explain the handle and keyboard controls in all twelve app languages, and close when a gesture begins. |
+| Authoring topic    | Contract                                                                                                                                                                                      |
+| ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Metadata           | An optional radial gizmo describes normalized center keys, an outer radius, an optional protected radius, radius units and optional ellipse aspect/rotation keys.                             |
+| Derived geometry   | The canvas derives its geometry from that metadata, including nested owner transforms, without an effect-type switch.                                                                         |
+| Preview and commit | Handles publish imperative layer previews; a completed drag commits one validated command.                                                                                                    |
+| Cancel             | Escape, pointer cancellation and stale document/selection guards restore the original.                                                                                                        |
+| Keyboard steps     | Arrow keys move handles by one document pixel; Shift uses ten.                                                                                                                                |
+| Overlap resolution | Fixed-size pointer handles resolve overlaps by screen-space proximity, including nested transforms; the center takes exact ties and every handle remains keyboard accessible.                 |
+| Pointer tolerance  | Transparent hit radius is `14 / zoom` around the existing `6 / zoom` knob. Preserve the grab offset so near-edge clicks and drags do not jump; interactions retain the owning effect popover. |
+| Handle help        | Shared Radix tooltips wait 500 ms on every hover, explain the handle and keyboard controls in all twelve app languages, and close when a gesture begins.                                      |
 
 ### Live playback lifecycle
 

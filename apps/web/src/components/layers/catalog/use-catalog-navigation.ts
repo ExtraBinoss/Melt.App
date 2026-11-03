@@ -6,7 +6,7 @@ import { CATALOG_PADDING, CATALOG_ROW_HEIGHT } from "./rows";
 export function useCatalogNavigation(
   entries: readonly CatalogEntry[],
   positions: ReadonlyMap<string, number>,
-  viewport: RefObject<HTMLDivElement | null>,
+  viewportRef: RefObject<HTMLDivElement | null>,
   publishScroll: (event: { currentTarget: HTMLElement }) => void,
   first: number,
   last: number,
@@ -18,17 +18,17 @@ export function useCatalogNavigation(
     const node =
       type &&
       [
-        ...(viewport.current?.querySelectorAll<HTMLElement>("[data-effect-catalog-item]") ?? []),
+        ...(viewportRef.current?.querySelectorAll<HTMLElement>("[data-effect-catalog-item]") ?? []),
       ].find((node) => node.dataset.effectCatalogItem === type);
     if (!node) return;
     pending.current = null;
     node.focus({ preventScroll: true });
-  }, [viewport]);
+  }, [viewportRef]);
   useLayoutEffect(focusPending, [first, last, entries, focusPending]);
   const focus = useCallback(
     (index: number) => {
       const entry = entries[index],
-        node = viewport.current;
+        node = viewportRef.current;
       if (!entry || !node) return;
       const row = positions.get(entry.type);
       if (row === undefined) return;
@@ -46,7 +46,7 @@ export function useCatalogNavigation(
       publishScroll({ currentTarget: node });
       focusPending();
     },
-    [entries, positions, viewport, publishScroll, focusPending],
+    [entries, positions, viewportRef, publishScroll, focusPending],
   );
   function key(event: KeyboardEvent<HTMLDivElement>) {
     const target = event.target as HTMLElement;
@@ -74,7 +74,7 @@ export function useCatalogNavigation(
     if (event.key === " " && !previous) return;
     const text = previous + (event.key === " " ? " " : normalizeEffectSearch(event.key));
     search.current = { text, at: event.timeStamp };
-    const query = [...text].every((character) => character === text[0]) ? text[0]! : text;
+    const query = /^(.)\1*$/u.exec(text)?.[1] ?? text;
     const start = index + (query.length === 1 ? 1 : 0);
     for (let offset = 0; offset < entries.length; offset++) {
       const next = (start + offset) % entries.length;

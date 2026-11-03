@@ -6,13 +6,13 @@ keyframes, easing, renderer and export graph apply. The base value is 1, keeping
 the unanimated design visible. Scheduling an entry/exit is a separate authoring
 command and interface milestone.
 
-| Family | Operators |
-| --- | --- |
-| Fade | Fade, through black, through white |
-| Reveal | Directional wipe, diagonal wipe, clock wipe, iris, diamond, blinds, checkerboard, grid reveal, luminance, dissolve |
-| Movement | Slide, zoom, spin, flip, doorway |
-| Distortion | Swirl, ripple, wave, squeeze, kaleidoscope |
-| Stylized | Pixelate, defocus, RGB split, glitch, ink, halftone, mosaic |
+| Family     | Operators                                                                                                          |
+| ---------- | ------------------------------------------------------------------------------------------------------------------ |
+| Fade       | Fade, through black, through white                                                                                 |
+| Reveal     | Directional wipe, diagonal wipe, clock wipe, iris, diamond, blinds, checkerboard, grid reveal, luminance, dissolve |
+| Movement   | Slide, zoom, spin, flip, doorway                                                                                   |
+| Distortion | Swirl, ripple, wave, squeeze, kaleidoscope                                                                         |
+| Stylized   | Pixelate, defocus, RGB split, glitch, ink, halftone, mosaic                                                        |
 
 The [implementation notes](../../packages/render/src/effects/transition/README.md)
 explain sampling and alpha. A typed JavaScript registry chooses one TSL builder
@@ -29,17 +29,17 @@ transparent images. Motion outside the layer's surface uses transform keys.
 
 ## Native verification on 2026-10-30
 
-| Check | Evidence |
-| --- | --- |
-| All 30 operators, WebGPU | Five focused Chromium cases passed |
-| All 30 operators, WebGL fallback | Five focused Chromium cases passed |
-| Exact identity endpoint | Maximum decoded RGBA difference 0 in the recorded cohort |
-| Empty endpoint | Sum of decoded alpha 0 for every operator |
-| Backward/forward seek | Repeated progress 0.37 produces identical decoded pixels |
-| Source coverage | No expanded alpha beyond the source |
-| Real image output | Intermediate PNGs contain visible pixels and differ from the source |
-| Production-side read APIs | GPUBuffer.mapAsync(READ), readPixels, getImageData and VideoFrame.copyTo all remain 0 |
-| Graph/lifecycle unit tests | 59 focused render cases passed before native execution |
+| Check                            | Evidence                                                                              |
+| -------------------------------- | ------------------------------------------------------------------------------------- |
+| All 30 operators, WebGPU         | Five focused Chromium cases passed                                                    |
+| All 30 operators, WebGL fallback | Five focused Chromium cases passed                                                    |
+| Exact identity endpoint          | Maximum decoded RGBA difference 0 in the recorded cohort                              |
+| Empty endpoint                   | Sum of decoded alpha 0 for every operator                                             |
+| Backward/forward seek            | Repeated progress 0.37 produces identical decoded pixels                              |
+| Source coverage                  | No expanded alpha beyond the source                                                   |
+| Real image output                | Intermediate PNGs contain visible pixels and differ from the source                   |
+| Production-side read APIs        | GPUBuffer.mapAsync(READ), readPixels, getImageData and VideoFrame.copyTo all remain 0 |
+| Graph/lifecycle unit tests       | 59 focused render cases passed before native execution                                |
 
 The witness uses the actual renderer and browser-owned PNG encoding. A separate
 uninstrumented page decodes PNGs for test-only inspection. These inspection reads

@@ -65,16 +65,16 @@ November 1, 2026, on Linux x64 with Bun 1.4.2, under a 200% CPU quota,
 `artifacts/scene-spatial/scene-final-500.json` preserves 100 jobs over 504 layers.
 Exact canonical keys matched outside every timed scenario.
 
-| Warm scenario | Canonical, 100 jobs | Incremental, 100 jobs | Stringify calls, canonical → incremental |
-| --- | ---: | ---: | ---: |
-| Unchanged | 235.20 ms | 108.25 ms | 50,600 → 200 |
-| One transform | 240.17 ms | 128.06 ms | 50,600 → 300 |
-| Source edit | 207.84 ms | 122.74 ms | 50,600 → 400 |
-| Group order | 573.00 ms | 299.50 ms | 50,600 → 25,400 |
-| Parent change | 370.84 ms | 184.06 ms | 50,600 → 25,400 |
-| Engine-compiled Motion | 212.01 ms | 146.89 ms | 50,600 → 300 |
-| Owned gesture, one layer | 214.31 ms | 158.64 ms | 50,600 → 300 |
-| Owned gesture, all text layers | 372.82 ms | 400.50 ms | 50,600 → 400 |
+| Warm scenario                  | Canonical, 100 jobs | Incremental, 100 jobs | Stringify calls, canonical → incremental |
+| ------------------------------ | ------------------: | --------------------: | ---------------------------------------: |
+| Unchanged                      |           235.20 ms |             108.25 ms |                             50,600 → 200 |
+| One transform                  |           240.17 ms |             128.06 ms |                             50,600 → 300 |
+| Source edit                    |           207.84 ms |             122.74 ms |                             50,600 → 400 |
+| Group order                    |           573.00 ms |             299.50 ms |                          50,600 → 25,400 |
+| Parent change                  |           370.84 ms |             184.06 ms |                          50,600 → 25,400 |
+| Engine-compiled Motion         |           212.01 ms |             146.89 ms |                             50,600 → 300 |
+| Owned gesture, one layer       |           214.31 ms |             158.64 ms |                             50,600 → 300 |
+| Owned gesture, all text layers |           372.82 ms |             400.50 ms |                             50,600 → 400 |
 
 These are single instrumented CPU cohorts, not browser frame times or a promise
 of universal ratios. Serialization instrumentation and shared-workstation/JIT/GC

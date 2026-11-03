@@ -3,15 +3,15 @@
 Every gallery card installs an independent saved project through the shared
 validated installation service. Templates remain fully editable documents.
 
-| Template         | Format              | Demonstrated capabilities                                                  |
-| ---------------- | ------------------- | -------------------------------------------------------------------------- |
-| Second Skin | 1080 × 1920, 10 s | One shared dancer original, Thermal/Scharr contour transformations and sparse native typography Motion |
-| Terminal Signal  | 1080 × 1920, 16 s   | Curved green terminal, editable typing, sparse Motion actions              |
-| Angel.exe        | 1080 × 1920, 12.8 s | Rotating imported 3D model, ASCII desktop and effect windows               |
-| Cornell Box      | 1080 × 1080, 8 s    | Shared native 3D scene, chrome type, shadows/reflections and camera orbit  |
-| Bloom Windows    | 1920 × 1080, 12 s   | Seamless flower timelapse with aligned dither, ASCII and cyanotype windows |
-| Melt Mascot      | 1920 × 1080, 6 s    | Editable vector mascot, moving eyes and stretched Melt lettering           |
-| Too Hot to Haunt | 480 × 480, 1.2 s    | Seamless photo collage with scale, blur and editable blocks                |
+| Template         | Format              | Demonstrated capabilities                                                                              |
+| ---------------- | ------------------- | ------------------------------------------------------------------------------------------------------ |
+| Second Skin      | 1080 × 1920, 10 s   | One shared dancer original, Thermal/Scharr contour transformations and sparse native typography Motion |
+| Terminal Signal  | 1080 × 1920, 16 s   | Curved green terminal, editable typing, sparse Motion actions                                          |
+| Angel.exe        | 1080 × 1920, 12.8 s | Rotating imported 3D model, ASCII desktop and effect windows                                           |
+| Cornell Box      | 1080 × 1080, 8 s    | Shared native 3D scene, chrome type, shadows/reflections and camera orbit                              |
+| Bloom Windows    | 1920 × 1080, 12 s   | Seamless flower timelapse with aligned dither, ASCII and cyanotype windows                             |
+| Melt Mascot      | 1920 × 1080, 6 s    | Editable vector mascot, moving eyes and stretched Melt lettering                                       |
+| Too Hot to Haunt | 480 × 480, 1.2 s    | Seamless photo collage with scale, blur and editable blocks                                            |
 
 Orbit Study, Paper Motion, Colorfield, Transition Atlas, AFTERHOURS, In Bloom,
 Motion Stress Lab and Sound Playground are retired from the gallery, search and

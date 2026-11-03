@@ -28,16 +28,16 @@ The inspected source is `/home/albi/Documents/Projects/Beam`, commit
 `c29043a71b00adef4a158424e2eb375d6343e844`. It was read without changing its
 existing working tree. These files establish the useful boundaries:
 
-| Beam implementation | Relevant behavior |
-| --- | --- |
+| Beam implementation                                                                  | Relevant behavior                                                                                                        |
+| ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
 | `packages/runtime/src/gpu/gpu-scene-renderer.ts:32` and `gpu-effects-renderer.ts:38` | Runtime scene/effect renderers obtain WebGL2 contexts on OffscreenCanvas, with retained GPU textures and bounded targets |
-| `packages/runtime/src/timeline/frame-queue.ts` | One idle-safe queue, measurement before painting, coalesced invalidations |
-| `apps/desktop/src/components/editor/timeline/TimelineSurfaceCanvas.vue` | Zero-size sticky frame, one viewport bitmap, native compositor coverage |
-| `composables/useTimelineSurface.ts` under that directory | Canvas2D context; viewport repaint on invalidation; playhead independent of static artwork |
-| `composables/timeline-range-index.ts` | Temporal intersection queries with stable document ordering |
-| `composables/useTimelineVirtualization.ts` | Vertical/horizontal culling, stable membership, retained focused/dragged controls |
-| `TimelineCanvasClip.vue` | Transparent HTML semantic controls for native focus, menus and trim |
-| `waveform/blick-waveform-renderer.ts` and `waveform/blick-waveform.worker.ts` | Shared worker WebGL2 waveform renderer, Canvas2D `drawImage`, transferred ImageBitmap |
+| `packages/runtime/src/timeline/frame-queue.ts`                                       | One idle-safe queue, measurement before painting, coalesced invalidations                                                |
+| `apps/desktop/src/components/editor/timeline/TimelineSurfaceCanvas.vue`              | Zero-size sticky frame, one viewport bitmap, native compositor coverage                                                  |
+| `composables/useTimelineSurface.ts` under that directory                             | Canvas2D context; viewport repaint on invalidation; playhead independent of static artwork                               |
+| `composables/timeline-range-index.ts`                                                | Temporal intersection queries with stable document ordering                                                              |
+| `composables/useTimelineVirtualization.ts`                                           | Vertical/horizontal culling, stable membership, retained focused/dragged controls                                        |
+| `TimelineCanvasClip.vue`                                                             | Transparent HTML semantic controls for native focus, menus and trim                                                      |
+| `waveform/blick-waveform-renderer.ts` and `waveform/blick-waveform.worker.ts`        | Shared worker WebGL2 waveform renderer, Canvas2D `drawImage`, transferred ImageBitmap                                    |
 
 Beam has WebGL2 scene/effect resources in its runtime and a separate Canvas2D
 timeline painter. Its worker waveform GPU renderer is another path. This
@@ -110,21 +110,21 @@ to zero and overrides the general row rule. The checks distinguish frozen
 **build 2**, **build 4**, the **build 5** handoff/scroll validation and the final
 **build 6** direct-control validation.
 
-| Check | Verified result |
-| --- | --- |
-| Focused implementation tests | **130 distinct focused tests** pass: 113 Canvas base cases, nine shared-presentation cases, five TrackClips cases and three hover-lease ownership cases. The initial 107 tests across 27 mirrored files passed in 16.60 s; the added stationary-held-reorder regression brought that base to 108, with its eight-test recheck passing in 2.80 s. The five TrackClips cases passed in 3.95 s. Rechecks are not counted twice. |
-| Source/static checks | Latest scoped TypeScript, including the new native harnesses, reports zero errors. ESLint and type-aware Oxlint report zero violations across all 67 changed TypeScript targets; contribution rules pass. The synchronized version check previously passed at `0.2.0`. |
-| Final build 5 scroll coverage | The 1,000-row fixture covered both axes at the first scroll RAF for all five samples, with exact expected bounds, zero instrumented production pixel readbacks and stable tracked editor React roots. |
-| Build 2 authoring | Key move, marquee, easing, clip move and trim passed in two native scenarios totaling 17.2 s. These exercise real targets and validated commands. |
-| Build 2 playback | Playback passed without repainting static timeline artwork or rendering the tracked editor roots. |
-| Build 2 audio controls | Audio right-click fade and volume editing, including one-step undo, passed. Popup retention received a separate later native check below. |
-| Build 4 reorder/drop | Both pointer directions and a real HTML `DataTransfer` drop passed, including one-step undo. The probe also captures at CanvasRoot, so a real drop whose propagation stops there remains observable. The `card-x` property proxy follows geometry while the accepted canonical insertion peer stays latched. |
-| Build 4 pose/idle and dense clusters | Two native cases passed in 14.7 s. With `no-preference` motion and actual HTML WAAPI parked at 40 ms, the recorded post-paint Canvas poses matched all three HTML labels within 0.25 CSS pixels, including the proxy. Stationary idle caused no paints; Escape cleanup and the dense-cluster case passed. |
-| Latest audio popup check | The committed volume popup remains open after the edit and actual `engine.undo()`. The earlier harness focused the ruler to invoke undo, which necessarily dismissed the popup; this check uses the same real engine undo path as the other native audio UI case. |
-| Final build 5 context-menu handoff | The 1,000-row and gap/transition cases pass together in 20.5 s. A real right-click on the second occurrence opens the retained transition editor, applies only to that occurrence, and undoes once. The earlier focus-restoration failure is preserved in the build 4 artifacts. |
-| Final build 5 original audio | Real WAV import, prepared Canvas waveform, audible native playback, live volume/undo without restarting the mixer, successful journal flush and sound-bank audition/stop pass in 17.5 s. Production WebGPU, WebGL, Canvas2D and VideoFrame read counters remain zero. |
-| Real template gallery | In Bloom and Stress Lab opened and passed their native gallery checks in 29.8 s. The real Sound Playground gallery is also the measured Canvas scroll workload below. |
-| Final build 6 direct fade controls | A direct click on the visible fade icon opens its real editor, commits a 250 ms fade with one undo and preserves subsequent volume/menu/undo behavior. This strengthened audio case passes in 17.1 s. The earlier pointer promotion into the clip is preserved as a failed build 5 capture. |
+| Check                                | Verified result                                                                                                                                                                                                                                                                                                                                                                                                              |
+| ------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Focused implementation tests         | **130 distinct focused tests** pass: 113 Canvas base cases, nine shared-presentation cases, five TrackClips cases and three hover-lease ownership cases. The initial 107 tests across 27 mirrored files passed in 16.60 s; the added stationary-held-reorder regression brought that base to 108, with its eight-test recheck passing in 2.80 s. The five TrackClips cases passed in 3.95 s. Rechecks are not counted twice. |
+| Source/static checks                 | Latest scoped TypeScript, including the new native harnesses, reports zero errors. ESLint and type-aware Oxlint report zero violations across all 67 changed TypeScript targets; contribution rules pass. The synchronized version check previously passed at `0.2.0`.                                                                                                                                                       |
+| Final build 5 scroll coverage        | The 1,000-row fixture covered both axes at the first scroll RAF for all five samples, with exact expected bounds, zero instrumented production pixel readbacks and stable tracked editor React roots.                                                                                                                                                                                                                        |
+| Build 2 authoring                    | Key move, marquee, easing, clip move and trim passed in two native scenarios totaling 17.2 s. These exercise real targets and validated commands.                                                                                                                                                                                                                                                                            |
+| Build 2 playback                     | Playback passed without repainting static timeline artwork or rendering the tracked editor roots.                                                                                                                                                                                                                                                                                                                            |
+| Build 2 audio controls               | Audio right-click fade and volume editing, including one-step undo, passed. Popup retention received a separate later native check below.                                                                                                                                                                                                                                                                                    |
+| Build 4 reorder/drop                 | Both pointer directions and a real HTML `DataTransfer` drop passed, including one-step undo. The probe also captures at CanvasRoot, so a real drop whose propagation stops there remains observable. The `card-x` property proxy follows geometry while the accepted canonical insertion peer stays latched.                                                                                                                 |
+| Build 4 pose/idle and dense clusters | Two native cases passed in 14.7 s. With `no-preference` motion and actual HTML WAAPI parked at 40 ms, the recorded post-paint Canvas poses matched all three HTML labels within 0.25 CSS pixels, including the proxy. Stationary idle caused no paints; Escape cleanup and the dense-cluster case passed.                                                                                                                    |
+| Latest audio popup check             | The committed volume popup remains open after the edit and actual `engine.undo()`. The earlier harness focused the ruler to invoke undo, which necessarily dismissed the popup; this check uses the same real engine undo path as the other native audio UI case.                                                                                                                                                            |
+| Final build 5 context-menu handoff   | The 1,000-row and gap/transition cases pass together in 20.5 s. A real right-click on the second occurrence opens the retained transition editor, applies only to that occurrence, and undoes once. The earlier focus-restoration failure is preserved in the build 4 artifacts.                                                                                                                                             |
+| Final build 5 original audio         | Real WAV import, prepared Canvas waveform, audible native playback, live volume/undo without restarting the mixer, successful journal flush and sound-bank audition/stop pass in 17.5 s. Production WebGPU, WebGL, Canvas2D and VideoFrame read counters remain zero.                                                                                                                                                        |
+| Real template gallery                | In Bloom and Stress Lab opened and passed their native gallery checks in 29.8 s. The real Sound Playground gallery is also the measured Canvas scroll workload below.                                                                                                                                                                                                                                                        |
+| Final build 6 direct fade controls   | A direct click on the visible fade icon opens its real editor, commits a 250 ms fade with one undo and preserves subsequent volume/menu/undo behavior. This strengthened audio case passes in 17.1 s. The earlier pointer promotion into the clip is preserved as a failed build 5 capture.                                                                                                                                  |
 
 Focused regressions also cover synchronous invalidation of stale audio peaks and
 recognized volume/mute publications. Native checks now establish the later
@@ -143,13 +143,13 @@ The latter does not change the scroll/painter path. Its separate interaction
 capture is recorded separately, with matching executable/maps rather than
 relabeling the build 5 measurements.
 
-| Same Sound Playground workload, requested browser/preview/dev quotas 50/45/5 | DOM reference | Canvas build 5 |
-| --- | ---: | ---: |
-| 20 visual wheel packets, main-thread script | 411.666 ms | 234.919 ms (−42.9%) |
-| 12 audio wheel packets, main-thread script | 131.168 ms | 34.262 ms (−73.9%) |
-| Visual long tasks | 8 | 2 |
-| Visual RAF-gap p95 | 66.7 ms | 50.0 ms |
-| Audio RAF-gap p95 | 50.0 ms | 33.4 ms |
+| Same Sound Playground workload, requested browser/preview/dev quotas 50/45/5 | DOM reference |      Canvas build 5 |
+| ---------------------------------------------------------------------------- | ------------: | ------------------: |
+| 20 visual wheel packets, main-thread script                                  |    411.666 ms | 234.919 ms (−42.9%) |
+| 12 audio wheel packets, main-thread script                                   |    131.168 ms |  34.262 ms (−73.9%) |
+| Visual long tasks                                                            |             8 |                   2 |
+| Visual RAF-gap p95                                                           |       66.7 ms |             50.0 ms |
+| Audio RAF-gap p95                                                            |       50.0 ms |             33.4 ms |
 
 The five editor roots and panel counters remain unchanged; production readbacks
 and application errors are zero. The visible Canvas is 1,196×283 CSS pixels and

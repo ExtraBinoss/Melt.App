@@ -10,6 +10,7 @@
     "**/dist/**",
     "coverage/**",
     "artifacts/**",
+    "apps/web/src/routeTree.gen.ts",
     "apps/web/public/templates/motion/**/*.json",
     "apps/web/public/templates/designed/**/*.json",
     "PLAN_UNIVERSEL_EDITEUR_CREATIF.md",

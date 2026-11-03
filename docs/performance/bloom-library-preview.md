@@ -19,11 +19,11 @@ real Three GPU timestamp queries, a 480 px output, one browser, a one-core CPU
 quota, 1.5/2 GB memory high/max limits and no swap. These development-server,
 CPU-capped diagnostics are **not production latency or physical-display claims**.
 
-| Workload | Host frame p50 / p95 | GPU passes p50 / p95 |
-| --- | --- | --- |
-| Raw preview video only | 2.85 / 8.70 ms | 0.12 / 0.17 ms |
-| Full composition, preview original | 16.65 / 54.30 ms | 0.97 / 1.11 ms |
-| Full composition, 1080p original | 20.40 / 58.70 ms | 1.24 / 1.89 ms |
+| Workload                           | Host frame p50 / p95 | GPU passes p50 / p95 |
+| ---------------------------------- | -------------------- | -------------------- |
+| Raw preview video only             | 2.85 / 8.70 ms       | 0.12 / 0.17 ms       |
+| Full composition, preview original | 16.65 / 54.30 ms     | 0.97 / 1.11 ms       |
+| Full composition, 1080p original   | 20.40 / 58.70 ms     | 1.24 / 1.89 ms       |
 
 Warm preview source preparation was 0.7 / 3.1 ms p50/p95; composition including
 submission and GPU acknowledgement was 15.15 / 50.1 ms. GPU shader execution

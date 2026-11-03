@@ -50,16 +50,16 @@ reference is a detached `df9d050` worktree. Raw reports and source hashes are in
 `artifacts/scene-spatial/spatial-{package,selection,hover}-final-*.json`.
 
 | Records / distribution | Baseline repeated exact hit | Indexed repeated exact hit |
-| --- | ---: | ---: |
-| 500 / grid | 11.040 µs | 1.861 µs |
-| 500 / clustered | 4.729 µs | 2.950 µs |
-| 500 / all overlap | 0.110 µs | 0.225 µs |
-| 1,000 / grid | 39.054 µs | 1.052 µs |
-| 1,000 / clustered | 4.514 µs | 4.609 µs |
-| 1,000 / all overlap | 0.128 µs | 0.134 µs |
-| 10,000 / grid | 338.517 µs | 3.364 µs |
-| 10,000 / clustered | 61.987 µs | 54.107 µs |
-| 10,000 / all overlap | 0.104 µs | 0.151 µs |
+| ---------------------- | --------------------------: | -------------------------: |
+| 500 / grid             |                   11.040 µs |                   1.861 µs |
+| 500 / clustered        |                    4.729 µs |                   2.950 µs |
+| 500 / all overlap      |                    0.110 µs |                   0.225 µs |
+| 1,000 / grid           |                   39.054 µs |                   1.052 µs |
+| 1,000 / clustered      |                    4.514 µs |                   4.609 µs |
+| 1,000 / all overlap    |                    0.128 µs |                   0.134 µs |
+| 10,000 / grid          |                  338.517 µs |                   3.364 µs |
+| 10,000 / clustered     |                   61.987 µs |                  54.107 µs |
+| 10,000 / all overlap   |                    0.104 µs |                   0.151 µs |
 
 These medians include the authoritative narrow phase, rather than just tree
 search. Each cohort verifies exact hits against the pre-change implementation.
@@ -87,14 +87,14 @@ The original slower hover cohort is preserved separately.
 The final hover cohort (`spatial-hover-cached-final.json`) measures the actual
 lease validation/publication, geometry/matrix lookup and release, after warmup:
 
-| Records / pose | Baseline hover | Final cached hover |
-| --- | ---: | ---: |
-| 500 / canonical | 159.359 µs | 3.995 µs |
-| 500 / evaluated | 275.302 µs | 2.309 µs |
-| 1,000 / canonical | 302.702 µs | 0.969 µs |
-| 1,000 / evaluated | 1,174.266 µs | 1.147 µs |
-| 10,000 / canonical | 10,678.435 µs | 0.718 µs |
-| 10,000 / evaluated | 17,782.983 µs | 3.252 µs |
+| Records / pose     | Baseline hover | Final cached hover |
+| ------------------ | -------------: | -----------------: |
+| 500 / canonical    |     159.359 µs |           3.995 µs |
+| 500 / evaluated    |     275.302 µs |           2.309 µs |
+| 1,000 / canonical  |     302.702 µs |           0.969 µs |
+| 1,000 / evaluated  |   1,174.266 µs |           1.147 µs |
+| 10,000 / canonical |  10,678.435 µs |           0.718 µs |
+| 10,000 / evaluated |  17,782.983 µs |           3.252 µs |
 
 Sub-microsecond medians and JIT variation across sizes do not imply larger scenes
 are intrinsically faster. These are CPU operations against one reusable pose;

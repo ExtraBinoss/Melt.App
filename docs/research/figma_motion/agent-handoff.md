@@ -71,7 +71,7 @@ Do not publish an interface merely because one agent needs it. Write the contrac
 
 | Domain               | Initial tasks | Boundary                                                                                                                                         |
 | -------------------- | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Core temporal engine | T01–T03       | Pure TypeScript generic/headless schema/validation/commands/property registry/evaluation/easing and focused behavior tests.                               |
+| Core temporal engine | T01–T03       | Pure TypeScript generic/headless schema/validation/commands/property registry/evaluation/easing and focused behavior tests.                      |
 | Media/storage/render | T04, T05, T07 | Bounded original/proxy media, native decoders, frame providers and GPU dependencies; no editor UI ownership.                                     |
 | Runtime/authoring UI | T06, T08–T11  | Transport, virtualized timeline, inspector key controls and direct manipulation; no alternative time model.                                      |
 | Audio/export         | T12, T13      | Exact A/V sample placement, mute/volume/mix, original media and Mediabunny.                                                                      |

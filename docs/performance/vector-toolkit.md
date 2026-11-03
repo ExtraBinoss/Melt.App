@@ -45,11 +45,11 @@ Native fidelity passed within each backend: baseline/batched screenshots were by
 
 The controlled same-realm paired cohort subsequently completed with eight shared warmup pairs and twelve alternating measured pairs, under the same bounded-resource protocol. Raw results and executable/maps are retained in `artifacts/vector-toolkit-paired/`.
 
-| Source | Paired baseline median | Paired batch median |
-| --- | ---: | ---: |
-| One icon with hole | 0.60 ms | 0.65 ms |
-| 128 imported icon parts | 15.15 ms | 4.25 ms |
-| 32 curved fill/stroke parts | 23.35 ms | 14.45 ms |
-| One 192-cubic fill/stroke path | 202.45 ms | 207.75 ms |
+| Source                         | Paired baseline median | Paired batch median |
+| ------------------------------ | ---------------------: | ------------------: |
+| One icon with hole             |                0.60 ms |             0.65 ms |
+| 128 imported icon parts        |               15.15 ms |             4.25 ms |
+| 32 curved fill/stroke parts    |               23.35 ms |            14.45 ms |
+| One 192-cubic fill/stroke path |              202.45 ms |           207.75 ms |
 
 The multipart savings persist after common warmup and interleaving. The single complex path is approximately equivalent in this cohort (2.6% slower median), with wide natural variation: baseline 147.8–328.8 ms and batch 133.8–350.3 ms. It does not reproduce the earlier separate-realm 82% regression as a stable adapter effect. Exact geometry checks still pass. Keep the optimization limited to demonstrated multipart parser savings; do not replace Three/Earcut or simplify genuine curve detail to chase the separate stroke-allocation cost.
