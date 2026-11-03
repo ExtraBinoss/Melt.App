@@ -36,5 +36,7 @@
   "cornellBox": "Cornell Box",
   "cornellBoxDescription": "Uno studio 3D in loop con testo cromato, pareti colorate e ombre proiettate.",
   "secondSkin": "Second Skin",
-  "secondSkinDescription": "10 s · Danza, effetti termici e contorni con tipografia modificabile"
+  "secondSkinDescription": "10 s · Danza, effetti termici e contorni con tipografia modificabile",
+  "terminalSignal": "Segnale terminale",
+  "terminalSignalDescription": "16 s · Terminale al neon, digitazione modificabile, testo scorrevole e vetro CRT curvo · 9:16"
 }

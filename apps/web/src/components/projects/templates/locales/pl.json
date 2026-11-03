@@ -36,5 +36,7 @@
   "cornellBox": "Pudełko Cornella",
   "cornellBoxDescription": "Zapętlona scena 3D z chromowanym tekstem, kolorowymi ścianami i rzucanymi cieniami.",
   "secondSkin": "Second Skin",
-  "secondSkinDescription": "10 s · Taniec, efekty termiczne i kontury z edytowalną typografią"
+  "secondSkinDescription": "10 s · Taniec, efekty termiczne i kontury z edytowalną typografią",
+  "terminalSignal": "Sygnał terminala",
+  "terminalSignalDescription": "16 s · Neonowy terminal, edytowalne pisanie, przewijany tekst i zakrzywione szkło CRT · 9:16"
 }

@@ -12,6 +12,7 @@ test("compares independently measured duration to budget and admits future metri
   const metric = performanceSnapshot("scene").metrics[0]!;
   expect(performanceDomainIds([metric, { ...metric, domain: "future" }])).toEqual([
     "scene",
+    "spatial",
     "images",
     "videos",
     "shapes",

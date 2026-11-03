@@ -487,6 +487,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Fixed
 
+- Complete 66 missing performance-diagnostic labels and Terminal Signal template copy in ten additional locales. Validate legitimate French CLDR plural forms while retaining required translation keys and interpolation checks.
+
 - Fix CI lint checks for the virtual effect catalog by preserving repeated-letter typeahead without string spreading and explicitly naming its mutable viewport ref. Exclude Wrangler-generated declarations from React linting while retaining the generated-binding consistency check. Format existing motion documentation/tests and leave the automatically regenerated TanStack route tree out of formatting checks.
 
 - Fix clean CI installs by declaring the root print-proof script's ImageMagick dependency explicitly. Pin the runner to Ubuntu 26.04, update pinned GitHub actions to Node 24 runtimes, and upload coverage reports only after a report exists. Preserve owner-only deployment guards and protected production approval.

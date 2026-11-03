@@ -36,5 +36,7 @@
   "cornellBox": "코넬 박스",
   "cornellBoxDescription": "크롬 텍스트, 컬러 벽, 그림자가 있는 반복 3D 장면.",
   "secondSkin": "Second Skin",
-  "secondSkinDescription": "10초 · 춤, 열화상 및 윤곽 효과, 편집 가능한 타이포그래피"
+  "secondSkinDescription": "10초 · 춤, 열화상 및 윤곽 효과, 편집 가능한 타이포그래피",
+  "terminalSignal": "터미널 신호",
+  "terminalSignalDescription": "16초 · 네온 터미널, 편집 가능한 타이핑, 스크롤 텍스트와 곡면 CRT 유리 · 9:16"
 }

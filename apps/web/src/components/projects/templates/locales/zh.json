@@ -36,5 +36,7 @@
   "cornellBox": "康奈尔盒",
   "cornellBoxDescription": "循环播放的 3D 场景，包含镀铬文字、彩色墙壁和投射阴影。",
   "secondSkin": "Second Skin",
-  "secondSkinDescription": "10 秒 · 舞蹈、热成像和轮廓效果，搭配可编辑文字"
+  "secondSkinDescription": "10 秒 · 舞蹈、热成像和轮廓效果，搭配可编辑文字",
+  "terminalSignal": "终端信号",
+  "terminalSignalDescription": "16 秒 · 霓虹终端、可编辑打字、滚动文本和弯曲 CRT 玻璃 · 9:16"
 }

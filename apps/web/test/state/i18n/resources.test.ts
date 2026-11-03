@@ -35,7 +35,28 @@ test("feature JSON has matching English/French keys and interpolation variables"
     expect(french, path).toBeDefined();
     const englishLeaves = leaves(source),
       frenchLeaves = leaves(french);
-    expect(Object.keys(frenchLeaves).sort(), path).toEqual(Object.keys(englishLeaves).sort());
+    const categories = new Intl.PluralRules("fr").resolvedOptions().pluralCategories;
+    const extraPluralBase = (key: string) => {
+      const match = /^(.*)_(zero|one|two|few|many|other)$/.exec(key);
+      return match &&
+        categories.includes(match[2] as Intl.LDMLPluralRule) &&
+        englishLeaves[`${match[1]}_other`] !== undefined
+        ? `${match[1]}_other`
+        : undefined;
+    };
+    expect(
+      Object.keys(frenchLeaves)
+        .filter((key) => englishLeaves[key] !== undefined || !extraPluralBase(key))
+        .sort(),
+      path,
+    ).toEqual(Object.keys(englishLeaves).sort());
+    for (const [key, text] of Object.entries(frenchLeaves)) {
+      const source = englishLeaves[key] ?? englishLeaves[extraPluralBase(key)!];
+      expect(text.trim(), `${path}:${key}`).not.toBe("");
+      expect(text.match(/{{[^}]+}}/g)?.sort() ?? [], `${path}:${key}`).toEqual(
+        source?.match(/{{[^}]+}}/g)?.sort() ?? [],
+      );
+    }
     for (const [key, text] of Object.entries(englishLeaves)) {
       expect(text.trim(), `${path}:${key}`).not.toBe("");
       expect(frenchLeaves[key]?.trim(), `${path}:${key}`).not.toBe("");

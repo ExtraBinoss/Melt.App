@@ -36,5 +36,7 @@
   "cornellBox": "Cornell-Box",
   "cornellBoxDescription": "Eine 3D-Schleife mit Chromschrift, farbigen Wänden und geworfenen Schatten.",
   "secondSkin": "Second Skin",
-  "secondSkinDescription": "10 s · Tanz, Wärmebild- und Kontureffekte mit bearbeitbarer Typografie"
+  "secondSkinDescription": "10 s · Tanz, Wärmebild- und Kontureffekte mit bearbeitbarer Typografie",
+  "terminalSignal": "Terminalsignal",
+  "terminalSignalDescription": "16 s · Neon-Terminal, bearbeitbarer Tipptext, laufender Text und gewölbtes CRT-Glas · 9:16"
 }
