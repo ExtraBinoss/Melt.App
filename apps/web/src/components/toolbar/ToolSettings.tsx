@@ -21,7 +21,7 @@ export function ToolSettings({
     tool = useAtomValue(toolAtom);
   if (tool !== "wand" && tool !== "segment") return null;
   return (
-    <aside className="tool-settings floating-panel" aria-label={t(tool)}>
+    <aside className="tool-settings floating-panel" data-tool={tool} aria-label={t(tool)}>
       {tool === "wand" ? (
         <WandOptions />
       ) : (

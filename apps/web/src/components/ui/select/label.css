@@ -1,0 +1,47 @@
+.select-label {
+  --select-label-shift: calc(-1 * var(--select-label-distance, 0px));
+  display: block;
+  flex: 1;
+  min-inline-size: 0;
+  overflow: hidden;
+}
+.select-label:dir(rtl) {
+  --select-label-shift: var(--select-label-distance, 0px);
+}
+.select-label-text {
+  display: block;
+  inline-size: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+:is(
+    [data-slot="select-trigger"]:hover,
+    [data-slot="select-trigger"]:focus-visible,
+    [data-slot="select-item"]:hover,
+    [data-slot="select-item"]:focus
+  )
+  .select-label[data-overflow]
+  .select-label-text {
+  overflow: visible;
+  text-overflow: clip;
+  animation: select-label-pan var(--select-label-duration, 4s) ease-in-out 500ms infinite;
+}
+@keyframes select-label-pan {
+  0%,
+  15%,
+  100% {
+    transform: translateX(0);
+  }
+  75%,
+  90% {
+    transform: translateX(var(--select-label-shift));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .select-label .select-label-text {
+    animation: none !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+}

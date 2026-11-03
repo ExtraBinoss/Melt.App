@@ -1,9 +1,128 @@
 .object-selection-options {
   display: grid;
-  gap: 10px;
-  margin-top: 12px;
-  padding-top: 12px;
+  gap: 14px;
+  margin-top: 16px;
+  padding-top: 16px;
   border-top: 1px solid var(--border);
+}
+.tool-settings[data-tool="segment"] {
+  width: min(300px, calc(100dvw - 100px));
+  max-height: calc(100dvh - 110px);
+  padding: 16px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+.workspace > .tool-settings[data-tool="segment"] {
+  max-height: calc(
+    100% - 2 * var(--workspace-gap) - var(--ruler-inset) - var(--floating-size) - 16px
+  );
+}
+.mobile-sheet .tool-settings[data-tool="segment"] {
+  width: 100%;
+  max-height: none;
+  padding: 0;
+  overflow: visible;
+}
+.tool-settings[data-tool="segment"] .local-model small,
+.tool-settings[data-tool="segment"] .local-model p,
+.object-selection-options .object-selection-detection small {
+  margin: 0;
+}
+.tool-settings[data-tool="segment"] .local-model-actions > button:first-child {
+  min-width: 0;
+  min-height: 32px;
+  height: auto;
+  white-space: normal;
+}
+.object-selection-mode {
+  display: grid;
+  gap: 6px;
+}
+.object-selection-options .object-selection-mode-field {
+  width: 100%;
+  min-width: 0;
+}
+.object-selection-mode-label {
+  font-size: 11px;
+  font-weight: 600;
+}
+.object-selection-guide {
+  display: grid;
+  gap: 18px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.object-selection-guide > li {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr);
+  gap: 9px;
+}
+.object-selection-step {
+  display: grid;
+  place-items: center;
+  height: 22px;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: var(--muted);
+  font-size: 10px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.object-selection-guide strong {
+  display: block;
+  margin-block: 2px 8px;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.object-selection-options .object-selection-guide p {
+  margin: 8px 0 0;
+  font-size: 11px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.object-selection-inputs {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.6;
+}
+.object-selection-inputs > div {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+}
+.object-selection-inputs dt {
+  max-width: 100%;
+}
+.object-selection-inputs dd {
+  flex: 1 1 9ch;
+  margin: 0;
+  color: var(--muted-foreground);
+  overflow-wrap: anywhere;
+}
+.object-selection-inputs [data-slot="kbd"] {
+  height: auto;
+  max-width: 100%;
+  padding-block: 1px;
+  white-space: normal;
+  font-size: 10px;
+  line-height: 1.6;
+}
+.object-selection-detection {
+  display: grid;
+  gap: 8px;
+  border-top: 1px solid var(--border);
+  padding-top: 14px;
+}
+.object-selection-detection > button {
+  width: 100%;
+  height: auto;
+  min-height: 32px;
+  white-space: normal;
 }
 .object-selection-options p,
 .object-selection-options small {
@@ -20,6 +139,15 @@
   align-items: center;
   justify-content: space-between;
   gap: 8px;
+}
+.object-selection-actions {
+  flex-wrap: wrap;
+}
+.object-selection-actions > button {
+  max-width: 100%;
+  min-height: 32px;
+  height: auto;
+  white-space: normal;
 }
 .object-selection-candidates {
   display: flex;

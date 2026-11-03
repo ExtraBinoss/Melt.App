@@ -6,11 +6,13 @@ test("language menus use scroll shadows without arrow rows and retain wheel and 
   await page.setViewportSize({ width: 390, height: 600 });
   await page.addInitScript(() => localStorage.setItem("musart.language", "en"));
   await page.goto("/tools");
+  // The footer hydrates its picker as it approaches the visible viewport.
+  await page.locator(".site-languages").scrollIntoViewIfNeeded();
   const trigger = page.locator('.site-languages [role="combobox"]');
   await expect(trigger).toBeEnabled();
   await trigger.scrollIntoViewIfNeeded();
   await trigger.click();
-  const menu = page.locator('[data-slot="select-content"]'),
+  const menu = page.locator('[data-slot="select-content"][data-state="open"]'),
     viewport = menu.locator('[data-slot="select-viewport"]');
   await expect(menu).toBeVisible();
   await expect(
@@ -58,7 +60,7 @@ test("tool menus match their field width and guides keep steps and output notes 
     const trigger = page.getByRole("combobox", { name, exact: true, includeHidden: true });
     const field = (await trigger.boundingBox())!;
     await trigger.click();
-    const menu = page.locator('[data-slot="select-content"]');
+    const menu = page.locator('[data-slot="select-content"][data-state="open"]');
     await expect
       .poll(async () => Math.abs((await menu.boundingBox())!.width - field.width))
       .toBeLessThan(1);

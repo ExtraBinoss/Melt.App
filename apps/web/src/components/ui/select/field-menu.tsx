@@ -20,6 +20,7 @@ import { ScrollShadow } from "../../shared/scroll/ScrollShadow";
 import { bindSelectScroll } from "./scroll";
 import { menuPointerUpCapture } from "../menu/pointer";
 import { cn } from "../utils";
+import { SelectLabel } from "./label";
 import "./scroll.css";
 
 const noPortalEvents = () => () => {};
@@ -220,7 +221,7 @@ export function FieldMenu({
           style={{ pointerEvents: "none" }}
           className="flex min-w-0 items-center gap-2 overflow-hidden text-ellipsis"
         >
-          {trigger}
+          {typeof trigger === "string" ? <SelectLabel text={trigger} /> : trigger}
         </span>
         <DropdownChevron className="size-4 shrink-0 opacity-50" />
       </PopoverTrigger>
@@ -321,13 +322,15 @@ export function FieldMenuOption({
           onClick?.(event);
           if (!event.defaultPrevented && !disabled) choose(value);
         }}
-        className="relative flex w-full cursor-default items-center gap-2 rounded-sm py-1.5 pr-8 pl-2 text-left text-sm outline-hidden select-none focus:bg-accent focus:text-accent-foreground disabled:pointer-events-none disabled:opacity-50"
+        className="relative flex w-full cursor-default items-center gap-2 rounded-sm py-1.5 pe-8 ps-2 text-start text-sm outline-hidden select-none focus:bg-accent focus:text-accent-foreground disabled:pointer-events-none disabled:opacity-50"
       >
-        <span className="min-w-0 truncate">{children}</span>
+        <span className="min-w-0 flex-1 truncate">
+          {typeof children === "string" ? <SelectLabel text={children} /> : children}
+        </span>
         {selected && (
           <span
             data-slot="select-item-indicator"
-            className="absolute right-2 flex size-3.5 items-center justify-center"
+            className="absolute end-2 flex size-3.5 items-center justify-center"
           >
             <CheckIcon className="size-4" />
           </span>

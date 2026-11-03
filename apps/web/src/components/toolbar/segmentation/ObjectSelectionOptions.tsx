@@ -1,4 +1,4 @@
-import { useSyncExternalStore, useState } from "react";
+import { useSyncExternalStore, useState, useId } from "react";
 import { useTranslation } from "react-i18next";
 import { Copy, RotateCcw, ScanSearch, Undo2, X } from "lucide-react";
 import type { EnginePort } from "@musart/core";
@@ -8,6 +8,7 @@ import { Button } from "../../ui/button";
 import { Throbber } from "../../ui/throbber/Throbber";
 import "../../../services/selection/wand/messages";
 import "./object-options.css";
+import { ObjectSelectionGuide } from "./ObjectSelectionGuide";
 const emptySubscribe = () => () => {},
   emptyRead = () => null;
 export function ObjectSelectionOptions({
@@ -28,6 +29,7 @@ export function ObjectSelectionOptions({
     [error, setError] = useState("");
   const target =
     state?.layerId ?? (snapshot?.selection.length === 1 ? snapshot.selection[0] : undefined);
+  const modeId = useId();
   function run(action: () => Promise<void>) {
     setError("");
     void action().catch((failure: unknown) => {
@@ -37,28 +39,38 @@ export function ObjectSelectionOptions({
   }
   return (
     <section className="object-selection-options" aria-label={t("objectTitle")}>
-      <SelectField
-        label={t("objectMode")}
-        value={mode}
-        options={[
-          { value: "points", label: t("objectPoints") },
-          { value: "box", label: t("objectBox") },
-        ]}
-        onValueChange={(value) => port.setMode(value === "box" ? "box" : "points")}
-      />
-      <p>{t("objectHint")}</p>
-      <Button
-        variant="secondary"
-        size="sm"
-        disabled={!target || state?.busy || state?.applying}
-        onClick={() => {
-          if (target) run(() => port.scan(target));
-        }}
-      >
-        <ScanSearch size={14} />
-        {t("objectDetect")}
-      </Button>
-      <small>{t("objectDetectHint")}</small>
+      <div className="object-selection-mode">
+        <label htmlFor={modeId} className="object-selection-mode-label">
+          {t("objectMode")}
+        </label>
+        <SelectField
+          id={modeId}
+          className="object-selection-mode-field"
+          contentClassName="object-selection-mode-menu"
+          label={t("objectMode")}
+          value={mode}
+          options={[
+            { value: "points", label: t("objectPoints") },
+            { value: "box", label: t("objectBox") },
+          ]}
+          onValueChange={(value) => port.setMode(value === "box" ? "box" : "points")}
+        />
+      </div>
+      <ObjectSelectionGuide mode={mode} />
+      <div className="object-selection-detection">
+        <Button
+          variant="secondary"
+          size="sm"
+          disabled={!target || state?.busy || state?.applying}
+          onClick={() => {
+            if (target) run(() => port.scan(target));
+          }}
+        >
+          <ScanSearch size={14} />
+          {t("objectDetect")}
+        </Button>
+        <small>{t("objectDetectHint")}</small>
+      </div>
       {state?.busy && (
         <div className="object-selection-working" role="status">
           <Throbber
