@@ -6,6 +6,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Added
 
+- Use the same shared shimmer text animation as project opening for background-removal progress, and vertically center the left-aligned layer/status group beside its thumbnail. Drive the genuine mascot through its loading and preparing poses with the existing smooth morph engine.
+
 - Paint the selected layer thumbnail before starting background-removal GPU work, retain an immediately visible throbber through initialization, report runtime readiness separately from inference completion, and remove redundant native title tooltips from the compact status card. Headless calls remain immediate and cancellation releases presentation waits.
 
 - Keep the compact background-removal card pinned to its original layer while selection and unrelated edits change. Show the layer name and thumbnail, an immediate throbber, three preparation stages, streamed download megabytes/percentage, and cancellation without a long instruction panel. Preserve the user's current selection when the result commits, and reject results if the source layer is changed, deleted, or its project/page is left.

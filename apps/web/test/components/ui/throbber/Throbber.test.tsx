@@ -27,6 +27,10 @@ test("fast operations never flash a loader, while slow operations announce once 
     await import("../../../../src/ui/brand/MeltLogo");
   });
   expect(view.container.querySelector("svg")).toHaveAttribute("data-brand-state", "working");
+  view.rerender(<Throbber label="Preparing" state="loading" variant="shimmer" />);
+  expect(view.container.querySelector("svg")).toHaveAttribute("data-brand-state", "loading");
+  view.rerender(<Throbber label="Preparing" state="preparing" variant="shimmer" />);
+  expect(view.container.querySelector("svg")).toHaveAttribute("data-brand-state", "preparing");
   view.rerender(<Throbber active={false} label="Loading projects" variant="shimmer" />);
   expect(screen.queryByRole("status")).toBeNull();
   expect(view.container.querySelector("svg")).toHaveAttribute("data-brand-state", "working");

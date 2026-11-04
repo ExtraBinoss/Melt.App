@@ -14,7 +14,7 @@ test("operation marks stay decorative beside their owner's existing live status 
   await act(async () => {
     await import("../../../src/ui/brand/MeltLogo");
   });
-  expect(view.container.querySelector("svg")).toHaveAttribute("data-brand-state", "working");
+  expect(view.container.querySelector("svg")).toHaveAttribute("data-brand-state", "preparing");
   vi.useRealTimers();
   expect(view.container.querySelector("svg")).toHaveAttribute("width", "36");
   expect(view.container.querySelector('[role="status"]')).toBeNull();

@@ -86,9 +86,14 @@ export function ObjectSelectionOptions({
         <div className="background-target-status">
           <span className="background-target-name">{state.targetName}</span>
           {state.busy ? (
-            <div className="background-phase" role="status">
-              <Throbber delayMs={0} size={20} decorative />
-              <span className="background-phase-label">{label}</span>
+            <div className="background-phase">
+              <Throbber
+                delayMs={0}
+                size={20}
+                variant="shimmer"
+                state={loading || initializing ? "loading" : "preparing"}
+                label={label}
+              />
               <span className="background-step" dir="ltr">
                 {number.format(stage)}/{number.format(3)}
               </span>

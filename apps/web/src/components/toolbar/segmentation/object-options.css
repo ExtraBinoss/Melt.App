@@ -11,7 +11,8 @@
   gap: 8px;
 }
 .background-action-row {
-  display: flex;
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
   align-items: center;
   gap: 12px;
   min-height: 28px;
@@ -92,8 +93,13 @@
   background: var(--muted);
 }
 .background-target-status {
+  position: relative;
+  padding-inline-start: 26px;
   min-width: 0;
-  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
 }
 .background-target-name {
   display: block;
@@ -106,7 +112,6 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  margin-top: 4px;
   font-size: 10px;
   color: var(--muted-foreground);
 }
@@ -131,17 +136,23 @@
 }
 
 .background-phase .ui-throbber {
-  flex: 0 0 20px;
-  width: 20px;
-  min-width: 20px;
+  flex: 1 1 0;
+  min-width: 0;
+  justify-content: flex-start;
+  gap: 6px;
+  font-size: inherit;
   opacity: 1;
   visibility: visible;
   transition: none;
 }
 .background-phase .ui-throbber-mark {
+  position: absolute;
+  inset-inline-start: 0;
+  top: 50%;
+  transform: translateY(-50%);
   flex-shrink: 0;
 }
-.background-phase-label {
+.background-phase .ui-throbber-label {
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
