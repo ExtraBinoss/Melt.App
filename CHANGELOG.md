@@ -6,6 +6,7 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Added
 
+- Complete workspace-switch translations and runtime registration in all twelve supported interface languages.
 - Add a switchable Studio workspace in the project-name menu while retaining the same engine, canvas, document, selection, history and export pipeline as Classic. Add native quick insertion, compact canonical pages/layers, direct text/font/extrusion controls, themed accessible material/environment sliders, editable stackable background effects, SVG extrusion and a static Studio Starter template. Keep interface mode project-local, restore legacy projects in Classic and support explicit headless Studio creation/screenshots.
 - Prevent concurrent gizmo/composition precompilation from silently disabling native 3D controls, and keep direct template creation unavailable until its click handler is hydrated.
 - Preserve admission for already-approved reflection/proxy refresh frames so they complete once instead of rescheduling every quiet interval; continue to revoke admission for foreground edits, gestures, playback and disposal.

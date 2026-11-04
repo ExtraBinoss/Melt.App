@@ -1,6 +1,7 @@
 import { expect, test } from "vitest";
 import { i18n } from "../../../src/state/i18n";
 import { supportedLocales } from "../../../src/state/i18n/locales";
+import { resources as workspaceModes } from "../../../src/components/projects/workspace-mode/messages";
 import "../../../src/ui/studio/library/messages";
 import "../../../src/ui/studio/background/messages";
 
@@ -46,6 +47,20 @@ test("normal feature imports register every Studio library and background locale
           i18n.services.interpolator.interpolate(text, options, code, {}),
         );
       }
+    }
+  }
+});
+
+test("the project workspace switch is fully registered in every supported locale", () => {
+  for (const { code } of supportedLocales) {
+    const translated = workspaceModes[code];
+    expect(translated, code).toBeDefined();
+    expect(Object.keys(translated!).sort()).toEqual(Object.keys(workspaceModes.en).sort());
+    expect(i18n.getResourceBundle(code, "workspaceMode"), code).toEqual(translated);
+    for (const [key, text] of Object.entries(translated!)) {
+      expect(typeof text).toBe("string");
+      expect(String(text).trim()).toBeTruthy();
+      expect(i18n.t(`workspaceMode:${key}`, { lng: code })).toBe(text);
     }
   }
 });
