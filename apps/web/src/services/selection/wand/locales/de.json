@@ -81,5 +81,9 @@
   "objectGestureHelp": "Nach dem Laden von SAM 3 zeigt Überfahren eine Vorschau. Motiv anklicken oder ein Rechteck darum ziehen.",
   "objectApply": "Maske anwenden",
   "objectApplyHelp": "Anwenden behält das Motiv und blendet den Hintergrund aus. Abbrechen verwirft die Vorschau.",
-  "objectModels": "Lokale KI-Modelle"
+  "objectModels": "Lokale KI-Modelle",
+  "backgroundDone": "Hintergrund entfernt",
+  "refineBackground": "Verfeinern",
+  "refineGestureHint": "Klicken zum Hinzufügen.\nAlt-Klick oder Rechtsklick zum Ausschließen.\nRechteck um ein Motiv ziehen.",
+  "removingBackground": "Hintergrund wird entfernt…"
 }

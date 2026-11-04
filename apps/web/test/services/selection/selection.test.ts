@@ -175,3 +175,22 @@ describe("bounded selection worker client", () => {
     client.dispose();
   });
 });
+
+it("returns only the worker-encoded automatic matte and seed to the editor", async () => {
+  const port = worker(),
+    client = new SelectionClient(() => port);
+  const pending = client.backgroundEncoded("original");
+  expect(port.postMessage).toHaveBeenCalledWith(
+    { id: 1, type: "background", dataUrl: "original", encode: true },
+    [],
+  );
+  const result = {
+    blob: new Blob(["png"]),
+    width: 3,
+    height: 2,
+    seed: { x: 1, y: 1, label: 1 as const },
+  };
+  reply(port, { id: 1, result });
+  expect(await pending).toEqual(result);
+  client.dispose();
+});

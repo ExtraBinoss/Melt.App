@@ -1,3 +1,4 @@
+import { removeSelectedBackground } from "../../services/selection/background-action";
 import { layerViaCopy } from "../../services/selection/layer-via-copy";
 import type { Locale } from "../../state/i18n/locales";
 import { createMotionTransport } from "../../services/motion/transport";
@@ -57,7 +58,10 @@ export function createSearchActions(context: SearchActions) {
     toolEllipse: () => context.setTool("ellipse"),
     toolText: () => context.setTool("text"),
     toolWand: () => context.setTool("wand"),
-    toolSegment: () => context.setTool("segment"),
+    toolSegment: () => {
+      context.setTool("pointer");
+      return removeSelectedBackground(engine, services.objectSelection);
+    },
     importImages: context.onImport,
     importSvg: context.onImportSvg,
     openPortable: context.onOpenPortable,

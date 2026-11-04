@@ -6,6 +6,10 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Added
 
+- Keep the compact background-removal card pinned to its original layer while selection and unrelated edits change. Show the layer name and thumbnail, an immediate throbber, three preparation stages, streamed download megabytes/percentage, and cancellation without a long instruction panel. Preserve the user's current selection when the result commits, and reject results if the source layer is changed, deleted, or its project/page is left.
+
+- Make Remove background a direct, undoable BiRefNet action shared by the dock, search and keyboard shortcut. Use a pinned 512-pixel browser export, encode luminance PNGs entirely in the worker, and bypass original-image decoding and selection contours for this action. Replace the large setup panel with compact progress and an explicit Refine action; SAM 3 never runs on hover. Refinement replaces the automatic matte so missing subject pixels can be recovered while preserving an older clip.
+
 - Replace the object-selection setup with a twelve-language background-removal workflow: one automatic preview, unified click/rectangle refinement, selected-image locking, hover previews after explicit model preparation, cancellable hints and reversible Apply. Use pinned WebGPU SAM 3 Tracker for interactive selection and BiRefNet Lite for single-pass soft-alpha background matting, with separate verified downloads, visible progress and GPU model handoff.
 
 - Prepare owner-only Cloudflare CI/CD for melt.plinka.eu with authenticated GitHub identity guards, protected production secrets and approvals, exact-commit artifact integrity checks, stale-main rejection and streamed precompressed WASM. Add local Cloudflare browser delivery regressions and deployment/token-rotation documentation; preparation performs no production deployment.

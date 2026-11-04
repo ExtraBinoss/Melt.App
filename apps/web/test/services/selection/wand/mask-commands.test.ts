@@ -97,3 +97,50 @@ it.each([true, false])(
     expect(engine.getSnapshot().canUndo).toBe(false);
   },
 );
+
+it("replaces the automatic matte during refinement so previously hidden pixels can be recovered", () => {
+  const original = asset("original"),
+    first = asset("auto"),
+    refined = asset("refined");
+  const layer = createLayer("image", { id: "image", assetId: original.id });
+  const engine = new EditorEngine(
+    createProject({ pages: [createPage({ layers: [layer] })], assets: { original } }),
+  );
+  engine.transaction(
+    selectionMaskCommands(engine.getSnapshot().project.pages[0]!, layer.id, first, false),
+  );
+  const before = engine.getSnapshot().project;
+  engine.transaction(selectionMaskCommands(before.pages[0]!, layer.id, refined, false, first.id));
+  expect(engine.getSnapshot().project.pages[0]!.layers).toHaveLength(1);
+  expect(engine.getSnapshot().project.pages[0]!.layers[0]!.mask?.assetId).toBe(refined.id);
+  engine.undo();
+  expect(engine.getSnapshot().project).toEqual(before);
+  engine.redo();
+  expect(engine.getSnapshot().project.pages[0]!.layers[0]!.mask?.assetId).toBe(refined.id);
+});
+it("refines the generated matte source while preserving a pre-existing clip", () => {
+  const original = asset("original"),
+    clip = asset("clip"),
+    first = asset("auto"),
+    refined = asset("refined");
+  const layer = createLayer("image", {
+    id: "image",
+    assetId: original.id,
+    mask: { assetId: clip.id, enabled: true, inverted: false, mode: "alpha" },
+  });
+  const engine = new EditorEngine(
+    createProject({ pages: [createPage({ layers: [layer] })], assets: { original, clip } }),
+  );
+  engine.transaction(
+    selectionMaskCommands(engine.getSnapshot().project.pages[0]!, layer.id, first, false),
+  );
+  const before = engine.getSnapshot().project;
+  engine.transaction(selectionMaskCommands(before.pages[0]!, layer.id, refined, false, first.id));
+  const layers = engine.getSnapshot().project.pages[0]!.layers;
+  const source = layers.find((layer) => layer.maskSource)!;
+  expect(source.assetId).toBe(refined.id);
+  expect(source.mask).toEqual(layer.mask);
+  expect(layers).toHaveLength(2);
+  engine.undo();
+  expect(engine.getSnapshot().project).toEqual(before);
+});

@@ -1,3 +1,4 @@
+import type { ObjectSelectionPort } from "../../../src/services/selection/object/model";
 import { expect, test, vi } from "vitest";
 import { createLayer, createPage, createProject, createEffect } from "@musart/core";
 import { setup } from "../../support/ui";
@@ -197,7 +198,6 @@ test("routes tools, dialogs, imports, saving, theme/language and viewport reques
     "toolEllipse",
     "toolText",
     "toolWand",
-    "toolSegment",
   ] as const)
     actions[name]();
   expect(vi.mocked(ctx.setTool).mock.calls.map(([value]) => value)).toEqual([
@@ -208,7 +208,6 @@ test("routes tools, dialogs, imports, saving, theme/language and viewport reques
     "ellipse",
     "text",
     "wand",
-    "segment",
   ]);
   for (const name of [
     "importImages",
@@ -407,4 +406,34 @@ test("a registry locale target changes language without editing the document", a
   await executeSearchItem(item({ kind: "language", language: "ja" }), d.context);
   expect(d.context.setLanguage).toHaveBeenCalledExactlyOnceWith("ja");
   expect(d.engine.getSnapshot()).toBe(original);
+});
+
+test("the background command runs the same one-click action as the dock without entering SAM mode", async () => {
+  const d = context(),
+    removeBackground = vi.fn(async () => {});
+  d.services.objectSelection = { removeBackground } as unknown as ObjectSelectionPort;
+  const image = createLayer("image", { id: "subject", assetId: "photo" });
+  d.engine.transaction([
+    {
+      type: "addAssets",
+      assets: [
+        {
+          id: "photo",
+          name: "Photo",
+          mime: "image/png",
+          width: 10,
+          height: 10,
+          dataUrl: "data:image/png;base64,AAAA",
+        },
+      ],
+    },
+    { type: "addLayers", layers: [image] },
+  ]);
+  d.engine.select([image.id]);
+  await d.actions.toolSegment();
+  expect(d.context.setTool).toHaveBeenCalledWith("pointer");
+  expect(removeBackground).toHaveBeenCalledExactlyOnceWith(image.id);
+  d.engine.select([d.rectangle.id]);
+  await expect(d.actions.toolSegment()).rejects.toBeInstanceOf(Error);
+  expect(removeBackground).toHaveBeenCalledOnce();
 });

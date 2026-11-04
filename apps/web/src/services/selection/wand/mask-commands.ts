@@ -15,11 +15,22 @@ export function selectionMaskCommands(
   layerId: string,
   asset: Asset,
   erase: boolean,
+  replaceAssetId?: string,
 ): Command[] {
   const geometry = createLayerGeometryIndex(page),
     layer = geometry.get(layerId);
   const commands: Command[] = [{ type: "addAssets", assets: [asset] }];
-  if (!layer.mask) {
+  const previousSource = layer.mask?.layerId ? geometry.byId.get(layer.mask.layerId) : undefined;
+  if (
+    replaceAssetId &&
+    previousSource?.kind === "image" &&
+    previousSource.maskSource &&
+    previousSource.assetId === replaceAssetId
+  ) {
+    commands.push({ type: "updateLayers", ids: [previousSource.id], patch: { assetId: asset.id } });
+    return commands;
+  }
+  if (!layer.mask || (replaceAssetId && layer.mask.assetId === replaceAssetId)) {
     commands.push({
       type: "updateLayers",
       ids: [layerId],

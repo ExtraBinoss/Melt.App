@@ -29,13 +29,12 @@ export async function processSelection(
       await import("./websam/background");
     if (request.type === "background" || (request.type === "prepare" && request.background)) {
       await releaseSam();
-      return {
-        id: request.id,
-        result:
-          request.type === "prepare"
-            ? (await prepareBackground(onProgress), null)
-            : await removeBackground(request.dataUrl, onProgress),
-      };
+      if (request.type === "prepare") {
+        await prepareBackground(onProgress);
+        return { id: request.id, result: null };
+      }
+      const mask = await removeBackground(request.dataUrl, onProgress);
+      return { id: request.id, result: request.encode ? await encodeMask(mask, true) : mask };
     }
     await releaseBackground();
     if (request.type === "prepare") {

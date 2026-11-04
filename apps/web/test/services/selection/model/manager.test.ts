@@ -115,18 +115,18 @@ test("tracks independent automatic weights and invalidates GPU readiness without
     {
       prepare: async () => {},
       cancel: vi.fn(),
-      inspect: async () => ({ available: true, bytes: 123224205, files: 1, supported: true }),
+      inspect: async () => ({ available: true, bytes: 98484532, files: 1, supported: true }),
     },
     BACKGROUND_MODEL,
   );
   automatic.start();
-  expect(automatic.read()).toMatchObject({ phase: "loading", total: 123224205, loaded: 0 });
-  automatic.note({ file: "birefnet_lite_webgpu_fp16.onnx", status: "done" });
-  expect(automatic.read()).toMatchObject({ phase: "initializing", loaded: 123224205 });
+  expect(automatic.read()).toMatchObject({ phase: "loading", total: 98484532, loaded: 0 });
+  automatic.note({ file: "onnx/model_fp16.onnx", status: "done" });
+  expect(automatic.read()).toMatchObject({ phase: "initializing", loaded: 98484532 });
   automatic.ready();
   await automatic.refresh();
   automatic.start();
   expect(automatic.read().phase).toBe("ready");
   automatic.deactivate();
-  expect(automatic.read()).toMatchObject({ phase: "idle", available: true, bytes: 123224205 });
+  expect(automatic.read()).toMatchObject({ phase: "idle", available: true, bytes: 98484532 });
 });

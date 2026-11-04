@@ -27,12 +27,12 @@ test("forwards real automatic-model progress as well as interactive weights", ()
   const send = vi.fn(),
     sink = modelProgressSink(send);
   sink.note({
-    file: "birefnet_lite_webgpu_fp16.onnx",
+    file: "onnx/model_fp16.onnx",
     status: "progress",
     loaded: 4096,
-    total: 123224205,
+    total: 98484532,
   });
   expect(send).toHaveBeenCalledWith(
-    expect.objectContaining({ file: "birefnet_lite_webgpu_fp16.onnx", loaded: 4096 }),
+    expect.objectContaining({ file: "onnx/model_fp16.onnx", loaded: 4096 }),
   );
 });

@@ -5,7 +5,7 @@ import type { ModelDownloadEvent } from "./model/contract";
 
 export type SelectionRequest =
   | { id: number; type: "prepare"; background?: boolean }
-  | { id: number; type: "background"; dataUrl: string }
+  | { id: number; type: "background"; dataUrl: string; encode?: boolean }
   | { id: number; type: "prompt"; dataUrl: string; prompt: SelectionPrompt }
   | { id: number; type: "scan"; dataUrl: string }
   | { id: number; type: "segment"; dataUrl: string; x: number; y: number; encode?: boolean }
@@ -28,6 +28,7 @@ export interface MaskResult {
   height: number;
 }
 export interface EncodedMaskResult {
+  seed?: SelectionPoint;
   blob: Blob;
   width: number;
   height: number;
@@ -156,6 +157,16 @@ export class SelectionClient {
   async background(dataUrl: string): Promise<MaskResult> {
     const result = await this.request({ id: ++this.nextId, type: "background", dataUrl });
     if (!result || !("data" in result)) throw Error("Background removal mask is missing.");
+    return result;
+  }
+  async backgroundEncoded(dataUrl: string): Promise<EncodedMaskResult> {
+    const result = await this.request({
+      id: ++this.nextId,
+      type: "background",
+      dataUrl,
+      encode: true,
+    });
+    if (!result || !("blob" in result)) throw Error("Background removal mask is missing.");
     return result;
   }
   async segment(dataUrl: string, x: number, y: number) {

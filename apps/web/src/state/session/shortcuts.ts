@@ -85,6 +85,7 @@ export function useShortcuts(
         save: services.saveProject,
         setTool,
         pixelSelection: services.pixelSelection,
+        objectSelection: services.objectSelection,
       });
       if (command === "action:undo" || command === "action:redo" || command === "action:deselect")
         setPreview(null);

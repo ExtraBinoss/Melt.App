@@ -35,13 +35,12 @@ export const INTERACTIVE_MODEL: ModelManifest = {
   hashes: MODEL_HASHES,
 };
 export const BACKGROUND_MODEL: ModelManifest = {
-  id: "runes/birefnet-lite-webgpu",
-  name: "BiRefNet Lite",
-  revision: "d553b221039609f1ab170e3c2e651b59f363c98a",
-  files: { "birefnet_lite_webgpu_fp16.onnx": 123224205 },
+  id: "studioludens/birefnet-lite-512",
+  name: "BiRefNet Lite · 512",
+  revision: "962e67969ec6acec9c19fab76acee4f5e22e990c",
+  files: { "onnx/model_fp16.onnx": 98484532 },
   hashes: {
-    "birefnet_lite_webgpu_fp16.onnx":
-      "348c075771a9f6631d6ac991a1ac613d33910390cf943afa752f3a73c36fca03",
+    "onnx/model_fp16.onnx": "eff9216bb2f9d3f023d9c2b7196845a7485739ab1f231593633e4d2344ffc516",
   },
 };
 export const modelBytes = (model: ModelManifest) =>
@@ -71,7 +70,9 @@ export function modelCachePath(
             "Cr7z676/sam2.1-hiera-tiny-onnx",
             "Xenova/slimsam-77-uniform",
           ]
-        : []),
+        : model === BACKGROUND_MODEL
+          ? ["runes/birefnet-lite-webgpu"]
+          : []),
     ]) {
       const prefix = `/${id}/resolve/`;
       if (!parsed.pathname.startsWith(prefix)) continue;

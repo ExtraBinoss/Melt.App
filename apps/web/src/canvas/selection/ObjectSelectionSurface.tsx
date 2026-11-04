@@ -36,8 +36,7 @@ export function ObjectSelectionSurface({
 }) {
   const root = useRef<SVGSVGElement>(null),
     drag = useRef<Drag | null>(null),
-    pan = useRef(false),
-    hoverTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+    pan = useRef(false);
   useLayoutEffect(() => {
     const svg = root.current;
     if (!svg || !port || !enabled) return;
@@ -156,7 +155,6 @@ export function ObjectSelectionSurface({
     window.addEventListener("blur", blur);
     paint();
     return () => {
-      clearTimeout(hoverTimer.current);
       drag.current = null;
       pan.current = false;
       for (const stop of stops) stop();
@@ -165,7 +163,7 @@ export function ObjectSelectionSurface({
       window.removeEventListener("keyup", keyboard);
       window.removeEventListener("blur", blur);
       svg.replaceChildren();
-      port.release();
+      if (!port.read()?.automatic) port.release();
     };
   }, [port, engine, controller, viewSource, viewport, enabled]);
   function local(event: { clientX: number; clientY: number }, group: SVGGElement) {
@@ -228,7 +226,6 @@ export function ObjectSelectionSurface({
         event.stopPropagation();
       }}
       onPointerDown={(event) => {
-        clearTimeout(hoverTimer.current);
         if (!port || !enabled || pan.current || (event.button !== 0 && event.button !== 2)) return;
         event.preventDefault();
         event.stopPropagation();
@@ -251,15 +248,7 @@ export function ObjectSelectionSurface({
       }}
       onPointerMove={(event) => {
         const held = drag.current;
-        if (!held) {
-          clearTimeout(hoverTimer.current);
-          const group = (event.target as Element).closest<SVGGElement>("g[data-layer-id]");
-          if (!port || !enabled || pan.current || !group || controller.read().playback) return;
-          const point = local(event, group),
-            layerId = group.dataset.layerId!;
-          hoverTimer.current = setTimeout(() => report(port.hover(layerId, point.x, point.y)), 250);
-          return;
-        }
+        if (!held) return;
         if (held.pointer !== event.pointerId || !held.foreground) return;
         event.stopPropagation();
         const end = local(event, held.group),
@@ -271,7 +260,6 @@ export function ObjectSelectionSurface({
         box.setAttribute("height", String(Math.abs(end.y - held.start.y)));
       }}
       onPointerLeave={() => {
-        clearTimeout(hoverTimer.current);
         if (!drag.current) port?.clearHover();
       }}
       onPointerUp={(event) => finish(event)}

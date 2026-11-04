@@ -327,8 +327,8 @@ export class PixelSelectionController implements MaskSelectionPort {
       this.publish(this.accepted);
     });
   }
-  async createMask() {
-    return this.applyMask(false);
+  async createMask(replaceAssetId?: string) {
+    return this.applyMask(false, replaceAssetId);
   }
   async erase() {
     return this.applyMask(true);
@@ -428,7 +428,7 @@ export class PixelSelectionController implements MaskSelectionPort {
       this.deselect(false);
     });
   }
-  private async applyMask(erase: boolean) {
+  private async applyMask(erase: boolean, replaceAssetId?: string) {
     if (!this.state?.selected || this.state.busy || this.state.dragging || this.state.error) return;
     return this.control(async (generation, gesture) => {
       const response = await this.client!.request({ type: "export" });
@@ -457,6 +457,7 @@ export class PixelSelectionController implements MaskSelectionPort {
             dataUrl,
           },
           erase,
+          replaceAssetId,
         ),
       );
       this.deselect();

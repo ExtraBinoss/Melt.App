@@ -81,5 +81,9 @@
   "objectGestureHelp": "加载 SAM 3 后，悬停可预览。点击主体，或在主体周围拖出矩形。",
   "objectApply": "应用蒙版",
   "objectApplyHelp": "应用以保留主体并隐藏背景。取消以放弃预览。",
-  "objectModels": "本地 AI 模型"
+  "objectModels": "本地 AI 模型",
+  "backgroundDone": "背景已移除",
+  "refineBackground": "优化",
+  "refineGestureHint": "点击添加。\nAlt + 点击或右键排除。\n拖出矩形框选主体。",
+  "removingBackground": "正在移除背景…"
 }

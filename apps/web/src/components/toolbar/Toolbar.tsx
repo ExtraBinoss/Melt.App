@@ -29,7 +29,6 @@ const tools = [
   ["hand", Hand, "action:toolHand"],
   ["text", Type, "action:toolText"],
   ["wand", WandSparkles, "action:toolWand"],
-  ["segment", Blend, "action:toolSegment"],
 ] as const;
 export function Toolbar(props: MagicSearchProps) {
   return <MagicSearch {...props}>{ToolbarContents}</MagicSearch>;
@@ -44,6 +43,14 @@ function ToolbarContents(surface: SearchSurface) {
     <nav className="toolbar floating-panel" aria-label={t("selection")}>
       <ToolbarScroll>
         <StaticTools engine={engine} />
+        <ToolbarCommand
+          id="action:toolSegment"
+          label={t("segment")}
+          shortcut={bindingLabel("action:toolSegment", bindings)}
+          disabled={Boolean(commands.find((item) => item.id === "action:toolSegment")?.disabled)}
+          Icon={Blend}
+          run={surface.run}
+        />
         <Separator />
         <ToolbarCommand
           id="action:importImages"

@@ -1,3 +1,5 @@
+import { removeSelectedBackground } from "../../services/selection/background-action";
+import type { ObjectSelectionPort } from "../../services/selection/object/model";
 import type { PixelSelectionPort } from "../../services/selection/preview";
 import { layerViaCopy } from "../../services/selection/layer-via-copy";
 import { createMotionTransport } from "../../services/motion/transport";
@@ -11,6 +13,7 @@ interface Context {
   engine: EnginePort;
   save: () => Promise<void>;
   pixelSelection?: PixelSelectionPort;
+  objectSelection?: ObjectSelectionPort;
   setTool: (tool: Tool) => void;
 }
 /** The headless document subset also works when the visual command surface is not mounted. */
@@ -27,6 +30,11 @@ export function documentShortcut(
       else transport.play();
     };
   }
+  if (id === "action:toolSegment")
+    return () => {
+      context.setTool("pointer");
+      return removeSelectedBackground(engine, context.objectSelection);
+    };
   const tools: Partial<Record<CommandId, Tool>> = {
     "action:toolPointer": "pointer",
     "action:toolHand": "hand",
@@ -35,7 +43,6 @@ export function documentShortcut(
     "action:toolEllipse": "ellipse",
     "action:toolText": "text",
     "action:toolWand": "wand",
-    "action:toolSegment": "segment",
   };
   const tool = tools[id];
   if (tool) return () => context.setTool(tool);

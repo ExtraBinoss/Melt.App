@@ -81,5 +81,9 @@
   "objectGestureHelp": "Beweeg na het laden van SAM 3 over een onderwerp voor een voorbeeld. Klik erop of sleep er een rechthoek omheen.",
   "objectApply": "Masker toepassen",
   "objectApplyHelp": "Pas toe om het onderwerp te behouden en de achtergrond te verbergen. Annuleer om het voorbeeld te verwerpen.",
-  "objectModels": "Lokale AI-modellen"
+  "objectModels": "Lokale AI-modellen",
+  "backgroundDone": "Achtergrond verwijderd",
+  "refineBackground": "Verfijnen",
+  "refineGestureHint": "Klik om toe te voegen.\nAlt-klik of rechtsklik om uit te sluiten.\nSleep een rechthoek rond het onderwerp.",
+  "removingBackground": "Achtergrond verwijderen…"
 }

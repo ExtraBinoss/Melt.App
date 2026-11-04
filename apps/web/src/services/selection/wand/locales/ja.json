@@ -81,5 +81,9 @@
   "objectGestureHelp": "SAM 3 の読み込み後、カーソルを合わせるとプレビューできます。被写体をクリックするか、周囲に長方形を描きます。",
   "objectApply": "マスクを適用",
   "objectApplyHelp": "適用すると被写体を残して背景を隠します。キャンセルするとプレビューを破棄します。",
-  "objectModels": "ローカル AI モデル"
+  "objectModels": "ローカル AI モデル",
+  "backgroundDone": "背景を削除しました",
+  "refineBackground": "調整",
+  "refineGestureHint": "クリックで追加。\nAlt + クリックまたは右クリックで除外。\n長方形をドラッグして被写体を囲みます。",
+  "removingBackground": "背景を削除中…"
 }
