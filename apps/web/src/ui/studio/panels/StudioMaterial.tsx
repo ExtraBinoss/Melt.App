@@ -1,0 +1,147 @@
+import { memo, useCallback, useMemo } from "react";
+import { Palette } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { spatialMaterial, type EnginePort, type Layer } from "@musart/core";
+import { useDocumentSnapshot } from "../../../state/session/use-document-snapshot";
+import { motionTimeChanges } from "../../../state/session/motion-edit";
+import { layerSelection } from "../../../components/layers/menu/selection";
+import { useLayerPreview } from "../../../components/layers/controls/use-layer-preview";
+import { MaterialPicker } from "../../../components/spatial/MaterialPicker";
+import { MotionColorControl } from "../../../components/properties/motion/MotionColorControl";
+import { MotionFieldProvider } from "../../../components/properties/motion/context";
+import { StudioDock } from "../controls/StudioDock";
+import { StudioSlider } from "../controls/StudioSlider";
+import "../messages";
+
+export const StudioMaterial = memo(function StudioMaterial({
+  engine,
+  run,
+}: {
+  engine: EnginePort;
+  run: (task: () => void) => void;
+}) {
+  const { t } = useTranslation("studioChrome");
+  const snapshot = useDocumentSnapshot(engine, true);
+  const page = snapshot.project.pages.find((item) => item.id === snapshot.pageId)!;
+  const selection = layerSelection(page, snapshot.selection);
+  const layer = selection.selected.length === 1 ? selection.selected[0] : undefined;
+  const spatial = layer?.spatial;
+  const enabled = spatial?.enabled && spatial.source !== "group";
+  const identity = useMemo(
+    () => ({ page, selection: snapshot.selection }),
+    [page, snapshot.selection],
+  );
+  const current = useCallback(() => {
+    const next = engine.getSnapshot();
+    return (
+      next.project === snapshot.project &&
+      next.pageId === snapshot.pageId &&
+      next.selection === snapshot.selection
+    );
+  }, [engine, snapshot.project, snapshot.pageId, snapshot.selection]);
+  const edit = useLayerPreview(engine, page, snapshot.selection, run, true);
+  function patch(value: Partial<Layer>, commit: boolean) {
+    if (!current() || !selection.editable) return edit.cancel();
+    if (commit) edit.commit(value);
+    else edit.previewLayer(value);
+  }
+  function tint(fill: string): Partial<Layer> {
+    return {
+      fill,
+      ...(layer?.vector ? { vector: { ...layer.vector, preserveColors: false } } : {}),
+      ...(spatial ? { spatial: { ...spatial, useModelMaterials: false } } : {}),
+    };
+  }
+  return (
+    <StudioDock
+      title={t("material")}
+      icon={<Palette size={15} />}
+      className="studio-material"
+      initiallyOpen={false}
+    >
+      {layer && spatial && enabled ? (
+        <MotionFieldProvider editor={edit}>
+          <div className="studio-material-owner" title={layer.name}>
+            {layer.name}
+          </div>
+          <MaterialPicker
+            value={spatial.material.preset}
+            disabled={!selection.editable}
+            onChoose={(id) => {
+              const material = spatialMaterial(id);
+              patch(
+                {
+                  fill: material.color,
+                  ...(layer.vector ? { vector: { ...layer.vector, preserveColors: false } } : {}),
+                  spatial: {
+                    ...spatial,
+                    useModelMaterials: false,
+                    material: { ...material.settings },
+                  },
+                },
+                true,
+              );
+            }}
+          />
+          <MotionColorControl
+            engine={engine}
+            target={{ kind: "layer", layerId: layer.id, property: "fill" }}
+            label={t("color")}
+            value={layer.fill}
+            identity={layer.id}
+            disabled={!selection.editable}
+            onPreview={(fill) => patch(tint(fill), false)}
+            onCommit={(fill) => patch(tint(fill), true)}
+            onCancel={edit.cancel}
+          />
+          {(["roughness", "metalness"] as const).map((key) => (
+            <StudioSlider
+              key={key}
+              identity={identity}
+              invalidation={motionTimeChanges(engine)}
+              label={t(key)}
+              value={spatial.material[key]}
+              min={0}
+              max={1}
+              disabled={!selection.editable}
+              onStart={() =>
+                edit.start({
+                  kind: "layer",
+                  layerId: layer.id,
+                  property: `spatial.material.${key}`,
+                })
+              }
+              onPreview={(value) =>
+                patch(
+                  {
+                    spatial: {
+                      ...spatial,
+                      useModelMaterials: false,
+                      material: { ...spatial.material, [key]: value },
+                    },
+                  },
+                  false,
+                )
+              }
+              onCommit={(value) =>
+                patch(
+                  {
+                    spatial: {
+                      ...spatial,
+                      useModelMaterials: false,
+                      material: { ...spatial.material, [key]: value },
+                    },
+                  },
+                  true,
+                )
+              }
+              onCancel={edit.cancel}
+            />
+          ))}
+        </MotionFieldProvider>
+      ) : (
+        <p className="studio-hint">{t("selectObject")}</p>
+      )}
+    </StudioDock>
+  );
+});

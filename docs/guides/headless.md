@@ -24,6 +24,17 @@ bun run headless create --output artifacts/demo.musart
 
 This creates a 1080 × 1080 white artboard containing a blue “MusArt” text layer. Import the file through the dashboard to continue editing visually. For your own artwork, download a `.musart` project from the editor and use that as input.
 
+The editable Studio starter can also be created without a browser:
+
+```sh
+bun run headless create --template studio-starter --output artifacts/studio.musart
+bun run headless screenshot --input artifacts/studio.musart --workspace studio --output artifacts/studio.png
+```
+
+`--workspace classic|studio` chooses the screenshot interface; it does not convert
+the document or affect image rendering. See [Studio](studio.md) and the optional
+[local WebSocket agent bridge](agent-bridge.md).
+
 ## Apply edits
 
 Save this JSON as `artifacts/commands.json`:

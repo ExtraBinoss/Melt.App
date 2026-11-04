@@ -3,12 +3,13 @@
 Panel sizes and timeline zoom belong to the local project identity. They do not
 change the portable document, revision, undo stack or replay journal.
 
-| Field             | Stored value                                            | Restore behavior                                                                                         |
-| ----------------- | ------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| `workspaceLayout` | Requested workspace/inspector percentages, totaling 100 | The split-panel library reapplies its pixel constraints on narrower screens.                             |
-| `sidebarLayout`   | Requested properties/layers percentages, totaling 100   | Restored independently from the horizontal split.                                                        |
-| `timelineHeight`  | Requested panel height divided by viewport height       | Recalculated and clamped to the current viewport; resizing the window does not overwrite the preference. |
-| `timelineZoom`    | 20–640 CSS pixels per second                            | Shared by this project's compositions and restored when Motion opens.                                    |
+| Field             | Stored value                                            | Restore behavior                                                                                                        |
+| ----------------- | ------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `workspaceMode`   | `classic` or `studio`                                   | Legacy/default is Classic. Switching replaces chrome only and preserves the canonical document, selection and renderer. |
+| `workspaceLayout` | Requested workspace/inspector percentages, totaling 100 | The split-panel library reapplies its pixel constraints on narrower screens.                                            |
+| `sidebarLayout`   | Requested properties/layers percentages, totaling 100   | Restored independently from the horizontal split.                                                                       |
+| `timelineHeight`  | Requested panel height divided by viewport height       | Recalculated and clamped to the current viewport; resizing the window does not overwrite the preference.                |
+| `timelineZoom`    | 20–640 CSS pixels per second                            | Shared by this project's compositions and restored when Motion opens.                                                   |
 
 The IndexedDB `preferences` store contains one small record keyed by
 `JSON.stringify(["musart:project-layout", projectId])`:

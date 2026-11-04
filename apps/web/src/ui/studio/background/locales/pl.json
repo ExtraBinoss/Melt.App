@@ -1,0 +1,10 @@
+{
+  "title": "Tło",
+  "canvas": "Wypełnienie płótna",
+  "layer": "Edytowalne tło",
+  "convert": "Włącz efekty tła",
+  "hint": "Utwórz zwykłą warstwę tła, aby nakładać efekty. Jej wypełnienie pozostaje edytowalne w obu przestrzeniach roboczych i w eksportach.",
+  "name": "Tło",
+  "select": "Wybierz warstwę tła",
+  "locked": "Odblokuj tę warstwę w panelu kompozycji, aby edytować jej tło."
+}

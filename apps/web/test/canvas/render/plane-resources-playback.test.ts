@@ -79,7 +79,7 @@ test("forwards the issued immutable scene owner through rendering and density re
     d.resources.setDensity(0.5);
     await frame();
     expect(gpu.render.mock.calls.at(-1)![2].immutableFrame).toBe(owner);
-    d.resources.requestProfileFrame();
+    d.resources.refreshFrame();
     await frame();
     expect(gpu.render.mock.calls.at(-1)![2].immutableFrame).toBe(owner);
   } finally {

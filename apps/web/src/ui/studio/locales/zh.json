@@ -1,0 +1,18 @@
+{
+  "add": "添加",
+  "text": "文字",
+  "newText": "你的文字",
+  "media": "媒体",
+  "export": "导出",
+  "advanced": "高级设置",
+  "compositions": "合成",
+  "material": "材质",
+  "color": "颜色",
+  "roughness": "粗糙度",
+  "metalness": "金属度",
+  "selectObject": "选择一个 3D 对象，赋予它专属材质。",
+  "scene": "场景",
+  "environment": "环境",
+  "intensity": "强度",
+  "rotation": "旋转"
+}

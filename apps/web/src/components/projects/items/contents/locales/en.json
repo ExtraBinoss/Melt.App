@@ -28,7 +28,8 @@
     "bloom-windows": "A blooming flower seen through moving desktop windows, mixing ASCII, cyanotype and print textures.",
     "morphing-type": "The Melt mascot stretches into oversized lettering through editable vector shapes and a continuous morph.",
     "share-your-work": "A seamless stack of photo cards and bold type, with soft shadows and a blur entrance. Replace the photos to make it yours.",
-    "blank": "An empty {{width}} × {{height}} canvas for {{name}}. Build your own layout with images, text and shapes."
+    "blank": "An empty {{width}} × {{height}} canvas for {{name}}. Build your own layout with images, text and shapes.",
+    "studio-starter": "Editable 3D lettering, sculptural shapes and soft studio lighting. Opens in the Studio workspace."
   },
   "failed": "The project contents could not be loaded."
 }

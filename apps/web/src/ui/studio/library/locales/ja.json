@@ -1,0 +1,23 @@
+{
+  "vectors": "SVG",
+  "packs": "パック",
+  "extrude": "3Dで追加",
+  "extrudeHint": "SVGは元の色も含めて編集できます。",
+  "packTitle": "Kenneyクリエイティブライブラリ",
+  "packDescription": "自然、オブジェクト、幾何学形状を含む{{count}}個のCC0モデル。一度ダウンロードすればオフラインで使えます。",
+  "download": "ダウンロード · {{size}} MB",
+  "downloading": "ダウンロード中 {{progress}}%",
+  "installed": "オフラインで利用可能",
+  "cancel": "キャンセル",
+  "search": "モデルを検索…",
+  "add": "モデルを追加",
+  "preview": "選択中のモデル",
+  "license": "Kenney · CC0",
+  "failed": "ライブラリを準備できませんでした。もう一度お試しください。",
+  "storage": "このブラウザーではライブラリのオフライン保存を利用できません。",
+  "empty": "一致するモデルがありません。",
+  "imported": "モデルを追加しました",
+  "learnMore": "配布元とライセンス",
+  "previous": "前へ",
+  "next": "次へ"
+}

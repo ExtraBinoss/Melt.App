@@ -1,0 +1,18 @@
+{
+  "agent": "Agent",
+  "editor": "Editor",
+  "title": "Lokaler Agent",
+  "description": "Verbinde einen lokalen Relay, damit dein Agent dieses Projekt mit den geprüften Befehlen und dem Verlauf des Editors bearbeiten kann.",
+  "endpoint": "Lokale Adresse",
+  "token": "Kopplungstoken",
+  "connect": "Verbinden",
+  "disconnect": "Trennen",
+  "disconnected": "Getrennt",
+  "connecting": "Verbindung wird hergestellt…",
+  "connected": "Verbunden",
+  "error": "Verbindungsfehler",
+  "waiting": "Warten auf einen authentifizierten Agenten.",
+  "peerReady": "Agent verbunden. Live-Bearbeitung ist aktiviert.",
+  "activity": "Live-Aktivität",
+  "empty": "Nach der Kopplung werden hier Befehle angezeigt."
+}

@@ -1,0 +1,23 @@
+{
+  "vectors": "SVG",
+  "packs": "팩",
+  "extrude": "3D로 추가",
+  "extrudeHint": "SVG는 원래 색상을 포함하여 계속 편집할 수 있습니다.",
+  "packTitle": "Kenney 크리에이티브 라이브러리",
+  "packDescription": "자연, 사물, 기하학적 형태를 포함한 CC0 모델 {{count}}개. 한 번 다운로드하면 오프라인에서 사용할 수 있습니다.",
+  "download": "다운로드 · {{size}} MB",
+  "downloading": "다운로드 중 {{progress}}%",
+  "installed": "오프라인에서 사용 가능",
+  "cancel": "취소",
+  "search": "모델 검색…",
+  "add": "모델 추가",
+  "preview": "선택한 모델",
+  "license": "Kenney · CC0",
+  "failed": "라이브러리를 준비하지 못했습니다. 다시 시도해 주세요.",
+  "storage": "이 브라우저에서는 라이브러리 오프라인 저장소를 사용할 수 없습니다.",
+  "empty": "일치하는 모델이 없습니다.",
+  "imported": "모델이 추가되었습니다",
+  "learnMore": "출처 및 라이선스",
+  "previous": "이전",
+  "next": "다음"
+}

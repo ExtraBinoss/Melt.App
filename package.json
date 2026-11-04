@@ -36,6 +36,8 @@
     "check-ci": "bun run version:check && bun run check:rules && bun run typecheck && bun run lint && bun run format:check && bun run test:coverage && bun run check:coverage && vite build",
     "check": "bun run check-ci && bun run test:browser",
     "headless": "bun scripts/headless.ts",
+    "agent:bridge": "bun scripts/agent-bridge/server.ts",
+    "agent:request": "bun scripts/agent-bridge/client.ts",
     "check:coverage": "bun scripts/check-rules.ts --coverage",
     "test:segmentation": "bun scripts/verify-segmentation.ts",
     "version:check": "bun scripts/release.ts --check",

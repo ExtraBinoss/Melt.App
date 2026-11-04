@@ -1,0 +1,18 @@
+{
+  "add": "追加",
+  "text": "テキスト",
+  "newText": "あなたの言葉",
+  "media": "メディア",
+  "export": "書き出す",
+  "advanced": "詳細設定",
+  "compositions": "コンポジション",
+  "material": "マテリアル",
+  "color": "色",
+  "roughness": "粗さ",
+  "metalness": "金属度",
+  "selectObject": "3Dオブジェクトを選択して、好みのマテリアルを設定します。",
+  "scene": "シーン",
+  "environment": "環境",
+  "intensity": "強度",
+  "rotation": "回転"
+}

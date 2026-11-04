@@ -1,0 +1,18 @@
+{
+  "add": "Dodaj",
+  "text": "Tekst",
+  "newText": "Twoje słowa",
+  "media": "Multimedia",
+  "export": "Eksportuj",
+  "advanced": "Ustawienia zaawansowane",
+  "compositions": "Kompozycje",
+  "material": "Materiał",
+  "color": "Kolor",
+  "roughness": "Chropowatość",
+  "metalness": "Metaliczność",
+  "selectObject": "Wybierz obiekt 3D, aby nadać mu własny materiał.",
+  "scene": "Scena",
+  "environment": "Otoczenie",
+  "intensity": "Intensywność",
+  "rotation": "Obrót"
+}

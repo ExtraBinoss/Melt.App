@@ -4,6 +4,7 @@ export const projectPreferencesKey = (projectId: string) =>
   JSON.stringify(["musart:project-layout", projectId]);
 
 export const preferenceFields = [
+  "workspaceMode",
   "workspaceLayout",
   "sidebarLayout",
   "timelineHeight",
@@ -18,7 +19,7 @@ function finite(value: unknown, min: number, max: number): value is number {
   return typeof value === "number" && Number.isFinite(value) && value >= min && value <= max;
 }
 
-/** Only the four small presentation fields are accepted; documents and assets cannot enter it. */
+/** Only small presentation fields are accepted; documents and assets cannot enter it. */
 export function validateProjectPreferences(value: unknown): ProjectLayoutPreferences {
   if (
     !record(value) ||
@@ -26,6 +27,11 @@ export function validateProjectPreferences(value: unknown): ProjectLayoutPrefere
   )
     throw new Error("Invalid project layout preferences.");
   const result: ProjectLayoutPreferences = {};
+  if (value.workspaceMode !== undefined) {
+    if (value.workspaceMode !== "classic" && value.workspaceMode !== "studio")
+      throw new Error("Invalid workspace mode preference.");
+    result.workspaceMode = value.workspaceMode;
+  }
   for (const [field, first, second] of [
     ["workspaceLayout", "workspace", "inspector"],
     ["sidebarLayout", "properties", "layers"],

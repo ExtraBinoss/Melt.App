@@ -1,0 +1,18 @@
+{
+  "add": "إضافة",
+  "text": "نص",
+  "newText": "كلماتك",
+  "media": "وسائط",
+  "export": "تصدير",
+  "advanced": "إعدادات متقدمة",
+  "compositions": "التركيبات",
+  "material": "الخامة",
+  "color": "اللون",
+  "roughness": "الخشونة",
+  "metalness": "المعدنية",
+  "selectObject": "اختر مجسمًا ثلاثي الأبعاد لإضافة خامة تناسبك.",
+  "scene": "المشهد",
+  "environment": "البيئة",
+  "intensity": "الشدة",
+  "rotation": "الدوران"
+}

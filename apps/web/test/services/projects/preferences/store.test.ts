@@ -19,11 +19,13 @@ test("restores per-project values and atomically merges concurrent independent f
   expect(await store.read("first")).toEqual({});
   await Promise.all([
     store.update("first", { timelineZoom: 260 }),
+    store.update("first", { workspaceMode: "studio" }),
     store.update("first", { sidebarLayout: { properties: 55, layers: 45 } }),
   ]);
   const reopened = new ProjectPreferencesStore(() => Promise.resolve(db));
   expect(await reopened.read("first")).toEqual({
     timelineZoom: 260,
+    workspaceMode: "studio",
     sidebarLayout: { properties: 55, layers: 45 },
   });
   expect(await reopened.read("second")).toEqual({});
@@ -34,12 +36,12 @@ test("restores per-project values and atomically merges concurrent independent f
 
 test("retirement rejects queued writes and cannot recreate the removed preference", async () => {
   const { db, store } = await fixture();
-  await store.update("retired", { timelineZoom: 320 });
+  await store.update("retired", { timelineZoom: 320, workspaceMode: "studio" });
   const tx = db.transaction("preferences", "readwrite");
   await retireProject(tx.store, "retired");
   await tx.store.delete(projectPreferencesKey("retired"));
   await tx.done;
-  await expect(store.update("retired", { timelineZoom: 200 })).rejects.toMatchObject({
+  await expect(store.update("retired", { workspaceMode: "classic" })).rejects.toMatchObject({
     code: "PROJECT_PREFERENCES_SAVE_FAILED",
     cause: { code: "PROJECT_DELETED" },
   });

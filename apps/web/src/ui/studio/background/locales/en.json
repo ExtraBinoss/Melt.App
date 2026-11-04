@@ -1,0 +1,10 @@
+{
+  "title": "Background",
+  "canvas": "Canvas paint",
+  "layer": "Editable background",
+  "convert": "Enable background effects",
+  "hint": "Create a normal background layer to stack effects. Its paint stays editable in both workspaces and exports.",
+  "name": "Background",
+  "select": "Select background layer",
+  "locked": "Unlock this layer in the composition panel to edit its background."
+}

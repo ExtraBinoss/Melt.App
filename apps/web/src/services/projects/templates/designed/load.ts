@@ -96,7 +96,7 @@ export async function prepareDesignedTemplate(
 
 /** Installation and hover consume the same validated bounded preparation. */
 export async function openDesignedTemplate(
-  services: Pick<EditorServices, "openMediaProject">,
+  services: Pick<EditorServices, "openMediaProject" | "projectPreferences">,
   id: DesignedTemplateId,
   options: TemplateLoadOptions = {},
   fetcher: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response> = fetch,
@@ -106,8 +106,14 @@ export async function openDesignedTemplate(
   const project = await prepareDesignedTemplate(id, options, fetcher);
   const now = new Date().toISOString();
   options.signal?.throwIfAborted();
+  const projectId = crypto.randomUUID();
+  if (id === "studio-starter") {
+    if (!services.projectPreferences) throw new DesignedTemplateError("unavailable");
+    await services.projectPreferences.update(projectId, { workspaceMode: "studio" });
+    options.signal?.throwIfAborted();
+  }
   await services.openMediaProject(
-    { ...project, id: crypto.randomUUID(), createdAt: now, updatedAt: now },
+    { ...project, id: projectId, createdAt: now, updatedAt: now },
     [],
     options,
   );

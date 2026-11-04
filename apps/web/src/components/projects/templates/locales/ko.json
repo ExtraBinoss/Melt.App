@@ -38,5 +38,7 @@
   "secondSkin": "Second Skin",
   "secondSkinDescription": "10초 · 춤, 열화상 및 윤곽 효과, 편집 가능한 타이포그래피",
   "terminalSignal": "터미널 신호",
-  "terminalSignalDescription": "16초 · 네온 터미널, 편집 가능한 타이핑, 스크롤 텍스트와 곡면 CRT 유리 · 9:16"
+  "terminalSignalDescription": "16초 · 네온 터미널, 편집 가능한 타이핑, 스크롤 텍스트와 곡면 CRT 유리 · 9:16",
+  "studioStarter": "Studio 시작",
+  "studioStarterDescription": "편집 가능한 3D 글자, 조형적인 도형과 부드러운 조명. Studio 작업 공간에서 열립니다."
 }

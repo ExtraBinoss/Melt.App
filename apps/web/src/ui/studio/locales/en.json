@@ -1,0 +1,18 @@
+{
+  "add": "Add",
+  "text": "Text",
+  "newText": "Your words",
+  "media": "Media",
+  "export": "Export",
+  "advanced": "Advanced controls",
+  "compositions": "Compositions",
+  "material": "Material",
+  "color": "Color",
+  "roughness": "Roughness",
+  "metalness": "Metalness",
+  "selectObject": "Select a 3D object to give it a material and make it yours.",
+  "scene": "Scene",
+  "environment": "Environment",
+  "intensity": "Intensity",
+  "rotation": "Rotation"
+}

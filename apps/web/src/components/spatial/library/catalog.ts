@@ -12,6 +12,7 @@ export type SpatialLibraryEntry =
       readonly id: string;
       readonly kind: "model";
       readonly model: SpatialModelDefinition;
+      readonly originalMaterials?: boolean;
       readonly nameKey: string;
       readonly index: number;
     };

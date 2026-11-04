@@ -48,7 +48,10 @@ order-independent transparency or path-traced global illumination.
 Scene reflections use a bounded set of native PMREM probes capturing actual
 neighbour geometry and the shared lighting. Probes are shared by receivers,
 cached by capture inputs, deferred during active preview gestures and throttled
-during playback. Exact exports update deterministically for their sampled scene.
+during playback. An admitted deferred refresh retains its permission through its
+own canvas submission; foreground edits or input revoke it. This prevents an
+idle reflection refresh from invalidating its own admission and rescheduling indefinitely.
+Exact exports update deterministically for their sampled scene.
 GLB meshes (including original materials and animated skinning), extruded text and
 native shapes all participate through their actual meshes and material properties;
 reflection selection never branches on a primitive or template name. They do not

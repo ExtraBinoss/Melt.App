@@ -1,0 +1,18 @@
+{
+  "agent": "智能体",
+  "editor": "编辑器",
+  "title": "本地智能体",
+  "description": "连接本地中继，让智能体使用编辑器经过验证的命令和撤销历史来编辑此项目。",
+  "endpoint": "本地地址",
+  "token": "配对令牌",
+  "connect": "连接",
+  "disconnect": "断开连接",
+  "disconnected": "未连接",
+  "connecting": "正在连接…",
+  "connected": "已连接",
+  "error": "连接错误",
+  "waiting": "正在等待已认证的智能体。",
+  "peerReady": "智能体已连接，实时编辑已启用。",
+  "activity": "实时活动",
+  "empty": "配对后将在此处显示命令活动。"
+}

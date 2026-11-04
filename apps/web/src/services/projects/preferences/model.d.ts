@@ -1,4 +1,8 @@
+export type WorkspaceMode = "classic" | "studio";
+
 export interface ProjectLayoutPreferences {
+  /** Project-local editor presentation; never part of the portable document. */
+  workspaceMode?: WorkspaceMode;
   workspaceLayout?: { workspace: number; inspector: number };
   sidebarLayout?: { properties: number; layers: number };
   /** Requested height as a fraction of the browser viewport, before responsive clamping. */

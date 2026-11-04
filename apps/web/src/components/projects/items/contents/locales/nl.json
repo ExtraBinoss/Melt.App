@@ -28,7 +28,8 @@
     "bloom-windows": "Een bloeiende bloem achter bewegende bureaubladvensters met ASCII, cyanotypie en druktexturen.",
     "morphing-type": "De Melt-mascotte verandert met bewerkbare vectorvormen en vloeiende morphing in reusachtige letters.",
     "share-your-work": "Een naadloze stapel fotokaarten en krachtige tekst, met zachte schaduwen en een onscherpe entree. Vervang de foto's door je eigen beelden.",
-    "blank": "Een leeg canvas van {{width}} × {{height}} voor {{name}}. Maak je eigen ontwerp met afbeeldingen, tekst en vormen."
+    "blank": "Een leeg canvas van {{width}} × {{height}} voor {{name}}. Maak je eigen ontwerp met afbeeldingen, tekst en vormen.",
+    "studio-starter": "Bewerkbare 3D-letters, sculpturale vormen en zacht studiolicht. Opent in de Studio-werkruimte."
   },
   "failed": "De projectinhoud kon niet worden geladen."
 }

@@ -1,0 +1,10 @@
+{
+  "title": "Arrière-plan",
+  "canvas": "Fond de la composition",
+  "layer": "Fond modifiable",
+  "convert": "Activer les effets de fond",
+  "hint": "Créez un calque de fond pour empiler les effets. Sa couleur et son dégradé restent modifiables dans les deux interfaces et les exports.",
+  "name": "Arrière-plan",
+  "select": "Sélectionner le calque de fond",
+  "locked": "Déverrouillez ce calque dans le panneau de composition pour modifier le fond."
+}

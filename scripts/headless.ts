@@ -24,12 +24,14 @@ const { positionals, values } = parseArgs({
     page: { type: "string" },
     webgl: { type: "boolean", default: false },
     time: { type: "string", default: "0" },
+    template: { type: "string" },
+    workspace: { type: "string" },
   },
 });
 const operation = positionals[0];
 if (!operation || !["create", "apply", "evaluate", "render", "screenshot"].includes(operation)) {
   console.log(
-    "MusArt headless\n  create --output project.musart\n  apply --input project.musart --commands commands.json --output result.musart\n  evaluate --input project.musart --time 15/30 --output frame.json [--page id]\n  render --input project.musart --output image.png [--scale 2] [--format png|webp|jpeg] [--page id] [--webgl]\n  screenshot --input project.musart --output editor.png\nCreate/apply/evaluate run without a browser. Render/screenshot require the local app running; --url changes its address.",
+    "MusArt headless\n  create --output project.musart [--template studio-starter]\n  apply --input project.musart --commands commands.json --output result.musart\n  evaluate --input project.musart --time 15/30 --output frame.json [--page id]\n  render --input project.musart --output image.png [--scale 2] [--format png|webp|jpeg] [--page id] [--webgl]\n  screenshot --input project.musart --output editor.png [--workspace classic|studio]\nCreate/apply/evaluate run without a browser. Render/screenshot require the local app running; --url changes its address.",
   );
   process.exit(operation ? 1 : 0);
 }
@@ -37,29 +39,39 @@ if (!values.output) throw new Error("--output is required.");
 if (!["png", "webp", "jpeg"].includes(values.format))
   throw new Error("--format must be png, webp, or jpeg.");
 const format = values.format as "png" | "webp" | "jpeg";
+if (values.workspace && !["classic", "studio"].includes(values.workspace))
+  throw new Error("--workspace must be classic or studio.");
+if (values.template && values.template !== "studio-starter")
+  throw new Error("--template must be studio-starter.");
+if (values.template && (values.input || operation !== "create"))
+  throw new Error("--template is only supported by create without --input.");
 await mkdir(dirname(resolve(values.output)), { recursive: true });
-const initial = values.input
-  ? parseProject(await readFile(values.input, "utf8"))
-  : createProject({
-      name: "Untitled",
-      pages: [
-        createPage({
-          width: 1080,
-          height: 1080,
-          layers: [
-            createLayer("text", {
-              text: "MusArt",
-              width: 600,
-              height: 200,
-              x: 120,
-              y: 400,
-              fontSize: 120,
-              fill: "#2563eb",
-            }),
-          ],
-        }),
-      ],
-    });
+const initial = values.template
+  ? (
+      await import("../apps/web/src/services/projects/templates/designed/studio-starter/build")
+    ).createStudioStarter().project
+  : values.input
+    ? parseProject(await readFile(values.input, "utf8"))
+    : createProject({
+        name: "Untitled",
+        pages: [
+          createPage({
+            width: 1080,
+            height: 1080,
+            layers: [
+              createLayer("text", {
+                text: "MusArt",
+                width: 600,
+                height: 200,
+                x: 120,
+                y: 400,
+                fontSize: 120,
+                fill: "#2563eb",
+              }),
+            ],
+          }),
+        ],
+      });
 if (operation === "create") {
   await writeFile(values.output, serializeProject(initial));
 } else if (operation === "apply") {
@@ -86,11 +98,20 @@ if (operation === "create") {
   });
   try {
     const page = await browser.newPage({ viewport: { width: 1600, height: 1000 } });
-    await page.goto(`${values.url}/?automation=1`);
+    await page.addInitScript(() => {
+      localStorage.setItem("musart.editor-tutorial.v1", "done");
+    });
+    const editorUrl = new URL(values.url);
+    if (editorUrl.pathname === "/") editorUrl.pathname = "/editor";
+    editorUrl.searchParams.set("automation", "1");
+    if (values.workspace) editorUrl.searchParams.set("workspace", values.workspace);
+    await page.goto(editorUrl.href);
     await page.waitForFunction(() => Boolean(window.musart));
     await page.evaluate((project) => window.musart!.load(project), initial);
     if (values.page) await page.evaluate((id) => window.musart!.page(id), values.page);
     if (operation === "screenshot") {
+      if (values.workspace === "studio")
+        await page.locator("[data-studio-chrome]").waitFor({ state: "visible" });
       await page.waitForFunction((pageId) => {
         const data = document.querySelector<HTMLCanvasElement>(".canvas-artboard canvas")?.dataset;
         return (

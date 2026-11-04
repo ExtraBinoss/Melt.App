@@ -38,5 +38,7 @@
   "secondSkin": "Second Skin",
   "secondSkinDescription": "10 s · Dans, warmtebeeld en contouren met bewerkbare typografie",
   "terminalSignal": "Terminaalsignaal",
-  "terminalSignalDescription": "16 s · Neonterminal, bewerkbare typtekst, scrollende tekst en gebogen CRT-glas · 9:16"
+  "terminalSignalDescription": "16 s · Neonterminal, bewerkbare typtekst, scrollende tekst en gebogen CRT-glas · 9:16",
+  "studioStarter": "Studio-start",
+  "studioStarterDescription": "Bewerkbare 3D-letters, sculpturale vormen en zacht studiolicht. Opent in de Studio-werkruimte."
 }

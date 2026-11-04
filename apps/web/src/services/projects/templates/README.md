@@ -1,8 +1,15 @@
 # Project template ownership
 
-The public `TEMPLATE_CATALOG` contains seven curated artwork templates and the
+The public `TEMPLATE_CATALOG` contains the Studio starter, seven curated Motion templates and the
 canonical blank canvas formats. Search, the dashboard, project dialogs and landing
 cards consume that catalog. Retired designs are absent from it.
+
+The static Studio starter owns `designed/studio-starter/build.ts`, its headless
+generator at `scripts/templates/studio-starter/generate.ts` and its validated
+manifest, portable document, command journal and rendered poster under
+`public/templates/designed/studio-starter/`. Its workspace choice is saved in
+project preferences before the new project is published; it is absent from the
+portable document.
 
 Each Motion design owns `motion/<id>/build.ts` and any template-specific helpers
 or reference data. Its headless entry point is

@@ -141,6 +141,7 @@ test("inline 3D mode keeps native gizmo edits, orbit and undo on the classic lay
   page.on("pageerror", (error) => errors.push(error.message));
   await page.addInitScript(() => {
     localStorage.setItem("musart.language", "en");
+    localStorage.setItem("musart.editor-tutorial.v1", "done");
     localStorage.setItem("musart.onboarding.v1", JSON.stringify({ version: 1, completed: true }));
   });
   await page.goto("/editor?automation=1&profile3d=1");
@@ -273,15 +274,39 @@ test("inline 3D mode keeps native gizmo edits, orbit and undo on the classic lay
   await expect(canvas).toHaveAttribute("data-spatial-projection", "PerspectiveCamera");
   await toolbar.getByRole("radio", { name: "2D", exact: true }).click();
   await expect(canvas).not.toHaveAttribute("data-spatial-center");
+  await page.waitForFunction(() => {
+    const data = document.querySelector<HTMLCanvasElement>(".editor-gpu-scene canvas")!.dataset;
+    return (
+      data.canonicalRevision === String(window.musart!.session().revision) &&
+      data.renderedRevision === data.sceneRevision &&
+      data.presentationReady === "true"
+    );
+  });
   await expect(canvas).toHaveAttribute("data-renderer-ready", "true");
+  // Wait for queued undo/helper teardown frames before measuring steady idle.
   await page.evaluate(
     () =>
-      new Promise<void>((resolve) =>
-        requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
-      ),
+      new Promise<void>((resolve, reject) => {
+        const canvas = document.querySelector<HTMLCanvasElement>(".editor-gpu-scene canvas")!;
+        let last = canvas.dataset.renderFrames;
+        const started = performance.now();
+        let quiet = started;
+        const check = (now: number) => {
+          const next = canvas.dataset.renderFrames;
+          if (next !== last) {
+            last = next;
+            quiet = now;
+          }
+          if (now - quiet >= 200) return resolve();
+          if (now - started > 5000)
+            return reject(new Error("Canvas did not become idle after 3D editing"));
+          requestAnimationFrame(check);
+        };
+        requestAnimationFrame(check);
+      }),
   );
   const idle = await canvas.getAttribute("data-render-frames");
-  await page.waitForTimeout(250);
+  await page.waitForTimeout(1000);
   expect(await canvas.getAttribute("data-render-frames")).toBe(idle);
   expect(await canvas.getAttribute("data-renderer-instances")).toBe(rendererCount);
   expect(errors).toEqual([]);

@@ -1,0 +1,18 @@
+{
+  "agent": "Agente",
+  "editor": "Editor",
+  "title": "Agente locale",
+  "description": "Collega un relay locale per consentire al tuo agente di modificare questo progetto con i comandi convalidati e la cronologia dell’editor.",
+  "endpoint": "Indirizzo locale",
+  "token": "Token di associazione",
+  "connect": "Connetti",
+  "disconnect": "Disconnetti",
+  "disconnected": "Disconnesso",
+  "connecting": "Connessione…",
+  "connected": "Connesso",
+  "error": "Errore di connessione",
+  "waiting": "In attesa di un agente autenticato.",
+  "peerReady": "Agente connesso. Modifiche in tempo reale abilitate.",
+  "activity": "Attività in tempo reale",
+  "empty": "I comandi appariranno qui dopo l’associazione."
+}

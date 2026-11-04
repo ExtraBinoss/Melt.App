@@ -1,0 +1,10 @@
+{
+  "title": "Hintergrund",
+  "canvas": "Leinwandfüllung",
+  "layer": "Bearbeitbarer Hintergrund",
+  "convert": "Hintergrundeffekte aktivieren",
+  "hint": "Erstelle eine normale Hintergrundebene, um Effekte zu stapeln. Ihre Füllung bleibt in beiden Arbeitsbereichen und beim Export bearbeitbar.",
+  "name": "Hintergrund",
+  "select": "Hintergrundebene auswählen",
+  "locked": "Entsperre diese Ebene im Kompositionsbereich, um ihren Hintergrund zu bearbeiten."
+}

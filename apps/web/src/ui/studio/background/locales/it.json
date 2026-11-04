@@ -1,0 +1,10 @@
+{
+  "title": "Sfondo",
+  "canvas": "Riempimento della tela",
+  "layer": "Sfondo modificabile",
+  "convert": "Attiva gli effetti di sfondo",
+  "hint": "Crea un normale livello di sfondo per sovrapporre gli effetti. Il riempimento resta modificabile in entrambe le aree di lavoro e nelle esportazioni.",
+  "name": "Sfondo",
+  "select": "Seleziona il livello di sfondo",
+  "locked": "Sblocca questo livello nel pannello di composizione per modificarne lo sfondo."
+}

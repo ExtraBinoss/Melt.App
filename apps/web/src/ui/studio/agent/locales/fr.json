@@ -1,0 +1,18 @@
+{
+  "agent": "Agent",
+  "editor": "Éditeur",
+  "title": "Agent local",
+  "description": "Associez un relais local pour permettre à votre agent de modifier ce projet avec les commandes validées et l’historique de l’éditeur.",
+  "endpoint": "Adresse locale",
+  "token": "Jeton d’association",
+  "connect": "Connecter",
+  "disconnect": "Déconnecter",
+  "disconnected": "Déconnecté",
+  "connecting": "Connexion…",
+  "connected": "Connecté",
+  "error": "Erreur de connexion",
+  "waiting": "En attente d’un agent authentifié.",
+  "peerReady": "Agent connecté. Les modifications en direct sont activées.",
+  "activity": "Activité en direct",
+  "empty": "Les commandes apparaîtront ici après l’association."
+}

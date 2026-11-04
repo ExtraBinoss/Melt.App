@@ -7,6 +7,7 @@ import {
 
 test("validates the small versioned record without admitting document fields", () => {
   const values = {
+    workspaceMode: "studio" as const,
     workspaceLayout: { workspace: 75, inspector: 25 },
     sidebarLayout: { properties: 60, layers: 40 },
     timelineZoom: 320,
@@ -20,6 +21,9 @@ test("validates the small versioned record without admitting document fields", (
     null,
     [],
     { assets: {} },
+    { workspaceMode: "3d" },
+    { workspaceMode: true },
+    { workspaceMode: null },
     { timelineZoom: NaN },
     { timelineZoom: 641 },
     { timelineHeight: 0 },
@@ -33,4 +37,16 @@ test("validates the small versioned record without admitting document fields", (
     JSON.stringify({ version: 1, values: [] }),
   ])
     expect(() => parseProjectPreferences(raw)).toThrow();
+});
+
+test("legacy layout records stay compatible and both presentation modes are explicit", () => {
+  expect(
+    parseProjectPreferences(JSON.stringify({ version: 1, values: { timelineZoom: 240 } })),
+  ).toEqual({ timelineZoom: 240 });
+  expect(validateProjectPreferences({ workspaceMode: "classic" })).toEqual({
+    workspaceMode: "classic",
+  });
+  expect(validateProjectPreferences({ workspaceMode: "studio" })).toEqual({
+    workspaceMode: "studio",
+  });
 });

@@ -2,6 +2,33 @@ import { afterEach, expect, it, vi } from "vitest";
 import { fireEvent } from "@testing-library/react";
 import { CanvasVideoProxyActivity } from "../../../src/canvas/render/video-proxy-activity";
 afterEach(() => vi.useRealTimers());
+it("retains admitted reflection/proxy work through its own refresh, then revokes it for new foreground work", () => {
+  vi.useFakeTimers();
+  let presented = true;
+  const ready = vi.fn(() => {
+    activity.setBlocked(false, true);
+    presented = false;
+  });
+  const activity = new CanvasVideoProxyActivity(ready, () => presented);
+  vi.advanceTimersByTime(180);
+  activity.ready();
+  expect(ready).toHaveBeenCalledOnce();
+  expect(activity.read()).toBe(true);
+  // An unrelated foreground request cannot inherit that admission.
+  activity.setBlocked(false);
+  expect(activity.read()).toBe(false);
+  vi.advanceTimersByTime(180);
+  expect(activity.read()).toBe(false);
+  presented = true;
+  activity.framePresented();
+  vi.advanceTimersByTime(180);
+  activity.ready();
+  expect(activity.read()).toBe(true);
+  fireEvent.pointerDown(window, { pointerId: 3 });
+  expect(activity.read()).toBe(false);
+  activity.dispose();
+  expect(vi.getTimerCount()).toBe(0);
+});
 it("keeps proxy conversion behind the current canonical presentation, including a reopened project", () => {
   vi.useFakeTimers();
   let presented = false;

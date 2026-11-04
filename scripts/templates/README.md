@@ -3,6 +3,7 @@
 Each current template owns its generator and specific preparation helpers:
 
 ```sh
+bun scripts/templates/studio-starter/generate.ts
 bun scripts/templates/second-skin/generate.ts
 bun scripts/templates/terminal-signal/generate.ts
 bun scripts/templates/angel-windows/generate.ts
@@ -12,12 +13,17 @@ bun scripts/templates/morphing-type/generate.ts
 bun scripts/templates/share-your-work/generate.ts
 ```
 
-Outputs live in `apps/web/public/templates/motion/<id>/`: `<id>.json` is the
+The static Studio starter lives under `public/templates/designed/studio-starter/`
+and uses the existing bounded designed-template loader. Its editable sources are
+core-native text extrusion and primitives, with no external media dependencies.
+
+Motion outputs live in `apps/web/public/templates/motion/<id>/`: `<id>.json` is the
 validated gallery bundle, `<id>.musart` is portable metadata, and
 `<id>.commands.json` records replayable public command batches. Template-specific
 builders live in `apps/web/src/services/projects/templates/motion/<id>/`.
 
-`generate.ts` and `designed.ts` regenerate retired internal workloads, keeping
+`generate.ts` regenerates retired internal workloads; `designed.ts` regenerates
+the Studio starter and the retired designed workloads, keeping
 one output directory per ID. Their existence does not add a gallery entry.
 `media.ts` prepares shared licensed media and original audio. Existing original
 files, hashes, attribution and license records remain in `motion/media/`.

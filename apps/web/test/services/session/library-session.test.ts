@@ -58,6 +58,22 @@ test("direct editor startup does not construct separate library resources", asyn
   await session.dispose();
 });
 
+test("template workspace preferences use the shared durable store without acquiring the editor", async () => {
+  const resources = data();
+  const read = vi.fn(async () => ({ workspaceMode: "studio" as const }));
+  const update = vi.fn(async () => {});
+  Object.defineProperty(resources.store, "preferences", { value: { read, update } });
+  const acquireRuntime = vi.fn(async () => runtime());
+  const services = createLibraryServices(async () => resources, acquireRuntime, vi.fn());
+  await services.projectPreferences!.update("new-project", { workspaceMode: "studio" });
+  expect(await services.projectPreferences!.read("new-project")).toEqual({
+    workspaceMode: "studio",
+  });
+  expect(update).toHaveBeenCalledExactlyOnceWith("new-project", { workspaceMode: "studio" });
+  expect(read).toHaveBeenCalledExactlyOnceWith("new-project");
+  expect(acquireRuntime).not.toHaveBeenCalled();
+});
+
 test("unmount rejects late metadata acquisition and closes its store/thumbnail owner exactly once", async () => {
   const resources = data();
   let finish!: (value: LibraryData) => void;

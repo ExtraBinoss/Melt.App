@@ -148,17 +148,7 @@ export class PlaneResources {
     this.users++;
     this.videoProxyActivity ??= new CanvasVideoProxyActivity(
       () => {
-        const current = this.current;
-        if (!current || this.disposed || !this.users || current.playback) return;
-        const page = { ...current.page };
-        this.submit(
-          page,
-          current.assets,
-          current.presentation,
-          current.motionFrame,
-          false,
-          current.immutableFrame ? { page } : undefined,
-        );
+        this.refreshFrame(true);
       },
       () => this.completed > 0 && this.presentedRevision === this.revision,
     );
@@ -219,9 +209,13 @@ export class PlaneResources {
     motionFrame?: MotionFramePlan,
     playback = false,
     immutableFrame?: PreviewRequest["immutableFrame"],
+    backgroundContinuation = false,
   ) {
     if (this.disposed || this.deviceLost) return;
-    this.videoProxyActivity?.setBlocked(playback || presentation?.canonical === false);
+    this.videoProxyActivity?.setBlocked(
+      playback || presentation?.canonical === false,
+      backgroundContinuation,
+    );
     this.current = {
       page,
       assets,
@@ -309,16 +303,19 @@ export class PlaneResources {
   borrowRenderer() {
     return this.disposed || this.deviceLost ? null : this.renderer;
   }
-  requestProfileFrame() {
+  refreshFrame(background = false) {
     const current = this.current;
-    if (!current) return undefined;
+    if (!current || this.disposed || (background && (!this.users || current.playback)))
+      return undefined;
+    const page = background ? { ...current.page } : current.page;
     this.submit(
-      current.page,
+      page,
       current.assets,
       current.presentation,
       current.motionFrame,
       current.playback,
-      current.immutableFrame,
+      background && current.immutableFrame ? { page } : current.immutableFrame,
+      background,
     );
     return this.revision;
   }
@@ -326,22 +323,22 @@ export class PlaneResources {
   setDensity(density: number): void {
     if (this.disposed || !Number.isFinite(density) || density <= 0 || density === this.density)
       return;
-    const before = this.current
-      ? previewScale(this.current.page, this.density, this.maxTextureDimension, this.current.assets)
+    const current = this.current;
+    const before = current
+      ? previewScale(current.page, this.density, this.maxTextureDimension, current.assets)
       : 1;
     this.density = density;
     if (
-      this.current &&
-      before !==
-        previewScale(this.current.page, density, this.maxTextureDimension, this.current.assets)
+      current &&
+      before !== previewScale(current.page, density, this.maxTextureDimension, current.assets)
     )
       this.submit(
-        this.current.page,
-        this.current.assets,
-        this.current.presentation,
-        this.current.motionFrame,
-        this.current.playback,
-        this.current.immutableFrame,
+        current.page,
+        current.assets,
+        current.presentation,
+        current.motionFrame,
+        current.playback,
+        current.immutableFrame,
       );
   }
   private schedule() {

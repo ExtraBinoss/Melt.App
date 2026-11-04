@@ -1,0 +1,73 @@
+.workspace-mode-root {
+  display: contents;
+}
+
+.workspace-mode-root[data-workspace-mode="studio"] .workspace-panels > [id="inspector"],
+.workspace-mode-root[data-workspace-mode="studio"] .workspace-panels > .sidebar-resize {
+  display: none;
+}
+
+.workspace-mode-root[data-workspace-mode="studio"] .workspace-panels > [id="workspace"] {
+  flex-grow: 1 !important;
+  flex-basis: 100% !important;
+  max-width: none !important;
+}
+
+/* Keep native spatial controls below Quick Add instead of behind its floating surface. */
+.workspace-mode-root[data-workspace-mode="studio"]
+  .canvas-object-toolbar-anchor:has([data-spatial-toolbar]) {
+  left: 50%;
+  top: 78px;
+  transform: translateX(-50%) !important;
+}
+
+.studio-agent-anchor {
+  position: absolute;
+  z-index: 22;
+  top: 72px;
+  right: 20px;
+  pointer-events: auto;
+}
+
+@media (max-width: 680px) {
+  .workspace-mode-root[data-workspace-mode="studio"] .project-trigger {
+    gap: 6px;
+    left: 10px;
+    top: 10px;
+  }
+
+  .workspace-mode-root[data-workspace-mode="studio"] .project-pill-title {
+    max-width: 125px;
+  }
+
+  .studio-agent-anchor {
+    top: 66px;
+    right: 12px;
+  }
+}
+@media (max-width: 760px) {
+  .workspace-mode-root[data-workspace-mode="studio"]
+    .canvas-object-toolbar-anchor:has([data-spatial-toolbar]) {
+    top: 124px;
+  }
+  .studio-chrome .studio-compositions {
+    top: 170px;
+  }
+  .studio-agent-anchor {
+    top: 124px;
+    right: 12px;
+  }
+  .studio-agent-anchor [data-testid="studio-agent-trigger"] > span {
+    display: none;
+  }
+  .studio-agent-anchor [data-testid="studio-agent-trigger"] {
+    padding-inline: 7px;
+  }
+  .studio-chrome:has(.studio-material .studio-dock-heading[aria-expanded="true"])
+    .studio-object-bar,
+  .studio-chrome:has(.studio-environment .studio-dock-heading[aria-expanded="true"])
+    .studio-object-bar {
+    visibility: hidden;
+    pointer-events: none;
+  }
+}

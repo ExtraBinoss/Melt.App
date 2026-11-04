@@ -1,0 +1,74 @@
+.studio-vector-library,
+.studio-pack-library {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  min-width: 0;
+  padding-block: 0.5rem;
+}
+.studio-vector-mode,
+.studio-pack-selected,
+.studio-pack-pages {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+.studio-library-hint {
+  margin: 0;
+  color: var(--muted-foreground);
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+.studio-pack-license {
+  color: var(--muted-foreground);
+  font-size: 0.75rem;
+  text-decoration: underline;
+}
+.studio-pack-library .spatial-library-preview-poster {
+  background-image: none !important;
+}
+.studio-pack-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.3rem;
+  max-height: 13rem;
+  overflow-y: auto;
+  contain: layout style;
+}
+.studio-pack-grid button {
+  min-height: 2.4rem;
+  padding: 0.35rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--background);
+  color: var(--foreground);
+  font-size: 0.7rem;
+  text-align: start;
+  overflow-wrap: anywhere;
+}
+.studio-pack-grid button[aria-pressed="true"] {
+  border-color: var(--primary);
+  background: var(--accent);
+}
+.studio-pack-grid button:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 1px;
+}
+.studio-pack-selected > span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.studio-pack-pages {
+  justify-content: center;
+  font-size: 0.75rem;
+}
+.studio-pack-library {
+  min-height: 0;
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.studio-pack-library > * {
+  flex-shrink: 0;
+}

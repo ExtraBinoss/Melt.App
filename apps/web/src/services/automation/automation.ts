@@ -4,7 +4,11 @@ import { createMotionTransport } from "../motion/transport";
 import { getAnimationSession, type AnimationState } from "../animation/session";
 import type { HistoryPage } from "../history/model";
 import { readDataUrl } from "../assets/imports";
+import { getAgentBridge, type BridgeState } from "./bridge/store";
 export interface AutomationApi {
+  agentConnect(endpoint: string, token: string): void;
+  agentDisconnect(): void;
+  agentStatus(): BridgeState;
   /** Small session metadata, without cloning documents/assets during interaction measurements. */
   session(): {
     projectId: string;
@@ -46,6 +50,9 @@ declare global {
 export function attachAutomation(engine: EnginePort, services: EditorServices) {
   const observers = new Set<() => void>();
   const api: AutomationApi = {
+    agentConnect: (endpoint, token) => getAgentBridge(engine).connect(endpoint, token),
+    agentDisconnect: () => getAgentBridge(engine).disconnect(),
+    agentStatus: () => structuredClone(getAgentBridge(engine).read()),
     session: () => {
       const state = engine.getSnapshot();
       return {
@@ -126,6 +133,7 @@ export function attachAutomation(engine: EnginePort, services: EditorServices) {
   };
   window.musart = api;
   return () => {
+    getAgentBridge(engine).disconnect();
     for (const stop of observers) stop();
     if (window.musart === api) delete window.musart;
   };

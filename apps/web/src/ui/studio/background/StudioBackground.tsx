@@ -1,0 +1,145 @@
+import { useCallback, useRef } from "react";
+import { useSetAtom } from "jotai";
+import { Layers, Paintbrush, Sparkles } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import type { Composition, EnginePort, Layer } from "@musart/core";
+import type { TaskRunner } from "../../../components/projects/ProjectDialog";
+import { useDocumentSnapshot } from "../../../state/session/use-document-snapshot";
+import { previewAtom } from "../../../state/session/editor";
+import { Popover, PopoverContent, PopoverTrigger } from "../../../components/ui/popover";
+import { Button } from "../../../components/ui/button";
+import { BackgroundPaintControls } from "../../../components/properties/gradient/BackgroundPaintControls";
+import { GradientControl } from "../../../components/properties/gradient/GradientControl";
+import { MotionColorControl } from "../../../components/properties/motion/MotionColorControl";
+import { MotionFieldProvider } from "../../../components/properties/motion/context";
+import { EffectsPanel } from "../../../components/properties/EffectsPanel";
+import { useLayerPreview } from "../../../components/layers/controls/use-layer-preview";
+import { backgroundLayer, createBackgroundLayer } from "./model";
+import "./messages";
+import "./background.css";
+
+export function StudioBackground({ engine, onTask }: { engine: EnginePort; onTask: TaskRunner }) {
+  const { t } = useTranslation("studioBackground");
+  return (
+    <Popover modal={false}>
+      <PopoverTrigger asChild>
+        <Button variant="outline" size="sm" className="studio-background-trigger">
+          <Paintbrush size={15} />
+          {t("title")}
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent
+        side="left"
+        align="end"
+        collisionPadding={12}
+        className="studio-background-popover"
+        data-canvas-control
+        aria-label={t("title")}
+        initialFocus="content"
+      >
+        <BackgroundEditor engine={engine} onTask={onTask} />
+      </PopoverContent>
+    </Popover>
+  );
+}
+function BackgroundEditor({ engine, onTask }: { engine: EnginePort; onTask: TaskRunner }) {
+  const { t } = useTranslation("studioBackground");
+  const snapshot = useDocumentSnapshot(engine, true);
+  const page = snapshot.project.pages.find((item) => item.id === snapshot.pageId)!;
+  const layer = backgroundLayer(page);
+  const setPreview = useSetAtom(previewAtom);
+  const cancel = useCallback(() => setPreview(null), [setPreview]);
+  const run = useCallback(
+    (task: () => void) => {
+      void onTask(task);
+    },
+    [onTask],
+  );
+  const origin = useRef(snapshot.project.id);
+  const current = () =>
+    engine.getSnapshot().project.id === origin.current && engine.getSnapshot().pageId === page.id;
+  return (
+    <div className="studio-background-editor">
+      <div className="studio-background-heading">
+        <Paintbrush size={15} />
+        <strong>{t(layer ? "layer" : "canvas")}</strong>
+      </div>
+      {layer ? (
+        <LayerBackground key={layer.id} engine={engine} page={page} layer={layer} run={run} />
+      ) : (
+        <>
+          <BackgroundPaintControls
+            engine={engine}
+            page={page}
+            current={current}
+            run={run}
+            cancel={cancel}
+          />
+          <p className="studio-background-hint">{t("hint")}</p>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() =>
+              run(() => {
+                if (current()) createBackgroundLayer(engine, t("name"));
+              })
+            }
+          >
+            <Sparkles size={14} />
+            {t("convert")}
+          </Button>
+        </>
+      )}
+    </div>
+  );
+}
+function LayerBackground({
+  engine,
+  page,
+  layer,
+  run,
+}: {
+  engine: EnginePort;
+  page: Composition;
+  layer: Layer;
+  run: (task: () => void) => void;
+}) {
+  const { t } = useTranslation("studioBackground");
+  const edit = useLayerPreview(engine, page, [layer.id], run, false);
+  return (
+    <MotionFieldProvider editor={edit}>
+      {layer.locked && <p className="studio-background-hint">{t("locked")}</p>}
+      <fieldset disabled={layer.locked} className="studio-background-fields">
+        <GradientControl
+          layer={layer}
+          engine={engine}
+          patch={edit.commit}
+          preview={edit.previewLayer}
+          cancel={edit.cancel}
+        />
+        {!layer.fillGradient && (
+          <MotionColorControl
+            engine={engine}
+            identity={layer.id}
+            label={t("title")}
+            value={layer.fill}
+            onPreview={(fill) => edit.previewLayer({ fill })}
+            onCommit={(fill) => edit.commit({ fill })}
+            onCancel={edit.cancel}
+          />
+        )}
+        <EffectsPanel
+          engine={engine}
+          layer={layer}
+          onPatch={edit.commit}
+          onPreview={edit.previewLayer}
+          onCancel={edit.cancel}
+        />
+      </fieldset>
+      <Button variant="ghost" size="sm" onClick={() => engine.select([layer.id])}>
+        <Layers size={14} />
+        {t("select")}
+      </Button>
+    </MotionFieldProvider>
+  );
+}

@@ -1,0 +1,18 @@
+{
+  "add": "Añadir",
+  "text": "Texto",
+  "newText": "Tus palabras",
+  "media": "Medios",
+  "export": "Exportar",
+  "advanced": "Controles avanzados",
+  "compositions": "Composiciones",
+  "material": "Material",
+  "color": "Color",
+  "roughness": "Rugosidad",
+  "metalness": "Metalicidad",
+  "selectObject": "Selecciona un objeto 3D para darle un material propio.",
+  "scene": "Escena",
+  "environment": "Entorno",
+  "intensity": "Intensidad",
+  "rotation": "Rotación"
+}

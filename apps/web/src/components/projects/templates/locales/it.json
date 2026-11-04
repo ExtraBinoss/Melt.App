@@ -38,5 +38,7 @@
   "secondSkin": "Second Skin",
   "secondSkinDescription": "10 s · Danza, effetti termici e contorni con tipografia modificabile",
   "terminalSignal": "Segnale terminale",
-  "terminalSignalDescription": "16 s · Terminale al neon, digitazione modificabile, testo scorrevole e vetro CRT curvo · 9:16"
+  "terminalSignalDescription": "16 s · Terminale al neon, digitazione modificabile, testo scorrevole e vetro CRT curvo · 9:16",
+  "studioStarter": "Inizio Studio",
+  "studioStarterDescription": "Testo 3D modificabile, forme scultoree e luci morbide. Si apre nello spazio Studio."
 }

@@ -28,7 +28,8 @@
     "bloom-windows": "Un fiore sboccia dietro finestre del desktop in movimento, mescolando ASCII, cianotipia e texture di stampa.",
     "morphing-type": "La mascotte Melt si trasforma in lettere giganti attraverso forme vettoriali modificabili e un morphing continuo.",
     "share-your-work": "Una pila continua di fotografie e testo deciso, con ombre morbide e un ingresso sfocato. Sostituisci le foto per creare la tua versione.",
-    "blank": "Una tela vuota di {{width}} × {{height}} per {{name}}. Crea il tuo layout con immagini, testo e forme."
+    "blank": "Una tela vuota di {{width}} × {{height}} per {{name}}. Crea il tuo layout con immagini, testo e forme.",
+    "studio-starter": "Testo 3D modificabile, forme scultoree e luci morbide. Si apre nello spazio Studio."
   },
   "failed": "Impossibile caricare il contenuto del progetto."
 }

@@ -53,7 +53,10 @@ test("build metadata follows documents rather than template IDs and contains no 
 });
 
 test("every listed template has generated contents and blank formats advertise an empty canvas", () => {
-  const generated = readTemplateContents(resolve("apps/web/public/templates/motion"));
+  const generated = {
+    ...readTemplateContents(resolve("apps/web/public/templates/motion")),
+    ...readTemplateContents(resolve("apps/web/public/templates/designed")),
+  };
   for (const template of TEMPLATE_CATALOG) {
     const expected = template.id.startsWith("preset:") ? ["feature:blank"] : generated[template.id];
     expect(expected, template.id).toBeDefined();

@@ -1,0 +1,23 @@
+{
+  "vectors": "SVG",
+  "packs": "资源包",
+  "extrude": "以 3D 添加",
+  "extrudeHint": "SVG 仍可编辑，包括其原始颜色。",
+  "packTitle": "Kenney 创意资源库",
+  "packDescription": "{{count}} 个 CC0 模型：自然、物体和几何形状。下载一次即可离线使用。",
+  "download": "下载 · {{size}} MB",
+  "downloading": "正在下载 {{progress}}%",
+  "installed": "可离线使用",
+  "cancel": "取消",
+  "search": "搜索模型…",
+  "add": "添加模型",
+  "preview": "选中的模型",
+  "license": "Kenney · CC0",
+  "failed": "无法准备资源库，请重试。",
+  "storage": "此浏览器不支持资源库离线存储。",
+  "empty": "没有匹配的模型。",
+  "imported": "已添加模型",
+  "learnMore": "来源和许可证",
+  "previous": "上一个",
+  "next": "下一个"
+}

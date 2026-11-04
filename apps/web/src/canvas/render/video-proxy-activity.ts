@@ -7,6 +7,7 @@ export class CanvasVideoProxyActivity implements VideoProxyActivity {
   private readonly pointers = new Set<number>();
   private timer: ReturnType<typeof setTimeout> | null = null;
   private idle = false;
+  private continuation = false;
   private blocked = false;
   private dragging = false;
   private closed = false;
@@ -31,7 +32,7 @@ export class CanvasVideoProxyActivity implements VideoProxyActivity {
   read = () =>
     !this.closed &&
     !this.blocked &&
-    this.presented() &&
+    (this.continuation || this.presented()) &&
     !this.dragging &&
     this.idle &&
     !this.pointers.size &&
@@ -56,6 +57,7 @@ export class CanvasVideoProxyActivity implements VideoProxyActivity {
     if (this.closed) return;
     this.clear();
     this.idle = false;
+    this.continuation = false;
     this.emit();
     if (
       !this.blocked &&
@@ -90,8 +92,14 @@ export class CanvasVideoProxyActivity implements VideoProxyActivity {
     this.dragging = false;
     this.pulse();
   };
-  setBlocked(value: boolean) {
+  setBlocked(value: boolean, continuation = false) {
     if (this.closed) return;
+    // Already-admitted background work must not revoke its own admission when
+    // submitting its refresh frame. New foreground requests retain the normal gate.
+    if (continuation && !value && this.read()) {
+      this.continuation = true;
+      return;
+    }
     this.blocked = value;
     this.pulse();
   }

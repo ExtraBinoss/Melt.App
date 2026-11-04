@@ -1,0 +1,23 @@
+{
+  "vectors": "SVG",
+  "packs": "Pakketten",
+  "extrude": "Toevoegen in 3D",
+  "extrudeHint": "SVG’s blijven bewerkbaar, inclusief hun oorspronkelijke kleuren.",
+  "packTitle": "Creatieve bibliotheek van Kenney",
+  "packDescription": "{{count}} CC0-modellen: natuur, objecten en geometrische vormen. Download eenmalig voor offline gebruik.",
+  "download": "Downloaden · {{size}} MB",
+  "downloading": "Downloaden: {{progress}}%",
+  "installed": "Offline beschikbaar",
+  "cancel": "Annuleren",
+  "search": "Modellen zoeken…",
+  "add": "Model toevoegen",
+  "preview": "Geselecteerd model",
+  "license": "Kenney · CC0",
+  "failed": "De bibliotheek kon niet worden voorbereid. Probeer het opnieuw.",
+  "storage": "Offline opslag voor de bibliotheek is niet beschikbaar in deze browser.",
+  "empty": "Geen overeenkomende modellen.",
+  "imported": "Model toegevoegd",
+  "learnMore": "Bron en licentie",
+  "previous": "Vorige",
+  "next": "Volgende"
+}

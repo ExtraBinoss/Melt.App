@@ -82,6 +82,14 @@ test("filters real Motion projects independently from blank formats and preserve
   fireEvent.change(screen.getByRole("searchbox"), { target: { value: "" } });
   fireEvent.click(screen.getByRole("radio", { name: "Statique" }));
   expect(screen.queryByRole("button", { name: /Bloom Windows/ })).toBeNull();
+  const studio = screen.getByRole("button", { name: "Créer depuis Départ Studio" });
+  expect(studio.closest("article")).toHaveTextContent("Lettrage 3D modifiable");
+  expect(studio.querySelector("img")).toHaveAttribute(
+    "src",
+    "/templates/designed/studio-starter/studio-starter.webp",
+  );
+  fireEvent.click(studio);
+  expect(onChoose).toHaveBeenLastCalledWith("studio-starter");
   expect(
     screen.queryByRole("button", {
       name: /Colorfield|AFTERHOURS|Orbit Study|Paper Motion|Laboratoire|Sound Playground|In Bloom/,

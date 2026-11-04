@@ -1,8 +1,10 @@
-import { expect, test } from "vitest";
+import { expect, test, vi } from "vitest";
 import { act, fireEvent, screen } from "@testing-library/react";
 import { createProject } from "@musart/core";
 import { ProjectPill } from "../../../src/components/projects/ProjectPill";
 import { setup } from "../../support/ui";
+import { choose } from "../../support/select";
+import { ProjectPreferencesProvider } from "../../../src/components/workspace/preferences/context";
 import { keybindings } from "../../../src/state/keybindings/store";
 test("one project-name button opens a rename field above divided save/download actions", () => {
   const d = setup();
@@ -89,4 +91,29 @@ test("save keycaps follow real overrides and disappear when the binding is remov
   } finally {
     act(() => keybindings.reset());
   }
+});
+
+test("the local workspace selector persists presentation without changing document history, selection or camera", async () => {
+  const d = setup();
+  const projectId = d.engine.getSnapshot().project.id;
+  const port = {
+    read: vi.fn().mockResolvedValue({}),
+    update: vi.fn().mockResolvedValue(undefined),
+  };
+  d.mount(
+    <ProjectPreferencesProvider projectId={projectId} port={port} onError={vi.fn()}>
+      <ProjectPill engine={d.engine} services={d.services} name="Atelier" onTask={d.onTask} />
+    </ProjectPreferencesProvider>,
+  );
+  fireEvent.click(screen.getByRole("button", { name: "Actions du projet" }));
+  const before = d.engine.getSnapshot();
+  const bodyStyle = document.body.getAttribute("style");
+  await choose("Espace de travail", "Studio");
+  expect(screen.getByRole("combobox", { name: "Espace de travail" })).toHaveTextContent("Studio");
+  expect(d.engine.getSnapshot()).toBe(before);
+  expect(document.body.getAttribute("style")).toBe(bodyStyle);
+  expect(port.update).toHaveBeenCalledExactlyOnceWith(projectId, { workspaceMode: "studio" });
+  await choose("Espace de travail", "Classique");
+  expect(d.engine.getSnapshot()).toBe(before);
+  expect(port.update).toHaveBeenLastCalledWith(projectId, { workspaceMode: "classic" });
 });

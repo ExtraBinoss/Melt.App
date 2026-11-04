@@ -28,7 +28,8 @@
     "bloom-windows": "Una flor se abre tras ventanas de escritorio en movimiento, mezclando ASCII, cianotipia y texturas de impresión.",
     "morphing-type": "La mascota de Melt se transforma en letras gigantes mediante formas vectoriales editables y un morphing continuo.",
     "share-your-work": "Una pila continua de tarjetas fotográficas y tipografía contundente, con sombras suaves y una entrada desenfocada. Sustituye las fotos por las tuyas.",
-    "blank": "Un lienzo vacío de {{width}} × {{height}} para {{name}}. Crea tu diseño con imágenes, texto y formas."
+    "blank": "Un lienzo vacío de {{width}} × {{height}} para {{name}}. Crea tu diseño con imágenes, texto y formas.",
+    "studio-starter": "Letras 3D editables, formas esculturales e iluminación suave. Se abre en el espacio Studio."
   },
   "failed": "No se ha podido cargar el contenido del proyecto."
 }

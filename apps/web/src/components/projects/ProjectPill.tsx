@@ -10,6 +10,9 @@ import { Button } from "../ui/button";
 import { Label } from "../ui/label";
 import { Separator } from "../ui/separator";
 import { Kbd, KbdGroup } from "../ui/kbd";
+import { SelectField } from "../shared/SelectField";
+import { useWorkspaceMode, useSetWorkspaceMode } from "../../ui/studio/workspace-mode";
+import "./workspace-mode/messages";
 import { modifierLabel } from "../search/shortcuts";
 import { useKeybindings } from "../../state/keybindings/use-keybindings";
 import { chordTokens } from "../../state/keybindings/chords";
@@ -30,13 +33,16 @@ export function ProjectPill({
 }) {
   const [open, setOpen] = useState(false);
   const navigating = useRef(false);
+  const mode = useWorkspaceMode();
+  const setMode = useSetWorkspaceMode();
   const bindings = useKeybindings();
   const save = bindings.bindings.get("action:save")?.[0];
   const [origin] = useState(() => engine.getSnapshot().project.id);
   const { t } = useTranslation(),
-    inputId = useId();
+    inputId = useId(),
+    modeId = useId();
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={setOpen} modal={false}>
       <PopoverTrigger asChild>
         <Button
           variant="ghost"
@@ -104,6 +110,26 @@ export function ProjectPill({
             </KbdGroup>
           )}
         </Button>
+        <div className="project-rename">
+          <Label htmlFor={modeId}>{t("workspaceMode:label")}</Label>
+          <SelectField
+            id={modeId}
+            label={t("workspaceMode:label")}
+            value={mode}
+            identity={origin}
+            options={[
+              { value: "classic", label: t("workspaceMode:classic") },
+              { value: "studio", label: t("workspaceMode:studio") },
+            ]}
+            onValueChange={(value) => {
+              if (
+                engine.getSnapshot().project.id === origin &&
+                (value === "classic" || value === "studio")
+              )
+                setMode(value);
+            }}
+          />
+        </div>
         <Separator />
         <Button
           variant="ghost"

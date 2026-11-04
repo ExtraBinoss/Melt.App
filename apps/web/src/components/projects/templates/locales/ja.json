@@ -38,5 +38,7 @@
   "secondSkin": "Second Skin",
   "secondSkinDescription": "10秒 · ダンス、サーマルと輪郭エフェクト、編集可能なタイポグラフィ",
   "terminalSignal": "ターミナルシグナル",
-  "terminalSignalDescription": "16秒 · ネオンのターミナル、編集可能なタイピング、スクロールするテキスト、湾曲したCRTガラス · 9:16"
+  "terminalSignalDescription": "16秒 · ネオンのターミナル、編集可能なタイピング、スクロールするテキスト、湾曲したCRTガラス · 9:16",
+  "studioStarter": "Studio スターター",
+  "studioStarterDescription": "編集可能な3D文字、立体的なシェイプ、柔らかなスタジオ照明。Studioワークスペースで開きます。"
 }

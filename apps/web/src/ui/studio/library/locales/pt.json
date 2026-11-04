@@ -1,0 +1,23 @@
+{
+  "vectors": "SVG",
+  "packs": "Pacotes",
+  "extrude": "Adicionar em 3D",
+  "extrudeHint": "Os SVGs continuam editáveis, incluindo as cores originais.",
+  "packTitle": "Biblioteca criativa Kenney",
+  "packDescription": "{{count}} modelos CC0: natureza, objetos e formas geométricas. Transfira uma vez para utilizar sem ligação.",
+  "download": "Transferir · {{size}} MB",
+  "downloading": "A transferir {{progress}}%",
+  "installed": "Disponível sem ligação",
+  "cancel": "Cancelar",
+  "search": "Pesquisar modelos…",
+  "add": "Adicionar modelo",
+  "preview": "Modelo selecionado",
+  "license": "Kenney · CC0",
+  "failed": "Não foi possível preparar a biblioteca. Tente novamente.",
+  "storage": "O armazenamento da biblioteca sem ligação não está disponível neste navegador.",
+  "empty": "Nenhum modelo correspondente.",
+  "imported": "Modelo adicionado",
+  "learnMore": "Fonte e licença",
+  "previous": "Anterior",
+  "next": "Seguinte"
+}

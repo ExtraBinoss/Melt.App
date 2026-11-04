@@ -6,6 +6,12 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Added
 
+- Add a switchable Studio workspace in the project-name menu while retaining the same engine, canvas, document, selection, history and export pipeline as Classic. Add native quick insertion, compact canonical pages/layers, direct text/font/extrusion controls, themed accessible material/environment sliders, editable stackable background effects, SVG extrusion and a static Studio Starter template. Keep interface mode project-local, restore legacy projects in Classic and support explicit headless Studio creation/screenshots.
+- Prevent concurrent gizmo/composition precompilation from silently disabling native 3D controls, and keep direct template creation unavailable until its click handler is hydrated.
+- Preserve admission for already-approved reflection/proxy refresh frames so they complete once instead of rescheduling every quiet interval; continue to revoke admission for foreground edits, gestures, playback and disposal.
+- Add an optional, cancellable offline library of 474 CC0 Kenney models with pinned provenance, verified downloads, worker-side extraction, completed-cache publication, bounded search and native previews, original materials and portable model insertion.
+- Add an opt-in authenticated loopback WebSocket relay and headless agent client. Route edits through validated engine commands with project/page/revision guards, real acknowledgments, atomic undo and bounded live activity logs; retain the connection across interface switches and localize new Studio surfaces in all twelve interface languages.
+
 - Replace the object-selection setup with a twelve-language background-removal workflow: one automatic preview, unified click/rectangle refinement, selected-image locking, hover previews after explicit model preparation, cancellable hints and reversible Apply. Use pinned WebGPU SAM 3 Tracker for interactive selection and BiRefNet Lite for single-pass soft-alpha background matting, with separate verified downloads, visible progress and GPU model handoff.
 
 - Prepare owner-only Cloudflare CI/CD for melt.plinka.eu with authenticated GitHub identity guards, protected production secrets and approvals, exact-commit artifact integrity checks, stale-main rejection and streamed precompressed WASM. Add local Cloudflare browser delivery regressions and deployment/token-rotation documentation; preparation performs no production deployment.

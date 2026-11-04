@@ -1,0 +1,18 @@
+{
+  "agent": "Agent",
+  "editor": "Editor",
+  "title": "Local agent",
+  "description": "Pair with a local relay to let your agent edit this project. Changes use the editor's validated commands and undo history.",
+  "endpoint": "Local endpoint",
+  "token": "Pairing token",
+  "connect": "Connect",
+  "disconnect": "Disconnect",
+  "disconnected": "Disconnected",
+  "connecting": "Connecting…",
+  "connected": "Connected",
+  "error": "Connection error",
+  "waiting": "Waiting for an authenticated agent.",
+  "peerReady": "Agent connected. Live edits are enabled.",
+  "activity": "Live activity",
+  "empty": "Command activity appears here after pairing."
+}

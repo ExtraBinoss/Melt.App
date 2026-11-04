@@ -38,5 +38,7 @@
   "terminalSignal": "Terminal Signal",
   "terminalSignalDescription": "16 s · Neon terminal, editable typing, scrolling text and curved CRT glass · 9:16",
   "secondSkin": "Second Skin",
-  "secondSkinDescription": "10 s · Dance, Thermal and contour treatments with editable typography"
+  "secondSkinDescription": "10 s · Dance, Thermal and contour treatments with editable typography",
+  "studioStarter": "Studio Starter",
+  "studioStarterDescription": "Editable 3D lettering, sculptural shapes and soft studio lighting. Opens in the Studio workspace."
 }

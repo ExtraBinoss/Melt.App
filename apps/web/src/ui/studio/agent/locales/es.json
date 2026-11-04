@@ -1,0 +1,18 @@
+{
+  "agent": "Agente",
+  "editor": "Editor",
+  "title": "Agente local",
+  "description": "Conecta un relé local para que tu agente edite este proyecto con los comandos validados y el historial del editor.",
+  "endpoint": "Dirección local",
+  "token": "Token de vinculación",
+  "connect": "Conectar",
+  "disconnect": "Desconectar",
+  "disconnected": "Desconectado",
+  "connecting": "Conectando…",
+  "connected": "Conectado",
+  "error": "Error de conexión",
+  "waiting": "Esperando un agente autenticado.",
+  "peerReady": "Agente conectado. Edición en directo activada.",
+  "activity": "Actividad en directo",
+  "empty": "Los comandos aparecerán aquí tras la vinculación."
+}

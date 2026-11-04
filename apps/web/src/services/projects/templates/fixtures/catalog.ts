@@ -43,5 +43,5 @@ export const RETIRED_TEMPLATE_FIXTURES: readonly ProjectTemplate[] = Object.free
     descriptionKey: "templates:soundPlaygroundDescription",
     preview: `${import.meta.env.BASE_URL}templates/motion/sound-playground/sound-playground.webp`,
   }),
-  ...DESIGNED_TEMPLATES,
+  ...DESIGNED_TEMPLATES.filter((template) => template.id !== "studio-starter"),
 ]);

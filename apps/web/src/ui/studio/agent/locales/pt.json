@@ -1,0 +1,18 @@
+{
+  "agent": "Agente",
+  "editor": "Editor",
+  "title": "Agente local",
+  "description": "Ligue um relay local para permitir que o seu agente edite este projeto com os comandos validados e o histórico do editor.",
+  "endpoint": "Endereço local",
+  "token": "Token de emparelhamento",
+  "connect": "Ligar",
+  "disconnect": "Desligar",
+  "disconnected": "Desligado",
+  "connecting": "A ligar…",
+  "connected": "Ligado",
+  "error": "Erro de ligação",
+  "waiting": "À espera de um agente autenticado.",
+  "peerReady": "Agente ligado. Edição em direto ativada.",
+  "activity": "Atividade em direto",
+  "empty": "Os comandos aparecem aqui após o emparelhamento."
+}

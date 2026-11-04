@@ -38,5 +38,7 @@
   "secondSkin": "Second Skin",
   "secondSkinDescription": "10 s · Tanz, Wärmebild- und Kontureffekte mit bearbeitbarer Typografie",
   "terminalSignal": "Terminalsignal",
-  "terminalSignalDescription": "16 s · Neon-Terminal, bearbeitbarer Tipptext, laufender Text und gewölbtes CRT-Glas · 9:16"
+  "terminalSignalDescription": "16 s · Neon-Terminal, bearbeitbarer Tipptext, laufender Text und gewölbtes CRT-Glas · 9:16",
+  "studioStarter": "Studio-Start",
+  "studioStarterDescription": "Bearbeitbare 3D-Schrift, skulpturale Formen und sanftes Studiolicht. Öffnet sich im Studio-Arbeitsbereich."
 }

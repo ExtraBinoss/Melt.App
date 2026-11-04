@@ -1,0 +1,18 @@
+{
+  "add": "Toevoegen",
+  "text": "Tekst",
+  "newText": "Jouw woorden",
+  "media": "Media",
+  "export": "Exporteren",
+  "advanced": "Geavanceerde instellingen",
+  "compositions": "Composities",
+  "material": "Materiaal",
+  "color": "Kleur",
+  "roughness": "Ruwheid",
+  "metalness": "Metaalgehalte",
+  "selectObject": "Selecteer een 3D-object en geef het je eigen materiaal.",
+  "scene": "Scène",
+  "environment": "Omgeving",
+  "intensity": "Intensiteit",
+  "rotation": "Rotatie"
+}

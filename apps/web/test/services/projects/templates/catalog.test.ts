@@ -18,7 +18,7 @@ const ports = () => ({
   ),
 });
 test("publishes exact canonical canvas formats and the editable artwork template", async () => {
-  expect(new Set(TEMPLATE_CATALOG.map((item) => item.id)).size).toBe(PRESETS.length + 7);
+  expect(new Set(TEMPLATE_CATALOG.map((item) => item.id)).size).toBe(PRESETS.length + 8);
   expect(Object.isFrozen(TEMPLATE_CATALOG)).toBe(true);
   const services = ports();
   for (const preset of PRESETS) {
@@ -135,6 +135,7 @@ test("retires the eight legacy designs from every public catalog consumer", () =
       .filter((template) => template.preview)
       .map((template) => template.id),
   ).toEqual([
+    "studio-starter",
     "second-skin",
     "terminal-signal",
     "angel-windows",
@@ -143,6 +144,8 @@ test("retires the eight legacy designs from every public catalog consumer", () =
     "morphing-type",
     "share-your-work",
   ]);
-  for (const template of TEMPLATE_CATALOG.filter((item) => item.preview))
-    expect(template.preview).toContain(`/templates/motion/${template.id}/${template.id}.webp`);
+  for (const template of TEMPLATE_CATALOG.filter((item) => item.preview)) {
+    const family = template.id === "studio-starter" ? "designed" : "motion";
+    expect(template.preview).toContain(`/templates/${family}/${template.id}/${template.id}.webp`);
+  }
 });

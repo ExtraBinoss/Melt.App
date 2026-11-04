@@ -286,18 +286,10 @@ export default function SpatialControls({ engine, controller, target }: Props) {
         invalidate();
       }),
       stopEngine = engine.subscribe(() => gesture.invalidate());
-    let alive = true;
-    void renderer
-      .compileAsync(helper, camera)
-      .then(() => {
-        if (alive) invalidate();
-      })
-      .catch(() => {
-        if (alive) store.set(spatialEditingAtom(engine), null);
-      });
+    // Native helpers compile on their first display draw. An independent async
+    // precompile overlaps the composition's compiler on this borrowed renderer.
     invalidate();
     return () => {
-      alive = false;
       active.current = null;
       delete canvas.dataset.spatialGizmo;
       delete canvas.dataset.spatialCenter;

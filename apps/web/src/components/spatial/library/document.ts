@@ -26,7 +26,7 @@ export function spatialLibraryDocument(entry: SpatialLibraryEntry, asset?: Scene
   layer.spatial!.receiveShadow = false;
   if (asset) {
     layer.assetId = asset.id;
-    layer.spatial!.useModelMaterials = false;
+    layer.spatial!.useModelMaterials = entry.kind === "model" && (entry.originalMaterials ?? false);
   }
   const engine = new EditorEngine(
     createProject({

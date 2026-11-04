@@ -28,7 +28,8 @@
     "bloom-windows": "Une fleur s’épanouit derrière des fenêtres de bureau en mouvement, mêlant ASCII, cyanotype et textures d’impression.",
     "morphing-type": "La mascotte Melt s’étire en lettres géantes grâce à des formes vectorielles éditables et un morphing continu.",
     "share-your-work": "Une pile de cartes photo et de texte en boucle fluide, avec ombres douces et apparition floutée. Remplacez les photos pour créer votre version.",
-    "blank": "Un canvas vierge de {{width}} × {{height}} pour {{name}}. Composez votre mise en page avec des images, du texte et des formes."
+    "blank": "Un canvas vierge de {{width}} × {{height}} pour {{name}}. Composez votre mise en page avec des images, du texte et des formes.",
+    "studio-starter": "Lettrage 3D modifiable, formes sculpturales et éclairage doux. S’ouvre dans l’espace Studio."
   },
   "failed": "Le contenu du projet n’a pas pu être chargé."
 }

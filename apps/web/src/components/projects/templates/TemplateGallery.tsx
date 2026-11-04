@@ -1,4 +1,5 @@
 import { dialogLinkKeyDown } from "../../../ui/navigation/activation";
+import { useHydrated } from "@tanstack/react-router";
 import { BrandStatus } from "../../../ui/brand/BrandStatus";
 import { useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
@@ -44,6 +45,7 @@ export function TemplateGallery({
 }) {
   const { t } = useTranslation();
   const reduced = useReducedMotion();
+  const hydrated = useHydrated();
   const favorites = useLibraryFavorites();
   const favoriteIds = new Set(
     favorites?.items.filter((item) => item.kind === "template").map((item) => item.id),
@@ -250,7 +252,7 @@ export function TemplateGallery({
                   {activation.inspectable && (
                     <LibraryOpenButton
                       onOpen={activation.direct}
-                      disabled={busy}
+                      disabled={busy || !hydrated}
                       label={t("templates:use", { name })}
                     />
                   )}

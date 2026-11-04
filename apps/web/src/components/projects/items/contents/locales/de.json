@@ -28,7 +28,8 @@
     "bloom-windows": "Eine aufblühende Blume hinter bewegten Desktopfenstern mit ASCII, Cyanotypie und Drucktexturen.",
     "morphing-type": "Das Melt-Maskottchen verwandelt sich mit bearbeitbaren Vektorformen und kontinuierlichem Morphing in übergroße Buchstaben.",
     "share-your-work": "Ein nahtloser Stapel aus Fotokarten und kräftiger Schrift mit weichen Schatten und unscharfem Einstieg. Ersetze die Fotos durch deine eigenen.",
-    "blank": "Eine leere {{width}} × {{height}} große Arbeitsfläche für {{name}}. Gestalte dein Layout mit Bildern, Text und Formen."
+    "blank": "Eine leere {{width}} × {{height}} große Arbeitsfläche für {{name}}. Gestalte dein Layout mit Bildern, Text und Formen.",
+    "studio-starter": "Bearbeitbare 3D-Schrift, skulpturale Formen und sanftes Studiolicht. Öffnet sich im Studio-Arbeitsbereich."
   },
   "failed": "Der Projektinhalt konnte nicht geladen werden."
 }

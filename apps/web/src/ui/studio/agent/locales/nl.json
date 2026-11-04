@@ -1,0 +1,18 @@
+{
+  "agent": "Agent",
+  "editor": "Editor",
+  "title": "Lokale agent",
+  "description": "Koppel een lokale relay zodat je agent dit project kan bewerken met de gevalideerde opdrachten en geschiedenis van de editor.",
+  "endpoint": "Lokaal adres",
+  "token": "Koppelingstoken",
+  "connect": "Verbinden",
+  "disconnect": "Verbreken",
+  "disconnected": "Niet verbonden",
+  "connecting": "Verbinden…",
+  "connected": "Verbonden",
+  "error": "Verbindingsfout",
+  "waiting": "Wachten op een geauthenticeerde agent.",
+  "peerReady": "Agent verbonden. Live bewerken is ingeschakeld.",
+  "activity": "Live activiteit",
+  "empty": "Na het koppelen verschijnen hier opdrachten."
+}

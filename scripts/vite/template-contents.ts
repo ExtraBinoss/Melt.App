@@ -27,8 +27,12 @@ export function readTemplateContents(directory: string, watch: (file: string) =>
 }
 
 export function templateContentsPlugin(
-  directory = resolve("apps/web/public/templates/motion"),
+  directories: string | readonly string[] = [
+    resolve("apps/web/public/templates/motion"),
+    resolve("apps/web/public/templates/designed"),
+  ],
 ): Plugin {
+  const roots = typeof directories === "string" ? [directories] : directories;
   return {
     name: "melt-template-contents",
     resolveId(id) {
@@ -36,11 +40,17 @@ export function templateContentsPlugin(
     },
     load(id) {
       if (id !== resolved) return;
-      const content = readTemplateContents(directory, (file) => this.addWatchFile(file));
+      const content = Object.assign(
+        {},
+        ...roots.map((directory) =>
+          readTemplateContents(directory, (file) => this.addWatchFile(file)),
+        ),
+      );
       return `export default ${JSON.stringify(content)};`;
     },
     handleHotUpdate({ file, server }) {
-      if (!file.startsWith(`${directory}/`) || !file.endsWith(".json")) return;
+      if (!roots.some((directory) => file.startsWith(`${directory}/`)) || !file.endsWith(".json"))
+        return;
       const module = server.moduleGraph.getModuleById(resolved);
       if (module) return [module];
     },

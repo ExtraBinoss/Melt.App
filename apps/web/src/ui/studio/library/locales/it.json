@@ -1,0 +1,23 @@
+{
+  "vectors": "SVG",
+  "packs": "Pacchetti",
+  "extrude": "Aggiungi in 3D",
+  "extrudeHint": "Gli SVG restano modificabili, inclusi i colori originali.",
+  "packTitle": "Libreria creativa Kenney",
+  "packDescription": "{{count}} modelli CC0: natura, oggetti e forme geometriche. Scaricali una volta per usarli offline.",
+  "download": "Scarica · {{size}} MB",
+  "downloading": "Download {{progress}}%",
+  "installed": "Disponibile offline",
+  "cancel": "Annulla",
+  "search": "Cerca modelli…",
+  "add": "Aggiungi modello",
+  "preview": "Modello selezionato",
+  "license": "Kenney · CC0",
+  "failed": "Impossibile preparare la libreria. Riprova.",
+  "storage": "L’archiviazione offline della libreria non è disponibile in questo browser.",
+  "empty": "Nessun modello corrispondente.",
+  "imported": "Modello aggiunto",
+  "learnMore": "Fonte e licenza",
+  "previous": "Precedente",
+  "next": "Successivo"
+}

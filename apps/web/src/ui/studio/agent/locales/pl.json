@@ -1,0 +1,18 @@
+{
+  "agent": "Agent",
+  "editor": "Edytor",
+  "title": "Agent lokalny",
+  "description": "Połącz lokalny przekaźnik, aby agent mógł edytować ten projekt za pomocą sprawdzonych poleceń i historii edytora.",
+  "endpoint": "Adres lokalny",
+  "token": "Token parowania",
+  "connect": "Połącz",
+  "disconnect": "Rozłącz",
+  "disconnected": "Rozłączono",
+  "connecting": "Łączenie…",
+  "connected": "Połączono",
+  "error": "Błąd połączenia",
+  "waiting": "Oczekiwanie na uwierzytelnionego agenta.",
+  "peerReady": "Agent połączony. Edycja na żywo jest włączona.",
+  "activity": "Aktywność na żywo",
+  "empty": "Polecenia pojawią się tutaj po sparowaniu."
+}

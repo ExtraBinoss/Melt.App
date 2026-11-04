@@ -1,0 +1,18 @@
+{
+  "add": "추가",
+  "text": "텍스트",
+  "newText": "나만의 문구",
+  "media": "미디어",
+  "export": "내보내기",
+  "advanced": "고급 설정",
+  "compositions": "컴포지션",
+  "material": "재질",
+  "color": "색상",
+  "roughness": "거칠기",
+  "metalness": "금속성",
+  "selectObject": "3D 오브젝트를 선택하고 원하는 재질을 적용하세요.",
+  "scene": "장면",
+  "environment": "환경",
+  "intensity": "강도",
+  "rotation": "회전"
+}

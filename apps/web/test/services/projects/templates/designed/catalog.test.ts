@@ -4,9 +4,9 @@ import {
   isDesignedTemplateId,
 } from "../../../../../src/services/projects/templates/designed/catalog";
 
-it("publishes four concrete original artworks with searchable Static/Motion metadata", () => {
-  expect(DESIGNED_TEMPLATES).toHaveLength(4);
-  expect(new Set(DESIGNED_TEMPLATES.map(({ id }) => id)).size).toBe(4);
+it("publishes five concrete original artworks with searchable Static/Motion metadata", () => {
+  expect(DESIGNED_TEMPLATES).toHaveLength(5);
+  expect(new Set(DESIGNED_TEMPLATES.map(({ id }) => id)).size).toBe(5);
   expect(DESIGNED_TEMPLATES.filter(({ mode }) => mode === "motion")).toHaveLength(3);
   for (const entry of DESIGNED_TEMPLATES) {
     expect(isDesignedTemplateId(entry.id)).toBe(true);

@@ -15,6 +15,7 @@ import { createMotionTransport } from "../../services/motion/transport";
 import { SegmentedTabs } from "../../components/shared/segmented/SegmentedTabs";
 import { IconButton } from "../../components/shared/IconButton";
 import { ObjectToolbar } from "../shared/ObjectToolbar";
+import { useWorkspaceMode } from "../../ui/studio/workspace-mode";
 import { clientToPage } from "../viewport/view";
 import { canvasHit } from "../selection/hit";
 import type { SceneController } from "../session/scene-controller";
@@ -56,6 +57,11 @@ export function CanvasSpatialEditing({
     editing.layerId === layer?.id,
   );
   const visible = enabled && supported && !playback && !vector;
+  const workspace = useWorkspaceMode();
+  const studioTarget =
+    workspace === "studio" && enabled && supported && !playback
+      ? `${snapshot.project.id}:${page.id}:${layer!.id}`
+      : null;
   useLayoutEffect(() => {
     const element = viewport.current;
     if (!active || !element) return;
@@ -96,6 +102,14 @@ export function CanvasSpatialEditing({
     if (editing && !active) setEditing(null);
   }, [editing, active, setEditing]);
   useEffect(() => () => setEditing(null), [setEditing]);
+  // Activate once for a newly selected Studio object. Explicit 2D/Escape remains respected.
+  useEffect(() => {
+    if (!studioTarget) return;
+    const layerId = engine.getSnapshot().selection[0];
+    if (!layerId) return;
+    setVector(null);
+    setEditing(spatialEditingTarget(engine, layerId));
+  }, [studioTarget, engine, setEditing, setVector]);
   useEffect(() => {
     const element = viewport.current;
     if (!element || !enabled || !supported || !layer) return;

@@ -1,0 +1,10 @@
+{
+  "title": "Fondo",
+  "canvas": "Relleno del lienzo",
+  "layer": "Fondo editable",
+  "convert": "Activar efectos de fondo",
+  "hint": "Crea una capa de fondo normal para apilar efectos. Su relleno sigue siendo editable en ambos espacios de trabajo y en las exportaciones.",
+  "name": "Fondo",
+  "select": "Seleccionar capa de fondo",
+  "locked": "Desbloquea esta capa en el panel de composición para editar su fondo."
+}

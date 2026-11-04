@@ -27,6 +27,10 @@ export function createLibraryServices(
     };
   };
   return {
+    projectPreferences: {
+      read: async (...args) => (await data()).store.preferences.read(...args),
+      update: async (...args) => (await data()).store.preferences.update(...args),
+    },
     listProjects: async () => (await data()).store.list(),
     listProjectPage: async (options) => (await data()).store.listPage(options),
     loadProjectPreview: async (id, options) => (await data()).store.loadPreview(id, options),

@@ -9,7 +9,7 @@ it("writes deterministic portable projects and replay journals without a browser
   const directory = await mkdtemp(join(tmpdir(), "musart-designed-"));
   try {
     const paths = await generateDesignedTemplates(directory);
-    expect(paths).toHaveLength(12);
+    expect(paths).toHaveLength(15);
     const before = await Promise.all(paths.map((path) => readFile(path, "utf8")));
     for (const path of paths.filter((path) => path.endsWith(".musart")))
       expect(parseProject(await readFile(path, "utf8")).pages).toHaveLength(1);

@@ -49,6 +49,12 @@ import { MotionImportConfirmation } from "./components/motion-import/Confirmatio
 import { EditorNotice, type EditorNoticeValue } from "./components/notifications/EditorNotice";
 import { errorDiagnostics } from "./components/notifications/diagnostics";
 import { ProjectPill } from "./components/projects/ProjectPill";
+import {
+  ClassicWorkspaceOnly,
+  StudioWorkspaceChrome,
+  StudioExportActions,
+  WorkspaceModeBoundary,
+} from "./ui/studio/WorkspaceModeBoundary";
 import { freezeEffectPreviews } from "./state/session/effect-preview";
 import { ToolSettings } from "./components/toolbar/ToolSettings";
 import type { ProjectView } from "./components/search/actions";
@@ -198,206 +204,247 @@ export function App({ engine, services, welcome = false, routing }: AppProps) {
             port={services.projectPreferences}
             onError={onPreferencesError}
           >
-            <main className="musart-app" ref={element}>
-              <ExportLeaveGuard />
-              <MotionImportConfirmation engine={engine} />
-              <TransitionRequestHost engine={engine} />
-              {(!choosingProject || hasOpenedEditor) && (
-                <>
-                  <ProjectPanelGroup
-                    preference="workspaceLayout"
-                    enabled={!mobile}
-                    orientation="horizontal"
-                    className="workspace-panels"
-                  >
-                    <ResizablePanel
-                      id="workspace"
-                      minSize="35%"
-                      defaultSize="77%"
-                      className="workspace"
+            <WorkspaceModeBoundary>
+              <main className="musart-app" ref={element}>
+                <ExportLeaveGuard />
+                <MotionImportConfirmation engine={engine} />
+                <TransitionRequestHost engine={engine} />
+                {(!choosingProject || hasOpenedEditor) && (
+                  <>
+                    <ProjectPanelGroup
+                      preference="workspaceLayout"
+                      enabled={!mobile}
+                      orientation="horizontal"
+                      className="workspace-panels"
                     >
-                      <CanvasArea
-                        services={services}
-                        engine={engine}
-                        onError={onError}
-                        onDropFiles={onDropFiles}
-                        onImagePoint={onImagePoint}
-                        fontResolver={services.fonts?.resolve}
-                      />
-                      <div className="project-trigger">
-                        <Button
-                          variant="ghost"
-                          className="brand-button floating-panel"
-                          aria-label={t("projectMenu")}
-                          asChild
-                        >
-                          <a
-                            href={dashboardHref}
-                            role="button"
-                            onKeyDown={dialogLinkKeyDown}
-                            onClick={(event) => {
-                              if (!isPlainPrimaryClick(event)) return;
-                              event.preventDefault();
-                              showProjectMenu("projects");
-                            }}
-                          >
-                            <MeltLogo interactive />
-                          </a>
-                        </Button>
-                        <ProjectPill
-                          key={projectId}
-                          engine={engine}
+                      <ResizablePanel
+                        id="workspace"
+                        minSize="35%"
+                        defaultSize="77%"
+                        className="workspace"
+                      >
+                        <CanvasArea
                           services={services}
-                          name={projectName}
-                          onTask={onTask}
-                          onProjects={() => showProjectMenu("projects")}
+                          engine={engine}
+                          onError={onError}
+                          onDropFiles={onDropFiles}
+                          onImagePoint={onImagePoint}
+                          fontResolver={services.fonts?.resolve}
                         />
-                      </div>
-                      {!mobile && (
-                        <Suspense fallback={null}>
-                          <Toolbar
+                        <div className="project-trigger">
+                          <Button
+                            variant="ghost"
+                            className="brand-button floating-panel"
+                            aria-label={t("projectMenu")}
+                            asChild
+                          >
+                            <a
+                              href={dashboardHref}
+                              role="button"
+                              onKeyDown={dialogLinkKeyDown}
+                              onClick={(event) => {
+                                if (!isPlainPrimaryClick(event)) return;
+                                event.preventDefault();
+                                showProjectMenu("projects");
+                              }}
+                            >
+                              <MeltLogo interactive />
+                            </a>
+                          </Button>
+                          <ProjectPill
+                            key={projectId}
                             engine={engine}
                             services={services}
+                            name={projectName}
                             onTask={onTask}
-                            onProjects={showProjectMenu}
-                            onExport={() => showExport(true)}
-                            onPanelMode={(mode) => {
-                              if (mode === "animate") showTimelapse(true);
-                            }}
-                            onImport={onImport}
+                            onProjects={() => showProjectMenu("projects")}
                           />
-                        </Suspense>
-                      )}
-                      {!mobile && (
-                        <ToolSettings engine={engine} services={services} onTask={onTask} />
-                      )}
-                      {processing && (
-                        <div className="processing-notice floating-panel" role="status">
-                          <Throbber label={t("processing")} delayMs={0} variant="shimmer" />
-                          {processing === "segment" && services.segmentationModel && (
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => services.segmentationModel?.cancel()}
-                            >
-                              {t("cancel")}
-                            </Button>
-                          )}
                         </div>
-                      )}
-                    </ResizablePanel>
-                    {!mobile && (
-                      <>
-                        <ResizableHandle aria-label={t("panelResize")} className="sidebar-resize" />
-                        <ResizablePanel
-                          id="inspector"
-                          minSize="260px"
-                          maxSize="480px"
-                          defaultSize="320px"
-                          className="sidebar"
-                        >
-                          <Suspense fallback={null}>
+                        <StudioWorkspaceChrome
+                          engine={engine}
+                          services={services}
+                          onTask={onTask}
+                          onImport={onImport}
+                          onExport={() => showExport(true)}
+                          onProjects={showProjectMenu}
+                          onPanelMode={(mode) => {
+                            if (mode === "animate") showTimelapse(true);
+                          }}
+                          exportControl={
                             <EditorDialogVisibility state={dialogs}>
-                              <EditorSidebar
+                              <StudioExportActions
                                 engine={engine}
                                 services={services}
-                                run={run}
                                 onTask={onTask}
                                 exportOpen={false}
-                                onExportOpenChange={showExport}
                                 timelapseOpen={false}
+                                onExportOpenChange={showExport}
                                 onTimelapseOpenChange={showTimelapse}
                               />
                             </EditorDialogVisibility>
-                          </Suspense>
-                        </ResizablePanel>
-                      </>
-                    )}
-                  </ProjectPanelGroup>
-                  {mobile ? (
-                    <Suspense fallback={null}>
-                      <EditorDialogVisibility state={dialogs}>
-                        <MobileEditor
-                          engine={engine}
-                          services={services}
-                          run={run}
-                          onTask={onTask}
-                          exportOpen={false}
-                          onExportOpenChange={showExport}
-                          timelapseOpen={false}
-                          onTimelapseOpenChange={showTimelapse}
-                          tools={
-                            <>
-                              <Suspense fallback={null}>
-                                <Toolbar
-                                  engine={engine}
-                                  services={services}
-                                  onTask={onTask}
-                                  onProjects={showProjectMenu}
-                                  onExport={() => showExport(true)}
-                                  onPanelMode={(mode) => {
-                                    if (mode === "animate") showTimelapse(true);
-                                  }}
-                                  onImport={onImport}
-                                />
-                              </Suspense>
-                              <ToolSettings engine={engine} services={services} onTask={onTask} />
-                            </>
                           }
                         />
-                      </EditorDialogVisibility>
-                    </Suspense>
-                  ) : (
-                    <Suspense fallback={null}>
-                      <MotionTimelineDock engine={engine} />
-                    </Suspense>
-                  )}
-                  <input
-                    ref={input}
-                    type="file"
-                    multiple
-                    accept="image/*,video/*,audio/*,.svg"
-                    className="sr-only"
-                    aria-label={t("import")}
-                    onChange={(event) => {
-                      if (event.target.files?.length) onDropFiles(Array.from(event.target.files));
-                      event.target.value = "";
-                    }}
-                  />
-                </>
-              )}
-              <Tutorial
-                engine={engine}
-                services={services}
-                hidden={choosingProject || !!projectMenu}
-                onProjectCreated={routing ? (id) => routing.navigate("editor", id) : undefined}
-              />
-              <EditorNotice notice={notice} onClose={dismissNotice} />
-              {projectMenu && (
-                <ProjectMenu
+                        {!mobile && (
+                          <ClassicWorkspaceOnly>
+                            <Suspense fallback={null}>
+                              <Toolbar
+                                engine={engine}
+                                services={services}
+                                onTask={onTask}
+                                onProjects={showProjectMenu}
+                                onExport={() => showExport(true)}
+                                onPanelMode={(mode) => {
+                                  if (mode === "animate") showTimelapse(true);
+                                }}
+                                onImport={onImport}
+                              />
+                            </Suspense>
+                          </ClassicWorkspaceOnly>
+                        )}
+                        {!mobile && (
+                          <ClassicWorkspaceOnly>
+                            <ToolSettings engine={engine} services={services} onTask={onTask} />
+                          </ClassicWorkspaceOnly>
+                        )}
+                        {processing && (
+                          <div className="processing-notice floating-panel" role="status">
+                            <Throbber label={t("processing")} delayMs={0} variant="shimmer" />
+                            {processing === "segment" && services.segmentationModel && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => services.segmentationModel?.cancel()}
+                              >
+                                {t("cancel")}
+                              </Button>
+                            )}
+                          </div>
+                        )}
+                      </ResizablePanel>
+                      {!mobile && (
+                        <>
+                          <ResizableHandle
+                            aria-label={t("panelResize")}
+                            className="sidebar-resize"
+                          />
+                          <ResizablePanel
+                            id="inspector"
+                            minSize="260px"
+                            maxSize="480px"
+                            defaultSize="320px"
+                            className="sidebar"
+                          >
+                            <ClassicWorkspaceOnly>
+                              <Suspense fallback={null}>
+                                <EditorDialogVisibility state={dialogs}>
+                                  <EditorSidebar
+                                    engine={engine}
+                                    services={services}
+                                    run={run}
+                                    onTask={onTask}
+                                    exportOpen={false}
+                                    onExportOpenChange={showExport}
+                                    timelapseOpen={false}
+                                    onTimelapseOpenChange={showTimelapse}
+                                  />
+                                </EditorDialogVisibility>
+                              </Suspense>
+                            </ClassicWorkspaceOnly>
+                          </ResizablePanel>
+                        </>
+                      )}
+                    </ProjectPanelGroup>
+                    <ClassicWorkspaceOnly>
+                      {mobile ? (
+                        <Suspense fallback={null}>
+                          <EditorDialogVisibility state={dialogs}>
+                            <MobileEditor
+                              engine={engine}
+                              services={services}
+                              run={run}
+                              onTask={onTask}
+                              exportOpen={false}
+                              onExportOpenChange={showExport}
+                              timelapseOpen={false}
+                              onTimelapseOpenChange={showTimelapse}
+                              tools={
+                                <>
+                                  <Suspense fallback={null}>
+                                    <Toolbar
+                                      engine={engine}
+                                      services={services}
+                                      onTask={onTask}
+                                      onProjects={showProjectMenu}
+                                      onExport={() => showExport(true)}
+                                      onPanelMode={(mode) => {
+                                        if (mode === "animate") showTimelapse(true);
+                                      }}
+                                      onImport={onImport}
+                                    />
+                                  </Suspense>
+                                  <ToolSettings
+                                    engine={engine}
+                                    services={services}
+                                    onTask={onTask}
+                                  />
+                                </>
+                              }
+                            />
+                          </EditorDialogVisibility>
+                        </Suspense>
+                      ) : (
+                        <Suspense fallback={null}>
+                          <MotionTimelineDock engine={engine} />
+                        </Suspense>
+                      )}
+                    </ClassicWorkspaceOnly>
+                    <input
+                      ref={input}
+                      type="file"
+                      multiple
+                      accept="image/*,video/*,audio/*,.svg"
+                      className="sr-only"
+                      aria-label={t("import")}
+                      onChange={(event) => {
+                        if (event.target.files?.length) onDropFiles(Array.from(event.target.files));
+                        event.target.value = "";
+                      }}
+                    />
+                  </>
+                )}
+                <Tutorial
                   engine={engine}
                   services={services}
-                  {...(choosingProject ? { welcome: true } : { projectName, projectId })}
-                  initialView={projectMenu}
-                  onReplayTutorial={
-                    !choosingProject
-                      ? () => {
-                          setProjectMenu(null);
-                          window.dispatchEvent(new Event(REPLAY_TUTORIAL));
-                        }
-                      : undefined
-                  }
-                  showLanding={!routing}
-                  onHome={routing ? () => routing.navigate("home") : undefined}
-                  onClose={() => {
-                    setChoosingProject(false);
-                    setProjectMenu(null);
-                    if (routing) routing.navigate("editor", engine.getSnapshot().project.id);
-                  }}
-                  onTask={onTask}
+                  hidden={choosingProject || !!projectMenu}
+                  onProjectCreated={routing ? (id) => routing.navigate("editor", id) : undefined}
                 />
-              )}
-            </main>
+                <EditorNotice notice={notice} onClose={dismissNotice} />
+                {projectMenu && (
+                  <ProjectMenu
+                    engine={engine}
+                    services={services}
+                    {...(choosingProject ? { welcome: true } : { projectName, projectId })}
+                    initialView={projectMenu}
+                    onReplayTutorial={
+                      !choosingProject
+                        ? () => {
+                            setProjectMenu(null);
+                            window.dispatchEvent(new Event(REPLAY_TUTORIAL));
+                          }
+                        : undefined
+                    }
+                    showLanding={!routing}
+                    onHome={routing ? () => routing.navigate("home") : undefined}
+                    onClose={() => {
+                      setChoosingProject(false);
+                      setProjectMenu(null);
+                      if (routing) routing.navigate("editor", engine.getSnapshot().project.id);
+                    }}
+                    onTask={onTask}
+                  />
+                )}
+              </main>
+            </WorkspaceModeBoundary>
           </ProjectPreferencesProvider>
         </TooltipProvider>
       </MobileControlsContext>

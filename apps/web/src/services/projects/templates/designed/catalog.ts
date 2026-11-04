@@ -2,6 +2,15 @@ export const DESIGNED_TEMPLATES = Object.freeze(
   (
     [
       {
+        id: "studio-starter",
+        nameKey: "templates:studioStarter",
+        width: 1440,
+        height: 1080,
+        mode: "static",
+        descriptionKey: "templates:studioStarterDescription",
+        category: "artwork",
+      },
+      {
         id: "orbit-study",
         nameKey: "templates:orbit",
         width: 1080,

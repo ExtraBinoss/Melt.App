@@ -28,7 +28,8 @@
     "bloom-windows": "Rozkwitający kwiat za ruchomymi oknami pulpitu, łączący ASCII, cyjanotypię i tekstury druku.",
     "morphing-type": "Maskotka Melt zmienia się w ogromne litery dzięki edytowalnym kształtom wektorowym i płynnemu morfingowi.",
     "share-your-work": "Zapętlony stos kart ze zdjęciami i wyrazistego tekstu, z miękkimi cieniami i rozmytym wejściem. Zastąp zdjęcia własnymi.",
-    "blank": "Puste płótno {{width}} × {{height}} dla {{name}}. Zbuduj własny układ z obrazów, tekstu i kształtów."
+    "blank": "Puste płótno {{width}} × {{height}} dla {{name}}. Zbuduj własny układ z obrazów, tekstu i kształtów.",
+    "studio-starter": "Edytowalny tekst 3D, rzeźbiarskie kształty i miękkie światło. Otwiera się w przestrzeni Studio."
   },
   "failed": "Nie udało się wczytać zawartości projektu."
 }

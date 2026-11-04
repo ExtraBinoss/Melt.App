@@ -7,7 +7,7 @@ export function canvasProfileSource(canvas: HTMLCanvasElement) {
   return owner
     ? {
         source: owner.profile,
-        force: () => owner.requestProfileFrame(),
+        force: () => owner.refreshFrame(),
       }
     : null;
 }

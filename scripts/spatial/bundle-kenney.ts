@@ -34,7 +34,11 @@ const models = [
   ["rockC", "nature", "rock_largeC"],
   ["rockE", "nature", "rock_largeE"],
 ] as const;
-function embedTextures(input: Uint8Array, folder: string, archive: Record<string, Uint8Array>) {
+export function embedTextures(
+  input: Uint8Array,
+  folder: string,
+  archive: Record<string, Uint8Array>,
+) {
   const header = new DataView(input.buffer, input.byteOffset, input.byteLength);
   if (header.getUint32(0, true) !== 0x46546c67 || header.getUint32(4, true) !== 2)
     throw Error("Expected GLB v2");

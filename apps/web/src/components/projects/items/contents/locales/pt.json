@@ -28,7 +28,8 @@
     "bloom-windows": "Uma flor desabrocha atrás de janelas em movimento, misturando ASCII, cianotipia e texturas de impressão.",
     "morphing-type": "A mascote Melt transforma-se em letras gigantes através de formas vetoriais editáveis e de um morphing contínuo.",
     "share-your-work": "Uma pilha contínua de cartões fotográficos e texto marcante, com sombras suaves e uma entrada desfocada. Substitua as fotografias pelas suas.",
-    "blank": "Uma tela vazia de {{width}} × {{height}} para {{name}}. Crie o seu layout com imagens, texto e formas."
+    "blank": "Uma tela vazia de {{width}} × {{height}} para {{name}}. Crie o seu layout com imagens, texto e formas.",
+    "studio-starter": "Letras 3D editáveis, formas escultóricas e iluminação suave. Abre no espaço Studio."
   },
   "failed": "Não foi possível carregar o conteúdo do projeto."
 }

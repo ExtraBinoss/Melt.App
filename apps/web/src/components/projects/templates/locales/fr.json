@@ -38,5 +38,7 @@
   "terminalSignal": "Terminal Signal",
   "terminalSignalDescription": "16 s · Terminal vert, frappe éditable, texte défilant et écran CRT incurvé · 9:16",
   "secondSkin": "Second Skin",
-  "secondSkinDescription": "10 s · Danse, traitements thermiques et contours, typographie éditable"
+  "secondSkinDescription": "10 s · Danse, traitements thermiques et contours, typographie éditable",
+  "studioStarter": "Départ Studio",
+  "studioStarterDescription": "Lettrage 3D modifiable, formes sculpturales et éclairage doux. S’ouvre dans l’espace Studio."
 }

@@ -20,6 +20,17 @@ export interface ProjectTemplate {
 }
 export const TEMPLATE_CATALOG: readonly ProjectTemplate[] = Object.freeze([
   Object.freeze({
+    id: "studio-starter",
+    nameKey: "templates:studioStarter",
+    descriptionKey: "libraryContents:description.studio-starter",
+    width: 1440,
+    height: 1080,
+    mode: "static",
+    category: "artwork",
+    previewBackground: "#F5F1EA",
+    preview: `${import.meta.env.BASE_URL}templates/designed/studio-starter/studio-starter.webp`,
+  }),
+  Object.freeze({
     id: "second-skin",
     nameKey: "templates:secondSkin",
     descriptionKey: "libraryContents:description.second-skin",
@@ -109,7 +120,10 @@ export const TEMPLATE_CATALOG: readonly ProjectTemplate[] = Object.freeze([
 
 /** Creates an independent, durably saved project through the normal validated service ports. */
 async function openProjectTemplate(
-  services: Pick<EditorServices, "createProject" | "openPortable" | "openMediaProject">,
+  services: Pick<
+    EditorServices,
+    "createProject" | "openPortable" | "openMediaProject" | "projectPreferences"
+  >,
   templateId: string,
   options: TemplateLoadOptions = {},
 ): Promise<void> {
@@ -150,7 +164,10 @@ async function openProjectTemplate(
 
 /** One timing follows the whole template operation, including the native first frame. */
 export async function createProjectFromTemplate(
-  services: Pick<EditorServices, "createProject" | "openPortable" | "openMediaProject">,
+  services: Pick<
+    EditorServices,
+    "createProject" | "openPortable" | "openMediaProject" | "projectPreferences"
+  >,
   templateId: string,
   options: TemplateLoadOptions = {},
 ): Promise<void> {

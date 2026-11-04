@@ -6,6 +6,8 @@ test("keeps template search and editable artwork descriptions translated in both
   expect(i18n.getResource("fr", "templates", "editable")).toContain("150 calques");
   for (const language of ["en", "fr"])
     for (const key of [
+      "studioStarter",
+      "studioStarterDescription",
       "bloom",
       "stress",
       "bloomDescription",

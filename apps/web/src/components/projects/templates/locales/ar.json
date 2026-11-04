@@ -38,5 +38,7 @@
   "secondSkin": "Second Skin",
   "secondSkinDescription": "10 ث · رقص وتأثيرات حرارية وحدود مع نصوص قابلة للتحرير",
   "terminalSignal": "إشارة الطرفية",
-  "terminalSignalDescription": "16 ثانية · طرفية نيون وكتابة قابلة للتحرير ونص متمرّر وزجاج CRT منحني · 9:16"
+  "terminalSignalDescription": "16 ثانية · طرفية نيون وكتابة قابلة للتحرير ونص متمرّر وزجاج CRT منحني · 9:16",
+  "studioStarter": "بداية Studio",
+  "studioStarterDescription": "نص ثلاثي الأبعاد قابل للتحرير وأشكال مجسمة وإضاءة ناعمة. يفتح في مساحة عمل Studio."
 }
