@@ -131,13 +131,17 @@
 }
 
 .background-phase .ui-throbber {
-  flex: 1;
-  min-width: 0;
+  flex: 0 0 20px;
+  width: 20px;
+  min-width: 20px;
+  opacity: 1;
+  visibility: visible;
+  transition: none;
 }
 .background-phase .ui-throbber-mark {
   flex-shrink: 0;
 }
-.background-phase .ui-throbber-label {
+.background-phase-label {
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;

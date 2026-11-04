@@ -130,3 +130,16 @@ test("tracks independent automatic weights and invalidates GPU readiness without
   automatic.deactivate();
   expect(automatic.read()).toMatchObject({ phase: "idle", available: true, bytes: 98484532 });
 });
+
+test("separates downloaded weights, initialized runtime and pending inference", () => {
+  const manager = new LocalModelManager(
+    { prepare: async () => {}, cancel: vi.fn() },
+    BACKGROUND_MODEL,
+  );
+  manager.start();
+  manager.note({ file: "onnx/model_fp16.onnx", status: "done" });
+  expect(manager.read().phase).toBe("initializing");
+  manager.note({ file: "onnx/model_fp16.onnx", status: "ready" });
+  expect(manager.read().phase).toBe("ready");
+  manager.dispose();
+});

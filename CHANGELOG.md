@@ -6,6 +6,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Added
 
+- Paint the selected layer thumbnail before starting background-removal GPU work, retain an immediately visible throbber through initialization, report runtime readiness separately from inference completion, and remove redundant native title tooltips from the compact status card. Headless calls remain immediate and cancellation releases presentation waits.
+
 - Keep the compact background-removal card pinned to its original layer while selection and unrelated edits change. Show the layer name and thumbnail, an immediate throbber, three preparation stages, streamed download megabytes/percentage, and cancellation without a long instruction panel. Preserve the user's current selection when the result commits, and reject results if the source layer is changed, deleted, or its project/page is left.
 
 - Make Remove background a direct, undoable BiRefNet action shared by the dock, search and keyboard shortcut. Use a pinned 512-pixel browser export, encode luminance PNGs entirely in the worker, and bypass original-image decoding and selection contours for this action. Replace the large setup panel with compact progress and an explicit Refine action; SAM 3 never runs on hover. Refinement replaces the automatic matte so missing subject pixels can be recovered while preserving an older clip.

@@ -22,7 +22,7 @@ export function modelProgressSink(
         status: event.status,
         ...(event.status === "progress" ? { loaded: event.loaded, total: event.total } : {}),
       });
-      if (event.status === "done" || now() - emittedAt >= 75) flush();
+      if (event.status === "done" || event.status === "ready" || now() - emittedAt >= 75) flush();
     },
     flush,
   };

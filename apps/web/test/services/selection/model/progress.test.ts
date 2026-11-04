@@ -36,3 +36,12 @@ test("forwards real automatic-model progress as well as interactive weights", ()
     expect.objectContaining({ file: "onnx/model_fp16.onnx", loaded: 4096 }),
   );
 });
+
+test("emits initialization completion immediately even after the final download packet", () => {
+  const send = vi.fn(),
+    sink = modelProgressSink(send, () => 0);
+  sink.note({ file: "onnx/model_fp16.onnx", status: "done" });
+  sink.note({ file: "onnx/model_fp16.onnx", status: "ready" });
+  expect(send).toHaveBeenLastCalledWith({ file: "onnx/model_fp16.onnx", status: "ready" });
+  expect(send).toHaveBeenCalledTimes(2);
+});

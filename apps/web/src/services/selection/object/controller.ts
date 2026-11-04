@@ -1,3 +1,4 @@
+import { SelectionPresentation } from "./presentation";
 import { readDataUrl } from "../../assets/imports";
 import { selectionMaskCommands } from "../wand/mask-commands";
 import {
@@ -40,6 +41,9 @@ export class ObjectSelectionController implements ObjectSelectionPort {
   private readonly stop: () => void;
   private readonly stopEngine: () => void;
   private committing = false;
+  private readonly presentation = new SelectionPresentation();
+  retainPresentation = this.presentation.retain;
+  presented = this.presentation.painted;
   constructor(
     private readonly engine: EnginePort,
     private readonly client: SelectionClient,
@@ -203,8 +207,11 @@ export class ObjectSelectionController implements ObjectSelectionPort {
       target = this.target!;
     const current = () =>
       generation === this.generation && this.target === target && this.automaticCurrent(target);
+    const presented = this.presentation.wait(layerId);
     this.publish({ ...this.state!, automatic: true, completed: false, busy: true, error: "" });
     const task = (async () => {
+      if (presented) await presented;
+      if (!current()) throw abort();
       const result = await this.client.backgroundEncoded(target.asset.dataUrl);
       if (!current()) throw abort();
       const dataUrl = await readDataUrl(result.blob);
@@ -440,6 +447,7 @@ export class ObjectSelectionController implements ObjectSelectionPort {
     }
   }
   private clear() {
+    this.presentation.cancel();
     this.generation++;
     this.version++;
     this.wanted = false;

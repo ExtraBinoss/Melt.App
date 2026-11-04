@@ -1,3 +1,4 @@
+import { useTargetPresentation } from "./use-target-presentation";
 import { useSyncExternalStore } from "react";
 import { useTranslation } from "react-i18next";
 import { Check, Copy, Info, Undo2, X } from "lucide-react";
@@ -35,8 +36,9 @@ export function ObjectSelectionOptions({
     model?.read ?? emptyRead,
     emptyRead,
   );
+  const thumbnail = useTargetPresentation(port, state);
   if (!state) return null;
-  const loading = status?.phase === "loading",
+  const loading = status?.phase === "loading" || status?.phase === "idle",
     initializing = status?.phase === "initializing";
   const percent = status ? Math.min(100, Math.floor((100 * status.loaded) / status.total)) : 0;
   const label = loading
@@ -74,6 +76,7 @@ export function ObjectSelectionOptions({
       <div className="background-action-row">
         {state.thumbnail && (
           <img
+            ref={thumbnail}
             className="background-target-thumbnail"
             src={state.thumbnail}
             alt=""
@@ -81,12 +84,11 @@ export function ObjectSelectionOptions({
           />
         )}
         <div className="background-target-status">
-          <span className="background-target-name" title={state.targetName}>
-            {state.targetName}
-          </span>
+          <span className="background-target-name">{state.targetName}</span>
           {state.busy ? (
-            <div className="background-phase" role="status" title={label}>
-              <Throbber delayMs={0} size={14} label={label} />
+            <div className="background-phase" role="status">
+              <Throbber delayMs={0} size={20} decorative />
+              <span className="background-phase-label">{label}</span>
               <span className="background-step" dir="ltr">
                 {number.format(stage)}/{number.format(3)}
               </span>

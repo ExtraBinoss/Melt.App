@@ -341,3 +341,43 @@ it("keeps an automatic job pinned through deselection and unrelated edits withou
   d.engine.undo();
   expect(d.engine.getSnapshot().project).toEqual(beforeCommit);
 });
+
+it("waits for the retained thumbnail presentation before starting the model and releases the lease", async () => {
+  const d = fixture(),
+    release = d.objects.retainPresentation();
+  d.engine.select(["image"]);
+  const pending = d.objects.removeBackground("image");
+  expect(d.objects.read()).toMatchObject({ busy: true, thumbnail: "data:image/png;base64,AAAA" });
+  expect(d.client.backgroundEncoded).not.toHaveBeenCalled();
+  d.objects.presented("another-layer");
+  await Promise.resolve();
+  expect(d.client.backgroundEncoded).not.toHaveBeenCalled();
+  d.objects.presented("image");
+  await pending;
+  expect(d.client.backgroundEncoded).toHaveBeenCalledOnce();
+  release();
+});
+it("cancels an unpainted job without starting the worker", async () => {
+  const d = fixture(),
+    release = d.objects.retainPresentation();
+  d.engine.select(["image"]);
+  const pending = d.objects.removeBackground("image");
+  const cancelled = expect(pending).rejects.toMatchObject({ name: "AbortError" });
+  d.objects.reset();
+  await cancelled;
+  expect(d.client.backgroundEncoded).not.toHaveBeenCalled();
+  release();
+});
+
+it("continues a queued automatic job when its card unmounts", async () => {
+  const d = fixture(),
+    release = d.objects.retainPresentation();
+  d.engine.select(["image"]);
+  const pending = d.objects.removeBackground("image");
+  expect(d.client.backgroundEncoded).not.toHaveBeenCalled();
+  release();
+  release();
+  await pending;
+  expect(d.client.backgroundEncoded).toHaveBeenCalledOnce();
+  expect(d.objects.read()?.completed).toBe(true);
+});

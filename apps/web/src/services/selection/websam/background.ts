@@ -12,6 +12,7 @@ export async function prepareBackground(onProgress?: (event: ModelDownloadEvent)
     await downloadModelFile(Object.keys(BACKGROUND_MODEL.files)[0]!, onProgress, BACKGROUND_MODEL),
     { executionProviders: runtime.executionProviders },
   );
+  onProgress?.({ file: Object.keys(BACKGROUND_MODEL.files)[0]!, status: "ready" });
   return { ...runtime, session };
 }
 /** One dedicated matting pass, preserving soft alpha instead of a 16-prompt object scan. */

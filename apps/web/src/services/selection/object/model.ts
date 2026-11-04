@@ -22,6 +22,8 @@ export interface ObjectSelectionPort {
   subscribe(this: void, listener: () => void): () => void;
   mode(this: void): "points" | "box";
   setMode(mode: "points" | "box"): void;
+  retainPresentation?(this: void): () => void;
+  presented?(this: void, layerId: string): void;
   removeBackground(layerId: string): Promise<void>;
   refine(): void;
   background(layerId: string): Promise<void>;

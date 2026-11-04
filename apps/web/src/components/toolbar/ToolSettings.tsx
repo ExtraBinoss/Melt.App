@@ -1,4 +1,4 @@
-import { useSyncExternalStore } from "react";
+import { useLayoutEffect, useSyncExternalStore } from "react";
 import type { EnginePort } from "@musart/core";
 import { ObjectSelectionOptions } from "./segmentation/ObjectSelectionOptions";
 import { useAtom } from "jotai";
@@ -20,6 +20,7 @@ export function ToolSettings({
   const { t } = useTranslation();
   const [tool, setTool] = useAtom(toolAtom);
   const port = services.objectSelection;
+  useLayoutEffect(() => port?.retainPresentation?.(), [port]);
   const state = useSyncExternalStore(
     port?.subscribe ?? emptySubscribe,
     port?.read ?? emptyRead,

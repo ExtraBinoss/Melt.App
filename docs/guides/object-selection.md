@@ -23,6 +23,12 @@ preserved on the existing generated mask source.
 
 ## Thread and resource ownership
 
+When a card is mounted, an optional presentation lease waits for its thumbnail to
+decode and paint before starting GPU work. Hidden tabs and unmounted cards release
+the wait; headless calls do not wait for UI. No artificial minimum job duration is
+introduced. Runtime readiness is reported as soon as model sessions are initialized,
+so inference has its own visible stage instead of extending the initialization label.
+
 The dedicated model worker decodes/resizes the original, runs inference, restores
 source-sized alpha and encodes the opaque luminance PNG using OffscreenCanvas.
 The common removal action returns a Blob and an optional foreground seed. It
