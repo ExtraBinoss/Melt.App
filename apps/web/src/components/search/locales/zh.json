@@ -99,7 +99,7 @@
     "toolEllipse": "绘制椭圆或圆形。",
     "toolText": "在画布上创建可编辑文字。",
     "toolWand": "以可调容差选择相连的颜色。",
-    "toolSegment": "通过一次可撤销的操作移除所选图像的背景。",
+    "toolSegment": "移除图像背景或分离视频中的人物，可一次撤销。",
     "importImages": "向项目添加图片、视频和音频。",
     "importSvg": "导入可编辑的SVG矢量图像。",
     "openPortable": "打开便携项目压缩包或旧版JSON文档。",

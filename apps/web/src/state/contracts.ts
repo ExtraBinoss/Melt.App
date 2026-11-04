@@ -125,6 +125,7 @@ export interface EditorServices {
   mediaResolverFor?(this: void, projectId: string): import("@musart/render").MediaSourceResolver;
   segmentationModel?: LocalModelPort;
   backgroundModel?: LocalModelPort;
+  videoBackgroundModel?: LocalModelPort;
   pixelSelection?: PixelSelectionPort;
   objectSelection?: ObjectSelectionPort;
   previewExport?(

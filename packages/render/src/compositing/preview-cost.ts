@@ -128,9 +128,10 @@ export function estimatePreviewCost(
       target(w, h, fixed);
       if (l.mask.assetId) {
         const asset = assets[l.mask.assetId];
-        if (asset && asset.kind !== "audio" && !originals.has(`image:${asset.id}`)) {
-          originals.add(`image:${asset.id}`);
-          originalBytes += asset.width * asset.height * 4;
+        const key = asset?.kind === "video" ? `video-mask:${l.id}` : `image:${asset?.id}`;
+        if (asset && asset.kind !== "audio" && !originals.has(key)) {
+          originals.add(key);
+          originalBytes += asset.width * asset.height * 4 * (asset.kind === "video" ? 4 : 1);
           maxDimension = Math.max(maxDimension, asset.width, asset.height);
         }
       }

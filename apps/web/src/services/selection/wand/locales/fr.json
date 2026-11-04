@@ -85,5 +85,9 @@
   "backgroundDone": "Fond supprimé",
   "refineBackground": "Affiner",
   "refineGestureHint": "Cliquez pour inclure.\nAlt + clic ou clic droit pour exclure.\nTracez un rectangle pour encadrer un sujet.",
-  "removingBackground": "Suppression du fond…"
+  "removingBackground": "Suppression du fond…",
+  "preparingVideo": "Préparation de la vidéo…",
+  "removingPeople": "Détourage des personnes…",
+  "selectMediaFirst": "Sélectionnez d’abord une image ou une vidéo.",
+  "videoExistingMask": "Retirez le masque existant avant de détourer les personnes de la vidéo."
 }

@@ -101,6 +101,11 @@
   justify-content: center;
   gap: 4px;
 }
+.background-target-placeholder {
+  display: grid;
+  place-items: center;
+  color: var(--muted-foreground);
+}
 .background-target-name {
   display: block;
   overflow: hidden;

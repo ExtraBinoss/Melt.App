@@ -99,7 +99,7 @@
     "toolEllipse": "Draw an ellipse or circle.",
     "toolText": "Create editable typography on the canvas.",
     "toolWand": "Select connected colors with adjustable tolerance.",
-    "toolSegment": "Remove the selected image’s background in one undoable action.",
+    "toolSegment": "Remove an image’s background or cut people out of a video in one undoable action.",
     "importImages": "Add image, video and audio files to the project.",
     "importSvg": "Import editable SVG vector artwork.",
     "openPortable": "Open a portable project archive or legacy JSON document.",

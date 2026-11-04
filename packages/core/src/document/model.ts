@@ -94,6 +94,7 @@ export interface Effect {
   settings?: EffectSettings;
 }
 export interface LayerMask {
+  /** Images use local UVs. A video asset is allowed on video owners and follows their relative source clock. */
   assetId?: string;
   layerId?: string;
   mode?: "alpha" | "luminance";

@@ -299,6 +299,8 @@ describe("asset and mask orchestration", () => {
     await expect(services.selectImagePoint(rectangle.id, 0, 0, "segment", 16)).rejects.toThrow(
       "unlocked 2D image",
     );
+    // Exercise locking on the active target, independently of the cross-layer selection guard.
+    engine.select(["image"]);
     engine.execute({ type: "updateLayers", ids: ["image"], patch: { locked: true } });
     await expect(services.selectImagePoint("image", 0, 0, "segment", 16)).rejects.toThrow(
       "unlocked 2D image",
@@ -319,8 +321,13 @@ describe("asset and mask orchestration", () => {
     await vi.waitFor(() => expect(selection.prompt).toHaveBeenCalledOnce());
     engine.execute({ type: "deleteLayers", ids: ["image"] });
     release({ data: new Uint8ClampedArray(4), width: 1, height: 1 });
-    await expect(pending).rejects.toThrow("cancelled");
+    // Superseded interactive previews retire quietly; no stale pixels or document mask may publish.
+    await expect(pending).resolves.toBeUndefined();
     expect(preview).not.toHaveBeenCalled();
+    expect(services.objectSelection!.read()).toBeNull();
+    expect(
+      engine.getSnapshot().project.pages[0]!.layers.some((layer) => layer.id === "image"),
+    ).toBe(false);
   });
 });
 describe("high-resolution file export", () => {

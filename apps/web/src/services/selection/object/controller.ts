@@ -17,6 +17,7 @@ import type { SelectionClient } from "../selection";
 import { MAX_SELECTION_POINTS, type SelectionBox, type SelectionPrompt } from "../prompts";
 import type { MaskSelectionPort } from "../preview";
 import type { ObjectSelectionPort, ObjectSelectionState } from "./model";
+import type { VideoBackgroundController } from "../video/controller";
 interface Target {
   layer: Layer;
   asset: ImageAsset;
@@ -40,16 +41,31 @@ export class ObjectSelectionController implements ObjectSelectionPort {
   private choice: "points" | "box" = "points";
   private readonly stop: () => void;
   private readonly stopEngine: () => void;
+  private readonly stopVideo?: () => void;
   private committing = false;
   private readonly presentation = new SelectionPresentation();
-  retainPresentation = this.presentation.retain;
-  presented = this.presentation.painted;
+  retainPresentation = () => {
+    const image = this.presentation.retain(),
+      video = this.video?.presentation.retain();
+    return () => {
+      image();
+      video?.();
+    };
+  };
+  presented = (id: string) => {
+    this.presentation.painted(id);
+    this.video?.presentation.painted(id);
+  };
   constructor(
     private readonly engine: EnginePort,
     private readonly client: SelectionClient,
     private readonly pixels: MaskSelectionPort,
     private readonly maskName = () => "Selection mask",
+    private readonly video?: VideoBackgroundController,
   ) {
+    this.stopVideo = video?.subscribe(() => {
+      for (const listener of this.listeners) listener();
+    });
     this.stop = pixels.subscribe(() => {
       if (!this.state || this.preparing || this.state.automatic) return;
       const selection = pixels.read();
@@ -74,7 +90,7 @@ export class ObjectSelectionController implements ObjectSelectionPort {
         this.reset();
     });
   }
-  read = () => this.state;
+  read = () => this.video?.read() ?? this.state;
   mode = () => this.choice;
   subscribe = (listener: () => void) => {
     this.listeners.add(listener);
@@ -196,6 +212,17 @@ export class ObjectSelectionController implements ObjectSelectionPort {
   }
   /** The common action never decodes original pixels or constructs preview contours on the UI thread. */
   async removeBackground(layerId: string) {
+    const snapshot = this.engine.getSnapshot();
+    const layer = snapshot.project.pages
+      .find((page) => page.id === snapshot.pageId)
+      ?.layers.find((layer) => layer.id === layerId);
+    if (layer?.kind === "video" && this.video) {
+      if (this.running) throw Error("Background removal is already running for another layer.");
+      this.clear();
+      return this.video.removeBackground(layerId);
+    }
+    if (this.video?.read()?.busy)
+      throw Error("Background removal is already running for another layer.");
     if (this.running && this.state?.automatic) {
       if (this.state.layerId === layerId) return this.running;
       throw Error("Background removal is already running for another layer.");
@@ -464,6 +491,7 @@ export class ObjectSelectionController implements ObjectSelectionPort {
     if (busy) this.pixels.cancel();
   };
   reset = () => {
+    this.video?.reset();
     this.clear();
     this.pixels.deselect();
   };
@@ -472,6 +500,8 @@ export class ObjectSelectionController implements ObjectSelectionPort {
     this.closed = true;
     this.stop();
     this.stopEngine();
+    this.stopVideo?.();
+    this.video?.dispose();
     this.reset();
     this.listeners.clear();
   };

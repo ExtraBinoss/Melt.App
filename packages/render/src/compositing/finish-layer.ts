@@ -22,7 +22,7 @@ interface Context {
   cache: GpuResourceCache;
   mask(id: string): Layer;
   maskSource(layer: Layer): FrameTexture;
-  image(id: string): FrameTexture["texture"];
+  image(id: string, ownerId?: string): FrameTexture["texture"];
   effectCache?: { entry: LayerTargets; signature: string };
 }
 const translate = (x: number, y: number): Matrix => [1, 0, 0, 1, x, y];
@@ -121,7 +121,7 @@ export function finishLayerSource(
     if (!mask?.enabled) continue;
     const target = context.target(index ? "clipping" : "mask", width, height);
     if (mask.assetId) {
-      context.passes.maskTo(source, context.image(mask.assetId), mask.inverted, target, {
+      context.passes.maskTo(source, context.image(mask.assetId, layer.id), mask.inverted, target, {
         luminance: mask.mode === "luminance",
         transformed: true,
         targetWidth: bounds.width,

@@ -85,5 +85,9 @@
   "backgroundDone": "تمت إزالة الخلفية",
   "refineBackground": "تحسين",
   "refineGestureHint": "انقر للإضافة.\nAlt مع النقر أو الزر الأيمن للاستبعاد.\nاسحب مستطيلاً حول العنصر.",
-  "removingBackground": "جارٍ إزالة الخلفية…"
+  "removingBackground": "جارٍ إزالة الخلفية…",
+  "preparingVideo": "جارٍ تجهيز الفيديو…",
+  "removingPeople": "جارٍ عزل الأشخاص…",
+  "selectMediaFirst": "حدد صورة أو فيديو أولاً.",
+  "videoExistingMask": "أزل القناع الحالي قبل عزل الأشخاص في الفيديو."
 }

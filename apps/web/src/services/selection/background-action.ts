@@ -1,6 +1,7 @@
 import {
   createLayerGeometryIndex,
   isImageAsset,
+  isVideoAsset,
   type EnginePort,
   type SessionSnapshot,
 } from "@musart/core";
@@ -15,11 +16,11 @@ export function backgroundImage(snapshot: SessionSnapshot): string | undefined {
     layer = geometry.byId.get(snapshot.selection[0]!);
   const asset = layer?.assetId ? snapshot.project.assets[layer.assetId] : undefined;
   if (
-    layer?.kind === "image" &&
+    (layer?.kind === "image" || layer?.kind === "video") &&
     !layer.spatial &&
     !layer.maskSource &&
     asset &&
-    isImageAsset(asset) &&
+    (isImageAsset(asset) || isVideoAsset(asset)) &&
     geometry.isVisible(layer.id) &&
     !geometry.isLocked(layer.id)
   )
@@ -28,7 +29,7 @@ export function backgroundImage(snapshot: SessionSnapshot): string | undefined {
 /** Buttons, search and shortcuts invoke the same explicit, undoable action. */
 export async function removeSelectedBackground(engine: EnginePort, objects?: ObjectSelectionPort) {
   const id = backgroundImage(engine.getSnapshot());
-  if (!id || !objects) throw Error(i18n.t("selectImageFirst"));
+  if (!id || !objects) throw Error(i18n.t("pixelSelection:selectMediaFirst"));
   const transport = createMotionTransport(engine);
   if (transport.read().playing) transport.pause();
   try {

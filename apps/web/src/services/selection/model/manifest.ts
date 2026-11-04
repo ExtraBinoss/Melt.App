@@ -43,6 +43,16 @@ export const BACKGROUND_MODEL: ModelManifest = {
     "onnx/model_fp16.onnx": "eff9216bb2f9d3f023d9c2b7196845a7485739ab1f231593633e4d2344ffc516",
   },
 };
+/** RVM's recurrent person matte; upstream weights are GPL-3.0, separately downloaded. */
+export const VIDEO_BACKGROUND_MODEL: ModelManifest = {
+  id: "inverseaibd/rvm_mobilenetv3_fp16",
+  name: "RVM MobileNetV3",
+  revision: "fc453688f604d0896e12f48df578fdd69ea2b4ac",
+  files: { "rvm_mobilenetv3_fp16.onnx": 7503483 },
+  hashes: {
+    "rvm_mobilenetv3_fp16.onnx": "6a0d5ce6cc17702613be548559879b4521ed424cfe14ddc48d1acaa44d616f64",
+  },
+};
 export const modelBytes = (model: ModelManifest) =>
   Object.values(model.files).reduce((sum, value) => sum + value, 0);
 export const MODEL_BYTES = Object.values(MODEL_FILES).reduce((sum, bytes) => sum + bytes, 0);

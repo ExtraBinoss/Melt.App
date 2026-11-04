@@ -85,5 +85,9 @@
   "backgroundDone": "Tło usunięte",
   "refineBackground": "Dopracuj",
   "refineGestureHint": "Kliknij, aby dodać.\nAlt + kliknięcie lub prawy przycisk, aby wykluczyć.\nNarysuj prostokąt wokół obiektu.",
-  "removingBackground": "Usuwanie tła…"
+  "removingBackground": "Usuwanie tła…",
+  "preparingVideo": "Przygotowywanie filmu…",
+  "removingPeople": "Wycinanie osób…",
+  "selectMediaFirst": "Najpierw zaznacz obraz lub film.",
+  "videoExistingMask": "Usuń istniejącą maskę przed wycięciem osób z filmu."
 }

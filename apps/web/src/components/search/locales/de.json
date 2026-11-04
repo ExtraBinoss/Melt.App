@@ -99,7 +99,7 @@
     "toolEllipse": "Ellipse oder Kreis zeichnen.",
     "toolText": "Bearbeitbaren Text auf der Arbeitsfläche erstellen.",
     "toolWand": "Zusammenhängende Farben mit einstellbarer Toleranz auswählen.",
-    "toolSegment": "Hintergrund des ausgewählten Bildes mit einer rückgängig machbaren Aktion entfernen.",
+    "toolSegment": "Den Hintergrund eines Bildes entfernen oder Personen in einem Video mit einer rückgängig machbaren Aktion freistellen.",
     "importImages": "Bilder, Videos und Audio zum Projekt hinzufügen.",
     "importSvg": "Bearbeitbare SVG-Vektorgrafik importieren.",
     "openPortable": "Portables Projektarchiv oder älteres JSON-Dokument öffnen.",

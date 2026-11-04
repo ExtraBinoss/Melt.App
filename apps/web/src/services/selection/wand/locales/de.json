@@ -85,5 +85,9 @@
   "backgroundDone": "Hintergrund entfernt",
   "refineBackground": "Verfeinern",
   "refineGestureHint": "Klicken zum Hinzufügen.\nAlt-Klick oder Rechtsklick zum Ausschließen.\nRechteck um ein Motiv ziehen.",
-  "removingBackground": "Hintergrund wird entfernt…"
+  "removingBackground": "Hintergrund wird entfernt…",
+  "preparingVideo": "Video wird vorbereitet…",
+  "removingPeople": "Personen werden freigestellt…",
+  "selectMediaFirst": "Wähle zuerst ein Bild oder Video aus.",
+  "videoExistingMask": "Entferne die vorhandene Maske, bevor du Personen im Video freistellst."
 }

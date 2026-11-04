@@ -24,9 +24,29 @@ export async function processSelection(
           height: request.height,
         },
       };
+    if (request.type === "video-poster") {
+      const { videoPoster } = await import("./video/poster");
+      return { id: request.id, result: await videoPoster(request.original, request.asset) };
+    }
     const { prepareSam, segmentObject, releaseSam } = await import("./sam");
     const { prepareBackground, removeBackground, releaseBackground } =
       await import("./websam/background");
+    if (request.type === "video-background") {
+      await releaseSam();
+      await releaseBackground();
+      const { removeVideoBackground } = await import("./video/process");
+      return {
+        id: request.id,
+        result: await removeVideoBackground(
+          request.original,
+          request.asset,
+          onProgress,
+          (activity) => {
+            globalThis.postMessage({ id: request.id, activity } satisfies SelectionResponse);
+          },
+        ),
+      };
+    }
     if (request.type === "background" || (request.type === "prepare" && request.background)) {
       await releaseSam();
       if (request.type === "prepare") {

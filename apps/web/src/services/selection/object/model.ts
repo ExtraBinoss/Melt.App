@@ -3,6 +3,9 @@ export interface ObjectSelectionState extends SelectionPrompt {
   layerId: string;
   targetName?: string;
   thumbnail?: string;
+  mediaKind?: "image" | "video";
+  preparingSource?: boolean;
+  videoProgress?: { completed: number; total: number };
   width: number;
   height: number;
   busy: boolean;

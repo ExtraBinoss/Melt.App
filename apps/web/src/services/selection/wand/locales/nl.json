@@ -85,5 +85,9 @@
   "backgroundDone": "Achtergrond verwijderd",
   "refineBackground": "Verfijnen",
   "refineGestureHint": "Klik om toe te voegen.\nAlt-klik of rechtsklik om uit te sluiten.\nSleep een rechthoek rond het onderwerp.",
-  "removingBackground": "Achtergrond verwijderen…"
+  "removingBackground": "Achtergrond verwijderen…",
+  "preparingVideo": "Video voorbereiden…",
+  "removingPeople": "Personen vrijstaand maken…",
+  "selectMediaFirst": "Selecteer eerst een afbeelding of video.",
+  "videoExistingMask": "Verwijder het bestaande masker voordat je personen in de video vrijstaand maakt."
 }

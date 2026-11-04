@@ -405,7 +405,8 @@ export class GpuCompositor {
         effects: this.effects!,
         cache: this.cache,
         ...layerEffectCache(layer, entry, keyFor),
-        image: (id) => this.sources.image(id),
+        image: (id, ownerId) =>
+          ownerId ? this.sources.maskImage(id, ownerId) : this.sources.image(id),
         maskSource: (maskLayer) => this.layer(maskLayer, frame),
         mask: (id) => {
           const maskLayer = geometry.byId.get(id);

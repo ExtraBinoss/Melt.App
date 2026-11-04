@@ -6,6 +6,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Added
 
+- Route Remove background automatically for video layers to a pinned 7.5 MB RVM MobileNetV3 person-matting worker. Keep recurrent GPU states between sequential frames, generate a bounded native luminance video mask, and persist its binary original atomically with one undo entry. Follow the owner’s source clock through seeking, trimming and repeated occurrences without copying motion keys or rerunning AI during playback. Show the original thumbnail, cancellation, verified model download progress and actual processed-video progress in the compact twelve-language card. This first video path targets people at a 512-pixel matte resolution; it is not EdgeTAM object tracking. Real-model quality and latency have not been benchmarked, following the request to avoid inference tests.
+
 - Use the same shared shimmer text animation as project opening for background-removal progress, and vertically center the left-aligned layer/status group beside its thumbnail. Drive the genuine mascot through its loading and preparing poses with the existing smooth morph engine.
 
 - Paint the selected layer thumbnail before starting background-removal GPU work, retain an immediately visible throbber through initialization, report runtime readiness separately from inference completion, and remove redundant native title tooltips from the compact status card. Headless calls remain immediate and cancellation releases presentation waits.

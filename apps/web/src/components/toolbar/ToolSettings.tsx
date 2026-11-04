@@ -37,7 +37,13 @@ export function ToolSettings({
     <aside className="tool-settings floating-panel" data-tool="segment" aria-label={t("segment")}>
       <ObjectSelectionOptions
         port={port}
-        model={state.automatic ? services.backgroundModel : services.segmentationModel}
+        model={
+          state.mediaKind === "video"
+            ? services.videoBackgroundModel
+            : state.automatic
+              ? services.backgroundModel
+              : services.segmentationModel
+        }
         onTask={onTask}
         refining={tool === "segment"}
         onRefine={() => {

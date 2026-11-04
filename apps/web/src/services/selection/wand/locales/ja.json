@@ -85,5 +85,9 @@
   "backgroundDone": "背景を削除しました",
   "refineBackground": "調整",
   "refineGestureHint": "クリックで追加。\nAlt + クリックまたは右クリックで除外。\n長方形をドラッグして被写体を囲みます。",
-  "removingBackground": "背景を削除中…"
+  "removingBackground": "背景を削除中…",
+  "preparingVideo": "動画を準備中…",
+  "removingPeople": "人物を切り抜いています…",
+  "selectMediaFirst": "先に画像または動画を選択してください。",
+  "videoExistingMask": "動画の人物を切り抜く前に、既存のマスクを削除してください。"
 }

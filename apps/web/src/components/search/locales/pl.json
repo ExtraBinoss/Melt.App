@@ -99,7 +99,7 @@
     "toolEllipse": "Narysuj elipsę lub okrąg.",
     "toolText": "Utwórz edytowalny tekst w obszarze roboczym.",
     "toolWand": "Zaznaczaj połączone kolory z regulowaną tolerancją.",
-    "toolSegment": "Usuń tło zaznaczonego obrazu jedną odwracalną czynnością.",
+    "toolSegment": "Usuń tło obrazu lub wytnij osoby z filmu jedną odwracalną czynnością.",
     "importImages": "Dodaj obrazy, filmy i dźwięki do projektu.",
     "importSvg": "Zaimportuj edytowalną grafikę wektorową SVG.",
     "openPortable": "Otwórz przenośne archiwum projektu lub starszy dokument JSON.",

@@ -99,7 +99,7 @@
     "toolEllipse": "Disegna un'ellisse o un cerchio.",
     "toolText": "Crea testo modificabile nell'area di lavoro.",
     "toolWand": "Seleziona colori connessi con tolleranza regolabile.",
-    "toolSegment": "Rimuovi lo sfondo dell’immagine selezionata con un’azione annullabile.",
+    "toolSegment": "Rimuovi lo sfondo di un’immagine o ritaglia le persone in un video con un’azione annullabile.",
     "importImages": "Aggiungi immagini, video e audio al progetto.",
     "importSvg": "Importa un'illustrazione vettoriale SVG modificabile.",
     "openPortable": "Apri un archivio portatile di progetto o un vecchio documento JSON.",

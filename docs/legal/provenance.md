@@ -53,3 +53,14 @@ formatting; it is still linted, tested and included in coverage.
 The earlier owner-supplied MusArt PNG artwork remains archived under
 `apps/web/public/branding/`. Current visible logos and favicons use the new Melt
 SVG source; portable format/storage identifiers are intentionally unchanged.
+
+## Separately downloaded RVM video weights
+
+Automatic person matting for video uses the RVM MobileNetV3 FP16 ONNX weights
+from [Robust Video Matting](https://github.com/PeterL1n/RobustVideoMatting).
+These weights are GPL-3.0, not MIT. The runtime verifies a pinned 7,503,483-byte
+mirror by SHA-256 before loading it. The weights are not checked into this
+repository; their [notice](../../apps/web/public/licenses/rvm-NOTICE.txt) and
+[GPL text](../../apps/web/public/licenses/rvm-GPL-3.0.txt) accompany the application.
+The worker adapter is independently written from the published tensor contract;
+no upstream inference implementation was copied.

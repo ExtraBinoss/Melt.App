@@ -85,5 +85,9 @@
   "backgroundDone": "Sfondo rimosso",
   "refineBackground": "Perfeziona",
   "refineGestureHint": "Fai clic per includere.\nAlt + clic o clic destro per escludere.\nTraccia un rettangolo intorno al soggetto.",
-  "removingBackground": "Rimozione dello sfondo…"
+  "removingBackground": "Rimozione dello sfondo…",
+  "preparingVideo": "Preparazione del video…",
+  "removingPeople": "Ritaglio delle persone…",
+  "selectMediaFirst": "Seleziona prima un’immagine o un video.",
+  "videoExistingMask": "Rimuovi la maschera esistente prima di ritagliare le persone nel video."
 }

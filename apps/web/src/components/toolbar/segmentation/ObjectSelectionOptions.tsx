@@ -1,7 +1,7 @@
 import { useTargetPresentation } from "./use-target-presentation";
 import { useSyncExternalStore } from "react";
 import { useTranslation } from "react-i18next";
-import { Check, Copy, Info, Undo2, X } from "lucide-react";
+import { Check, Copy, Info, Undo2, X, Film } from "lucide-react";
 import { Progress } from "radix-ui";
 import type { ObjectSelectionPort } from "../../../services/selection/object/model";
 import type { LocalModelPort } from "../../../services/selection/model/contract";
@@ -41,11 +41,22 @@ export function ObjectSelectionOptions({
   const loading = status?.phase === "loading" || status?.phase === "idle",
     initializing = status?.phase === "initializing";
   const percent = status ? Math.min(100, Math.floor((100 * status.loaded) / status.total)) : 0;
-  const label = loading
-    ? t("localModel:downloading")
-    : initializing
-      ? t("localModel:initializing")
-      : t(state.automatic ? "removingBackground" : "working");
+  const label = state.preparingSource
+    ? t("preparingVideo")
+    : loading
+      ? t("localModel:downloading")
+      : initializing
+        ? t("localModel:initializing")
+        : t(
+            state.mediaKind === "video"
+              ? "removingPeople"
+              : state.automatic
+                ? "removingBackground"
+                : "working",
+          );
+  const videoPercent = state.videoProgress
+    ? Math.min(100, Math.floor((100 * state.videoProgress.completed) / state.videoProgress.total))
+    : undefined;
   function run(action: () => Promise<void>) {
     void onTask(async () => {
       try {
@@ -74,7 +85,7 @@ export function ObjectSelectionOptions({
         )}
       </div>
       <div className="background-action-row">
-        {state.thumbnail && (
+        {state.thumbnail ? (
           <img
             ref={thumbnail}
             className="background-target-thumbnail"
@@ -82,6 +93,10 @@ export function ObjectSelectionOptions({
             alt=""
             decoding="async"
           />
+        ) : (
+          <span className="background-target-thumbnail background-target-placeholder" aria-hidden>
+            <Film size={20} />
+          </span>
         )}
         <div className="background-target-status">
           <span className="background-target-name">{state.targetName}</span>
@@ -95,7 +110,9 @@ export function ObjectSelectionOptions({
                 label={label}
               />
               <span className="background-step" dir="ltr">
-                {number.format(stage)}/{number.format(3)}
+                {videoPercent !== undefined
+                  ? `${number.format(videoPercent)} %`
+                  : `${number.format(stage)}/${number.format(3)}`}
               </span>
             </div>
           ) : state.completed ? (
@@ -104,7 +121,7 @@ export function ObjectSelectionOptions({
         </div>
       </div>
       <div className="background-action-buttons">
-        {state.completed && !state.error && (
+        {state.completed && state.mediaKind !== "video" && !state.error && (
           <Button size="sm" variant="secondary" onClick={onRefine}>
             {t("refineBackground")}
           </Button>
@@ -146,7 +163,7 @@ export function ObjectSelectionOptions({
           </>
         )}
       </div>
-      {state.busy && loading && status && (
+      {state.busy && !state.preparingSource && loading && status && (
         <div className="background-download-bytes">
           <span>
             {mb(status.loaded)} / {mb(status.total)}
@@ -154,7 +171,7 @@ export function ObjectSelectionOptions({
           <span>{number.format(percent)} %</span>
         </div>
       )}
-      {state.busy && loading && status && (
+      {state.busy && !state.preparingSource && loading && status && (
         <Progress.Root
           className="background-action-progress"
           value={percent}

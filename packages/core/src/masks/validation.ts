@@ -1,6 +1,10 @@
 import { ensure } from "../errors";
 import { assertRecord, assertText, assertBoolean } from "../document/guards";
-export function validateMaskSource(mask: unknown, assets: Record<string, unknown>): void {
+export function validateMaskSource(
+  mask: unknown,
+  assets: Record<string, unknown>,
+  ownerKind?: unknown,
+): void {
   assertRecord(mask);
   const asset = mask.assetId !== undefined,
     layer = mask.layerId !== undefined;
@@ -9,9 +13,10 @@ export function validateMaskSource(mask: unknown, assets: Record<string, unknown
     assertText(mask.assetId);
     ensure(Object.hasOwn(assets, mask.assetId), "INVALID_DOCUMENT", "Mask asset is missing");
     ensure(
-      [undefined, "image"].includes((assets[mask.assetId] as { kind?: string })?.kind),
+      [undefined, "image"].includes((assets[mask.assetId] as { kind?: string })?.kind) ||
+        (ownerKind === "video" && (assets[mask.assetId] as { kind?: string })?.kind === "video"),
       "INVALID_DOCUMENT",
-      "A mask asset must be an image; timed media must reference a visual layer",
+      "A video mask asset requires a video owner; other masks must use an image or visual layer",
     );
   }
   if (layer) assertText(mask.layerId);

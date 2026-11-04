@@ -1,7 +1,7 @@
 # Background removal and refinement
 
-Select one unlocked, visible 2D image and click **Remove background**. The dock,
-search result and S shortcut invoke the same service action. BiRefNet creates an
+Select one unlocked, visible 2D image or video and click **Remove background**. The dock,
+search result and S shortcut invoke the same service action. For images, BiRefNet creates an
 editable luminance mask directly, with one undo entry. There is no mode chooser,
 preview-confirmation step or model-preparation panel in the normal flow.
 
@@ -74,3 +74,50 @@ they do not establish real-model quality or inference latency. Following memory
 pressure and the user's request, no further inference/stress runs were performed
 for this change. The previous load-only check was for the former 1024 export and
 does not validate inference with this 512 export.
+
+## Video people
+
+The same action accepts an unlocked, visible 2D video. It automatically chooses
+RVM MobileNetV3 person matting, rather than running the image model independently
+for every frame. This first version keeps people; arbitrary prompted object
+tracking remains outside this path. EdgeTAM is designed for video tracking, but the
+available Transformers.js/ONNX export inspected here exposes only its image
+encoder and prompt decoder, without the temporal memory modules. It is not wired
+as a pretend tracker.
+
+One worker sequentially decodes the immutable original, prepares native source
+pixels at a maximum 512-pixel edge, retains all four recurrent tensors on WebGPU,
+and fetches only the predicted alpha plane for native video encoding. It awaits
+encoder backpressure after every frame. The encoded grayscale mask is capped at
+96 MiB and source duration at ten minutes. This is a quality/memory bound, not a
+real-time performance claim. Thumbnail decoding happens before model work; the
+same compact card reports actual processed source time, model bytes, initialization
+and cancellation. Point refinement is currently offered for images only. Existing
+non-video masks must be removed explicitly before generating a video matte.
+
+The original video and its audio remain unchanged. One reserved engine transaction
+and atomic binary persistence install a separate luminance VideoAsset. Its source
+clock is the owner's source time minus the owner's first timestamp, plus the matte's
+first timestamp. Local UV mapping makes it follow transforms, trims and repeated
+occurrences automatically. Render preparation creates ephemeral decoder bindings;
+it authors no layers or motion keys. Playback, seeking, thumbnails and export use
+the ordinary retained GPU video-texture path, with no live AI inference and no
+compositor pixel readbacks. Undo/redo and portable archives retain binary originals
+through the existing media lifecycle. Changed/deleted sources and stale project or
+page results cannot commit; unrelated edits and selection changes remain allowed.
+
+The separately downloaded [RVM FP16 weights](https://huggingface.co/inverseaibd/rvm_mobilenetv3_fp16/tree/fc453688f604d0896e12f48df578fdd69ea2b4ac)
+are pinned at 7,503,483 bytes with SHA-256
+`6a0d5ce6cc17702613be548559879b4521ed424cfe14ddc48d1acaa44d616f64`.
+They are licensed under GPL-3.0, independently of Melt's MIT code; see
+[notice](../../apps/web/public/licenses/rvm-NOTICE.txt) and
+[license](../../apps/web/public/licenses/rvm-GPL-3.0.txt). No upstream inference
+implementation was copied. The [upstream inference contract](https://github.com/PeterL1n/RobustVideoMatting/blob/master/documentation/inference.md)
+specifies RGB 0–1 input, four recurrent states and a soft-alpha output. The pinned
+ONNX metadata was inspected without inference: source/recurrent/alpha tensors are
+FP16 and `downsample_ratio` is FP32. A 512-pixel prepared source uses ratio 1.
+
+Small deterministic tests cover recurrent handoff/disposal, binary publication,
+cancellation, stale results and single-step undo/redo. Native video fixtures check
+decoded mask timing and transformed rendering. No real-model inference, quality
+comparison or latency benchmark was run, honoring the request to avoid model tests.

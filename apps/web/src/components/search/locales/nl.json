@@ -99,7 +99,7 @@
     "toolEllipse": "Ellips of cirkel tekenen.",
     "toolText": "Bewerkbare tekst op het canvas maken.",
     "toolWand": "Aaneengesloten kleuren selecteren met instelbare tolerantie.",
-    "toolSegment": "Verwijder de achtergrond van de geselecteerde afbeelding met één herstelbare actie.",
+    "toolSegment": "Verwijder de achtergrond van een afbeelding of maak personen in een video vrijstaand met één herstelbare actie.",
     "importImages": "Afbeeldingen, video's en audio aan het project toevoegen.",
     "importSvg": "Bewerkbare SVG-vectorillustratie importeren.",
     "openPortable": "Draagbaar projectarchief of ouder JSON-document openen.",

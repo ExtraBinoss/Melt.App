@@ -85,5 +85,9 @@
   "backgroundDone": "背景已移除",
   "refineBackground": "优化",
   "refineGestureHint": "点击添加。\nAlt + 点击或右键排除。\n拖出矩形框选主体。",
-  "removingBackground": "正在移除背景…"
+  "removingBackground": "正在移除背景…",
+  "preparingVideo": "正在准备视频…",
+  "removingPeople": "正在分离人物…",
+  "selectMediaFirst": "请先选择图像或视频。",
+  "videoExistingMask": "分离视频人物之前，请先移除已有的蒙版。"
 }

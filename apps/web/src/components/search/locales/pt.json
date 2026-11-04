@@ -99,7 +99,7 @@
     "toolEllipse": "Desenhar uma elipse ou círculo.",
     "toolText": "Criar texto editável na tela.",
     "toolWand": "Selecionar cores ligadas com tolerância ajustável.",
-    "toolSegment": "Remove o fundo da imagem selecionada numa ação que podes desfazer.",
+    "toolSegment": "Remove o fundo de uma imagem ou recorta as pessoas de um vídeo numa ação que podes desfazer.",
     "importImages": "Adicionar imagens, vídeos e áudio ao projeto.",
     "importSvg": "Importar uma ilustração vetorial SVG editável.",
     "openPortable": "Abrir um arquivo portátil de projeto ou documento JSON antigo.",
