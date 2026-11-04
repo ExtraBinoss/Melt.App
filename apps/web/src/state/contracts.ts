@@ -1,3 +1,4 @@
+import type { LocalModelPort } from "../services/selection/model/contract";
 import type { ObjectSelectionPort } from "../services/selection/object/model";
 import type { ProjectTiming } from "../services/performance/project-timing";
 import type { Composition, EnginePort, Project, ProjectContentTag } from "@musart/core";
@@ -122,7 +123,8 @@ export interface EditorServices {
   ): Promise<import("../services/export/model").CompositionExportResult>;
   projectPreferences?: import("../services/projects/preferences/model").ProjectPreferencesPort;
   mediaResolverFor?(this: void, projectId: string): import("@musart/render").MediaSourceResolver;
-  segmentationModel?: import("../services/selection/model/contract").LocalModelPort;
+  segmentationModel?: LocalModelPort;
+  backgroundModel?: LocalModelPort;
   pixelSelection?: PixelSelectionPort;
   objectSelection?: ObjectSelectionPort;
   previewExport?(

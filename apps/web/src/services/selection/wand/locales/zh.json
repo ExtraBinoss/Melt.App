@@ -28,7 +28,7 @@
   "helpOutline": "移动的虚线表示所选区域。复杂轮廓会使用简化预览，但蒙版保留精确选区。",
   "adjacent": "仅相邻像素",
   "adjacentHint": "选择相连的区域。关闭后将在整张图像中匹配颜色。",
-  "objectTitle": "对象选择",
+  "objectTitle": "移除背景",
   "objectMode": "选择工具",
   "objectPoints": "点",
   "objectBox": "矩形",
@@ -69,10 +69,17 @@
   "objectExcludeHelp": "排除此区域。",
   "objectBoxHelp": "拖出一个矩形，框住要保留的主体。",
   "objectRefineTitle": "细化轮廓",
-  "objectRefineHelp": "检查预览，添加点以修正遗漏或多余的区域。",
+  "objectRefineHelp": "点击添加缺失区域。右键或 Alt + 点击排除不需要的区域。",
   "objectRefineBoxHelp": "切换到“点”模式以细化轮廓。",
   "objectFinishTitle": "创建蒙版",
   "objectKeepHelp": "保留主体，隐藏其余部分。",
   "objectEraseHelp": "隐藏选中的区域。",
-  "objectOriginalHelp": "使用预览上的按钮。原始照片保持不变。"
+  "objectOriginalHelp": "使用预览上的按钮。原始照片保持不变。",
+  "objectBackground": "移除背景",
+  "objectBackgroundHint": "自动检测主体，检查预览后再应用。",
+  "objectTarget": "仅编辑选中的图像。",
+  "objectGestureHelp": "加载 SAM 3 后，悬停可预览。点击主体，或在主体周围拖出矩形。",
+  "objectApply": "应用蒙版",
+  "objectApplyHelp": "应用以保留主体并隐藏背景。取消以放弃预览。",
+  "objectModels": "本地 AI 模型"
 }

@@ -12,7 +12,7 @@
   "zoomOut": "축소",
   "zoomIn": "확대",
   "resetView": "100% 및 가운데 맞춤",
-  "segment": "개체 선택",
+  "segment": "배경 제거",
   "wand": "자동 선택",
   "tolerance": "허용치",
   "prepareModel": "로컬 모델 준비",

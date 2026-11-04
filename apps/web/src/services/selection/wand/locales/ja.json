@@ -28,7 +28,7 @@
   "helpOutline": "動く破線が選択範囲を示します。複雑な輪郭は簡略化して表示しますが、マスクには正確な選択範囲が保持されます。",
   "adjacent": "隣接するピクセルのみ",
   "adjacentHint": "つながった領域を選択します。オフにすると画像全体で同じ色を検索します。",
-  "objectTitle": "オブジェクト選択",
+  "objectTitle": "背景を削除",
   "objectMode": "選択ツール",
   "objectPoints": "ポイント",
   "objectBox": "長方形",
@@ -69,10 +69,17 @@
   "objectExcludeHelp": "この部分を除外する。",
   "objectBoxHelp": "残したい被写体を四角形で囲んでください。",
   "objectRefineTitle": "輪郭を調整",
-  "objectRefineHelp": "プレビューを確認し、足りない部分や余分な部分をポイントで修正します。",
+  "objectRefineHelp": "クリックで不足部分を追加。右クリックまたは Alt + クリックで不要な部分を除外します。",
   "objectRefineBoxHelp": "「ポイント」に切り替えて輪郭を調整します。",
   "objectFinishTitle": "マスクを作成",
   "objectKeepHelp": "被写体を残し、周囲を隠します。",
   "objectEraseHelp": "選択した部分を隠します。",
-  "objectOriginalHelp": "プレビュー上のボタンを使います。元の写真はそのまま保持されます。"
+  "objectOriginalHelp": "プレビュー上のボタンを使います。元の写真はそのまま保持されます。",
+  "objectBackground": "背景を削除",
+  "objectBackgroundHint": "被写体を自動検出し、プレビューを確認してから適用します。",
+  "objectTarget": "選択中の画像だけを編集します。",
+  "objectGestureHelp": "SAM 3 の読み込み後、カーソルを合わせるとプレビューできます。被写体をクリックするか、周囲に長方形を描きます。",
+  "objectApply": "マスクを適用",
+  "objectApplyHelp": "適用すると被写体を残して背景を隠します。キャンセルするとプレビューを破棄します。",
+  "objectModels": "ローカル AI モデル"
 }

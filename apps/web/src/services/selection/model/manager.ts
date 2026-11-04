@@ -1,5 +1,5 @@
 import { inspectModelCache, removeModelCache } from "./cache";
-import { MODEL_BYTES, MODEL_FILES, modelFile } from "./manifest";
+import { INTERACTIVE_MODEL, modelBytes, modelFile } from "./manifest";
 import type { LocalModelPort, ModelCacheInfo, ModelDownloadEvent, ModelStatus } from "./contract";
 
 export class LocalModelManager implements LocalModelPort {
@@ -10,7 +10,7 @@ export class LocalModelManager implements LocalModelPort {
     bytes: 0,
     files: 0,
     loaded: 0,
-    total: MODEL_BYTES,
+    total: 0,
   });
   private readonly listeners = new Set<() => void>();
   private readonly progress = new Map<string, number>();
@@ -23,7 +23,10 @@ export class LocalModelManager implements LocalModelPort {
       inspect?: () => Promise<ModelCacheInfo>;
       remove?: () => Promise<ModelCacheInfo>;
     },
-  ) {}
+    private readonly manifest = INTERACTIVE_MODEL,
+  ) {
+    this.snapshot = Object.freeze({ ...this.snapshot, total: modelBytes(manifest) });
+  }
   read = () => this.snapshot;
   subscribe = (listener: () => void) => {
     this.listeners.add(listener);
@@ -44,22 +47,24 @@ export class LocalModelManager implements LocalModelPort {
   }
   note = (event: ModelDownloadEvent): void => {
     if (this.snapshot.phase === "removing") return;
-    const file = modelFile(event.file);
+    const file = modelFile(event.file, this.manifest);
     if (!file || (event.status !== "done" && (!Number.isFinite(event.loaded) || event.loaded! < 0)))
       return;
     this.progress.set(
       file,
-      event.status === "done" ? MODEL_FILES[file]! : Math.min(event.loaded!, MODEL_FILES[file]!),
+      event.status === "done"
+        ? this.manifest.files[file]!
+        : Math.min(event.loaded!, this.manifest.files[file]!),
     );
     const loaded = [...this.progress.values()].reduce((sum, value) => sum + value, 0);
     this.publish({
       loaded,
-      phase: loaded === MODEL_BYTES ? "initializing" : "loading",
+      phase: loaded === modelBytes(this.manifest) ? "initializing" : "loading",
       error: undefined,
     });
   };
   ready = (): void => {
-    this.publish({ phase: "ready", loaded: MODEL_BYTES, error: undefined });
+    this.publish({ phase: "ready", loaded: modelBytes(this.manifest), error: undefined });
   };
   failed = (error: unknown): void => {
     if (this.snapshot.phase === "loading" || this.snapshot.phase === "initializing")
@@ -70,7 +75,9 @@ export class LocalModelManager implements LocalModelPort {
   };
   async refresh(): Promise<void> {
     const generation = this.generation;
-    const cache = await (this.operations.inspect ?? inspectModelCache)();
+    const cache = await (
+      this.operations.inspect ?? (() => inspectModelCache(globalThis.caches, this.manifest))
+    )();
     if (generation === this.generation) this.publish(cache);
   }
   prepare(): Promise<void> {
@@ -102,6 +109,14 @@ export class LocalModelManager implements LocalModelPort {
     void run.then(settle, settle);
     return run;
   }
+  start(): void {
+    if (this.snapshot.phase === "ready") return;
+    this.progress.clear();
+    this.publish({ phase: "loading", loaded: 0, error: undefined });
+  }
+  deactivate(): void {
+    this.publish({ phase: "idle", loaded: 0, error: undefined });
+  }
   cancel(): void {
     this.generation++;
     this.operations.cancel();
@@ -116,7 +131,9 @@ export class LocalModelManager implements LocalModelPort {
     this.operations.cancel();
     this.publish({ phase: "removing", error: undefined });
     try {
-      const cache = await (this.operations.remove ?? removeModelCache)();
+      const cache = await (
+        this.operations.remove ?? (() => removeModelCache(globalThis.caches, this.manifest))
+      )();
       if (generation === this.generation) {
         this.progress.clear();
         this.publish({ ...cache, phase: "idle", loaded: 0 });

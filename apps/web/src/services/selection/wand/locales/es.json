@@ -28,7 +28,7 @@
   "helpOutline": "La línea discontinua animada indica el área seleccionada. Los contornos muy detallados usan una vista previa simplificada; la máscara conserva la selección exacta.",
   "adjacent": "Solo píxeles adyacentes",
   "adjacentHint": "Selecciona una región conectada. Desactívalo para buscar el color en toda la imagen.",
-  "objectTitle": "Selección de objetos",
+  "objectTitle": "Eliminar fondo",
   "objectMode": "Herramienta de selección",
   "objectPoints": "Puntos",
   "objectBox": "Rectángulo",
@@ -69,10 +69,17 @@
   "objectExcludeHelp": "Excluir esta zona.",
   "objectBoxHelp": "Dibuja un rectángulo alrededor del sujeto que quieras conservar.",
   "objectRefineTitle": "Afinar el contorno",
-  "objectRefineHelp": "Revisa la vista previa. Añade puntos para corregir las zonas que falten o sobren.",
+  "objectRefineHelp": "Haz clic para añadir zonas. Clic derecho o Alt + clic para excluir zonas no deseadas.",
   "objectRefineBoxHelp": "Cambia a Puntos para afinar el contorno.",
   "objectFinishTitle": "Crear la máscara",
   "objectKeepHelp": "Conserva el sujeto y oculta el resto.",
   "objectEraseHelp": "Oculta la zona seleccionada.",
-  "objectOriginalHelp": "Usa los botones de la vista previa. La foto original queda intacta."
+  "objectOriginalHelp": "Usa los botones de la vista previa. La foto original queda intacta.",
+  "objectBackground": "Eliminar fondo",
+  "objectBackgroundHint": "Detecta el sujeto automáticamente y revisa la vista previa antes de aplicar.",
+  "objectTarget": "Solo se edita la imagen seleccionada.",
+  "objectGestureHelp": "Tras cargar SAM 3, pasa el cursor para previsualizar. Haz clic en un sujeto o dibuja un rectángulo alrededor.",
+  "objectApply": "Aplicar máscara",
+  "objectApplyHelp": "Aplica para conservar el sujeto y ocultar el fondo. Cancela para descartar la vista previa.",
+  "objectModels": "Modelos de IA locales"
 }

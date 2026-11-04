@@ -37,9 +37,13 @@ test("configures deferred native buffer release and GPU-resident embeddings", as
   expect(fake.create.mock.calls[0]![1]).toEqual({
     executionProviders: [{ name: "webgpu", storageBufferCacheMode: "lazyRelease" }],
     preferredOutputLocation: "gpu-buffer",
+    externalData: [{ path: "vision_encoder_fp16.onnx_data", data: expect.any(Uint8Array) }],
   });
   expect(fake.create.mock.calls[1]![1]).toEqual({
     executionProviders: [{ name: "webgpu", storageBufferCacheMode: "lazyRelease" }],
+    externalData: [
+      { path: "prompt_encoder_mask_decoder_fp16.onnx_data", data: expect.any(Uint8Array) },
+    ],
   });
   expect(fake.env.wasm.numThreads).toBe(1);
 });

@@ -1,144 +1,86 @@
-# Local object selection
+# Background removal and object selection
 
-Object selection uses SAM 2.1 Tiny in the dedicated selection worker. Images stay
-on the device. Its encoder runs once for the current source; subsequent clicks
-reuse three GPU-resident embedding tensors and run only the decoder. Changing
-sources releases the previous embedding. Cancellation terminates the worker,
-releasing its model sessions, tensors and pending work. The magic wand remains
-an independent connected flood fill; both algorithms now publish to the same
-temporary pixel-selection preview and explicit mask actions.
+Select one unlocked, visible 2D image, then activate **Remove background**.
+The tool stays on the selected image, including when other layers overlap it or
+when the pointer leaves its bounds. It does not sample the whole composition.
 
-## Interactive selection
+- **Remove background** runs BiRefNet Lite once and displays a temporary selection.
+  It does not publish a document edit or silently apply the result.
+- Click a subject, or drag a rectangle around it, to guide SAM 3. There is no
+  Points/Rectangle mode switch. Left-click adds foreground hints; right-click or
+  Alt-click adds background hints. A real opaque point from the automatic matte
+  seeds subsequent SAM refinement. A new rectangle starts a fresh prompt set.
+- After explicitly preparing SAM 3, hovering for 250 ms previews a candidate.
+  Hover never starts a model download. Clicking commits that hint; moving away
+  discards an unconfirmed hover preview. Hover hints do not accumulate.
+- The shaded region and marching ants identify the selection. This bounded vector
+  preview is an approximation of the exact mask retained in the worker; soft
+  matting alpha is preserved when applying the mask.
+- **Apply mask** keeps the selection and hides its surroundings using the existing
+  validated mask commands. The original image and previous mask are preserved.
+  Apply produces one reversible document transaction. Clear/cancel, inference,
+  hints and previews do not enter document history. Shared selection actions also
+  support Keep, Erase, Invert and Layer via Copy/Cut.
+- Undo the last hint or cancel the preview at any time. Escape cancels a rectangle.
+  Failed inference disables applying the previous mask and exposes copyable details.
+- **Local AI models** contains preparation, real download progress and cache
+  removal. It opens automatically while a model loads or initialization fails.
+  Controls and instructions are localized in all twelve application languages.
 
-- Select **Object selection** and click an unlocked 2D image. Left-click adds a
-  foreground point; right-click adds a background point. Points remain visible
-  over the image and every prediction includes the full current prompt set.
-- Drag a rectangle to guide detection, or choose **Rectangle** in the local
-  selector. Subsequent points refine that rectangle's prediction. Reverse drags
-  and transformed/nested image coordinates are supported. A simple click in
-  Rectangle mode does not submit a zero-area box.
-- **Remove last hint** restores the preceding prompt set, including its box.
-  Prompt history and point counts are bounded to 64 entries. **Clear** discards
-  the temporary selection. Escape cancels a box/selection without editing the
-  document. Leaving the tool cancels inference and retains the last accepted
-  pixel selection so it can be refined with the magic wand.
-- **Detect objects** samples a 4×4 image-wide grid with real decoder predictions,
-  reusing the same encoded source. Proposals below 0.7 predicted IoU, almost-empty
-  masks and masks covering over 90% of the image are rejected. A bounded 64×64
-  coverage signature suppresses duplicate proposals above 0.85 mask IoU. The
-  highest-scoring retained object appears first; numbered buttons select the
-  other detected objects as editable point prompts. This is a bounded automatic
-  proposal scan, not an exhaustive guarantee that every small object is found.
-- The marching-ants outline previews the detected region. **Keep area**, **Erase
-  area**, **Invert selection** and **Deselect** use the exact same controller and
-  mask command planning as the wand, preserving an existing mask. Only Keep, Erase or
-  New layer via copy publishes a document transaction and one undo entry. Corrective clicks,
-  proposals, box previews and cancellation do not enter document history.
-- During inference, local status appears immediately and mask application is
-  disabled. Errors expose technical details and a copy button; a failed preview
-  cannot apply an older mask under the failed prompt set.
+## Local model backends
 
-The algorithm-independent `MaskSelectionPort` in `services/selection/preview.ts`
-accepts source-sized alpha coverage. `PixelSelectionController` owns the worker,
-preview contours and explicit mask actions; `ObjectSelectionController` owns
-only SAM prompts, proposal selection and inference admission. This boundary can
-accept other selection producers without adding tool-specific document commands.
-The worker retains the exact alpha mask, while the main thread receives bounded
-vector preview geometry. There is one model request in flight and one replaceable
-latest prompt intent; intermediate clicks do not create an unbounded GPU queue.
-Project/page/document/target changes, deselection and disposal invalidate pending
-work. Rectangle movement writes its retained SVG directly without React updates.
+Both producers run in the dedicated worker with ONNX Runtime Web's WebGPU provider
+and require `shader-f16`. Unsupported hardware reports a real error; the magic
+wand remains independently available. No images are uploaded. Downloads use
+immutable Hub URLs, pinned lengths and SHA-256 verification before inference.
 
-The selection controls, tool instructions, shared actions and model status messages
-are localized in all twelve supported application languages. Translation checks
-require matching keys, preserved interpolation tokens and direct locale resources
-so a missing translation cannot pass through the English fallback.
+| Purpose                         | Model and immutable revision                                                                                           | Weight bytes | License                                                        |
+| ------------------------------- | ---------------------------------------------------------------------------------------------------------------------- | -----------: | -------------------------------------------------------------- |
+| Interactive points / rectangles | [SAM 3 Tracker](https://huggingface.co/onnx-community/sam3-tracker-ONNX/tree/429305c8a5b3de597243d919a07e4e6bdcd00ef7) |  947,233,609 | [SAM License](../../apps/web/public/licenses/sam3-LICENSE.txt) |
+| Automatic background matting    | [BiRefNet Lite](https://huggingface.co/runes/birefnet-lite-webgpu/tree/d553b221039609f1ab170e3c2e651b59f363c98a)       |  123,224,205 | MIT                                                            |
 
-## Model and runtime
+SAM 3 here is the interactive tracker image predictor, not text-prompt concept
+segmentation. Its FP16 graph and external weights replace the old SAM 2.1 Tiny
+pipeline. It stretches input to 1008 square pixels, normalizes channels with mean
+and deviation 0.5, caches three GPU embedding tensors and runs the decoder for
+subsequent prompts. Labels are int64. The best finite predicted-IoU mask is chosen
+and resized to the original dimensions. The WebGPU-prepared BiRefNet export folds static shapes offline, bounds wide
+Split/Concat operations and replaces variadic Sum with Add chains. No runtime
+graph surgery is added to Melt. BiRefNet stretches to 1024 square pixels,
+uses ImageNet normalization and converts output logits to interpolated soft alpha.
 
-The requested [WebSAM project](https://github.com/Xevion/WebSAM) demonstrates
-SAM 2.1 with a preoptimized ORT encoder and an ONNX decoder on WebGPU. It is a
-Svelte application rather than a published SDK, has no published source license,
-and obtains its model files through its own signed private R2 endpoint. Melt
-therefore implements that model/runtime architecture independently using a
-public Apache-2.0 export; no WebSAM application source is copied.
+The worker releases the other algorithm's sessions and embeddings before loading
+a new one. Model status follows actual session lifetime; disk cache availability
+is separate from GPU readiness. Cancellation terminates the worker and invalidates
+both readiness states. The ORT provider uses `lazyRelease` so queued buffers are
+not destroyed before command submission. Sessions initialize sequentially.
 
-- Model: `diffusionstudio/sam2.1-tiny-video-onnx-fp16`.
-- Immutable revision: `66673b5db39371b7dd7847f4d3bc0d4f4179b79e`.
-- License/provenance: [pinned model card](https://huggingface.co/diffusionstudio/sam2.1-tiny-video-onnx-fp16/blob/66673b5db39371b7dd7847f4d3bc0d4f4179b79e/README.md), derived from Meta SAM 2.1 Tiny, Apache-2.0.
-- Runtime: ONNX Runtime Web, MIT; direct `onnxruntime-web/webgpu` import.
-- Precision: FP16 weights and compute, with FP32 model inputs/outputs. Both sessions
-  explicitly require only the WebGPU provider and shader-f16 support. The native
-  provider uses `lazyRelease` for temporary storage buffers: release happens after
-  command submission, preventing ORT from destroying a buffer still referenced by
-  queued WebGPU commands. Inference requests are serialized before replacing cached
-  image embeddings.
-- Unsupported WebGPU or failed initialization returns an actual error. The
-  interface never claims a CPU session is GPU execution. Magic wand is available
-  independently.
+The generic `MaskSelectionPort` accepts source-sized coverage from either producer.
+`PixelSelectionController` owns the exact alpha, bounded vector contours and
+explicit document actions. `ObjectSelectionController` owns prompts and admission:
+one active prediction and one replaceable latest intent. Project/page changes,
+selection changes, disposal and cancellation invalidate asynchronous results.
+Rectangle movement writes retained SVG geometry directly without root React work.
+The original-image preparation and ML output processing are independent of the
+editor compositor: its GPU textures are never read back into JavaScript.
 
-| Required file              | Exact bytes | SHA-256                                                            |
-| -------------------------- | ----------: | ------------------------------------------------------------------ |
-| `onnx/vision_encoder.onnx` |  58,385,353 | `24e9ccf5994be5c8dd93ebe771a4cc4f8bb122d0524555ac3ba4e7141710b133` |
-| `onnx/mask_decoder.onnx`   |   8,898,805 | `6bc158b0d028777ca2e25203ece0f27429c436de39a5c7fe301b3858d6059789` |
+## Verification boundaries
 
-The model download totals **67,284,158 bytes (64 MiB)**, excluding the shared
-runtime and physical browser-storage overhead. These lengths and hashes come
-from the [pinned Hub metadata](https://huggingface.co/api/models/diffusionstudio/sam2.1-tiny-video-onnx-fp16/revision/66673b5db39371b7dd7847f4d3bc0d4f4179b79e?blobs=true).
-Each downloaded or cached file is checked against its length and SHA-256 before
-inference. Model progress uses streamed bytes and reports initialization
-separately. Cache writes are awaited and real storage errors are reported.
+Focused tests cover pinned resources, independent model/cache progress, GPU-only
+configuration, session handoff, tensor cleanup, soft alpha, target locking,
+latest-intent admission, cancellation and reversible commands. Native browser
+checks use deterministic model-worker outputs to exercise actual pointer input,
+localized layout, selection preview and a decoded GPU export. These doubles do
+not establish model quality, real-model compatibility or inference latency.
 
-The initial 1024 FP32 encoder exceeded a bounded 2.6 GB browser scope during
-real inference on the integrated Intel GPU. This 512 FP16 export reduces the
-input area fourfold and halves compute precision; its actual memory and timing
-must still be measured by the native browser gate.
+Actual model execution is a separate native GPU check. Record browser, hardware
+adapter, source dimensions, cold download/initialization, warm decoder latency
+and memory separately. Do not reuse historical SAM 2.1 timing claims for SAM 3.
 
-## Geometry and resource ownership
-
-SAM 2 stretches the image to 512 × 512, normalizes ImageNet RGB values and uses
-independent x/y scale factors for point and box coordinates. Foreground/background
-labels are 1/0; box corners use labels 2/3, following the
-[official SAM 2 image predictor](https://github.com/facebookresearch/sam2/blob/main/sam2/sam2_image_predictor.py).
-Point-only prompts include a -1 padding point. The pinned decoder accepts dynamic
-`[1,1,N,2]` point coordinates and `[1,1,N]` labels, as documented in its model card. It does not use SAM 1's
-longest-edge padding. Decoder logits are interpolated to original image
-coordinates before thresholding, and the decoder chooses its candidate inside the graph using SAM 2 video predictor
-selection and returns that real mask and IoU. Only this mask is resized. Output
-alpha is binary. The 512 inference resolution reduces activation memory; small
-objects and thin structures have less detail than the 1024 model. The returned
-mask still has the original source dimensions.
-
-The encoder's three outputs stay on GPU between clicks. Only the decoder's model
-mask outputs are returned to CPU for native PNG encoding. This is ML output,
-not a readback of the editor's render/composition textures. Source image
-preparation uses browser decoding and an OffscreenCanvas. Temporary input and
-output tensors are disposed after each request, including error paths.
-
-The client admits one operation and rejects stale responses. Explicit Keep/Erase or Layer via Copy
-produces one validated undoable document transaction; inference alone never does. Preparation
-and inference can be cancelled. Removing cached model files terminates the
-worker, serializes against preparation with the existing named browser lock,
-and preserves shared runtime and unrelated model files. Previous SlimSAM
-resources in this feature's cache are also recognized for removal.
-
-## Verification
-
-Focused tests cover GPU-only configuration, capability errors before download,
-verified cache reuse, corrupted/truncated downloads, point transforms,
-highest-IoU reconstruction, single-image embedding reuse and tensor cleanup.
-These tests use runtime doubles and do not establish GPU inference correctness.
-The interactive controller tests also cover prompt accumulation, latest-intent
-coalescing, cancellation, failed previews, bounds and shared undo/redo. The native
-`test/browser/object-selection.spec.ts` exercises real pointer input, exclusion
-without context menus, rectangle preview/cancellation, proposal selection, shared
-contours, decoded GPU exports and document undo/redo. Its deterministic model
-worker double tests integration without downloading or claiming real inference.
-Actual model execution remains a separate manual/native-model check.
-
-Run the dedicated `bun scripts/verify-segmentation.ts` browser harness for actual
-model inference, PNG validation, adapter details and native input-to-RAF
-measurements. Store reports in ignored `artifacts/`. Historical SlimSAM CPU and
-GPU timings do not establish performance for this SAM 2.1 pipeline; record a new
-cohort before making speed or memory claims. The workstation's bounded browser
-scope and adapter classification must accompany those results.
+On 2026-11-04, preparation of the pinned WebGPU BiRefNet export completed on a
+hardware Intel Xe-LPG adapter in a separate 1,400 MiB memory-limited Chromium
+scope. Input/output names matched the adapter contract. This was a load-only
+check: no inference was executed with that export, and SAM 3 was not loaded in
+that check. Further model stress runs were stopped at the user's request after
+memory pressure from earlier experiments. The source SAM 2.1 benchmark cannot
+be reused to claim performance or quality for these new backends.

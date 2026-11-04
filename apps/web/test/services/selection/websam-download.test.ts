@@ -1,6 +1,10 @@
 import { afterEach, beforeEach, expect, test, vi } from "vitest";
 vi.mock("../../../src/services/selection/model/manifest", () => ({
   MODEL_CACHE: "test-model-cache",
+  INTERACTIVE_MODEL: {
+    files: { "encoder.ort": 3 },
+    hashes: { "encoder.ort": "039058c6f2c0cb492c533b0a4d14ef77cc0f78abccced5287d84a1a2011cfb81" },
+  },
   MODEL_FILES: { "encoder.ort": 3 },
   MODEL_HASHES: {
     "encoder.ort": "039058c6f2c0cb492c533b0a4d14ef77cc0f78abccced5287d84a1a2011cfb81",

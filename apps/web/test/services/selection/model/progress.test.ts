@@ -4,21 +4,35 @@ test("bounds download progress messages to the latest known file and flushes ter
   let time = 0;
   const send = vi.fn(),
     sink = modelProgressSink(send, () => time);
-  sink.note({ file: "vision_encoder.onnx", status: "progress", loaded: 10, total: 100 });
+  sink.note({ file: "vision_encoder_fp16.onnx", status: "progress", loaded: 10, total: 100 });
   expect(send).toHaveBeenCalledOnce();
   for (let loaded = 11; loaded < 75; loaded++)
-    sink.note({ file: "vision_encoder.onnx", status: "progress", loaded, total: 100 });
+    sink.note({ file: "vision_encoder_fp16.onnx", status: "progress", loaded, total: 100 });
   expect(send).toHaveBeenCalledOnce();
   time = 80;
-  sink.note({ file: "vision_encoder.onnx", status: "progress", loaded: 80, total: 100 });
+  sink.note({ file: "vision_encoder_fp16.onnx", status: "progress", loaded: 80, total: 100 });
   expect(send).toHaveBeenCalledTimes(2);
   sink.note({ file: "unknown", status: "done" });
   expect(send).toHaveBeenCalledTimes(2);
-  sink.note({ file: "vision_encoder.onnx", status: "done" });
-  expect(send).toHaveBeenLastCalledWith({ file: "onnx/vision_encoder.onnx", status: "done" });
+  sink.note({ file: "vision_encoder_fp16.onnx", status: "done" });
+  expect(send).toHaveBeenLastCalledWith({ file: "onnx/vision_encoder_fp16.onnx", status: "done" });
   sink.flush();
   expect(send).toHaveBeenCalledTimes(3);
   const native = modelProgressSink(send);
-  native.note({ file: "mask_decoder.onnx", status: "done" });
+  native.note({ file: "prompt_encoder_mask_decoder_fp16.onnx", status: "done" });
   expect(send).toHaveBeenCalledTimes(4);
+});
+
+test("forwards real automatic-model progress as well as interactive weights", () => {
+  const send = vi.fn(),
+    sink = modelProgressSink(send);
+  sink.note({
+    file: "birefnet_lite_webgpu_fp16.onnx",
+    status: "progress",
+    loaded: 4096,
+    total: 123224205,
+  });
+  expect(send).toHaveBeenCalledWith(
+    expect.objectContaining({ file: "birefnet_lite_webgpu_fp16.onnx", loaded: 4096 }),
+  );
 });

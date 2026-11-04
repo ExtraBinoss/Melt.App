@@ -4,7 +4,11 @@ import { Check, Download, Trash2, X } from "lucide-react";
 import { Progress } from "radix-ui";
 import type { EditorServices } from "../../../state/contracts";
 import type { LocalModelPort } from "../../../services/selection/model/contract";
-import { MODEL_BYTES, MODEL_NAME } from "../../../services/selection/model/manifest";
+import {
+  INTERACTIVE_MODEL,
+  modelBytes,
+  type ModelManifest,
+} from "../../../services/selection/model/manifest";
 import type { TaskRunner } from "../../projects/ProjectDialog";
 import { Button } from "../../ui/button";
 import { Throbber } from "../../ui/throbber/Throbber";
@@ -25,7 +29,15 @@ export function SegmentationModel({
     <LegacyPreparation prepare={services.prepareSegmentation} onTask={onTask} />
   );
 }
-function ManagedModel({ model, onTask }: { model: LocalModelPort; onTask: TaskRunner }) {
+export function ManagedModel({
+  model,
+  onTask,
+  manifest = INTERACTIVE_MODEL,
+}: {
+  model: LocalModelPort;
+  onTask: TaskRunner;
+  manifest?: ModelManifest;
+}) {
   const { t, i18n } = useTranslation(["translation", "localModel"]);
   const state = useSyncExternalStore(model.subscribe, model.read, model.read),
     [error, setError] = useState("");
@@ -48,8 +60,8 @@ function ManagedModel({ model, onTask }: { model: LocalModelPort; onTask: TaskRu
   return (
     <div className="local-model" aria-live="polite">
       <div className="local-model-summary">
-        <strong>{MODEL_NAME}</strong>
-        <span>{mb(MODEL_BYTES)}</span>
+        <strong>{manifest.name}</strong>
+        <span>{mb(modelBytes(manifest))}</span>
       </div>
       {busy ? (
         <>

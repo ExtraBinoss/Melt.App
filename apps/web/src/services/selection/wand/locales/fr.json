@@ -28,7 +28,7 @@
   "helpOutline": "Les pointillés indiquent la zone sélectionnée. Les contours très détaillés utilisent un aperçu allégé ; le masque conserve la sélection exacte.",
   "adjacent": "Pixels voisins uniquement",
   "adjacentHint": "Sélectionner une région connectée. Désactivez cette option pour chercher la couleur dans toute l’image.",
-  "objectTitle": "Sélection d’objet",
+  "objectTitle": "Supprimer le fond",
   "objectMode": "Outil de sélection",
   "objectPoints": "Points",
   "objectBox": "Rectangle",
@@ -69,10 +69,17 @@
   "objectExcludeHelp": "Exclure cette zone.",
   "objectBoxHelp": "Tracez un rectangle autour du sujet à garder.",
   "objectRefineTitle": "Affiner le contour",
-  "objectRefineHelp": "Vérifiez l’aperçu. Ajoutez des points pour corriger les zones manquantes ou en trop.",
+  "objectRefineHelp": "Cliquez pour ajouter les zones manquantes. Clic droit ou Alt + clic pour retirer les zones indésirables.",
   "objectRefineBoxHelp": "Passez en mode Points pour affiner le contour.",
   "objectFinishTitle": "Créer le masque",
   "objectKeepHelp": "Garde le sujet et masque le reste.",
   "objectEraseHelp": "Masque la zone sélectionnée.",
-  "objectOriginalHelp": "Utilisez les boutons sur l’aperçu. La photo originale reste intacte."
+  "objectOriginalHelp": "Utilisez les boutons sur l’aperçu. La photo originale reste intacte.",
+  "objectBackground": "Supprimer le fond",
+  "objectBackgroundHint": "Détectez automatiquement le sujet, puis vérifiez l’aperçu avant d’appliquer.",
+  "objectTarget": "Seule l’image sélectionnée est modifiée.",
+  "objectGestureHelp": "Survolez pour prévisualiser après le chargement de SAM 3. Cliquez sur un sujet ou tracez un rectangle autour.",
+  "objectApply": "Appliquer le masque",
+  "objectApplyHelp": "Appliquez pour garder le sujet et masquer le fond. Annulez pour abandonner l’aperçu.",
+  "objectModels": "Modèles IA locaux"
 }

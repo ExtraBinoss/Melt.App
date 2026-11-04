@@ -75,6 +75,7 @@ export function PixelSelectionOverlay({
       style={{ display: "none" }}
     >
       <g>
+        <path className="pixel-selection-tint" fillRule="evenodd" />
         <path className="pixel-selection-white" strokeWidth={1} vectorEffect="non-scaling-stroke" />
         <path className="pixel-selection-ants" strokeWidth={1} vectorEffect="non-scaling-stroke" />
       </g>

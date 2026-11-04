@@ -24,7 +24,20 @@ export async function processSelection(
           height: request.height,
         },
       };
-    const { prepareSam, segmentObject } = await import("./sam");
+    const { prepareSam, segmentObject, releaseSam } = await import("./sam");
+    const { prepareBackground, removeBackground, releaseBackground } =
+      await import("./websam/background");
+    if (request.type === "background" || (request.type === "prepare" && request.background)) {
+      await releaseSam();
+      return {
+        id: request.id,
+        result:
+          request.type === "prepare"
+            ? (await prepareBackground(onProgress), null)
+            : await removeBackground(request.dataUrl, onProgress),
+      };
+    }
+    await releaseBackground();
     if (request.type === "prepare") {
       await prepareSam(onProgress);
       return { id: request.id, result: null };

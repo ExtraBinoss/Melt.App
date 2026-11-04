@@ -6,9 +6,16 @@ import {
 } from "../../../src/services/selection/selection.worker";
 const sam = vi.hoisted(() => ({
   prepareSam: vi.fn(),
+  releaseSam: vi.fn(),
   segmentObject: vi.fn(),
   segmentPrompt: vi.fn(),
 }));
+const background = vi.hoisted(() => ({
+  prepareBackground: vi.fn(),
+  removeBackground: vi.fn(),
+  releaseBackground: vi.fn(),
+}));
+vi.mock("../../../src/services/selection/websam/background", () => background);
 const scan = vi.hoisted(() => vi.fn());
 vi.mock("../../../src/services/selection/sam", () => sam);
 vi.mock("../../../src/services/selection/websam/scan", () => ({ scanObjects: scan }));
@@ -150,4 +157,20 @@ describe("selection worker protocol", () => {
     await handleSelection({ data: { id: 3, type: "prepare" } } as MessageEvent);
     expect(postMessage).toHaveBeenCalledWith({ id: 3, error: "download failed" }, []);
   });
+});
+
+it("routes automatic matting separately and releases the previous GPU algorithm", async () => {
+  const mask = { width: 1, height: 1, data: new Uint8ClampedArray([255, 255, 255, 128]) };
+  background.removeBackground.mockResolvedValueOnce(mask);
+  expect(await processSelection({ id: 70, type: "background", dataUrl: "original" })).toEqual({
+    id: 70,
+    result: mask,
+  });
+  expect(sam.releaseSam).toHaveBeenCalled();
+  expect(background.removeBackground).toHaveBeenCalledWith("original", undefined);
+  expect(await processSelection({ id: 71, type: "prepare", background: true })).toEqual({
+    id: 71,
+    result: null,
+  });
+  expect(background.prepareBackground).toHaveBeenCalled();
 });

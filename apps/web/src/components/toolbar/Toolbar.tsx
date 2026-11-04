@@ -3,7 +3,7 @@ import {
   Hand,
   Type,
   WandSparkles,
-  Scan,
+  Blend,
   ImagePlus,
   Undo2,
   Redo2,
@@ -29,7 +29,7 @@ const tools = [
   ["hand", Hand, "action:toolHand"],
   ["text", Type, "action:toolText"],
   ["wand", WandSparkles, "action:toolWand"],
-  ["segment", Scan, "action:toolSegment"],
+  ["segment", Blend, "action:toolSegment"],
 ] as const;
 export function Toolbar(props: MagicSearchProps) {
   return <MagicSearch {...props}>{ToolbarContents}</MagicSearch>;

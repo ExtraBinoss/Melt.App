@@ -440,6 +440,7 @@ export function createEditorServices(
       await objectSelection.point(layerId, x, y, true);
     },
     segmentationModel: selection.model,
+    backgroundModel: selection.backgroundModel,
     prepareSegmentation: () => (selection.model ? selection.model.prepare() : selection.prepare()),
   };
 }

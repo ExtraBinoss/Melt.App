@@ -28,7 +28,7 @@
   "helpOutline": "La linea tratteggiata in movimento indica l’area selezionata. I contorni molto dettagliati usano un’anteprima semplificata; la maschera conserva la selezione esatta.",
   "adjacent": "Solo pixel adiacenti",
   "adjacentHint": "Seleziona una regione connessa. Disattiva per cercare il colore in tutta l’immagine.",
-  "objectTitle": "Selezione oggetti",
+  "objectTitle": "Rimuovi sfondo",
   "objectMode": "Strumento di selezione",
   "objectPoints": "Punti",
   "objectBox": "Rettangolo",
@@ -69,10 +69,17 @@
   "objectExcludeHelp": "Escludi questa zona.",
   "objectBoxHelp": "Traccia un rettangolo attorno al soggetto da mantenere.",
   "objectRefineTitle": "Perfeziona il contorno",
-  "objectRefineHelp": "Controlla l’anteprima. Aggiungi punti per correggere le zone mancanti o indesiderate.",
+  "objectRefineHelp": "Fai clic per includere le aree mancanti. Clic destro o Alt + clic per escludere le aree indesiderate.",
   "objectRefineBoxHelp": "Passa a Punti per perfezionare il contorno.",
   "objectFinishTitle": "Crea la maschera",
   "objectKeepHelp": "Mantiene il soggetto e nasconde il resto.",
   "objectEraseHelp": "Nasconde la zona selezionata.",
-  "objectOriginalHelp": "Usa i pulsanti nell’anteprima. La foto originale resta intatta."
+  "objectOriginalHelp": "Usa i pulsanti nell’anteprima. La foto originale resta intatta.",
+  "objectBackground": "Rimuovi sfondo",
+  "objectBackgroundHint": "Rileva automaticamente il soggetto e controlla l’anteprima prima di applicare.",
+  "objectTarget": "Viene modificata solo l’immagine selezionata.",
+  "objectGestureHelp": "Dopo il caricamento di SAM 3, passa il puntatore per l’anteprima. Fai clic sul soggetto o traccia un rettangolo intorno.",
+  "objectApply": "Applica maschera",
+  "objectApplyHelp": "Applica per conservare il soggetto e nascondere lo sfondo. Annulla per scartare l’anteprima.",
+  "objectModels": "Modelli IA locali"
 }

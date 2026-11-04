@@ -31,7 +31,7 @@ export class ObjectSelectionController implements ObjectSelectionPort {
   private preparing = false;
   private wanted = false;
   private closed = false;
-  private history: SelectionPrompt[] = [];
+  private history: (SelectionPrompt & { automatic?: boolean })[] = [];
   private choice: "points" | "box" = "points";
   private readonly stop: () => void;
   constructor(
@@ -64,6 +64,8 @@ export class ObjectSelectionController implements ObjectSelectionPort {
     this.publish(this.state ? { ...this.state, mode } : null);
   };
   private attach(layerId: string) {
+    const selected = this.engine.getSnapshot().selection;
+    if (selected.length && (selected.length !== 1 || selected[0] !== layerId)) throw abort();
     if (this.closed || this.pixels.read()?.applying) throw abort();
     if (
       this.state?.layerId === layerId &&
@@ -121,8 +123,15 @@ export class ObjectSelectionController implements ObjectSelectionPort {
     if (this.state!.points.length >= MAX_SELECTION_POINTS)
       throw Error("The selection has reached 64 points. Remove a point or start again.");
     const point = { ...this.position(x, y), label: foreground ? (1 as const) : (0 as const) };
-    this.remember();
-    this.publish({ ...this.state!, points: [...this.state!.points, point], scanning: false });
+    const previous = this.state!.hovering ? [] : this.state!.points;
+    if (!this.state!.hovering) this.remember();
+    this.publish({
+      ...this.state!,
+      points: [...previous, point],
+      hovering: false,
+      automatic: false,
+      scanning: false,
+    });
     return this.request();
   }
   async box(layerId: string, box: SelectionBox) {
@@ -131,8 +140,54 @@ export class ObjectSelectionController implements ObjectSelectionPort {
       b = this.position(Math.max(box.x, box.right), Math.max(box.y, box.bottom));
     if (a.x === b.x || a.y === b.y) throw Error("Draw a rectangle with a nonzero area.");
     this.remember();
-    this.publish({ ...this.state!, box: { ...a, right: b.x, bottom: b.y }, scanning: false });
+    this.publish({
+      ...this.state!,
+      points: [],
+      box: { ...a, right: b.x, bottom: b.y },
+      hovering: false,
+      automatic: false,
+      scanning: false,
+    });
     return this.request();
+  }
+  async background(layerId: string) {
+    this.attach(layerId);
+    this.remember();
+    this.publish({
+      ...this.state!,
+      points: [],
+      box: undefined,
+      automatic: true,
+      hovering: false,
+      scanning: false,
+      candidates: [],
+    });
+    return this.request();
+  }
+  async hover(layerId: string, x: number, y: number) {
+    const selection = this.engine.getSnapshot().selection;
+    if (selection.length !== 1 || selection[0] !== layerId) return;
+    if (this.state && !this.state.hovering) return;
+    // Hover never starts a model download. It is available after explicit preparation.
+    if (this.client.model.read().phase !== "ready") return;
+    this.attach(layerId);
+    const point = { ...this.position(x, y), label: 1 as const };
+    this.publish({
+      ...this.state!,
+      points: [point],
+      hovering: true,
+      automatic: false,
+      scanning: false,
+    });
+    return this.request();
+  }
+  clearHover() {
+    if (!this.state?.hovering) return;
+    this.reset();
+  }
+  async apply() {
+    if (!this.state || this.state.busy || this.state.error || this.state.hovering) throw abort();
+    await this.pixels.createMask();
   }
   async scan(layerId: string) {
     this.attach(layerId);
@@ -163,7 +218,8 @@ export class ObjectSelectionController implements ObjectSelectionPort {
     if (this.pixels.read()?.applying) throw abort();
     if (!this.state) return;
     this.history.push({
-      points: this.state.points,
+      automatic: this.state.automatic,
+      points: this.state.hovering ? [] : this.state.points,
       ...(this.state.box ? { box: this.state.box } : {}),
     });
     if (this.history.length > 64) this.history.shift();
@@ -172,11 +228,18 @@ export class ObjectSelectionController implements ObjectSelectionPort {
     if (this.pixels.read()?.applying) throw abort();
     if (!this.state) return;
     const previous = this.history.pop();
-    if (!previous || (!previous.points.length && !previous.box)) {
+    if (!previous || (!previous.points.length && !previous.box && !previous.automatic)) {
       this.reset();
       return;
     }
-    this.publish({ ...this.state, ...previous, box: previous.box, scanning: false });
+    this.publish({
+      ...this.state,
+      ...previous,
+      box: previous.box,
+      automatic: previous.automatic,
+      hovering: false,
+      scanning: false,
+    });
     return this.request();
   }
   private request(): Promise<void> {
@@ -231,9 +294,11 @@ export class ObjectSelectionController implements ObjectSelectionPort {
         points: state.points,
         ...(state.box ? { box: state.box } : {}),
       };
-      const result = state.scanning
-        ? await this.client.scan(target.asset.dataUrl)
-        : await this.client.prompt(target.asset.dataUrl, prompt);
+      const result = state.automatic
+        ? await this.client.background(target.asset.dataUrl)
+        : state.scanning
+          ? await this.client.scan(target.asset.dataUrl)
+          : await this.client.prompt(target.asset.dataUrl, prompt);
       if (!current()) throw abort();
       if (version !== this.version) continue;
       await this.pixels.previewMask(result, true);
@@ -246,6 +311,8 @@ export class ObjectSelectionController implements ObjectSelectionPort {
       this.publish({
         ...this.state!,
         busy: this.wanted,
+        selected: this.pixels.read()?.selected ?? 0,
+        ...(result.seed ? { points: [result.seed] } : {}),
         scanning: false,
         ...(result.candidates
           ? {

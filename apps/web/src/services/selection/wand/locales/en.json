@@ -28,7 +28,7 @@
   "helpOutline": "The moving dashed line marks the selected area. Very detailed outlines use a simpler preview; the mask retains the exact selection.",
   "adjacent": "Adjacent pixels only",
   "adjacentHint": "Match a connected region. Turn this off to match the color across the image.",
-  "objectTitle": "Object selection",
+  "objectTitle": "Remove background",
   "objectMode": "Selection tool",
   "objectPoints": "Points",
   "objectBox": "Rectangle",
@@ -69,10 +69,17 @@
   "objectExcludeHelp": "Exclude this area.",
   "objectBoxHelp": "Drag a rectangle around the subject you want to keep.",
   "objectRefineTitle": "Refine the outline",
-  "objectRefineHelp": "Check the preview. Add points to correct missing or unwanted areas.",
+  "objectRefineHelp": "Click to include missing areas. Right-click or Alt-click to exclude unwanted areas.",
   "objectRefineBoxHelp": "Switch to Points to refine the outline.",
   "objectFinishTitle": "Create the mask",
   "objectKeepHelp": "Keep the subject and hide the rest.",
   "objectEraseHelp": "Hide the selected area.",
-  "objectOriginalHelp": "Use the buttons on the preview. The original photo stays intact."
+  "objectOriginalHelp": "Use the buttons on the preview. The original photo stays intact.",
+  "objectBackground": "Remove background",
+  "objectBackgroundHint": "Detect the main subject automatically, then check the preview before applying.",
+  "objectTarget": "Only the selected image is edited.",
+  "objectGestureHelp": "Hover to preview after loading SAM 3. Click a subject, or drag a rectangle around it.",
+  "objectApply": "Apply mask",
+  "objectApplyHelp": "Apply to keep the subject and hide the background. Cancel to discard the preview.",
+  "objectModels": "Local AI models"
 }

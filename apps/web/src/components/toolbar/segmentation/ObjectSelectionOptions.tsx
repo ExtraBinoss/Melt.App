@@ -1,9 +1,8 @@
-import { useSyncExternalStore, useState, useId } from "react";
+import { useSyncExternalStore, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Copy, RotateCcw, ScanSearch, Undo2, X } from "lucide-react";
-import type { EnginePort } from "@musart/core";
+import { Copy, Blend, Undo2, X, Check } from "lucide-react";
+import { createLayerGeometryIndex, type EnginePort } from "@musart/core";
 import type { ObjectSelectionPort } from "../../../services/selection/object/model";
-import { SelectField } from "../../shared/SelectField";
 import { Button } from "../../ui/button";
 import { Throbber } from "../../ui/throbber/Throbber";
 import "../../../services/selection/wand/messages";
@@ -25,11 +24,18 @@ export function ObjectSelectionOptions({
       engine?.getSnapshot ?? emptyRead,
       emptyRead,
     ),
-    mode = useSyncExternalStore(port.subscribe, port.mode, port.mode),
     [error, setError] = useState("");
+  const page = snapshot?.project.pages.find((item) => item.id === snapshot.pageId);
+  const geometry = page ? createLayerGeometryIndex(page) : undefined;
+  const selected =
+    snapshot?.selection.length === 1 ? geometry?.byId.get(snapshot.selection[0]!) : undefined;
   const target =
-    state?.layerId ?? (snapshot?.selection.length === 1 ? snapshot.selection[0] : undefined);
-  const modeId = useId();
+    selected?.kind === "image" &&
+    !selected.spatial &&
+    geometry?.isVisible(selected.id) &&
+    !geometry.isLocked(selected.id)
+      ? selected.id
+      : undefined;
   function run(action: () => Promise<void>) {
     setError("");
     void action().catch((failure: unknown) => {
@@ -39,38 +45,27 @@ export function ObjectSelectionOptions({
   }
   return (
     <section className="object-selection-options" aria-label={t("objectTitle")}>
-      <div className="object-selection-mode">
-        <label htmlFor={modeId} className="object-selection-mode-label">
-          {t("objectMode")}
-        </label>
-        <SelectField
-          id={modeId}
-          className="object-selection-mode-field"
-          contentClassName="object-selection-mode-menu"
-          label={t("objectMode")}
-          value={mode}
-          options={[
-            { value: "points", label: t("objectPoints") },
-            { value: "box", label: t("objectBox") },
-          ]}
-          onValueChange={(value) => port.setMode(value === "box" ? "box" : "points")}
-        />
-      </div>
-      <ObjectSelectionGuide mode={mode} />
-      <div className="object-selection-detection">
+      <p>{target ? t("objectTarget") : t("translation:selectImageFirst")}</p>
+      <Button
+        disabled={!target || state?.busy || state?.applying}
+        onClick={() => {
+          if (target) run(() => port.background(target));
+        }}
+      >
+        <Blend size={14} />
+        {t("objectBackground")}
+      </Button>
+      <p>{t("objectBackgroundHint")}</p>
+      <ObjectSelectionGuide />
+      {state && !state.hovering && (
         <Button
-          variant="secondary"
-          size="sm"
-          disabled={!target || state?.busy || state?.applying}
-          onClick={() => {
-            if (target) run(() => port.scan(target));
-          }}
+          disabled={state.busy || state.applying || Boolean(state.error) || state.selected === 0}
+          onClick={() => run(() => port.apply())}
         >
-          <ScanSearch size={14} />
-          {t("objectDetect")}
+          <Check size={14} />
+          {t("objectApply")}
         </Button>
-        <small>{t("objectDetectHint")}</small>
-      </div>
+      )}
       {state?.busy && (
         <div className="object-selection-working" role="status">
           <Throbber
@@ -89,28 +84,6 @@ export function ObjectSelectionOptions({
           >
             <X size={14} />
           </Button>
-        </div>
-      )}
-      {Boolean(state?.candidates.length) && (
-        <div
-          className="object-selection-candidates"
-          role="group"
-          aria-label={t("objectCandidates")}
-        >
-          {state!.candidates.map((candidate, index) => (
-            <Button
-              key={`${candidate.x}:${candidate.y}`}
-              variant="outline"
-              size="sm"
-              disabled={state?.busy || state?.applying}
-              aria-pressed={
-                state?.points[0]?.x === candidate.x && state?.points[0]?.y === candidate.y
-              }
-              onClick={() => run(() => port.candidate(index))}
-            >
-              {t("objectCandidate", { number: index + 1 })}
-            </Button>
-          ))}
         </div>
       )}
       {state && (
@@ -132,8 +105,8 @@ export function ObjectSelectionOptions({
               setError("");
             }}
           >
-            <RotateCcw size={14} />
-            {t("objectReset")}
+            <X size={14} />
+            {t("translation:cancel")}
           </Button>
         </div>
       )}

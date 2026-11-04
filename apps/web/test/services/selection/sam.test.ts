@@ -39,17 +39,17 @@ beforeEach(() => {
   });
   fake.image.mockResolvedValue({ width: 4, height: 2, data: new Float32Array(3) });
   fake.encode.mockImplementation(async () => ({
-    feats2_no_mem: tensor([1]),
-    feats0: tensor([1]),
-    feats1: tensor([1]),
+    "image_embeddings.2": tensor([1]),
+    "image_embeddings.0": tensor([1]),
+    "image_embeddings.1": tensor([1]),
   }));
   fake.decode.mockImplementation(async () => ({
-    low_res_mask: tensor([1, -1], [1, 1, 1, 2]),
-    iou: tensor([0.9], [1, 1]),
+    pred_masks: tensor([1, -1], [1, 1, 1, 2]),
+    iou_scores: tensor([0.9], [1, 1]),
   }));
 });
 afterEach(() => vi.unstubAllGlobals());
-describe("SAM 2 worker inference", () => {
+describe("SAM 3 worker inference", () => {
   it("feeds multiple inclusion/exclusion points and box corners to the dynamic decoder", async () => {
     const { segmentPrompt } = await import("../../../src/services/selection/sam");
     await segmentPrompt("a", {
@@ -62,7 +62,7 @@ describe("SAM 2 worker inference", () => {
     const feeds = fake.decode.mock.calls[0]![0];
     expect(feeds.input_points.dims).toEqual([1, 1, 4, 2]);
     expect(feeds.input_labels.dims).toEqual([1, 1, 4]);
-    expect(Array.from(feeds.input_labels.data)).toEqual([2, 3, 1, 0]);
+    expect(Array.from(feeds.input_labels.data)).toEqual([2n, 3n, 1n, 0n]);
     expect(Array.from(feeds.input_points.data)).toEqual([0, 0, 384, 256, 128, 256, 256, 256]);
     expect(fake.tensors.every((value) => value.dispose.mock.calls.length === 1)).toBe(true);
   });
@@ -89,18 +89,18 @@ describe("SAM 2 worker inference", () => {
     ]);
     const feeds = fake.decode.mock.calls[0]![0];
     expect(Array.from(feeds.input_points.data)).toEqual([128, 256, 0, 0]);
-    expect(Array.from(feeds.input_labels.data)).toEqual([1, -1]);
+    expect(Array.from(feeds.input_labels.data)).toEqual([1n, -1n]);
     const embeddings = await fake.encode.mock.results[0]!.value;
     await segmentObject("a", 2, 1);
     expect(fake.encode).toHaveBeenCalledOnce();
-    expect(embeddings.feats2_no_mem.dispose).not.toHaveBeenCalled();
+    expect(embeddings["image_embeddings.2"].dispose).not.toHaveBeenCalled();
     await segmentObject("b", 1, 1);
-    expect(embeddings.feats2_no_mem.dispose).toHaveBeenCalledOnce();
+    expect(embeddings["image_embeddings.2"].dispose).toHaveBeenCalledOnce();
     expect(fake.image).toHaveBeenCalledTimes(2);
     expect(fake.tensors.every((value) => value.dispose.mock.calls.length === 1)).toBe(true);
     const outputs = await fake.decode.mock.results[0]!.value;
-    expect(outputs.low_res_mask.dispose).toHaveBeenCalledOnce();
-    expect(outputs.iou.dispose).toHaveBeenCalledOnce();
+    expect(outputs.pred_masks.dispose).toHaveBeenCalledOnce();
+    expect(outputs.iou_scores.dispose).toHaveBeenCalledOnce();
   });
   it("cleans failed encoder/decoder work and rejects invalid points and malformed outputs", async () => {
     const { segmentObject } = await import("../../../src/services/selection/sam");
@@ -127,8 +127,8 @@ describe("SAM 2 worker inference", () => {
       finish = resolve;
     });
     const outputs = {
-      low_res_mask: tensor([1, -1], [1, 1, 1, 2]),
-      iou: tensor([0.9], [1, 1]),
+      pred_masks: tensor([1, -1], [1, 1, 1, 2]),
+      iou_scores: tensor([0.9], [1, 1]),
     };
     fake.decode.mockImplementationOnce(async () => {
       begin();
@@ -143,19 +143,19 @@ describe("SAM 2 worker inference", () => {
     expect(fake.encode).toHaveBeenCalledOnce();
     expect(fake.decode).toHaveBeenCalledOnce();
     expect(fake.image).toHaveBeenCalledOnce();
-    expect(embeddings.feats0.dispose).not.toHaveBeenCalled();
-    expect(embeddings.feats1.dispose).not.toHaveBeenCalled();
-    expect(embeddings.feats2_no_mem.dispose).not.toHaveBeenCalled();
+    expect(embeddings["image_embeddings.0"].dispose).not.toHaveBeenCalled();
+    expect(embeddings["image_embeddings.1"].dispose).not.toHaveBeenCalled();
+    expect(embeddings["image_embeddings.2"].dispose).not.toHaveBeenCalled();
     expect(fake.tensors.slice(1).every((value) => !value.dispose.mock.calls.length)).toBe(true);
     finish();
     await first;
-    expect(outputs.low_res_mask.dispose).toHaveBeenCalledOnce();
-    expect(outputs.iou.dispose).toHaveBeenCalledOnce();
+    expect(outputs.pred_masks.dispose).toHaveBeenCalledOnce();
+    expect(outputs.iou_scores.dispose).toHaveBeenCalledOnce();
     expect(fake.tensors.every((value) => value.dispose.mock.calls.length === 1)).toBe(true);
     await segmentObject("b", 1, 1);
-    expect(embeddings.feats0.dispose).toHaveBeenCalledOnce();
-    expect(embeddings.feats1.dispose).toHaveBeenCalledOnce();
-    expect(embeddings.feats2_no_mem.dispose).toHaveBeenCalledOnce();
+    expect(embeddings["image_embeddings.0"].dispose).toHaveBeenCalledOnce();
+    expect(embeddings["image_embeddings.1"].dispose).toHaveBeenCalledOnce();
+    expect(embeddings["image_embeddings.2"].dispose).toHaveBeenCalledOnce();
   });
 });
 describe("SAM 2 mask reconstruction", () => {

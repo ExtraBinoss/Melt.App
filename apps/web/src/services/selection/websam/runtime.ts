@@ -20,23 +20,8 @@ export function disposeTensors(values: Record<string, Tensor>): void {
 export async function loadSam(
   onProgress?: (event: ModelDownloadEvent) => void,
 ): Promise<LoadedSam> {
-  const adapter = await navigator.gpu?.requestAdapter();
-  if (!adapter)
-    throw new Error("SAM 2.1 requires WebGPU. Enable a supported GPU or use the magic wand.");
-  if (!adapter.features.has("shader-f16"))
-    throw new Error(
-      "SAM 2.1 requires WebGPU shader-f16 support. Use a supported GPU or the magic wand.",
-    );
-  const ort = await import("onnxruntime-web/webgpu");
-  ort.env.wasm.numThreads = 1;
-  ort.env.wasm.wasmPaths = {
-    wasm: new URL(wasmUrl, import.meta.url).href,
-    mjs: new URL(moduleUrl, import.meta.url).href,
-  };
-  const executionProviders: InferenceSession.ExecutionProviderConfig[] = [
-    { name: "webgpu", storageBufferCacheMode: "lazyRelease" },
-  ];
-  // Fixed 512 shapes and FP16 compute bound integrated-GPU activation memory.
+  const { ort, executionProviders } = await gpuRuntime();
+  // SAM 3 FP16 weights use external data; embeddings stay on GPU between prompts.
   // ORT records several dispatches before submitting. Immediate release destroys
   // temporary buffers still referenced by those commands; lazyRelease retires
   // them after submission without retaining a storage-buffer reuse cache.
@@ -45,6 +30,12 @@ export async function loadSam(
     {
       executionProviders,
       preferredOutputLocation: "gpu-buffer",
+      externalData: [
+        {
+          path: "vision_encoder_fp16.onnx_data",
+          data: await downloadModelFile(`${ENCODER_FILE}_data`, onProgress),
+        },
+      ],
     },
   );
   try {
@@ -53,6 +44,12 @@ export async function loadSam(
       await downloadModelFile(DECODER_FILE, onProgress),
       {
         executionProviders,
+        externalData: [
+          {
+            path: "prompt_encoder_mask_decoder_fp16.onnx_data",
+            data: await downloadModelFile(`${DECODER_FILE}_data`, onProgress),
+          },
+        ],
       },
     );
     return {
@@ -70,4 +67,24 @@ export async function loadSam(
     await encoder.release();
     throw error;
   }
+}
+
+export async function gpuRuntime() {
+  const adapter = await navigator.gpu?.requestAdapter();
+  if (!adapter)
+    throw new Error("Segmentation requires WebGPU. Enable a supported GPU or use the magic wand.");
+  if (!adapter.features.has("shader-f16"))
+    throw new Error(
+      "Segmentation requires WebGPU shader-f16 support. Use a supported GPU or the magic wand.",
+    );
+  const ort = await import("onnxruntime-web/webgpu");
+  ort.env.wasm.numThreads = 1;
+  ort.env.wasm.wasmPaths = {
+    wasm: new URL(wasmUrl, import.meta.url).href,
+    mjs: new URL(moduleUrl, import.meta.url).href,
+  };
+  const executionProviders: InferenceSession.ExecutionProviderConfig[] = [
+    { name: "webgpu", storageBufferCacheMode: "lazyRelease" },
+  ];
+  return { ort, executionProviders };
 }

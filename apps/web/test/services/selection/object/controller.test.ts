@@ -66,6 +66,8 @@ function fixture() {
     client: workerClient,
   });
   const client = {
+    model: { read: () => ({ phase: "ready" }) },
+    background: vi.fn(async (_url: string) => mask([255, 128, 0])),
     prompt: vi.fn(async (_url: string, _prompt: SelectionPrompt) => mask()),
     scan: vi.fn(async (_url: string): Promise<MaskResult> => ({
       ...mask(),
@@ -225,4 +227,35 @@ it("retains completed coverage across tool exit so the wand can refine the same 
   await d.pixels.accept();
   expect(d.pixels.read()?.selected).toBe(9);
   expect(d.engine.getSnapshot().canUndo).toBe(false);
+});
+
+it("previews automatic matting without a document edit, then applies a reversible mask", async () => {
+  const d = fixture(),
+    original = d.engine.getSnapshot().project;
+  d.engine.select(["image"]);
+  await d.objects.background("image");
+  expect(d.client.background).toHaveBeenCalledWith("data:image/png;base64,AAAA");
+  expect(d.client.scan).not.toHaveBeenCalled();
+  expect(d.engine.getSnapshot().project).toBe(original);
+  await d.objects.apply();
+  expect(d.engine.getSnapshot().project.pages[0]!.layers[0]!.mask).toBeDefined();
+  d.engine.undo();
+  expect(d.engine.getSnapshot().project).toEqual(original);
+  d.engine.redo();
+  expect(d.engine.getSnapshot().project.pages[0]!.layers[0]!.mask).toBeDefined();
+});
+it("locks prompts to the selected layer and keeps hover hints out of committed prompts", async () => {
+  const d = fixture();
+  d.engine.select(["image"]);
+  await expect(d.objects.point("different-layer", 1, 1, true)).rejects.toMatchObject({
+    name: "AbortError",
+  });
+  expect(d.engine.getSnapshot().selection).toEqual(["image"]);
+  await d.objects.hover("image", 5, 5);
+  expect(d.objects.read()?.hovering).toBe(true);
+  await d.objects.point("image", 15, 15, true);
+  expect(d.client.prompt.mock.lastCall![1].points).toEqual([{ x: 1.5, y: 1.5, label: 1 }]);
+  expect(d.engine.getSnapshot().canUndo).toBe(false);
+  await d.objects.removeLast();
+  expect(d.objects.read()).toBeNull();
 });

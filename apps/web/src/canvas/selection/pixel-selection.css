@@ -61,3 +61,8 @@
     animation: none;
   }
 }
+
+.pixel-selection-outline .pixel-selection-tint {
+  fill: color-mix(in srgb, var(--primary) 18%, transparent);
+  stroke: none;
+}

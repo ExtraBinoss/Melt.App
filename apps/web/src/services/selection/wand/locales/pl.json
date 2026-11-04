@@ -28,7 +28,7 @@
   "helpOutline": "Ruchoma przerywana linia wskazuje zaznaczony obszar. Bardzo szczegółowe kontury są wyświetlane w uproszczeniu; maska zachowuje dokładne zaznaczenie.",
   "adjacent": "Tylko sąsiednie piksele",
   "adjacentHint": "Zaznacza połączony obszar. Wyłącz, aby szukać koloru w całym obrazie.",
-  "objectTitle": "Zaznaczanie obiektów",
+  "objectTitle": "Usuń tło",
   "objectMode": "Narzędzie zaznaczania",
   "objectPoints": "Punkty",
   "objectBox": "Prostokąt",
@@ -69,10 +69,17 @@
   "objectExcludeHelp": "Wyklucz ten obszar.",
   "objectBoxHelp": "Narysuj prostokąt wokół obiektu, który chcesz zachować.",
   "objectRefineTitle": "Dopracuj kontur",
-  "objectRefineHelp": "Sprawdź podgląd. Dodaj punkty, aby poprawić brakujące lub niepożądane obszary.",
+  "objectRefineHelp": "Kliknij, aby dodać brakujące obszary. Prawy przycisk lub Alt + kliknięcie wyklucza niechciane obszary.",
   "objectRefineBoxHelp": "Przełącz na Punkty, aby dopracować kontur.",
   "objectFinishTitle": "Utwórz maskę",
   "objectKeepHelp": "Zachowuje obiekt i ukrywa resztę.",
   "objectEraseHelp": "Ukrywa zaznaczony obszar.",
-  "objectOriginalHelp": "Użyj przycisków w podglądzie. Oryginalne zdjęcie pozostaje nienaruszone."
+  "objectOriginalHelp": "Użyj przycisków w podglądzie. Oryginalne zdjęcie pozostaje nienaruszone.",
+  "objectBackground": "Usuń tło",
+  "objectBackgroundHint": "Automatycznie wykryj obiekt i sprawdź podgląd przed zastosowaniem.",
+  "objectTarget": "Edytowany jest tylko zaznaczony obraz.",
+  "objectGestureHelp": "Po załadowaniu SAM 3 najedź, aby zobaczyć podgląd. Kliknij obiekt lub narysuj wokół niego prostokąt.",
+  "objectApply": "Zastosuj maskę",
+  "objectApplyHelp": "Zastosuj, aby zachować obiekt i ukryć tło. Anuluj, aby odrzucić podgląd.",
+  "objectModels": "Lokalne modele AI"
 }

@@ -1,5 +1,5 @@
 import type { ModelDownloadEvent } from "./contract";
-import { modelFile } from "./manifest";
+import { modelFile, BACKGROUND_MODEL } from "./manifest";
 
 /** Latest progress per known file; no timers and no download-chunk message flood. */
 export function modelProgressSink(
@@ -15,7 +15,7 @@ export function modelProgressSink(
   };
   return {
     note: (event: ModelDownloadEvent) => {
-      const file = modelFile(event.file);
+      const file = modelFile(event.file) ?? modelFile(event.file, BACKGROUND_MODEL);
       if (!file) return;
       pending.set(file, {
         file,

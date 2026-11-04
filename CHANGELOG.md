@@ -6,6 +6,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Added
 
+- Replace the object-selection setup with a twelve-language background-removal workflow: one automatic preview, unified click/rectangle refinement, selected-image locking, hover previews after explicit model preparation, cancellable hints and reversible Apply. Use pinned WebGPU SAM 3 Tracker for interactive selection and BiRefNet Lite for single-pass soft-alpha background matting, with separate verified downloads, visible progress and GPU model handoff.
+
 - Prepare owner-only Cloudflare CI/CD for melt.plinka.eu with authenticated GitHub identity guards, protected production secrets and approvals, exact-commit artifact integrity checks, stale-main rejection and streamed precompressed WASM. Add local Cloudflare browser delivery regressions and deployment/token-rotation documentation; preparation performs no production deployment.
 
 - Add configurable Photoshop-style Layer via Cut (Ctrl/Cmd+Shift+J), selection inversion (Ctrl/Cmd+Shift+I), bounded last-selection recovery (Ctrl/Cmd+Shift+D), sibling stacking (Ctrl/Cmd+[ / ]) and independent GPU alpha clipping (Ctrl/Cmd+Alt+G). Preserve originals, existing masks, affine placement, visible bases, atomic undo/redo, portable and clipboard references, and older custom shortcut assignments. Add twelve-language action labels/help, generic English/current-language description and configured-chord search in both command surfaces, effect-algorithm indexing and shared plus-separated keycaps.

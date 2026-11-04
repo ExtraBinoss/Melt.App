@@ -6,7 +6,7 @@ import { toolAtom } from "../../state/session/editor";
 import type { EditorServices } from "../../state/contracts";
 import type { TaskRunner } from "../projects/ProjectDialog";
 import { WandOptions } from "./wand/WandOptions";
-import { SegmentationModel } from "./segmentation/SegmentationModel";
+import { SelectionModels } from "./segmentation/SelectionModels";
 
 export function ToolSettings({
   services,
@@ -26,10 +26,10 @@ export function ToolSettings({
         <WandOptions />
       ) : (
         <div>
-          <SegmentationModel services={services} onTask={onTask} />
           {services.objectSelection && (
             <ObjectSelectionOptions port={services.objectSelection} engine={engine} />
           )}
+          <SelectionModels services={services} onTask={onTask} />
         </div>
       )}
     </aside>

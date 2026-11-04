@@ -28,7 +28,7 @@
   "helpOutline": "De bewegende stippellijn geeft het geselecteerde gebied aan. Zeer gedetailleerde omtrekken gebruiken een vereenvoudigd voorbeeld; het masker behoudt de exacte selectie.",
   "adjacent": "Alleen aangrenzende pixels",
   "adjacentHint": "Selecteert een verbonden gebied. Schakel dit uit om de kleur in de hele afbeelding te zoeken.",
-  "objectTitle": "Objectselectie",
+  "objectTitle": "Achtergrond verwijderen",
   "objectMode": "Selectiegereedschap",
   "objectPoints": "Punten",
   "objectBox": "Rechthoek",
@@ -69,10 +69,17 @@
   "objectExcludeHelp": "Dit gebied uitsluiten.",
   "objectBoxHelp": "Sleep een rechthoek rond het onderwerp dat je wilt behouden.",
   "objectRefineTitle": "Contour verfijnen",
-  "objectRefineHelp": "Controleer het voorbeeld. Voeg punten toe om ontbrekende of ongewenste gebieden te corrigeren.",
+  "objectRefineHelp": "Klik om ontbrekende gebieden toe te voegen. Rechtsklik of Alt-klik om ongewenste gebieden uit te sluiten.",
   "objectRefineBoxHelp": "Schakel naar Punten om de contour te verfijnen.",
   "objectFinishTitle": "Masker maken",
   "objectKeepHelp": "Behoudt het onderwerp en verbergt de rest.",
   "objectEraseHelp": "Verbergt het geselecteerde gebied.",
-  "objectOriginalHelp": "Gebruik de knoppen in het voorbeeld. De originele foto blijft intact."
+  "objectOriginalHelp": "Gebruik de knoppen in het voorbeeld. De originele foto blijft intact.",
+  "objectBackground": "Achtergrond verwijderen",
+  "objectBackgroundHint": "Detecteer het onderwerp automatisch en controleer het voorbeeld voordat je toepast.",
+  "objectTarget": "Alleen de geselecteerde afbeelding wordt bewerkt.",
+  "objectGestureHelp": "Beweeg na het laden van SAM 3 over een onderwerp voor een voorbeeld. Klik erop of sleep er een rechthoek omheen.",
+  "objectApply": "Masker toepassen",
+  "objectApplyHelp": "Pas toe om het onderwerp te behouden en de achtergrond te verbergen. Annuleer om het voorbeeld te verwerpen.",
+  "objectModels": "Lokale AI-modellen"
 }

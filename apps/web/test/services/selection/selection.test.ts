@@ -88,15 +88,15 @@ describe("bounded selection worker client", () => {
     const preparing = client.prepare();
     expect(factory).toHaveBeenCalledTimes(1);
     reply(port, { id: 999, result: null });
-    await expect(client.prepare()).rejects.toThrow("déjà");
+    await expect(client.prepare()).rejects.toThrow("already");
     reply(port, { id: 1, result: null });
     await preparing;
     const selecting = client.segment("image", 10, 20);
     expect(port.postMessage).toHaveBeenLastCalledWith(
-      { id: 3, type: "segment", dataUrl: "image", x: 10, y: 20 },
+      { id: 2, type: "segment", dataUrl: "image", x: 10, y: 20 },
       [],
     );
-    reply(port, { id: 3, result: mask });
+    reply(port, { id: 2, result: mask });
     expect(await selecting).toEqual(mask);
     expect(factory).toHaveBeenCalledTimes(1);
     client.dispose();

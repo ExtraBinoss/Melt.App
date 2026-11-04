@@ -1,9 +1,11 @@
-import type { SelectionPrompt, ObjectCandidate } from "./prompts";
+import type { SelectionPrompt, ObjectCandidate, SelectionPoint } from "./prompts";
+import { BACKGROUND_MODEL } from "./model/manifest";
 import { LocalModelManager } from "./model/manager";
 import type { ModelDownloadEvent } from "./model/contract";
 
 export type SelectionRequest =
-  | { id: number; type: "prepare" }
+  | { id: number; type: "prepare"; background?: boolean }
+  | { id: number; type: "background"; dataUrl: string }
   | { id: number; type: "prompt"; dataUrl: string; prompt: SelectionPrompt }
   | { id: number; type: "scan"; dataUrl: string }
   | { id: number; type: "segment"; dataUrl: string; x: number; y: number; encode?: boolean }
@@ -18,6 +20,7 @@ export type SelectionRequest =
       tolerance: number;
     };
 export interface MaskResult {
+  seed?: SelectionPoint;
   candidates?: ObjectCandidate[];
   score?: number;
   data: Uint8ClampedArray;
@@ -44,6 +47,7 @@ export interface WorkerPort {
 /** A worker owns the model and one image embedding; one active job prevents unbounded queues. */
 export class SelectionClient {
   readonly model: LocalModelManager;
+  readonly backgroundModel: LocalModelManager;
   private worker: WorkerPort | undefined;
   private nextId = 0;
   private workerGeneration = 0;
@@ -62,6 +66,13 @@ export class SelectionClient {
     private readonly createWorker = (): WorkerPort =>
       new Worker(new URL("./selection.worker.ts", import.meta.url), { type: "module" }),
   ) {
+    this.backgroundModel = new LocalModelManager(
+      {
+        prepare: () => this.prepare(true),
+        cancel: () => this.resetWorker(),
+      },
+      BACKGROUND_MODEL,
+    );
     this.model = new LocalModelManager({
       prepare: () => this.prepare(),
       cancel: () => this.resetWorker(),
@@ -73,16 +84,25 @@ export class SelectionClient {
     this.worker.onmessage = ({ data }) => {
       if (!this.pending || this.pending.id !== data.id) return;
       if ("progress" in data) {
-        this.model.note(data.progress);
+        (this.pending.type === "background" ||
+        (this.pending.type === "prepare" && this.preparingBackground)
+          ? this.backgroundModel
+          : this.model
+        ).note(data.progress);
         return;
       }
       const pending = this.pending;
       this.pending = undefined;
       if ("error" in data) {
         this.model.failed(data.error);
+        this.backgroundModel.failed(data.error);
         pending.reject(new Error(data.error));
       } else {
-        if (pending.type !== "wand") this.model.ready();
+        if (pending.type !== "wand")
+          (pending.type === "background" || (pending.type === "prepare" && this.preparingBackground)
+            ? this.backgroundModel
+            : this.model
+          ).ready();
         pending.resolve(data.result);
       }
     };
@@ -105,6 +125,12 @@ export class SelectionClient {
     if (this.pending) return Promise.reject(new Error("Une sélection est déjà en cours."));
     return new Promise((resolve, reject) => {
       const worker = this.connect();
+      if (request.type !== "wand") {
+        const background =
+          request.type === "background" || (request.type === "prepare" && request.background);
+        (background ? this.model : this.backgroundModel).deactivate();
+        (background ? this.backgroundModel : this.model).start();
+      }
       this.pending = { id: request.id, type: request.type, resolve, reject };
       try {
         worker.postMessage(
@@ -117,8 +143,20 @@ export class SelectionClient {
       }
     });
   }
-  async prepare() {
-    await this.request({ id: ++this.nextId, type: "prepare" });
+  private preparingBackground = false;
+  async prepare(background = false) {
+    if (this.pending) throw Error("A selection is already running.");
+    this.preparingBackground = background;
+    await this.request({
+      id: ++this.nextId,
+      type: "prepare",
+      ...(background ? { background: true } : {}),
+    });
+  }
+  async background(dataUrl: string): Promise<MaskResult> {
+    const result = await this.request({ id: ++this.nextId, type: "background", dataUrl });
+    if (!result || !("data" in result)) throw Error("Background removal mask is missing.");
+    return result;
   }
   async segment(dataUrl: string, x: number, y: number) {
     const result = await this.request({ id: ++this.nextId, type: "segment", dataUrl, x, y });
@@ -150,6 +188,7 @@ export class SelectionClient {
   }
   cancel() {
     this.model.cancel();
+    this.backgroundModel.cancel();
   }
   async wand(
     pixels: Uint8ClampedArray,
@@ -174,6 +213,8 @@ export class SelectionClient {
   }
   private resetWorker() {
     this.workerGeneration++;
+    this.model.deactivate();
+    this.backgroundModel.deactivate();
     this.pending?.reject(new DOMException("Sélection annulée.", "AbortError"));
     this.pending = undefined;
     if (this.worker) {
@@ -187,5 +228,6 @@ export class SelectionClient {
   dispose() {
     this.resetWorker();
     this.model.dispose();
+    this.backgroundModel.dispose();
   }
 }

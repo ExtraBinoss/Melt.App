@@ -33,32 +33,32 @@ test("inspects declared model bytes without reading binary response bodies", asy
   const read = vi.spyOn(Response.prototype, "arrayBuffer");
   expect(await inspectModelCache(d.storage)).toEqual({
     available: true,
-    bytes: 67284158,
-    files: 2,
+    bytes: 947233609,
+    files: 4,
     supported: true,
   });
   expect(read).not.toHaveBeenCalled();
   expect(d.storage.open).toHaveBeenCalledWith(MODEL_CACHE);
-  d.entries.set(d.base + "onnx/mask_decoder.onnx", new Response(""));
+  d.entries.set(d.base + "onnx/prompt_encoder_mask_decoder_fp16.onnx", new Response(""));
   d.entries.set(d.base + "old.bin", new Response("", { headers: { "Content-Length": "bad" } }));
   d.entries.set(d.base + "missing.bin", new Response("", { status: 404 }));
-  expect(await inspectModelCache(d.storage)).toMatchObject({ available: true, files: 3 });
+  expect(await inspectModelCache(d.storage)).toMatchObject({ available: true, files: 5 });
 });
 test("removes only this model, preserving shared runtime and other models, and reports partial failures", async () => {
   const d = fixture();
-  d.entries.set(d.base + "onnx/mask_decoder.onnx", new Response(""));
+  d.entries.set(d.base + "onnx/prompt_encoder_mask_decoder_fp16.onnx", new Response(""));
   d.entries.set(
-    `https://huggingface.co/${MODEL_ID}/resolve/old/mask_decoder.onnx`,
+    `https://huggingface.co/${MODEL_ID}/resolve/old/prompt_encoder_mask_decoder_fp16.onnx`,
     new Response("", { headers: { "Content-Length": "50" } }),
   );
   d.entries.set("https://cdn.jsdelivr.net/runtime.wasm", new Response(""));
   d.entries.set(
-    "https://huggingface.co/other/model/resolve/main/mask_decoder.onnx",
+    "https://huggingface.co/other/model/resolve/main/prompt_encoder_mask_decoder_fp16.onnx",
     new Response(""),
   );
   expect(await removeModelCache(d.storage)).toMatchObject({ files: 0, available: false });
   expect(d.entries.size).toBe(2);
-  d.entries.set(d.base + "onnx/mask_decoder.onnx", new Response(""));
+  d.entries.set(d.base + "onnx/prompt_encoder_mask_decoder_fp16.onnx", new Response(""));
   d.cache.delete.mockResolvedValue(false);
   await expect(removeModelCache(d.storage)).rejects.toThrow("could not be removed");
 });

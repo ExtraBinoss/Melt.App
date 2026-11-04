@@ -1,6 +1,10 @@
 import { expect, test, vi } from "vitest";
 import { LocalModelManager } from "../../../../src/services/selection/model/manager";
-import { MODEL_BYTES, MODEL_FILES } from "../../../../src/services/selection/model/manifest";
+import {
+  BACKGROUND_MODEL,
+  MODEL_BYTES,
+  MODEL_FILES,
+} from "../../../../src/services/selection/model/manifest";
 const info = { available: true, bytes: MODEL_BYTES, files: 2, supported: true };
 function deferred() {
   let resolve!: () => void, reject!: (reason: Error) => void;
@@ -22,12 +26,12 @@ test("tracks actual pinned-file bytes, initialization and real completion with b
   const run = manager.prepare();
   expect(prepare).toHaveBeenCalledOnce();
   await expect(manager.prepare()).rejects.toThrow("busy");
-  manager.note({ file: "vision_encoder.onnx", status: "progress", loaded: 100 });
+  manager.note({ file: "vision_encoder_fp16.onnx", status: "progress", loaded: 100 });
   expect(manager.read()).toMatchObject({ loaded: 100, phase: "loading" });
   const before = manager.read();
   manager.note({ file: "unknown", status: "done" });
-  manager.note({ file: "mask_decoder.onnx", status: "progress", loaded: NaN });
-  manager.note({ file: "mask_decoder.onnx", status: "progress", loaded: -1 });
+  manager.note({ file: "prompt_encoder_mask_decoder_fp16.onnx", status: "progress", loaded: NaN });
+  manager.note({ file: "prompt_encoder_mask_decoder_fp16.onnx", status: "progress", loaded: -1 });
   expect(manager.read()).toBe(before);
   for (const file of Object.keys(MODEL_FILES)) manager.note({ file, status: "done" });
   expect(manager.read()).toMatchObject({ loaded: MODEL_BYTES, phase: "initializing" });
@@ -104,4 +108,25 @@ test("removes only after active preparation ends, prevents stale refresh adoptio
   await expect(manager.remove()).rejects.toThrow("quota");
   expect(manager.read()).toMatchObject({ phase: "error", error: "quota" });
   manager.dispose();
+});
+
+test("tracks independent automatic weights and invalidates GPU readiness without losing disk metadata", async () => {
+  const automatic = new LocalModelManager(
+    {
+      prepare: async () => {},
+      cancel: vi.fn(),
+      inspect: async () => ({ available: true, bytes: 123224205, files: 1, supported: true }),
+    },
+    BACKGROUND_MODEL,
+  );
+  automatic.start();
+  expect(automatic.read()).toMatchObject({ phase: "loading", total: 123224205, loaded: 0 });
+  automatic.note({ file: "birefnet_lite_webgpu_fp16.onnx", status: "done" });
+  expect(automatic.read()).toMatchObject({ phase: "initializing", loaded: 123224205 });
+  automatic.ready();
+  await automatic.refresh();
+  automatic.start();
+  expect(automatic.read().phase).toBe("ready");
+  automatic.deactivate();
+  expect(automatic.read()).toMatchObject({ phase: "idle", available: true, bytes: 123224205 });
 });

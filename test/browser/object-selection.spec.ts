@@ -6,7 +6,7 @@ import type {
   SelectionResponse,
 } from "../../apps/web/src/services/selection/selection";
 /** Real UI/worker mask pipeline with deterministic ML outputs; does not download or benchmark SAM. */
-test("SAM points, exclusion, boxes and proposals share an explicit, reversible pixel preview", async ({
+test("automatic matting and locked-layer click/rectangle refinement share a reversible pixel preview", async ({
   page,
   context,
 }) => {
@@ -34,7 +34,7 @@ test("SAM points, exclusion, boxes and proposals share an explicit, reversible p
             } as MessageEvent<SelectionResponse>);
             return;
           }
-          if (request.type !== "prompt" && request.type !== "scan")
+          if (request.type !== "prompt" && request.type !== "scan" && request.type !== "background")
             throw Error("Unexpected model request");
           const data = new Uint8ClampedArray(96 * 64 * 4),
             prompt = request.type === "prompt" ? request.prompt : { points: [] },
@@ -105,6 +105,14 @@ test("SAM points, exclusion, boxes and proposals share an explicit, reversible p
         background: "#00000000",
         layers: [
           createLayer("image", {
+            id: "other-image",
+            assetId: "source",
+            x: 228,
+            y: 0,
+            width: 24,
+            height: 24,
+          }),
+          createLayer("image", {
             id: "object-image",
             assetId: "source",
             x: 32,
@@ -138,14 +146,19 @@ test("SAM points, exclusion, boxes and proposals share an explicit, reversible p
       Number(data.canonicalRevision) === window.musart!.session().revision
     );
   });
-  await page.getByRole("button", { name: "Object selection", exact: true }).click();
+  await page.getByRole("button", { name: "Remove background", exact: true }).click();
   const surface = page.getByTestId("object-selection-surface"),
     outline = page.getByTestId("pixel-selection-outline");
   await expect(surface.locator(".object-selection-hit")).toBeVisible();
   const bounds = (await surface.locator(".object-selection-hit").boundingBox())!,
     left = { x: bounds.x + bounds.width / 6, y: bounds.y + bounds.height / 2 },
     middle = { x: bounds.x + bounds.width / 2, y: left.y };
+  await expect(surface.locator(".object-selection-hit")).toHaveCount(1);
   const before = await page.evaluate(() => window.musart!.snapshot());
+  await surface.click({ position: { x: 10, y: 10 } });
+  expect((await page.evaluate(() => window.musart!.snapshot())).selection).toEqual([
+    "object-image",
+  ]);
   await page.mouse.click(left.x, left.y);
   await expect(outline).toHaveAttribute("data-selection-pixels", "4096");
   await expect(surface.locator(".object-point-positive")).toHaveCount(1);
@@ -178,15 +191,16 @@ test("SAM points, exclusion, boxes and proposals share an explicit, reversible p
   await expect(surface.locator(".object-selection-box")).toBeVisible();
   expect(Number(await outline.getAttribute("data-selection-pixels"))).toBeGreaterThan(0);
   expect((await page.evaluate(() => window.musart!.snapshot())).canUndo).toBe(false);
-  await page.getByRole("button", { name: "Clear", exact: true }).click();
-  await page.getByRole("button", { name: "Detect objects", exact: true }).click();
-  await expect(page.getByRole("button", { name: "Object 2", exact: true })).toBeVisible();
-  await page.getByRole("button", { name: "Object 2", exact: true }).click();
-  await expect(page.getByRole("button", { name: "Object 2", exact: true })).toHaveAttribute(
-    "aria-pressed",
-    "true",
-  );
-  await expect(outline).toHaveAttribute("data-selection-pixels", "4096");
+  await page
+    .locator(".object-selection-options")
+    .getByRole("button", { name: "Cancel", exact: true })
+    .click();
+  await page
+    .locator(".object-selection-options")
+    .getByRole("button", { name: "Remove background", exact: true })
+    .click();
+  await expect(page.getByRole("button", { name: "Apply mask", exact: true })).toBeEnabled();
+  expect((await page.evaluate(() => window.musart!.snapshot())).canUndo).toBe(false);
   await page.mouse.click(left.x, left.y, { button: "right" });
   await expect(outline).toHaveAttribute("data-selection-pixels", "2048");
   await page.mouse.click(bounds.x + bounds.width * 0.9, left.y);
@@ -203,7 +217,9 @@ test("SAM points, exclusion, boxes and proposals share an explicit, reversible p
     .poll(() => page.evaluate(() => window.musart!.snapshot().revision))
     .toBe(before.revision + 1);
   const masked = await page.evaluate(() => window.musart!.snapshot());
-  expect(masked.project.pages[0]!.layers[0]!.mask).toMatchObject({
+  expect(
+    masked.project.pages[0]!.layers.find((layer) => layer.id === "object-image")!.mask,
+  ).toMatchObject({
     mode: "luminance",
     enabled: true,
   });
@@ -247,7 +263,13 @@ test("SAM points, exclusion, boxes and proposals share an explicit, reversible p
             rotation: 12,
             scaleX: 0.9,
           }),
-          { ...project.pages[0]!.layers[0]!, parentId: "parent", x: 0, y: 0, rotation: -6 },
+          {
+            ...project.pages[0]!.layers.find((layer) => layer.id === "object-image")!,
+            parentId: "parent",
+            x: 0,
+            y: 0,
+            rotation: -6,
+          },
         ],
       },
     ],

@@ -28,7 +28,7 @@
   "helpOutline": "Die bewegte gestrichelte Linie markiert die Auswahl. Sehr detaillierte Konturen werden vereinfacht dargestellt; die Maske behält die genaue Auswahl bei.",
   "adjacent": "Nur benachbarte Pixel",
   "adjacentHint": "Wählt einen zusammenhängenden Bereich. Deaktivieren, um die Farbe im gesamten Bild auszuwählen.",
-  "objectTitle": "Objektauswahl",
+  "objectTitle": "Hintergrund entfernen",
   "objectMode": "Auswahlwerkzeug",
   "objectPoints": "Punkte",
   "objectBox": "Rechteck",
@@ -69,10 +69,17 @@
   "objectExcludeHelp": "Diesen Bereich ausschließen.",
   "objectBoxHelp": "Ziehen Sie ein Rechteck um das Motiv, das Sie behalten möchten.",
   "objectRefineTitle": "Kontur verfeinern",
-  "objectRefineHelp": "Prüfen Sie die Vorschau. Korrigieren Sie fehlende oder unerwünschte Bereiche mit weiteren Punkten.",
+  "objectRefineHelp": "Klicken fügt fehlende Bereiche hinzu. Rechtsklick oder Alt-Klick entfernt unerwünschte Bereiche.",
   "objectRefineBoxHelp": "Wechseln Sie zu Punkte, um die Kontur zu verfeinern.",
   "objectFinishTitle": "Maske erstellen",
   "objectKeepHelp": "Motiv behalten und den Rest ausblenden.",
   "objectEraseHelp": "Ausgewählten Bereich ausblenden.",
-  "objectOriginalHelp": "Verwenden Sie die Schaltflächen in der Vorschau. Das Originalfoto bleibt erhalten."
+  "objectOriginalHelp": "Verwenden Sie die Schaltflächen in der Vorschau. Das Originalfoto bleibt erhalten.",
+  "objectBackground": "Hintergrund entfernen",
+  "objectBackgroundHint": "Hauptmotiv automatisch erkennen und die Vorschau vor dem Anwenden prüfen.",
+  "objectTarget": "Nur das ausgewählte Bild wird bearbeitet.",
+  "objectGestureHelp": "Nach dem Laden von SAM 3 zeigt Überfahren eine Vorschau. Motiv anklicken oder ein Rechteck darum ziehen.",
+  "objectApply": "Maske anwenden",
+  "objectApplyHelp": "Anwenden behält das Motiv und blendet den Hintergrund aus. Abbrechen verwirft die Vorschau.",
+  "objectModels": "Lokale KI-Modelle"
 }

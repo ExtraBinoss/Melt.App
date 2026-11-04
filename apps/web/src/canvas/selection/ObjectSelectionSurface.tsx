@@ -13,7 +13,6 @@ interface Drag {
   start: { x: number; y: number };
   client: { x: number; y: number };
   foreground: boolean;
-  box: boolean;
   project: object;
   pageId: string;
   pose: object | undefined;
@@ -37,7 +36,8 @@ export function ObjectSelectionSurface({
 }) {
   const root = useRef<SVGSVGElement>(null),
     drag = useRef<Drag | null>(null),
-    pan = useRef(false);
+    pan = useRef(false),
+    hoverTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   useLayoutEffect(() => {
     const svg = root.current;
     if (!svg || !port || !enabled) return;
@@ -56,7 +56,9 @@ export function ObjectSelectionSurface({
           layer.kind === "image" &&
           !layer.spatial &&
           index.isVisible(layer.id) &&
-          !index.isLocked(layer.id),
+          !index.isLocked(layer.id) &&
+          (snapshot.selection.length === 0 ||
+            (snapshot.selection.length === 1 && layer.id === snapshot.selection[0])),
       );
       const selected = layers.find((layer) => layer.id === snapshot.selection[0]);
       if (selected) {
@@ -92,7 +94,7 @@ export function ObjectSelectionSurface({
         hit.setAttribute("pointer-events", pan.current ? "none" : "all");
         const marks = group.querySelector(".object-selection-points")!;
         marks.replaceChildren();
-        if (state?.layerId === layer.id)
+        if (state?.layerId === layer.id && !state.automatic)
           for (const point of state.points) {
             const circle = document.createElementNS(ns, "circle");
             circle.setAttribute("cx", String((point.x * layer.width) / state.width));
@@ -154,6 +156,7 @@ export function ObjectSelectionSurface({
     window.addEventListener("blur", blur);
     paint();
     return () => {
+      clearTimeout(hoverTimer.current);
       drag.current = null;
       pan.current = false;
       for (const stop of stops) stop();
@@ -201,7 +204,7 @@ export function ObjectSelectionSurface({
       sx = (layer?.width ?? 1) / Number(hit.getAttribute("width")),
       sy = (layer?.height ?? 1) / Number(hit.getAttribute("height")),
       moved = Math.hypot(event.clientX - held.client.x, event.clientY - held.client.y);
-    if (held.foreground && (held.box || moved > 4)) {
+    if (held.foreground && moved > 4) {
       if (moved > 4)
         report(
           port!.box(held.layerId, {
@@ -219,17 +222,18 @@ export function ObjectSelectionSurface({
       className="object-selection-surface"
       data-testid="object-selection-surface"
       aria-hidden="true"
-      style={{ display: enabled ? undefined : "none" }}
+      style={{ display: enabled ? undefined : "none", pointerEvents: enabled ? "auto" : "none" }}
       onContextMenu={(event) => {
         event.preventDefault();
         event.stopPropagation();
       }}
       onPointerDown={(event) => {
+        clearTimeout(hoverTimer.current);
         if (!port || !enabled || pan.current || (event.button !== 0 && event.button !== 2)) return;
-        const group = (event.target as Element).closest<SVGGElement>("g[data-layer-id]");
-        if (!group || drag.current) return;
         event.preventDefault();
         event.stopPropagation();
+        const group = (event.target as Element).closest<SVGGElement>("g[data-layer-id]");
+        if (!group || drag.current) return;
         viewport.current?.focus({ preventScroll: true });
         const snapshot = engine.getSnapshot();
         drag.current = {
@@ -238,8 +242,7 @@ export function ObjectSelectionSurface({
           layerId: group.dataset.layerId!,
           start: local(event, group),
           client: { x: event.clientX, y: event.clientY },
-          foreground: event.button === 0,
-          box: port.mode() === "box",
+          foreground: event.button === 0 && !event.altKey,
           project: snapshot.project,
           pageId: snapshot.pageId,
           pose: controller.read().motionFrame,
@@ -248,7 +251,16 @@ export function ObjectSelectionSurface({
       }}
       onPointerMove={(event) => {
         const held = drag.current;
-        if (!held || held.pointer !== event.pointerId || !held.foreground) return;
+        if (!held) {
+          clearTimeout(hoverTimer.current);
+          const group = (event.target as Element).closest<SVGGElement>("g[data-layer-id]");
+          if (!port || !enabled || pan.current || !group || controller.read().playback) return;
+          const point = local(event, group),
+            layerId = group.dataset.layerId!;
+          hoverTimer.current = setTimeout(() => report(port.hover(layerId, point.x, point.y)), 250);
+          return;
+        }
+        if (held.pointer !== event.pointerId || !held.foreground) return;
         event.stopPropagation();
         const end = local(event, held.group),
           box = held.group.querySelector<SVGRectElement>(".object-selection-box")!;
@@ -257,6 +269,10 @@ export function ObjectSelectionSurface({
         box.setAttribute("y", String(Math.min(end.y, held.start.y)));
         box.setAttribute("width", String(Math.abs(end.x - held.start.x)));
         box.setAttribute("height", String(Math.abs(end.y - held.start.y)));
+      }}
+      onPointerLeave={() => {
+        clearTimeout(hoverTimer.current);
+        if (!drag.current) port?.clearHover();
       }}
       onPointerUp={(event) => finish(event)}
       onPointerCancel={(event) => finish(event, true)}
