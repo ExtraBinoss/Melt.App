@@ -4,6 +4,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ## [Unreleased]
 
+- Bring the 2D rotation grip closer to the resize handles, reducing its screen-space offset from 36 px to 18 px while retaining its small circle and independent hit target.
+
 - Reuse the standard Melt text-and-throbber loading presentation during workspace switches, removing the custom pill, shadow, extra canvas orbit and duplicate loading feedback beneath it.
 
 - Keep Studio camera and environment animation requests owned by the shared Scene popover, while Classic and light requests continue to reveal their existing inspector controls.

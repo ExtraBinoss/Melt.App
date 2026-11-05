@@ -1,6 +1,6 @@
 import { transformPoint, type Matrix } from "@musart/core";
 
-export const ROTATION_HANDLE_OFFSET = 36;
+export const ROTATION_HANDLE_OFFSET = 18;
 
 /** Screen-sized, upright grip outside the top edge, including scaled or mirrored parents. */
 export function rotationHandlePlacement(matrix: Matrix, zoom: number) {
