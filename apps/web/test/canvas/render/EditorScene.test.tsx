@@ -29,6 +29,7 @@ import {
   makeRenderer,
 } from "../../../src/canvas/render/EditorScene";
 import { FiberTimerClock } from "../../../src/canvas/render/fiber-timer";
+import { PlaneResources } from "../../../src/canvas/render/plane-resources";
 
 const gpu = vi.hoisted(() => ({
   videoFallback: vi.fn(async () => true),
@@ -140,6 +141,7 @@ beforeEach(() => {
       compileAsync: gpu.compile,
       getRenderTarget: vi.fn(() => null),
       setRenderTarget: vi.fn(),
+      render: vi.fn(drawn),
     },
     scene: new Scene(),
     camera: new OrthographicCamera(),
@@ -330,7 +332,10 @@ describe("R3F direct WebGPU scene lifetime", () => {
     });
     render(<EditorScene controller={source().controller} onError={onError} />);
     expect(screen.getByRole("alert")).toHaveTextContent("GPU est indisponible");
-    expect(onError).toHaveBeenCalledWith("Rendu GPU indisponible : device lost");
+    expect(onError).toHaveBeenCalledWith(
+      "Rendu GPU indisponible : device lost",
+      "Error: device lost",
+    );
   });
   it("waits for a pending compositor job before releasing GPU resources after unmount", async () => {
     let complete:
@@ -366,7 +371,10 @@ describe("R3F direct WebGPU scene lifetime", () => {
       expect(screen.getByRole("alert")).toHaveTextContent(
         "GPU rendering is unavailable. Reload to try again.",
       );
-      expect(onError).toHaveBeenCalledWith("GPU rendering unavailable: device lost");
+      expect(onError).toHaveBeenCalledWith(
+        "GPU rendering unavailable: device lost",
+        "Error: device lost",
+      );
       await act(() => changeLanguage("fr"));
       expect(screen.getByRole("alert")).toHaveTextContent("Le rendu GPU est indisponible");
     } finally {
@@ -386,7 +394,7 @@ describe("R3F direct WebGPU scene lifetime", () => {
     expect(192 * resizeRatio).toBe(768);
     expect(vi.mocked(Canvas)).toHaveBeenCalledOnce();
     expect(gpu.frame).toBeTypeOf("function");
-    expect(gpu.framePriority).toBe(-1);
+    expect(gpu.framePriority).toBe(1);
   });
   it("prepares exact frame texels before Fiber renders, including a later external resize", async () => {
     const input = source(page(778, 17));
@@ -418,10 +426,78 @@ describe("R3F direct WebGPU scene lifetime", () => {
     });
     render(<EditorScene controller={input.controller} onError={onError} />);
     await waitFor(() =>
-      expect(onError).toHaveBeenCalledWith(expect.stringContaining("Constructor failed")),
+      expect(onError).toHaveBeenCalledWith(
+        expect.stringContaining("Constructor failed"),
+        "Error: Constructor failed",
+      ),
     );
     expect(input.controller.presentation.read().available).toBe(false);
     expect(screen.getByRole("alert")).toBeInTheDocument();
+  });
+  it("reports final display failures once with copyable details and recovers after a valid edit", async () => {
+    const input = source(),
+      onError = vi.fn(),
+      failure = new RangeError("GPU texture 8439×2265 exceeds device limit 8192"),
+      renderer = gpu.state.gl as {
+        domElement: HTMLCanvasElement;
+        render: ReturnType<typeof vi.fn>;
+      };
+    render(<EditorScene engine={input.engine} controller={input.controller} onError={onError} />);
+    await waitFor(() => expect(gpu.invalidate).toHaveBeenCalled());
+    renderer.render.mockImplementation(() => {
+      throw failure;
+    });
+    act(() => gpu.frame?.());
+    act(() => gpu.frame?.());
+    expect(onError).toHaveBeenCalledExactlyOnceWith(
+      failure.message,
+      `RangeError: ${failure.message}`,
+    );
+    expect(renderer.domElement.dataset.renderError).toBe(failure.message);
+    expect(renderer.domElement.dataset.rendererReady).toBe("false");
+    expect(renderer.domElement.dataset.presentationReady).toBe("false");
+    const snapshot = input.engine.getSnapshot();
+    expect(
+      input.controller.presentation.ready({
+        projectId: snapshot.project.id,
+        revision: snapshot.revision,
+      }),
+    ).toBe(false);
+    renderer.render.mockImplementation(drawn);
+    act(() => input.engine.execute({ type: "updatePage", patch: { background: "#ffffff" } }));
+    await waitFor(() => expect(gpu.invalidate).toHaveBeenCalledTimes(2));
+    act(() => gpu.frame?.());
+    expect(renderer.domElement.dataset.rendererReady).toBe("true");
+    expect(renderer.domElement.dataset.presentationReady).toBe("true");
+    expect(renderer.domElement.dataset.renderError).toBeUndefined();
+    expect(vi.mocked(Canvas)).toHaveBeenCalledOnce();
+  });
+  it("routes synchronous frame submission errors through notices without rejecting the editor command", async () => {
+    const input = source(),
+      onError = vi.fn(),
+      failure = new RangeError("GPU texture 8439×2265 exceeds device limit 8192");
+    render(<EditorScene engine={input.engine} controller={input.controller} onError={onError} />);
+    await waitFor(() => expect(gpu.invalidate).toHaveBeenCalled());
+    vi.spyOn(PlaneResources.prototype, "submit").mockImplementationOnce(() => {
+      throw failure;
+    });
+    expect(() =>
+      act(() =>
+        input.engine.execute({
+          type: "updatePage",
+          patch: { background: "#ffffff" },
+        }),
+      ),
+    ).not.toThrow();
+    expect(onError).toHaveBeenCalledExactlyOnceWith(
+      failure.message,
+      `RangeError: ${failure.message}`,
+    );
+    expect(input.engine.getSnapshot().project.pages[0]?.background).toBe("#ffffff");
+    expect(
+      (gpu.state.gl as { domElement: HTMLCanvasElement }).domElement.dataset.rendererReady,
+    ).toBe("false");
+    expect(screen.queryByText("GPU rendering is unavailable. Reload to try again.")).toBeNull();
   });
 });
 

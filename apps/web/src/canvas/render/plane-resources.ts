@@ -522,7 +522,12 @@ export class PlaneResources {
       active: Number(Boolean(this.active)),
     };
   }
-  private report(error: unknown) {
+  report(error: unknown, displayFailed = false) {
+    if (displayFailed) {
+      this.prepared = false;
+      this.renderer.domElement.dataset.presentationReady = "false";
+    }
+    this.renderer.domElement.dataset.rendererReady = "false";
     this.opening.failed(error);
     const message = error instanceof Error ? error.message : String(error);
     this.renderer.domElement.dataset.renderError = message;

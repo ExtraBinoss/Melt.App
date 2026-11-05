@@ -22,6 +22,9 @@ import { useVideoBackend } from "./use-video-backend";
 import { FiberTimerClock } from "./fiber-timer";
 import { DrawingDensity } from "./drawing-density";
 import { watchDisplayDensity } from "./display-density";
+import { createRendererErrorReporter } from "./error-reporting";
+import { errorDiagnostics } from "../../components/notifications/diagnostics";
+import { formatUiError } from "../../state/i18n/errors/format";
 import "../../state/i18n/errors/messages";
 import "./loading.css";
 
@@ -92,6 +95,10 @@ export function CompositionPlane({
   useEffect(() => {
     onErrorRef.current = onError;
   }, [onError]);
+  const reportError = useMemo(
+    () => createRendererErrorReporter(engine, () => onErrorRef.current),
+    [engine],
+  );
   const invalidate = useThree((state) => state.invalidate);
   const setDpr = useThree((state) => state.setDpr);
   const clock = useThree((state) => state.clock);
@@ -111,18 +118,27 @@ export function CompositionPlane({
     [renderer, fontResolver, mediaResolverFor, controller],
   );
   useFrame(() => {
-    density.prepare(renderer);
-    // Composition preparation uses offscreen targets. Fiber's display draw must
-    // explicitly return to the canvas after those asynchronous GPU passes.
-    renderer.setRenderTarget(null);
-  }, -1);
+    try {
+      density.prepare(renderer);
+      // Own Fiber's final display draw so RAF errors reach the same copyable notice
+      // as asynchronous composition failures, without aborting the shared frame loop.
+      renderer.setRenderTarget(null);
+      renderer.render(scene, camera);
+    } catch (error) {
+      resources.report(error, true);
+    }
+  }, 1);
   useEffect(() => {
     if (!engine) return;
     const viewport = getStudioViewport(engine);
     const update = () => {
       const value = viewport.read(),
         page = controller.read().page;
-      resources.setViewport(value?.pageId === page.id ? value.displayRegion : undefined);
+      try {
+        resources.setViewport(value?.pageId === page.id ? value.displayRegion : undefined);
+      } catch (error) {
+        resources.report(error);
+      }
     };
     const stop = viewport.subscribe(update);
     update();
@@ -150,14 +166,18 @@ export function CompositionPlane({
     const update = () => {
       const frame = controller.read();
       const { page, assets, presentation, motionFrame, playback } = frame;
-      resources.submit(page, assets, presentation, motionFrame, playback, frame);
+      try {
+        resources.submit(page, assets, presentation, motionFrame, playback, frame);
+      } catch (error) {
+        resources.report(error);
+      }
     };
     try {
       release = resources.activate(
         scene,
         camera,
         invalidate,
-        (message, details) => onErrorRef.current?.(message, details),
+        reportError,
         (scale, width, height) => density.apply(scale, setDpr, width, height),
         presenter,
         fontPresenter,
@@ -174,12 +194,23 @@ export function CompositionPlane({
       return cleanup;
     } catch (error) {
       cleanup();
-      void resources.dispose().catch((failure: unknown) => onErrorRef.current?.(String(failure)));
+      void resources
+        .dispose()
+        .catch((failure: unknown) =>
+          reportError(formatUiError(failure), errorDiagnostics(failure)),
+        );
       throw error;
     }
-  }, [resources, scene, camera, invalidate, controller, setDpr, density]);
+  }, [resources, scene, camera, invalidate, controller, setDpr, density, reportError]);
   useEffect(
-    () => watchDisplayDensity(zoom, (density) => resources.setDensity(density)),
+    () =>
+      watchDisplayDensity(zoom, (density) => {
+        try {
+          resources.setDensity(density);
+        } catch (error) {
+          resources.report(error);
+        }
+      }),
     [zoom, resources],
   );
   return <primitive object={resources.mesh} dispose={null} />;
@@ -198,7 +229,7 @@ class GpuBoundary extends Component<
     return { error: true };
   }
   componentDidCatch(error: Error) {
-    this.props.onError?.(this.props.describeError(error.message));
+    this.props.onError?.(this.props.describeError(error.message), errorDiagnostics(error));
   }
   render() {
     if (this.state.error)
@@ -221,6 +252,10 @@ export const EditorScene = memo(function EditorScene({
   const [{ page }] = useState(() => controller.read());
   const videoBackend = useVideoBackend(controller, engine);
   const density = useMemo(() => new DrawingDensity(), []);
+  const reportError = useMemo(
+    () => createRendererErrorReporter(engine, () => onError),
+    [engine, onError],
+  );
   const { t } = useTranslation();
   const element = useRef<HTMLDivElement>(null);
   const preparing = useMemo(
@@ -267,7 +302,7 @@ export const EditorScene = memo(function EditorScene({
   useRenderMetrics(element);
   return (
     <GpuBoundary
-      onError={onError}
+      onError={reportError}
       fallback={t("errors:gpuUnavailable")}
       describeError={(message) => t("errors:gpuError", { message })}
     >
@@ -299,7 +334,7 @@ export const EditorScene = memo(function EditorScene({
           <CompositionPlane
             engine={engine}
             controller={controller}
-            onError={onError}
+            onError={reportError}
             zoom={zoom}
             fontResolver={fontResolver}
             mediaResolverFor={mediaResolverFor}

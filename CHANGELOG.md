@@ -4,6 +4,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ## [Unreleased]
 
+- Route synchronous canvas updates, final display failures and GPU boundary errors through the existing copyable editor notice, preserving diagnostics and recovery without repeated notification floods.
+
 - Bound grazing-camera GPU allocations before resource creation while preserving authored effect coordinates and requested output dimensions. Clip projected effect expansion to the actual output window.
 
 - Fix nearly black RVM person mattes on the Second Skin video by explicitly keeping its recurrent FP16 graph in WebGPU NCHW layout. Preserve GPU recurrent states and soft alpha without changing the shared SAM/BiRefNet runtime. Add an opt-in real-model verification of the complete source, native encoded masks and transparent WebGPU/WebGL exports.
