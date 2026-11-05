@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import type { EnginePort } from "@musart/core";
 import { animationPresentation } from "../motion/animations/presentation";
+import { useWorkspaceMode } from "../../ui/studio/workspace-mode";
 
 /** Explicit activation reveals an existing owner editor; drag selection never opens a popup. */
 export function useSceneMotionNavigation(engine: EnginePort) {
+  const mode = useWorkspaceMode();
   const [camera, setCamera] = useState("");
   const [light, setLight] = useState<string | null>(null);
   useEffect(() => {
@@ -14,12 +16,14 @@ export function useSceneMotionNavigation(engine: EnginePort) {
       const animation = page?.motion?.sceneAnimations?.find(
         (animation) => animation.id === animationId,
       );
-      if (animation?.owner.kind === "camera") {
+      if (animation?.owner.kind === "camera" && mode === "classic") {
         setCamera("camera");
         setLight(null);
       } else if (animation?.owner.kind === "light") setLight(animation.owner.lightId);
-      else if (animation?.owner.kind === "environment") setLight(null);
-      if (animation && animation.owner.kind !== "compositionEffect") {
+      if (
+        animation?.owner.kind === "light" ||
+        (animation?.owner.kind === "camera" && mode === "classic")
+      ) {
         const request = store.readEditorRequest();
         if (request?.animationId === animationId) store.consumeEditorRequest(request);
       }
@@ -28,6 +32,6 @@ export function useSceneMotionNavigation(engine: EnginePort) {
     const pending = store.readEditorRequest();
     if (pending && pending.owner.kind !== "compositionEffect") reveal(pending.animationId);
     return stop;
-  }, [engine]);
+  }, [engine, mode]);
   return { camera, setCamera, light, setLight };
 }

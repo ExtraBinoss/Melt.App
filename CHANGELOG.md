@@ -4,6 +4,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ## [Unreleased]
 
+- Keep Studio camera and environment animation requests owned by the shared Scene popover, while Classic and light requests continue to reveal their existing inspector controls.
+
 - Keep Studio rulers inactive without shifting the canvas. Put guide visibility inside the capture popover and reveal its settings only while enabled. Add left-hand color swatches with hover previews, configurable safe margins and center lines, and validated Undo/Redo for framing inputs. Preserve rendered artwork and honor the authored capture dimensions in export.
 
 - Fix live camera, light and environment Motion playback by including scene values in retained-pose invalidation. Preview scene animations with the existing Motion evaluator and retained native GPU renderer, using a bounded budget that admits native environment preparation. Distinguish preview failures from preset storage errors and clear preview errors after a successfully presented frame. Keep scene animation controls outside object properties, name each section for its owner, and open the matching Studio scene editor from timeline requests.
