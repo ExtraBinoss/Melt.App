@@ -19,5 +19,7 @@
   "ingredients": {
     "grain": "Grain",
     "feather": "Feather"
-  }
+  },
+  "transparent": "Transparent",
+  "position": "Gradient position"
 }

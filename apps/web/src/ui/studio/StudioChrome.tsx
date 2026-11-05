@@ -1,12 +1,11 @@
 import { memo, useCallback, type ReactNode } from "react";
 import { useSetAtom } from "jotai";
-import { Crosshair, ImagePlus, SlidersHorizontal, Type, Upload } from "lucide-react";
+import { Crosshair, Download, ImagePlus, SlidersHorizontal, Type } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import type { EnginePort } from "@musart/core";
 import type { EditorServices } from "../../state/contracts";
 import type { TaskRunner } from "../../components/projects/ProjectDialog";
 import { toolAtom } from "../../state/session/editor";
-import { Button } from "../../components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "../../components/ui/popover";
 import { SpatialLibrary } from "../../components/spatial/SpatialLibrary";
 import { ShapeToolSlot } from "../../components/assets/ShapeToolSlot";
@@ -60,48 +59,52 @@ export const StudioChrome = memo(function StudioChrome({
   return (
     <div className="studio-chrome" data-studio-chrome>
       <nav className="studio-quick-add studio-surface" aria-label={t("add")} data-canvas-control>
-        <Button
-          variant="ghost"
-          size="sm"
-          aria-label={t("text")}
-          onClick={() =>
-            run(() => {
-              insertSpatialObject(engine, "text", t("newText"));
-              setTool("pointer");
-            })
-          }
-        >
-          <Type size={17} />
-        </Button>
-        {library ?? (
-          <>
-            <SpatialLibrary engine={engine} />
-            <ShapeToolSlot engine={engine} />
-          </>
-        )}
-        <Button variant="ghost" size="sm" aria-label={t("media")} onClick={onImport}>
-          <ImagePlus size={17} />
-        </Button>
-        <div className="studio-view-shortcuts">
-          <IconButton label={common("recenterView")} onClick={() => viewport.run("recenter")}>
-            <Crosshair size={15} />
+        <div className="studio-tool-group">
+          <IconButton
+            label={t("text")}
+            tooltipSide="bottom"
+            onClick={() =>
+              run(() => {
+                insertSpatialObject(engine, "text", t("newText"));
+                setTool("pointer");
+              })
+            }
+          >
+            <Type size={17} />
+          </IconButton>
+          {library ?? (
+            <>
+              <SpatialLibrary engine={engine} tooltipSide="bottom" />
+              <ShapeToolSlot engine={engine} tooltipSide="bottom" />
+            </>
+          )}
+          <IconButton label={t("media")} tooltipSide="bottom" onClick={onImport}>
+            <ImagePlus size={17} />
           </IconButton>
         </div>
-        <StudioGuides engine={engine} />
-        <StudioEffects engine={engine} run={run} />
-        {commandControl}
+        <span className="studio-toolbar-divider" aria-hidden />
+        <div className="studio-tool-group">
+          <StudioEffects engine={engine} run={run} />
+        </div>
+        <span className="studio-toolbar-divider" aria-hidden />
+        <div className="studio-tool-group studio-view-shortcuts">
+          <IconButton
+            label={common("recenterView")}
+            tooltipSide="bottom"
+            onClick={() => viewport.run("recenter")}
+          >
+            <Crosshair size={15} />
+          </IconButton>
+          <StudioGuides engine={engine} />
+          {commandControl}
+        </div>
       </nav>
       <div className="studio-actions" data-canvas-control>
         <Popover modal={false}>
           <PopoverTrigger asChild>
-            <Button
-              variant="outline"
-              size="icon"
-              className="studio-surface"
-              aria-label={t("advanced")}
-            >
+            <IconButton label={t("advanced")} tooltipSide="bottom" className="studio-surface">
               <SlidersHorizontal size={17} />
-            </Button>
+            </IconButton>
           </PopoverTrigger>
           <PopoverContent
             side="bottom"
@@ -116,10 +119,15 @@ export const StudioChrome = memo(function StudioChrome({
           </PopoverContent>
         </Popover>
         {exportControl ?? (
-          <Button className="studio-export" onClick={onExport}>
-            <Upload size={15} />
-            <span>{t("export")}</span>
-          </Button>
+          <IconButton
+            label={t("export")}
+            tooltipSide="bottom"
+            variant="default"
+            className="studio-export"
+            onClick={onExport}
+          >
+            <Download size={17} />
+          </IconButton>
         )}
       </div>
       <StudioCompositions engine={engine} services={services} run={run} />

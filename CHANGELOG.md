@@ -43,6 +43,10 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Refine Studio into separated icon toolbars with directional tooltips, translucent theme surfaces, visible hover states and a primary export action. Native material/environment sphere controls expose adjacent properties, camera direction, distance and field of view; disabled material tools explain the required 3D selection in all twelve languages.
+- Pick prepared 3D geometry in Studio instead of authored 2D frames, ignore structural background paint during canvas picking, and display GPU silhouette contours. One composition camera orbits without a selected object; hover pulses settle instead of running continuously. Classic interaction and canonical export remain shared.
+- Add transparent/solid/gradient Studio background modes with live direction/position pads, ordinary editable paint and preserved native effect stacks. Continue paint outside the fitted camera gate, enrich direct primitive transforms, refresh the starter's lighting/material, and share 45 pre-rendered native effect thumbnails between Studio and Classic without runtime preview renderers.
+
 - Rebuild Studio Starter as a focused 1920 × 1080 composition with one editable MELT text object, an ink-centered transform origin, a compact authoring frame and native-resolution-friendly lighting. Fit the complete composition in Studio without stretching/cropping; show text, font, size and native depth/bevel/scale controls inline, reserving the popover for geometry quality.
 - Keep asynchronous 3D, text and typography preview work alive during continuous gestures while coalescing newer samples, with canonical cancellation and one undoable commit. Budget known primitives from conservative projected native crops, retaining unknown-source fallbacks and existing GPU memory limits; render empty/whitespace 3D text as genuine zero-triangle geometry so typing can resume.
 - Use the existing shadcn/Radix accordion for Studio color disclosures and effect stacks, removing duplicate HTML disclosure behavior and local accordion-trigger skins.

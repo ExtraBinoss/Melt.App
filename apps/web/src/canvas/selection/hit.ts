@@ -1,4 +1,5 @@
 import {
+  backgroundLayer,
   createLayerGeometryIndex,
   morphContentBounds,
   type Composition,
@@ -41,14 +42,19 @@ export function canvasHit(
   point: Point,
   includeLocked = false,
   index: LayerGeometryIndex = createLayerGeometryIndex(page),
+  studio = false,
 ) {
   const picked = nativeSpatialHit(page, point, includeLocked, index);
   const layer = index.hitTest(point, {
     includeLocked,
     contentBounds: morphContentBounds,
-    ...(picked !== undefined ? { spatialHit: (layer) => layer.id === picked } : {}),
+    ...(picked !== undefined || studio ? { spatialHit: (layer) => layer.id === picked } : {}),
   });
-  return layer ? { layer, locked: index.isLocked(layer.id) } : null;
+  return layer &&
+    (!studio ||
+      (layer.id !== backgroundLayer(page)?.id && !(layer.spatial?.enabled && picked == null)))
+    ? { layer, locked: index.isLocked(layer.id) }
+    : null;
 }
 
 /** A layer selected in the tree keeps its move target through overlapping artwork.

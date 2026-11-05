@@ -41,5 +41,9 @@
     "tunnel": "Tunnel",
     "halo": "Halo",
     "low": "Tiefes Licht"
-  }
+  },
+  "select3DObject": "Wähle ein bearbeitbares 3D-Objekt aus, um sein Material zu ändern.",
+  "materialProperties": "Materialeigenschaften",
+  "direction": "Richtung",
+  "highlights": "Glanzlichter"
 }

@@ -1,4 +1,5 @@
 import { useAtomValue } from "jotai";
+import { useWorkspaceMode } from "../../ui/studio/workspace-mode";
 import { spatialEditingAtom } from "../../state/session/spatial-editing";
 import { vectorEditingAtom } from "../../state/session/vector-editing";
 import { memo, useLayoutEffect, useMemo, useRef, type PointerEvent, type RefObject } from "react";
@@ -29,6 +30,7 @@ export const CanvasSelection = memo(function CanvasSelection({
   showHandles: boolean;
   onHandle: (event: PointerEvent<HTMLButtonElement>) => void;
 }) {
+  const studio = useWorkspaceMode() === "studio";
   const editing = useAtomValue(vectorEditingAtom(engine));
   const spatialEditing = useAtomValue(spatialEditingAtom(engine));
   const page = useEngineValue(
@@ -65,14 +67,19 @@ export const CanvasSelection = memo(function CanvasSelection({
           ) && (
             <SelectionOverlays
               page={page}
-              selected={selected}
+              selected={studio ? selected.filter((layer) => !layer.spatial?.enabled) : selected}
               zoom={view.zoom}
               controller={controller}
               viewSource={viewSource}
               onHandle={onHandle}
             />
           )}
-        <TimelineHoverOutline engine={engine} controller={controller} viewSource={viewSource} />
+        <TimelineHoverOutline
+          engine={engine}
+          controller={controller}
+          viewSource={viewSource}
+          studio={studio}
+        />
       </SelectionPlane>
     </>
   );
@@ -83,10 +90,12 @@ function TimelineHoverOutline({
   engine,
   controller,
   viewSource,
+  studio,
 }: {
   engine: EnginePort;
   controller: SceneController;
   viewSource: ViewSource;
+  studio: boolean;
 }) {
   const element = useRef<HTMLDivElement>(null);
   const hover = useMemo(() => createTimelineHoverSource(engine), [engine]);
@@ -135,7 +144,11 @@ function TimelineHoverOutline({
       }
       const index = sourceGeometry(controller);
       const layer = index.byId.get(target.layerId);
-      const visible = layer && index.isVisible(layer.id) && !index.isMaskSource(layer.id);
+      const visible =
+        layer &&
+        !(studio && layer.spatial?.enabled) &&
+        index.isVisible(layer.id) &&
+        !index.isMaskSource(layer.id);
       node.style.display = visible ? "" : "none";
       if (!visible || !layer) {
         delete node.dataset.layerId;
@@ -167,7 +180,7 @@ function TimelineHoverOutline({
       stopView();
       stopSelection();
     };
-  }, [controller, engine, hover, viewSource]);
+  }, [controller, engine, hover, viewSource, studio]);
   return (
     <div
       ref={element}

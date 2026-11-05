@@ -11,6 +11,7 @@ import { useTranslation } from "react-i18next";
 import type { EffectType } from "@musart/core";
 import { DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel } from "../../ui/dropdown-menu";
 import { useVirtualList } from "../../shared/scroll/use-virtual-list";
+import { EffectThumbnail } from "./EffectThumbnail";
 import { catalogRows, CATALOG_PADDING, CATALOG_ROW_HEIGHT } from "./rows";
 import { useCatalogNavigation } from "./use-catalog-navigation";
 import type { CatalogEntry, EffectFamily } from "./model";
@@ -81,7 +82,9 @@ export function CatalogRows({
               <DropdownMenuGroup key={group.family} aria-label={label}>
                 {visible(group.heading) && (
                   <DropdownMenuLabel
-                    style={{ top: CATALOG_PADDING + group.heading * CATALOG_ROW_HEIGHT }}
+                    style={{
+                      top: CATALOG_PADDING + group.heading * CATALOG_ROW_HEIGHT,
+                    }}
                   >
                     {label}
                   </DropdownMenuLabel>
@@ -132,7 +135,8 @@ const CatalogItem = memo(function CatalogItem({
       aria-posinset={index + 1}
       onSelect={() => onAdd(entry.type)}
     >
-      {entry.label}
+      <EffectThumbnail type={entry.type} />
+      <span className="effect-catalog-item-label">{entry.label}</span>
     </DropdownMenuItem>
   );
 });

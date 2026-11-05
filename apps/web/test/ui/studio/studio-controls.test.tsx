@@ -1,5 +1,5 @@
 import type { ComponentProps } from "react";
-import { act, screen } from "@testing-library/react";
+import { act, fireEvent, screen } from "@testing-library/react";
 import { expect, test, vi } from "vitest";
 import { createLayer, createSpatialLayer, createSpatialScene } from "@musart/core";
 import { StudioMaterial } from "../../../src/ui/studio/panels/StudioMaterial";
@@ -39,7 +39,7 @@ function fixture() {
       const view = mount(ui);
       const dock = screen
         .getAllByRole("button")
-        .find((button) => ["Matière", "Scène"].includes(button.textContent?.trim() ?? ""));
+        .find((button) => ["Matière", "Scène"].includes(button.getAttribute("aria-label") ?? ""));
       if (dock) act(() => dock.click());
       return view;
     },
@@ -96,7 +96,7 @@ test("selection replacement retires a material draft and late captured callbacks
   expect(d.run).not.toHaveBeenCalled();
 });
 
-test("a locked ancestor disables material gestures and rejects direct stale callbacks", () => {
+test("a locked ancestor disables the material trigger and keeps its controls closed", () => {
   const d = fixture(),
     project = structuredClone(d.engine.getSnapshot().project);
   const group = createLayer("group", { name: "Locked group", locked: true });
@@ -105,13 +105,8 @@ test("a locked ancestor disables material gestures and rejects direct stale call
   d.engine.load(project);
   d.engine.select([d.rectangle.id]);
   d.mount(<StudioMaterial engine={d.engine} run={d.run} />);
-  expect(screen.getByRole("slider", { name: "Rugosité" })).toHaveAttribute("data-disabled");
-  const field = control("Rugosité");
-  act(() => {
-    field.onStart?.();
-    field.onPreview(0.9);
-    field.onCommit(0.9);
-  });
+  expect(screen.getByRole("button", { name: "Matière" })).toBeDisabled();
+  expect(screen.queryByRole("slider", { name: "Rugosité" })).toBeNull();
   expect(d.store.get(previewAtom)).toBeNull();
   expect(d.engine.getSnapshot().canUndo).toBe(false);
 });
@@ -165,4 +160,21 @@ test("unrelated scene commands cancel an active environment draft and reject its
   expect(d.engine.getSnapshot().project).toBe(original);
   expect(d.engine.getSnapshot().project.pages[0]!.spatial!.environment.intensity).toBe(1);
   expect(d.run).not.toHaveBeenCalled();
+});
+
+test("direction pad edits the canonical camera and restores both axes with one undo", () => {
+  const d = fixture();
+  const original = d.engine.getSnapshot().project;
+  const camera = original.pages[0]!.spatial!.camera;
+  d.mount(<StudioEnvironment engine={d.engine} run={d.run} />);
+  fireEvent.keyDown(screen.getByRole("button", { name: "Direction" }), { key: "ArrowRight" });
+  expect(d.run).toHaveBeenCalledOnce();
+  expect(d.engine.getSnapshot().project.pages[0]!.spatial!.camera).toEqual({
+    ...camera,
+    yaw: camera.yaw + 1,
+  });
+  expect(d.store.get(previewAtom)).toBeNull();
+  act(() => d.engine.undo());
+  expect(d.engine.getSnapshot().project).toEqual(original);
+  expect(d.engine.getSnapshot().canUndo).toBe(false);
 });

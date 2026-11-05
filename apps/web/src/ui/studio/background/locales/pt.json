@@ -19,5 +19,7 @@
   "ingredients": {
     "grain": "Grão",
     "feather": "Suavizar bordas"
-  }
+  },
+  "transparent": "Transparente",
+  "position": "Posição do gradiente"
 }

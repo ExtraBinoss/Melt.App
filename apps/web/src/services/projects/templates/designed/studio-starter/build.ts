@@ -11,8 +11,8 @@ import { TemplateAuthor } from "../../motion/author";
 export function createStudioStarter() {
   const a = new TemplateAuthor("studio-starter", "Studio Starter", 1920, 1080);
   const scene = createSpatialScene();
-  scene.camera = { projection: "perspective", yaw: -10, pitch: 6, distance: 4.8, fov: 35 };
-  scene.environment = { preset: "softbox", assetId: null, intensity: 0.8, rotation: 20 };
+  scene.camera = { projection: "perspective", yaw: -20, pitch: 10, distance: 4.8, fov: 35 };
+  scene.environment = { preset: "softbox", assetId: null, intensity: 0.55, rotation: 20 };
   scene.reflections = { mode: "environment", quality: "balanced" };
   scene.shadows = true;
   scene.lights = [
@@ -23,7 +23,7 @@ export function createStudioStarter() {
       y: 4,
       z: 5,
       color: "#FFF2DE",
-      intensity: 3.2,
+      intensity: 1.7,
       castShadow: true,
     },
     {
@@ -33,7 +33,7 @@ export function createStudioStarter() {
       y: 1,
       z: 2,
       color: "#C9D8FF",
-      intensity: 1.4,
+      intensity: 0.6,
     },
     {
       ...createSpatialLight("point"),
@@ -42,7 +42,7 @@ export function createStudioStarter() {
       y: 1.5,
       z: -1,
       color: "#EAC4FF",
-      intensity: 0.7,
+      intensity: 0.4,
     },
   ];
   const fontSize = 300;
@@ -60,14 +60,14 @@ export function createStudioStarter() {
     fontSize,
     letterSpacing: -8,
     textAlign: "center",
-    fill: "#B8A3E5",
+    fill: "#7547E8",
     fillGradient: {
       kind: "linear",
       angle: 15,
       stops: [
-        { offset: 0, color: "#A99ADE" },
-        { offset: 0.6, color: "#D4BFEA" },
-        { offset: 1, color: "#F1C8B4" },
+        { offset: 0, color: "#5130A8" },
+        { offset: 0.6, color: "#8554E4" },
+        { offset: 1, color: "#C089ED" },
       ],
     },
     spatial: {
@@ -78,15 +78,15 @@ export function createStudioStarter() {
       scaleX: 1.8,
       scaleY: 1.8,
       scaleZ: 1.8,
-      depth: 0.18,
-      bevel: 0.012,
+      depth: 0.3,
+      bevel: 0.025,
       bevelSegments: 3,
       curveSegments: 12,
-      material: { ...spatialMaterial("plastic").settings, roughness: 0.28, clearcoat: 0.6 },
+      material: { ...spatialMaterial("plastic").settings, roughness: 0.24, clearcoat: 0.8 },
     },
   });
   a.commit([
-    { type: "updatePage", patch: { background: "#F5F1EA", spatial: scene } },
+    { type: "updatePage", patch: { background: "#F1EEE8", spatial: scene } },
     { type: "addLayers", layers: [title] },
   ]);
   return a.finish();

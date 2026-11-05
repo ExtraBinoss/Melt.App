@@ -6,6 +6,7 @@ import {
   filterEffectCatalog,
   type EffectCategory,
 } from "../../../components/layers/catalog/model";
+import { EffectThumbnail } from "../../../components/layers/catalog/EffectThumbnail";
 import { Input } from "../../../components/ui/input";
 import { Button } from "../../../components/ui/button";
 import "../../../components/layers/catalog/messages";
@@ -46,7 +47,8 @@ export function StudioEffectCatalog({
             disabled={disabled}
             onClick={() => onAdd(entry.type)}
           >
-            {entry.label}
+            <EffectThumbnail type={entry.type} />
+            <span>{entry.label}</span>
           </Button>
         ))}
         {!visible.length && <p className="muted-description">{t("effectCatalog:empty")}</p>}

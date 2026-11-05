@@ -13,28 +13,47 @@ portable-project, image/video export and headless command paths.
 Studio fits the complete active composition inside the viewport with uniform scale.
 Landscape projects retain their aspect ratio on portrait screens. This presentation
 zoom does not change the portable composition or its camera.
+The surrounding workspace continues ordinary background paint to the window edges;
+it does not enlarge the composition or stretch its objects. Native effects and exact
+output remain evaluated inside the canonical capture gate.
 Switching back restores the Classic view. Objects outside a capture guide remain
 editable and are retained in the project.
 
 - Icon-only quick insertion uses native text, shapes/models, flat or extruded SVGs,
-  images, video and audio services. The regular gizmos handle move/rotate/scale.
+  images, video and audio services. Separated toolbar groups contain insertion,
+  effects/color adjustments and view controls. Top tooltips open below their buttons;
+  bottom tooltips open above. Export retains the primary theme accent.
 - The closed composition control opens the existing pages and layer components,
   including visibility, locks, nested effects and ordering.
 - Selecting text reveals an outlined text input, font, font size, depth and bevel
   directly in the centered object bar. Models and primitives expose proportional
-  size instead of irrelevant extrusion parameters. Advanced tessellation quality
-  remains in the small contextual popover.
+  size and X/Y rotation. Position, axis scales and Z rotation are available in the
+  contextual popover alongside extrusion tessellation quality when applicable.
 - Material and scene controls open on demand. Their 134 materials and 62 environment
   entries are grouped into initially expanded categories; each project's preferences
   remember collapsed categories. Sphere atlases are rendered with the native engine
   ahead of time, avoiding a renderer per swatch. The original eleven lit environment
   presets retain their exact RoomEnvironment geometry and colors.
+- The closed material and environment tools use native sphere atlas thumbnails.
+  Material editing requires one unlocked native object; its disabled tool explains
+  this requirement. Material properties sit beside the catalog. The scene panel's
+  direction pad, distance and focal-angle controls edit the composition camera.
 - Sliders preview imperatively, commit once on release and restore on cancellation,
   owner changes or unmount. Neutral surfaces use the shared theme without glows.
 - Recenter restores the immersive view. Wheel/trackpad navigation and pointer zoom
   retain the existing canvas behavior. Classic retains its fit and 100% controls.
 - Advanced opens the regular Inspector. There is no agent activity surface in Studio;
   opt-in automation remains available without interrupting manual composition.
+
+Studio picks actual prepared native triangles, including glyph counters and imported
+model geometry, and omits their ordinary 2D selection frames. Structural background
+paint is selected from the layer tree rather than stealing blank-canvas clicks.
+Native hover/selection contours sample retained GPU coverage before ordinary
+post-composite effects/masks. Hover pulses twice then settles; reduced motion uses
+a static contour. No extra native render target, GPU readback or perpetual idle
+animation is required. Dragging empty space or a native object orbits the single
+composition camera; selected gizmo handles retain native transforms. Hand/Space,
+wheel navigation and direct dragging of ordinary 2D artwork retain their behavior.
 
 Studio does not add a separate Motion editor. Existing animated compositions remain
 animated and editable through shared advanced controls or Classic.
@@ -64,6 +83,12 @@ bleed. The original project and undo history remain intact.
 Background initially edits ordinary composition paint. **Enable background effects**
 copies it to a normal full-frame rectangle at the bottom of the layer stack in one
 validated transaction. Foreground selection is preserved.
+The compact controls expose transparent, solid and gradient modes. Linear direction
+and radial position use the same captured-pointer pad as the camera, with live
+previews, cancellation and one undo entry. The advanced paint popover retains the
+shared full gradient editor. Effect menus in both workspaces share 45 static native
+thumbnail exports; opening a catalog starts no GPU preview work. Regenerate them
+with `bun scripts/effects/render-catalog.ts` against a running local editor.
 
 The 65 gradient recipes are grouped into glossy plastic, cinematic, social,
 editorial and atmosphere palettes. Hover or keyboard focus previews the entire

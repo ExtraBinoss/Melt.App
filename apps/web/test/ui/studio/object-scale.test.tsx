@@ -25,3 +25,29 @@ test("model/primitive size preserves proportions within every native axis limit 
   act(() => d.engine.undo());
   expect(d.engine.getSnapshot().project).toEqual(before);
 });
+
+test("primitive direct rotation and advanced axis transforms use canonical reversible properties", () => {
+  const d = setup();
+  d.engine.execute({
+    type: "updateLayers",
+    ids: [d.rectangle.id],
+    patch: { spatial: { ...createSpatialLayer("box"), z: 20 } },
+  });
+  d.engine.select([d.rectangle.id]);
+  const before = d.engine.getSnapshot().project;
+  d.mount(<StudioObjectBar engine={d.engine} run={d.run} />);
+  const rotation = screen.getByRole("slider", { name: "Rotation Y" });
+  fireEvent.keyDown(rotation, { key: "ArrowRight" });
+  fireEvent.keyUp(rotation, { key: "ArrowRight" });
+  expect(d.engine.getSnapshot().project.pages[0]!.layers[0]!.spatial!.rotationY).toBe(1);
+  act(() => d.engine.undo());
+  expect(d.engine.getSnapshot().project).toEqual(before);
+  act(() => screen.getByRole("button", { name: "Avancé" }).click());
+  const position = screen.getByRole("slider", { name: "Position Z" });
+  expect(Number(position.getAttribute("aria-valuemax"))).toBeGreaterThanOrEqual(20);
+  fireEvent.keyDown(position, { key: "ArrowLeft" });
+  fireEvent.keyUp(position, { key: "ArrowLeft" });
+  expect(d.engine.getSnapshot().project.pages[0]!.layers[0]!.spatial!.z).toBeCloseTo(19.99);
+  act(() => d.engine.undo());
+  expect(d.engine.getSnapshot().project).toEqual(before);
+});

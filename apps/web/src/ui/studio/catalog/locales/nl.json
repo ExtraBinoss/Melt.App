@@ -41,5 +41,9 @@
     "tunnel": "Tunnel",
     "halo": "Halo",
     "low": "Laag licht"
-  }
+  },
+  "select3DObject": "Selecteer een bewerkbaar 3D-object om het materiaal te wijzigen.",
+  "materialProperties": "Materiaaleigenschappen",
+  "direction": "Richting",
+  "highlights": "Hooglichten"
 }

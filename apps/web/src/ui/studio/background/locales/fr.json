@@ -19,5 +19,7 @@
   "ingredients": {
     "grain": "Grain",
     "feather": "Contour progressif"
-  }
+  },
+  "transparent": "Transparent",
+  "position": "Position du dégradé"
 }

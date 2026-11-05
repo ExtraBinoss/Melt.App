@@ -19,5 +19,7 @@
   "ingredients": {
     "grain": "颗粒",
     "feather": "羽化"
-  }
+  },
+  "transparent": "透明",
+  "position": "渐变位置"
 }

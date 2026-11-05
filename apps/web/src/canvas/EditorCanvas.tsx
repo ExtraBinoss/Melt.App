@@ -18,6 +18,7 @@ import { completeDrawing, resizeDrawing } from "./interaction/drawing";
 import { createCanvasTransfers } from "./interaction/transfers";
 import { CanvasContextMenu } from "./selection/CanvasContextMenu";
 import { readReleasePoint } from "./interaction/release";
+import { canvasNavigationKeys, canvasNavigationKeyDown } from "./interaction/keyboard-navigation";
 import { useTranslation } from "react-i18next";
 import {
   createLayer,
@@ -57,6 +58,7 @@ import {
 import "./artboards/artboards.css";
 import { QuickAdd } from "./quick-add/QuickAdd";
 import { CanvasSelection } from "./selection/CanvasSelection";
+import { useWorkspaceMode } from "../ui/studio/workspace-mode";
 import { useCanvasHover } from "./selection/use-canvas-hover";
 import { sourcePagePoint } from "./selection/frame-geometry";
 import { canvasHit } from "./selection/hit";
@@ -129,8 +131,9 @@ export function EditorCanvas({
   const containMarquee = useAtomValue(marqueeContainAtom);
   const [space, setSpace] = useState(false);
   const [dragOver, setDragOver] = useState(false);
+  const studio = useWorkspaceMode() === "studio";
   const hoverEnabled = tool === "pointer" && !space;
-  useCanvasHover(viewport, engine, controller, pageViewSource, hoverEnabled, gesture);
+  useCanvasHover(viewport, engine, controller, pageViewSource, hoverEnabled, gesture, studio);
   const wand = useWand({ port: services?.pixelSelection, store, tool, onError });
   const cancelWand = wand.cancel;
   const pixelSelection = services?.pixelSelection;
@@ -293,7 +296,7 @@ export function EditorCanvas({
       return;
     }
     const currentPage = controller.read().page;
-    const picked = pickCanvasPointer(engine, controller, point, tool, additive),
+    const picked = pickCanvasPointer(engine, controller, point, tool, additive, studio),
       hit = picked?.layer;
     if (tool === "wand" || tool === "segment") {
       if (hit?.kind === "image") {
@@ -461,6 +464,8 @@ export function EditorCanvas({
       <div
         className="editor-canvas"
         data-testid="editor-canvas"
+        data-canvas-tool={tool}
+        data-navigation-held={space || undefined}
         aria-label={t("canvas")}
         ref={viewport}
         tabIndex={0}
@@ -473,29 +478,20 @@ export function EditorCanvas({
         onLostPointerCapture={(event) => {
           if (gesture.current || wand.active()) pointerCancel(event);
         }}
+        {...canvasNavigationKeys(setSpace)}
         onKeyDown={(event) => {
-          if ((event.target as HTMLElement).closest("[data-canvas-control]")) return;
-          if (event.code === "Space" && !event.ctrlKey && !event.metaKey && !event.altKey) {
+          if (!canvasNavigationKeyDown(event, setSpace)) return;
+          const pendingBox = gesture.current?.boxSelection;
+          const pixelSelection = Boolean(services?.pixelSelection?.read());
+          if (pixelSelection || pendingBox?.secondary) {
             event.preventDefault();
-            setSpace(true);
+            event.stopPropagation();
           }
-          if (event.key === "Escape") {
-            const pendingBox = gesture.current?.boxSelection;
-            const pixelSelection = Boolean(services?.pixelSelection?.read());
-            if (pixelSelection || pendingBox?.secondary) {
-              event.preventDefault();
-              event.stopPropagation();
-            }
-            wand.escape();
-            if (!pendingBox?.secondary) liveMarquee.discard();
-            cancelGesture();
-            if (!pixelSelection && !pendingBox?.secondary) engine.select([]);
-          }
+          wand.escape();
+          if (!pendingBox?.secondary) liveMarquee.discard();
+          cancelGesture();
+          if (!pixelSelection && !pendingBox?.secondary) engine.select([]);
         }}
-        onKeyUp={(event) => {
-          if (event.code === "Space") setSpace(false);
-        }}
-        onBlur={() => setSpace(false)}
         onDragOver={(event) => transfers().files.onDragOver(event)}
         onDragLeave={(event) => transfers().files.onDragLeave(event)}
         onDrop={(event) => transfers().files.onDrop(event)}

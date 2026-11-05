@@ -52,7 +52,12 @@ export function StudioWorkspaceChrome(props: {
             {...chromeProps}
             exportControl={exportControl}
             commandControl={
-              <MagicSearch {...chromeProps} onProjects={onProjects} onPanelMode={onPanelMode} />
+              <MagicSearch
+                {...chromeProps}
+                onProjects={onProjects}
+                onPanelMode={onPanelMode}
+                tooltipSide="bottom"
+              />
             }
             library={<StudioLibrary engine={props.engine} onTask={props.onTask} />}
             background={<StudioBackground engine={props.engine} onTask={props.onTask} />}

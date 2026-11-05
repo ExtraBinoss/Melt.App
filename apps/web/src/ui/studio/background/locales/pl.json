@@ -19,5 +19,7 @@
   "ingredients": {
     "grain": "Ziarno",
     "feather": "Miękkie krawędzie"
-  }
+  },
+  "transparent": "Przezroczyste",
+  "position": "Pozycja gradientu"
 }

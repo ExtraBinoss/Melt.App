@@ -1,8 +1,8 @@
 .studio-background-trigger {
-  width: 100%;
-  justify-content: flex-start;
-  gap: 8px;
-  margin-top: 12px;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border-radius: 12px;
 }
 .studio-background-popover {
   width: min(390px, calc(100vw - 24px));
@@ -109,4 +109,58 @@
   overflow-y: auto;
   overscroll-behavior: contain;
   scrollbar-width: thin;
+}
+.studio-background-paint {
+  display: grid;
+  gap: 10px;
+}
+.studio-background-modes,
+.studio-background-types {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--foreground) 5%, transparent);
+}
+.studio-background-modes > button,
+.studio-background-types > button {
+  flex: 1;
+  border-radius: 8px;
+}
+.studio-background-modes > button:last-child {
+  flex: 0 0 32px;
+  margin-inline-start: 4px;
+}
+.studio-gradient-icon {
+  width: 20px;
+  height: 20px;
+  border: 1px solid color-mix(in srgb, var(--foreground) 25%, transparent);
+  border-radius: 50%;
+  background: linear-gradient(180deg, var(--foreground), transparent);
+}
+.studio-background-advanced {
+  width: min(350px, calc(100vw - 24px));
+  padding: 16px;
+  max-height: 70dvh;
+  overflow-y: auto;
+}
+.studio-background-modes .icon-button.is-active,
+.studio-background-types .icon-button.is-active {
+  color: var(--foreground);
+  background: color-mix(in srgb, var(--foreground) 14%, var(--card));
+  box-shadow: none;
+}
+.studio-background-paint .effect-color-field {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  font-size: 11px;
+}
+.studio-background-paint .effect-color-field > button {
+  min-width: 155px;
+  justify-content: flex-start;
+  background: var(--background);
 }

@@ -10,6 +10,7 @@ import { Download } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Button } from "../ui/button";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import { ExportSettings } from "./ExportSettings";
 import { CompositionExportSettings } from "./CompositionExportSettings";
 import type { ExportPopoverProps } from "./model";
@@ -24,18 +25,23 @@ export function ExportPopover(props: ExportPopoverProps) {
   if (!props.engine) return <LegacyExportPopover {...props} />;
   return (
     <Dialog open={props.open} onOpenChange={props.onOpenChange}>
-      <DialogTrigger asChild>
-        <Button
-          className="inspector-export-button"
-          data-inspector-export-trigger
-          size="sm"
-          aria-label={t("export")}
-        >
-          <span className="export-trigger-label">
-            <ExportTriggerLabel engine={props.engine} />
-          </span>
-        </Button>
-      </DialogTrigger>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <DialogTrigger asChild>
+            <Button
+              className="inspector-export-button"
+              data-inspector-export-trigger
+              size="sm"
+              aria-label={t("export")}
+            >
+              <span className="export-trigger-label">
+                <ExportTriggerLabel engine={props.engine} />
+              </span>
+            </Button>
+          </DialogTrigger>
+        </TooltipTrigger>
+        <TooltipContent side="bottom">{t("export")}</TooltipContent>
+      </Tooltip>
       <DialogContent
         ref={surface}
         onEscapeKeyDown={preservePlayerTimeEdit}

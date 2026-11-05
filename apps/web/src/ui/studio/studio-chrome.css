@@ -10,11 +10,12 @@
   pointer-events: auto;
 }
 .studio-surface {
-  background: var(--card);
+  background: color-mix(in srgb, var(--card) 88%, transparent);
   color: var(--foreground);
-  border: 1px solid var(--border);
-  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--border) 76%, transparent);
+  border-radius: 14px;
   box-shadow: none;
+  backdrop-filter: blur(18px);
 }
 .studio-quick-add {
   position: absolute;
@@ -23,84 +24,103 @@
   transform: translateX(-50%);
   display: flex;
   align-items: center;
-  gap: 3px;
-  padding: 4px;
+  gap: 5px;
+  padding: 5px;
+  width: max-content;
   max-width: calc(100% - 440px);
 }
-.studio-quick-add > button,
-.studio-view-shortcuts > button,
-.studio-quick-add [data-slot="popover-trigger"] {
+.studio-tool-group {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  min-width: 0;
+}
+.studio-tool-group > button,
+.studio-tool-group .shape-tool-slot > .icon-button {
   flex-shrink: 0;
-  width: 34px;
-  height: 34px;
-  padding: 8px;
-  border-radius: 8px;
+  width: 36px;
+  height: 36px;
+  padding: 9px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--workspace) 82%, transparent);
   box-shadow: none;
+  color: var(--toolbar-foreground);
+}
+.studio-tool-group > button:hover,
+.studio-tool-group .shape-tool-slot > .icon-button:hover,
+.studio-tool-group > button[data-state="open"],
+.studio-tool-group > button[aria-pressed="true"] {
+  background: color-mix(in srgb, var(--foreground) 10%, var(--card));
+  border-color: color-mix(in srgb, var(--border) 70%, transparent);
   color: var(--foreground);
 }
-.studio-quick-add > button > span:not(.sr-only) {
-  display: none;
-}
-.studio-view-shortcuts {
-  display: flex;
-  border-inline-start: 1px solid var(--border);
-  padding-inline-start: 4px;
-  margin-inline-start: 3px;
+.studio-toolbar-divider {
+  align-self: center;
+  flex-shrink: 0;
+  width: 1px;
+  height: 22px;
+  margin-inline: 2px;
+  background: color-mix(in srgb, var(--border) 80%, transparent);
 }
 .studio-actions {
   position: absolute;
   right: var(--studio-gap);
   top: var(--studio-gap);
   display: flex;
-  gap: 6px;
+  gap: 8px;
   align-items: center;
 }
 .studio-actions > button,
 .studio-actions .inspector-export-button,
-.studio-export {
-  width: 42px;
-  height: 42px;
-  min-width: 42px;
-  min-height: 42px;
-  padding: 10px;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  background: var(--card);
-  color: var(--foreground);
+.studio-export,
+.studio-dock-heading {
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
+  min-height: 48px;
+  padding: 13px;
+  border: 1px solid color-mix(in srgb, var(--border) 76%, transparent);
+  border-radius: 14px;
+  color: var(--toolbar-foreground);
   box-shadow: none;
-  font-size: 0;
   gap: 0;
+}
+.studio-actions > button:hover,
+.studio-dock-heading:hover,
+.studio-actions > button[data-state="open"],
+.studio-dock-heading[data-state="open"] {
+  background: color-mix(in srgb, var(--foreground) 8%, var(--card));
+  color: var(--foreground);
+}
+.studio-actions .inspector-export-button,
+.studio-actions .studio-export {
+  background: var(--primary);
+  border-color: color-mix(in srgb, var(--primary) 80%, var(--foreground));
+  color: var(--primary-foreground);
+}
+.studio-actions .inspector-export-button:hover,
+.studio-actions .studio-export:hover {
+  background: color-mix(in srgb, var(--primary) 88%, var(--foreground));
+  color: var(--primary-foreground);
 }
 .studio-actions .inspector-export-button > svg,
 .studio-actions > button > svg {
-  width: 17px;
-  height: 17px;
+  width: 18px;
+  height: 18px;
 }
 .studio-actions .inspector-export-button .export-button-label {
   display: none;
-}
-.studio-actions .inspector-export-button:has([data-export-pending="true"]) {
-  width: auto;
 }
 .studio-dock {
   position: absolute;
   bottom: var(--studio-gap);
 }
-.studio-dock-heading {
-  height: 42px;
-  padding: 0 14px;
-  gap: 9px;
-  font-size: 11px;
-  font-weight: 500;
-}
-.studio-dock-heading > svg {
-  color: var(--muted-foreground);
-}
 .studio-material {
   left: var(--studio-gap);
 }
 .studio-environment {
-  right: calc(var(--studio-gap) + 146px);
+  right: calc(var(--studio-gap) + 60px);
 }
 .studio-compositions {
   top: var(--studio-gap);
@@ -113,10 +133,12 @@
   max-height: min(650px, 78dvh);
   overflow: auto;
   overscroll-behavior: contain;
-  border-radius: 12px;
-  background: var(--card);
+  border: 1px solid color-mix(in srgb, var(--border) 76%, transparent);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--card) 94%, transparent);
   color: var(--foreground);
   box-shadow: none;
+  backdrop-filter: blur(18px);
   scrollbar-width: thin;
 }
 .studio-panel-title {
@@ -311,8 +333,18 @@
   max-height: 75dvh;
   overflow: auto;
   overscroll-behavior: contain;
-  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--border) 76%, transparent);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--popover) 94%, transparent);
   box-shadow: none;
+  backdrop-filter: blur(18px);
+}
+.studio-advanced-popover .studio-popover-title {
+  margin: 0;
+  padding: 18px var(--inspector-gutter) 0;
+  font-size: 12px;
+  line-height: 1.4;
+  font-weight: 500;
 }
 .studio-advanced-popover .inspector {
   width: 100%;
@@ -331,18 +363,24 @@
   right: var(--studio-gap);
 }
 .studio-background-dock .studio-background-trigger {
-  width: auto;
-  height: 42px;
-  min-height: 42px;
+  width: 48px;
+  height: 48px;
+  min-height: 48px;
   margin: 0;
-  padding: 0 14px;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  background: var(--card);
-  color: var(--foreground);
+  padding: 13px;
+  border: 1px solid color-mix(in srgb, var(--border) 76%, transparent);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--card) 88%, transparent);
+  color: var(--toolbar-foreground);
   box-shadow: none;
-  font-size: 11px;
-  font-weight: 400;
+  backdrop-filter: blur(18px);
+  font-size: 0;
+  gap: 0;
+}
+.studio-background-dock .studio-background-trigger:hover,
+.studio-background-dock .studio-background-trigger[data-state="open"] {
+  background: color-mix(in srgb, var(--foreground) 8%, var(--card));
+  color: var(--foreground);
 }
 @media (max-width: 1200px) {
   .studio-compositions {
@@ -369,30 +407,6 @@
   .studio-compositions {
     top: 122px;
   }
-  .studio-compositions .studio-dock-heading {
-    width: 42px;
-    padding: 11px;
-  }
-  .studio-compositions .studio-dock-heading > span {
-    display: none;
-  }
-  .studio-material .studio-dock-heading,
-  .studio-environment .studio-dock-heading,
-  .studio-background-trigger {
-    width: 42px !important;
-    padding: 11px !important;
-  }
-  .studio-material .studio-dock-heading > span,
-  .studio-environment .studio-dock-heading > span {
-    display: none;
-  }
-  .studio-environment {
-    right: calc(var(--studio-gap) + 54px);
-  }
-  .studio-background-dock .studio-background-trigger {
-    font-size: 0;
-    gap: 0;
-  }
   .studio-object-bar {
     bottom: 70px;
   }
@@ -404,8 +418,8 @@
   gap: 0;
 }
 .studio-actions .export-trigger-label > svg {
-  width: 17px;
-  height: 17px;
+  width: 18px;
+  height: 18px;
 }
 .studio-effects-popover {
   box-shadow: none;

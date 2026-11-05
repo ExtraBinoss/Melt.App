@@ -1,0 +1,10 @@
+.effect-thumbnail {
+  display: block;
+  width: 40px;
+  height: 30px;
+  flex: 0 0 auto;
+  overflow: hidden;
+  border-radius: 3px;
+  background-color: #17191f;
+  background-repeat: no-repeat;
+}

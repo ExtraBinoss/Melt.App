@@ -19,5 +19,7 @@
   "ingredients": {
     "grain": "粒子",
     "feather": "境界ぼかし"
-  }
+  },
+  "transparent": "透明",
+  "position": "グラデーションの位置"
 }

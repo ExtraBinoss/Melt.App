@@ -19,5 +19,7 @@
   "ingredients": {
     "grain": "Korrel",
     "feather": "Zachte rand"
-  }
+  },
+  "transparent": "Transparant",
+  "position": "Verlooppositie"
 }

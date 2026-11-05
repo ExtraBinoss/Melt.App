@@ -41,5 +41,9 @@
     "tunnel": "隧道",
     "halo": "光环",
     "low": "低位光"
-  }
+  },
+  "select3DObject": "选择可编辑的 3D 对象以更改其材质。",
+  "materialProperties": "材质属性",
+  "direction": "方向",
+  "highlights": "高光"
 }

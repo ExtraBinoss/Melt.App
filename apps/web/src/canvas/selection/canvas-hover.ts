@@ -21,6 +21,7 @@ export function installCanvasHover(
     request: (callback) => requestAnimationFrame(callback),
     cancel: (id) => cancelAnimationFrame(id),
   },
+  studio = false,
 ): () => void {
   const hover = createTimelineHoverSource(engine);
   let point: { x: number; y: number } | null = null;
@@ -44,7 +45,7 @@ export function installCanvasHover(
     const rect = node.getBoundingClientRect();
     const frame = controller.read();
     const location = clientToPage(point, rect, view.read(), frame.page);
-    const picked = canvasHit(frame.page, location, true, sourceGeometry(controller));
+    const picked = canvasHit(frame.page, location, true, sourceGeometry(controller), studio);
     const id = picked?.layer.id ?? null;
     if (id === layerId && hover.read()?.layerId === id) return;
     const previous = release;

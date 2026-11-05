@@ -56,8 +56,8 @@ export function CanvasSpatialEditing({
     editing.pageId === page.id &&
     editing.layerId === layer?.id,
   );
-  const visible = enabled && supported && !playback && !vector;
   const workspace = useWorkspaceMode();
+  const visible = workspace !== "studio" && enabled && supported && !playback && !vector;
   const studioTarget =
     workspace === "studio" && enabled && supported && !playback
       ? `${snapshot.project.id}:${page.id}:${layer!.id}`

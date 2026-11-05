@@ -1,0 +1,133 @@
+.studio-sphere-trigger-wrap {
+  display: inline-flex;
+  border-radius: 12px;
+}
+.studio-sphere-trigger-wrap:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 3px;
+}
+.studio-dock .studio-sphere-trigger {
+  width: 48px;
+  height: 48px;
+  padding: 3px;
+  border-radius: 12px;
+  transition:
+    background-color 120ms,
+    border-color 120ms;
+}
+.studio-dock .studio-sphere-trigger:hover {
+  background: var(--accent);
+  border-color: var(--muted-foreground);
+}
+.studio-dock .studio-sphere-trigger > .studio-catalog-swatch {
+  display: block;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+}
+.studio-sphere-content {
+  width: min(586px, calc(100vw - 24px));
+  padding: 0;
+  border: 0;
+  color: var(--foreground);
+  background: transparent;
+  box-shadow: none;
+  contain: layout style;
+}
+.studio-sphere-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 354px) minmax(180px, 220px);
+  align-items: end;
+  gap: 8px;
+}
+.studio-sphere-library,
+.studio-sphere-properties {
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 13px;
+  background: color-mix(in srgb, var(--card) 94%, transparent);
+  backdrop-filter: blur(16px);
+  min-width: 0;
+}
+.studio-sphere-library .studio-catalog-scroll {
+  max-height: min(430px, 54dvh);
+}
+.studio-sphere-properties {
+  max-height: min(590px, 70dvh);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.studio-sphere-properties .studio-panel-title {
+  color: var(--muted-foreground);
+  margin-bottom: 9px;
+  font-size: 10px;
+}
+.studio-sphere-properties .studio-color-disclosure {
+  margin-top: 8px;
+}
+.studio-direction-pad {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 138px;
+  border-radius: 11px;
+  border: 1px solid var(--border);
+  background: var(--background);
+  overflow: hidden;
+  cursor: crosshair;
+  touch-action: none;
+}
+.studio-direction-pad:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+.studio-direction-origin {
+  position: absolute;
+  inset: calc(50% - 2px) auto auto calc(50% - 2px);
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--muted-foreground);
+}
+.studio-direction-position {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  border: 1px solid var(--foreground);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+.studio-scene-section-title {
+  margin: 16px 0 8px;
+  text-align: center;
+  color: var(--muted-foreground);
+  font-size: 10px;
+  font-weight: 500;
+}
+.studio-direction-help {
+  margin: 7px 0 0;
+  color: var(--muted-foreground);
+  font-size: 10px;
+  line-height: 1.4;
+}
+@media (max-width: 560px) {
+  .studio-sphere-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(145px, 0.8fr);
+    gap: 6px;
+  }
+  .studio-sphere-library,
+  .studio-sphere-properties {
+    padding: 10px;
+  }
+  .studio-sphere-library .studio-catalog-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .studio-sphere-library .studio-catalog-swatch {
+    width: 46px;
+    height: 46px;
+  }
+  .studio-direction-pad {
+    height: 116px;
+  }
+}

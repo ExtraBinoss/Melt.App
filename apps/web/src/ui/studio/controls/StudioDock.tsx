@@ -1,6 +1,6 @@
 import { useId } from "react";
 import type { ReactNode } from "react";
-import { Button } from "../../../components/ui/button";
+import { IconButton } from "../../../components/shared/IconButton";
 import { Popover, PopoverContent, PopoverTrigger } from "../../../components/ui/popover";
 
 /** Closed tools are one quiet button; each owned surface opens only on deliberate input. */
@@ -20,10 +20,14 @@ export function StudioDock({
     <section className={`studio-dock ${className}`} data-canvas-control>
       <Popover modal={false}>
         <PopoverTrigger asChild>
-          <Button variant="ghost" className="studio-dock-heading studio-surface" aria-controls={id}>
+          <IconButton
+            label={title}
+            tooltipSide={className === "studio-compositions" ? "bottom" : "top"}
+            className="studio-dock-heading studio-surface"
+            aria-controls={id}
+          >
             {icon}
-            <span>{title}</span>
-          </Button>
+          </IconButton>
         </PopoverTrigger>
         <PopoverContent
           id={id}

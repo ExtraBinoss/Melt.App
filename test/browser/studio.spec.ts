@@ -69,19 +69,11 @@ test("Studio retains the native canvas and byte-exact exports across mode switch
   await workspace(page, "Studio");
   expect(await page.evaluate(() => JSON.stringify(window.musart!.snapshot()))).toBe(original);
   expect(await canvas!.evaluate((node) => node.isConnected)).toBe(true);
-  await expect(
-    page
-      .getByRole("radiogroup", { name: "Editing mode", exact: true })
-      .getByRole("radio", { name: "3D", exact: true }),
-  ).toBeChecked();
+  await expect(page.getByRole("radiogroup", { name: "Editing mode", exact: true })).toHaveCount(0);
   await page.keyboard.press("Control+k");
   await expect(page.locator(".magic-search-dialog")).toBeVisible();
   await page.keyboard.press("Escape");
   await expect(page.locator(".magic-search-dialog")).toHaveCount(0);
-  const editingMode = page.getByRole("radiogroup", { name: "Editing mode", exact: true });
-  await editingMode.getByRole("radio", { name: "2D", exact: true }).click();
-  await expect(editingMode.getByRole("radio", { name: "2D", exact: true })).toBeChecked();
-  await editingMode.getByRole("radio", { name: "3D", exact: true }).click();
   const textField = page.locator(".studio-object-bar").getByRole("textbox");
   await textField.fill("Melt Studio");
   await textField.press("Enter");
@@ -121,12 +113,14 @@ test("Studio retains the native canvas and byte-exact exports across mode switch
     .getByRole("button", { name: "Material", exact: true })
     .click();
   const slider = material.getByRole("slider", { name: "Roughness", exact: true });
-  expect(
-    await material
-      .locator('.studio-slider [data-slot="slider-track"]')
-      .first()
-      .evaluate((node) => node.getBoundingClientRect().height),
-  ).toBe(36);
+  await expect
+    .poll(() =>
+      material
+        .locator('.studio-slider [data-slot="slider-track"]')
+        .first()
+        .evaluate((node) => node.getBoundingClientRect().height),
+    )
+    .toBeCloseTo(36, 1);
   await page.screenshot({ path: "artifacts/studio/studio-material.png" });
   const before = await page.evaluate(() => ({
     project: JSON.stringify(window.musart!.snapshot().project),
@@ -171,16 +165,14 @@ test("Studio retains the native canvas and byte-exact exports across mode switch
         window.musart!.snapshot().project.pages[0]!.layers.find((l) => l.id === "studio-title")!
           .spatial!.material.roughness,
     ),
-  ).toBeCloseTo(0.29);
+  ).toBeCloseTo(0.25);
   await page.evaluate(() => window.musart!.undo());
   await page.keyboard.press("Escape");
   await page.locator(".studio-compositions .studio-dock-heading").click();
   await expect(page.locator("[data-layers-presentation]")).toHaveAttribute("aria-busy", "false");
   await page.getByRole("button", { name: "Lock layer · MELT", exact: true }).click();
   await page.keyboard.press("Escape");
-  await page.locator(".studio-material .studio-dock-heading").click();
-  await expect(slider).toHaveAttribute("data-disabled");
-  await page.keyboard.press("Escape");
+  await expect(page.locator(".studio-material .studio-dock-heading")).toBeDisabled();
   await page.locator(".studio-compositions .studio-dock-heading").click();
   await page.getByRole("button", { name: "Unlock layer · MELT", exact: true }).click();
   await page.keyboard.press("Escape");

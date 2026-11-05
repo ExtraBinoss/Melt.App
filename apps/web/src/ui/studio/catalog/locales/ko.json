@@ -41,5 +41,9 @@
     "tunnel": "터널",
     "halo": "후광",
     "low": "낮은 조명"
-  }
+  },
+  "select3DObject": "재질을 변경하려면 편집 가능한 3D 오브젝트를 선택하세요.",
+  "materialProperties": "재질 속성",
+  "direction": "방향",
+  "highlights": "하이라이트"
 }

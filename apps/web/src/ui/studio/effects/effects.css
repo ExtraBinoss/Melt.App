@@ -28,7 +28,7 @@
 }
 .studio-effect-options {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 3px;
   max-height: 340px;
   overflow-y: auto;
@@ -38,7 +38,8 @@
   justify-content: flex-start;
   white-space: normal;
   height: auto;
-  min-height: 32px;
+  min-height: 42px;
+  gap: 9px;
   text-align: start;
 }
 .studio-effects-stack {

@@ -95,9 +95,7 @@ test("choosing a catalog sphere commits the physical material once, exposes tran
   const original = d.engine.getSnapshot().project;
   d.mount(<StudioMaterial engine={d.engine} run={d.run} />);
   fireEvent.click(screen.getByRole("button", { name: "Matière" }));
-  expect(screen.getByText("Couleur", { selector: "summary" }).parentElement).not.toHaveAttribute(
-    "open",
-  );
+  expect(screen.getByRole("button", { name: "Couleur" })).toHaveAttribute("aria-expanded", "false");
   fireEvent.click(screen.getByRole("button", { name: "Verre · Corail" }));
   expect(d.run).toHaveBeenCalledOnce();
   const preset = SPATIAL_MATERIALS.find((item) => item.id === "glassCoral")!;

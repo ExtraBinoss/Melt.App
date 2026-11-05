@@ -15,6 +15,7 @@ export function StudioLibrary({ engine, onTask }: { engine: EnginePort; onTask: 
   return (
     <SpatialLibrary
       engine={engine}
+      tooltipSide="bottom"
       vectorLibrary={{
         label: t("vectors"),
         content: <VectorLibrary engine={engine} onTask={onTask} />,

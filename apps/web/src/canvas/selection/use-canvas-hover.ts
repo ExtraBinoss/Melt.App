@@ -11,10 +11,19 @@ export function useCanvasHover(
   view: ViewSource,
   enabled: boolean,
   gesture: RefObject<unknown>,
+  studio = false,
 ) {
   useEffect(() => {
     const node = viewport.current;
     if (!node || !enabled) return;
-    return installCanvasHover(node, engine, controller, view, () => !!gesture.current);
-  }, [viewport, engine, controller, view, enabled, gesture]);
+    return installCanvasHover(
+      node,
+      engine,
+      controller,
+      view,
+      () => !!gesture.current,
+      undefined,
+      studio,
+    );
+  }, [viewport, engine, controller, view, enabled, gesture, studio]);
 }

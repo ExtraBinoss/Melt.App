@@ -53,14 +53,14 @@ function EffectButton({
   return (
     <Popover modal={false}>
       <PopoverTrigger asChild>
-        <IconButton label={label} data-studio-effect-category={category}>
+        <IconButton label={label} tooltipSide="bottom" data-studio-effect-category={category}>
           <Icon size={15} />
         </IconButton>
       </PopoverTrigger>
       <PopoverContent
         className="studio-effects-popover"
-        side="left"
-        align="end"
+        side="bottom"
+        align="center"
         collisionPadding={12}
         initialFocus="content"
         aria-label={label}

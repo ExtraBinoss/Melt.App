@@ -92,3 +92,36 @@ test("a selected native source raycasts its real triangles through a nearer mesh
     vi.resetAllMocks();
   }
 });
+
+test("Studio ignores composition background paint and never replaces unprepared native geometry with a layout hit", () => {
+  const background = createLayer("rectangle", {
+    id: "paint",
+    x: 0,
+    y: 0,
+    width: 256,
+    height: 256,
+    radius: 0,
+  });
+  const native = createLayer("text", {
+    id: "native",
+    width: 256,
+    height: 256,
+    text: "O",
+    spatial: createSpatialLayer("extrude"),
+  });
+  const page = createPage({ width: 256, height: 256, layers: [background, native] });
+  // No retained renderer: Classic keeps its existing bounds fallback. Studio
+  // waits for real triangles instead of allowing an enormous authored text frame.
+  expect(canvasHit(page, { x: 128, y: 128 }, true)?.layer.id).toBe("native");
+  expect(canvasHit(page, { x: 128, y: 128 }, true, undefined, true)).toBeNull();
+  const paintOnly = { ...page, layers: [background] };
+  expect(canvasHit(paintOnly, { x: 128, y: 128 }, true)?.layer.id).toBe("paint");
+  expect(canvasHit(paintOnly, { x: 128, y: 128 }, true, undefined, true)).toBeNull();
+  // A transformed ordinary rectangle is editable artwork, rather than backdrop.
+  const artwork = { ...paintOnly, layers: [{ ...background, x: 1 }] };
+  expect(canvasHit(artwork, { x: 128, y: 128 }, true, undefined, true)?.layer.id).toBe("paint");
+  const unpreparedOverArtwork = { ...page, layers: [artwork.layers[0]!, native] };
+  expect(
+    canvasHit(unpreparedOverArtwork, { x: 128, y: 128 }, true, undefined, true)?.layer.id,
+  ).toBe("paint");
+});

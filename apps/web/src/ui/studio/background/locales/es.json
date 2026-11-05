@@ -19,5 +19,7 @@
   "ingredients": {
     "grain": "Grano",
     "feather": "Desvanecer bordes"
-  }
+  },
+  "transparent": "Transparente",
+  "position": "Posición del degradado"
 }

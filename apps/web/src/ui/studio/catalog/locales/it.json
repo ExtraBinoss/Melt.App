@@ -41,5 +41,9 @@
     "tunnel": "Tunnel",
     "halo": "Alone",
     "low": "Luce bassa"
-  }
+  },
+  "select3DObject": "Seleziona un oggetto 3D modificabile per cambiarne il materiale.",
+  "materialProperties": "Proprietà del materiale",
+  "direction": "Direzione",
+  "highlights": "Riflessi"
 }

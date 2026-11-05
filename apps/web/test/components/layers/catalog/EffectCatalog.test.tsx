@@ -32,7 +32,10 @@ test("localized category headings, text search and family filter share a real bo
   ).not.toBeNull();
   const search = screen.getByRole("searchbox", { name: "Rechercher un effet" });
   fireEvent.change(search, { target: { value: "flou" } });
-  expect(screen.getAllByRole("menuitem").map((item) => item.textContent)).toEqual(["Flou"]);
+  expect(screen.getAllByRole("menuitem").map((item) => item.textContent)).toEqual([
+    "Contour progressif",
+    "Flou",
+  ]);
   expect(d.add).not.toHaveBeenCalled();
   expect(d.engine.getSnapshot().canUndo).toBe(false);
   fireEvent.change(search, { target: { value: "" } });
@@ -83,7 +86,7 @@ test("a technique search adds the unified Blur without exposing discovery metada
 });
 
 test.each([
-  ["effect", "Flou", "Flou", "Blur"],
+  ["effect", "Flou", "Contour progressif", "Blur"],
   ["adjustment", "Lumière et tonalité", "Contraste", "Brightness"],
 ] as const)(
   "%s search uses localized shared hints from its selected family without editing the document",

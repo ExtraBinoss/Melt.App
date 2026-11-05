@@ -52,6 +52,7 @@ export interface MagicSearchProps {
   onExport: () => void;
   onPanelMode: (mode: PanelMode) => void;
   children?: ComponentType<SearchSurface>;
+  tooltipSide?: "top" | "right" | "bottom" | "left";
 }
 export interface SearchSurface {
   engine: EnginePort;
@@ -68,6 +69,7 @@ export function MagicSearch({
   onExport,
   onPanelMode,
   children,
+  tooltipSide,
 }: MagicSearchProps) {
   const { t, i18n } = useTranslation();
   const locale = i18n.resolvedLanguage ?? i18n.language;
@@ -214,6 +216,7 @@ export function MagicSearch({
       <IconButton
         id={triggerId}
         label={t("search:title")}
+        tooltipSide={tooltipSide}
         shortcut={bindingLabel("app:search", bindings)}
         className="magic-search-trigger"
         aria-haspopup="dialog"
@@ -223,7 +226,7 @@ export function MagicSearch({
         <Ellipsis size={19} />
       </IconButton>
     ),
-    [triggerId, t, bindings, open, setOpen],
+    [triggerId, t, tooltipSide, bindings, open, setOpen],
   );
   return (
     <>

@@ -51,12 +51,15 @@ export function BackgroundPresets({
   useEffect(() => draft.start(), [draft]);
   const disabled = Boolean(backgroundLayer(page)?.locked);
   return (
-    <section className="studio-background-presets" aria-label={t("presets")}>
+    <section
+      className="studio-background-presets"
+      aria-label={t("presets")}
+      aria-description={t("previewHint")}
+    >
       <div className="studio-background-preset-heading">
         <strong>{t("presets")}</strong>
         <span>{BACKGROUND_PRESETS.length}</span>
       </div>
-      <p className="studio-background-hint">{t("previewHint")}</p>
       <Accordion type="multiple" defaultValue={[...BACKGROUND_CATEGORIES]}>
         {BACKGROUND_CATEGORIES.map((category) => (
           <AccordionItem value={category} key={category}>

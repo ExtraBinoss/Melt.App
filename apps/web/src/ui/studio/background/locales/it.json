@@ -19,5 +19,7 @@
   "ingredients": {
     "grain": "Grana",
     "feather": "Sfuma bordi"
-  }
+  },
+  "transparent": "Trasparente",
+  "position": "Posizione della sfumatura"
 }

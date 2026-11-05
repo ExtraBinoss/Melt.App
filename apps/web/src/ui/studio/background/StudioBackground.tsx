@@ -10,7 +10,8 @@ import { Popover, PopoverContent, PopoverTrigger } from "../../../components/ui/
 import { Button } from "../../../components/ui/button";
 import { BackgroundPaintControls } from "../../../components/properties/gradient/BackgroundPaintControls";
 import { GradientControl } from "../../../components/properties/gradient/GradientControl";
-import { MotionColorControl } from "../../../components/properties/motion/MotionColorControl";
+import { StudioBackgroundPaint } from "./StudioBackgroundPaint";
+import { IconButton } from "../../../components/shared/IconButton";
 import { MotionFieldProvider } from "../../../components/properties/motion/context";
 import { EffectsPanel } from "../../../components/properties/EffectsPanel";
 import { useLayerPreview } from "../../../components/layers/controls/use-layer-preview";
@@ -24,10 +25,13 @@ export function StudioBackground({ engine, onTask }: { engine: EnginePort; onTas
   return (
     <Popover modal={false}>
       <PopoverTrigger asChild>
-        <Button variant="outline" size="sm" className="studio-background-trigger">
-          <Paintbrush size={15} />
-          {t("title")}
-        </Button>
+        <IconButton
+          label={t("title")}
+          tooltipSide="top"
+          className="studio-background-trigger studio-surface"
+        >
+          <Paintbrush size={19} />
+        </IconButton>
       </PopoverTrigger>
       <PopoverContent
         side="left"
@@ -58,26 +62,57 @@ function BackgroundEditor({ engine, onTask }: { engine: EnginePort; onTask: Task
   );
   const origin = useRef(snapshot.project.id);
   const current = () =>
-    engine.getSnapshot().project.id === origin.current && engine.getSnapshot().pageId === page.id;
+    engine.getSnapshot().project.id === origin.current &&
+    engine.getSnapshot().pageId === page.id &&
+    engine.getSnapshot().project.pages.find((item) => item.id === page.id) === page;
   return (
     <div className="studio-background-editor">
       <div className="studio-background-heading">
         <Paintbrush size={15} />
         <strong>{t(layer ? "layer" : "canvas")}</strong>
       </div>
-      <BackgroundPresets engine={engine} page={page} run={run} />
+
       {layer ? (
         <LayerBackground key={layer.id} engine={engine} page={page} layer={layer} run={run} />
       ) : (
         <>
-          <BackgroundPaintControls
+          <StudioBackgroundPaint
             engine={engine}
-            page={page}
-            current={current}
-            run={run}
+            identity={page}
+            ownerId={`${snapshot.project.id}:${page.id}:${snapshot.revision}`}
+            color={page.background}
+            gradient={page.backgroundGradient}
+            preview={({ color, gradient }) => {
+              if (current())
+                setPreview({
+                  target: "page",
+                  patch: { background: color, backgroundGradient: gradient },
+                });
+            }}
+            commit={({ color, gradient }) => {
+              cancel();
+              if (current())
+                run(() => {
+                  if (
+                    engine.getSnapshot().project.pages.find((item) => item.id === page.id) === page
+                  )
+                    engine.execute({
+                      type: "updatePage",
+                      patch: { background: color, backgroundGradient: gradient },
+                    });
+                });
+            }}
             cancel={cancel}
+            advanced={
+              <BackgroundPaintControls
+                engine={engine}
+                page={page}
+                current={current}
+                run={run}
+                cancel={cancel}
+              />
+            }
           />
-          <p className="studio-background-hint">{t("hint")}</p>
           <Button
             variant="outline"
             size="sm"
@@ -92,6 +127,7 @@ function BackgroundEditor({ engine, onTask }: { engine: EnginePort; onTask: Task
           </Button>
         </>
       )}
+      <BackgroundPresets engine={engine} page={page} run={run} />
     </div>
   );
 }
@@ -112,24 +148,28 @@ function LayerBackground({
     <MotionFieldProvider editor={edit}>
       {layer.locked && <p className="studio-background-hint">{t("locked")}</p>}
       <fieldset disabled={layer.locked} className="studio-background-fields">
-        <GradientControl
-          layer={layer}
+        <StudioBackgroundPaint
           engine={engine}
-          patch={edit.commit}
-          preview={edit.previewLayer}
+          identity={layer}
+          ownerId={`${engine.getSnapshot().project.id}:${layer.id}:${engine.getSnapshot().revision}`}
+          color={layer.fill}
+          gradient={layer.fillGradient}
+          disabled={layer.locked}
+          preview={({ color, gradient }) =>
+            edit.previewLayer({ fill: color, fillGradient: gradient })
+          }
+          commit={({ color, gradient }) => edit.commit({ fill: color, fillGradient: gradient })}
           cancel={edit.cancel}
+          advanced={
+            <GradientControl
+              layer={layer}
+              engine={engine}
+              patch={edit.commit}
+              preview={edit.previewLayer}
+              cancel={edit.cancel}
+            />
+          }
         />
-        {!layer.fillGradient && (
-          <MotionColorControl
-            engine={engine}
-            identity={layer.id}
-            label={t("title")}
-            value={layer.fill}
-            onPreview={(fill) => edit.previewLayer({ fill })}
-            onCommit={(fill) => edit.commit({ fill })}
-            onCancel={edit.cancel}
-          />
-        )}
         <EffectsPanel
           engine={engine}
           layer={layer}

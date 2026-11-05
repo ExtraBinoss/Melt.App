@@ -35,7 +35,7 @@ export function StudioGuides({ engine }: { engine: EnginePort }) {
   return (
     <Popover modal={false} open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <IconButton label={t("guides")} active={value.visible}>
+        <IconButton label={t("guides")} tooltipSide="bottom" active={value.visible}>
           <Scan size={17} />
         </IconButton>
       </PopoverTrigger>

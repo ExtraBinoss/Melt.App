@@ -19,5 +19,7 @@
   "ingredients": {
     "grain": "Körnung",
     "feather": "Weiche Kante"
-  }
+  },
+  "transparent": "Transparent",
+  "position": "Verlaufsposition"
 }

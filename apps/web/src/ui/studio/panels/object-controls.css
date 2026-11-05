@@ -1,0 +1,15 @@
+.studio-object-bar .studio-object-name {
+  max-width: 130px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.studio-object-popover {
+  max-height: min(660px, 72dvh);
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+.studio-object-popover > .studio-field-title {
+  display: block;
+  padding: 2px 2px 8px;
+}

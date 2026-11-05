@@ -41,5 +41,9 @@
     "tunnel": "Tunel",
     "halo": "Aureola",
     "low": "Światło dolne"
-  }
+  },
+  "select3DObject": "Wybierz edytowalny obiekt 3D, aby zmienić jego materiał.",
+  "materialProperties": "Właściwości materiału",
+  "direction": "Kierunek",
+  "highlights": "Refleksy"
 }

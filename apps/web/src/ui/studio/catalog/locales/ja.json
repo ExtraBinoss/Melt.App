@@ -41,5 +41,9 @@
     "tunnel": "トンネル",
     "halo": "ハロー",
     "low": "低い光"
-  }
+  },
+  "select3DObject": "マテリアルを変更するには、編集可能な3Dオブジェクトを選択してください。",
+  "materialProperties": "マテリアルのプロパティ",
+  "direction": "方向",
+  "highlights": "ハイライト"
 }

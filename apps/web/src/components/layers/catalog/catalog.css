@@ -84,3 +84,14 @@
   text-align: center;
   color: var(--muted-foreground);
 }
+
+.effect-catalog-virtual .effect-thumbnail {
+  width: 28px;
+  height: 21px;
+}
+.effect-catalog-virtual .effect-catalog-item-label {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}

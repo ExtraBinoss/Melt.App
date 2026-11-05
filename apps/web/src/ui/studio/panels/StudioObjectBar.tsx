@@ -12,6 +12,8 @@ import { FontPicker } from "../../../components/properties/fonts/FontPicker";
 import { Popover, PopoverContent, PopoverTrigger } from "../../../components/ui/popover";
 import { IconButton } from "../../../components/shared/IconButton";
 import { StudioSlider } from "../controls/StudioSlider";
+import { StudioObjectTransform } from "./StudioObjectTransform";
+import "./object-controls.css";
 import "../messages";
 import "../../../components/spatial/messages";
 
@@ -166,6 +168,16 @@ export const StudioObjectBar = memo(function StudioObjectBar({
               onCancel={edit.cancel}
             />
           )}
+          {source?.enabled && source.source !== "extrude" && (
+            <StudioObjectTransform
+              engine={engine}
+              layer={layer}
+              identity={identity}
+              edit={edit}
+              current={current}
+              disabled={!selection.editable}
+            />
+          )}
           {layer.kind === "text" && (
             <StudioSlider
               identity={identity}
@@ -187,10 +199,10 @@ export const StudioObjectBar = memo(function StudioObjectBar({
             />
           )}
         </div>
-        {source?.enabled && source.source === "extrude" && (
+        {source?.enabled && (
           <Popover modal={false}>
             <PopoverTrigger asChild>
-              <IconButton label={spatialText("advanced")}>
+              <IconButton label={spatialText("advanced")} tooltipSide="top">
                 <Settings2 size={16} />
               </IconButton>
             </PopoverTrigger>
@@ -203,33 +215,43 @@ export const StudioObjectBar = memo(function StudioObjectBar({
               initialFocus="content"
             >
               <strong className="studio-field-title">{layer.name}</strong>
-              {(["bevelSegments", "curveSegments"] as const).map((key) => (
-                <StudioSlider
-                  key={key}
-                  identity={identity}
-                  invalidation={motionTimeChanges(engine)}
-                  label={spatialText(key)}
-                  value={source[key]}
-                  min={SPATIAL_NUMBERS[key][0]}
-                  max={SPATIAL_NUMBERS[key][1]}
-                  step={1}
-                  disabled={!selection.editable}
-                  onStart={() => {
-                    if (current())
-                      edit.start({
-                        kind: "layer",
-                        layerId: layer.id,
-                        property:
-                          key === "bevelSegments"
-                            ? "spatial.bevelSegments"
-                            : "spatial.curveSegments",
-                      });
-                  }}
-                  onPreview={(value) => patch({ spatial: { ...source, [key]: value } }, false)}
-                  onCommit={(value) => patch({ spatial: { ...source, [key]: value } }, true)}
-                  onCancel={edit.cancel}
-                />
-              ))}
+              {source.source === "extrude" &&
+                (["bevelSegments", "curveSegments"] as const).map((key) => (
+                  <StudioSlider
+                    key={key}
+                    identity={identity}
+                    invalidation={motionTimeChanges(engine)}
+                    label={spatialText(key)}
+                    value={source[key]}
+                    min={SPATIAL_NUMBERS[key][0]}
+                    max={SPATIAL_NUMBERS[key][1]}
+                    step={1}
+                    disabled={!selection.editable}
+                    onStart={() => {
+                      if (current())
+                        edit.start({
+                          kind: "layer",
+                          layerId: layer.id,
+                          property:
+                            key === "bevelSegments"
+                              ? "spatial.bevelSegments"
+                              : "spatial.curveSegments",
+                        });
+                    }}
+                    onPreview={(value) => patch({ spatial: { ...source, [key]: value } }, false)}
+                    onCommit={(value) => patch({ spatial: { ...source, [key]: value } }, true)}
+                    onCancel={edit.cancel}
+                  />
+                ))}
+              <StudioObjectTransform
+                advanced
+                engine={engine}
+                layer={layer}
+                identity={identity}
+                edit={edit}
+                current={current}
+                disabled={!selection.editable}
+              />
             </PopoverContent>
           </Popover>
         )}

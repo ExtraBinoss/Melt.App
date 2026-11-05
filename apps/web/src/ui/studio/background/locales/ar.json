@@ -19,5 +19,7 @@
   "ingredients": {
     "grain": "حبيبات",
     "feather": "تنعيم الحواف"
-  }
+  },
+  "transparent": "شفاف",
+  "position": "موضع التدرج"
 }

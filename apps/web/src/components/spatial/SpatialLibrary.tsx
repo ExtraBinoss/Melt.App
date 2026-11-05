@@ -25,10 +25,12 @@ import "./spatial.css";
 import "./library/library.css";
 export function SpatialLibrary({
   engine,
+  tooltipSide,
   vectorLibrary,
   modelPacks,
 }: {
   engine: EnginePort;
+  tooltipSide?: "top" | "right" | "bottom" | "left";
   vectorLibrary?: { label: string; content: ReactNode };
   modelPacks?: { label: string; content: ReactNode };
 }) {
@@ -112,7 +114,7 @@ export function SpatialLibrary({
       modal={false}
     >
       <PopoverTrigger asChild>
-        <IconButton label={t("title")} disabled={busy}>
+        <IconButton label={t("title")} tooltipSide={tooltipSide} disabled={busy}>
           <Box strokeWidth={1.65} />
         </IconButton>
       </PopoverTrigger>

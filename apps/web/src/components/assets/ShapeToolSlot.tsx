@@ -15,7 +15,13 @@ import { bindingLabel } from "../search/shortcuts";
 import "./messages";
 import "./assets.css";
 
-export function ShapeToolSlot({ engine }: { engine: EnginePort }) {
+export function ShapeToolSlot({
+  engine,
+  tooltipSide,
+}: {
+  engine: EnginePort;
+  tooltipSide?: "top" | "right" | "bottom" | "left";
+}) {
   const { t } = useTranslation("assets");
   const bindings = useKeybindings();
   const [open, setOpen] = useState(false);
@@ -42,6 +48,7 @@ export function ShapeToolSlot({ engine }: { engine: EnginePort }) {
         >
           <IconButton
             label={t("tool")}
+            tooltipSide={tooltipSide}
             shortcut={bindingLabel("action:toolShape", bindings)}
             active={tool === "shape"}
             onPointerDown={() => {

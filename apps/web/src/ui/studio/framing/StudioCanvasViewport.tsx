@@ -4,6 +4,7 @@ import { useProjectPreference } from "../../../components/workspace/preferences/
 import { useWorkspaceMode } from "../workspace-mode";
 import type { SpatialCanvasProps } from "../../../canvas/spatial/CanvasSpatialEditing";
 import { getStudioViewport } from "./viewport";
+import { StudioBackdrop } from "./StudioBackdrop";
 import "./framing.css";
 
 /** One imperative projection: camera input paints only the guide, never the editor React tree. */
@@ -92,15 +93,24 @@ export function StudioCanvasViewport({
     };
   }, [active, engine, controller, viewSource, viewport]);
   return active ? (
-    <div className="studio-capture-overlay" aria-hidden="true">
-      <div
-        ref={window}
-        className="studio-capture-window"
-        hidden={!capture?.visible}
-        data-studio-capture
-      >
-        <span ref={label} />
+    <>
+      <StudioBackdrop
+        engine={engine}
+        controller={controller}
+        viewSource={viewSource}
+        viewport={viewport}
+        enabled
+      />
+      <div className="studio-capture-overlay" aria-hidden="true">
+        <div
+          ref={window}
+          className="studio-capture-window"
+          hidden={!capture?.visible}
+          data-studio-capture
+        >
+          <span ref={label} />
+        </div>
       </div>
-    </div>
+    </>
   ) : null;
 }

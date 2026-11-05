@@ -19,5 +19,7 @@
   "ingredients": {
     "grain": "입자",
     "feather": "가장자리 페더"
-  }
+  },
+  "transparent": "투명",
+  "position": "그레이디언트 위치"
 }

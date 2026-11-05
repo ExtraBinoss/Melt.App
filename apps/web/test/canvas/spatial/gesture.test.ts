@@ -156,3 +156,27 @@ test("native Euler wrapping preserves multiple turns and does not flip adjacent 
     expect(f.page().layers[0]!.spatial!.rotationZ).toBeCloseTo(0);
   }
 });
+
+test("composition orbit works without a selected layer and commits once, with cancellation restoring its preview", () => {
+  const f = fixture();
+  f.engine.select([]);
+  const before = f.engine.getSnapshot().project;
+  const camera = new Group();
+  f.gesture.beginOrbit();
+  for (let step = 0; step < 12; step++) {
+    camera.position.set(2 + step / 20, 1, 4);
+    f.gesture.camera(camera);
+  }
+  expect(f.engine.getSnapshot().project).toBe(before);
+  expect(f.store.get(previewAtom)?.target).toBe("page");
+  f.gesture.commit();
+  expect(f.page().spatial?.camera.yaw).toBeCloseTo(MathUtils.radToDeg(Math.atan2(2.55, 4)));
+  expect(f.store.get(previewAtom)).toBeNull();
+  f.engine.undo();
+  expect(f.engine.getSnapshot().project).toEqual(before);
+  f.gesture.beginOrbit();
+  f.gesture.camera(camera);
+  f.gesture.cancel();
+  expect(f.store.get(previewAtom)).toBeNull();
+  expect(f.engine.getSnapshot().project).toEqual(before);
+});
