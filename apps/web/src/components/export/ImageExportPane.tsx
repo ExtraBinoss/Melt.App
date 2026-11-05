@@ -29,7 +29,7 @@ export function ImageExportPane(
     () => jobs.pending,
     () => false,
   );
-  const [options, setOptions] = useState<ManagedImageOptions>(() => ({
+  const [settings, setOptions] = useState<ManagedImageOptions>(() => ({
     format: page.colorSpace === "cmyk" ? "pdf" : "png",
     colorMode: page.colorSpace === "cmyk" ? "cmyk" : "srgb",
     quality: 1,
@@ -42,6 +42,13 @@ export function ImageExportPane(
       pageInfo: false,
     },
   }));
+  const options = useMemo(
+    () =>
+      props.framing && settings.print.bleedMm !== 0
+        ? { ...settings, print: { ...settings.print, bleedMm: 0 } }
+        : settings,
+    [settings, props.framing],
+  );
   const [scale, setScale] = useState(1);
   const [edge, setEdge] = useState<number | null>(null);
   const selectionOnly = selection.length > 0 && !allPages;
@@ -62,6 +69,7 @@ export function ImageExportPane(
             services.previewExport!(
               {
                 ...request,
+                framing: props.framing,
                 centerSelection: props.centerSelection,
                 colorOutput: options.colorMode === "cmyk" ? "source" : "display",
               },
@@ -69,7 +77,7 @@ export function ImageExportPane(
             )
         : undefined,
     }),
-    [services, options.colorMode, props.centerSelection],
+    [services, options.colorMode, props.centerSelection, props.framing],
   );
   const preview = useExportPreview(
     page,
@@ -86,6 +94,7 @@ export function ImageExportPane(
     options,
     services,
     busy || props.previewActive === false ? null : edge,
+    props.framing,
   );
   const proof = options.format === "pdf" ? printPreview : managed;
   const bleed = Math.ceil((options.print.bleedMm * options.print.dpi) / 25.4);
@@ -94,8 +103,14 @@ export function ImageExportPane(
   )
     ? (56 * options.print.dpi) / 72
     : 0;
-  const previewWidth = options.format === "pdf" ? scope.width + 2 * bleed + margin : scope.width;
-  const previewHeight = options.format === "pdf" ? scope.height + 2 * bleed + margin : scope.height;
+  const output = {
+    width: Math.max(1, Math.round((props.framing?.width ?? scope.width) * scale)),
+    height: Math.max(1, Math.round((props.framing?.height ?? scope.height) * scale)),
+  };
+  const previewWidth =
+    options.format === "pdf" ? output.width / scale + 2 * bleed + margin : output.width;
+  const previewHeight =
+    options.format === "pdf" ? output.height / scale + 2 * bleed + margin : output.height;
   const sizeKey = exportSizeKey(origin.project, [
     "image",
     page.id,
@@ -103,6 +118,7 @@ export function ImageExportPane(
     props.centerSelection ?? false,
     scale,
     options,
+    props.framing,
     allPages,
   ]);
   const start = useStartExport(props, "image", sizeKey);
@@ -124,7 +140,7 @@ export function ImageExportPane(
           <div className="export-preview-caption">
             <strong>{scope.name}</strong>
             <span>
-              {Math.round(scope.width * scale)} × {Math.round(scope.height * scale)} px ·{" "}
+              {output.width} × {output.height} px ·{" "}
               {options.colorMode === "cmyk" ? "CMYK · CGATS21 CRPC6" : "sRGB"}
             </span>
           </div>
@@ -140,6 +156,7 @@ export function ImageExportPane(
               centerSelection: props.centerSelection,
               compositionId: page.id,
               scale,
+              framing: props.framing,
               image: { ...options, allPages, selectionOnly },
               selection,
               background: true,
@@ -225,6 +242,7 @@ export function ImageExportPane(
       {options.format === "pdf" && (
         <PrintSettings
           value={options.print}
+          framed={!!props.framing}
           onChange={(print) => setOptions({ ...options, print })}
           disabled={busy}
         />

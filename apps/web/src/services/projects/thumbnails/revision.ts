@@ -62,6 +62,7 @@ export async function thumbnailRevision(
           ...effectAssetIds(layer.effects),
         ]),
         captured.spatial?.environment.assetId,
+        ...effectAssetIds(captured.effects ?? []),
       ].filter((id): id is string => !!id),
     ),
   ].sort();

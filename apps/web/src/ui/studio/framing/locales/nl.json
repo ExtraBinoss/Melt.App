@@ -1,0 +1,18 @@
+{
+  "guides": "Opnamehulplijnen",
+  "title": "Opnamegebied",
+  "full": "Volledige weergave",
+  "custom": "Aangepast",
+  "width": "Breedte",
+  "height": "Hoogte",
+  "showGuide": "Opnamehulplijn tonen",
+  "exportFrame": "Uitvoerkader",
+  "original": "Oorspronkelijke compositie",
+  "format": "Formaat",
+  "scene": "Scène",
+  "portrait": "Staand",
+  "landscape": "Liggend",
+  "square": "Vierkant",
+  "captureHint": "Alleen het gemarkeerde gebied wordt geëxporteerd.",
+  "customHint": "Kies de uitvoerafmetingen zonder de compositie te wijzigen."
+}

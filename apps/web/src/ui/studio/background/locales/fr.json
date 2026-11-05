@@ -6,5 +6,18 @@
   "hint": "Créez un calque de fond pour empiler les effets. Sa couleur et son dégradé restent modifiables dans les deux interfaces et les exports.",
   "name": "Arrière-plan",
   "select": "Sélectionner le calque de fond",
-  "locked": "Déverrouillez ce calque dans le panneau de composition pour modifier le fond."
+  "locked": "Déverrouillez ce calque dans le panneau de composition pour modifier le fond.",
+  "presets": "Collection de dégradés",
+  "previewHint": "Survolez pour prévisualiser dans la composition. Un clic applique un fond et des effets modifiables.",
+  "categories": {
+    "plastic": "Plastique brillant",
+    "cinematic": "Cinéma",
+    "social": "Réseaux sociaux",
+    "editorial": "Éditorial",
+    "atmosphere": "Atmosphère"
+  },
+  "ingredients": {
+    "grain": "Grain",
+    "feather": "Contour progressif"
+  }
 }

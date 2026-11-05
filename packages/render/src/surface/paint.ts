@@ -9,6 +9,9 @@ export function paintControls() {
     size: uniform(new Vector2(1, 1)),
     mode: uniform(0),
     angle: uniform(0),
+    center: uniform(new Vector2(0.5, 0.5)),
+    radialScale: uniform(new Vector2(1, 1)),
+    radius: uniform(0.5),
     colors: Array.from({ length: 8 }, () => uniform(new Vector4())),
     offsets: Array.from({ length: 8 }, () => uniform(1)),
     count: uniform(2),
@@ -25,6 +28,11 @@ export function updatePaintControls(
   controls.size.value.set(width, height);
   controls.mode.value = gradient ? (gradient.kind === "linear" ? 1 : 2) : 0;
   controls.angle.value = ((gradient?.angle ?? 0) * Math.PI) / 180;
+  controls.center.value.set(gradient?.centerX ?? 0.5, gradient?.centerY ?? 0.5);
+  controls.radius.value = gradient?.radius ?? 0.5;
+  const span =
+    gradient?.radialShape === "circle" ? Math.max(1, Math.min(width, height)) : undefined;
+  controls.radialScale.value.set(span ? width / span : 1, span ? height / span : 1);
   controls.count.value = gradient?.stops.length ?? 2;
   for (let index = 0; index < 8; index++) {
     const stop = gradient?.stops[Math.min(index, gradient.stops.length - 1)];
@@ -42,7 +50,9 @@ export const paintNode = (controls: ReturnType<typeof paintControls>, coordinate
       .dot(direction)
       .div(max(abs(direction).dot(controls.size), 0.000001))
       .add(0.5);
-    const radial = length(point.sub(0.5)).mul(2);
+    const radial = length(point.sub(controls.center).mul(controls.radialScale)).div(
+      controls.radius,
+    );
     const position = clamp(controls.mode.equal(2).select(radial, projected), 0, 1).toVar();
     // Fixed graph size; colors/offsets/count remain live uniforms across gestures.
     const result = vec4(controls.colors[0]!).toVar();

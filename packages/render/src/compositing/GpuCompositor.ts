@@ -1,3 +1,5 @@
+import { finishCompositionEffects, prepareEffectStacks } from "./composition-effects";
+import { assetIdentity } from "../cache/keys";
 import { compositionPaintKey } from "../cache/composition-key";
 import { PlaybackSubmissions } from "../cache/playback-submissions";
 import type { RenderFrame } from "./render-frame";
@@ -184,28 +186,7 @@ export class GpuCompositor {
         await proof.prepare(preparationTarget, canPrepare);
       }
       await this.passes.prepare(preparationTarget, canPrepare);
-      for (const layer of page.layers) {
-        if (!layer.effects.length) continue;
-        // Future opacity/enabled keys reuse these materials; only actual drawing applies pixels.
-        const preparedEffects = layer.effects.map((effect) =>
-          effect.enabled ? effect : { ...effect, enabled: true },
-        );
-        this.cache.ensureCapacity(
-          "shared-effects",
-          this.effects.projectedBytes(1, 1, preparedEffects),
-        );
-        try {
-          await this.effects.prepare(
-            layer.effects,
-            preparationTarget,
-            layer.width,
-            layer.height,
-            canPrepare,
-          );
-        } finally {
-          this.cache.synchronize("shared-effects");
-        }
-      }
+      await prepareEffectStacks(page, this.effects, this.cache, preparationTarget, canPrepare);
       await this.normal.prepare(page.layers, preparationTarget, canPrepare);
       this.sample("pipeline", pipelineStarted, options.profileVideo);
       const sourceStarted = options.profileVideo ? performance.now() : 0;
@@ -258,7 +239,7 @@ export class GpuCompositor {
       const rootKey = `page:${page.id}:${scale}${options.colorOutput === "source" ? ":source" : ""}${frame.vectorAntialias ? ":vector-aa" : ""}${density}`;
       const entry = this.entry(rootKey);
       const roots = geometry.children(null);
-      const signature = compositionPaintKey(page, roots, keyFor);
+      const signature = compositionPaintKey(page, roots, keyFor, (id) => assetIdentity(assets[id]));
       if (entry.signature === signature && entry.output) {
         this.cacheHits++;
         this.frames++;
@@ -269,7 +250,7 @@ export class GpuCompositor {
       }
       if (isGraphicsPlayback(options)) await this.submissions.admit(options.signal);
       entry.signature = "";
-      const composed = this.children(
+      const blended = this.children(
         null,
         page.width,
         page.height,
@@ -278,6 +259,12 @@ export class GpuCompositor {
         rootKey,
         frame,
       );
+      const composed = finishCompositionEffects(page, blended, {
+        passes: this.passes,
+        effects: this.effects,
+        cache: this.cache,
+        target: (role, width, height) => this.target(entry, rootKey, role, width, height),
+      });
       const target = this.target(
         entry,
         rootKey,

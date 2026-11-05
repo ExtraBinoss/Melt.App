@@ -10,41 +10,93 @@ portable-project, image/video export and headless command paths.
 
 ## Composition workflow
 
-Studio overlays compact controls on the retained canvas:
+Studio covers the full viewport with the active composition. This is a presentation
+zoom and pan constraint, not a change to the portable composition or its camera.
+Switching back restores the Classic view. Objects outside a capture guide remain
+editable and are retained in the project.
 
-- Quick Add inserts native editable 3D text, shapes/models, flat or extruded SVGs,
-  and imported images, video or audio through the existing services.
-- The composition dock embeds the regular pages and layers components. Visibility,
-  locks, nesting, effect disclosure, ordering and masks use the existing commands.
-- Selecting a spatial object exposes its existing native move/rotate/scale gizmo.
-  Selecting text adds a direct content field, with typography, depth and bevel
-  controls in its contextual panel. Locked ancestors remain authoritative.
-- Material and scene docks use the regular material catalog, shared lighting and
-  environment presets. Continuous sliders preview outside the document, commit
-  once at release and restore on cancellation, owner changes or unmount.
-- Fit, 100% reset and recenter remain available next to Quick Add. Wheel and
-  trackpad behavior remains the canvas behavior; changing interface does not
-  change the render camera.
-- Advanced opens the regular Inspector and stackable effect controls. Studio uses
-  the existing export workspace, including its actual supported export formats.
+- Icon-only quick insertion uses native text, shapes/models, flat or extruded SVGs,
+  images, video and audio services. The regular gizmos handle move/rotate/scale.
+- The closed composition control opens the existing pages and layer components,
+  including visibility, locks, nested effects and ordering.
+- Selecting text reveals content and typography; extruded sources expose depth and
+  bevel. Models and primitives expose proportional size instead of irrelevant
+  extrusion parameters. Properties open above the centered object controls.
+- Material and scene controls open on demand. Their 134 materials and 62 environment
+  entries are grouped into initially expanded categories; each project's preferences
+  remember collapsed categories. Sphere atlases are rendered with the native engine
+  ahead of time, avoiding a renderer per swatch. The original eleven lit environment
+  presets retain their exact RoomEnvironment geometry and colors.
+- Sliders preview imperatively, commit once on release and restore on cancellation,
+  owner changes or unmount. Neutral surfaces use the shared theme without glows.
+- Recenter restores the immersive view. Wheel/trackpad navigation and pointer zoom
+  retain the existing canvas behavior. Classic retains its fit and 100% controls.
+- Advanced opens the regular Inspector. There is no agent activity surface in Studio;
+  opt-in automation remains available without interrupting manual composition.
 
-Studio does not add a separate Motion editor. Existing animated compositions
-remain animated and editable through shared advanced controls or Classic.
+Studio does not add a separate Motion editor. Existing animated compositions remain
+animated and editable through shared advanced controls or Classic.
 
-## Backgrounds and effects
+## Capture guides and export
 
-The Background control initially edits the ordinary composition solid/gradient
-paint. **Enable background effects** copies it to an ordinary full-frame rectangle
-at the bottom of the layer stack and clears the composition paint in one validated
-transaction. The original foreground selection is preserved. Undo restores the
-original document; redo restores the editable layer.
+Capture guides and the export workspace share the existing social/video format
+catalog, SVG aspect thumbnails and custom dimensions. A guide highlights the
+centered capture rectangle within the current visible composition window. Full view
+captures that entire window. Guide preferences never modify layers or history.
 
-A full-frame, untransformed, root rectangle at the bottom of the stack is presented
-as an editable background. It has no special name-dependent rendering behavior.
-Its gradients, effects, blending, visibility and locks remain ordinary portable
-layer data in Classic, Studio, previews, saved files and native exports. Transforming
-or moving it out of that structural position returns the Background control to
-composition paint. Effects are not applied by an unrelated CSS overlay.
+Opening export in Studio captures the visible window and defaults to its guide's
+format. Preview, still image, motion and timelapse paths pass the same typed
+`OutputFraming` through the shared renderer. The GPU renders the original scene at
+the required sampling density, applies all effects, then crops its final texture.
+It does not resize or reflow a derivative document. Classic defaults to the original
+composition and can also select a format. Selecting another artboard resets the
+format to that artboard. Selection exports retain their existing isolated behavior.
+
+Output dimensions must be integer pixels from 1 through 16384 per edge, with at
+most 64 megapixels after scaling. Invalid requests fail instead of being capped.
+Print bleed requires original full-artboard output; framed print explicitly disables
+bleed. The original project and undo history remain intact.
+
+## Background recipes and effects
+
+Background initially edits ordinary composition paint. **Enable background effects**
+copies it to a normal full-frame rectangle at the bottom of the layer stack in one
+validated transaction. Foreground selection is preserved.
+
+The 65 gradient recipes are grouped into glossy plastic, cinematic, social,
+editorial and atmosphere palettes. Hover or keyboard focus previews the entire
+recipe through the existing GPU preview graph. Leaving, closing, switching owner,
+changing transport time or editing cancels that draft without a history entry.
+Clicking commits a single `applyBackgroundPreset` command and preserves selection.
+Recipes use ordinary editable gradient stops plus Melt's existing grain and a
+reusable Feather effect. There is no parallel CSS treatment or baked image.
+
+Radial gradients support circle/ellipse, center coordinates and radius in the shared
+paint controls. Legacy radial gradients retain their original ellipse behavior.
+Feather exposes center, radius, softness and amount as a normal alpha effect,
+available to Classic, Studio, saved projects, motion, export and headless commands.
+A recipe can be authored directly:
+
+```ts
+engine.execute({
+  type: "applyBackgroundPreset",
+  presetId: "atmosphere-aurora-mist",
+  options: { grain: 0.06, feather: 0.35 },
+});
+```
+
+A full-frame untransformed root rectangle at the bottom of the stack is recognized
+structurally as the background. Its gradients, stack, blending, visibility and locks
+remain ordinary layer data. Moving or transforming it out of that position returns
+the Background control to composition paint. Existing locked backgrounds reject edits.
+
+The direct Effect and Color grade controls target the selected editable layer, or
+the whole composition when nothing is selected. Composition effects are an ordinary
+optional `Composition.effects` stack, evaluated after all paint/layer blending and
+before final output/color presentation. They share the normal effect operators,
+validation, caches, asset ownership, undo, clipboard and export paths. Source-only
+morphing remains a source operation. Image-input configuration for composition
+stacks is currently limited to portable/command-authored inputs.
 
 ## Optional offline model pack
 
@@ -83,8 +135,7 @@ bun run headless render --input artifacts/studio.musart --output artifacts/studi
 
 `--workspace classic|studio` changes screenshot presentation only. Rendering uses
 the same document regardless of interface. Browser automation can use the explicit
-`workspace` query parameter with `automation=1`. For live agent edits and genuine
-activity logs in either workspace, see [the local agent bridge](agent-bridge.md).
+`workspace` query parameter with `automation=1`. For opt-in live agent automation and command logs, see [the local agent bridge](agent-bridge.md).
 
 ## Local verification
 
@@ -102,10 +153,64 @@ The real `headless create`, `headless screenshot --workspace studio` and
 port 6100. Focused integration tests, strict TypeScript, type-aware lint, React
 lint, formatting and contribution rules are checked separately from release CI.
 
-A final native pointer-down to the next acknowledged canvas frame sample measured
-**69.7 ms** with Playwright Chromium, the Three.js WebGPU backend, a 1600 × 1000
-viewport and a 200% CPU quota. This is one development sample, not INP, a GPU fence,
-a physical-display measurement or a production benchmark. The probe and rendering
-regressions live in `test/browser/studio.spec.ts` and
-`test/browser/support/studio-presentation.ts`; local captures and logs stay under
-ignored `artifacts/studio/`.
+## Production presentation measurements (2026-11-05)
+
+An isolated production build with source maps was served on port 4186. Chromium
+156.0.8078.4 used the Three.js WebGPU backend on Linux / Intel Core Ultra 5 125H,
+1600 × 1000, one worker, with the browser runner limited to 200% CPU and 2.9 GiB
+memory (no swap). The retained five-object Studio Starter scene was used.
+
+| Native gesture to acknowledged preview | Samples | Median  | Maximum |
+| -------------------------------------- | ------- | ------- | ------- |
+| Material roughness slider              | 7       | 25.6 ms | 80.4 ms |
+| Native grain + Feather gradient hover  | 7       | 35.3 ms | 99.9 ms |
+
+These measure browser dispatch through the next acknowledged composed frame,
+not physical-display latency, field INP or a cross-device guarantee. The sample
+maximum is also the nearest-rank p95 for this small cohort; the full samples are
+retained in `artifacts/studio/presentation-performance.json`.
+
+During previews, App, CanvasArea, EditorCanvas and EditorScene React counters
+remained unchanged and the portable document was unchanged until release. After
+seven slider gestures and seven recipe previews, retained GPU cache usage was
+100,859,790 bytes (96.2 MiB), 39 compositor targets and 60 native node programs.
+Across a settled 1.1-second idle observation there were zero additional composition
+or display frames, with identical resource counters. Instrumented GPUBuffer.mapAsync,
+WebGL.readPixels, Canvas2D.getImageData and VideoFrame.copyTo recorded zero production
+pixel readbacks. Native PNG decoding separately verified exact crop dimensions,
+orientation, composition-wide effects, distinct radial-gradient colors and Feather alpha.
+
+Preview fidelity remains adaptive under the existing GPU memory limits. In dense
+3D scenes the estimator conservatively uses authored bounds before prepared mesh
+bounds are available; this can lower on-screen resolution. Do not reduce the real
+56-byte MSAA/depth source allocation or raise caps to disguise it. Export remains
+at its explicitly requested resolution. Composition effect admission now accounts
+for all three final surfaces, shared scratch, native image inputs and bounded glyph
+uploads. Empty legacy composition stacks retain their previous estimates.
+
+Reproduce functional and presentation checks with `studio-backgrounds.spec.ts` and
+`studio-performance.spec.ts`, using an isolated production preview as described in
+[the performance protocol](../performance/protocol.md). Source diff, hashes,
+compiled output, source maps and captures for this cohort are in `artifacts/studio`.
+
+In an earlier production cohort, before the final shared-shape gradient correction,
+the separate 2400 × 1500 stress composition (50 photos, 100 effects, five groups,
+ten masks) also passed native preview, decoded export, storage thumbnail, loss
+recovery and zero-readback checks. In this constrained local cohort, cold first
+presentation took 19.187 s; twelve move samples had a 58.5 ms median / 196.2 ms p95,
+and twelve effect edits had an 82.4 ms median / 157.6 ms p95. The full-resolution
+export took 8.546 s. This heavy cold path remains substantially more expensive
+than an already prepared Studio preview. The full observations and pixel witnesses
+are in `artifacts/performance-50.json`; no test thresholds were loosened. The test
+now separates settled pan assertions from the deferred zoom-density frame rather
+than assuming that a host-side round trip always precedes its 140 ms debounce.
+
+A separate DevTools startup trace used Chromium 140’s WebGL fallback on the default
+2D demo. FCP/LCP were 340 ms, CLS 0 and the critical network chain 341 ms. Its LCP
+was the opening mascot, not the canvas: the canonical GPU frame was acknowledged
+at 6.858 s. Therefore the shell LCP must not be presented as editor readiness. This
+trace reported 69 ms of synchronous startup layout; it estimated no LCP savings from
+render-blocking resources. No optional model packs, sphere atlases, ONNX or WASM
+were requested at startup. These are a different backend/scene from the Studio
+WebGPU gesture cohort. The local trace summary is
+`artifacts/studio/devtools-startup-summary.json`.

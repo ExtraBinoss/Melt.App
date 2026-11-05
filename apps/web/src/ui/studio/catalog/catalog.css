@@ -1,0 +1,110 @@
+.studio-catalog-popover {
+  width: min(354px, calc(100vw - 24px));
+  padding: 10px;
+  contain: layout style;
+  color: var(--foreground);
+  background: var(--popover);
+  border: 1px solid var(--border);
+  box-shadow: none;
+}
+.studio-catalog-scroll {
+  max-height: min(480px, calc(var(--radix-popover-content-available-height) - 24px));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-inline: 2px;
+}
+.studio-catalog-embedded .studio-catalog-scroll {
+  max-height: min(300px, 38dvh);
+}
+.studio-catalog-grid button:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+.studio-catalog-groups [data-slot="accordion-item"] {
+  border-color: var(--border);
+}
+.studio-catalog-groups [data-slot="accordion-trigger"] {
+  gap: 8px;
+  padding-block: 10px;
+  font-size: 11px;
+  font-weight: 500;
+  text-decoration: none;
+}
+.studio-catalog-count {
+  margin-inline-start: auto;
+  color: var(--muted-foreground);
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+}
+.studio-catalog-groups [data-slot="accordion-content"] > div {
+  padding-bottom: 10px;
+}
+.studio-catalog-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 5px;
+}
+.studio-catalog-grid button {
+  min-width: 0;
+  padding: 5px 2px;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 5px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 10px;
+  line-height: 1.3;
+  color: var(--muted-foreground);
+  text-align: center;
+}
+.studio-catalog-grid button:hover {
+  background: var(--accent);
+  color: var(--foreground);
+}
+.studio-catalog-grid button[aria-pressed="true"] {
+  color: var(--foreground);
+  border-color: var(--foreground);
+}
+.studio-catalog-grid button:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 1px;
+}
+.studio-catalog-swatch {
+  display: block;
+  width: 56px;
+  height: 56px;
+  flex: none;
+  background-repeat: no-repeat;
+  border-radius: 4px;
+}
+.studio-catalog-trigger {
+  width: 100%;
+  justify-content: flex-start;
+  height: 42px;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 400;
+}
+.studio-catalog-trigger .studio-catalog-swatch {
+  width: 30px;
+  height: 30px;
+}
+.studio-catalog-trigger > span:last-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.studio-color-disclosure > summary {
+  padding-block: 6px;
+  cursor: pointer;
+  color: var(--muted-foreground);
+  font-size: 11px;
+}
+.studio-color-disclosure > summary:focus-visible {
+  outline: 2px solid var(--ring);
+}
+.studio-color-disclosure[open] > summary {
+  margin-bottom: 8px;
+}

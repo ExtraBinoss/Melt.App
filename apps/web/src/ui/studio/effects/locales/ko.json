@@ -1,0 +1,10 @@
+{
+  "addEffect": "효과 추가",
+  "addGrade": "색상 보정 추가",
+  "composition": "컴포지션",
+  "layerScope": "선택한 개체에 적용",
+  "compositionScope": "전체 컴포지션에 적용",
+  "singleSelection": "효과를 편집할 개체 하나를 선택하세요.",
+  "locked": "효과를 편집하려면 이 개체의 잠금을 해제하세요.",
+  "stack": "스택 ({{count}})"
+}

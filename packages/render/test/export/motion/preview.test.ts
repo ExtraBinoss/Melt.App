@@ -251,3 +251,21 @@ it("excludes a delayed GPU frame from elapsed playback and rejects stale audio h
   expect(preview.read().time.value / preview.read().time.rate).toBeCloseTo(0.6);
   await preview.dispose();
 });
+
+it("keeps a fixed framing contract across preview playback samples", async () => {
+  const scheduler = clock(),
+    framing = { width: 1080, height: 1920 };
+  const preview = createMotionPreview(motionProject(), {
+    compositionId: "composition",
+    framing,
+    edge: 384,
+    scheduler,
+    onFrame: vi.fn(),
+  });
+  await scheduler.step(0);
+  await scheduler.step(100);
+  expect(state.render).toHaveBeenCalledTimes(2);
+  for (const call of state.render.mock.calls)
+    expect(call[3]).toMatchObject({ framing, scale: 384 / 1920 });
+  await preview.dispose();
+});

@@ -1,0 +1,18 @@
+{
+  "guides": "Guías de captura",
+  "title": "Área de captura",
+  "full": "Vista completa",
+  "custom": "Personalizado",
+  "width": "Ancho",
+  "height": "Alto",
+  "showGuide": "Mostrar guía de captura",
+  "exportFrame": "Encuadre de salida",
+  "original": "Composición original",
+  "format": "Formato",
+  "scene": "Escena",
+  "portrait": "Vertical",
+  "landscape": "Horizontal",
+  "square": "Cuadrado",
+  "captureHint": "Solo se exporta el área resaltada.",
+  "customHint": "Elige las dimensiones de salida sin cambiar la composición."
+}

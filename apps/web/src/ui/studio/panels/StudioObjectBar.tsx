@@ -1,7 +1,7 @@
 import { memo, useMemo } from "react";
 import { SlidersHorizontal } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import type { EnginePort, Layer } from "@musart/core";
+import { SPATIAL_NUMBERS, type EnginePort, type Layer } from "@musart/core";
 import { useDocumentSnapshot } from "../../../state/session/use-document-snapshot";
 import { motionTimeChanges } from "../../../state/session/motion-edit";
 import { layerSelection } from "../../../components/layers/menu/selection";
@@ -13,6 +13,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "../../../components/ui/
 import { Button } from "../../../components/ui/button";
 import { StudioSlider } from "../controls/StudioSlider";
 import "../messages";
+import "../../../components/spatial/messages";
 
 export const StudioObjectBar = memo(function StudioObjectBar({
   engine,
@@ -46,6 +47,20 @@ export const StudioObjectBar = memo(function StudioObjectBar({
     else edit.previewLayer(value);
   };
   if (!layer) return null;
+  const source = layer.spatial;
+  const scaleX = source?.scaleX ?? 1;
+  const axes = source ? [source.scaleX, source.scaleY, source.scaleZ] : [1];
+  const minimum = Math.min(
+    scaleX,
+    Math.ceil(((scaleX * SPATIAL_NUMBERS.scaleX[0]) / Math.min(...axes)) * 100) / 100,
+  );
+  const maximum = Math.max(
+    scaleX,
+    Math.min(
+      50,
+      Math.floor(((scaleX * SPATIAL_NUMBERS.scaleX[1]) / Math.max(...axes)) * 100) / 100,
+    ),
+  );
   return (
     <MotionFieldProvider editor={edit}>
       <div className="studio-object-bar studio-surface" data-canvas-control aria-label={layer.name}>
@@ -89,6 +104,7 @@ export const StudioObjectBar = memo(function StudioObjectBar({
               />
             )}
             {layer.spatial?.enabled &&
+              layer.spatial.source === "extrude" &&
               (["depth", "bevel"] as const).map((key) => {
                 const spatial = layer.spatial!;
                 return (
@@ -116,6 +132,53 @@ export const StudioObjectBar = memo(function StudioObjectBar({
                   />
                 );
               })}
+            {layer.spatial?.enabled && layer.spatial.source !== "extrude" && (
+              <StudioSlider
+                identity={identity}
+                invalidation={motionTimeChanges(engine)}
+                label={spatialText("scale")}
+                value={Math.abs(layer.spatial.scaleX)}
+                min={minimum}
+                max={maximum}
+                step={0.01}
+                disabled={!selection.editable || minimum === maximum}
+                onStart={() => {
+                  if (current())
+                    edit.start({ kind: "layer", layerId: layer.id, property: "spatial.scaleX" });
+                }}
+                onPreview={(value) => {
+                  const spatial = layer.spatial!;
+                  const factor = value / Math.max(0.0001, Math.abs(spatial.scaleX));
+                  patch(
+                    {
+                      spatial: {
+                        ...spatial,
+                        scaleX: spatial.scaleX * factor,
+                        scaleY: spatial.scaleY * factor,
+                        scaleZ: spatial.scaleZ * factor,
+                      },
+                    },
+                    false,
+                  );
+                }}
+                onCommit={(value) => {
+                  const spatial = layer.spatial!;
+                  const factor = value / Math.max(0.0001, Math.abs(spatial.scaleX));
+                  patch(
+                    {
+                      spatial: {
+                        ...spatial,
+                        scaleX: spatial.scaleX * factor,
+                        scaleY: spatial.scaleY * factor,
+                        scaleZ: spatial.scaleZ * factor,
+                      },
+                    },
+                    true,
+                  );
+                }}
+                onCancel={edit.cancel}
+              />
+            )}
             {layer.kind === "text" && (
               <StudioSlider
                 identity={identity}

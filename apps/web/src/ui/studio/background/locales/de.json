@@ -6,5 +6,18 @@
   "hint": "Erstelle eine normale Hintergrundebene, um Effekte zu stapeln. Ihre Füllung bleibt in beiden Arbeitsbereichen und beim Export bearbeitbar.",
   "name": "Hintergrund",
   "select": "Hintergrundebene auswählen",
-  "locked": "Entsperre diese Ebene im Kompositionsbereich, um ihren Hintergrund zu bearbeiten."
+  "locked": "Entsperre diese Ebene im Kompositionsbereich, um ihren Hintergrund zu bearbeiten.",
+  "presets": "Verlaufskollektion",
+  "previewHint": "Zum Vorschauen in der Komposition darüberfahren. Ein Klick wendet bearbeitbare Farben und Effekte an.",
+  "categories": {
+    "plastic": "Glänzender Kunststoff",
+    "cinematic": "Kino",
+    "social": "Social Media",
+    "editorial": "Editorial",
+    "atmosphere": "Atmosphäre"
+  },
+  "ingredients": {
+    "grain": "Körnung",
+    "feather": "Weiche Kante"
+  }
 }

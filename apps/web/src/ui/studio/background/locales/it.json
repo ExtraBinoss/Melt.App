@@ -6,5 +6,18 @@
   "hint": "Crea un normale livello di sfondo per sovrapporre gli effetti. Il riempimento resta modificabile in entrambe le aree di lavoro e nelle esportazioni.",
   "name": "Sfondo",
   "select": "Seleziona il livello di sfondo",
-  "locked": "Sblocca questo livello nel pannello di composizione per modificarne lo sfondo."
+  "locked": "Sblocca questo livello nel pannello di composizione per modificarne lo sfondo.",
+  "presets": "Collezione di sfumature",
+  "previewHint": "Passa il cursore per vedere l’anteprima nella composizione. Un clic applica colori ed effetti modificabili.",
+  "categories": {
+    "plastic": "Plastica lucida",
+    "cinematic": "Cinema",
+    "social": "Social",
+    "editorial": "Editoriale",
+    "atmosphere": "Atmosfera"
+  },
+  "ingredients": {
+    "grain": "Grana",
+    "feather": "Sfuma bordi"
+  }
 }

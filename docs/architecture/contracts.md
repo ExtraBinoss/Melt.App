@@ -1,7 +1,7 @@
 # Build contracts
 
 - `packages/core`: serializable model, validation, immutable engine, history, and geometry. No DOM, React, or GPU dependencies.
-- `packages/render`: GPU texture/RenderTarget composition and TSL effects confined to a layer/group; image sources upload directly and text sources are prepared when needed. Zero GPU readback into JavaScript; export uses a GPU canvas and the browser encoder. The same graph feeds R3F and export. The R3F adapter lives in `apps/web/src/canvas`.
+- `packages/render`: GPU texture/RenderTarget composition and TSL effects on isolated layers/groups and the final composition surface; image sources upload directly and text sources are prepared when needed. Zero GPU readback into JavaScript; export uses a GPU canvas and the browser encoder. The same graph feeds R3F and export. The R3F adapter lives in `apps/web/src/canvas`.
 - `apps/web/src/services`: IndexedDB, import, save, segmentation, and automation.
 - `apps/web/src/components`: shadcn/Radix interface. Jotai owns presentation state; document commands go through `EnginePort`.
 - Keep behavior tests in the relevant `test/` tree, never under `src/`. Exact per-file mirrors are optional; integration tests may cover several source files. Preserve meaningful regressions and full source coverage rather than adding mechanical wrapper or re-export tests. Maximum 600 lines per source, script, or test file; lockfiles and documentation are exempt.

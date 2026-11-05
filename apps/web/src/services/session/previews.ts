@@ -69,9 +69,11 @@ export function createPreviewExport(
       variant ?? null,
       centered ? [source.width, source.height] : null,
       options.colorOutput ?? "display",
+      options.framing ?? null,
     ]);
     return thumbnails.preview(key, page, snapshot.project.assets, {
       edge,
+      ...(options.framing ? { framing: options.framing } : {}),
       ...(options.colorOutput ? { colorOutput: options.colorOutput } : {}),
       ...(mediaResolverFor ? { mediaResolver: mediaResolverFor(snapshot.project.id) } : {}),
       ...(options.priority ? { priority: options.priority } : {}),

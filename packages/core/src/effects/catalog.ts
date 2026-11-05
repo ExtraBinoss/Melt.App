@@ -1,3 +1,4 @@
+import { FEATHER_DEFINITION } from "./feather/definition";
 import { HALFTONE_DEFINITION } from "./halftone/definition";
 import { TORN_EDGES_DEFINITION } from "./torn-edges/definition";
 import { LIQUIFY_DEFINITION } from "./liquify/definition";
@@ -44,6 +45,7 @@ import { ASCII_DEFINITION } from "./ascii/definition";
 import { DITHER_DEFINITION } from "./dither/definition";
 /** Portable effect metadata shared by factories, validation and client controls. */
 export const EFFECT_CATALOG: Readonly<Record<EffectType, EffectDefinition>> = Object.freeze({
+  feather: FEATHER_DEFINITION,
   terminal: TERMINAL_DEFINITION,
   "torn-edges": TORN_EDGES_DEFINITION,
   liquify: LIQUIFY_DEFINITION,

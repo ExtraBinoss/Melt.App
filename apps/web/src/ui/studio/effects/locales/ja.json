@@ -1,0 +1,10 @@
+{
+  "addEffect": "エフェクトを追加",
+  "addGrade": "カラーグレーディングを追加",
+  "composition": "コンポジション",
+  "layerScope": "選択したオブジェクトに適用",
+  "compositionScope": "コンポジション全体に適用",
+  "singleSelection": "エフェクトを編集するオブジェクトを1つ選択してください。",
+  "locked": "エフェクトを編集するにはロックを解除してください。",
+  "stack": "スタック（{{count}}）"
+}

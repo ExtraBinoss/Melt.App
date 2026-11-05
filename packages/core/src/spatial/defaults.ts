@@ -1,20 +1,10 @@
 import { createId } from "../document/identity";
 import type { SpatialLayer, SpatialLight, SpatialScene, SpatialSource } from "./model";
 import { spatialMaterial } from "./materials";
-export const SPATIAL_ENVIRONMENTS = [
-  "studio",
-  "softbox",
-  "overcast",
-  "sunset",
-  "dawn",
-  "night",
-  "neon",
-  "warm",
-  "cool",
-  "gallery",
-  "contrast",
-  "none",
-] as const;
+import { SPATIAL_ENVIRONMENT_PRESETS } from "./catalog/environments";
+export const SPATIAL_ENVIRONMENTS: readonly string[] = Object.freeze(
+  SPATIAL_ENVIRONMENT_PRESETS.map((preset) => preset.id),
+);
 export function createSpatialLayer(source: SpatialSource = "box"): SpatialLayer {
   return {
     enabled: true,

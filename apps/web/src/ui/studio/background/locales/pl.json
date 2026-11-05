@@ -6,5 +6,18 @@
   "hint": "Utwórz zwykłą warstwę tła, aby nakładać efekty. Jej wypełnienie pozostaje edytowalne w obu przestrzeniach roboczych i w eksportach.",
   "name": "Tło",
   "select": "Wybierz warstwę tła",
-  "locked": "Odblokuj tę warstwę w panelu kompozycji, aby edytować jej tło."
+  "locked": "Odblokuj tę warstwę w panelu kompozycji, aby edytować jej tło.",
+  "presets": "Kolekcja gradientów",
+  "previewHint": "Najedź, aby zobaczyć podgląd kompozycji. Kliknięcie stosuje edytowalne kolory i efekty.",
+  "categories": {
+    "plastic": "Błyszczący plastik",
+    "cinematic": "Filmowe",
+    "social": "Społecznościowe",
+    "editorial": "Redakcyjne",
+    "atmosphere": "Atmosfera"
+  },
+  "ingredients": {
+    "grain": "Ziarno",
+    "feather": "Miękkie krawędzie"
+  }
 }

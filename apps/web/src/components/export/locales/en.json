@@ -76,5 +76,6 @@
   "targetSize": "Target size",
   "fileSize": "File size",
   "targetSizeHint": "Based on the target bitrate. Variable bitrate can produce a smaller or larger file. The estimate updates during export.",
-  "measuredSizeHint": "Size of the last completed export with these settings."
+  "measuredSizeHint": "Size of the last completed export with these settings.",
+  "framedBleedHint": "Bleed requires full-artboard output. Choose Full view without a capture window to enable bleed."
 }

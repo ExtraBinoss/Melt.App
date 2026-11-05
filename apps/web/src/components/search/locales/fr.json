@@ -166,7 +166,8 @@
     "edge-detect": "Extraire les contours et les frontières de contraste.",
     "window-trails": "Répéter des traînées de fenêtres décalées.",
     "morph": "Interpoler les éléments entre plusieurs états de forme.",
-    "transition": "Animer l’entrée ou la sortie d’un calque."
+    "transition": "Animer l’entrée ou la sortie d’un calque.",
+    "feather": "Atténuation elliptique de la transparence avec centre, rayon et douceur modifiables."
   },
   "commandLabels": {
     "togglePlayback": "Lire / mettre en pause Motion",

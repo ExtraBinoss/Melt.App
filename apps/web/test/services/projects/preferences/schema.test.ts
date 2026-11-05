@@ -50,3 +50,22 @@ test("legacy layout records stay compatible and both presentation modes are expl
     workspaceMode: "studio",
   });
 });
+
+test("Studio stores bounded category choices and validated capture formats independently of documents", () => {
+  const studioCapture = { preset: "custom", width: 1080, height: 1920, full: false, visible: true };
+  const studioCatalogOpen = { "material:plastic": false, "environment:studio": true };
+  const input = { studioCapture, studioCatalogOpen };
+  const parsed = validateProjectPreferences(input);
+  expect(parsed).toEqual(input);
+  expect(parsed.studioCapture).not.toBe(studioCapture);
+  expect(parsed.studioCatalogOpen).not.toBe(studioCatalogOpen);
+  for (const invalid of [
+    { studioCapture: { ...studioCapture, width: 0 } },
+    { studioCapture: { ...studioCapture, height: 1.5 } },
+    { studioCapture: { ...studioCapture, height: 16385 } },
+    { studioCapture: { ...studioCapture, region: { x: 0 } } },
+    { studioCatalogOpen: { "material:plastic": 1 } },
+    { studioCatalogOpen: { "script:arbitrary": false } },
+  ])
+    expect(() => validateProjectPreferences(invalid)).toThrow();
+});

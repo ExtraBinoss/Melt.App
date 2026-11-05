@@ -1,0 +1,45 @@
+{
+  "variantName": "{{base}} · {{variant}}",
+  "materialCategories": {
+    "plastic": "塑料",
+    "metal": "金属",
+    "glass": "玻璃",
+    "ceramic": "陶瓷",
+    "stone": "石材",
+    "fabric": "织物",
+    "iridescent": "虹彩",
+    "emissive": "发光"
+  },
+  "environmentCategories": {
+    "studio": "摄影棚",
+    "daylight": "日光",
+    "interior": "室内",
+    "night": "夜景",
+    "color": "彩色"
+  },
+  "variants": {
+    "ivory": "象牙白",
+    "coral": "珊瑚色",
+    "mint": "薄荷色",
+    "cobalt": "钴蓝",
+    "lemon": "柠檬色",
+    "rose": "玫瑰色",
+    "lavender": "薰衣草色",
+    "graphite": "石墨色",
+    "terracotta": "陶土色",
+    "navy": "海军蓝",
+    "sage": "鼠尾草绿",
+    "cherry": "樱桃色",
+    "teal": "蓝绿色",
+    "side": "侧光",
+    "split": "分割光",
+    "ceiling": "顶光",
+    "rim": "轮廓光",
+    "strip": "条形光",
+    "window": "窗光",
+    "cross": "交叉光",
+    "tunnel": "隧道",
+    "halo": "光环",
+    "low": "低位光"
+  }
+}

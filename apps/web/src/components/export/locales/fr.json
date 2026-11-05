@@ -76,5 +76,6 @@
   "targetSize": "Poids cible",
   "fileSize": "Poids du fichier",
   "targetSizeHint": "Calculé à partir du débit cible. Le débit variable peut produire un fichier plus petit ou plus grand. L’estimation s’affine pendant l’export.",
-  "measuredSizeHint": "Poids du dernier export terminé avec ces paramètres."
+  "measuredSizeHint": "Poids du dernier export terminé avec ces paramètres.",
+  "framedBleedHint": "Le fond perdu nécessite la sortie du plan de travail entier. Choisissez Vue entière sans fenêtre de capture pour l’activer."
 }

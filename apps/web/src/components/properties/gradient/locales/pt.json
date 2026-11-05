@@ -26,5 +26,11 @@
   "empty": "Sem gradientes guardados",
   "loadError": "Não foi possível carregar os gradientes.",
   "saveError": "Não foi possível guardar esta alteração.",
-  "preset": "Gradiente {{number}}"
+  "preset": "Gradiente {{number}}",
+  "radialcenterX": "Centro X",
+  "radialcenterY": "Centro Y",
+  "radialradius": "Raio",
+  "radialellipse": "Elipse",
+  "radialcircle": "Círculo",
+  "radialShape": "Forma"
 }

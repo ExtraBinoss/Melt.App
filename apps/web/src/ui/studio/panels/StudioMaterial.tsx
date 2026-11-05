@@ -11,6 +11,7 @@ import { MotionColorControl } from "../../../components/properties/motion/Motion
 import { MotionFieldProvider } from "../../../components/properties/motion/context";
 import { StudioDock } from "../controls/StudioDock";
 import { StudioSlider } from "../controls/StudioSlider";
+import { materialParameters } from "../catalog/material-parameters";
 import "../messages";
 
 export const StudioMaterial = memo(function StudioMaterial({
@@ -21,6 +22,7 @@ export const StudioMaterial = memo(function StudioMaterial({
   run: (task: () => void) => void;
 }) {
   const { t } = useTranslation("studioChrome");
+  const { t: spatialText } = useTranslation("spatial");
   const snapshot = useDocumentSnapshot(engine, true);
   const page = snapshot.project.pages.find((item) => item.id === snapshot.pageId)!;
   const selection = layerSelection(page, snapshot.selection);
@@ -53,18 +55,14 @@ export const StudioMaterial = memo(function StudioMaterial({
     };
   }
   return (
-    <StudioDock
-      title={t("material")}
-      icon={<Palette size={15} />}
-      className="studio-material"
-      initiallyOpen={false}
-    >
+    <StudioDock title={t("material")} icon={<Palette size={15} />} className="studio-material">
       {layer && spatial && enabled ? (
         <MotionFieldProvider editor={edit}>
           <div className="studio-material-owner" title={layer.name}>
             {layer.name}
           </div>
           <MaterialPicker
+            embedded
             value={spatial.material.preset}
             disabled={!selection.editable}
             onChoose={(id) => {
@@ -83,26 +81,29 @@ export const StudioMaterial = memo(function StudioMaterial({
               );
             }}
           />
-          <MotionColorControl
-            engine={engine}
-            target={{ kind: "layer", layerId: layer.id, property: "fill" }}
-            label={t("color")}
-            value={layer.fill}
-            identity={layer.id}
-            disabled={!selection.editable}
-            onPreview={(fill) => patch(tint(fill), false)}
-            onCommit={(fill) => patch(tint(fill), true)}
-            onCancel={edit.cancel}
-          />
-          {(["roughness", "metalness"] as const).map((key) => (
+          <details className="studio-color-disclosure">
+            <summary>{t("color")}</summary>
+            <MotionColorControl
+              engine={engine}
+              target={{ kind: "layer", layerId: layer.id, property: "fill" }}
+              label={t("color")}
+              value={layer.fill}
+              identity={layer.id}
+              disabled={!selection.editable}
+              onPreview={(fill) => patch(tint(fill), false)}
+              onCommit={(fill) => patch(tint(fill), true)}
+              onCancel={edit.cancel}
+            />
+          </details>
+          {materialParameters(spatialMaterial(spatial.material.preset).category).map((key) => (
             <StudioSlider
               key={key}
               identity={identity}
               invalidation={motionTimeChanges(engine)}
-              label={t(key)}
+              label={spatialText(key)}
               value={spatial.material[key]}
               min={0}
-              max={1}
+              max={key === "emissiveIntensity" ? 5 : 1}
               disabled={!selection.editable}
               onStart={() =>
                 edit.start({

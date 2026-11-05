@@ -1,0 +1,45 @@
+{
+  "variantName": "{{base}} · {{variant}}",
+  "materialCategories": {
+    "plastic": "プラスチック",
+    "metal": "金属",
+    "glass": "ガラス",
+    "ceramic": "セラミック",
+    "stone": "石",
+    "fabric": "布",
+    "iridescent": "偏光",
+    "emissive": "発光"
+  },
+  "environmentCategories": {
+    "studio": "スタジオ",
+    "daylight": "昼光",
+    "interior": "室内",
+    "night": "夜",
+    "color": "カラー"
+  },
+  "variants": {
+    "ivory": "アイボリー",
+    "coral": "コーラル",
+    "mint": "ミント",
+    "cobalt": "コバルト",
+    "lemon": "レモン",
+    "rose": "ローズ",
+    "lavender": "ラベンダー",
+    "graphite": "グラファイト",
+    "terracotta": "テラコッタ",
+    "navy": "ネイビー",
+    "sage": "セージ",
+    "cherry": "チェリー",
+    "teal": "ティール",
+    "side": "サイド光",
+    "split": "分割光",
+    "ceiling": "天井光",
+    "rim": "リム光",
+    "strip": "ストリップ光",
+    "window": "窓",
+    "cross": "交差光",
+    "tunnel": "トンネル",
+    "halo": "ハロー",
+    "low": "低い光"
+  }
+}

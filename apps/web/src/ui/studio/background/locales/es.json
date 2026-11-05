@@ -6,5 +6,18 @@
   "hint": "Crea una capa de fondo normal para apilar efectos. Su relleno sigue siendo editable en ambos espacios de trabajo y en las exportaciones.",
   "name": "Fondo",
   "select": "Seleccionar capa de fondo",
-  "locked": "Desbloquea esta capa en el panel de composición para editar su fondo."
+  "locked": "Desbloquea esta capa en el panel de composición para editar su fondo.",
+  "presets": "Colección de degradados",
+  "previewHint": "Pasa el cursor para previsualizar en la composición. Un clic aplica pintura y efectos editables.",
+  "categories": {
+    "plastic": "Plástico brillante",
+    "cinematic": "Cine",
+    "social": "Redes sociales",
+    "editorial": "Editorial",
+    "atmosphere": "Atmósfera"
+  },
+  "ingredients": {
+    "grain": "Grano",
+    "feather": "Desvanecer bordes"
+  }
 }

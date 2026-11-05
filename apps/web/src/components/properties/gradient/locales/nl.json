@@ -26,5 +26,11 @@
   "empty": "Geen opgeslagen verlopen",
   "loadError": "Verlopen konden niet worden geladen.",
   "saveError": "Deze wijziging kon niet worden opgeslagen.",
-  "preset": "Verloop {{number}}"
+  "preset": "Verloop {{number}}",
+  "radialcenterX": "Middelpunt X",
+  "radialcenterY": "Middelpunt Y",
+  "radialradius": "Straal",
+  "radialellipse": "Ellips",
+  "radialcircle": "Cirkel",
+  "radialShape": "Vorm"
 }

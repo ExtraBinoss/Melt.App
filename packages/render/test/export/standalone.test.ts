@@ -54,10 +54,11 @@ vi.mock("../../src/compositing/GpuCompositor", () => ({
 vi.mock("../../src/export/presentation", () => ({
   GpuPresentation: class {
     constructor(private readonly renderer: { domElement: HTMLCanvasElement }) {}
-    render(frame: { width: number; height: number }) {
-      this.renderer.domElement.width = frame.width;
-      this.renderer.domElement.height = frame.height;
-      gpu.present(frame);
+    render(frame: { width: number; height: number }, output?: { width: number; height: number }) {
+      this.renderer.domElement.width = output?.width ?? frame.width;
+      this.renderer.domElement.height = output?.height ?? frame.height;
+      if (output) gpu.present(frame, output);
+      else gpu.present(frame);
     }
     dispose = gpu.presentationDispose;
   },
@@ -323,5 +324,33 @@ it("honors stable canonical video hints before a future video appears", async ()
   const session = createRenderSession({ videoSources: true });
   await session.render(createPage(), {});
   expect(gpu.constructors).toHaveBeenCalledWith(expect.objectContaining({ forceWebGL: true }));
+  await session.dispose();
+});
+
+it("renders the unchanged source at crop density and presents exact target dimensions in the same session", async () => {
+  const page = createPage({ width: 800, height: 600, background: "#f80" });
+  const before = structuredClone(page);
+  const session = createRenderSession();
+  const framing = { width: 200, height: 400, region: { x: 200, y: 100, width: 400, height: 400 } };
+  const size = await session.withCanvasFrame(page, {}, (canvas) => [canvas.width, canvas.height], {
+    framing,
+    scale: 2,
+  });
+  expect(gpu.render).toHaveBeenCalledWith(page, {}, expect.objectContaining({ scale: 2 }));
+  expect(gpu.render.mock.calls[0]![0]).toBe(page);
+  expect(gpu.present).toHaveBeenCalledWith(
+    expect.anything(),
+    expect.objectContaining({
+      width: 400,
+      height: 800,
+      region: { x: 300, y: 100, width: 200, height: 400 },
+      source: page,
+    }),
+  );
+  expect(size).toEqual([400, 800]);
+  await session.render(page, {});
+  expect(gpu.present.mock.calls[1]).toHaveLength(1);
+  expect(gpu.init).toHaveBeenCalledOnce();
+  expect(page).toEqual(before);
   await session.dispose();
 });

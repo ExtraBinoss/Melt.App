@@ -1,0 +1,18 @@
+{
+  "guides": "キャプチャガイド",
+  "title": "キャプチャ範囲",
+  "full": "全体表示",
+  "custom": "カスタム",
+  "width": "幅",
+  "height": "高さ",
+  "showGuide": "キャプチャガイドを表示",
+  "exportFrame": "出力フレーミング",
+  "original": "元のコンポジション",
+  "format": "形式",
+  "scene": "シーン",
+  "portrait": "縦長",
+  "landscape": "横長",
+  "square": "正方形",
+  "captureHint": "ハイライトされた範囲のみが書き出されます。",
+  "customHint": "コンポジションを変更せずに出力サイズを選択できます。"
+}

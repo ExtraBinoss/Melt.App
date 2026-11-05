@@ -1,4 +1,4 @@
-import type { MotionFrameRate, MotionTime } from "@musart/core";
+import type { MotionFrameRate, MotionTime, OutputFraming } from "@musart/core";
 import type { StreamTargetChunk } from "mediabunny";
 import type { MediaSourceResolver } from "../../sources/media/model";
 import type { FontResolver } from "../../surface/text/fonts";
@@ -11,6 +11,7 @@ export interface MotionVideoExportOptions {
   beforeFrame?: () => Promise<void>;
   frameRate?: MotionFrameRate;
   scale?: number;
+  framing?: OutputFraming;
   container?: "auto" | "mp4" | "webm";
   alpha?: "discard" | "keep";
   /** Target video bits/second; default 8,000,000, variable bitrate. */

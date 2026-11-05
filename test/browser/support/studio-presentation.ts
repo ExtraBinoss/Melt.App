@@ -12,7 +12,9 @@ export async function armStudioPresentation(page: Page) {
     delete window.__studioPresentation;
     const canvas = document.querySelector<HTMLCanvasElement>(".editor-gpu-scene canvas")!;
     const slider = document
-      .querySelector<HTMLElement>('.studio-material [role="slider"][aria-label="Roughness"]')!
+      .querySelector<HTMLElement>(
+        '.studio-material-content [role="slider"][aria-label="Roughness"]',
+      )!
       .closest<HTMLElement>(".studio-slider")!;
     let start = 0;
     let revision = canvas.dataset.renderedRevision;

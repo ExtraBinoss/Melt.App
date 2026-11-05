@@ -1,4 +1,5 @@
 import { memo, useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { RadialControls } from "./RadialControls";
 import { RetainedPaint } from "./retained-paint";
 import { Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -297,6 +298,16 @@ function PaintGradientControl({
             </div>
           )}
         </div>
+        {paint.kind === "radial" && (
+          <RadialControls
+            gradient={paint}
+            identity={identity}
+            disabled={disabled}
+            preview={previewPaint}
+            commit={commitPaint}
+            cancel={cancelPaint}
+          />
+        )}
         <GradientBar
           gradient={paint}
           identity={ownerId}
@@ -426,6 +437,10 @@ function sameAuthoredPaint(a: FillGradient, b: FillGradient | undefined): boolea
     b &&
     a.kind === b.kind &&
     a.angle === b.angle &&
+    a.centerX === b.centerX &&
+    a.centerY === b.centerY &&
+    a.radius === b.radius &&
+    a.radialShape === b.radialShape &&
     a.stops.length === b.stops.length &&
     a.stops.every(
       (stop, index) =>

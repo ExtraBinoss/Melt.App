@@ -1,6 +1,6 @@
 # Local live agent bridge
 
-The optional local bridge lets an authenticated agent edit the project that is open in the editor. It uses the existing `EnginePort`, the same validated commands, atomic transactions and undo history as manual edits. The activity popover shows actual command results and targeted layer names. It never moves focus or selection to imitate an agent cursor.
+The optional local bridge lets an authenticated agent edit the project that is open in the editor. It uses the existing `EnginePort`, the same validated commands, atomic transactions and undo history as manual edits. Command logs report actual results and targeted layer names. Studio has no activity popover; the automation API does not move focus or selection to imitate a cursor.
 
 ## Pair the editor
 
@@ -11,9 +11,19 @@ bun dev
 bun scripts/agent-bridge/server.ts
 ```
 
-The relay prints its loopback WebSocket endpoint and a new 64-character pairing token. In the editor, open **Agent**, enter the endpoint and token, and choose **Connect**. The editor does not connect until this action. It shows a separate waiting state until an authenticated agent joins. **Disconnect**, leaving the editor, and relay shutdown close the connection and release listeners. Pairing information is kept in memory, and the token input is cleared after connecting.
+The relay prints its loopback WebSocket endpoint and a new 64-character pairing token.
+Open the editor with `?automation=1` and pair explicitly through the opt-in API:
 
-The bridge works in the ordinary editor; `?automation=1` is unnecessary. Switching between Classic and Studio shares the same engine and bridge store. Local edits remain available during pairing and can invalidate an agent's expected revision.
+```js
+window.musart.agentConnect("ws://127.0.0.1:6101/", "<pairing-token>");
+window.musart.agentStatus(); // connection, peer presence and real bounded logs
+window.musart.agentDisconnect();
+```
+
+There is no automatic connection or Studio agent panel. Leaving the editor and
+relay shutdown close the connection and release listeners. Credentials remain in
+memory. Switching Classic/Studio retains the same engine and bridge store. Local
+edits remain available during pairing and can invalidate an agent's expected revision.
 
 The relay binds only `127.0.0.1`, defaults to port `6101`, and permits editor origins `http://127.0.0.1:6100` and `http://localhost:6100`. To use another development origin or port, set exact origins and a port before starting it:
 

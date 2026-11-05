@@ -26,5 +26,11 @@
   "empty": "Aucun dégradé enregistré",
   "loadError": "Impossible de charger les dégradés.",
   "saveError": "Impossible d’enregistrer cette modification.",
-  "preset": "Dégradé {{number}}"
+  "preset": "Dégradé {{number}}",
+  "radialcenterX": "Centre X",
+  "radialcenterY": "Centre Y",
+  "radialradius": "Rayon",
+  "radialellipse": "Ellipse",
+  "radialcircle": "Cercle",
+  "radialShape": "Forme"
 }

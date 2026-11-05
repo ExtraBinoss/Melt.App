@@ -1,8 +1,14 @@
 import { usesVideoSources } from "../../renderer/video-backend";
 import { selectionFrameScope } from "./selection";
-import { applyMotionFrame, compileMotion, evaluateMotion, type Project } from "@musart/core";
+import {
+  resolveOutputFraming,
+  applyMotionFrame,
+  compileMotion,
+  evaluateMotion,
+  type Project,
+} from "@musart/core";
 import { AudioSample, AudioSampleSource, CanvasSource, Output } from "mediabunny";
-import { assertRenderSize, rasterExtent } from "../../compositing/types";
+import { assertRenderSize } from "../../compositing/types";
 import { createRenderSession } from "../standalone";
 import { createMotionAudioMixer } from "./audio/mixer";
 import { assertMotionAlphaMode, chooseMotionEncoding } from "./encoding";
@@ -38,9 +44,9 @@ export async function exportMotionVideo(
     options.centerSelection,
   );
   const scale = options.scale ?? 1;
-  assertRenderSize(selection.page, scale);
-  const width = rasterExtent(selection.page.width, scale),
-    height = rasterExtent(selection.page.height, scale);
+  const outputFrame = resolveOutputFraming(selection.page, options.framing, scale);
+  assertRenderSize(selection.page, outputFrame.scale);
+  const { width, height } = outputFrame;
   const mixer =
     options.audio === false
       ? {
@@ -175,6 +181,7 @@ export async function exportMotionVideo(
           },
           {
             scale,
+            framing: options.framing,
             vectorAntialias: true,
             mediaSequential: true,
             motionFrame: plan,

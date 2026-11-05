@@ -5,12 +5,17 @@ export function compositionPaintKey(
   page: Composition,
   roots: readonly Layer[],
   keyFor: (layer: Layer) => unknown,
+  effectInputKey?: (id: string) => unknown,
 ): string {
   return JSON.stringify([
     page.width,
     page.height,
     page.background,
     page.backgroundGradient,
+    page.effects ?? [],
+    (page.effects ?? []).flatMap((effect) =>
+      Object.values(effect.inputs ?? {}).map((id) => effectInputKey?.(id) ?? id),
+    ),
     page.colorSpace ?? "srgb",
     roots.map((layer) => [
       layer.id,

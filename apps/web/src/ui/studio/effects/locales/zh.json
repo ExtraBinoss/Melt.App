@@ -1,0 +1,10 @@
+{
+  "addEffect": "添加效果",
+  "addGrade": "添加调色",
+  "composition": "合成",
+  "layerScope": "应用于所选对象",
+  "compositionScope": "应用于整个合成",
+  "singleSelection": "选择一个对象以编辑其效果。",
+  "locked": "解锁此对象以编辑其效果。",
+  "stack": "效果堆栈（{{count}}）"
+}

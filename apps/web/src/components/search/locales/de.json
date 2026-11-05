@@ -166,7 +166,8 @@
     "edge-detect": "Konturen und Kontrastgrenzen hervorheben.",
     "window-trails": "Versetzte fensterartige Spuren wiederholen.",
     "morph": "Zwischen Formzuständen interpolieren.",
-    "transition": "Ein- oder Ausblenden einer Ebene animieren."
+    "transition": "Ein- oder Ausblenden einer Ebene animieren.",
+    "feather": "Weicher elliptischer Transparenzverlauf mit anpassbarer Mitte, Radius und Weichheit."
   },
   "commandLabels": {
     "togglePlayback": "Wiedergabe / Pause",

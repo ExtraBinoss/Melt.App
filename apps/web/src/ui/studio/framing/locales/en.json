@@ -1,0 +1,18 @@
+{
+  "guides": "Capture guides",
+  "title": "Capture area",
+  "full": "Full view",
+  "custom": "Custom",
+  "width": "Width",
+  "height": "Height",
+  "showGuide": "Show capture guide",
+  "exportFrame": "Output framing",
+  "original": "Original composition",
+  "format": "Format",
+  "scene": "Scene",
+  "portrait": "Portrait",
+  "landscape": "Landscape",
+  "square": "Square",
+  "captureHint": "Only the highlighted area is exported.",
+  "customHint": "Choose output dimensions without changing the composition."
+}

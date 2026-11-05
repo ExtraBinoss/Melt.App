@@ -7,10 +7,12 @@ export function PrintSettings({
   value,
   onChange,
   disabled,
+  framed = false,
 }: {
   value: PrintExportOptions;
   onChange: (value: PrintExportOptions) => void;
   disabled: boolean;
+  framed?: boolean;
 }) {
   const { t } = useTranslation("exportPanel");
   return (
@@ -30,9 +32,10 @@ export function PrintSettings({
         min={0}
         max={25}
         step={0.5}
-        disabled={disabled}
+        disabled={disabled || framed}
         onCommit={(bleedMm) => onChange({ ...value, bleedMm })}
       />
+      {framed && <p className="export-scope">{t("framedBleedHint")}</p>}
       {(["cropMarks", "registrationMarks", "colorBars", "pageInfo"] as const).map((key) => (
         <label key={key} className="switch-row">
           <span>{t(key)}</span>

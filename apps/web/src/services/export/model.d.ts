@@ -1,4 +1,4 @@
-import type { Composition, MotionFrameRate } from "@musart/core";
+import type { Composition, MotionFrameRate, OutputFraming } from "@musart/core";
 import type { ManagedImageOptions } from "@musart/render";
 import type { ExportOptions } from "../../state/contracts";
 
@@ -13,6 +13,7 @@ export type CompositionExportOptions = {
   compositionId: string;
   centerSelection?: boolean;
   scale: number;
+  framing?: OutputFraming;
   signal?: AbortSignal;
   onProgress?: (fraction: number) => void;
   onSizeEstimate?: (bytes: number) => void;

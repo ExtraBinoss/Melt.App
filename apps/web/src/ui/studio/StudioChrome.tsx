@@ -1,6 +1,6 @@
 import { memo, useCallback, type ReactNode } from "react";
 import { useSetAtom } from "jotai";
-import { Crosshair, ImagePlus, Scan, SlidersHorizontal, Type, Upload } from "lucide-react";
+import { Crosshair, ImagePlus, SlidersHorizontal, Type, Upload } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import type { EnginePort } from "@musart/core";
 import type { EditorServices } from "../../state/contracts";
@@ -17,6 +17,8 @@ import { StudioEnvironment } from "./panels/StudioEnvironment";
 import { StudioAdvanced } from "./panels/StudioAdvanced";
 import { StudioObjectBar } from "./panels/StudioObjectBar";
 import { createViewportActions } from "../../canvas/session/viewport-actions";
+import { StudioGuides } from "./framing/StudioGuides";
+import { StudioEffects } from "./effects/StudioEffects";
 import { IconButton } from "../../components/shared/IconButton";
 import "./messages";
 import "./studio-chrome.css";
@@ -58,7 +60,6 @@ export const StudioChrome = memo(function StudioChrome({
   return (
     <div className="studio-chrome" data-studio-chrome>
       <nav className="studio-quick-add studio-surface" aria-label={t("add")} data-canvas-control>
-        <span className="studio-quick-label">{t("add")}</span>
         <Button
           variant="ghost"
           size="sm"
@@ -71,7 +72,6 @@ export const StudioChrome = memo(function StudioChrome({
           }
         >
           <Type size={17} />
-          <span>{t("text")}</span>
         </Button>
         {library ?? (
           <>
@@ -81,24 +81,14 @@ export const StudioChrome = memo(function StudioChrome({
         )}
         <Button variant="ghost" size="sm" aria-label={t("media")} onClick={onImport}>
           <ImagePlus size={17} />
-          <span>{t("media")}</span>
         </Button>
         <div className="studio-view-shortcuts">
-          <IconButton label={common("fitView")} onClick={() => viewport.run("fit")}>
-            <Scan size={15} />
-          </IconButton>
-          <Button
-            variant="ghost"
-            size="sm"
-            aria-label={common("resetView")}
-            onClick={() => viewport.run("reset")}
-          >
-            100%
-          </Button>
           <IconButton label={common("recenterView")} onClick={() => viewport.run("recenter")}>
             <Crosshair size={15} />
           </IconButton>
         </div>
+        <StudioGuides engine={engine} />
+        <StudioEffects engine={engine} run={run} />
         {commandControl}
       </nav>
       <div className="studio-actions" data-canvas-control>

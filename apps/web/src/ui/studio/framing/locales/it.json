@@ -1,0 +1,18 @@
+{
+  "guides": "Guide di acquisizione",
+  "title": "Area di acquisizione",
+  "full": "Vista completa",
+  "custom": "Personalizzato",
+  "width": "Larghezza",
+  "height": "Altezza",
+  "showGuide": "Mostra guida di acquisizione",
+  "exportFrame": "Inquadratura di uscita",
+  "original": "Composizione originale",
+  "format": "Formato",
+  "scene": "Scena",
+  "portrait": "Verticale",
+  "landscape": "Orizzontale",
+  "square": "Quadrato",
+  "captureHint": "Viene esportata solo l’area evidenziata.",
+  "customHint": "Scegli le dimensioni di uscita senza modificare la composizione."
+}

@@ -9,5 +9,6 @@
   "targetSize": "Rozmiar docelowy",
   "fileSize": "Rozmiar pliku",
   "targetSizeHint": "Obliczony na podstawie docelowej przepływności. Zmienna przepływność może dać mniejszy lub większy plik. Oszacowanie jest aktualizowane podczas eksportu.",
-  "measuredSizeHint": "Rozmiar ostatniego ukończonego eksportu z tymi ustawieniami."
+  "measuredSizeHint": "Rozmiar ostatniego ukończonego eksportu z tymi ustawieniami.",
+  "framedBleedHint": "Spad wymaga eksportu całego obszaru roboczego. Wybierz pełny widok bez okna przechwytywania, aby go włączyć."
 }

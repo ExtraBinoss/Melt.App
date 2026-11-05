@@ -18,6 +18,7 @@ export function projectContentTags(project: Pick<Project, "pages">): readonly Pr
     if (page.motion?.mode === "motion") tags.add("feature:motion");
     if (page.motion?.audioTracks?.length) tags.add("feature:audio");
     if (page.backgroundGradient) tags.add("feature:gradients");
+    for (const effect of page.effects ?? []) tags.add(`effect:${effect.type}`);
     for (const layer of page.layers) {
       tags.add(`layer:${layer.kind}`);
       if (layer.spatial?.enabled) tags.add("feature:3d");

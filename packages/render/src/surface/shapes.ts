@@ -2,14 +2,17 @@ import { roundedRectangleDistance } from "./rounded-rectangle";
 import type { Layer } from "@musart/core";
 import { Vector2, Vector4, type Node } from "three/webgpu";
 import { abs, length, max, min, mix, smoothstep, uniform, uv, vec4 } from "three/tsl";
+import { paintControls, updatePaintControls } from "./paint";
 import { parseColor } from "../compositing/nodes/color";
 export function shapeControls() {
+  const paint = paintControls();
   return {
+    paint,
     size: uniform(new Vector2(1, 1)),
     radius: uniform(0),
     strokeWidth: uniform(0),
     ellipse: uniform(0),
-    fill: uniform(new Vector4(0, 0, 0, 1)),
+    fill: paint.solid,
     stroke: uniform(new Vector4(0, 0, 0, 0)),
   };
 }
@@ -22,7 +25,13 @@ export function updateShape(
   controls.radius.value = Math.min(layer.radius, layer.width / 2, layer.height / 2) * scale;
   controls.strokeWidth.value = layer.strokeWidth * scale;
   controls.ellipse.value = layer.kind === "ellipse" ? 1 : 0;
-  controls.fill.value.copy(parseColor(layer.fill));
+  updatePaintControls(
+    controls.paint,
+    layer.fill,
+    layer.width * scale,
+    layer.height * scale,
+    layer.fillGradient,
+  );
   controls.stroke.value.copy(parseColor(layer.stroke));
 }
 export interface ShapeInputs {

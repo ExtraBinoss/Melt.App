@@ -183,3 +183,100 @@ it("admits the media clipping surface only when image/video corners are rounded"
     );
   }
 });
+
+it("budgets final composition targets at preview density and clips effect padding to the artboard", () => {
+  const page = createPage({ width: 120, height: 80 });
+  const legacy = { ...page, effects: undefined };
+  expect(estimatePreviewCost(page, 2)).toEqual(estimatePreviewCost(legacy, 2));
+  for (const scale of [0.5, 1, 2]) {
+    const plain = estimatePreviewCost(page, scale);
+    const invert = estimatePreviewCost({ ...page, effects: [createEffect("invert")] }, scale);
+    const blur = estimatePreviewCost({ ...page, effects: [createEffect("blur")] }, scale);
+    const pixels = 120 * 80 * scale * scale;
+    expect(invert.scaledBytes - plain.scaledBytes).toBe(pixels * 4 * 3);
+    expect(invert.fixedBytes).toBe(plain.fixedBytes);
+    // Blur owns one shared scratch plane; its first block needs no backdrop copy.
+    expect(blur.scaledBytes - plain.scaledBytes).toBe(pixels * 4 * 4);
+    expect(blur.maxDimension).toBe(Math.ceil(120 * scale));
+    const laterBlur = estimatePreviewCost(
+      { ...page, effects: [createEffect("invert"), createEffect("blur")] },
+      scale,
+    );
+    expect(laterBlur.scaledBytes - plain.scaledBytes).toBe(pixels * 4 * 5);
+  }
+});
+
+it("shares the effect working-set high water with fixed layer treatments rather than charging each stack", () => {
+  const layer = createLayer("text", {
+    width: 64,
+    height: 64,
+    effects: [createEffect("blur"), createEffect("invert")],
+  });
+  const page = createPage({ width: 80, height: 80, layers: [layer] });
+  const baseline = estimatePreviewCost(page, 1);
+  const effects = [createEffect("invert"), createEffect("blur")];
+  const sameSize = estimatePreviewCost({ ...page, effects }, 1);
+  // Both layer scratch/backdrop planes already cover the80×80 global working set.
+  expect(sameSize.fixedBytes).toBe(baseline.fixedBytes);
+  expect(sameSize.scaledBytes - baseline.scaledBytes).toBe(80 * 80 * 4 * 3);
+  const larger = estimatePreviewCost({ ...page, effects }, 2);
+  const ungraded = estimatePreviewCost(page, 2);
+  expect(larger.fixedBytes).toBe(ungraded.fixedBytes);
+  expect(larger.scaledBytes - ungraded.scaledBytes).toBe(
+    160 * 160 * 4 * 3 + (160 * 160 - 80 * 80) * 4 * 2,
+  );
+});
+
+it("counts actual global effect input dimensions once and ignores disabled uploads", () => {
+  const asset = {
+    id: "map",
+    name: "Displacement map",
+    width: 4096,
+    height: 2048,
+    mime: "image/png",
+    dataUrl: "data:image/png;base64,",
+  };
+  const effects = [
+    createEffect("displace", { inputs: { map: asset.id } }),
+    createEffect("displace", { inputs: { map: asset.id } }),
+  ];
+  const page = createPage({ width: 120, height: 80, effects });
+  const cost = estimatePreviewCost(page, 0.5, { map: asset });
+  expect(cost.originalBytes).toBe(4096 * 2048 * 4);
+  expect(cost.maxDimension).toBe(4096);
+  const shared = estimatePreviewCost(
+    { ...page, layers: [createLayer("image", { assetId: asset.id })] },
+    0.5,
+    { map: asset },
+  );
+  expect(shared.originalBytes).toBe(cost.originalBytes);
+  const disabled = estimatePreviewCost(
+    { ...page, effects: effects.map((effect) => ({ ...effect, enabled: false })) },
+    0.5,
+    { map: asset },
+  );
+  expect(disabled.originalBytes).toBe(0);
+  expect(disabled.maxDimension).toBe(60);
+  // The prepared image sampler still owns its actual1×1 neutral texture.
+  expect(disabled.fixedBytes).toBe(4);
+});
+
+it("includes bounded shared glyph uploads and dormant compilation scratch", () => {
+  const page = createPage({ width: 32, height: 24 });
+  const first = createEffect("ascii", { settings: { characters: "@#" } });
+  const shared = estimatePreviewCost({ ...page, effects: [first, { ...first, id: "second" }] }, 1);
+  expect(shared.fixedBytes).toBe(2 * 16 * 16 * 4);
+  const dormant = estimatePreviewCost(
+    { ...page, effects: [createEffect("blur", { enabled: false })] },
+    1,
+  );
+  expect(dormant.fixedBytes).toBe(4);
+  expect(dormant.scaledBytes).toBe(estimatePreviewCost(page, 1).scaledBytes);
+  const many = Array.from({ length: 12 }, (_, index) =>
+    createEffect("ascii", { settings: { characters: "@".repeat(index + 1) } }),
+  );
+  const bounded = estimatePreviewCost({ ...page, effects: many }, 1);
+  // Eight atlas cache slots bound all possible warmup/render reuse orders.
+  expect(bounded.fixedBytes).toBe((5 + 6 + 7 + 8 + 9 + 10 + 11 + 12) * 16 * 16 * 4);
+  expect(bounded.maxDimension).toBe(12 * 16);
+});

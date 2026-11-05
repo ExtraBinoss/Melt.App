@@ -9,5 +9,6 @@
   "targetSize": "Dimensione prevista",
   "fileSize": "Dimensione del file",
   "targetSizeHint": "Calcolata dal bitrate di destinazione. Il bitrate variabile può produrre file più piccoli o più grandi. La stima si aggiorna durante l’esportazione.",
-  "measuredSizeHint": "Dimensione dell’ultima esportazione completata con queste impostazioni."
+  "measuredSizeHint": "Dimensione dell’ultima esportazione completata con queste impostazioni.",
+  "framedBleedHint": "L’abbondanza richiede l’esportazione dell’intera tavola. Scegli Vista completa senza finestra di acquisizione per attivarla."
 }

@@ -1,0 +1,18 @@
+{
+  "guides": "Repères de capture",
+  "title": "Zone de capture",
+  "full": "Vue entière",
+  "custom": "Personnalisé",
+  "width": "Largeur",
+  "height": "Hauteur",
+  "showGuide": "Afficher le repère de capture",
+  "exportFrame": "Cadrage de sortie",
+  "original": "Composition originale",
+  "format": "Format",
+  "scene": "Scène",
+  "portrait": "Portrait",
+  "landscape": "Paysage",
+  "square": "Carré",
+  "captureHint": "Seule la zone mise en évidence est exportée.",
+  "customHint": "Choisissez les dimensions de sortie sans modifier la composition."
+}

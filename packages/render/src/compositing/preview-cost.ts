@@ -1,6 +1,12 @@
 import { hasEffectTreatment } from "../effects/shared/active";
 import {
+  ASCII_DEFAULT_CHARACTERS,
   createLayerGeometryIndex,
+  effectAssetIds,
+  getEffectDefinition,
+  isImageAsset,
+  resolveEffectSettings,
+  resolveGradientSettings,
   type Asset,
   type Bounds,
   type Composition,
@@ -156,7 +162,67 @@ export function estimatePreviewCost(
       BASE_GEOMETRY_BYTES +
       primitiveCapacity(Math.min(primitiveCount, MAX_PRIMITIVE_INSTANCES)) * INSTANCE_BYTES;
   // Shared effect scratch/backdrop are high-water resources, not one pair per layer.
-  fixedBytes += scratch + backdrop;
+  let sharedFixed = scratch + backdrop,
+    sharedScaled = 0;
+  if (page.effects?.length) {
+    const effects = page.effects.filter(hasEffectTreatment);
+    if (effects.length) {
+      const w = rasterExtent(page.width, scale),
+        h = rasterExtent(page.height, scale);
+      // Final artboard roles: straight input, effect output and premultiplied result.
+      // Unlike source-local effects, this stack is clipped to the artboard gate.
+      for (let index = 0; index < 3; index++) target(w, h, false);
+      const blocks = effects.map(effectStages);
+      const stages = blocks.reduce((count, block) => count + block.length, 0);
+      const count =
+        Number(stages > 1) + Number(blocks.some((block, index) => index > 0 && block.length > 1));
+      // Existing fixed layer scratch serves the same shared operator. Charge only
+      // the extra high-water working set at the scalable composition resolution.
+      sharedScaled = Math.max(0, w * h * 4 * count - sharedFixed);
+      scaledBytes += sharedScaled;
+      for (const id of effectAssetIds(effects)) {
+        const asset = assets[id];
+        if (!asset || !isImageAsset(asset) || originals.has(`image:${id}`)) continue;
+        originals.add(`image:${id}`);
+        originalBytes += asset.width * asset.height * 4;
+        maxDimension = Math.max(maxDimension, asset.width, asset.height);
+      }
+    }
+    // Preparation also visits disabled effects. Their immutable uploads and 1px
+    // sampler-distinction surface exist even when no final artboard pass runs.
+    const prepared = [page, ...page.layers].flatMap((owner) => owner.effects ?? []);
+    const atlases = new Map<string, number>();
+    let needsNeutral = false;
+    for (const effect of prepared) {
+      const stages = effectStages(effect);
+      if (!stages.length) continue;
+      if (stages.length > 1 && !sharedFixed && !sharedScaled) sharedFixed = 4;
+      needsNeutral ||= Boolean(getEffectDefinition(effect.type).inputs?.length);
+      if (
+        effect.type === "ascii" ||
+        effect.type === "window-trails" ||
+        (effect.type === "gradient" &&
+          resolveGradientSettings(effect.settings).treatment === "ascii")
+      ) {
+        const characters =
+          effect.type === "ascii"
+            ? String(resolveEffectSettings(effect).characters)
+            : ASCII_DEFAULT_CHARACTERS;
+        const width = Array.from(characters).length * 16;
+        atlases.set(characters, width * 16 * 4);
+        maxDimension = Math.max(maxDimension, width, 16);
+      }
+    }
+    // The operator retains at most eight immutable atlases. The largest eight
+    // bound any warmup/render LRU order without multiplying a shared upload.
+    fixedBytes +=
+      [...atlases.values()]
+        .sort((a, b) => b - a)
+        .slice(0, 8)
+        .reduce((sum, bytes) => sum + bytes, 0) +
+      Number(needsNeutral) * 4;
+  }
+  fixedBytes += sharedFixed;
   if (page.colorSpace === "cmyk") fixedBytes += PRINT_PROOF_BYTES;
   if (page.layers.some((layer) => layer.spatial?.enabled)) fixedBytes += 40 * 1024 * 1024;
   return {

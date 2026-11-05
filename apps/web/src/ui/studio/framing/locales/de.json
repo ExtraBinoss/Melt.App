@@ -1,0 +1,18 @@
+{
+  "guides": "Aufnahmehilfen",
+  "title": "Aufnahmebereich",
+  "full": "Gesamte Ansicht",
+  "custom": "Benutzerdefiniert",
+  "width": "Breite",
+  "height": "Höhe",
+  "showGuide": "Aufnahmehilfe anzeigen",
+  "exportFrame": "Ausgabebildausschnitt",
+  "original": "Originalkomposition",
+  "format": "Format",
+  "scene": "Szene",
+  "portrait": "Hochformat",
+  "landscape": "Querformat",
+  "square": "Quadrat",
+  "captureHint": "Nur der hervorgehobene Bereich wird exportiert.",
+  "customHint": "Wähle die Ausgabegröße, ohne die Komposition zu ändern."
+}

@@ -1,0 +1,45 @@
+{
+  "variantName": "{{base}} · {{variant}}",
+  "materialCategories": {
+    "plastic": "Tworzywa",
+    "metal": "Metale",
+    "glass": "Szkło",
+    "ceramic": "Ceramika",
+    "stone": "Kamień",
+    "fabric": "Tkaniny",
+    "iridescent": "Iryzujące",
+    "emissive": "Świecące"
+  },
+  "environmentCategories": {
+    "studio": "Studio",
+    "daylight": "Światło dzienne",
+    "interior": "Wnętrza",
+    "night": "Noc",
+    "color": "Kolor"
+  },
+  "variants": {
+    "ivory": "Kość słoniowa",
+    "coral": "Koral",
+    "mint": "Mięta",
+    "cobalt": "Kobalt",
+    "lemon": "Cytryna",
+    "rose": "Róża",
+    "lavender": "Lawenda",
+    "graphite": "Grafit",
+    "terracotta": "Terakota",
+    "navy": "Granat",
+    "sage": "Szałwia",
+    "cherry": "Wiśnia",
+    "teal": "Morski",
+    "side": "Światło boczne",
+    "split": "Światło dzielone",
+    "ceiling": "Światło sufitowe",
+    "rim": "Światło konturowe",
+    "strip": "Pas światła",
+    "window": "Okno",
+    "cross": "Światło krzyżowe",
+    "tunnel": "Tunel",
+    "halo": "Aureola",
+    "low": "Światło dolne"
+  }
+}

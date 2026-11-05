@@ -1,4 +1,6 @@
 import {
+  resolveOutputFraming,
+  type OutputFraming,
   createTimelapseReplay,
   evaluateReplay,
   type Composition,
@@ -18,6 +20,7 @@ export interface VideoExportOptions {
   duration: number;
   fps: number;
   scale: number;
+  framing?: OutputFraming;
   container: "auto" | "mp4" | "webm";
   pageId?: string;
   signal?: AbortSignal;
@@ -88,8 +91,7 @@ export async function exportReplayVideo(
         options.centerSelection,
       )
     : { page: lastPage, frame: (page: Composition) => page };
-  const width = Math.max(1, Math.round(selection.page.width * scale));
-  const height = Math.max(1, Math.round(selection.page.height * scale));
+  const { width, height } = resolveOutputFraming(selection.page, options.framing, scale);
   const quality = new Quality("high");
   const size = createEncodedSizeTracker(duration);
   const codecs: VideoCodec[] =
@@ -156,7 +158,7 @@ export async function exportReplayVideo(
             keyFrame: index % (fps * 2) === 0,
           });
         },
-        { scale, imageSourceScale: scale, signal },
+        { scale, framing: options.framing, imageSourceScale: scale, signal },
       );
       const estimate = size.estimate();
       if (estimate !== null) options.onSizeEstimate?.(estimate);

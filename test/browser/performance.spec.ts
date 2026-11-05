@@ -120,6 +120,7 @@ test("50 image layers and 100 effects: GPU-only composition, bounded updates, id
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
   await page.addInitScript(() => {
+    localStorage.setItem("musart.editor-tutorial.v1", "done");
     const probe: ReadbackProbe = {
       enabled: true,
       gpuReads: 0,
@@ -273,20 +274,20 @@ test("50 image layers and 100 effects: GPU-only composition, bounded updates, id
   ).toBe(afterEffect.regions[0]!.hash);
   const canvas = page.getByTestId("editor-canvas");
   await canvas.hover({ position: { x: 350, y: 250 } });
-  const beforeView = stats;
+  const beforeView = await waitForSettledRender(page);
   for (let index = 0; index < 12; index++) await page.mouse.wheel(20, -10);
-  await page.keyboard.down("Control");
-  await page.mouse.wheel(0, 40);
-  await page.keyboard.up("Control");
   await page.evaluate(
     () =>
       new Promise<void>((resolve) =>
         requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
       ),
   );
-  const afterView = await waitForRender(page);
+  const afterView = await waitForSettledRender(page);
   expect(afterView.renders).toBe(beforeView.renders);
   expect(afterView.uploads).toBe(beforeView.uploads);
+  await page.keyboard.down("Control");
+  await page.mouse.wheel(0, 40);
+  await page.keyboard.up("Control");
   // Actual display density below 100% now gets one deferred GPU frame, so
   // document-space effects can filter their real pixel footprint after zoom.
   await page.waitForFunction(() => {

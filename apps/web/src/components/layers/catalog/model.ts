@@ -53,6 +53,7 @@ export const EFFECT_FAMILY = {
   sepia: "color",
   threshold: "tone",
   posterize: "color",
+  feather: "blur",
   grain: "texture",
   halftone: "texture",
   vignette: "light",

@@ -34,6 +34,7 @@ export const EFFECT_SEARCH_ALIASES = {
   sepia: "sepia sépia vintage brown brun ancien",
   threshold: "threshold binary cutoff seuil binaire noir blanc",
   posterize: "posterize posterise posterization quantization postérisation aplats paliers",
+  feather: "feather soft edge alpha fade ellipse contour progressif bord doux transparence",
   grain: "grain film analog argentique pellicule",
   halftone:
     "halftone print dots circle grid mosaic round photoshop grille cercles mosaique mosaïque ronds comic demi teinte trame points impression bande dessinée",

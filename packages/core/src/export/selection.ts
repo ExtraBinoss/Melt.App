@@ -91,6 +91,8 @@ function dependencyCopies(
   if (!included.size) return { layers: [] as Layer[], ids: new Map<string, string>() };
   const reserved = new Set(reservedIds);
   reserved.add(page.id);
+  for (const effect of page.effects ?? []) reserved.add(effect.id);
+  for (const id of effectAssetIds(page.effects ?? [])) reserved.add(id);
   for (const guide of page.guides) reserved.add(guide.id);
   for (const layer of page.layers) {
     reserved.add(layer.id);

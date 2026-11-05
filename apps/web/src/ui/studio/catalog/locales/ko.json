@@ -1,0 +1,45 @@
+{
+  "variantName": "{{base}} · {{variant}}",
+  "materialCategories": {
+    "plastic": "플라스틱",
+    "metal": "금속",
+    "glass": "유리",
+    "ceramic": "세라믹",
+    "stone": "돌",
+    "fabric": "직물",
+    "iridescent": "무지갯빛",
+    "emissive": "발광"
+  },
+  "environmentCategories": {
+    "studio": "스튜디오",
+    "daylight": "주광",
+    "interior": "실내",
+    "night": "야간",
+    "color": "컬러"
+  },
+  "variants": {
+    "ivory": "아이보리",
+    "coral": "코럴",
+    "mint": "민트",
+    "cobalt": "코발트",
+    "lemon": "레몬",
+    "rose": "로즈",
+    "lavender": "라벤더",
+    "graphite": "흑연",
+    "terracotta": "테라코타",
+    "navy": "네이비",
+    "sage": "세이지",
+    "cherry": "체리",
+    "teal": "청록",
+    "side": "측면광",
+    "split": "분할광",
+    "ceiling": "천장광",
+    "rim": "윤곽광",
+    "strip": "띠 조명",
+    "window": "창문",
+    "cross": "교차광",
+    "tunnel": "터널",
+    "halo": "후광",
+    "low": "낮은 조명"
+  }
+}

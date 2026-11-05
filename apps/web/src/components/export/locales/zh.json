@@ -9,5 +9,6 @@
   "targetSize": "目标大小",
   "fileSize": "文件大小",
   "targetSizeHint": "根据目标比特率计算。可变比特率可能使文件变小或变大。估算值会在导出过程中更新。",
-  "measuredSizeHint": "使用这些设置完成的上一次导出的大小。"
+  "measuredSizeHint": "使用这些设置完成的上一次导出的大小。",
+  "framedBleedHint": "出血需要输出整个画板。选择不带捕捉窗口的完整视图即可启用。"
 }

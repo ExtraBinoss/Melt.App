@@ -59,6 +59,7 @@ export function TimelapseExportPane(props: ExportPaneProps) {
     selection,
     true,
     props.centerSelection,
+    props.framing,
   );
   useEffect(() => {
     const controller = new AbortController();
@@ -109,6 +110,7 @@ export function TimelapseExportPane(props: ExportPaneProps) {
     props.centerSelection ?? false,
     duration,
     scale,
+    props.framing,
     fps,
     container,
   ]);
@@ -169,6 +171,7 @@ export function TimelapseExportPane(props: ExportPaneProps) {
               duration,
               fps,
               scale,
+              framing: props.framing,
               container,
               pageId: page.id,
               signal,

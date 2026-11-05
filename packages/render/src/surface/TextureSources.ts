@@ -99,7 +99,12 @@ export class TextureSources {
         ])
         .filter((id): id is string => !!id),
     );
+    for (const id of effectAssetIds((page.effects ?? []).filter(hasEffectTreatment)))
+      active.add(id);
     const footprints = imageFootprints(visible, options.imageSourceScale);
+    // An operator samples authored reference pixels even when its asset also appears as a small layer.
+    for (const id of effectAssetIds((page.effects ?? []).filter(hasEffectTreatment)))
+      footprints.set(id, null);
     for (const id of active) {
       const asset = assets[id];
       if (!asset) throw new Error(`Ressource introuvable : ${id}`);

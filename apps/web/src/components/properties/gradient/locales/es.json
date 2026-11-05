@@ -26,5 +26,11 @@
   "empty": "No hay degradados guardados",
   "loadError": "No se pudieron cargar los degradados.",
   "saveError": "No se pudo guardar este cambio.",
-  "preset": "Degradado {{number}}"
+  "preset": "Degradado {{number}}",
+  "radialcenterX": "Centro X",
+  "radialcenterY": "Centro Y",
+  "radialradius": "Radio",
+  "radialellipse": "Elipse",
+  "radialcircle": "Círculo",
+  "radialShape": "Forma"
 }

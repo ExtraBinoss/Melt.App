@@ -280,3 +280,23 @@ it("honors cancellation during encoding once and never reports final success", a
   expect(state.mixerDispose).toHaveBeenCalledOnce();
   expect(progress.mock.calls.some(([value]) => value.fraction === 1)).toBe(false);
 });
+
+it("keeps the output crop fixed and reports actual encoder dimensions for every authored frame", async () => {
+  const project = fixture(),
+    before = structuredClone(project),
+    framing = { width: 16, height: 32 };
+  const result = await exportMotionVideo(project, {
+    compositionId: "comp",
+    framing,
+    scale: 2,
+    audio: false,
+  });
+  expect(result).toMatchObject({ width: 32, height: 64 });
+  expect(state.render.mock.calls.length).toBeGreaterThan(1);
+  for (const call of state.render.mock.calls) {
+    expect(call[0]).toMatchObject({ width: 32, height: 16 });
+    expect(call[3]).toMatchObject({ framing, scale: 2 });
+  }
+  expect(project).toEqual(before);
+  expect(state.sessionDispose).toHaveBeenCalledOnce();
+});

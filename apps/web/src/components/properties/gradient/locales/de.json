@@ -26,5 +26,11 @@
   "empty": "Keine gespeicherten Verläufe",
   "loadError": "Verläufe konnten nicht geladen werden.",
   "saveError": "Änderung konnte nicht gespeichert werden.",
-  "preset": "Verlauf {{number}}"
+  "preset": "Verlauf {{number}}",
+  "radialcenterX": "Mitte X",
+  "radialcenterY": "Mitte Y",
+  "radialradius": "Radius",
+  "radialellipse": "Ellipse",
+  "radialcircle": "Kreis",
+  "radialShape": "Form"
 }

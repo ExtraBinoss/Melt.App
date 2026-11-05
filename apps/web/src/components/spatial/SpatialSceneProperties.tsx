@@ -32,6 +32,7 @@ import { SpatialLightEditor } from "./SpatialLightEditor";
 import { useCurrentSceneEdit } from "./use-current-scene-edit";
 import { LIGHTING_RIGS, lightingRig } from "./lighting-presets";
 import { importSpatialEnvironment } from "../../services/assets/spatial-import";
+import { useCatalogNames } from "../../ui/studio/catalog/names";
 import "./messages";
 import "./spatial.css";
 const ScenePage = createContext<Composition | null>(null);
@@ -95,6 +96,7 @@ const SpatialSceneView = memo(function SpatialSceneView({
   assetName?: string;
 }) {
   const { t } = useTranslation("spatial");
+  const { environmentName } = useCatalogNames();
   const navigation = useSceneMotionNavigation(engine);
   const input = useRef<HTMLInputElement>(null);
   const [error, setError] = useState("");
@@ -215,7 +217,7 @@ const SpatialSceneView = memo(function SpatialSceneView({
                 },
               ]
             : []),
-          ...SPATIAL_ENVIRONMENTS.map((value) => ({ value, label: t(`environments.${value}`) })),
+          ...SPATIAL_ENVIRONMENTS.map((value) => ({ value, label: environmentName(value) })),
         ]}
         onPreview={(preset) => {
           if (SPATIAL_ENVIRONMENTS.some((value) => value === preset))

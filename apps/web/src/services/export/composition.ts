@@ -1,6 +1,11 @@
 import { brand } from "../../ui/brand/config";
 import { createExportArchive } from "./archive";
-import { selectionComposition, type EnginePort, type EditorEngine } from "@musart/core";
+import {
+  resolveOutputFraming,
+  selectionComposition,
+  type EnginePort,
+  type EditorEngine,
+} from "@musart/core";
 import type { FontResolver, MediaSourceResolver } from "@musart/render";
 import { downloadBlob, safeName } from "../files/download";
 import { ExportScopeError } from "../session/export-scope";
@@ -71,6 +76,7 @@ export function createCompositionExporter(
           centerSelection: options.centerSelection,
           beforeFrame: options.beforeFrame,
           scale: options.scale,
+          framing: options.framing,
           container: options.container,
           frameRate: options.frameRate,
           videoBitrate: options.videoBitrate,
@@ -121,8 +127,11 @@ export function createCompositionExporter(
           const print = options.image.print ?? renderer.DEFAULT_PRINT;
           if (managed && (!renderer.encodeManagedImage || !print))
             throw new Error("Managed image encoding is unavailable.");
+          if (options.framing && options.image.format === "pdf" && print!.bleedMm !== 0)
+            throw new Error("Print bleed is unavailable with output framing.");
+          const outputFrame = resolveOutputFraming(item, options.framing, options.scale);
           const printable =
-            options.image.format === "pdf" && renderer.printComposition
+            options.image.format === "pdf" && !options.framing && renderer.printComposition
               ? renderer.printComposition(item, print!)
               : item;
           let encoded = await renderer.exportComposition(printable, project.assets, {
@@ -130,6 +139,7 @@ export function createCompositionExporter(
             colorOutput: options.image.colorMode === "cmyk" ? "source" : "display",
             format: managed ? "png" : (options.image.format as "png" | "jpeg" | "webp"),
             scale: options.scale,
+            framing: options.framing,
             mediaResolver,
             fontResolver: dependencies.fontResolver,
             signal: options.signal,
@@ -144,8 +154,8 @@ export function createCompositionExporter(
                   quality: options.image.quality,
                   print: print!,
                 },
-                width: Math.max(1, Math.round(item.width * options.scale)),
-                height: Math.max(1, Math.round(item.height * options.scale)),
+                width: outputFrame.width,
+                height: outputFrame.height,
                 name: item.name,
                 creator: brand.name,
               },
@@ -162,8 +172,8 @@ export function createCompositionExporter(
           if (!options.image.allPages) {
             single = encoded;
             filename = name;
-            width = Math.max(1, Math.round(item.width * options.scale));
-            height = Math.max(1, Math.round(item.height * options.scale));
+            width = outputFrame.width;
+            height = outputFrame.height;
           } else
             files[String(index + 1).padStart(2, "0") + "-" + name] = new Uint8Array(
               await encoded.arrayBuffer(),

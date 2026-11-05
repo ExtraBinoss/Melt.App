@@ -1,73 +1,58 @@
 .workspace-mode-root {
   display: contents;
 }
-
 .workspace-mode-root[data-workspace-mode="studio"] .workspace-panels > [id="inspector"],
 .workspace-mode-root[data-workspace-mode="studio"] .workspace-panels > .sidebar-resize {
   display: none;
 }
-
 .workspace-mode-root[data-workspace-mode="studio"] .workspace-panels > [id="workspace"] {
   flex-grow: 1 !important;
   flex-basis: 100% !important;
   max-width: none !important;
 }
-
-/* Keep native spatial controls below Quick Add instead of behind its floating surface. */
+.workspace-mode-root[data-workspace-mode="studio"] .editor-canvas {
+  background: var(--background);
+  background-image: none;
+}
+.workspace-mode-root[data-workspace-mode="studio"] .canvas-artboard {
+  box-shadow: none;
+  outline: none;
+  border: 0;
+  background: var(--background);
+}
+.workspace-mode-root[data-workspace-mode="studio"] .canvas-artboard:not([data-active="true"]),
+.workspace-mode-root[data-workspace-mode="studio"] .artboard-heading,
+.workspace-mode-root[data-workspace-mode="studio"] .artboard-mode-footer,
+.workspace-mode-root[data-workspace-mode="studio"] .artboard-performance-footer,
+.workspace-mode-root[data-workspace-mode="studio"] .canvas-rulers {
+  display: none;
+}
 .workspace-mode-root[data-workspace-mode="studio"]
   .canvas-object-toolbar-anchor:has([data-spatial-toolbar]) {
   left: 50%;
-  top: 78px;
+  top: 76px;
   transform: translateX(-50%) !important;
 }
-
-.studio-agent-anchor {
-  position: absolute;
-  z-index: 22;
-  top: 72px;
-  right: 20px;
-  pointer-events: auto;
+.workspace-mode-root[data-workspace-mode="studio"] .floating-panel {
+  box-shadow: none;
 }
-
-@media (max-width: 680px) {
-  .workspace-mode-root[data-workspace-mode="studio"] .project-trigger {
-    gap: 6px;
-    left: 10px;
-    top: 10px;
-  }
-
-  .workspace-mode-root[data-workspace-mode="studio"] .project-pill-title {
-    max-width: 125px;
-  }
-
-  .studio-agent-anchor {
-    top: 66px;
-    right: 12px;
-  }
+.workspace-mode-root[data-workspace-mode="studio"]
+  .spatial-canvas-toolbar
+  > button[aria-pressed="true"] {
+  background: var(--muted);
+  color: var(--foreground);
 }
 @media (max-width: 760px) {
+  .workspace-mode-root[data-workspace-mode="studio"] .project-trigger {
+    left: 12px;
+    top: 12px;
+    gap: 6px;
+  }
+  .workspace-mode-root[data-workspace-mode="studio"] .project-pill-title {
+    max-width: 90px;
+  }
   .workspace-mode-root[data-workspace-mode="studio"]
     .canvas-object-toolbar-anchor:has([data-spatial-toolbar]) {
     top: 124px;
-  }
-  .studio-chrome .studio-compositions {
-    top: 170px;
-  }
-  .studio-agent-anchor {
-    top: 124px;
-    right: 12px;
-  }
-  .studio-agent-anchor [data-testid="studio-agent-trigger"] > span {
-    display: none;
-  }
-  .studio-agent-anchor [data-testid="studio-agent-trigger"] {
-    padding-inline: 7px;
-  }
-  .studio-chrome:has(.studio-material .studio-dock-heading[aria-expanded="true"])
-    .studio-object-bar,
-  .studio-chrome:has(.studio-environment .studio-dock-heading[aria-expanded="true"])
-    .studio-object-bar {
-    visibility: hidden;
-    pointer-events: none;
   }
 }

@@ -1,21 +1,6 @@
-import { createLayer, type Composition, type EnginePort } from "@musart/core";
+import { backgroundLayer, createLayer, type EnginePort } from "@musart/core";
 
-/** An ordinary full-frame first layer, never a separate background rendering pipeline. */
-export function backgroundLayer(page: Composition) {
-  const first = page.layers.find((layer) => !layer.parentId);
-  return first?.kind === "rectangle" &&
-    !first.spatial?.enabled &&
-    first.x === 0 &&
-    first.y === 0 &&
-    first.width === page.width &&
-    first.height === page.height &&
-    first.rotation === 0 &&
-    (first.scaleX ?? 1) === 1 &&
-    (first.scaleY ?? 1) === 1 &&
-    !first.affine
-    ? first
-    : undefined;
-}
+export { backgroundLayer } from "@musart/core";
 
 /** Preserve the existing paint exactly and make it effect-editable in one undo transaction. */
 export function createBackgroundLayer(engine: EnginePort, name: string) {

@@ -9,5 +9,6 @@
   "targetSize": "Zielgröße",
   "fileSize": "Dateigröße",
   "targetSizeHint": "Aus der Zielbitrate berechnet. Eine variable Bitrate kann kleinere oder größere Dateien erzeugen. Die Schätzung wird beim Export aktualisiert.",
-  "measuredSizeHint": "Größe des letzten abgeschlossenen Exports mit diesen Einstellungen."
+  "measuredSizeHint": "Größe des letzten abgeschlossenen Exports mit diesen Einstellungen.",
+  "framedBleedHint": "Beschnittzugabe erfordert die vollständige Zeichenfläche. Wähle die vollständige Ansicht ohne Aufnahmefenster, um sie zu aktivieren."
 }

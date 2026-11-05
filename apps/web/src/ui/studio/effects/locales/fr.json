@@ -1,0 +1,10 @@
+{
+  "addEffect": "Ajouter un effet",
+  "addGrade": "Ajouter un étalonnage",
+  "composition": "Composition",
+  "layerScope": "Appliqué à l’objet sélectionné",
+  "compositionScope": "Appliqué à toute la composition",
+  "singleSelection": "Sélectionnez un objet pour modifier ses effets.",
+  "locked": "Déverrouillez cet objet pour modifier ses effets.",
+  "stack": "Pile ({{count}})"
+}

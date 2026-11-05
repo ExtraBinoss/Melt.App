@@ -26,5 +26,11 @@
   "empty": "لا توجد تدرجات محفوظة",
   "loadError": "تعذر تحميل التدرجات.",
   "saveError": "تعذر حفظ هذا التغيير.",
-  "preset": "تدرج {{number}}"
+  "preset": "تدرج {{number}}",
+  "radialcenterX": "المركز X",
+  "radialcenterY": "المركز Y",
+  "radialradius": "نصف القطر",
+  "radialellipse": "بيضاوي",
+  "radialcircle": "دائرة",
+  "radialShape": "الشكل"
 }

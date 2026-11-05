@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { Composition, Project } from "@musart/core";
+import type { Composition, Project, OutputFraming } from "@musart/core";
 import type { ManagedImageOptions } from "@musart/render";
 import type { EditorServices } from "../../state/contracts";
 
@@ -10,6 +10,7 @@ export function usePrintPreview(
   options: ManagedImageOptions,
   services: EditorServices,
   edge: number | null,
+  framing?: OutputFraming,
 ) {
   const [resource, setResource] = useState<{
     key: object;
@@ -18,7 +19,7 @@ export function usePrintPreview(
     width: number;
     height: number;
   } | null>(null);
-  const key = useMemo(() => ({ page, options, edge }), [page, options, edge]);
+  const key = useMemo(() => ({ page, options, edge, framing }), [page, options, edge, framing]);
   const queue = useRef(Promise.resolve());
   const active = useRef<AbortController | null>(null);
   useEffect(() => {
@@ -38,8 +39,15 @@ export function usePrintPreview(
           mediaResolver: services.mediaResolverFor?.(project.id),
         });
         try {
-          const printable = printComposition(page, options.print),
-            scale = Math.min(1, edge / Math.max(printable.width, printable.height));
+          if (framing && options.print.bleedMm !== 0)
+            throw new Error("Print bleed is unavailable with output framing.");
+          const printable = framing ? page : printComposition(page, options.print);
+          const width = framing?.width ?? page.width,
+            height = framing?.height ?? page.height;
+          const scale = Math.min(
+            1,
+            edge / Math.max(framing?.width ?? printable.width, framing?.height ?? printable.height),
+          );
           const blob = await renderer.withCanvasFrame(
             printable,
             project.assets,
@@ -52,12 +60,13 @@ export function usePrintPreview(
               ),
             {
               scale,
+              framing,
               signal: controller.signal,
               colorOutput: options.colorMode === "cmyk" ? "source" : "display",
             },
           );
           const proof = await encodeManagedImage(
-            { blob, options, width: page.width, height: page.height, name: page.name, proof: true },
+            { blob, options, width, height, name: page.name, proof: true },
             controller.signal,
           );
           controller.signal.throwIfAborted();
@@ -66,8 +75,8 @@ export function usePrintPreview(
             key,
             url,
             failed: false,
-            width: Math.round(printable.width * scale),
-            height: Math.round(printable.height * scale),
+            width: Math.round((framing?.width ?? printable.width) * scale),
+            height: Math.round((framing?.height ?? printable.height) * scale),
           });
         } finally {
           await renderer.dispose();
@@ -81,7 +90,7 @@ export function usePrintPreview(
       controller.abort();
       if (url) URL.revokeObjectURL(url);
     };
-  }, [key, project, page, options, services, edge]);
+  }, [key, project, page, options, services, edge, framing]);
   return {
     release: () => {
       active.current?.abort();

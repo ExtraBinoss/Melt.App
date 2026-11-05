@@ -1,3 +1,4 @@
+import { applyBackgroundPreset } from "../paint/background-recipe";
 import { shiftLayers, toggleClipping } from "../layers/stacking";
 import * as animations from "../motion/animations/commands";
 import * as layers from "../layers/commands";
@@ -22,6 +23,7 @@ import {
 } from "../motion/track-commands";
 /** Domain handlers are exhaustively checked against the portable command union. */
 export const COMMAND_HANDLERS: CommandHandlers = Object.freeze({
+  applyBackgroundPreset,
   addLayers: layers.addLayers,
   updateLayers: layers.updateLayers,
   updateLayerPatches,

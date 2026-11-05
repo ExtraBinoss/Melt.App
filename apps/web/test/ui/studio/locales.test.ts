@@ -4,12 +4,32 @@ import { supportedLocales } from "../../../src/state/i18n/locales";
 import { resources as workspaceModes } from "../../../src/components/projects/workspace-mode/messages";
 import "../../../src/ui/studio/library/messages";
 import "../../../src/ui/studio/background/messages";
+import "../../../src/ui/studio/effects/messages";
+import "../../../src/ui/studio/framing/messages";
 
-const modules = import.meta.glob("../../../src/ui/studio/{library,background}/locales/*.json", {
-  eager: true,
-  import: "default",
-});
-const features = { studioLibrary: "library", studioBackground: "background" };
+const modules = import.meta.glob(
+  "../../../src/ui/studio/{library,background,effects,framing}/locales/*.json",
+  {
+    eager: true,
+    import: "default",
+  },
+);
+const features = {
+  studioLibrary: "library",
+  studioBackground: "background",
+  studioEffects: "effects",
+  studioFraming: "framing",
+};
+
+function strings(value: Record<string, unknown>, prefix = ""): Record<string, string> {
+  return Object.fromEntries(
+    Object.entries(value).flatMap(([key, child]) =>
+      typeof child === "string"
+        ? [[prefix + key, child]]
+        : Object.entries(strings(child as Record<string, unknown>, prefix + key + ".")),
+    ),
+  );
+}
 
 function resource(feature: string, language: string): Record<string, string> {
   return modules[`../../../src/ui/studio/${feature}/locales/${language}.json`] as Record<
@@ -20,9 +40,9 @@ function resource(feature: string, language: string): Record<string, string> {
 
 test("Studio library and background copy covers every locale and preserves interpolation", () => {
   for (const feature of Object.values(features)) {
-    const english = resource(feature, "en");
+    const english = strings(resource(feature, "en"));
     for (const { code } of supportedLocales) {
-      const translated = resource(feature, code);
+      const translated = strings(resource(feature, code));
       expect(translated, `${feature}:${code}`).toBeDefined();
       expect(Object.keys(translated).sort()).toEqual(Object.keys(english).sort());
       for (const [key, text] of Object.entries(english)) {
@@ -41,7 +61,7 @@ test("normal feature imports register every Studio library and background locale
     for (const { code } of supportedLocales) {
       const translated = resource(feature, code);
       expect(i18n.getResourceBundle(code, namespace), `${namespace}:${code}`).toEqual(translated);
-      for (const [key, text] of Object.entries(translated)) {
+      for (const [key, text] of Object.entries(strings(translated))) {
         const options = { lng: code, count: 20, size: 12, progress: 45 };
         expect(i18n.t(`${namespace}:${key}`, options), `${namespace}:${code}:${key}`).toBe(
           i18n.services.interpolator.interpolate(text, options, code, {}),

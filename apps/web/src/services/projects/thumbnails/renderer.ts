@@ -1,5 +1,5 @@
 import { yieldThumbnailInput } from "./scheduling";
-import type { Asset, Composition } from "@musart/core";
+import { resolveOutputFraming, type Asset, type Composition } from "@musart/core";
 import type { FontResolver, RenderOptions } from "@musart/render";
 import { MAX_THUMBNAIL_BYTES, THUMBNAIL_EDGE, THUMBNAIL_QUALITY } from "./model";
 export interface ThumbnailFrameSession {
@@ -35,7 +35,7 @@ export class ThumbnailRenderer {
     assets: Record<string, Asset>,
     canRender?: () => boolean,
     edge = THUMBNAIL_EDGE,
-    media: Pick<RenderOptions, "mediaResolver" | "motionFrame" | "colorOutput"> = {},
+    media: Pick<RenderOptions, "mediaResolver" | "motionFrame" | "colorOutput" | "framing"> = {},
   ) {
     if (this.disposed) throw new Error("Thumbnail renderer is closed.");
     if (canRender && !canRender()) throw new DOMException("Rendering deferred.", "AbortError");
@@ -53,7 +53,8 @@ export class ThumbnailRenderer {
     if (!allowed()) throw new DOMException("Rendering deferred.", "AbortError");
     const release = await this.admit();
     try {
-      const scale = Math.min(8, edge / Math.max(page.width, page.height));
+      const output = resolveOutputFraming(page, media.framing);
+      const scale = Math.min(8, edge / Math.max(output.width, output.height));
       const frame = await session.withCanvasFrame(
         page,
         assets,

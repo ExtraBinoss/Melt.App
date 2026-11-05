@@ -26,5 +26,11 @@
   "empty": "No saved gradients",
   "loadError": "Could not load gradients.",
   "saveError": "Could not save this change.",
-  "preset": "Gradient {{number}}"
+  "preset": "Gradient {{number}}",
+  "radialcenterX": "Center X",
+  "radialcenterY": "Center Y",
+  "radialradius": "Radius",
+  "radialellipse": "Ellipse",
+  "radialcircle": "Circle",
+  "radialShape": "Shape"
 }

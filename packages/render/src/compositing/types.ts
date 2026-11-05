@@ -3,7 +3,7 @@ import type { VideoProxyActivity } from "../sources/video/proxy/model";
 import type { MediaVideoSources } from "../sources/media/video-sources";
 import type { ReflectionStats } from "../spatial/reflections/model";
 import type { Texture } from "three/webgpu";
-import type { Bounds, Composition, MotionFramePlan } from "@musart/core";
+import type { Bounds, Composition, MotionFramePlan, OutputFraming } from "@musart/core";
 import type { MediaSourceResolver } from "../sources/media/model";
 import type { FontResolver } from "../surface/text/fonts";
 import type { ImmutableSourceFrame, SourceKeyCache } from "../cache/source-key-cache";
@@ -20,6 +20,8 @@ export interface RenderOptions {
   /** Admission for optional GPU work; preview interactions can defer captures without React. */
   backgroundGpu?: BackgroundGpuActivity;
   scale?: number;
+  /** Final texture crop/output format; source composition remains unchanged. */
+  framing?: OutputFraming;
   /** Preview-only native image preparation cap; exact exports retain original image pixels. */
   maxImageDimension?: number;
   /** Prepare plain image sources at their actual local raster footprint for this output scale. */

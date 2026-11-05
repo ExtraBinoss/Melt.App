@@ -1,6 +1,6 @@
 import type { MediaSourceResolver } from "@musart/render";
 import { hasThumbnailBudget } from "./scheduling";
-import type { Asset, Composition } from "@musart/core";
+import type { Asset, Composition, OutputFraming } from "@musart/core";
 import type { ActivityPort } from "./activity";
 import { THUMBNAIL_EDGE } from "./model";
 import type { ThumbnailRenderer } from "./renderer";
@@ -13,6 +13,7 @@ export interface ThumbnailPreviewOptions {
   isCurrent?: () => boolean;
   mediaResolver?: MediaSourceResolver;
   colorOutput?: "display" | "source";
+  framing?: OutputFraming;
 }
 export interface ThumbnailPreview {
   blob: Blob;
@@ -31,6 +32,7 @@ interface Job {
   assets: Record<string, Asset>;
   edge: number;
   colorOutput?: "display" | "source";
+  framing?: OutputFraming;
   consumers: Set<Consumer>;
 }
 const abortError = (message = "Preview is no longer current.") =>
@@ -78,7 +80,12 @@ export class ThumbnailPreviews {
     } catch (error) {
       return Promise.reject(error);
     }
-    const identity = JSON.stringify([key, edge, options.colorOutput ?? "display"]),
+    const identity = JSON.stringify([
+        key,
+        edge,
+        options.colorOutput ?? "display",
+        options.framing ?? null,
+      ]),
       cached = this.cache.get(identity);
     if (cached) {
       this.cache.delete(identity);
@@ -102,6 +109,7 @@ export class ThumbnailPreviews {
         assets,
         edge,
         colorOutput: options.colorOutput,
+        framing: options.framing,
         consumers: new Set(),
       };
       this.jobs.set(identity, job);
@@ -271,9 +279,10 @@ export class ThumbnailPreviews {
       const resolver = [...job.consumers].find((consumer) => consumer.options.mediaResolver)
         ?.options.mediaResolver;
       const result =
-        resolver || job.colorOutput
+        resolver || job.colorOutput || job.framing
           ? await this.renderer.render(job.page, job.assets, () => this.canRender(job), job.edge, {
               ...(resolver ? { mediaResolver: resolver } : {}),
+              ...(job.framing ? { framing: job.framing } : {}),
               ...(job.colorOutput ? { colorOutput: job.colorOutput } : {}),
             })
           : await this.renderer.render(job.page, job.assets, () => this.canRender(job), job.edge);

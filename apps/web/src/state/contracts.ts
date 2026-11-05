@@ -1,7 +1,13 @@
 import type { LocalModelPort } from "../services/selection/model/contract";
 import type { ObjectSelectionPort } from "../services/selection/object/model";
 import type { ProjectTiming } from "../services/performance/project-timing";
-import type { Composition, EnginePort, Project, ProjectContentTag } from "@musart/core";
+import type {
+  Composition,
+  EnginePort,
+  Project,
+  ProjectContentTag,
+  OutputFraming,
+} from "@musart/core";
 import type { MediaOriginalInput } from "../services/projects/media/model";
 import type { FontLibraryPort } from "../services/fonts/model";
 import type { PixelSelectionPort } from "../services/selection/wand/model";
@@ -83,6 +89,7 @@ export interface NewProjectOptions {
   background: string;
 }
 export interface ExportOptions {
+  framing?: OutputFraming;
   signal?: AbortSignal;
   scale: number;
   format: "png" | "jpeg" | "webp";
@@ -98,6 +105,7 @@ export interface ExportScope {
 }
 export type LayerPreviewVariant = { kind: "effect"; effectId: string } | { kind: "mask" };
 export interface ExportPreviewOptions {
+  framing?: OutputFraming;
   centerSelection?: boolean;
   /** Bypass the canvas proof only when the next stage performs native CMYK conversion. */
   colorOutput?: "display" | "source";

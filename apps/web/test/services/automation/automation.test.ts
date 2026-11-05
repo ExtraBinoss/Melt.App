@@ -85,6 +85,15 @@ describe("opt-in headless automation port", () => {
     );
     expect(render.renderComposition).toHaveBeenCalledWith(page, {}, { scale: 2, forceWebGL: true });
     expect(await api.render({ forceWebGL: true })).toBe("data:image/png;base64,gpu");
+    const framing = { width: 32, height: 64, region: { x: 0, y: 0, width: 50, height: 100 } };
+    await api.render({ forceWebGL: true, framing });
+    expect(render.renderComposition).toHaveBeenLastCalledWith(
+      page,
+      {},
+      { scale: undefined, forceWebGL: true, framing },
+    );
+    await api.render({ framing });
+    expect(render.exportComposition).toHaveBeenLastCalledWith(page, {}, { framing });
     detach();
   });
   it("detaches only its own installed API, leaving a newer session attached", () => {

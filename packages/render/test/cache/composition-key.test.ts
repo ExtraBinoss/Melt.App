@@ -1,5 +1,5 @@
 import { expect, it } from "vitest";
-import { createPage, createLayer } from "@musart/core";
+import { createPage, createLayer, createEffect } from "@musart/core";
 import { compositionPaintKey } from "../../src/cache/composition-key";
 it("invalidates root pixels for gradient edits but preserves editing-only metadata and solid state", () => {
   const root = createLayer("rectangle"),
@@ -29,4 +29,18 @@ it("invalidates root pixels for gradient edits but preserves editing-only metada
   expect(compositionPaintKey({ ...page, backgroundGradient: undefined }, [root], source)).toBe(
     plain,
   );
+});
+it("invalidates global effects and their input originals without confusing legacy empty stacks", () => {
+  const page = createPage();
+  const key = (value = page, input = "original") =>
+    compositionPaintKey(
+      value,
+      [],
+      () => "",
+      () => input,
+    );
+  expect(key({ ...page, effects: undefined })).toBe(key());
+  const effects = [createEffect("displace", { inputs: { map: "map" } })];
+  expect(key({ ...page, effects })).not.toBe(key());
+  expect(key({ ...page, effects }, "replacement")).not.toBe(key({ ...page, effects }));
 });

@@ -1,5 +1,7 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import {
+  resolveOutputFraming,
+  type OutputFraming,
   createTimelapseReplay,
   evaluateReplay,
   isImageAsset,
@@ -37,6 +39,7 @@ export function useTimelapsePreview(
   selection?: readonly string[],
   autoPlay = false,
   centerSelection = false,
+  framing?: OutputFraming,
 ) {
   const viewport = useRef<HTMLDivElement>(null);
   const slider = useMemo(() => createSliderValue([0]), []);
@@ -118,7 +121,8 @@ export function useTimelapsePreview(
           const sample = replayFrame(timing, index);
           const project = evaluateReplay(replay, sample.historyTime);
           const page = project.pages.find((item) => item.id === pageId) ?? { ...final, layers: [] };
-          const scale = Math.min(1, 480 / Math.max(crop.page.width, crop.page.height));
+          const output = resolveOutputFraming(crop.page, framing);
+          const scale = Math.min(1, 480 / Math.max(output.width, output.height));
           const framePage = crop.frame({ ...page, width: final.width, height: final.height });
           const cost = estimatePreviewCost(framePage, scale);
           const effectSourceScale = Math.min(
@@ -142,6 +146,7 @@ export function useTimelapsePreview(
             },
             {
               scale,
+              framing,
               imageSourceScale: scale,
               maxImageDimension: imageDimension,
               effectSourceScale,
@@ -230,6 +235,7 @@ export function useTimelapsePreview(
     selection,
     autoPlay,
     centerSelection,
+    framing,
   ]);
   return { viewport, slider, clock, status, error, playing, controls };
 }

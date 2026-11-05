@@ -166,7 +166,8 @@
     "edge-detect": "Extract contours and contrast boundaries.",
     "window-trails": "Repeat offset window-like trails.",
     "morph": "Interpolate artwork between shape states.",
-    "transition": "Animate the entrance or exit of a layer."
+    "transition": "Animate the entrance or exit of a layer.",
+    "feather": "Soft elliptical alpha falloff with editable center, radius and softness."
   },
   "commandLabels": {
     "togglePlayback": "Play / pause Motion",

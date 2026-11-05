@@ -9,5 +9,6 @@
   "targetSize": "Doelgrootte",
   "fileSize": "Bestandsgrootte",
   "targetSizeHint": "Berekend op basis van de doelbitsnelheid. Een variabele bitsnelheid kan een kleiner of groter bestand opleveren. De schatting wordt tijdens het exporteren bijgewerkt.",
-  "measuredSizeHint": "Grootte van de laatste voltooide export met deze instellingen."
+  "measuredSizeHint": "Grootte van de laatste voltooide export met deze instellingen.",
+  "framedBleedHint": "Afloop vereist uitvoer van het volledige tekengebied. Kies Volledige weergave zonder opnamevenster om afloop in te schakelen."
 }

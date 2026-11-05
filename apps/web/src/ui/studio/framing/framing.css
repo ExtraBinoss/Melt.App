@@ -1,0 +1,91 @@
+.studio-frame-picker {
+  display: grid;
+  gap: 14px;
+}
+.studio-format-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+  max-height: 260px;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+.studio-format-grid > button {
+  display: flex;
+  flex-direction: column;
+  height: 82px;
+  gap: 3px;
+  padding: 7px 4px;
+  white-space: normal;
+  font-size: 10px;
+  line-height: 1.15;
+  text-align: center;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  color: var(--muted-foreground);
+}
+.studio-format-grid > button[aria-pressed="true"] {
+  border-color: color-mix(in srgb, var(--foreground) 38%, transparent);
+  color: var(--foreground);
+  background: var(--muted);
+}
+.studio-format-glyph {
+  width: 48px;
+  height: 40px;
+  flex-shrink: 0;
+}
+.studio-frame-dimensions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 7px;
+}
+.studio-frame-dimensions .number-field {
+  min-width: 0;
+}
+.studio-capture-popover {
+  width: min(354px, calc(100vw - 24px));
+  padding: 16px;
+  max-height: 75dvh;
+  overflow: auto;
+}
+.studio-capture-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 12px;
+  margin-bottom: 14px;
+}
+.studio-capture-popover p {
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--muted-foreground);
+  margin-top: 12px;
+}
+.studio-capture-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 8;
+  overflow: hidden;
+}
+.studio-capture-window {
+  position: absolute;
+  border: 1px solid color-mix(in srgb, white 85%, transparent);
+  outline: 1px solid #0005;
+  box-shadow: 0 0 0 100vmax #0007;
+}
+.studio-capture-window > span {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  font-size: 10px;
+  line-height: 1.3;
+  color: white;
+  background: #222c;
+  padding: 3px 6px;
+  border-radius: 4px;
+  white-space: nowrap;
+}

@@ -83,7 +83,10 @@ export class GpuPasses {
     this.copyMaterial.fragmentNode = copyNode(this.copy);
     this.maskMaterial.fragmentNode = maskNode(this.mask);
     this.blendMaterial.fragmentNode = blendNode(this.blend);
-    this.shapeMaterial.fragmentNode = shapeNode(this.shape);
+    this.shapeMaterial.fragmentNode = shapeNode({
+      ...this.shape,
+      fill: paintNode(this.shape.paint, vec2(uv().x, uv().y.oneMinus()).mul(this.shape.paint.size)),
+    });
   }
   async prepare(target: RenderTarget, canContinue?: () => boolean): Promise<void> {
     const materials = [

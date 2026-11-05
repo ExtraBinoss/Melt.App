@@ -39,7 +39,6 @@ export const StudioCompositions = memo(function StudioCompositions({
       title={t("compositions")}
       icon={<Layers3 size={15} />}
       className="studio-compositions"
-      initiallyOpen={!mobile}
     >
       <PagesPanel engine={engine} page={page} pages={snapshot.project.pages} run={run} />
       <LayersPresentation engine={engine} services={services} model={model} run={run} />

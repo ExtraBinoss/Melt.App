@@ -14,6 +14,7 @@ import { MotionColorControl } from "../../../components/properties/motion/Motion
 import { MotionFieldProvider } from "../../../components/properties/motion/context";
 import { EffectsPanel } from "../../../components/properties/EffectsPanel";
 import { useLayerPreview } from "../../../components/layers/controls/use-layer-preview";
+import { BackgroundPresets } from "./BackgroundPresets";
 import { backgroundLayer, createBackgroundLayer } from "./model";
 import "./messages";
 import "./background.css";
@@ -64,6 +65,7 @@ function BackgroundEditor({ engine, onTask }: { engine: EnginePort; onTask: Task
         <Paintbrush size={15} />
         <strong>{t(layer ? "layer" : "canvas")}</strong>
       </div>
+      <BackgroundPresets engine={engine} page={page} run={run} />
       {layer ? (
         <LayerBackground key={layer.id} engine={engine} page={page} layer={layer} run={run} />
       ) : (

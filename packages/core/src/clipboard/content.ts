@@ -53,7 +53,7 @@ export function copyContent(
             ),
           },
         };
-  const assetIds = new Set<string>();
+  const assetIds = new Set<string>(effectAssetIds(page.effects ?? []));
   for (const layer of page.layers) {
     for (const id of effectAssetIds(layer.effects)) assetIds.add(id);
     if (layer.assetId) assetIds.add(layer.assetId);

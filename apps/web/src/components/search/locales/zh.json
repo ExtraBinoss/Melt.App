@@ -166,7 +166,8 @@
     "edge-detect": "提取轮廓和对比度边界。",
     "window-trails": "重复错位的窗口形拖影。",
     "morph": "在形状状态之间进行插值。",
-    "transition": "为图层进入或离开添加动画。"
+    "transition": "为图层进入或离开添加动画。",
+    "feather": "可编辑中心、半径和柔和度的椭圆形透明度渐变。"
   },
   "commandLabels": {
     "togglePlayback": "播放 / 暂停",

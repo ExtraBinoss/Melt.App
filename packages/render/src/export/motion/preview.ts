@@ -1,6 +1,7 @@
 import { usesVideoSources } from "../../renderer/video-backend";
 import { selectionFrameScope } from "./selection";
 import {
+  resolveOutputFraming,
   applyMotionFrame,
   compileMotion,
   evaluateMotion,
@@ -31,6 +32,8 @@ export function createMotionPreview(project: Project, options: MotionPreviewOpti
   const edge = options.edge ?? 768;
   if (!Number.isInteger(edge) || edge < 16 || edge > 768)
     throw new MotionExportError("invalidOptions", "Motion preview edge must be 16–768 pixels.");
+  const output = resolveOutputFraming(selection.page, options.framing);
+  const previewScale = Math.min(1, edge / Math.max(output.width, output.height));
   const scheduler = options.scheduler ?? {
     now: () => performance.now(),
     request: (callback: () => void) => requestAnimationFrame(callback),
@@ -113,7 +116,8 @@ export function createMotionPreview(project: Project, options: MotionPreviewOpti
         if (!closed && owner === generation) options.onFrame(canvas, session.stats()?.backend);
       },
       {
-        scale: Math.min(1, edge / Math.max(selection.page.width, selection.page.height)),
+        scale: previewScale,
+        framing: options.framing,
         vectorAntialias: true,
         motionFrame: plan,
         mediaMode: state.playing ? "playback" : "preview",

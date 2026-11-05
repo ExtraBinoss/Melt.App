@@ -46,6 +46,7 @@ type Target<K extends HistoryOwner["kind"], P extends string> = {
   readonly property: P;
 };
 export type LayerHistoryProperty =
+  | `fillGradient.${"centerX" | "centerY" | "radius" | "radialShape"}`
   | LayerMotionProperty
   | "name"
   | "locked"
@@ -70,6 +71,7 @@ export type CompositionHistoryProperty =
   | "background"
   | "backgroundGradient.kind"
   | "backgroundGradient.angle"
+  | `backgroundGradient.${"centerX" | "centerY" | "radius" | "radialShape"}`
   | `backgroundGradient.stops.${number}.${"color" | "offset"}`
   | "rulers"
   | "colorSpace"

@@ -38,6 +38,10 @@ export function MotionExportPane(props: ExportPaneProps) {
         : page,
     [page, selection, props.centerSelection],
   );
+  const output = {
+    width: Math.max(1, Math.round((props.framing?.width ?? scope.width) * scale)),
+    height: Math.max(1, Math.round((props.framing?.height ?? scope.height) * scale)),
+  };
   const motion = page.motion!;
   const rate =
     fps === "composition"
@@ -54,6 +58,7 @@ export function MotionExportPane(props: ExportPaneProps) {
     selection,
     props.centerSelection ?? false,
     scale,
+    props.framing,
     container,
     rate.numerator,
     rate.denominator,
@@ -75,13 +80,14 @@ export function MotionExportPane(props: ExportPaneProps) {
             services={services}
             selection={selection}
             centerSelection={props.centerSelection}
+            framing={props.framing}
             paused={busy || props.previewActive === false}
             onReady={receive}
           />
           <div className="export-preview-caption">
             <strong>{page.name}</strong>
             <span>
-              {Math.round(scope.width * scale)} × {Math.round(scope.height * scale)} px ·{" "}
+              {output.width} × {output.height} px ·{" "}
               {t("duration", {
                 seconds: duration.toFixed(2),
                 rate: `${rate.numerator}/${rate.denominator}`,
@@ -102,6 +108,7 @@ export function MotionExportPane(props: ExportPaneProps) {
               centerSelection: props.centerSelection,
               compositionId: page.id,
               scale,
+              framing: props.framing,
               container,
               frameRate: rate,
               videoBitrate: bitrate,

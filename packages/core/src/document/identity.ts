@@ -20,6 +20,7 @@ export function collectProjectIds(project: Project): Set<string> {
   for (const asset of Object.values(project.assets)) ids.add(asset.id);
   for (const page of project.pages) {
     ids.add(page.id);
+    for (const effect of page.effects ?? []) ids.add(effect.id);
     for (const light of page.spatial?.lights ?? []) ids.add(light.id);
     for (const track of page.motion?.audioTracks ?? []) ids.add(track.id);
     for (const animation of page.motion?.sceneAnimations ?? []) ids.add(animation.id);

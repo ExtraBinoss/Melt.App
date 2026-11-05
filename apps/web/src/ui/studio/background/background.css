@@ -44,3 +44,69 @@
 .studio-background-fields .inspector-section {
   padding-inline: 0;
 }
+.studio-background-preset-heading {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  margin-bottom: 6px;
+}
+.studio-background-preset-heading > span {
+  color: var(--muted-foreground);
+}
+.studio-background-category {
+  padding-block: 12px;
+  font-size: 12px;
+}
+.studio-background-preset-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+.studio-background-preset {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 4px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+  padding: 0 0 6px;
+  text-align: left;
+  background: var(--background);
+  cursor: pointer;
+}
+.studio-background-preset:hover,
+.studio-background-preset:focus-visible {
+  border-color: var(--foreground);
+  outline: none;
+}
+.studio-background-preset:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.studio-background-preset > svg {
+  width: 100%;
+  aspect-ratio: 1.6;
+}
+.studio-background-preset > span {
+  padding-inline: 6px;
+  font-size: 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+.studio-background-preset .studio-background-preset-recipe {
+  color: var(--muted-foreground);
+  font-size: 9px;
+}
+.studio-background-radial {
+  display: grid;
+  gap: 8px;
+}
+.studio-background-presets > [data-slot="accordion"] {
+  max-height: min(300px, 36dvh);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}

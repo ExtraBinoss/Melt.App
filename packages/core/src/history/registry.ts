@@ -9,6 +9,9 @@ import * as audio from "./audio";
 
 /** Exhaustive domain dispatch: implementations stay beside the relevant property collectors. */
 export const HISTORY_HANDLERS: HistoryHandlers = {
+  applyBackgroundPreset: (context) => {
+    context.history.action("geometry", { kind: "composition", compositionId: context.page.id });
+  },
   updateLayers: layers.updateLayers,
   updateLayerPatches: layers.updateLayerPatches,
   alignLayers: layers.alignLayers,

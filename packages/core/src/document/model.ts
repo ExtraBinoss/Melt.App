@@ -4,6 +4,7 @@ import type { VectorDefinition } from "../vector/model";
 import type { ShapeMorph } from "../effects/morph/model";
 import type { Insets, WorkingColorSpace, Alignment, LayoutReference } from "../layout/model";
 import type { ReplaySpec } from "../animation/model";
+import type { ApplyBackgroundPresetCommand } from "../paint/background-recipe";
 import type { FillGradient } from "../paint/gradient";
 import type { EffectCompositeMode } from "../effects/compositing";
 import type { Asset } from "../assets/model";
@@ -54,6 +55,7 @@ export type EffectType =
   | "sepia"
   | "threshold"
   | "posterize"
+  | "feather"
   | "grain"
   | "halftone"
   | "vignette"
@@ -152,6 +154,8 @@ export interface Guide {
   color?: string;
 }
 export interface Composition {
+  /** Applied to the complete blended artboard before output color conversion. Missing means empty. */
+  effects?: Effect[];
   spatial?: SpatialScene;
   id: string;
   name: string;
@@ -188,6 +192,7 @@ export interface SessionSnapshot {
   canRedo: boolean;
 }
 export type Command =
+  | ApplyBackgroundPresetCommand
   | ApplyMotionTransitionCommand
   | MotionCommand
   | { type: "addLayers"; layers: Layer[]; assets?: Asset[] }

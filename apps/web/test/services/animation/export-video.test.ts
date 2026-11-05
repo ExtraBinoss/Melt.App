@@ -13,6 +13,7 @@ const probe = vi.hoisted(() => ({
   close: vi.fn(),
   dispose: vi.fn(),
   frames: [] as unknown[],
+  options: [] as unknown[],
   contexts: 0,
   sourceCanvases: [] as HTMLCanvasElement[],
   failRender: false,
@@ -28,8 +29,10 @@ vi.mock("@musart/render", () => ({
         page: unknown,
         _assets: unknown,
         consume: (canvas: HTMLCanvasElement) => Promise<void>,
+        options: unknown,
       ) => {
         probe.frames.push(page);
+        probe.options.push(options);
         if (probe.failRender) throw new Error("GPU failed");
         await consume(canvas);
       },
@@ -83,6 +86,7 @@ const options = { duration: 1, fps: 2, scale: 1, container: "auto" as const };
 beforeEach(() => {
   vi.clearAllMocks();
   probe.frames = [];
+  probe.options = [];
   probe.sourceCanvases = [];
   probe.contexts = 0;
   probe.failRender = false;
@@ -195,4 +199,17 @@ describe("native canvas video export", () => {
     await expect(exportReplayVideo(replay(), options)).rejects.toThrow("cancel failed");
     expect(probe.dispose).toHaveBeenCalledOnce();
   });
+});
+
+it("negotiates the framed resolution and retains the same crop across replay frames", async () => {
+  const framing = { width: 16, height: 32 };
+  await exportReplayVideo(replay(), { ...options, framing, scale: 2 });
+  expect(probe.encode).toHaveBeenCalledWith(
+    "avc",
+    expect.objectContaining({ width: 32, height: 64 }),
+  );
+  expect(probe.options).toHaveLength(2);
+  for (const request of probe.options) expect(request).toMatchObject({ framing, scale: 2 });
+  expect(probe.contexts).toBe(1);
+  expect(probe.dispose).toHaveBeenCalledOnce();
 });

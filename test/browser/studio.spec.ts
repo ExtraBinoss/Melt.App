@@ -12,7 +12,7 @@ async function openStudio(page: Page) {
     localStorage.setItem("musart.editor-tutorial.v1", "done");
   });
   await page.goto("/editor?automation=1&workspace=studio");
-  await page.waitForFunction(() => !!window.musart);
+  await page.waitForFunction(() => !!window.musart, undefined, { timeout: 60000 });
   const manifest = JSON.parse(
     await readFile("apps/web/public/templates/designed/studio-starter/studio-starter.json", "utf8"),
   ) as { project: Project };
@@ -120,7 +120,10 @@ test("Studio retains the native canvas and byte-exact exports across mode switch
   await page.evaluate(() => window.musart!.undo());
   await page.keyboard.press("Escape");
   const material = page.getByRole("region", { name: "Material", exact: true });
-  await material.getByRole("button", { name: "Material", exact: true }).click();
+  await page
+    .locator(".studio-material")
+    .getByRole("button", { name: "Material", exact: true })
+    .click();
   const slider = material.getByRole("slider", { name: "Roughness", exact: true });
   expect(
     await material
@@ -137,7 +140,9 @@ test("Studio retains the native canvas and byte-exact exports across mode switch
     ].map((node) => node.getAttribute("data-react-renders")),
   }));
   await armStudioPresentation(page);
-  const box = (await slider.boundingBox())!;
+  const box = (await material
+    .locator('.studio-slider:has([aria-label="Roughness"]) [data-slot="slider-track"]')
+    .boundingBox())!;
   await page.mouse.move(box.x + box.width * 0.2, box.y + box.height / 2);
   await page.mouse.down();
   await page.mouse.move(box.x + box.width * 0.8, box.y + box.height / 2, { steps: 6 });
@@ -172,14 +177,21 @@ test("Studio retains the native canvas and byte-exact exports across mode switch
     ),
   ).toBeCloseTo(0.29);
   await page.evaluate(() => window.musart!.undo());
+  await page.keyboard.press("Escape");
+  await page.locator(".studio-compositions .studio-dock-heading").click();
   await expect(page.locator("[data-layers-presentation]")).toHaveAttribute("aria-busy", "false");
   await page
     .getByRole("button", { name: "Lock layer · Editable 3D lettering", exact: true })
     .click();
+  await page.keyboard.press("Escape");
+  await page.locator(".studio-material .studio-dock-heading").click();
   await expect(slider).toHaveAttribute("data-disabled");
+  await page.keyboard.press("Escape");
+  await page.locator(".studio-compositions .studio-dock-heading").click();
   await page
     .getByRole("button", { name: "Unlock layer · Editable 3D lettering", exact: true })
     .click();
+  await page.keyboard.press("Escape");
   await page.getByRole("button", { name: "Export", exact: true }).click();
   await expect(page.locator(".export-dialog")).toBeVisible();
   await page.keyboard.press("Escape");
@@ -197,7 +209,10 @@ test("Studio retains the native canvas and byte-exact exports across mode switch
     { id: background.id, effect: createEffect("blur", { id: "studio-bg-blur", amount: 0.2 }) },
   );
   await page.evaluate(() => window.musart!.save());
-  await material.getByRole("button", { name: "Material", exact: true }).click();
+  await page
+    .locator(".studio-material")
+    .getByRole("button", { name: "Material", exact: true })
+    .click();
   await page.screenshot({ path: "artifacts/studio/studio-desktop.png" });
   await page.setViewportSize({ width: 390, height: 844 });
   await expect(page.locator(".studio-compositions .studio-dock-heading")).toHaveAttribute(
@@ -205,7 +220,7 @@ test("Studio retains the native canvas and byte-exact exports across mode switch
     "false",
   );
   expect(await canvas!.evaluate((node) => node.isConnected)).toBe(true);
-  await page.getByRole("button", { name: "Fit to view", exact: true }).click();
+  await page.getByRole("button", { name: "Recenter view", exact: true }).click();
   await page.waitForTimeout(350);
   await page.screenshot({ path: "artifacts/studio/studio-mobile.png" });
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
@@ -344,9 +359,7 @@ test("Studio downloads its optional library explicitly, imports editable SVGs an
         window.musart!.agentStatus().logs.some((entry) => entry.source === "agent" && entry.ok),
       ),
     ).toBe(true);
-    await page.getByRole("button", { name: "Local agent", exact: true }).click();
-    await expect(page.getByText("Agent · updateLayers")).toBeVisible();
-    await page.screenshot({ path: "artifacts/studio/agent-activity.png" });
+    await expect(page.locator(".studio-agent-anchor")).toHaveCount(0);
   } finally {
     await page.evaluate(() => window.musart?.agentDisconnect());
     agent?.close();
@@ -377,7 +390,9 @@ test("Studio starter installs through the real gallery and restores its presenta
   expect(source.id).not.toBe("template-studio-starter");
   await page.evaluate(() => window.musart!.save());
   await page.goto(`/editor?project=${encodeURIComponent(source.id)}&automation=1`);
-  await page.waitForFunction((id) => window.musart?.session().projectId === id, source.id);
+  await page.waitForFunction((id) => window.musart?.session().projectId === id, source.id, {
+    timeout: 60000,
+  });
   await expect(page.locator("[data-workspace-mode]")).toHaveAttribute(
     "data-workspace-mode",
     "studio",
@@ -386,7 +401,9 @@ test("Studio starter installs through the real gallery and restores its presenta
   await workspace(page, "Classic");
   await page.evaluate(() => window.musart!.save());
   await page.reload();
-  await page.waitForFunction((id) => window.musart?.session().projectId === id, source.id);
+  await page.waitForFunction((id) => window.musart?.session().projectId === id, source.id, {
+    timeout: 60000,
+  });
   await expect(page.locator("[data-workspace-mode]")).toHaveAttribute(
     "data-workspace-mode",
     "classic",

@@ -6,5 +6,18 @@
   "hint": "Maak een gewone achtergrondlaag om effecten te stapelen. De vulling blijft bewerkbaar in beide werkruimten en in exports.",
   "name": "Achtergrond",
   "select": "Achtergrondlaag selecteren",
-  "locked": "Ontgrendel deze laag in het compositiepaneel om de achtergrond te bewerken."
+  "locked": "Ontgrendel deze laag in het compositiepaneel om de achtergrond te bewerken.",
+  "presets": "Verloopcollectie",
+  "previewHint": "Beweeg de muis voor een voorbeeld op de compositie. Eén klik past bewerkbare kleuren en effecten toe.",
+  "categories": {
+    "plastic": "Glanzend plastic",
+    "cinematic": "Filmisch",
+    "social": "Sociaal",
+    "editorial": "Redactioneel",
+    "atmosphere": "Atmosfeer"
+  },
+  "ingredients": {
+    "grain": "Korrel",
+    "feather": "Zachte rand"
+  }
 }

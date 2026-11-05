@@ -1,3 +1,8 @@
+import { ExportFramingControls, exportFraming } from "./ExportFramingControls";
+import type { FrameChoice } from "../../ui/studio/framing/FramePresetPicker";
+import { getStudioViewport } from "../../ui/studio/framing/viewport";
+import { useWorkspaceMode } from "../../ui/studio/workspace-mode";
+import { useProjectPreferences } from "../workspace/preferences/context";
 import { createRenderActivity } from "../../services/session/render-activity";
 import { InfoTooltip } from "../shared/InfoTooltip";
 import { usePreviewAdmission } from "./use-preview-admission";
@@ -46,7 +51,26 @@ export const ExportWorkspace = memo(function ExportWorkspace({
   const [kind, setKind] = useState<ExportKind>(
     initialKind ?? (page.motion?.mode === "motion" ? "motion" : "image"),
   );
-  const [whole, setWhole] = useState(false);
+  const workspace = useWorkspaceMode();
+  const preferences = useProjectPreferences();
+  const [capture] = useState(() => {
+    const view = getStudioViewport(engine).read();
+    return workspace === "studio" &&
+      view?.projectId === origin.project.id &&
+      view.pageId === page.id
+      ? { view, choice: preferences?.read("studioCapture") }
+      : null;
+  });
+  const [frameChoice, setFrameChoice] = useState<FrameChoice>(
+    () =>
+      (capture?.choice && !capture.choice.full ? capture.choice : null) ?? {
+        preset: "full",
+        full: true,
+        width: Math.max(1, Math.round(capture?.view.region.width ?? page.width)),
+        height: Math.max(1, Math.round(capture?.view.region.height ?? page.height)),
+      },
+  );
+  const [whole, setWhole] = useState(workspace === "studio");
   const [center, setCenter] = useState(false);
   const [allPages, setAllPages] = useState(false);
   const jobs = getExportJobs(engine);
@@ -60,6 +84,14 @@ export const ExportWorkspace = memo(function ExportWorkspace({
   }, [engine, busy]);
   const selected = page.id === origin.pageId ? origin.selection : empty;
   const selection = !whole && !allPages ? selected : empty;
+  const capturedRegion =
+    capture?.view.pageId === page.id && !selection.length && !allPages
+      ? capture.view.region
+      : undefined;
+  const framing = useMemo(
+    () => exportFraming(frameChoice, capturedRegion),
+    [frameChoice, capturedRegion],
+  );
   const controls = (
     <>
       <div className="export-field">
@@ -75,6 +107,7 @@ export const ExportWorkspace = memo(function ExportWorkspace({
             setWhole(false);
             setAllPages(false);
             const next = origin.project.pages.find((item) => item.id === id)!;
+            setFrameChoice({ preset: "full", full: true, width: next.width, height: next.height });
             if (kind !== "timelapse") setKind(next.motion?.mode === "motion" ? "motion" : "image");
           }}
         />
@@ -98,6 +131,12 @@ export const ExportWorkspace = memo(function ExportWorkspace({
           }}
         />
       </div>
+      <ExportFramingControls
+        value={frameChoice}
+        onChange={setFrameChoice}
+        bounds={capturedRegion ?? page}
+        disabled={busy}
+      />
       {selected.length > 0 && (
         <label className="switch-row">
           <span>{t("whole")}</span>
@@ -156,6 +195,7 @@ export const ExportWorkspace = memo(function ExportWorkspace({
     page,
     selection,
     centerSelection: center && selection.length === 1,
+    framing,
     controls,
     onClose,
     previewActive,

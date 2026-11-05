@@ -26,5 +26,11 @@
   "empty": "暂无已保存的渐变",
   "loadError": "无法加载渐变。",
   "saveError": "无法保存此更改。",
-  "preset": "渐变 {{number}}"
+  "preset": "渐变 {{number}}",
+  "radialcenterX": "中心 X",
+  "radialcenterY": "中心 Y",
+  "radialradius": "半径",
+  "radialellipse": "椭圆",
+  "radialcircle": "圆形",
+  "radialShape": "形状"
 }

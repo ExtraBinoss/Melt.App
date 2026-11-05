@@ -84,6 +84,7 @@ const text = new Set([
 ]);
 const choices: Readonly<Record<string, readonly string[]>> = {
   "backgroundGradient.kind": ["linear", "radial"],
+  "backgroundGradient.radialShape": ["ellipse", "circle"],
   colorSpace: ["srgb", "display-p3", "cmyk", "cmyk-proof"],
   "reflections.mode": ["scene", "environment"],
   "reflections.quality": ["draft", "balanced", "high"],
@@ -121,6 +122,10 @@ function layerDefinition(target: HistoryPropertyTarget): Definition | null {
               ? { unit: "s" as const }
               : {}),
     };
+  if (/^fillGradient\.(centerX|centerY|radius)$/.test(property))
+    return { kind: "number", label, displayScale: 100, unit: "%" };
+  if (property === "fillGradient.radialShape")
+    return { kind: "choice", label, options: ["ellipse", "circle"] };
   if (booleans.has(property)) return { kind: "boolean", label };
   if (text.has(property)) return { kind: "string", label };
   if (/^(affine\.[0-3]|(margin|padding)\.(top|right|bottom|left))$/.test(property))
@@ -254,7 +259,8 @@ export function getHistoryPropertyDefinition(target: HistoryPropertyTarget): Def
         ? { unit: "s" }
         : property === "volume" || property === "strength" || property === "reverb.mix"
           ? { displayScale: 100, unit: "%" }
-          : /^backgroundGradient\.stops\.\d+\.offset$/.test(property)
+          : /^backgroundGradient\.(centerX|centerY|radius)$/.test(property) ||
+              /^backgroundGradient\.stops\.\d+\.offset$/.test(property)
             ? { displayScale: 100, unit: "%" }
             : property === "backgroundGradient.angle"
               ? { unit: "°" }

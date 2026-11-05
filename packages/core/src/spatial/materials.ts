@@ -1,7 +1,15 @@
 import type { SpatialMaterial } from "./model";
+import { MATERIAL_ADDITIONS } from "./catalog/materials";
+export { SPATIAL_MATERIAL_CATEGORIES } from "./catalog/materials";
+export type { SpatialMaterialCategory } from "./catalog/materials";
+import type { SpatialMaterialCategory } from "./catalog/materials";
 export interface SpatialMaterialPreset {
   id: string;
   color: string;
+  label: string;
+  baseId: string;
+  variant: string | null;
+  category: SpatialMaterialCategory;
   family: "metal" | "solid" | "glass" | "iridescent" | "fabric";
   settings: SpatialMaterial;
 }
@@ -26,10 +34,20 @@ const preset = (
 ): SpatialMaterialPreset =>
   Object.freeze({
     id,
+    baseId: id,
+    variant: null,
+    label: id.replace(/([a-z])([A-Z])/g, "$1 $2").replace(/^./, (letter) => letter.toUpperCase()),
+    category: categoryFor(id, family),
     color,
     family,
     settings: Object.freeze({ ...base, ...settings, preset: id }),
   });
+function categoryFor(id: string, family: SpatialMaterialPreset["family"]): SpatialMaterialCategory {
+  if (["porcelain", "ceramic", "clay"].includes(id)) return "ceramic";
+  if (["concrete", "stone"].includes(id)) return "stone";
+  if (id === "emissive") return "emissive";
+  return family === "solid" ? "plastic" : family;
+}
 export const SPATIAL_MATERIALS: readonly SpatialMaterialPreset[] = Object.freeze([
   preset("chrome", "#ECEFF5", "metal", { metalness: 1, roughness: 0.06 }),
   preset("aluminium", "#CCD2DC", "metal", { metalness: 1, roughness: 0.25 }),
@@ -80,6 +98,15 @@ export const SPATIAL_MATERIALS: readonly SpatialMaterialPreset[] = Object.freeze
     clearcoatRoughness: 0.05,
   }),
   preset("emissive", "#A776FF", "solid", { roughness: 0.5, emissiveIntensity: 1.5 }),
+  ...MATERIAL_ADDITIONS.map((entry) =>
+    Object.freeze({
+      ...preset(entry.id, entry.color, entry.family, entry.settings),
+      baseId: entry.baseId,
+      variant: entry.variant,
+      category: entry.category,
+      label: entry.label,
+    }),
+  ),
 ]);
 export function spatialMaterial(id: string): SpatialMaterialPreset {
   const value = SPATIAL_MATERIALS.find((item) => item.id === id);

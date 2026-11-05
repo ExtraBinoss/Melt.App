@@ -311,7 +311,22 @@ export {
   DEFAULT_SPATIAL_SCENE,
   SPATIAL_ENVIRONMENTS,
 } from "./spatial/defaults";
-export { SPATIAL_MATERIALS, spatialMaterial } from "./spatial/materials";
+export {
+  SPATIAL_MATERIALS,
+  SPATIAL_MATERIAL_CATEGORIES,
+  spatialMaterial,
+} from "./spatial/materials";
+export type { SpatialMaterialCategory, SpatialMaterialPreset } from "./spatial/materials";
+export {
+  SPATIAL_ENVIRONMENT_PRESETS,
+  SPATIAL_ENVIRONMENT_CATEGORIES,
+  spatialEnvironment,
+} from "./spatial/catalog/environments";
+export type {
+  SpatialEnvironmentPreset,
+  SpatialEnvironmentPanel,
+  SpatialEnvironmentCategory,
+} from "./spatial/catalog/environments";
 export {
   SPATIAL_MOTION_SCHEMAS,
   isSpatialMotionProperty,
@@ -383,3 +398,18 @@ export { effectAssetIds, validateEffectInputs } from "./effects/inputs";
 export { MAX_LIQUIFY_DABS, validateLiquifyDabs } from "./effects/liquify/strokes";
 export type { LiquifyDab } from "./effects/liquify/strokes";
 export { LIQUIFY_MODES } from "./effects/liquify/definition";
+export { fitOutputRegion, resolveOutputFraming } from "./export/framing";
+export type { OutputFraming } from "./export/framing";
+export {
+  BACKGROUND_CATEGORIES,
+  BACKGROUND_PRESETS,
+  getBackgroundPreset,
+} from "./paint/background-presets";
+export type { BackgroundPreset, BackgroundCategory } from "./paint/background-presets";
+export { backgroundLayer, backgroundPresetLayer } from "./paint/background-recipe";
+export type {
+  BackgroundPresetOptions,
+  ApplyBackgroundPresetCommand,
+} from "./paint/background-recipe";
+
+export { SPATIAL_NUMBERS } from "./spatial/validation";

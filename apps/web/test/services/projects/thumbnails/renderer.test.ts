@@ -298,3 +298,19 @@ it("always guards asynchronous source preparation against disposal even without 
   expect(submit).not.toHaveBeenCalled();
   expect(d.encode).not.toHaveBeenCalled();
 });
+
+it("scales previews to delivered framing while retaining original composition and one renderer", async () => {
+  const d = fixture(),
+    page = createPage({ width: 800, height: 600 });
+  const framing = { width: 1080, height: 1920 };
+  await d.renderer.render(page, {}, undefined, 384, { framing });
+  expect(d.session.withCanvasFrame).toHaveBeenCalledWith(
+    page,
+    {},
+    expect.any(Function),
+    expect.objectContaining({ framing, scale: 384 / 1920 }),
+  );
+  await d.renderer.render(page, {}, undefined, 384, { framing: { width: 1920, height: 1080 } });
+  expect(d.factory).toHaveBeenCalledOnce();
+  await d.renderer.dispose();
+});

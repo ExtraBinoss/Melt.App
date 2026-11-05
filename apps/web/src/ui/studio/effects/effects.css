@@ -1,0 +1,70 @@
+.studio-effects-popover {
+  width: min(360px, calc(100vw - 32px));
+  padding: 12px;
+}
+.studio-effects-owner {
+  display: grid;
+  gap: 3px;
+  margin-bottom: 10px;
+}
+.studio-effects-owner strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.studio-effects-owner span {
+  color: var(--muted-foreground);
+  font-size: 11px;
+}
+.studio-effects-navigation {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 10px;
+}
+.studio-effect-catalog {
+  display: grid;
+  gap: 8px;
+}
+.studio-effect-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3px;
+  max-height: 340px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.studio-effect-options button {
+  justify-content: flex-start;
+  white-space: normal;
+  height: auto;
+  min-height: 32px;
+  text-align: start;
+}
+.studio-effects-stack {
+  display: grid;
+  gap: 7px;
+  max-height: min(520px, 65vh);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.studio-effect-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 8px;
+}
+.studio-effect-card summary {
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+}
+.studio-effect-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 3px;
+  margin-top: 5px;
+}
+.studio-effect-actions > [data-slot="switch"] {
+  margin-inline-end: auto;
+}

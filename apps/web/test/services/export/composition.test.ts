@@ -218,3 +218,23 @@ test("an empty artboard fails before constructing a multi-artboard archive", asy
   ).rejects.toThrow(/empty/);
   expect(d.download).not.toHaveBeenCalled();
 });
+
+test("output framing reaches the existing image renderer without changing the captured canonical page", async () => {
+  const d = fixture(),
+    before = d.engine.getSnapshot();
+  const framing = { width: 16, height: 32, region: { x: 16, y: 0, width: 32, height: 32 } };
+  const result = await d.run(
+    {
+      mode: "static",
+      compositionId: "b",
+      scale: 2,
+      framing,
+      image: { format: "png", quality: 1, allPages: false },
+    },
+    d.scope(),
+  );
+  expect(d.image.mock.calls[0]![0]).toBe(before.project.pages.find((page) => page.id === "b"));
+  expect(d.image.mock.calls[0]![2]).toMatchObject({ framing, scale: 2 });
+  expect(result).toMatchObject({ width: 32, height: 64 });
+  expect(d.engine.getSnapshot()).toBe(before);
+});

@@ -6,5 +6,18 @@
   "hint": "Crie uma camada de fundo normal para sobrepor efeitos. O preenchimento continua editável nos dois espaços de trabalho e nas exportações.",
   "name": "Fundo",
   "select": "Selecionar camada de fundo",
-  "locked": "Desbloqueie esta camada no painel de composição para editar o fundo."
+  "locked": "Desbloqueie esta camada no painel de composição para editar o fundo.",
+  "presets": "Coleção de gradientes",
+  "previewHint": "Passe o cursor para pré-visualizar na composição. Um clique aplica cores e efeitos editáveis.",
+  "categories": {
+    "plastic": "Plástico brilhante",
+    "cinematic": "Cinema",
+    "social": "Redes sociais",
+    "editorial": "Editorial",
+    "atmosphere": "Atmosfera"
+  },
+  "ingredients": {
+    "grain": "Grão",
+    "feather": "Suavizar bordas"
+  }
 }

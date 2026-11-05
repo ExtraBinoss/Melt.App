@@ -6,5 +6,18 @@
   "hint": "创建普通背景图层以叠加效果。其填充在两个工作区和导出文件中均可编辑。",
   "name": "背景",
   "select": "选择背景图层",
-  "locked": "在合成面板中解锁此图层以编辑其背景。"
+  "locked": "在合成面板中解锁此图层以编辑其背景。",
+  "presets": "渐变集",
+  "previewHint": "悬停可在作品中预览。单击应用可编辑的颜色和效果。",
+  "categories": {
+    "plastic": "光泽塑料",
+    "cinematic": "电影",
+    "social": "社交",
+    "editorial": "编辑",
+    "atmosphere": "氛围"
+  },
+  "ingredients": {
+    "grain": "颗粒",
+    "feather": "羽化"
+  }
 }

@@ -1,0 +1,10 @@
+{
+  "addEffect": "Effect toevoegen",
+  "addGrade": "Kleurcorrectie toevoegen",
+  "composition": "Compositie",
+  "layerScope": "Van toepassing op het geselecteerde object",
+  "compositionScope": "Van toepassing op de hele compositie",
+  "singleSelection": "Selecteer één object om de effecten te bewerken.",
+  "locked": "Ontgrendel dit object om de effecten te bewerken.",
+  "stack": "Stapel ({{count}})"
+}

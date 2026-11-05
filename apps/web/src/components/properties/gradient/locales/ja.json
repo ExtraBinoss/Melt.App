@@ -26,5 +26,11 @@
   "empty": "保存したグラデーションはありません",
   "loadError": "グラデーションを読み込めませんでした。",
   "saveError": "変更を保存できませんでした。",
-  "preset": "グラデーション {{number}}"
+  "preset": "グラデーション {{number}}",
+  "radialcenterX": "中心 X",
+  "radialcenterY": "中心 Y",
+  "radialradius": "半径",
+  "radialellipse": "楕円",
+  "radialcircle": "円",
+  "radialShape": "形状"
 }

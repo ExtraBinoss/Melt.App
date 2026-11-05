@@ -178,3 +178,30 @@ test("holds optional snapshots for the entire export workspace and releases on u
   view.unmount();
   expect(activity.optionalBusy()).toBe(false);
 });
+
+test("format presets control delivered image dimensions without editing the document", async () => {
+  const d = setup(),
+    before = d.engine.getSnapshot();
+  d.services.exportComposition = vi.fn(async () => ({
+    mode: "static" as const,
+    filename: "story.png",
+    mimeType: "image/png",
+    bytes: 12,
+    width: 1080,
+    height: 1920,
+  }));
+  const view = d.mount(
+    <ExportWorkspace engine={d.engine} services={d.services} onClose={vi.fn()} />,
+  );
+  fireEvent.click(view.container.querySelector('[data-preset-id="instagram-story"]')!);
+  expect(screen.getByText(/1080 × 1920 px/)).toBeInTheDocument();
+  fireEvent.click(screen.getByRole("button", { name: "Exporter l’image" }));
+  await waitFor(() =>
+    expect(d.services.exportComposition).toHaveBeenCalledWith(
+      expect.objectContaining({ framing: { width: 1080, height: 1920 }, scale: 1 }),
+      expect.objectContaining({ page: d.page }),
+    ),
+  );
+  await waitFor(() => expect(getExportJobs(d.engine).pending).toBe(false));
+  expect(d.engine.getSnapshot()).toBe(before);
+});

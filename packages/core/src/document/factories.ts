@@ -74,6 +74,7 @@ export function createPage(patch: Partial<Composition> = {}): Composition {
     height: 1080,
     background: "#ffffff",
     layers: [],
+    effects: [],
     guides: [],
     ...patch,
   };

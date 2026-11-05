@@ -1,0 +1,45 @@
+{
+  "variantName": "{{base}} · {{variant}}",
+  "materialCategories": {
+    "plastic": "Plastiques",
+    "metal": "Métaux",
+    "glass": "Verres",
+    "ceramic": "Céramiques",
+    "stone": "Pierres",
+    "fabric": "Tissus",
+    "iridescent": "Iridescents",
+    "emissive": "Lumineux"
+  },
+  "environmentCategories": {
+    "studio": "Studio",
+    "daylight": "Lumière du jour",
+    "interior": "Intérieurs",
+    "night": "Nuit",
+    "color": "Couleurs"
+  },
+  "variants": {
+    "ivory": "Ivoire",
+    "coral": "Corail",
+    "mint": "Menthe",
+    "cobalt": "Cobalt",
+    "lemon": "Citron",
+    "rose": "Rose",
+    "lavender": "Lavande",
+    "graphite": "Graphite",
+    "terracotta": "Terre cuite",
+    "navy": "Bleu marine",
+    "sage": "Sauge",
+    "cherry": "Cerise",
+    "teal": "Bleu canard",
+    "side": "Lumière latérale",
+    "split": "Lumière divisée",
+    "ceiling": "Plafonnier",
+    "rim": "Contre-jour",
+    "strip": "Bande lumineuse",
+    "window": "Fenêtre",
+    "cross": "Lumière croisée",
+    "tunnel": "Tunnel",
+    "halo": "Halo",
+    "low": "Lumière basse"
+  }
+}

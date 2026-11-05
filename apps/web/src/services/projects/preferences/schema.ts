@@ -5,6 +5,8 @@ export const projectPreferencesKey = (projectId: string) =>
 
 export const preferenceFields = [
   "workspaceMode",
+  "studioCatalogOpen",
+  "studioCapture",
   "workspaceLayout",
   "sidebarLayout",
   "timelineHeight",
@@ -27,6 +29,42 @@ export function validateProjectPreferences(value: unknown): ProjectLayoutPrefere
   )
     throw new Error("Invalid project layout preferences.");
   const result: ProjectLayoutPreferences = {};
+  if (value.studioCatalogOpen !== undefined) {
+    const open = value.studioCatalogOpen;
+    if (
+      !record(open) ||
+      Object.keys(open).length > 32 ||
+      Object.entries(open).some(
+        ([key, active]) =>
+          !/^(material|environment):[a-z-]{1,32}$/.test(key) || typeof active !== "boolean",
+      )
+    )
+      throw new Error("Invalid Studio category preferences.");
+    result.studioCatalogOpen = { ...open } as Record<string, boolean>;
+  }
+  if (value.studioCapture !== undefined) {
+    const frame = value.studioCapture;
+    if (
+      !record(frame) ||
+      Object.keys(frame).length !== 5 ||
+      typeof frame.preset !== "string" ||
+      frame.preset.length > 100 ||
+      !finite(frame.width, 1, 16384) ||
+      !finite(frame.height, 1, 16384) ||
+      !Number.isInteger(frame.width) ||
+      !Number.isInteger(frame.height) ||
+      typeof frame.full !== "boolean" ||
+      typeof frame.visible !== "boolean"
+    )
+      throw new Error("Invalid Studio capture preference.");
+    result.studioCapture = {
+      preset: frame.preset,
+      width: frame.width,
+      height: frame.height,
+      full: frame.full,
+      visible: frame.visible,
+    };
+  }
   if (value.workspaceMode !== undefined) {
     if (value.workspaceMode !== "classic" && value.workspaceMode !== "studio")
       throw new Error("Invalid workspace mode preference.");

@@ -1,0 +1,10 @@
+{
+  "addEffect": "Effekt hinzufügen",
+  "addGrade": "Farbkorrektur hinzufügen",
+  "composition": "Komposition",
+  "layerScope": "Gilt für das ausgewählte Objekt",
+  "compositionScope": "Gilt für die gesamte Komposition",
+  "singleSelection": "Wähle ein Objekt, um seine Effekte zu bearbeiten.",
+  "locked": "Entsperre dieses Objekt, um seine Effekte zu bearbeiten.",
+  "stack": "Stapel ({{count}})"
+}

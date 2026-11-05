@@ -166,7 +166,8 @@
     "edge-detect": "Contouren en contrastgrenzen zichtbaar maken.",
     "window-trails": "Verschoven venstervormige sporen herhalen.",
     "morph": "Tussen vormtoestanden interpoleren.",
-    "transition": "Binnenkomst of vertrek van een laag animeren."
+    "transition": "Binnenkomst of vertrek van een laag animeren.",
+    "feather": "Zachte elliptische transparantie met instelbaar middelpunt, straal en zachtheid."
   },
   "commandLabels": {
     "togglePlayback": "Afspelen / pauzeren",

@@ -1,0 +1,10 @@
+{
+  "addEffect": "Dodaj efekt",
+  "addGrade": "Dodaj korekcję kolorów",
+  "composition": "Kompozycja",
+  "layerScope": "Dotyczy zaznaczonego obiektu",
+  "compositionScope": "Dotyczy całej kompozycji",
+  "singleSelection": "Wybierz jeden obiekt, aby edytować jego efekty.",
+  "locked": "Odblokuj ten obiekt, aby edytować jego efekty.",
+  "stack": "Stos ({{count}})"
+}

@@ -1,0 +1,10 @@
+{
+  "addEffect": "Add effect",
+  "addGrade": "Add color grade",
+  "composition": "Composition",
+  "layerScope": "Applies to the selected item",
+  "compositionScope": "Applies to the entire composition",
+  "singleSelection": "Select one item to edit its effects.",
+  "locked": "Unlock this item to edit its effects.",
+  "stack": "Stack ({{count}})"
+}

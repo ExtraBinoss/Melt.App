@@ -17,9 +17,6 @@ const StudioBackground = lazy(() =>
 const StudioLibrary = lazy(() =>
   import("./library/StudioLibrary").then((module) => ({ default: module.StudioLibrary })),
 );
-const StudioAgentActivity = lazy(() =>
-  import("./agent/StudioAgentActivity").then((module) => ({ default: module.StudioAgentActivity })),
-);
 
 /** A presentation-only leaf: switching chrome never replaces the engine or canvas. */
 export function WorkspaceModeBoundary({ children }: { children: ReactNode }) {
@@ -62,9 +59,6 @@ export function StudioWorkspaceChrome(props: {
           />
         </>
       )}
-      <div className="studio-agent-anchor" data-canvas-control>
-        <StudioAgentActivity engine={props.engine} />
-      </div>
     </Suspense>
   );
 }

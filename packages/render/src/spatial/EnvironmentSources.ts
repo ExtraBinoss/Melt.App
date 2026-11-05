@@ -1,9 +1,8 @@
-import { isSceneAsset, type Asset, type SpatialScene } from "@musart/core";
+import { isSceneAsset, spatialEnvironment, type Asset, type SpatialScene } from "@musart/core";
 import {
   Color,
   EquirectangularReflectionMapping,
   PMREMGenerator,
-  Mesh,
   type CubeRenderTarget,
   type Texture,
   type Scene,
@@ -11,7 +10,7 @@ import {
   type WebGPURenderer,
 } from "three/webgpu";
 import { decodeEnvironment, disposeEnvironmentInput } from "./environment-input";
-import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+import { createProceduralEnvironment } from "./procedural-environment";
 import { GpuResourceCache, type GpuResource } from "../cache/GpuResourceCache";
 import { assetIdentity } from "../cache/keys";
 import { pmremScratchBytes, pmremTargetBytes } from "./pmrem-budget";
@@ -102,30 +101,11 @@ export class EnvironmentSources {
     } else {
       this.getGenerator();
       this.cache.ensureCapacity(key, pmremTargetBytes(256));
-      const room = new RoomEnvironment();
+      const room = createProceduralEnvironment(spatialEnvironment(settings.preset));
       try {
-        const colors: Record<string, string> = {
-          sunset: "#FFB781",
-          dawn: "#E0C6FF",
-          night: "#8D9AD8",
-          neon: "#D59BFF",
-          warm: "#FFE1BC",
-          cool: "#BDDDFF",
-          gallery: "#F2ECE5",
-          overcast: "#D3DBE6",
-          contrast: "#AAAAAA",
-          softbox: "#EEEEFF",
-        };
-        const tint = new Color(colors[settings.preset] ?? "#FFFFFF");
-        room.traverse((node) => {
-          if (node instanceof Mesh)
-            for (const material of Array.isArray(node.material) ? node.material : [node.material])
-              if ("color" in material && material.color instanceof Color)
-                material.color.multiply(tint);
-        });
         await this.generator!.compileCubemapShader();
         if (!canContinue()) throw new DOMException("3D preparation superseded", "AbortError");
-        target = this.generator!.fromScene(room, 0.04, 0.1, 100, { size: 128 });
+        target = this.generator!.fromScene(room.scene, 0.04, 0.1, 100, { size: 128 });
       } finally {
         room.dispose();
       }

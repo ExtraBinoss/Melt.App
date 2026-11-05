@@ -166,7 +166,8 @@
     "edge-detect": "Extraer contornos y límites de contraste.",
     "window-trails": "Repetir estelas desplazadas con forma de ventana.",
     "morph": "Interpolar entre estados de formas.",
-    "transition": "Animar la entrada o salida de una capa."
+    "transition": "Animar la entrada o salida de una capa.",
+    "feather": "Desvanecimiento elíptico de transparencia con centro, radio y suavidad editables."
   },
   "commandLabels": {
     "togglePlayback": "Reproducir / pausar",

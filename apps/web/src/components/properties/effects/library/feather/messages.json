@@ -1,0 +1,110 @@
+{
+  "en": {
+    "name": "Feather",
+    "parameter": {
+      "centerX": "Center X",
+      "centerY": "Center Y",
+      "radius": "Radius",
+      "softness": "Soft edge"
+    }
+  },
+  "fr": {
+    "name": "Contour progressif",
+    "parameter": {
+      "centerX": "Centre X",
+      "centerY": "Centre Y",
+      "radius": "Rayon",
+      "softness": "Bord doux"
+    }
+  },
+  "de": {
+    "name": "Weiche Kante",
+    "parameter": {
+      "centerX": "Mitte X",
+      "centerY": "Mitte Y",
+      "radius": "Radius",
+      "softness": "Weicher Rand"
+    }
+  },
+  "es": {
+    "name": "Desvanecer bordes",
+    "parameter": {
+      "centerX": "Centro X",
+      "centerY": "Centro Y",
+      "radius": "Radio",
+      "softness": "Borde suave"
+    }
+  },
+  "it": {
+    "name": "Sfuma bordi",
+    "parameter": {
+      "centerX": "Centro X",
+      "centerY": "Centro Y",
+      "radius": "Raggio",
+      "softness": "Bordo morbido"
+    }
+  },
+  "pt": {
+    "name": "Suavizar bordas",
+    "parameter": {
+      "centerX": "Centro X",
+      "centerY": "Centro Y",
+      "radius": "Raio",
+      "softness": "Borda suave"
+    }
+  },
+  "nl": {
+    "name": "Zachte rand",
+    "parameter": {
+      "centerX": "Middelpunt X",
+      "centerY": "Middelpunt Y",
+      "radius": "Straal",
+      "softness": "Zachte rand"
+    }
+  },
+  "pl": {
+    "name": "Miękkie krawędzie",
+    "parameter": {
+      "centerX": "Środek X",
+      "centerY": "Środek Y",
+      "radius": "Promień",
+      "softness": "Miękka krawędź"
+    }
+  },
+  "ja": {
+    "name": "境界ぼかし",
+    "parameter": {
+      "centerX": "中心 X",
+      "centerY": "中心 Y",
+      "radius": "半径",
+      "softness": "境界の柔らかさ"
+    }
+  },
+  "ko": {
+    "name": "가장자리 페더",
+    "parameter": {
+      "centerX": "중심 X",
+      "centerY": "중심 Y",
+      "radius": "반경",
+      "softness": "부드러운 가장자리"
+    }
+  },
+  "zh": {
+    "name": "羽化",
+    "parameter": {
+      "centerX": "中心 X",
+      "centerY": "中心 Y",
+      "radius": "半径",
+      "softness": "柔和边缘"
+    }
+  },
+  "ar": {
+    "name": "تنعيم الحواف",
+    "parameter": {
+      "centerX": "المركز X",
+      "centerY": "المركز Y",
+      "radius": "نصف القطر",
+      "softness": "حافة ناعمة"
+    }
+  }
+}

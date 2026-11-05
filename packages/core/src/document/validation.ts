@@ -241,6 +241,18 @@ export function validateProject(value: unknown): asserts value is Project {
     assertRecord(page);
     assertUniqueId(page.id, ids);
     validatePageMetadata(page);
+    if (page.effects !== undefined) {
+      assertList(page.effects, 64);
+      for (const effect of page.effects) {
+        validateEffect(effect, ids);
+        ensure(
+          !EFFECT_CATALOG[(effect as Effect).type].source,
+          "INVALID_DOCUMENT",
+          "Composition effects cannot require layer geometry",
+        );
+        validateEffectInputs(effect as Effect, value.assets as Record<string, Asset>);
+      }
+    }
     assertList(page.layers, 10000);
     assertList(page.guides, 1000);
     for (const layer of page.layers) validateLayer(layer, ids, value.assets);

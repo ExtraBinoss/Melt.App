@@ -1,0 +1,10 @@
+{
+  "addEffect": "Adicionar efeito",
+  "addGrade": "Adicionar gradação de cor",
+  "composition": "Composição",
+  "layerScope": "Aplica-se ao objeto selecionado",
+  "compositionScope": "Aplica-se à composição inteira",
+  "singleSelection": "Selecione um objeto para editar os seus efeitos.",
+  "locked": "Desbloqueie este objeto para editar os seus efeitos.",
+  "stack": "Pilha ({{count}})"
+}

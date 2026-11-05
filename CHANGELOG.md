@@ -6,6 +6,11 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Added
 
+- Add 65 categorized editable background recipes, native circle/ellipse gradient positioning and radius, and a reusable GPU Feather effect. Preview complete native grain/Feather recipes on hover or focus with cancellation and commit through one typed headless-compatible command with atomic undo.
+- Expand native catalogs to 134 materials and 62 environments with generated sphere atlases, initially expanded remembered categories, simple contextual controls and exact compatibility for legacy environment lighting.
+- Add composition-wide stackable effects and color grades through the existing validated effect operators, GPU graph, cache keys, asset references, serialization and undo/export paths.
+- Add shared capture guides and export aspect presets/custom dimensions with SVG thumbnails, visible-window sampling and final GPU texture cropping for previews, stills, motion and timelapses without reflowing the original document.
+
 - Complete workspace-switch translations and runtime registration in all twelve supported interface languages.
 - Add a switchable Studio workspace in the project-name menu while retaining the same engine, canvas, document, selection, history and export pipeline as Classic. Add native quick insertion, compact canonical pages/layers, direct text/font/extrusion controls, themed accessible material/environment sliders, editable stackable background effects, SVG extrusion and a static Studio Starter template. Keep interface mode project-local, restore legacy projects in Classic and support explicit headless Studio creation/screenshots.
 - Prevent concurrent gizmo/composition precompilation from silently disabling native 3D controls, and keep direct template creation unavailable until its click handler is hydrated.
@@ -37,6 +42,11 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 - Add the 3-minute Melt promotional film in `films/melt-promo` (Remotion, 1920×1080): real homepage and dashboard captures with continuous camera moves, a faithful editor recreation, the travelling Melt mascot, the retained Melt Mascot export, and a code-generated music + UI-effects soundtrack.
 
 ### Changed
+
+- Render rectangle and ellipse fill gradients through Melt’s shared GPU paint uniforms, preserving solid primitive instancing and stroke coverage. Verify exported recipe color variation as well as native Feather alpha.
+
+- Make Studio immersive and quieter: full-viewport active composition, icon-only quick insertion, closed contextual panels, centered object properties, flat neutral sliders, equal export controls and no visible agent activity panel. Keep the original Classic view and canonical document when switching interfaces; constrain proportional model size against every native axis limit.
+- Account for composition-wide effect surfaces, shared scratch and input textures in GPU preview admission. Preserve native effect-map resolution when an original is also used by a small image layer. On the documented production Studio Starter cohort, measure median native preview presentation of 20.4 ms for roughness and 5.4 ms for gradient recipes (seven samples each), zero editor-parent React commits/readbacks and no additional idle draws.
 
 - Shorten owner-controlled production CI to named static checks, build, Cloudflare configuration and native HTTP/WASM delivery checks. Move full unit tests and coverage enforcement out of the deployment workflow while preserving the explicit full quality command and existing thresholds. Reuse a bounded Bun download cache across jobs, save it before later failures, and remove test-only FFmpeg installation; retain all production identity, approval and artifact-integrity guards.
 

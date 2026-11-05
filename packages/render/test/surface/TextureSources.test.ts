@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
+  createEffect,
   createLayer,
   createPage,
   createProject,
@@ -293,4 +294,25 @@ it("closes resized bitmaps when strict allocation fails, preserving the visible 
   expect(closed).toHaveBeenCalledOnce();
   expect(originalClosed).toHaveBeenCalledOnce();
   expect(cache.stats().cacheBytes).toBe(0);
+});
+
+it("keeps native originals for composition effect maps also used by small plain image layers", async () => {
+  const cache = new GpuResourceCache();
+  const sources = new TextureSources(cache, 16384);
+  const page = createPage({
+    layers: [createLayer("image", { assetId: "image", width: 20, height: 20 })],
+    effects: [createEffect("displace", { inputs: { map: "image" } })],
+  });
+  const close = vi.fn();
+  const resize = vi.fn().mockResolvedValue({ width: 20, height: 15, close });
+  vi.stubGlobal("createImageBitmap", resize);
+  try {
+    await sources.prepare(page, { image: asset }, { imageSourceScale: 0.5 });
+    expect(resize).not.toHaveBeenCalled();
+    expect(cache.stats().cacheBytes).toBe(asset.width * asset.height * 4);
+    expect(context.getImageData).not.toHaveBeenCalled();
+  } finally {
+    await sources.dispose();
+    cache.clear();
+  }
 });

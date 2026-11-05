@@ -1,0 +1,18 @@
+{
+  "guides": "捕获参考线",
+  "title": "捕获区域",
+  "full": "完整视图",
+  "custom": "自定义",
+  "width": "宽度",
+  "height": "高度",
+  "showGuide": "显示捕获参考线",
+  "exportFrame": "输出取景",
+  "original": "原始合成",
+  "format": "格式",
+  "scene": "场景",
+  "portrait": "竖向",
+  "landscape": "横向",
+  "square": "正方形",
+  "captureHint": "仅导出高亮显示的区域。",
+  "customHint": "选择输出尺寸，无需更改合成。"
+}

@@ -1,3 +1,4 @@
+import { featherNode } from "./feather/node";
 import { liquifyNode } from "./liquify/node";
 import { tornEdgesNode } from "./torn-edges/node";
 import { terminalNode } from "./terminal/node";
@@ -50,6 +51,7 @@ export const EFFECT_NODES: Readonly<
     EffectNodeBuilder
   >
 > = Object.freeze({
+  feather: featherNode,
   terminal: terminalNode,
   liquify: liquifyNode,
   "torn-edges": tornEdgesNode,

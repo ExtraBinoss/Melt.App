@@ -5,7 +5,7 @@ import { createSpatialScene, SPATIAL_ENVIRONMENTS, type EnginePort } from "@musa
 import { useDocumentSnapshot } from "../../../state/session/use-document-snapshot";
 import { motionTimeChanges } from "../../../state/session/motion-edit";
 import { useCurrentSceneEdit } from "../../../components/spatial/use-current-scene-edit";
-import { SelectField } from "../../../components/shared/SelectField";
+import { EnvironmentPicker } from "../catalog/EnvironmentPicker";
 import { StudioDock } from "../controls/StudioDock";
 import { StudioSlider } from "../controls/StudioSlider";
 import "../../../components/spatial/messages";
@@ -19,7 +19,6 @@ export const StudioEnvironment = memo(function StudioEnvironment({
   run: (task: () => void) => void;
 }) {
   const { t } = useTranslation("studioChrome");
-  const { t: spatialText } = useTranslation("spatial");
   const snapshot = useDocumentSnapshot(engine, true);
   const page = snapshot.project.pages.find((item) => item.id === snapshot.pageId)!;
   const settings = useMemo(() => page.spatial ?? createSpatialScene(), [page.spatial]);
@@ -36,33 +35,13 @@ export const StudioEnvironment = memo(function StudioEnvironment({
   };
   const asset = environment.assetId ? snapshot.project.assets[environment.assetId] : undefined;
   return (
-    <StudioDock
-      title={t("scene")}
-      icon={<Sun size={15} />}
-      className="studio-environment"
-      initiallyOpen={false}
-    >
+    <StudioDock title={t("scene")} icon={<Sun size={15} />} className="studio-environment">
       <div className="studio-field-title">{t("environment")}</div>
-      <SelectField
-        label={t("environment")}
+      <EnvironmentPicker
+        embedded
         value={environment.assetId ?? environment.preset}
-        identity={identity}
-        contentAttributes={{ "data-canvas-control": true }}
-        options={[
-          ...(environment.assetId
-            ? [{ value: environment.assetId, label: asset?.name ?? t("environment") }]
-            : []),
-          ...SPATIAL_ENVIRONMENTS.map((value) => ({
-            value,
-            label: spatialText(`environments.${value}`),
-          })),
-        ]}
-        onPreview={(preset) => {
-          if (current() && SPATIAL_ENVIRONMENTS.some((item) => item === preset))
-            edit.preview({ ...settings, environment: { ...environment, preset, assetId: null } });
-        }}
-        onPreviewCancel={edit.cancel}
-        onValueChange={(preset) => {
+        assetName={environment.assetId ? (asset?.name ?? t("environment")) : undefined}
+        onChoose={(preset) => {
           if (current() && SPATIAL_ENVIRONMENTS.some((item) => item === preset))
             edit.commit({ ...settings, environment: { ...environment, preset, assetId: null } });
         }}

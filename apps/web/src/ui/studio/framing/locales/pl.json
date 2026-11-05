@@ -1,0 +1,18 @@
+{
+  "guides": "Prowadnice kadrowania",
+  "title": "Obszar przechwytywania",
+  "full": "Pełny widok",
+  "custom": "Własne",
+  "width": "Szerokość",
+  "height": "Wysokość",
+  "showGuide": "Pokaż prowadnicę kadrowania",
+  "exportFrame": "Kadr wyjściowy",
+  "original": "Oryginalna kompozycja",
+  "format": "Format",
+  "scene": "Scena",
+  "portrait": "Pionowy",
+  "landscape": "Poziomy",
+  "square": "Kwadratowy",
+  "captureHint": "Eksportowany jest tylko wyróżniony obszar.",
+  "customHint": "Wybierz wymiary wyjściowe bez zmiany kompozycji."
+}

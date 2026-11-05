@@ -26,5 +26,11 @@
   "empty": "Brak zapisanych gradientów",
   "loadError": "Nie udało się wczytać gradientów.",
   "saveError": "Nie udało się zapisać zmiany.",
-  "preset": "Gradient {{number}}"
+  "preset": "Gradient {{number}}",
+  "radialcenterX": "Środek X",
+  "radialcenterY": "Środek Y",
+  "radialradius": "Promień",
+  "radialellipse": "Elipsa",
+  "radialcircle": "Koło",
+  "radialShape": "Kształt"
 }

@@ -14,6 +14,8 @@ import { animatePresentationProgress } from "../../components/shared/motion/pres
 import { createResizeAnchor } from "./resize-anchor";
 import { createViewportMetrics } from "./viewport-metrics";
 import { ViewMotion } from "./motion";
+import { immersiveView } from "./immersive";
+import { useWorkspaceMode } from "../../ui/studio/workspace-mode";
 import type { ArtboardWorkspace } from "../artboards/layout";
 import {
   zoomAt,
@@ -34,10 +36,22 @@ function clearPanIdle(idle: PanIdle) {
   idle.timer = undefined;
 }
 
+function createImmersiveMode() {
+  let active = false;
+  return {
+    read: () => active,
+    write: (next: boolean) => {
+      active = next;
+    },
+  };
+}
+
 function createMotion(
   workspace: WorkspaceSource,
   metrics: ReturnType<typeof createViewportMetrics>,
   media: MediaQueryList,
+  immersive: ReturnType<typeof createImmersiveMode>,
+  engine: EnginePort,
 ) {
   return new ViewMotion({
     clock: {
@@ -47,7 +61,9 @@ function createMotion(
     },
     reduced: () => media.matches,
     constrain: (next) => {
-      return constrainView(next, workspace.read(), metrics.read());
+      return immersive.read()
+        ? immersiveView(workspace.read(), metrics.read(), engine.getSnapshot().pageId, next)
+        : constrainView(next, workspace.read(), metrics.read());
     },
   });
 }
@@ -82,11 +98,16 @@ export function useViewport({
   layoutKey: string;
   projectId: string;
 }) {
+  const studio = useWorkspaceMode() === "studio";
+  const immersive = useMemo(() => createImmersiveMode(), []);
+  const activeId = engine.getSnapshot().pageId;
+  const remembered = useRef<{ projectId: string; mode: boolean } | null>(null);
+  const classicView = useRef<ReturnType<typeof fitView> | null>(null);
   const media = useMemo(() => matchMedia("(prefers-reduced-motion: reduce)"), []);
   const metrics = useMemo(() => createViewportMetrics(viewport), [viewport]);
   const motion = useMemo(
-    () => createMotion(workspace, metrics, media),
-    [workspace, metrics, media],
+    () => createMotion(workspace, metrics, media, immersive, engine),
+    [workspace, metrics, media, engine, immersive],
   );
   const view = useSyncExternalStore(
     motion.subscribeSettled,
@@ -101,6 +122,20 @@ export function useViewport({
     [motion, metrics, workspace, media, engine],
   );
   const panIdle = useMemo<PanIdle>(() => ({ timer: undefined }), []);
+  useLayoutEffect(() => {
+    const previous = remembered.current;
+    const rect = metrics.measure();
+    if (previous?.projectId === projectId && !previous.mode && studio)
+      classicView.current = motion.read();
+    if (previous?.projectId !== projectId) classicView.current = null;
+    immersive.write(studio);
+    if (rect) {
+      if (studio) motion.jump(immersiveView(workspace.read(), rect, activeId));
+      else if (previous?.mode && previous.projectId === projectId)
+        motion.jump(classicView.current ?? fitView(workspace.read(), rect));
+    }
+    remembered.current = { projectId, mode: studio };
+  }, [studio, activeId, projectId, workspace, metrics, motion, immersive]);
   const previousLayout = useRef<{ projectId: string; layout: ArtboardWorkspace } | null>(null);
   useLayoutEffect(() => {
     const layout = workspace.read(),
@@ -109,6 +144,10 @@ export function useViewport({
     if (!previous || previous.projectId !== projectId || previous.layout === layout) return;
     const rect = metrics.measure();
     if (!rect) return;
+    if (immersive.read()) {
+      motion.jump(immersiveView(layout, rect, engine.getSnapshot().pageId, motion.read()));
+      return;
+    }
     const shown = motion.read(),
       old = previous.layout;
     const rebased = {
@@ -133,7 +172,7 @@ export function useViewport({
       motion.reframe(rebased, false);
       motion.animateTo(fitView(layout, rect), true);
     }
-  }, [motion, metrics, projectId, layoutKey, workspace]);
+  }, [motion, metrics, projectId, layoutKey, workspace, engine, immersive]);
   useEffect(() => {
     motion.activate();
     viewRef.current = motion.read();
@@ -163,10 +202,15 @@ export function useViewport({
   useEffect(() => {
     const frame = requestAnimationFrame(() => {
       const rect = metrics.measure();
-      if (rect) motion.jump(fitView(workspace.read(), rect));
+      if (rect)
+        motion.jump(
+          immersive.read()
+            ? immersiveView(workspace.read(), rect, engine.getSnapshot().pageId)
+            : fitView(workspace.read(), rect),
+        );
     });
     return () => cancelAnimationFrame(frame);
-  }, [motion, metrics, projectId, workspace]);
+  }, [motion, metrics, projectId, workspace, engine, immersive]);
   useEffect(
     () =>
       actions.subscribeFocus((target) => {
@@ -191,16 +235,28 @@ export function useViewport({
         const handlers = {
           fit: () => {
             const rect = metrics.measure();
-            if (rect) motion.animateTo(fitView(workspace.read(), rect));
+            if (rect)
+              motion.animateTo(
+                immersive.read()
+                  ? immersiveView(workspace.read(), rect, engine.getSnapshot().pageId)
+                  : fitView(workspace.read(), rect),
+              );
           },
           reset: () => motion.animateTo(INITIAL_VIEW),
-          recenter: () => motion.animateTo({ ...motion.read(), x: 0, y: 0 }),
+          recenter: () => {
+            const rect = metrics.measure();
+            motion.animateTo(
+              immersive.read() && rect
+                ? immersiveView(workspace.read(), rect, engine.getSnapshot().pageId)
+                : { ...motion.read(), x: 0, y: 0 },
+            );
+          },
           zoomIn: () => motion.zoomBy(1.2, { x: 0, y: 0 }),
           zoomOut: () => motion.zoomBy(1 / 1.2, { x: 0, y: 0 }),
         };
         handlers[action]();
       }),
-    [actions, workspace, motion, metrics, panIdle, resizeAnchor],
+    [actions, workspace, motion, metrics, panIdle, resizeAnchor, engine, immersive],
   );
   useEffect(() => {
     const element = viewport.current;

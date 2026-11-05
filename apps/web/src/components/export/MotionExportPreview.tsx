@@ -1,6 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { selectionComposition, type Composition, type Project } from "@musart/core";
+import {
+  selectionComposition,
+  type Composition,
+  type Project,
+  type OutputFraming,
+} from "@musart/core";
 import { PreviewPreparation } from "./PreviewPreparation";
 import { PreviewAudio } from "../../services/motion/audio/preview";
 import { MediaPlayer } from "../shared/player/MediaPlayer";
@@ -17,6 +22,7 @@ export function MotionExportPreview({
   onReady,
   selection,
   centerSelection = false,
+  framing,
 }: {
   project: Project;
   page: Composition;
@@ -24,6 +30,7 @@ export function MotionExportPreview({
   paused?: boolean;
   selection?: readonly string[];
   centerSelection?: boolean;
+  framing?: OutputFraming;
   onReady?: (preview: ReturnType<typeof createMotionPreview> | null) => void;
 }) {
   const { t } = useTranslation("exportPanel");
@@ -31,10 +38,11 @@ export function MotionExportPreview({
   const [slider] = useState(() => createSliderValue([0]));
   const [monitor, setMonitor] = useState<PreviewAudio | undefined>();
   const source = useRef<ReturnType<typeof createMotionPreview> | null>(null);
+  const retiring = useRef<Promise<void>>(Promise.resolve());
   const pauseRequested = useRef(paused);
   const owner = useMemo(
-    () => ({ project, page, selection, centerSelection }),
-    [project, page, selection, centerSelection],
+    () => ({ project, page, selection, centerSelection, framing }),
+    [project, page, selection, centerSelection, framing],
   );
   const [playing, setPlaying] = useState(true);
   const [presentation, setPresentation] = useState<{
@@ -55,12 +63,14 @@ export function MotionExportPreview({
       if (document.hidden) preview?.pause();
     };
     void import("@musart/render")
-      .then(({ createMotionPreview }) => {
+      .then(async ({ createMotionPreview }) => {
+        await retiring.current;
         if (!active) return;
         preview = createMotionPreview(project, {
           compositionId: page.id,
           selection,
           centerSelection,
+          framing,
           edge: 768,
           mediaResolver: services.mediaResolverFor?.(project.id),
           fontResolver: services.fonts?.resolve,
@@ -154,10 +164,22 @@ export function MotionExportPreview({
       document.removeEventListener("visibilitychange", hidden);
       if (source.current === preview) source.current = null;
       onReady?.(null);
-      if (managed) void managed.dispose().catch(() => {});
-      else if (preview) void preview.dispose().catch(() => {});
+      retiring.current = (managed?.dispose() ?? preview?.dispose() ?? retiring.current).catch(
+        () => {},
+      );
     };
-  }, [project, page, services, paused, onReady, slider, selection, centerSelection, owner]);
+  }, [
+    project,
+    page,
+    services,
+    paused,
+    onReady,
+    slider,
+    selection,
+    centerSelection,
+    framing,
+    owner,
+  ]);
   useEffect(() => {
     pauseRequested.current = paused;
     if (paused) source.current?.pause();

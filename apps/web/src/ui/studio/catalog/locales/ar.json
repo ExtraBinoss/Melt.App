@@ -1,0 +1,45 @@
+{
+  "variantName": "{{base}} · {{variant}}",
+  "materialCategories": {
+    "plastic": "البلاستيك",
+    "metal": "المعادن",
+    "glass": "الزجاج",
+    "ceramic": "السيراميك",
+    "stone": "الحجر",
+    "fabric": "الأقمشة",
+    "iridescent": "متقزح",
+    "emissive": "مضيء"
+  },
+  "environmentCategories": {
+    "studio": "الاستوديو",
+    "daylight": "ضوء النهار",
+    "interior": "المساحات الداخلية",
+    "night": "الليل",
+    "color": "الألوان"
+  },
+  "variants": {
+    "ivory": "عاجي",
+    "coral": "مرجاني",
+    "mint": "نعناعي",
+    "cobalt": "كوبالتي",
+    "lemon": "ليموني",
+    "rose": "وردي",
+    "lavender": "خزامي",
+    "graphite": "جرافيتي",
+    "terracotta": "طيني",
+    "navy": "كحلي",
+    "sage": "مريمي",
+    "cherry": "كرزي",
+    "teal": "أزرق مخضر",
+    "side": "ضوء جانبي",
+    "split": "ضوء منقسم",
+    "ceiling": "ضوء سقفي",
+    "rim": "ضوء حواف",
+    "strip": "شريط ضوئي",
+    "window": "نافذة",
+    "cross": "ضوء متقاطع",
+    "tunnel": "نفق",
+    "halo": "هالة",
+    "low": "ضوء منخفض"
+  }
+}

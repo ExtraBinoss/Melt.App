@@ -1,4 +1,11 @@
-import type { Command, CommandCommitInfo, EnginePort, Project, ReplaySpec } from "@musart/core";
+import type {
+  Command,
+  CommandCommitInfo,
+  EnginePort,
+  OutputFraming,
+  Project,
+  ReplaySpec,
+} from "@musart/core";
 import type { EditorServices } from "../../state/contracts";
 import { createMotionTransport } from "../motion/transport";
 import { getAnimationSession, type AnimationState } from "../animation/session";
@@ -39,6 +46,7 @@ export interface AutomationApi {
     scale?: number;
     format?: "png" | "jpeg" | "webp";
     forceWebGL?: boolean;
+    framing?: OutputFraming;
   }): Promise<string>;
 }
 declare global {
@@ -117,6 +125,7 @@ export function attachAutomation(engine: EnginePort, services: EditorServices) {
         const canvas = await renderComposition(page, project.assets, {
           ...media,
           scale: options.scale,
+          ...(options.framing ? { framing: options.framing } : {}),
           forceWebGL: true,
           ...(services.fonts ? { fontResolver: services.fonts.resolve } : {}),
         });

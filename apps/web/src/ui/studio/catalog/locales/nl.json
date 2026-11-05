@@ -1,0 +1,45 @@
+{
+  "variantName": "{{base}} · {{variant}}",
+  "materialCategories": {
+    "plastic": "Kunststoffen",
+    "metal": "Metalen",
+    "glass": "Glas",
+    "ceramic": "Keramiek",
+    "stone": "Steen",
+    "fabric": "Stoffen",
+    "iridescent": "Iridescent",
+    "emissive": "Lichtgevend"
+  },
+  "environmentCategories": {
+    "studio": "Studio",
+    "daylight": "Daglicht",
+    "interior": "Interieurs",
+    "night": "Nacht",
+    "color": "Kleur"
+  },
+  "variants": {
+    "ivory": "Ivoor",
+    "coral": "Koraal",
+    "mint": "Munt",
+    "cobalt": "Kobalt",
+    "lemon": "Citroen",
+    "rose": "Roos",
+    "lavender": "Lavendel",
+    "graphite": "Grafiet",
+    "terracotta": "Terracotta",
+    "navy": "Marineblauw",
+    "sage": "Salie",
+    "cherry": "Kers",
+    "teal": "Blauwgroen",
+    "side": "Zijlicht",
+    "split": "Gesplitst licht",
+    "ceiling": "Plafondlicht",
+    "rim": "Randlicht",
+    "strip": "Lichtstrook",
+    "window": "Raam",
+    "cross": "Kruislicht",
+    "tunnel": "Tunnel",
+    "halo": "Halo",
+    "low": "Laag licht"
+  }
+}

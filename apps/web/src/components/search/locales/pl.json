@@ -166,7 +166,8 @@
     "edge-detect": "Wyodrębnij kontury i granice kontrastu.",
     "window-trails": "Powielaj przesunięte smugi w kształcie okien.",
     "morph": "Interpoluj między stanami kształtów.",
-    "transition": "Animuj wejście lub wyjście warstwy."
+    "transition": "Animuj wejście lub wyjście warstwy.",
+    "feather": "Miękka eliptyczna przezroczystość z edytowalnym środkiem, promieniem i miękkością."
   },
   "commandLabels": {
     "togglePlayback": "Odtwórz / wstrzymaj",

@@ -166,7 +166,8 @@
     "edge-detect": "Estrai contorni e confini di contrasto.",
     "window-trails": "Ripeti scie sfalsate a forma di finestra.",
     "morph": "Interpola tra stati delle forme.",
-    "transition": "Anima l'entrata o l'uscita di un livello."
+    "transition": "Anima l'entrata o l'uscita di un livello.",
+    "feather": "Sfumatura ellittica della trasparenza con centro, raggio e morbidezza modificabili."
   },
   "commandLabels": {
     "togglePlayback": "Riproduci / pausa",

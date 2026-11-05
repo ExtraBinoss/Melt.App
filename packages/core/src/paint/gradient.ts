@@ -10,6 +10,12 @@ export interface GradientStop {
 export interface FillGradient {
   kind: "linear" | "radial";
   angle: number;
+  /** Normalized radial ellipse center and radius (legacy defaults: .5, .5, .5). */
+  centerX?: number;
+  centerY?: number;
+  radius?: number;
+  /** Missing preserves the legacy artboard ellipse; circles use the shorter artboard dimension. */
+  radialShape?: "ellipse" | "circle";
   stops: GradientStop[];
 }
 
@@ -21,6 +27,15 @@ export function validateFillGradient(value: unknown): asserts value is FillGradi
     "Unknown gradient kind",
   );
   assertNumber(value.angle, -360000, 360000);
+  for (const key of ["centerX", "centerY"] as const)
+    if (value[key] !== undefined) assertNumber(value[key], 0, 1);
+  if (value.radialShape !== undefined)
+    ensure(
+      value.radialShape === "ellipse" || value.radialShape === "circle",
+      "INVALID_DOCUMENT",
+      "Unknown radial gradient shape",
+    );
+  if (value.radius !== undefined) assertNumber(value.radius, 0.01, 4);
   assertList(value.stops, 8);
   ensure(value.stops.length >= 2, "INVALID_DOCUMENT", "A gradient needs 2 to 8 stops");
   let previous = 0;

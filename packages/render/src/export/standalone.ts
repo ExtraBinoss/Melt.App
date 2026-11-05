@@ -1,4 +1,4 @@
-import type { Asset, Composition } from "@musart/core";
+import { resolveOutputFraming, type Asset, type Composition } from "@musart/core";
 import { LinearSRGBColorSpace, NoToneMapping, WebGPURenderer } from "three/webgpu";
 import { GpuCompositor } from "../compositing/GpuCompositor";
 import type { RenderOptions } from "../compositing/types";
@@ -73,6 +73,7 @@ export class StandaloneRenderer {
       if (this.disposed) throw new Error("L’export GPU est fermé.");
       if (options.canRender && !options.canRender())
         throw new DOMException("Rendering deferred.", "AbortError");
+      const output = resolveOutputFraming(page, options.framing, options.scale);
       await this.init(
         options.videoSources ?? this.mediaDefaults.videoSources ?? usesVideoSources(page, assets),
       );
@@ -81,12 +82,16 @@ export class StandaloneRenderer {
         mediaMode: "exact",
         ...this.mediaDefaults,
         ...options,
+        scale: output.scale,
+        ...(options.imageSourceScale !== undefined
+          ? { imageSourceScale: (options.imageSourceScale * output.scale) / (options.scale ?? 1) }
+          : {}),
       });
       // Playback presents on the same ordered GPU queue; upload rings retain
       // native frames until acknowledgement. Exact exports keep the explicit fence.
       if (mediaMode !== "playback" && page.layers.some((layer) => layer.kind === "video"))
         await this.compositor!.settleMedia();
-      this.presentation!.render(frame);
+      this.presentation!.render(frame, options.framing ? { ...output, source: page } : undefined);
       return consume(this.renderer!.domElement);
     });
     this.queue = job.catch(() => undefined);

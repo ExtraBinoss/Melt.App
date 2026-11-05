@@ -1,3 +1,4 @@
+import feather from "./library/feather/messages.json";
 import halftone from "./library/halftone/messages.json";
 import liquify from "./library/liquify/messages.json";
 import tornEdges from "./library/torn-edges/messages.json";
@@ -30,6 +31,7 @@ import receipt from "./library/receipt/messages.json";
 import pinkPhosphor from "./library/pink-phosphor/messages.json";
 /** UI resources stay on the web side; the core catalog only contains stable label keys. */
 export const libraryMessages = {
+  feather,
   terminal,
   halftone,
   liquify,

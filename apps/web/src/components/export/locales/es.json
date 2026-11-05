@@ -9,5 +9,6 @@
   "targetSize": "Tamaño objetivo",
   "fileSize": "Tamaño del archivo",
   "targetSizeHint": "Calculado con la tasa de bits objetivo. Una tasa variable puede generar un archivo más pequeño o más grande. La estimación se actualiza durante la exportación.",
-  "measuredSizeHint": "Tamaño de la última exportación completada con estos ajustes."
+  "measuredSizeHint": "Tamaño de la última exportación completada con estos ajustes.",
+  "framedBleedHint": "El sangrado requiere exportar toda la mesa de trabajo. Elige Vista completa sin ventana de captura para activarlo."
 }
