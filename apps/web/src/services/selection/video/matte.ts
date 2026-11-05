@@ -62,11 +62,15 @@ export async function createPersonMatte(onProgress?: (event: ModelDownloadEvent)
           alpha.dims.at(-2) !== height
         )
           throw Error("RVM returned an invalid person matte.");
-        const values = (await alpha.getData()) as Uint16Array;
-        if (values.length !== area) throw Error("RVM returned an incomplete alpha plane.");
+        const values = await alpha.getData();
+        if (!ArrayBuffer.isView(values) || values.byteLength !== area * 2)
+          throw Error("RVM returned an incomplete alpha plane.");
+        // ORT exposes Float16Array on modern browsers and Uint16Array elsewhere.
+        // Always read the underlying half-float bits, including sliced tensor views.
+        const bits = new Uint16Array(values.buffer, values.byteOffset, area);
         const rgba = new Uint8ClampedArray(area * 4);
         for (let i = 0; i < area; i++) {
-          const a = Math.max(0, Math.min(1, halfValue(values[i]!))) * 255;
+          const a = Math.max(0, Math.min(1, halfValue(bits[i]!))) * 255;
           rgba[i * 4] = rgba[i * 4 + 1] = rgba[i * 4 + 2] = a;
           rgba[i * 4 + 3] = 255;
         }

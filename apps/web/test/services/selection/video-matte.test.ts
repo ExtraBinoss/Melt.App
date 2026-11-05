@@ -1,4 +1,5 @@
 import { expect, it, vi } from "vitest";
+import { Tensor } from "onnxruntime-web";
 import {
   createPersonMatte,
   halfUnit,
@@ -58,7 +59,8 @@ it("retains recurrent states between frames, releases replaced GPU tensors and f
   const alpha = () => ({
     type: "float16",
     dims: [1, 1, 1, 2],
-    getData: async () => Uint16Array.from([halfUnit(0.5), halfUnit(1)]),
+    getData: async () =>
+      Uint16Array.from([0xffff, halfUnit(0.5), halfUnit(1), 0xffff]).subarray(1, 3),
     dispose: vi.fn(),
   });
   fake.run
@@ -86,4 +88,29 @@ it("normalizes source colors and preserves finite soft alpha", () => {
   expect(halfValue(halfUnit(0.5) | 32768)).toBe(-0.5);
   expect(() => halfValue(0x7c00)).toThrow("alpha");
   expect(() => halfValue(0x7e00)).toThrow("alpha");
+});
+it("preserves native Float16Array alpha from the real ORT tensor instead of interpreting decimal values as encoded bits", async () => {
+  fake.create.mockResolvedValue({ run: fake.run, release: fake.release });
+  const model = await createPersonMatte();
+  const values = Uint16Array.from([
+    0xffff,
+    0,
+    halfUnit(0.5),
+    halfUnit(1),
+    halfUnit(0.25),
+    0xffff,
+  ]).subarray(1, 5);
+  const alpha = new Tensor("float16", values, [1, 1, 1, 4]);
+  const data = await alpha.getData();
+  expect(Object.prototype.toString.call(data)).toBe("[object Float16Array]");
+  const states = Object.fromEntries(
+    ["r1o", "r2o", "r3o", "r4o"].map((name) => [name, { dispose: vi.fn() }]),
+  );
+  fake.run.mockResolvedValueOnce({ pha: alpha, ...states });
+  try {
+    const rgba = await model.frame(new Uint8ClampedArray(16), 4, 1);
+    expect([rgba[0], rgba[4], rgba[8], rgba[12]]).toEqual([0, 128, 255, 64]);
+  } finally {
+    await model.dispose();
+  }
 });
