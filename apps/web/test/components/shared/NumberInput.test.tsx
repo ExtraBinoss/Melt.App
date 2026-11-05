@@ -9,6 +9,7 @@ const render = (node: ReactNode) =>
     wrapper: ({ children }) => <TooltipProvider skipDelayDuration={0}>{children}</TooltipProvider>,
   });
 import { NumberInput } from "../../../src/components/shared/NumberInput";
+import { isEditingShortcutTarget } from "../../../src/state/keybindings/matching";
 beforeEach(async () => {
   await i18n.changeLanguage("fr");
 });
@@ -136,6 +137,26 @@ test("scrubs with threshold, snapping and one commit; cancel restores canonical 
   fireEvent.pointerDown(handle, { clientX: 10, button: 0, pointerId: 3 });
   fireEvent.pointerUp(handle, { clientX: 10, pointerId: 3 });
   expect(screen.getByLabelText("Angle")).toHaveFocus();
+});
+test("a completed label scrub leaves text editing and commits an existing typed draft only once", () => {
+  const commit = vi.fn(),
+    preview = vi.fn();
+  render(<NumberInput label="Width" value={10} onCommit={commit} onPreview={preview} />);
+  const input = screen.getByRole("textbox", { name: "Width" }),
+    handle = screen.getByRole("button", { name: "Ajuster Width" });
+  input.focus();
+  fireEvent.change(input, { target: { value: "20" } });
+  fireEvent.pointerDown(handle, { button: 0, clientX: 0, pointerId: 1 });
+  fireEvent.pointerMove(handle, { clientX: 40, pointerId: 1 });
+  expect(commit).not.toHaveBeenCalled();
+  expect(input).toHaveFocus();
+  fireEvent.pointerUp(handle, { clientX: 40, pointerId: 1 });
+  expect(commit).toHaveBeenCalledExactlyOnceWith(28);
+  expect(input).toHaveValue("28");
+  expect(input).not.toHaveFocus();
+  expect(isEditingShortcutTarget(document.activeElement)).toBe(false);
+  fireEvent.blur(input);
+  expect(commit).toHaveBeenCalledOnce();
 });
 test("clamps shift keyboard steps and cancels lost pointer capture", () => {
   const cancel = vi.fn();

@@ -5,6 +5,7 @@ test("Studio guides stay in the capture popup, preview colors, undo inputs and l
   page,
 }) => {
   test.setTimeout(90000);
+  await page.routeWebSocket("**", () => {});
   await page.addInitScript(() => {
     localStorage.setItem("musart.language", "en");
     localStorage.setItem("musart.editor-tutorial.v1", "done");
@@ -42,6 +43,58 @@ test("Studio guides stay in the capture popup, preview colors, undo inputs and l
   const toggle = popover.getByRole("switch", { name: "Show guides", exact: true });
   await toggle.click();
   await popover.locator('[data-preset-id="tiktok-video"]').click();
+  const width = popover.getByRole("textbox", { name: "Width", exact: true });
+  const height = popover.getByRole("textbox", { name: "Height", exact: true });
+  const revision = await page.evaluate(() => window.musart!.snapshot().revision);
+  await width.fill("1200");
+  expect(
+    await page.evaluate(() => window.musart!.snapshot().project.pages[0]!.captureGuides!.width),
+  ).toBe(1080);
+  await width.press("Enter");
+  expect(await page.evaluate(() => window.musart!.snapshot().revision)).toBe(revision + 1);
+  await page.keyboard.press("Control+z");
+  await expect(width).toHaveValue("1080");
+  await page.keyboard.press("Control+Shift+z");
+  await expect(width).toHaveValue("1200");
+  await height.fill("2048");
+  await height.press("Tab");
+  expect(
+    await page.evaluate(() => window.musart!.snapshot().project.pages[0]!.captureGuides!.height),
+  ).toBe(2048);
+  await page.keyboard.press("Control+z");
+  await expect(height).toHaveValue("1920");
+  await page.keyboard.press("Control+Shift+z");
+  await expect(height).toHaveValue("2048");
+  await width.fill("1080");
+  await width.press("Enter");
+  await height.fill("1920");
+  await height.press("Enter");
+  for (const focused of [toggle, width]) {
+    await focused.focus();
+    const beforeScrub = await page.evaluate(() => window.musart!.snapshot().revision);
+    const scrub = (await popover
+      .getByRole("button", { name: "Adjust Width", exact: true })
+      .boundingBox())!;
+    await page.mouse.move(scrub.x + scrub.width / 2, scrub.y + scrub.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(scrub.x + scrub.width / 2 + 35, scrub.y + scrub.height / 2, { steps: 5 });
+    await page.mouse.up();
+    expect(await page.evaluate(() => window.musart!.snapshot().revision)).toBe(beforeScrub + 1);
+    const draggedWidth = await width.inputValue();
+    expect(draggedWidth).not.toBe("1080");
+    await page.keyboard.press("Control+z");
+    await expect(width).toHaveValue("1080");
+    expect(
+      await page.evaluate(() => window.musart!.snapshot().project.pages[0]!.captureGuides!.width),
+    ).toBe(1080);
+    await page.keyboard.press("Control+Shift+z");
+    await expect(width).toHaveValue(draggedWidth);
+    expect(
+      await page.evaluate(() => window.musart!.snapshot().project.pages[0]!.captureGuides!.width),
+    ).toBe(Number(draggedWidth));
+    await width.fill("1080");
+    await width.press("Enter");
+  }
   await popover.getByRole("combobox", { name: "Guide color", exact: true }).click();
   await page.getByRole("option", { name: "Magenta", exact: true }).hover();
   await expect(page.locator("[data-studio-capture]")).toHaveCSS(

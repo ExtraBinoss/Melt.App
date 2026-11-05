@@ -64,12 +64,19 @@ export function useShortcuts(
       const target = event.target;
       const capture =
         target instanceof HTMLElement ? target.closest("[data-keybinding-capture]") : null;
+      // Local parameter popovers retain focus after scrubbing. Their completed
+      // edits use document history; editable fields and modal dialogs keep native ownership.
+      const historyPopover =
+        (command === "action:undo" || command === "action:redo") &&
+        target instanceof HTMLElement &&
+        target.closest('[data-slot="popover-content"][data-canvas-control]');
       const documentScope = Boolean(
-        capture?.hasAttribute("data-document-shortcuts") &&
-        (command === "action:undo" ||
-          command === "action:redo" ||
-          command === "action:save" ||
-          command === "action:togglePlayback"),
+        historyPopover ||
+        (capture?.hasAttribute("data-document-shortcuts") &&
+          (command === "action:undo" ||
+            command === "action:redo" ||
+            command === "action:save" ||
+            command === "action:togglePlayback")),
       );
       if (capture && !documentScope) return;
       if (command !== "action:save" && isEditingShortcutTarget(target, { documentScope })) return;

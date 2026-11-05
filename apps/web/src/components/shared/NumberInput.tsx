@@ -255,8 +255,13 @@ function DesktopNumberInput({
     if (cancel || active.origin !== origin) {
       if (field.current) field.current.value = originalDisplay();
       onCancel?.();
-    } else if (active.moved) commit(active.next);
-    else {
+    } else if (active.moved) {
+      // Pointer capture keeps the textbox focused. Finish its editing ownership
+      // without committing the same draft again through the native blur handler.
+      skipBlur.current = true;
+      field.current?.blur();
+      commit(active.next);
+    } else {
       field.current?.focus();
       field.current?.select();
     }

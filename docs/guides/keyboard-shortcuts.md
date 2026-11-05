@@ -2,7 +2,7 @@
 
 These tables list MusArt's **default shortcuts**. They cover familiar creative-editor actions and MusArt's own tools. Every command binding can be changed in **Preferences → Shortcuts**, including commands with no default key. The shortcut shown in the app always reflects your current settings.
 
-**Ctrl** below means **Ctrl on Windows/Linux** and **Cmd (⌘) on macOS**. **Alt** means **Option (⌥) on macOS**. Shortcuts act on the canvas; text fields, menus and dialogs keep their normal keyboard behavior. Save also works while editing a field.
+**Ctrl** below means **Ctrl on Windows/Linux** and **Cmd (⌘) on macOS**. **Alt** means **Option (⌥) on macOS**. Shortcuts act on the canvas; text fields, menus and dialogs keep their normal keyboard behavior. Save also works while editing a field. Undo and Redo also work from nonmodal canvas parameter popovers after a committed edit. Releasing a numeric label drag ends text-field editing so these shortcuts reach document history; unfinished text input keeps its native keyboard behavior.
 
 ## Everyday editing
 

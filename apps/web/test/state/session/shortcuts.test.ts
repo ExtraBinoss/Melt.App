@@ -211,7 +211,7 @@ test("maps tool shortcuts and routes keyboard document commands through the same
     ["o", "ellipse"],
     ["t", "text"],
     ["w", "wand"],
-    ["s", "segment"],
+    ["s", "pointer"],
   ]) {
     await act(() => fireEvent.keyDown(document, { key }));
     expect(d.store.get(toolAtom)).toBe(tool);
@@ -407,4 +407,59 @@ test("Ctrl/Cmd Space plays Motion from canvas and timeline controls, respecting 
   hook.unmount();
   panel.remove();
   transport.dispose();
+});
+
+test("parameter popovers route document history while native fields, menus and modal dialogs retain ownership", async () => {
+  const d = setup();
+  const hook = renderHook(() => useShortcuts(d.engine, d.services, d.onTask), {
+    wrapper: ({ children }) => createElement(Provider, { store: d.store }, children),
+  });
+  const popup = document.createElement("div");
+  popup.setAttribute("role", "dialog");
+  popup.setAttribute("data-slot", "popover-content");
+  popup.setAttribute("data-canvas-control", "");
+  const button = document.createElement("button");
+  const input = document.createElement("input");
+  const menu = document.createElement("div");
+  menu.setAttribute("role", "menu");
+  const menuButton = document.createElement("button");
+  menu.append(menuButton);
+  popup.append(button, input, menu);
+  document.body.append(popup);
+  try {
+    const before = d.engine.getSnapshot().project;
+    act(() => d.engine.execute({ type: "updateLayers", ids: [d.rectangle.id], patch: { x: 57 } }));
+    const after = d.engine.getSnapshot().project;
+    await act(async () => {
+      fireEvent.keyDown(button, { key: "z", ctrlKey: true });
+    });
+    expect(d.engine.getSnapshot().project).toEqual(before);
+    await act(async () => {
+      fireEvent.keyDown(button, { key: "z", ctrlKey: true, shiftKey: true });
+    });
+    expect(d.engine.getSnapshot().project).toEqual(after);
+    for (const target of [input, menuButton]) {
+      await act(async () => {
+        fireEvent.keyDown(target, { key: "z", ctrlKey: true });
+      });
+      expect(d.engine.getSnapshot().project).toBe(after);
+    }
+    popup.setAttribute("aria-modal", "true");
+    await act(async () => {
+      fireEvent.keyDown(button, { key: "z", ctrlKey: true });
+    });
+    expect(d.engine.getSnapshot().project).toBe(after);
+    popup.removeAttribute("aria-modal");
+    popup.removeAttribute("data-canvas-control");
+    await act(async () => {
+      fireEvent.keyDown(button, { key: "z", ctrlKey: true });
+    });
+    expect(d.engine.getSnapshot().project).toBe(after);
+    popup.setAttribute("data-canvas-control", "");
+    fireEvent.keyDown(button, { key: "r" });
+    expect(d.store.get(toolAtom)).toBe("pointer");
+  } finally {
+    popup.remove();
+    hook.unmount();
+  }
 });
