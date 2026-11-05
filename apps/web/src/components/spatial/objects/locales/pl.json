@@ -19,5 +19,8 @@
   "imported": "Dodano model",
   "learnMore": "Źródło i licencja",
   "previous": "Poprzedni",
-  "next": "Następny"
+  "next": "Następny",
+  "vectorPartLimit": "Ten SVG wymaga ponad 256 wypełnionych części w 3D. Uprość ścieżki.",
+  "vectorOutlineLimit": "Ten SVG jest zbyt szczegółowy dla 3D. Uprość ścieżki.",
+  "vectorOutlineFailed": "Nie udało się przekształcić obrysu SVG w wypełniony kontur 3D."
 }

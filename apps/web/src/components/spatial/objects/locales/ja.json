@@ -19,5 +19,8 @@
   "imported": "モデルを追加しました",
   "learnMore": "配布元とライセンス",
   "previous": "前へ",
-  "next": "次へ"
+  "next": "次へ",
+  "vectorPartLimit": "このSVGは3Dで256個を超える塗りつぶしパーツが必要です。パスを簡略化してください。",
+  "vectorOutlineLimit": "このSVGは3Dの輪郭変換には複雑すぎます。パスを簡略化してください。",
+  "vectorOutlineFailed": "SVGの線を塗りつぶされた3Dの輪郭に変換できませんでした。"
 }

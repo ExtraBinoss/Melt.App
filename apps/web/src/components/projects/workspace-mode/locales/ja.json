@@ -1,5 +1,6 @@
 {
   "label": "ワークスペース",
   "classic": "クラシック",
-  "studio": "Studio"
+  "studio": "Studio",
+  "switching": "{{workspace}}に切り替え中…"
 }

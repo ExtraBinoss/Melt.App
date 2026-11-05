@@ -98,6 +98,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Complete the translated SVG-outline errors and workspace-switch loading labels across all supported locales.
+
 - Give primary buttons a subtle shared brand gradient while retaining the selected accent, readable labels, focus rings and disabled states. Preserve the gradient in Studio, landing, site, export and timelapse primary-action styles.
 
 - Move model, SVG and pack scrollbar gutters to the popover's right border while retaining internal content padding. Keep shallow layer trees free of horizontal overflow and reserve horizontal scrolling for expanded hierarchies that actually exceed the viewport.

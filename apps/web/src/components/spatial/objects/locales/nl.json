@@ -19,5 +19,8 @@
   "imported": "Model toegevoegd",
   "learnMore": "Bron en licentie",
   "previous": "Vorige",
-  "next": "Volgende"
+  "next": "Volgende",
+  "vectorPartLimit": "Deze SVG heeft meer dan 256 gevulde delen nodig voor 3D. Vereenvoudig de paden.",
+  "vectorOutlineLimit": "Deze SVG is te gedetailleerd voor 3D. Vereenvoudig de paden.",
+  "vectorOutlineFailed": "De SVG-lijn kon niet worden omgezet in een gevulde 3D-omtrek."
 }

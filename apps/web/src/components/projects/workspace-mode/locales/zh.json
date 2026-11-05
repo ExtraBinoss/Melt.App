@@ -1,5 +1,6 @@
 {
   "label": "工作区",
   "classic": "经典",
-  "studio": "Studio"
+  "studio": "Studio",
+  "switching": "正在切换到{{workspace}}…"
 }

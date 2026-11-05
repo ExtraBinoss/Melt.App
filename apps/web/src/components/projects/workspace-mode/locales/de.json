@@ -1,5 +1,6 @@
 {
   "label": "Arbeitsbereich",
   "classic": "Klassisch",
-  "studio": "Studio"
+  "studio": "Studio",
+  "switching": "Wechsel zu {{workspace}}…"
 }

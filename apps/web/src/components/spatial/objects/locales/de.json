@@ -19,5 +19,8 @@
   "imported": "Modell hinzugefügt",
   "learnMore": "Quelle und Lizenz",
   "previous": "Zurück",
-  "next": "Weiter"
+  "next": "Weiter",
+  "vectorPartLimit": "Dieses SVG benötigt mehr als 256 gefüllte Teile für 3D. Vereinfache die Pfade.",
+  "vectorOutlineLimit": "Dieses SVG ist für 3D zu detailliert. Vereinfache die Pfade.",
+  "vectorOutlineFailed": "Die SVG-Kontur konnte nicht in eine gefüllte 3D-Form umgewandelt werden."
 }

@@ -19,5 +19,8 @@
   "imported": "모델이 추가되었습니다",
   "learnMore": "출처 및 라이선스",
   "previous": "이전",
-  "next": "다음"
+  "next": "다음",
+  "vectorPartLimit": "이 SVG는 3D에 256개가 넘는 채워진 부분이 필요합니다. 경로를 단순화해 주세요.",
+  "vectorOutlineLimit": "이 SVG는 3D 윤곽선으로 변환하기에 너무 복잡합니다. 경로를 단순화해 주세요.",
+  "vectorOutlineFailed": "SVG 선을 채워진 3D 윤곽선으로 변환할 수 없습니다."
 }

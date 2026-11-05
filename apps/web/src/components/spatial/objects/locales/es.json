@@ -19,5 +19,8 @@
   "imported": "Modelo añadido",
   "learnMore": "Fuente y licencia",
   "previous": "Anterior",
-  "next": "Siguiente"
+  "next": "Siguiente",
+  "vectorPartLimit": "Este SVG necesita más de 256 partes rellenas para 3D. Simplifica sus trazados.",
+  "vectorOutlineLimit": "Este SVG es demasiado detallado para 3D. Simplifica sus trazados.",
+  "vectorOutlineFailed": "No se pudo convertir el trazo SVG en un contorno 3D relleno."
 }

@@ -19,5 +19,8 @@
   "imported": "已添加模型",
   "learnMore": "来源和许可证",
   "previous": "上一个",
-  "next": "下一个"
+  "next": "下一个",
+  "vectorPartLimit": "此SVG的3D转换需要超过256个填充部分，请简化路径。",
+  "vectorOutlineLimit": "此SVG过于复杂，无法转换为3D轮廓，请简化路径。",
+  "vectorOutlineFailed": "无法将SVG描边转换为填充的3D轮廓。"
 }
