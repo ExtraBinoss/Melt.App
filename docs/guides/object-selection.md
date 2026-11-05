@@ -114,10 +114,27 @@ They are licensed under GPL-3.0, independently of Melt's MIT code; see
 [license](../../apps/web/public/licenses/rvm-GPL-3.0.txt). No upstream inference
 implementation was copied. The [upstream inference contract](https://github.com/PeterL1n/RobustVideoMatting/blob/master/documentation/inference.md)
 specifies RGB 0–1 input, four recurrent states and a soft-alpha output. The pinned
-ONNX metadata was inspected without inference: source/recurrent/alpha tensors are
+ONNX graph uses source/recurrent/alpha tensors in
 FP16 and `downsample_ratio` is FP32. A 512-pixel prepared source uses ratio 1.
+RVM explicitly selects the WebGPU NCHW layout. With ONNX Runtime Web 1.31.1 on
+Intel Xe LPG, the default layout path produced an almost-black alpha on the real
+Second Skin clip, despite valid shapes and finite values. Selecting NCHW restored
+the person matte and agreed closely with CPU inference of the same pinned graph.
+This setting belongs to the RVM session; SAM and BiRefNet retain their own defaults.
 
 Small deterministic tests cover recurrent handoff/disposal, binary publication,
 cancellation, stale results and single-step undo/redo. Native video fixtures check
-decoded mask timing and transformed rendering. No real-model inference, quality
-comparison or latency benchmark was run, honoring the request to avoid model tests.
+decoded mask timing and transformed rendering. Real-model verification is opt-in:
+run Vite, then `bun scripts/verify-video-matte.ts`. It processes the full ten-second
+Second Skin original, checks decoded masks at five source times, and checks the
+alpha of transparent PNG exports on both native rendering backends. Set
+`MUSART_BASE_URL` to select the Vite server, and optionally `MUSART_RVM_MODEL` to a
+local copy of the pinned weights (the production downloader still checks its hash).
+Reports, encoded masks and PNGs go to ignored
+`artifacts/rvm-second-skin-verification/`. This is functional verification, not a
+production latency benchmark. See the [diagnosis](../rendering/rvm-second-skin.md).
+
+Regenerate previously created black video masks after updating: stored mask videos
+are immutable and are not changed by a runtime fix. A composition background or
+other layers still appear behind a correctly transparent person matte; the Second
+Skin template itself has a dark background and additional artistic effects.

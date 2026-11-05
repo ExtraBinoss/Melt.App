@@ -41,6 +41,9 @@ it("retains recurrent states between frames, releases replaced GPU tensors and f
     model = await createPersonMatte(progress);
   expect(progress).toHaveBeenLastCalledWith({ file: "rvm_mobilenetv3_fp16.onnx", status: "ready" });
   const options = fake.create.mock.calls[0]![1];
+  expect(options.executionProviders).toEqual([
+    { name: "webgpu", storageBufferCacheMode: "lazyRelease", preferredLayout: "NCHW" },
+  ]);
   expect(options.preferredOutputLocation).toEqual({
     r1o: "gpu-buffer",
     r2o: "gpu-buffer",

@@ -30,7 +30,13 @@ export async function createPersonMatte(onProgress?: (event: ModelDownloadEvent)
   const session = await ort.InferenceSession.create(
     await downloadModelFile(file, onProgress, VIDEO_BACKGROUND_MODEL),
     {
-      executionProviders,
+      // Preserve RVM's native NCHW layout: ORT 1.31's default layout path
+      // collapses alpha for this pinned FP16 graph despite valid tensor shapes.
+      executionProviders: executionProviders.map((provider) =>
+        typeof provider === "object" && provider.name === "webgpu"
+          ? { ...provider, preferredLayout: "NCHW" as const }
+          : provider,
+      ),
       preferredOutputLocation: Object.fromEntries(
         outputs.map((name) => [name, "gpu-buffer" as const]),
       ),
