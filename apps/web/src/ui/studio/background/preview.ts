@@ -54,6 +54,8 @@ export function createBackgroundRecipePreview(
       owned = {
         target: "page",
         patch: {
+          background: "#00000000",
+          backgroundGradient: undefined,
           layers: previous
             ? page.layers.map((item) => (item.id === previous.id ? layer : item))
             : [layer, ...page.layers],

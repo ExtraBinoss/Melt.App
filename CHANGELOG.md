@@ -4,6 +4,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ## [Unreleased]
 
+- Transfer background recipe paint ownership to its editable rectangle atomically, clearing the previous composition paint so resizing or feathering the rectangle cannot uncover an old gradient. Undo restores both paint owners.
+
 - Keep a Studio object's white contour continuous from hover through primary press and selection. Retain the same silhouette until pointer-up selection takes ownership, cancel hover normally on drags/cancellation, and keep selected contours steady instead of restarting hover pulses.
 
 - Align native 3D selection contours with the used source viewport instead of padded texture storage. Keep white selection strokes at a stable CSS-pixel width across zoom and preview density, including rotated sources, glyph counters and contour margins.

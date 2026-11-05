@@ -107,6 +107,10 @@ export const applyBackgroundPreset: CommandHandler<"applyBackgroundPreset"> = (
   page.layers = existing
     ? page.layers.map((item) => (item.id === existing.id ? layer : item))
     : [layer, ...page.layers];
+  // The recipe replaces the background paint. Keeping its previous gradient
+  // underneath makes resizing or feathering the new rectangle reveal a second fill.
+  page.background = "#00000000";
+  delete page.backgroundGradient;
   // Normal motion ownership is reconciled once; evaluating or hovering never authors keys.
   if (page.motion) {
     reconcileMotionLayers(page, nextId, before, project.assets);

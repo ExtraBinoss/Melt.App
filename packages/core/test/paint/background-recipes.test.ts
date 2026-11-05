@@ -45,13 +45,14 @@ test("65 distinct categorized recipes are portable native paints with editable e
   expect(recipe.effects.map((item) => item.type)).toEqual(["grain", "feather"]);
 });
 
-test("headless application preserves foreground/selection/page paint and round-trips an editable layer in one undo", () => {
+test("headless application replaces page paint and preserves foreground/selection and round-trips an editable layer in one undo", () => {
   const engine = fixture(),
     before = engine.getSnapshot();
   engine.execute({ type: "applyBackgroundPreset", presetId: recipe.id });
   const after = engine.getSnapshot(),
     page = after.project.pages[0]!;
-  expect(page.background).toBe(before.project.pages[0]!.background);
+  expect(page.background).toBe("#00000000");
+  expect(page.backgroundGradient).toBeUndefined();
   expect(page.layers[1]).toEqual(before.project.pages[0]!.layers[0]);
   expect(after.selection).toEqual(before.selection);
   const background = backgroundLayer(page)!;
@@ -139,4 +140,28 @@ test("pure recipe preparation does not mutate page data and accepts explicit nat
     radius: 1.1,
     radialShape: "circle",
   });
+});
+
+test("a background recipe owns its paint once, so resizing its rectangle cannot uncover the previous gradient", () => {
+  const engine = fixture();
+  engine.execute({
+    type: "updatePage",
+    patch: { backgroundGradient: BACKGROUND_PRESETS[0]!.gradient },
+  });
+  engine.load(engine.getSnapshot().project);
+  const before = engine.getSnapshot().project;
+  engine.execute({ type: "applyBackgroundPreset", presetId: recipe.id });
+  const id = backgroundLayer(engine.getSnapshot().project.pages[0]!)!.id;
+  engine.execute({
+    type: "updateLayerPatches",
+    patches: [{ id, patch: { width: 700, height: 400 } }],
+  });
+  const page = engine.getSnapshot().project.pages[0]!;
+  expect(backgroundLayer(page)).toBeUndefined();
+  expect(page.backgroundGradient).toBeUndefined();
+  expect(page.background).toBe("#00000000");
+  expect(page.layers[0]!.fillGradient).toEqual(recipe.gradient);
+  engine.undo();
+  engine.undo();
+  expect(engine.getSnapshot().project).toEqual(before);
 });

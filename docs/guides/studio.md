@@ -83,7 +83,9 @@ bleed. The original project and undo history remain intact.
 
 Background initially edits ordinary composition paint. **Enable background effects**
 copies it to a normal full-frame rectangle at the bottom of the layer stack in one
-validated transaction. Foreground selection is preserved.
+validated transaction. Foreground selection is preserved. Applying a background recipe transfers paint
+ownership to its rectangle and clears previous composition paint in the same
+undo entry, so shrinking it cannot reveal an older gradient underneath.
 The compact controls expose transparent, solid and gradient modes. Linear direction
 and radial position use the same captured-pointer pad as the camera, with live
 previews, cancellation and one undo entry. The advanced paint popover retains the
