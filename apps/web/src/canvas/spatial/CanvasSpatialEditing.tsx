@@ -143,7 +143,8 @@ export function CanvasSpatialEditing({
     <AnimatePresence>
       {visible && layer && (
         <ObjectToolbar
-          key={`${snapshot.project.id}:${page.id}:${layer.id}`}
+          key={`${snapshot.project.id}:${page.id}`}
+          layoutKey={`${layer.id}:${active}:${layer.kind}`}
           layerId={layer.id}
           controller={controller}
           view={viewSource}
@@ -151,7 +152,7 @@ export function CanvasSpatialEditing({
           allowDraft
           className="canvas-object-toolbar"
         >
-          <div className="spatial-canvas-toolbar" data-spatial-toolbar>
+          <div key={layer.id} className="spatial-canvas-toolbar" data-spatial-toolbar>
             <SegmentedTabs
               mode="choice"
               size="compact"

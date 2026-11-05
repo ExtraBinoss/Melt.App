@@ -6,6 +6,7 @@ import {
   multiplyMatrices,
   transformPoint,
   type Composition,
+  type Bounds,
   type Layer,
   type Point,
   type SnapCue,
@@ -22,6 +23,7 @@ export class TransformSnapping {
   constructor(
     private readonly page: Composition,
     private readonly layers: Layer[],
+    private readonly selectionBounds?: Bounds,
   ) {}
   private candidates(): SnapIndex {
     return (this.index ??= new SnapIndex(
@@ -56,7 +58,7 @@ export class TransformSnapping {
   ): SnappedTransform {
     const layer = this.layers[0];
     if (!layer) return { patches: [], cues: [] };
-    const raw = resizePatch(this.page, layer, handle, from, to, aspect);
+    const raw = resizePatch(this.page, layer, handle, from, to, aspect, this.selectionBounds);
     if (!enabled || handle === "rotate") return { patches: [raw], cues: [] };
     const geometry = createLayerGeometryIndex(this.page);
     const parent = layer.parentId ? geometry.worldMatrix(layer.parentId) : IDENTITY;
@@ -67,8 +69,12 @@ export class TransformSnapping {
     const corner = (patch: LayerPatch): Point => {
       const next = { ...layer, ...patch.patch };
       return transformPoint(multiplyMatrices(parent, layerTransform(next)), {
-        x: fractionX * next.width,
-        y: fractionY * next.height,
+        x: this.selectionBounds
+          ? this.selectionBounds.x + fractionX * this.selectionBounds.width
+          : fractionX * next.width,
+        y: this.selectionBounds
+          ? this.selectionBounds.y + fractionY * this.selectionBounds.height
+          : fractionY * next.height,
       });
     };
     const point = corner(raw),
@@ -79,12 +85,20 @@ export class TransformSnapping {
     if (aspect) {
       const matrix = geometry.worldMatrix(layer.id);
       const anchor = transformPoint(matrix, {
-        x: (1 - fractionX) * layer.width,
-        y: (1 - fractionY) * layer.height,
+        x: this.selectionBounds
+          ? this.selectionBounds.x + (1 - fractionX) * this.selectionBounds.width
+          : (1 - fractionX) * layer.width,
+        y: this.selectionBounds
+          ? this.selectionBounds.y + (1 - fractionY) * this.selectionBounds.height
+          : (1 - fractionY) * layer.height,
       });
       const original = transformPoint(matrix, {
-        x: fractionX * layer.width,
-        y: fractionY * layer.height,
+        x: this.selectionBounds
+          ? this.selectionBounds.x + fractionX * this.selectionBounds.width
+          : fractionX * layer.width,
+        y: this.selectionBounds
+          ? this.selectionBounds.y + fractionY * this.selectionBounds.height
+          : fractionY * layer.height,
       });
       const vector = { x: original.x - anchor.x, y: original.y - anchor.y };
       let distance = Infinity;
@@ -109,6 +123,7 @@ export class TransformSnapping {
       from,
       { x: to.x + corrected.x - point.x, y: to.y + corrected.y - point.y },
       aspect,
+      this.selectionBounds,
     );
     const achieved = corner(patch),
       axes = new Set(

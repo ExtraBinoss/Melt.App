@@ -66,7 +66,7 @@ import { QuickAdd } from "./quick-add/QuickAdd";
 import { CanvasSelection } from "./selection/CanvasSelection";
 import { useWorkspaceMode } from "../ui/studio/workspace-mode";
 import { useCanvasHover } from "./selection/use-canvas-hover";
-import { sourcePagePoint } from "./selection/frame-geometry";
+import { sourcePagePoint, sourceSelectionBounds } from "./selection/frame-geometry";
 import { canvasHit } from "./selection/hit";
 import * as pointerPick from "./interaction/pointer-pick";
 import { editablePresentedLayer, pickMotionPlayback } from "./selection/presented-pick";
@@ -204,6 +204,7 @@ export function EditorCanvas({
       view: viewRef.current,
       layers: [layer],
       handle,
+      selectionBounds: sourceSelectionBounds(controller, layer, viewport.current),
     };
   }
   function handlePointerDown(event: ReactPointerEvent<HTMLButtonElement>) {

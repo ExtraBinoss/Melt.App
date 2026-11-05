@@ -1,44 +1,6 @@
 import { useLayoutEffect, useRef, type ReactNode } from "react";
-import { motion, useAnimationControls, useIsPresent, useReducedMotion } from "motion/react";
-
-const ease = [0.22, 1, 0.36, 1] as const;
-
-/** Motion measures the real wrapped layout; no guessed widths or sampled size keys. */
-export function StudioObjectSurface({
-  children,
-  label,
-  layoutKey,
-}: {
-  children: ReactNode;
-  label: string;
-  layoutKey: string;
-}) {
-  const present = useIsPresent();
-  const reduced = useReducedMotion();
-  return (
-    <motion.div
-      className="studio-object-bar studio-surface"
-      data-canvas-control
-      data-studio-object-present={present}
-      aria-label={label}
-      aria-hidden={!present}
-      inert={!present}
-      layout={!reduced}
-      layoutDependency={layoutKey}
-      initial={reduced ? false : { opacity: 0, y: 12, scale: 0.97, filter: "blur(3px)" }}
-      animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
-      exit={{ opacity: 0, transition: { duration: reduced ? 0 : 0.1, ease: "easeOut" } }}
-      transition={{
-        duration: reduced ? 0 : 0.22,
-        ease,
-        layout: { duration: reduced ? 0 : 0.3, ease },
-      }}
-      style={{ transformOrigin: "50% 100%" }}
-    >
-      {children}
-    </motion.div>
-  );
-}
+import { motion, useAnimationControls, useReducedMotion } from "motion/react";
+import { contextualSurfaceEase as ease } from "../../../components/shared/motion/ContextualSurface";
 
 /** Stable semantic field keys preserve focus and active gestures across ordinary edits. */
 export function StudioObjectField({

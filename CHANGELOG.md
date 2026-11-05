@@ -4,6 +4,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ## [Unreleased]
 
+- Align Classic 3D selection, hover and the 2D/3D toolbar with prepared glyph bounds; resize visible content without changing text wrapping and rotate around its visible center in one undoable gesture.
+- Share Studio’s measured contextual toolbar growth with Classic, preserving the toolbar shell across object changes and honoring reduced motion.
 - Round numeric Undo/Redo descriptions to at most two decimal places while preserving full document and history precision.
 - Keep rendered 2D and 3D text colors when selecting letters for editing, with the existing selection highlight and caret.
 - Let a simple Classic canvas click select visible foreground artwork over an already-selected background, including native 3D text. Preserve selected-layer drag targeting, additive selection and undo behavior.

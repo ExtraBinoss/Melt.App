@@ -1,6 +1,12 @@
 import { clientToPage, type Point } from "../viewport/view";
 import type { ViewSource } from "../viewport/motion";
-import { createLayerGeometryIndex, LayerGeometryIndex, type Composition } from "@musart/core";
+import {
+  createLayerGeometryIndex,
+  LayerGeometryIndex,
+  type Composition,
+  type Layer,
+} from "@musart/core";
+import { resolveSelectionFrame } from "./selection-frame";
 interface Frame {
   readonly page: Composition;
 }
@@ -29,6 +35,15 @@ export function sourceGeometry(source: Source): LayerGeometryIndex {
   const index = frameGeometry(frame, previous?.index);
   sources.set(source, { page: frame.page, index });
   return index;
+}
+
+export function sourceSelectionBounds(source: Source, layer: Layer, viewport: HTMLElement | null) {
+  return resolveSelectionFrame(
+    source.read().page,
+    sourceGeometry(source),
+    layer,
+    viewport?.querySelector("canvas"),
+  ).bounds;
 }
 
 /** Convert input only inside its handler; never inspect a React ref during render. */

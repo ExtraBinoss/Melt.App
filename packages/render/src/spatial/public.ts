@@ -10,3 +10,4 @@ export type { SpatialResource } from "./SpatialResource";
 export { decodeEnvironment, disposeEnvironmentInput } from "./environment-input";
 export { pickSpatialLayer } from "./picking";
 export { SpatialSelectionContour } from "./SelectionContour";
+export { spatialSelectionBounds } from "./selection-bounds";

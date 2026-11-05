@@ -6,12 +6,14 @@ import {
   layerTransform,
   transformPoint,
   type Command,
+  type Bounds,
   type Composition,
   type Layer,
   type LayerGeometryIndex,
 } from "@musart/core";
 import { selectionContentBounds } from "../selection/content-bounds";
 import type { Point } from "../viewport/view";
+import { anchorSpatialFrame, spatialFramePatch } from "./spatial-frame-gesture";
 
 export type Tool =
   | "pointer"
@@ -106,10 +108,17 @@ export function resizePatch(
   from: Point,
   to: Point,
   keepAspect: boolean,
+  selectionBounds?: Bounds,
 ): LayerPatch {
   if (handle === "rotate") {
     const matrix = createLayerGeometryIndex(page).worldMatrix(layer.id);
-    const center = transformPoint(matrix, { x: layer.width / 2, y: layer.height / 2 });
+    const pivot = selectionBounds
+      ? {
+          x: selectionBounds.x + selectionBounds.width / 2,
+          y: selectionBounds.y + selectionBounds.height / 2,
+        }
+      : { x: layer.width / 2, y: layer.height / 2 };
+    const center = transformPoint(matrix, pivot);
     const angle =
       ((Math.atan2(to.y - center.y, to.x - center.x) -
         Math.atan2(from.y - center.y, from.x - center.x)) *
@@ -118,12 +127,23 @@ export function resizePatch(
     const rotation = layer.rotation + angle;
     return {
       layerId: layer.id,
-      patch: { rotation: keepAspect ? Math.round(rotation / 15) * 15 : rotation },
+      patch: selectionBounds
+        ? anchorSpatialFrame(
+            layer,
+            { rotation: keepAspect ? Math.round(rotation / 15) * 15 : rotation },
+            pivot,
+          )
+        : { rotation: keepAspect ? Math.round(rotation / 15) * 15 : rotation },
     };
   }
   const inverse = invertMatrix(createLayerGeometryIndex(page).worldMatrix(layer.id));
   const a = transformPoint(inverse, from);
   const b = transformPoint(inverse, to);
+  if (layer.spatial?.enabled && selectionBounds)
+    return {
+      layerId: layer.id,
+      patch: spatialFramePatch(layer, selectionBounds, handle, a, b, keepAspect),
+    };
   const west = handle.includes("w");
   const north = handle.includes("n");
   const horizontal = west || handle.includes("e"),

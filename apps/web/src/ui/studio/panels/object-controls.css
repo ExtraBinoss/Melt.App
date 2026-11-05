@@ -56,7 +56,7 @@
   pointer-events: auto;
   overflow: hidden;
 }
-.studio-object-bar[data-studio-object-present="false"] {
+.studio-object-bar[data-contextual-surface-present="false"] {
   pointer-events: none;
 }
 .studio-object-field {

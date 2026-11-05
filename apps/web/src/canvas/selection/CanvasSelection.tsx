@@ -13,6 +13,7 @@ import { SelectionPlane } from "./SelectionPlane";
 import { createTimelineHoverSource } from "../../state/motion/hover";
 import { sourceGeometry } from "./frame-geometry";
 import { paintSelectionHandleInk } from "./handle-color";
+import { observeSelectionPresentation, resolveSelectionFrame } from "./selection-frame";
 
 /** Only selection decorations subscribe to selected IDs; the retained canvas stays untouched. */
 export const CanvasSelection = memo(function CanvasSelection({
@@ -79,6 +80,7 @@ export const CanvasSelection = memo(function CanvasSelection({
           controller={controller}
           viewSource={viewSource}
           studio={studio}
+          viewport={viewport}
         />
       </SelectionPlane>
     </>
@@ -91,11 +93,13 @@ function TimelineHoverOutline({
   controller,
   viewSource,
   studio,
+  viewport,
 }: {
   engine: EnginePort;
   controller: SceneController;
   viewSource: ViewSource;
   studio: boolean;
+  viewport: RefObject<HTMLDivElement | null>;
 }) {
   const element = useRef<HTMLDivElement>(null);
   const hover = useMemo(() => createTimelineHoverSource(engine), [engine]);
@@ -108,7 +112,7 @@ function TimelineHoverOutline({
     let selected = new Set<string>();
     const handles =
       element.current?.querySelectorAll<HTMLElement>(".canvas-timeline-hover-handle") ?? [];
-    const paint = () => {
+    const paint = (force = false) => {
       const node = element.current,
         target = hover.read(),
         frame = controller.read(),
@@ -117,7 +121,8 @@ function TimelineHoverOutline({
         selection = snapshot.selection;
       if (
         !node ||
-        (previousPage === frame.page &&
+        (!force &&
+          previousPage === frame.page &&
           previousTarget === target &&
           previousZoom === scale &&
           previousPlayback === frame.playback &&
@@ -158,13 +163,17 @@ function TimelineHoverOutline({
       node.dataset.layerKind = layer.kind;
       node.dataset.playback = String(Boolean(frame.playback));
       paintSelectionHandleInk(node, layer, frame.page);
-      const bounds = layer.spatial?.enabled ? index.worldBounds(layer.id) : null;
-      const matrix = bounds ? [1, 0, 0, 1, bounds.x, bounds.y] : index.worldMatrix(layer.id);
+      const selectionFrame = resolveSelectionFrame(
+        frame.page,
+        index,
+        layer,
+        viewport.current?.querySelector("canvas"),
+      );
       Object.assign(node.style, {
-        width: `${bounds?.width ?? layer.width}px`,
-        height: `${bounds?.height ?? layer.height}px`,
+        width: `${selectionFrame.width}px`,
+        height: `${selectionFrame.height}px`,
         borderWidth: `${1 / scale}px`,
-        transform: `matrix(${matrix.join(",")})`,
+        transform: `matrix(${selectionFrame.matrix.join(",")})`,
         opacity: frame.playback ? ".2" : "1",
       });
       for (const handle of handles) handle.style.transform = `scale(${1 / scale})`;
@@ -174,13 +183,17 @@ function TimelineHoverOutline({
       stopScene = controller.subscribe(paint),
       stopView = viewSource.subscribe(paint),
       stopSelection = engine.subscribe(paint);
+    const stopNative = viewport.current
+      ? observeSelectionPresentation(viewport.current, () => paint(true))
+      : undefined;
     return () => {
       stopHover();
       stopScene();
       stopView();
       stopSelection();
+      stopNative?.();
     };
-  }, [controller, engine, hover, viewSource, studio]);
+  }, [controller, engine, hover, viewSource, studio, viewport]);
   return (
     <div
       ref={element}

@@ -16,7 +16,8 @@ import { StudioSlider } from "../controls/StudioSlider";
 import { StudioObjectPaint } from "../controls/StudioObjectPaint";
 import { NumberInput } from "../../../components/shared/NumberInput";
 import { StudioObjectTransform } from "./StudioObjectTransform";
-import { StudioObjectField, StudioObjectSurface } from "./StudioObjectMotion";
+import { StudioObjectField } from "./StudioObjectMotion";
+import { ContextualSurface } from "../../../components/shared/motion/ContextualSurface";
 import "./object-controls.css";
 import "../messages";
 import "../../../components/spatial/messages";
@@ -109,7 +110,11 @@ function StudioObjectControls({
   const field = { owner, layoutKey: structure };
   return (
     <MotionFieldProvider editor={edit}>
-      <StudioObjectSurface label={layer.name} layoutKey={structure}>
+      <ContextualSurface
+        className="studio-object-bar studio-surface"
+        label={layer.name}
+        layoutKey={structure}
+      >
         <StudioObjectField
           {...field}
           className={layer.kind === "text" ? "studio-object-text" : "studio-object-label"}
@@ -388,7 +393,7 @@ function StudioObjectControls({
             )}
           </StudioObjectField>
         )}
-      </StudioObjectSurface>
+      </ContextualSurface>
     </MotionFieldProvider>
   );
 }

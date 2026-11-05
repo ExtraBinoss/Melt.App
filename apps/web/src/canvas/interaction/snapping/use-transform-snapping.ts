@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, type RefObject } from "react";
-import type { Composition, EnginePort, Layer, Point } from "@musart/core";
+import type { Bounds, Composition, EnginePort, Layer, Point } from "@musart/core";
 import type { SceneController } from "../../session/scene-controller";
 import type { ViewSource } from "../../viewport/motion";
 import { isTransformAuthoringCurrent, type TransformAuthoring } from "../transform-authoring";
@@ -15,6 +15,7 @@ export interface TransformGesture extends TransformAuthoring {
   current: Point;
   layers: Layer[];
   handle?: Handle;
+  selectionBounds?: Bounds;
   snapping?: TransformSnapping;
   modifiers?: { alt: boolean; shift: boolean };
 }
@@ -38,7 +39,11 @@ export function useTransformSnapping({
       const page =
         active.presentation ??
         active.origin.project.pages.find((item) => item.id === active.origin.pageId)!;
-      const session = (active.snapping ??= new TransformSnapping(page, active.layers));
+      const session = (active.snapping ??= new TransformSnapping(
+        page,
+        active.layers,
+        active.selectionBounds,
+      ));
       const preferences = snappingPreferences.read(),
         threshold = preferences.threshold / view.read().zoom;
       const enabled = preferences.enabled && !alt;

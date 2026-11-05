@@ -9,6 +9,7 @@ import { paintSelectionHandleInk } from "../selection/handle-color";
 import { rotationHandlePlacement } from "../selection/rotation-handle";
 import { sourceGeometry } from "../selection/frame-geometry";
 import { paintCanvasStyle } from "../shared/paint-style";
+import { observeSelectionPresentation, resolveSelectionFrame } from "../selection/selection-frame";
 
 interface Options {
   controller: SceneController;
@@ -54,6 +55,7 @@ function createPresentation({ controller, workspace, motion, viewport, beforePai
     previousZoom = view.zoom;
     previousPlayback = frame.playback;
     const index = sourceGeometry(controller);
+    const canvas = root.querySelector<HTMLCanvasElement>("canvas");
     for (const overlay of root.querySelectorAll<HTMLElement>(".canvas-selection[data-layer-id]")) {
       const layer = index.byId.get(overlay.dataset.layerId!);
       const visible = layer && index.isVisible(layer.id) && !layer.maskSource;
@@ -65,10 +67,11 @@ function createPresentation({ controller, workspace, motion, viewport, beforePai
       paintCanvasStyle(overlay, { display, opacity });
       if (!layer) continue;
       paintSelectionHandleInk(overlay, layer, page);
-      const world = index.worldMatrix(layer.id);
+      const selectionFrame = resolveSelectionFrame(page, index, layer, canvas);
+      const world = selectionFrame.matrix;
       paintCanvasStyle(overlay, {
-        width: `${layer.width}px`,
-        height: `${layer.height}px`,
+        width: `${selectionFrame.width}px`,
+        height: `${selectionFrame.height}px`,
         borderWidth: `${1 / view.zoom}px`,
         transform: `matrix(${world.join(",")})`,
       });
@@ -77,7 +80,7 @@ function createPresentation({ controller, workspace, motion, viewport, beforePai
         const label = `${Math.round(layer.width)} × ${Math.round(layer.height)}`;
         if (size.textContent !== label) size.textContent = label;
         paintCanvasStyle(size, {
-          ...selectionSizeLabel(layer, world, view.zoom),
+          ...selectionSizeLabel(selectionFrame, world, view.zoom),
           transformOrigin: "0px 0px",
         });
       }
@@ -112,9 +115,13 @@ export function useCanvasPresentation({
     const update = () => paint();
     const stopScene = controller.subscribe(update),
       stopView = motion.subscribe(update);
+    const stopNative = viewport.current
+      ? observeSelectionPresentation(viewport.current, () => paint(true))
+      : undefined;
     return () => {
       stopScene();
       stopView();
+      stopNative?.();
     };
-  }, [controller, motion, paint]);
+  }, [controller, motion, paint, viewport]);
 }

@@ -37,6 +37,12 @@ supplies the canvas CSS size once per draw; the contour quad includes the stroke
 margin and guards sampling beyond the used rectangle. No extra GPU target or
 pixel readback is required.
 
+Classic selection frames, hover outlines and contextual toolbar anchors share
+prepared native mesh bounds, projected into the layer’s local plane. Text layout
+frames remain wrapping constraints. Classic resize handles scale native content
+around the opposite visible edge; rotation preserves its visible center. Empty or
+unprepared sources retain portable bounds until the native source presents.
+
 Interactive previews keep native half-float/MSAA storage in 64-pixel buckets,
 with one bucket of shrink hysteresis. The viewport and source crop remain exact;
 the output pass samples only that used rectangle, so effect dimensions, seeds

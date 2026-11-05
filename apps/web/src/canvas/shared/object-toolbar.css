@@ -22,6 +22,7 @@
   transform: none;
   transform-origin: center bottom;
   pointer-events: auto;
+  overflow: hidden;
 }
 @media (prefers-reduced-motion: reduce) {
   .canvas-object-toolbar-anchor {
