@@ -8,8 +8,8 @@ import {
   spatialMaterial,
   type FillGradient,
 } from "@musart/core";
-import { StudioMaterial } from "../../../src/ui/studio/panels/StudioMaterial";
-import { StudioEnvironment } from "../../../src/ui/studio/panels/StudioEnvironment";
+import { MaterialControl } from "../../../src/components/spatial/MaterialControl";
+import { EnvironmentControl } from "../../../src/components/spatial/EnvironmentControl";
 import { StudioSlider } from "../../../src/ui/studio/controls/StudioSlider";
 import { previewAtom } from "../../../src/state/session/editor";
 import { setup } from "../../support/ui";
@@ -70,7 +70,7 @@ const paint: FillGradient = {
 
 test("material presets and finish edits preserve active gradient paint", () => {
   const d = fixture(paint);
-  d.mount(<StudioMaterial engine={d.engine} run={d.run} />);
+  d.mount(<MaterialControl engine={d.engine} run={d.run} />);
   const original = d.engine.getSnapshot().project;
   const roughness = control("Rugosité");
   act(() => roughness.onStart?.());
@@ -97,7 +97,7 @@ test("the visible material color row previews without parent renders, cancels pa
   let renders = 0;
   function Parent() {
     renders++;
-    return <StudioMaterial engine={d.engine} run={d.run} />;
+    return <MaterialControl engine={d.engine} run={d.run} />;
   }
   d.mount(<Parent />);
   const original = d.engine.getSnapshot().project;
@@ -142,7 +142,7 @@ test("the visible material color row previews without parent renders, cancels pa
 
 test("the primary gradient swatch opens real editable stops and preserves the gradient kind", () => {
   const d = fixture(paint);
-  d.mount(<StudioMaterial engine={d.engine} run={d.run} />);
+  d.mount(<MaterialControl engine={d.engine} run={d.run} />);
   const original = d.engine.getSnapshot().project;
   expect(screen.getByRole("radio", { name: "Dégradé" })).toBeChecked();
   fireEvent.click(screen.getByRole("button", { name: "Dégradé" }));
@@ -167,7 +167,7 @@ test("material sliders preview outside document and parent renders, release once
   let renders = 0;
   function Outer() {
     renders++;
-    return <StudioMaterial engine={d.engine} run={d.run} />;
+    return <MaterialControl engine={d.engine} run={d.run} />;
   }
   d.mount(<Outer />);
   const before = renders,
@@ -193,7 +193,7 @@ test("material sliders preview outside document and parent renders, release once
 
 test("selection replacement retires a material draft and late captured callbacks cannot edit the new owner", () => {
   const d = fixture();
-  d.mount(<StudioMaterial engine={d.engine} run={d.run} />);
+  d.mount(<MaterialControl engine={d.engine} run={d.run} />);
   const stale = control("Rugosité");
   act(() => {
     stale.onStart?.();
@@ -219,7 +219,7 @@ test("a locked ancestor disables the material trigger and keeps its controls clo
   project.pages[0]!.layers.push(group);
   d.engine.load(project);
   d.engine.select([d.rectangle.id]);
-  d.mount(<StudioMaterial engine={d.engine} run={d.run} />);
+  d.mount(<MaterialControl engine={d.engine} run={d.run} />);
   expect(screen.getByRole("button", { name: "Matière" })).toBeDisabled();
   expect(screen.queryByRole("slider", { name: "Rugosité" })).toBeNull();
   expect(d.store.get(previewAtom)).toBeNull();
@@ -232,7 +232,7 @@ test("environment previews and release use the existing owned scene transaction;
   let renders = 0;
   function Outer() {
     renders++;
-    return <StudioEnvironment engine={d.engine} run={d.run} />;
+    return <EnvironmentControl engine={d.engine} run={d.run} />;
   }
   const view = d.mount(<Outer />),
     before = renders,
@@ -262,7 +262,7 @@ test("environment previews and release use the existing owned scene transaction;
 
 test("unrelated scene commands cancel an active environment draft and reject its late release", () => {
   const d = fixture();
-  d.mount(<StudioEnvironment engine={d.engine} run={d.run} />);
+  d.mount(<EnvironmentControl engine={d.engine} run={d.run} />);
   const stale = control("Intensité");
   act(() => {
     stale.onStart?.();
@@ -281,7 +281,7 @@ test("direction pad edits the canonical camera and restores both axes with one u
   const d = fixture();
   const original = d.engine.getSnapshot().project;
   const camera = original.pages[0]!.spatial!.camera;
-  d.mount(<StudioEnvironment engine={d.engine} run={d.run} />);
+  d.mount(<EnvironmentControl engine={d.engine} run={d.run} />);
   fireEvent.keyDown(screen.getByRole("button", { name: "Direction" }), { key: "ArrowRight" });
   expect(d.run).toHaveBeenCalledOnce();
   expect(d.engine.getSnapshot().project.pages[0]!.spatial!.camera).toEqual({

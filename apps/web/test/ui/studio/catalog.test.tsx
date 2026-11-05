@@ -4,7 +4,7 @@ import { SPATIAL_MATERIALS, createSpatialLayer } from "@musart/core";
 import { CatalogGroups, catalogOpenGroups } from "../../../src/ui/studio/catalog/CatalogGroups";
 import { materialParameters } from "../../../src/ui/studio/catalog/material-parameters";
 import { ProjectPreferencesProvider } from "../../../src/components/workspace/preferences/context";
-import { StudioMaterial } from "../../../src/ui/studio/panels/StudioMaterial";
+import { MaterialControl } from "../../../src/components/spatial/MaterialControl";
 import type { ProjectLayoutPreferences } from "../../../src/services/projects/preferences/model";
 import { setup } from "../../support/ui";
 
@@ -93,7 +93,7 @@ test("choosing a catalog sphere commits the physical material once, exposes tran
   d.engine.load(d.engine.getSnapshot().project);
   d.engine.select([d.rectangle.id]);
   const original = d.engine.getSnapshot().project;
-  d.mount(<StudioMaterial engine={d.engine} run={d.run} />);
+  d.mount(<MaterialControl engine={d.engine} run={d.run} />);
   fireEvent.click(screen.getByRole("button", { name: "Matière" }));
   expect(screen.getByRole("button", { name: "Couleur" })).toHaveAttribute("aria-expanded", "false");
   fireEvent.click(screen.getByRole("button", { name: "Verre · Corail" }));

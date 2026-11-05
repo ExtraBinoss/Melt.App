@@ -4,6 +4,10 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ## [Unreleased]
 
+- Retain the last selected Studio material thumbnail after deselection while keeping editing disabled without a current editable object. Reset presentation memory when switching projects or pages.
+
+- Share the complete material and environment popovers between Classic and Studio, including thumbnail catalogs and property controls. Retain the latest hover/focus preview across tile gaps and property areas, restore uncommitted changes on dismissal, and commit selections with one undo. Hide duplicate material and environment controls in Studio's advanced inspector.
+
 - Route synchronous canvas updates, final display failures and GPU boundary errors through the existing copyable editor notice, preserving diagnostics and recovery without repeated notification floods.
 
 - Bound grazing-camera GPU allocations before resource creation while preserving authored effect coordinates and requested output dimensions. Clip projected effect expansion to the actual output window.

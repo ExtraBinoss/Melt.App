@@ -441,6 +441,7 @@ export const Inspector = memo(
                     </fieldset>
                     <SpatialLayerProperties
                       engine={engine}
+                      run={runCurrent}
                       layer={displayLayer!}
                       patch={patch}
                       preview={preview}

@@ -8,6 +8,7 @@ import {
   gestureQuantum,
   snapNumericValue,
 } from "../../../components/shared/numeric-gesture";
+import "./slider.css";
 import "./slider-precision.css";
 import "../messages";
 

@@ -9,6 +9,10 @@
   outline: 2px solid var(--ring);
   outline-offset: 3px;
 }
+.spatial-sphere-control .studio-sphere-trigger-wrap {
+  width: 100%;
+  height: auto;
+}
 .studio-dock .studio-sphere-trigger {
   width: 48px;
   height: 48px;
@@ -37,6 +41,19 @@
   background: transparent;
   box-shadow: none;
   contain: layout style;
+}
+.studio-sphere-content .studio-panel-title {
+  margin-bottom: 12px;
+  font-weight: 500;
+  font-size: 12px;
+}
+.studio-material-owner {
+  font-size: 10px;
+  color: var(--muted-foreground);
+  margin-bottom: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .studio-sphere-layout {
   display: grid;

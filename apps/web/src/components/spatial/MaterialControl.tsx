@@ -1,25 +1,27 @@
-import { memo, useCallback, useMemo } from "react";
+import { memo, useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { SPATIAL_MATERIALS, spatialMaterial, type EnginePort, type Layer } from "@musart/core";
-import { useDocumentSnapshot } from "../../../state/session/use-document-snapshot";
-import { motionTimeChanges } from "../../../state/session/motion-edit";
-import { layerSelection } from "../../../components/layers/menu/selection";
-import { useLayerPreview } from "../../../components/layers/controls/use-layer-preview";
-import { MaterialPicker } from "../../../components/spatial/MaterialPicker";
-import { MotionFieldProvider } from "../../../components/properties/motion/context";
-import { StudioMaterialPaint } from "../controls/StudioMaterialPaint";
-import { StudioSphereDock } from "../controls/StudioSphereDock";
-import { CatalogSwatch } from "../catalog/CatalogSwatch";
-import { useCatalogNames } from "../catalog/names";
-import { StudioSlider } from "../controls/StudioSlider";
-import { materialParameters } from "../catalog/material-parameters";
-import "../messages";
+import { useDocumentSnapshot } from "../../state/session/use-document-snapshot";
+import { motionTimeChanges } from "../../state/session/motion-edit";
+import { layerSelection } from "../layers/menu/selection";
+import { useLayerPreview } from "../layers/controls/use-layer-preview";
+import { MaterialPicker } from "./MaterialPicker";
+import { MotionFieldProvider } from "../properties/motion/context";
+import { StudioMaterialPaint } from "../../ui/studio/controls/StudioMaterialPaint";
+import { SceneSpherePopover } from "./SceneSpherePopover";
+import { CatalogSwatch } from "../../ui/studio/catalog/CatalogSwatch";
+import { useCatalogNames } from "../../ui/studio/catalog/names";
+import { StudioSlider } from "../../ui/studio/controls/StudioSlider";
+import { materialParameters } from "../../ui/studio/catalog/material-parameters";
+import "../../ui/studio/messages";
 
-export const StudioMaterial = memo(function StudioMaterial({
+export const MaterialControl = memo(function MaterialControl({
   engine,
   run,
+  presentation = "studio",
 }: {
   engine: EnginePort;
+  presentation?: "classic" | "studio";
   run: (task: () => void) => void;
 }) {
   const { t } = useTranslation("studioChrome");
@@ -32,7 +34,30 @@ export const StudioMaterial = memo(function StudioMaterial({
   const layer = selection.selected.length === 1 ? selection.selected[0] : undefined;
   const spatial = layer?.spatial;
   const enabled = Boolean(spatial?.enabled && spatial.source !== "group" && selection.editable);
-  const materialIndex = SPATIAL_MATERIALS.findIndex((item) => item.id === spatial?.material.preset);
+  const materialIndex =
+    spatial?.enabled && spatial.source !== "group"
+      ? SPATIAL_MATERIALS.findIndex((item) => item.id === spatial.material.preset)
+      : -1;
+  // Retain only an atlas index: deselection never retains an editable layer or scene draft.
+  const [swatch, setSwatch] = useState({
+    projectId: snapshot.project.id,
+    pageId: page.id,
+    index: Math.max(0, materialIndex),
+  });
+  const sameSwatchOwner = swatch.projectId === snapshot.project.id && swatch.pageId === page.id;
+  if (
+    !sameSwatchOwner ||
+    (presentation === "studio" && materialIndex >= 0 && materialIndex !== swatch.index)
+  )
+    setSwatch({
+      projectId: snapshot.project.id,
+      pageId: page.id,
+      index: Math.max(0, materialIndex),
+    });
+  const displayedMaterialIndex =
+    presentation === "studio" && materialIndex < 0 && sameSwatchOwner
+      ? swatch.index
+      : Math.max(0, materialIndex);
   const identity = useMemo(
     () => ({ page, selection: snapshot.selection }),
     [page, snapshot.selection],
@@ -58,10 +83,30 @@ export const StudioMaterial = memo(function StudioMaterial({
       ...(spatial ? { spatial: { ...spatial, useModelMaterials: false } } : {}),
     };
   }
+  function materialPreset(id: string, commit: boolean) {
+    const material = spatialMaterial(id);
+    patch(
+      {
+        ...(layer?.fillGradient ? {} : { fill: material.color }),
+        ...(layer?.vector ? { vector: { ...layer.vector, preserveColors: false } } : {}),
+        ...(spatial
+          ? {
+              spatial: {
+                ...spatial,
+                useModelMaterials: false,
+                material: { ...material.settings },
+              },
+            }
+          : {}),
+      },
+      commit,
+    );
+  }
   return (
-    <StudioSphereDock
+    <SceneSpherePopover
+      presentation={presentation}
       title={t("material")}
-      icon={<CatalogSwatch kind="materials" index={Math.max(0, materialIndex)} />}
+      icon={<CatalogSwatch kind="materials" index={displayedMaterialIndex} />}
       className="studio-material"
       disabled={!enabled}
       disabledHint={catalogText("select3DObject")}
@@ -69,35 +114,23 @@ export const StudioMaterial = memo(function StudioMaterial({
       {layer && spatial && enabled ? (
         <MotionFieldProvider editor={edit}>
           <div className="studio-sphere-layout">
-            <section className="studio-sphere-library" aria-label={t("material")}>
+            <section role="group" className="studio-sphere-library" aria-label={t("material")}>
               <div className="studio-panel-title">{t("material")}</div>
               <div className="studio-material-owner" title={layer.name}>
                 {layer.name}
               </div>
               <MaterialPicker
                 embedded
+                identity={identity}
                 value={spatial.material.preset}
                 disabled={!selection.editable}
-                onChoose={(id) => {
-                  const material = spatialMaterial(id);
-                  patch(
-                    {
-                      ...(layer.fillGradient ? {} : { fill: material.color }),
-                      ...(layer.vector
-                        ? { vector: { ...layer.vector, preserveColors: false } }
-                        : {}),
-                      spatial: {
-                        ...spatial,
-                        useModelMaterials: false,
-                        material: { ...material.settings },
-                      },
-                    },
-                    true,
-                  );
-                }}
+                onPreview={(id) => materialPreset(id, false)}
+                onCancel={edit.cancel}
+                onChoose={(id) => materialPreset(id, true)}
               />
             </section>
             <section
+              role="group"
               className="studio-sphere-properties"
               aria-label={catalogText("materialProperties")}
             >
@@ -161,6 +194,6 @@ export const StudioMaterial = memo(function StudioMaterial({
       ) : (
         <p className="studio-hint">{t("selectObject")}</p>
       )}
-    </StudioSphereDock>
+    </SceneSpherePopover>
   );
 });

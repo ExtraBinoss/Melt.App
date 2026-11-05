@@ -1,0 +1,83 @@
+.studio-slider {
+  position: relative;
+  min-height: 36px;
+  margin-top: 9px;
+}
+.studio-slider-heading {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 13px;
+  font-size: 11px;
+  font-weight: 400;
+}
+.studio-slider-heading label {
+  color: var(--foreground);
+}
+.studio-slider-heading output {
+  font-variant-numeric: tabular-nums;
+  font-size: 11px;
+}
+.studio-slider [data-slot="slider"] {
+  height: 36px;
+  min-height: 36px;
+  padding: 0;
+  cursor: ew-resize;
+}
+.studio-slider [data-slot="slider"][data-orientation="horizontal"] [data-slot="slider-track"] {
+  height: 36px;
+  box-sizing: border-box;
+  border: 1px solid color-mix(in srgb, var(--foreground) 20%, var(--border));
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--foreground) 5%, var(--card));
+  box-shadow: none;
+}
+.studio-slider [data-slot="slider"] [data-slot="slider-range"] {
+  border-radius: var(--radius-md) 0 0 var(--radius-md);
+  background: color-mix(in srgb, var(--foreground) 16%, transparent);
+}
+.studio-slider [data-slot="slider-thumb"] {
+  width: 4px;
+  height: 24px;
+  background: color-mix(in srgb, var(--foreground) 65%, var(--card));
+  border: 0;
+  border-radius: var(--radius-full);
+  box-shadow: none;
+  backdrop-filter: none;
+  opacity: 0.25;
+  scale: 0.5 0.583333;
+  transition:
+    scale 140ms ease,
+    opacity 140ms ease,
+    background-color 140ms ease;
+}
+.studio-slider:hover [data-slot="slider"]:not([data-disabled]) [data-slot="slider-thumb"] {
+  background: color-mix(in srgb, var(--foreground) 80%, var(--card));
+  opacity: 0.65;
+  scale: 0.75 0.833333;
+}
+.studio-slider [data-slot="slider"]:not([data-disabled]):active [data-slot="slider-thumb"] {
+  background: var(--foreground);
+  opacity: 1;
+  scale: 1;
+}
+.studio-slider [data-slot="slider-thumb"]:focus-visible {
+  outline: 1px solid var(--foreground);
+  outline-offset: 3px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .studio-slider [data-slot="slider-thumb"] {
+    transition: none;
+  }
+}
+.studio-slider:has([data-disabled]) {
+  opacity: 0.45;
+}
+.studio-slider [data-disabled] {
+  opacity: 1;
+}

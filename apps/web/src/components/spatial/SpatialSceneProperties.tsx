@@ -10,7 +10,6 @@ import { Plus, Sun, Trash2, Upload } from "lucide-react";
 import {
   createSpatialLight,
   createSpatialScene,
-  SPATIAL_ENVIRONMENTS,
   type Composition,
   type EnginePort,
   type SpatialLight,
@@ -32,7 +31,8 @@ import { SpatialLightEditor } from "./SpatialLightEditor";
 import { useCurrentSceneEdit } from "./use-current-scene-edit";
 import { LIGHTING_RIGS, lightingRig } from "./lighting-presets";
 import { importSpatialEnvironment } from "../../services/assets/spatial-import";
-import { useCatalogNames } from "../../ui/studio/catalog/names";
+import { useWorkspaceMode } from "../../ui/studio/workspace-mode";
+import { EnvironmentControl } from "./EnvironmentControl";
 import "./messages";
 import "./spatial.css";
 const ScenePage = createContext<Composition | null>(null);
@@ -50,9 +50,7 @@ export function SpatialSceneProperties({
   const page = useEngineValue(engine, () => resolveInspectorPage(engine, originPage) ?? originPage);
   const settings = useMemo(() => page.spatial ?? createSpatialScene(), [page.spatial]);
   const binding = useCurrentSceneEdit(engine, page, run, settings);
-  const assetName = settings.environment.assetId
-    ? engine.getSnapshot().project.assets[settings.environment.assetId]?.name
-    : undefined;
+  const showEnvironment = useWorkspaceMode() !== "studio";
   return (
     <ScenePage value={page}>
       <SpatialSceneView
@@ -62,7 +60,8 @@ export function SpatialSceneProperties({
         settings={settings}
         identity={binding.identity}
         edit={binding.edit}
-        assetName={assetName}
+        run={run}
+        showEnvironment={showEnvironment}
       />
     </ScenePage>
   );
@@ -86,37 +85,23 @@ const SpatialSceneView = memo(function SpatialSceneView({
   settings,
   identity,
   edit,
-  assetName,
+  run,
+  showEnvironment,
 }: {
   engine: EnginePort;
   pageId: string;
   settings: SpatialScene;
   identity: ReturnType<typeof useCurrentSceneEdit>["identity"];
   edit: ReturnType<typeof useCurrentSceneEdit>["edit"];
-  assetName?: string;
+  run: (task: () => void) => void;
+  showEnvironment: boolean;
 }) {
   const { t } = useTranslation("spatial");
-  const { environmentName } = useCatalogNames();
   const navigation = useSceneMotionNavigation(engine);
   const input = useRef<HTMLInputElement>(null);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
-  const environment = settings.environment,
-    camera = settings.camera;
-  const changeEnvironment = (patch: Partial<SpatialScene["environment"]>, commit: boolean) =>
-    (commit ? edit.commit : edit.preview)(
-      {
-        ...settings,
-        environment: { ...environment, ...patch },
-      },
-      Object.keys(patch).length === 1 && ("intensity" in patch || "rotation" in patch)
-        ? {
-            kind: "environment",
-            compositionId: pageId,
-            property: "intensity" in patch ? "intensity" : "rotation",
-          }
-        : undefined,
-    );
+  const camera = settings.camera;
   const changeCamera = (patch: Partial<SpatialScene["camera"]>, commit: boolean) =>
     (commit ? edit.commit : edit.preview)(
       { ...settings, camera: { ...camera, ...patch } },
@@ -169,113 +154,46 @@ const SpatialSceneView = memo(function SpatialSceneView({
   }
   return (
     <section className="inspector-section spatial-properties">
-      <div className="spatial-title">
-        <h3>
-          <Sun size={13} />
-          {t("environment")}
-        </h3>
-        <IconButton
-          label={t("importEnvironment")}
-          disabled={busy}
-          onClick={() => input.current?.click()}
-        >
-          <Upload size={13} />
-        </IconButton>
-      </div>
-      <input
-        ref={input}
-        type="file"
-        hidden
-        accept=".hdr,.exr,image/png,image/jpeg,image/webp"
-        disabled={busy}
-        onChange={(event) => {
-          const file = event.target.files?.[0];
-          event.target.value = "";
-          if (!file) return;
-          setBusy(true);
-          setError("");
-          void importSpatialEnvironment(engine, file)
-            .catch(() => setError(t("errors.import")))
-            .finally(() => setBusy(false));
-        }}
-      />
-      {error && (
-        <p role="status" className="spatial-import-error">
-          {error}
-        </p>
+      {showEnvironment && (
+        <>
+          <div className="spatial-title">
+            <h3>
+              <Sun size={13} />
+              {t("environment")}
+            </h3>
+            <IconButton
+              label={t("importEnvironment")}
+              disabled={busy}
+              onClick={() => input.current?.click()}
+            >
+              <Upload size={13} />
+            </IconButton>
+          </div>
+          <input
+            ref={input}
+            type="file"
+            hidden
+            accept=".hdr,.exr,image/png,image/jpeg,image/webp"
+            disabled={busy}
+            onChange={(event) => {
+              const file = event.target.files?.[0];
+              event.target.value = "";
+              if (!file) return;
+              setBusy(true);
+              setError("");
+              void importSpatialEnvironment(engine, file)
+                .catch(() => setError(t("errors.import")))
+                .finally(() => setBusy(false));
+            }}
+          />
+          {error && (
+            <p role="status" className="spatial-import-error">
+              {error}
+            </p>
+          )}
+          <EnvironmentControl engine={engine} run={run} presentation="classic" />
+        </>
       )}
-      <SelectField
-        label={t("environment")}
-        identity={identity}
-        value={environment.assetId ?? environment.preset}
-        options={[
-          ...(environment.assetId
-            ? [
-                {
-                  value: environment.assetId,
-                  label: assetName ?? t("environment"),
-                },
-              ]
-            : []),
-          ...SPATIAL_ENVIRONMENTS.map((value) => ({ value, label: environmentName(value) })),
-        ]}
-        onPreview={(preset) => {
-          if (SPATIAL_ENVIRONMENTS.some((value) => value === preset))
-            changeEnvironment({ preset, assetId: null }, false);
-        }}
-        onPreviewCancel={edit.cancel}
-        onValueChange={(preset) => {
-          if (SPATIAL_ENVIRONMENTS.some((value) => value === preset))
-            changeEnvironment({ preset, assetId: null }, true);
-        }}
-      />
-      <div className="fields-grid">
-        <SceneMotionField
-          engine={engine}
-          target={{ kind: "environment", compositionId: pageId, property: "intensity" }}
-          label={t("intensity")}
-        >
-          <NumberInput
-            engine={engine}
-            target={{ kind: "environment", compositionId: pageId, property: "intensity" }}
-            onStart={edit.begin}
-            label={t("intensity")}
-            identity={identity}
-            value={environment.intensity}
-            min={0}
-            max={10}
-            step={0.1}
-            onPreview={(intensity) => changeEnvironment({ intensity }, false)}
-            onCommit={(intensity) => changeEnvironment({ intensity }, true)}
-            onCancel={edit.cancel}
-          />
-        </SceneMotionField>
-        <SceneMotionField
-          engine={engine}
-          target={{ kind: "environment", compositionId: pageId, property: "rotation" }}
-          label={t("rotation")}
-        >
-          <NumberInput
-            engine={engine}
-            target={{ kind: "environment", compositionId: pageId, property: "rotation" }}
-            onStart={edit.begin}
-            label={t("rotation")}
-            identity={identity}
-            value={environment.rotation}
-            min={-360}
-            max={360}
-            step={1}
-            unit="°"
-            onPreview={(rotation) => changeEnvironment({ rotation }, false)}
-            onCommit={(rotation) => changeEnvironment({ rotation }, true)}
-            onCancel={edit.cancel}
-          />
-        </SceneMotionField>
-      </div>
-      <CurrentSceneAnimations
-        engine={engine}
-        owner={{ kind: "environment", compositionId: pageId }}
-      />
       <div className="spatial-title">
         <span>{t("reflections")}</span>
         <InfoTooltip label={t("reflections")}>{t("reflectionsHint")}</InfoTooltip>

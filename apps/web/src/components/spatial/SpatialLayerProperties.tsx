@@ -2,7 +2,6 @@ import { useTranslation } from "react-i18next";
 import { Box } from "lucide-react";
 import {
   createSpatialLayer,
-  spatialMaterial,
   type EnginePort,
   type Layer,
   type SpatialLayer,
@@ -13,17 +12,20 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import { Switch } from "../ui/switch";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../ui/accordion";
 import { MotionNumberInput } from "../properties/motion/MotionNumberInput";
-import { MaterialPicker } from "./MaterialPicker";
+import { MaterialControl } from "./MaterialControl";
+import { useWorkspaceMode } from "../../ui/studio/workspace-mode";
 import "./messages";
 interface Props {
   engine: EnginePort;
+  run: (task: () => void) => void;
   layer: Layer;
   patch: (value: Partial<Layer>) => void;
   preview: (value: Partial<Layer>) => void;
   cancel: () => void;
 }
-export function SpatialLayerProperties({ engine, layer, patch, preview, cancel }: Props) {
+export function SpatialLayerProperties({ engine, layer, patch, preview, cancel, run }: Props) {
   const { t } = useTranslation("spatial");
+  const showMaterial = useWorkspaceMode() !== "studio";
   const spatial = layer.spatial;
   const group = layer.kind === "group" && spatial?.source === "group";
   if (!group && !["rectangle", "ellipse", "text", "vector"].includes(layer.kind)) return null;
@@ -152,25 +154,10 @@ export function SpatialLayerProperties({ engine, layer, patch, preview, cancel }
       </div>
       {spatial?.enabled && (
         <>
-          {!group && (
-            <MaterialPicker
-              disabled={locked}
-              value={settings.material.preset}
-              onChoose={(id) => {
-                const material = spatialMaterial(id);
-                patch({
-                  fill: material.color,
-                  ...(layer.vector ? { vector: { ...layer.vector, preserveColors: false } } : {}),
-                  spatial: {
-                    ...settings,
-                    useModelMaterials: false,
-                    material: { ...material.settings },
-                  },
-                });
-              }}
-            />
+          {!group && showMaterial && (
+            <MaterialControl engine={engine} run={run} presentation="classic" />
           )}
-          {settings.source === "glb" && (
+          {showMaterial && settings.source === "glb" && (
             <label className="spatial-compact-row">
               {t("originalMaterials")}
               <Switch
@@ -187,12 +174,6 @@ export function SpatialLayerProperties({ engine, layer, patch, preview, cancel }
             </div>
           )}
           {settings.source === "box" && field("bevel", 0, 0.8, 0.01)}
-          {!group && (
-            <div className="fields-grid">
-              {materialField("roughness")}
-              {materialField("metalness")}
-            </div>
-          )}
           {settings.source === "glb" && clips.length > 0 && (
             <>
               <SelectField
@@ -239,14 +220,18 @@ export function SpatialLayerProperties({ engine, layer, patch, preview, cancel }
                 <AccordionContent>
                   <div className="spatial-accordion-body">
                     <div className="fields-grid">
-                      {materialField("transmission")}
-                      {materialField("ior", 1, 2.333)}
-                      {materialField("clearcoat")}
-                      {materialField("clearcoatRoughness")}
-                      {materialField("sheen")}
-                      {materialField("iridescence")}
-                      {materialField("emissiveIntensity", 0, 10)}
-                      {materialField("opacity")}
+                      {showMaterial && (
+                        <>
+                          {materialField("transmission")}
+                          {materialField("ior", 1, 2.333)}
+                          {materialField("clearcoat")}
+                          {materialField("clearcoatRoughness")}
+                          {materialField("sheen")}
+                          {materialField("iridescence")}
+                          {materialField("emissiveIntensity", 0, 10)}
+                          {materialField("opacity")}
+                        </>
+                      )}
                       {settings.source === "extrude" && (
                         <>
                           {field("bevelSegments", 1, 12, 1)}

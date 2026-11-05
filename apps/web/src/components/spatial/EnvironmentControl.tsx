@@ -1,4 +1,4 @@
-import { memo, useMemo } from "react";
+import { memo, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   createSpatialScene,
@@ -6,29 +6,50 @@ import {
   SPATIAL_ENVIRONMENT_PRESETS,
   type EnginePort,
 } from "@musart/core";
-import { useDocumentSnapshot } from "../../../state/session/use-document-snapshot";
-import { motionTimeChanges } from "../../../state/session/motion-edit";
-import { useCurrentSceneEdit } from "../../../components/spatial/use-current-scene-edit";
-import { EnvironmentPicker } from "../catalog/EnvironmentPicker";
-import { CatalogSwatch } from "../catalog/CatalogSwatch";
-import { StudioSphereDock } from "../controls/StudioSphereDock";
-import { StudioDirectionPad } from "../controls/StudioDirectionPad";
-import type { DirectionValue } from "../controls/StudioDirectionPad";
-import { StudioSlider } from "../controls/StudioSlider";
-import "../../../components/spatial/messages";
-import "../messages";
-import "../catalog/messages";
+import { useDocumentSnapshot } from "../../state/session/use-document-snapshot";
+import { motionTimeChanges } from "../../state/session/motion-edit";
+import { useCurrentSceneEdit } from "./use-current-scene-edit";
+import { EnvironmentPicker } from "./EnvironmentPicker";
+import { SceneAnimations } from "../motion/scene/SceneAnimations";
+import { animationPresentation } from "../motion/animations/presentation";
+import { CatalogSwatch } from "../../ui/studio/catalog/CatalogSwatch";
+import { SceneSpherePopover } from "./SceneSpherePopover";
+import { StudioDirectionPad } from "../../ui/studio/controls/StudioDirectionPad";
+import type { DirectionValue } from "../../ui/studio/controls/StudioDirectionPad";
+import { StudioSlider } from "../../ui/studio/controls/StudioSlider";
+import "./messages";
+import "../../ui/studio/messages";
+import "../../ui/studio/catalog/messages";
 
-export const StudioEnvironment = memo(function StudioEnvironment({
+export const EnvironmentControl = memo(function EnvironmentControl({
   engine,
   run,
+  presentation = "studio",
 }: {
   engine: EnginePort;
+  presentation?: "classic" | "studio";
   run: (task: () => void) => void;
 }) {
   const { t } = useTranslation("studioChrome");
   const { t: spatialText } = useTranslation("spatial");
   const { t: catalogText } = useTranslation("studioCatalog");
+  const [open, setOpen] = useState(false);
+  useEffect(() => {
+    const source = animationPresentation(engine);
+    const reveal = () => {
+      const request = source.readEditorRequest();
+      if (
+        request?.owner.kind === "environment" ||
+        (request?.owner.kind === "camera" && presentation === "studio")
+      ) {
+        setOpen(true);
+        source.consumeEditorRequest(request);
+      }
+    };
+    const stop = source.subscribeEditor(reveal);
+    reveal();
+    return stop;
+  }, [engine, presentation]);
   const snapshot = useDocumentSnapshot(engine, true);
   const page = snapshot.project.pages.find((item) => item.id === snapshot.pageId)!;
   const settings = useMemo(() => page.spatial ?? createSpatialScene(), [page.spatial]);
@@ -53,29 +74,36 @@ export const StudioEnvironment = memo(function StudioEnvironment({
     if (commit) edit.commit(next);
     else edit.preview(next);
   }
+  function environmentPreset(preset: string, commit: boolean) {
+    if (!current()) return edit.cancel();
+    if (!SPATIAL_ENVIRONMENTS.some((item) => item === preset)) return;
+    const next = { ...settings, environment: { ...environment, preset, assetId: null } };
+    if (commit) edit.commit(next);
+    else edit.preview(next);
+  }
   return (
-    <StudioSphereDock
-      title={t("scene")}
+    <SceneSpherePopover
+      presentation={presentation}
+      open={open}
+      onOpenChange={setOpen}
+      title={t(presentation === "classic" ? "environment" : "scene")}
       icon={<CatalogSwatch kind="environments" index={Math.max(0, environmentIndex)} />}
       className="studio-environment"
     >
       <div className="studio-sphere-layout">
-        <section className="studio-sphere-library" aria-label={t("environment")}>
+        <section role="group" className="studio-sphere-library" aria-label={t("environment")}>
           <div className="studio-panel-title">{t("environment")}</div>
           <EnvironmentPicker
             embedded
+            identity={identity}
             value={environment.assetId ?? environment.preset}
             assetName={environment.assetId ? (asset?.name ?? t("environment")) : undefined}
-            onChoose={(preset) => {
-              if (current() && SPATIAL_ENVIRONMENTS.some((item) => item === preset))
-                edit.commit({
-                  ...settings,
-                  environment: { ...environment, preset, assetId: null },
-                });
-            }}
+            onPreview={(preset) => environmentPreset(preset, false)}
+            onCancel={edit.cancel}
+            onChoose={(preset) => environmentPreset(preset, true)}
           />
         </section>
-        <section className="studio-sphere-properties" aria-label={t("scene")}>
+        <section role="group" className="studio-sphere-properties" aria-label={t("scene")}>
           <div className="studio-panel-title">{catalogText("direction")}</div>
           <StudioDirectionPad
             label={catalogText("direction")}
@@ -121,6 +149,11 @@ export const StudioEnvironment = memo(function StudioEnvironment({
               onCancel={edit.cancel}
             />
           ))}
+          <SceneAnimations
+            engine={engine}
+            page={page}
+            owner={{ kind: "camera", compositionId: page.id }}
+          />
           <div className="studio-scene-section-title">{catalogText("highlights")}</div>
           {(["intensity", "rotation"] as const).map((key) => {
             const target = { kind: "environment" as const, compositionId: page.id, property: key };
@@ -154,8 +187,13 @@ export const StudioEnvironment = memo(function StudioEnvironment({
               />
             );
           })}
+          <SceneAnimations
+            engine={engine}
+            page={page}
+            owner={{ kind: "environment", compositionId: page.id }}
+          />
         </section>
       </div>
-    </StudioSphereDock>
+    </SceneSpherePopover>
   );
 });

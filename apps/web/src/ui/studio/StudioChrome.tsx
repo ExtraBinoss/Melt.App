@@ -8,8 +8,8 @@ import { TextTool } from "../../components/text/TextTool";
 import { StudioPropertyPopover } from "./controls/StudioPropertyPopover";
 import { ObjectLibrary } from "../../components/spatial/objects/ObjectLibrary";
 import { StudioCompositions } from "./panels/StudioCompositions";
-import { StudioMaterial } from "./panels/StudioMaterial";
-import { StudioEnvironment } from "./panels/StudioEnvironment";
+import { MaterialControl } from "../../components/spatial/MaterialControl";
+import { EnvironmentControl } from "../../components/spatial/EnvironmentControl";
 import { StudioAdvanced } from "./panels/StudioAdvanced";
 import { StudioObjectBar } from "./panels/StudioObjectBar";
 import { createViewportActions } from "../../canvas/session/viewport-actions";
@@ -109,9 +109,9 @@ export const StudioChrome = memo(function StudioChrome({
         )}
       </div>
       <StudioCompositions engine={engine} services={services} run={run} />
-      <StudioMaterial engine={engine} run={run} />
+      <MaterialControl engine={engine} run={run} />
       <StudioObjectBar engine={engine} run={run} />
-      <StudioEnvironment engine={engine} run={run} />
+      <EnvironmentControl engine={engine} run={run} />
       {background && (
         <div className="studio-background-dock" data-canvas-control>
           {background}
