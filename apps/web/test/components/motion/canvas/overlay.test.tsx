@@ -156,6 +156,7 @@ it("compensates both native scroll axes on the single semantic overlay wrapper",
   d.viewport.scrollLeft = 60;
   d.viewport.scrollTop = 24;
   const view = render(<CanvasTimelineOverlay {...d.props} />, { container: d.root });
+  dwell(16);
   const overlay = d.root.querySelector<HTMLElement>(".motion-canvas-overlays")!;
   expect(overlay.style.transform).toBe("translate(-60px, -24px)");
   d.viewport.scrollLeft = 120;
@@ -343,6 +344,8 @@ it("native scroll updates overlay pose without remeasuring viewport width", () =
   const width = vi.fn(() => 644);
   Object.defineProperty(d.viewport, "clientWidth", { get: width });
   const view = render(<CanvasTimelineOverlay {...d.props} />);
+  expect(width).not.toHaveBeenCalled();
+  dwell(16);
   const reads = width.mock.calls.length;
   expect(reads).toBeGreaterThan(0);
   d.viewport.scrollLeft = 180;

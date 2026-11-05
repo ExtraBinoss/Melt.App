@@ -55,9 +55,15 @@ export class NormalBatch {
     layers: readonly Layer[],
     target: RenderTarget,
     canContinue?: () => boolean,
+    unbatchedId?: string,
   ): Promise<void> {
     for (const layer of layers) {
-      if (layer.maskSource || layer.blendMode !== "normal" || isInstancedPrimitive(layer)) continue;
+      if (
+        layer.maskSource ||
+        layer.blendMode !== "normal" ||
+        (isInstancedPrimitive(layer) && layer.id !== unbatchedId)
+      )
+        continue;
       const item = this.item(layer.id);
       if (this.compiled.has(item)) continue;
       this.scene.clear();

@@ -1,3 +1,4 @@
+import { CompositionEffectsRow, CompositionEffectRow } from "../composition/CompositionEffectsRow";
 import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useReducedMotion } from "motion/react";
 import { useTranslation } from "react-i18next";
@@ -40,7 +41,8 @@ export const LayerTree = memo(function LayerTree({
   const { t } = useTranslation();
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set()),
     [attachments, setAttachments] = useState<Set<string>>(new Set()),
-    [collapsedPages, setCollapsedPages] = useState<Set<string>>(new Set());
+    [collapsedPages, setCollapsedPages] = useState<Set<string>>(new Set()),
+    [collapsedEffects, setCollapsedEffects] = useState<Set<string>>(new Set());
   const drag = useLayerDrag(page, engine, run),
     reduced = !!useReducedMotion();
   const effectDrag = useRef<EffectDragSession | null>(null);
@@ -52,10 +54,28 @@ export const LayerTree = memo(function LayerTree({
     return () => window.removeEventListener("keydown", cancel);
   }, []);
   const canonicalEntries = useMemo(
-    () => projectLayerWorkspace(project, collapsedPages, collapsed, attachments),
-    [project, collapsedPages, collapsed, attachments],
+    () =>
+      projectLayerWorkspace(
+        project,
+        collapsedPages,
+        collapsed,
+        attachments,
+        undefined,
+        collapsedEffects,
+      ),
+    [project, collapsedPages, collapsed, attachments, collapsedEffects],
   );
   const entries = canonicalEntries;
+  // Reserve the ordinary row controls plus real hierarchy indentation. Names
+  // truncate inside the row; only expanded depth can widen the virtual window.
+  const minimumRowWidth = useMemo(
+    () =>
+      entries.reduce(
+        (width, entry) => Math.max(width, 160 + ("depth" in entry ? entry.depth : 0) * 16),
+        0,
+      ),
+    [entries],
+  );
   const positions = useMemo(() => {
     const result = new Map<string, number>();
     for (let at = 0; at < entries.length; at++) {
@@ -112,6 +132,15 @@ export const LayerTree = memo(function LayerTree({
     },
     [beginExpansion],
   );
+  const toggleEffects = (id: string) => {
+    beginExpansion(`composition-effects:${id}`);
+    setCollapsedEffects((previous) => {
+      const next = new Set(previous);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
   const thumbnailIdentities = useMemo(() => new SelectionPreviewIdentity(), []);
   const slottedEntries = useRowSlots(visibleEntries, !!drag.dragging);
   useLayoutEffect(() => {
@@ -186,7 +215,7 @@ export const LayerTree = memo(function LayerTree({
           >
             <div
               className="layer-tree-window"
-              style={{ position: "relative", height: list.height }}
+              style={{ position: "relative", height: list.height, minWidth: minimumRowWidth }}
               data-total-rows={entries.length}
             >
               {slottedEntries.map(({ entry, at, slot }) =>
@@ -218,6 +247,27 @@ export const LayerTree = memo(function LayerTree({
                   >
                     {t("emptyLayers")}
                   </div>
+                ) : entry.kind === "composition-effects" ? (
+                  <CompositionEffectsRow
+                    key={`${project.id}:${entry.key}`}
+                    engine={engine}
+                    page={entry.page}
+                    top={at * LAYER_ROW_HEIGHT}
+                    expanded={entry.expanded}
+                    onToggle={toggleEffects}
+                    run={run}
+                    onDragReject={drag.clearTarget}
+                  />
+                ) : entry.kind === "composition-effect" ? (
+                  <CompositionEffectRow
+                    key={`${project.id}:${entry.key}`}
+                    engine={engine}
+                    page={entry.page}
+                    effectId={entry.effectId}
+                    top={at * LAYER_ROW_HEIGHT}
+                    run={run}
+                    onDragReject={drag.clearTarget}
+                  />
                 ) : entry.kind === "layer" ? (
                   <LayerRow
                     key={`${project.id}:${slot}`}

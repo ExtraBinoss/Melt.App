@@ -77,6 +77,30 @@ it("changes canonical colors without remounting or measuring the Radix slider th
   expect(height).not.toHaveBeenCalled();
 });
 
+it("rejects delayed HSV widget echoes while hue and alpha own their current draft", () => {
+  const d = setup(),
+    preview = vi.fn(),
+    commit = vi.fn();
+  d.mount(<ColorPalette value="#3366ff80" onPreview={preview} onCommit={commit} />);
+  const retired = callbacks.at(-1)!;
+  const hue = screen.getByRole("slider", { name: "Teinte" });
+  const alpha = screen.getByRole("slider", { name: "Transparence" });
+  fireEvent.keyDown(hue, { key: "ArrowDown" });
+  expect(hue).toHaveAttribute("aria-valuenow", "226");
+  fireEvent.keyDown(alpha, { key: "ArrowDown" });
+  const last = preview.mock.calls.at(-1)![0] as string;
+  act(() => {
+    retired.onChange?.({ h: 225, s: 80, v: 100 });
+    retired.onChangeEnd?.({ h: 225, s: 80, v: 100 });
+  });
+  expect(hue).toHaveAttribute("aria-valuenow", "226");
+  expect(preview).toHaveBeenCalledTimes(2);
+  expect(preview).toHaveBeenLastCalledWith(last);
+  expect(commit).not.toHaveBeenCalled();
+  fireEvent.keyDown(hue, { key: "ArrowUp" });
+  expect(hue).toHaveAttribute("aria-valuenow", "225");
+});
+
 it("synchronously flushes SV release, retires late widget callbacks, then accepts the next gesture and keyboard", () => {
   const d = setup(),
     values: string[] = [],

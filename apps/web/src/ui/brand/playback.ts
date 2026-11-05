@@ -41,8 +41,7 @@ export function createBrandPlayback(
     visible = true,
     disposed = false,
     frame: number | null = null,
-    last: number | null = null,
-    paintedAt = -Infinity;
+    last: number | null = null;
   surface.paint(engine.sample(time));
   function stop() {
     if (frame !== null) clock.cancel(frame);
@@ -63,20 +62,17 @@ export function createBrandPlayback(
     if (disposed || !wantsFrames()) return;
     time += last === null ? 0 : Math.min(0.1, Math.max(0, (stamp - last) / 1000));
     last = stamp;
-    if (stamp - paintedAt >= 1000 / 30 || (state === "idle" && !hovered && time >= end)) {
-      paintedAt = stamp;
-      // Keep the real face for most of the loop, then morph to the native dots and back.
-      // The engine owns the geometry and continuous transition; no React frame updates.
-      if (state === "working") {
-        const phase = (time - workingAt) % 5.2;
-        const next = phase >= 2.4 && phase < 3.8 ? "thinking" : "idle";
-        if (next !== workingPose) {
-          workingPose = next;
-          engine.setState(next, time);
-        }
+    // Follow the display clock, including 120 Hz panels. Keep the real face for
+    // most of the loop, then morph to the native dots and back without React frames.
+    if (state === "working") {
+      const phase = (time - workingAt) % 5.2;
+      const next = phase >= 2.4 && phase < 3.8 ? "thinking" : "idle";
+      if (next !== workingPose) {
+        workingPose = next;
+        engine.setState(next, time);
       }
-      surface.paint(engine.sample(time));
     }
+    surface.paint(engine.sample(time));
     if (wantsFrames()) frame = clock.request(tick);
   }
   function resume() {

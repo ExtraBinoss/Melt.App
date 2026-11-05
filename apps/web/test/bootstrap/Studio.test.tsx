@@ -2,9 +2,20 @@ import { changeLanguage } from "../../src/state/i18n";
 import { render, screen, act, fireEvent, waitFor } from "@testing-library/react";
 import { vi } from "vitest";
 import { createProject, EditorEngine } from "@musart/core";
-const mocks = vi.hoisted(() => ({ createRuntime: vi.fn(), attach: vi.fn() }));
+const mocks = vi.hoisted(() => ({
+  createRuntime: vi.fn(),
+  attach: vi.fn(),
+  listProjectPage: vi.fn(),
+  closeStore: vi.fn(),
+}));
 vi.mock("../../src/services/session/runtime", () => ({ createRuntime: mocks.createRuntime }));
 vi.mock("../../src/services/automation/automation", () => ({ attachAutomation: mocks.attach }));
+vi.mock("../../src/services/projects/storage", () => ({
+  ProjectStore: class {
+    listPage = mocks.listProjectPage;
+    close = mocks.closeStore;
+  },
+}));
 vi.mock("../../src/App", () => ({
   App: ({ welcome }: { welcome?: boolean }) => (
     <div data-welcome={String(welcome)}>Atelier prêt</div>
@@ -34,6 +45,8 @@ beforeEach(async () => {
   await changeLanguage("fr");
   mocks.createRuntime.mockReset();
   mocks.attach.mockReset();
+  mocks.listProjectPage.mockReset().mockResolvedValue({ projects: [], before: null });
+  mocks.closeStore.mockReset().mockResolvedValue(undefined);
   history.replaceState(null, "", "/");
 });
 it("shows startup then mounts editor and closes resources", async () => {
@@ -142,5 +155,23 @@ it("passes a durable URL target to startup and opens another URL target without 
   view.rerender(<Studio routing={{ ...routing, projectId: "another-project" }} />);
   expect(result.services.openProject).toHaveBeenCalledWith("another-project");
   expect(mocks.createRuntime).toHaveBeenCalledOnce();
+  view.unmount();
+});
+
+it("names an existing routed project while the genuine runtime is still opening", async () => {
+  mocks.createRuntime.mockReturnValue(new Promise(() => {}));
+  mocks.listProjectPage.mockResolvedValue({
+    projects: [{ id: "saved-project", name: "Summer study" }],
+    before: null,
+  });
+  const view = render(
+    <Studio routing={{ view: "editor", projectId: "saved-project", navigate: vi.fn() }} />,
+  );
+  expect(await screen.findByText("Ouverture de Summer study…")).toBeVisible();
+  expect(mocks.listProjectPage).toHaveBeenCalledExactlyOnceWith({
+    ids: ["saved-project"],
+    limit: 1,
+  });
+  expect(mocks.closeStore).toHaveBeenCalledOnce();
   view.unmount();
 });

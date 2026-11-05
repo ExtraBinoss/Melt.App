@@ -4,11 +4,16 @@ import "./messages";
 import "./loading.css";
 
 /** Full-page startup phases share the canvas throbber, without restarting its reveal delay. */
-export function StudioPreparation() {
+export function StudioPreparation({ projectName }: { projectName?: string } = {}) {
   const { t } = useTranslation("startup");
   return (
     <div className="studio-loading">
-      <Throbber size={80} variant="shimmer" label={t("opening")} delayMs={0} />
+      <Throbber
+        size={80}
+        variant="shimmer"
+        label={projectName ? t("openingProject", { projectName }) : t("opening")}
+        delayMs={0}
+      />
     </div>
   );
 }

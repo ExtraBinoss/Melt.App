@@ -18,20 +18,27 @@ it("pauses reading time for hover/focus, replaces rapid undo/redo, closes and cl
   const d = setup();
   d.engine.load(
     createProject({
-      pages: [createPage({ layers: [createLayer("rectangle", { id: "item", fill: "#8b5cf6" })] })],
+      pages: [
+        createPage({
+          layers: [createLayer("rectangle", { id: "item", name: "MELT", fill: "#8b5cf6" })],
+        }),
+      ],
     }),
   );
   const view = d.mount(<HistoryNotice engine={d.engine} />);
   act(() => d.engine.execute({ type: "updateLayers", ids: ["item"], patch: { fill: "#ff0000" } }));
   expect(screen.queryByRole("status")).toBeNull();
   act(() => d.engine.undo());
-  const card = screen.getByRole("status", { name: "Annulé · Fond #8b5cf6" });
+  const card = screen.getByRole("status", { name: "Annulé · Modifier Fond #8b5cf6 · MELT" });
+  expect(card.querySelector("span")).toHaveTextContent("Annulé · Modifier Fond #8b5cf6 · MELT");
   await advance(1000);
   fireEvent.pointerOver(card);
   await advance(3000);
   expect(card).toBeVisible();
   act(() => d.engine.redo());
-  expect(screen.getByRole("status", { name: "Rétabli · Fond #ff0000" })).toBeVisible();
+  expect(
+    screen.getByRole("status", { name: "Rétabli · Modifier Fond #ff0000 · MELT" }),
+  ).toBeVisible();
   const close = screen.getByRole("button", { name: "Fermer la notification" });
   act(() => close.focus());
   fireEvent.pointerOut(card);

@@ -1,0 +1,44 @@
+.effect-placement {
+  border-top: 1px solid var(--border);
+  margin-top: 8px;
+  padding-top: 8px;
+}
+.effect-placement > summary {
+  cursor: pointer;
+  font-size: 11px;
+  padding: 6px 0;
+}
+.effect-position-pad > button {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100px;
+  margin: 6px 0;
+  touch-action: none;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background:
+    linear-gradient(
+      90deg,
+      transparent calc(50% - 0.5px),
+      var(--border) 50%,
+      transparent calc(50% + 0.5px)
+    ),
+    linear-gradient(
+      transparent calc(50% - 0.5px),
+      var(--border) 50%,
+      transparent calc(50% + 0.5px)
+    ),
+    var(--muted);
+}
+.effect-position-pad span {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border: 2px solid var(--foreground);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  background: var(--background);
+}

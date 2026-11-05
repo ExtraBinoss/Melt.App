@@ -97,3 +97,23 @@ test("clears the union on an empty pose and recomputes authored coordinates afte
   expect(layout.rectangles[0]!.toArray()).toEqual([900, 1760, 4, 1]);
   expect(layout.bounds.value.toArray()).toEqual([900, 1760, 1272, 2094]);
 });
+
+test("retains authored window poses when the background transport is expanded or cropped", () => {
+  const effect = createEffect("window-trails", { time: 8, settings: { count: 12, ribbons: 2 } });
+  const controls = createEffectUniforms(effect, 1080, 1920);
+  const layout = controls.windowTrails!;
+  const rectangles = layout.rectangles.map((rectangle) => rectangle.toArray());
+  const bounds = layout.bounds.value.toArray();
+  for (const transport of [
+    { width: 2160, height: 2560, content: { x: 540, y: 320, width: 1080, height: 1920 } },
+    { width: 540, height: 960, content: { x: -270, y: -480, width: 1080, height: 1920 } },
+  ]) {
+    updateEffectUniforms(controls, effect, transport.width / 2, transport.height / 2, transport);
+    expect(layout.rectangles.map((rectangle) => rectangle.toArray())).toEqual(rectangles);
+    expect(layout.bounds.value.toArray()).toEqual(bounds);
+    const initial = createEffectUniforms(effect, transport.width, transport.height, transport);
+    expect(initial.windowTrails!.rectangles.map((rectangle) => rectangle.toArray())).toEqual(
+      rectangles,
+    );
+  }
+});

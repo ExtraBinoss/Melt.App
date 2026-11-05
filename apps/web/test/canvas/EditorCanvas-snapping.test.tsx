@@ -6,6 +6,11 @@ import { EditorCanvas } from "../../src/canvas/EditorCanvas";
 import { TooltipProvider } from "../../src/components/ui/tooltip";
 import { snappingPreferences } from "../../src/state/snapping/preferences";
 import type { SceneController } from "../../src/canvas/session/scene-controller";
+const mode = vi.hoisted(() => ({ studio: false }));
+vi.mock("../../src/ui/studio/workspace-mode", async (original) => ({
+  ...(await original<typeof import("../../src/ui/studio/workspace-mode")>()),
+  useWorkspaceMode: () => (mode.studio ? "studio" : "classic"),
+}));
 const scene = vi.hoisted(() => ({ controller: null as SceneController | null }));
 vi.mock("../../src/canvas/render/EditorScene", () => ({
   EditorScene: ({ controller }: { controller: SceneController }) => {
@@ -24,6 +29,7 @@ vi.mock("react-i18next", async (original) => ({
   }),
 }));
 beforeEach(() => {
+  mode.studio = false;
   snappingPreferences.update({ enabled: true, threshold: 6 });
   vi.spyOn(window, "matchMedia").mockImplementation((query) => ({
     matches: query.includes("prefers-reduced-motion"),
@@ -64,8 +70,15 @@ const point = (x: number, y: number, altKey = false) => ({
   button: 0,
   altKey,
 });
-async function fixture() {
-  const moving = createLayer("rectangle", { id: "moving", x: 10, y: 10, width: 20, height: 20 }),
+async function fixture(background = false) {
+  const moving = createLayer("rectangle", {
+      id: "moving",
+      name: "Custom wall",
+      x: background ? 0 : 10,
+      y: background ? 0 : 10,
+      width: background ? 200 : 20,
+      height: background ? 160 : 20,
+    }),
     target = createLayer("rectangle", { id: "target", x: 100, y: 80, width: 20, height: 20 });
   const engine = new EditorEngine(
     createProject({ pages: [createPage({ width: 200, height: 160, layers: [moving, target] })] }),
@@ -145,4 +158,34 @@ it("re-evaluates late release modifiers and Alt key transitions without requirin
   expect(engine.getSnapshot().project.pages[0]!.layers[0]!.x).toBe(77);
   act(() => engine.undo());
   expect(engine.getSnapshot().project.pages[0]!.layers[0]!.x).toBe(10);
+});
+
+it("captures a Studio background owner through the actual resize binding, preserves cancellation and commits one undo", async () => {
+  mode.studio = true;
+  const { engine, canvas } = await fixture(true);
+  act(() => engine.select(["moving"]));
+  const before = engine.getSnapshot().project;
+  const handle = document.querySelector('[data-layer-id="moving"][data-handle="w"]')!;
+  fireEvent.pointerDown(handle, point(0, 80));
+  fireEvent.pointerMove(canvas, point(40, 80, true));
+  expect(scene.controller!.read().page.layers[0]).toMatchObject({
+    background: true,
+    x: 8,
+    width: 192,
+  });
+  expect(engine.getSnapshot().project).toBe(before);
+  fireEvent.pointerCancel(canvas, point(40, 80, true));
+  expect(scene.controller!.read().page.layers[0]!.background).toBeUndefined();
+  expect(engine.getSnapshot().canUndo).toBe(false);
+  fireEvent.pointerDown(handle, point(0, 80));
+  fireEvent.pointerMove(canvas, point(40, 80, true));
+  fireEvent.pointerUp(canvas, point(40, 80, true));
+  expect(engine.getSnapshot().project.pages[0]!.layers[0]).toMatchObject({
+    background: true,
+    x: 8,
+    width: 192,
+  });
+  act(() => engine.undo());
+  expect(engine.getSnapshot().project).toBe(before);
+  expect(engine.getSnapshot().canUndo).toBe(false);
 });

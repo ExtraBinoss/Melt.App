@@ -1,3 +1,4 @@
+import { authoredPixelDown, transportUv } from "../shared/coordinates";
 import type { Node } from "three/webgpu";
 import {
   Fn,
@@ -33,9 +34,9 @@ export function crtNode({ source, controls }: EffectNodeContext) {
     colors = controls.colors,
     original = sampleEffect(source, controls, uv());
   const processed = Fn(() => {
-    const resolution = controls.logicalResolution,
-      position = vec2(uv().x, uv().y.oneMinus()).toVar(),
-      pixel = position.mul(resolution).toVar(),
+    const resolution = controls.contentResolution,
+      pixel = authoredPixelDown(controls).toVar(),
+      position = pixel.div(resolution).toVar(),
       centered = position.mul(2).sub(1).toVar(),
       frame = mod(floor(controls.time.mul(60)), 65536).toVar(),
       line = floor(pixel.y.div(max(1, u.scanlinePitch!))).toVar(),
@@ -52,10 +53,10 @@ export function crtNode({ source, controls }: EffectNodeContext) {
         .add(0.5)
         .toVar(),
       imagePosition = distorted.add(vec2(lineNoise.mul(u.jitter!).div(resolution.x), 0)).toVar(),
-      halfTexel = vec2(0.5).div(controls.resolution);
+      halfTexel = controls.pixelFootprint.mul(0.5).div(resolution);
     const read = (coord: Node<"vec2">) => {
       const safe = clamp(coord, halfTexel, halfTexel.oneMinus());
-      return sampleEffect(source, controls, vec2(safe.x, safe.y.oneMinus()));
+      return sampleEffect(source, controls, transportUv(controls, vec2(safe.x, safe.y.oneMinus())));
     };
     const center = read(imagePosition),
       reliable = (value: Node<"vec4">) =>

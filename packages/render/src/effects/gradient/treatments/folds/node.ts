@@ -1,14 +1,16 @@
 // MIT: ExtraBinoss / Plinka (2026), React-Beautiful-Gradient folds pass.
-import { abs, clamp, cos, fract, max, mix, sign, sin, uv, vec2, vec4 } from "three/tsl";
+import { authoredFragmentPixel } from "../../../shared/coordinates";
+import { abs, clamp, cos, fract, max, mix, sign, sin, vec2, vec4 } from "three/tsl";
 import type { EffectNodeContext } from "../../../shared/context";
 import { rotate } from "../../shared/field";
 import { readGradient, treatmentControls } from "../shared";
 export function foldsNode(context: EffectNodeContext) {
   const u = treatmentControls(context),
-    resolution = context.controls.logicalResolution,
+    resolution = context.controls.contentResolution,
     size = max(2, u.size),
     angle = u.treatmentRotation.mul(Math.PI / 180);
-  const p = rotate(uv().mul(resolution).sub(resolution.mul(0.5)), angle),
+  const pixel = authoredFragmentPixel(context.controls),
+    p = rotate(pixel.sub(resolution.mul(0.5)), angle),
     direction = rotate(vec2(1, 0), angle.negate());
   const cycle = p.x.div(size).add(u.phase),
     phase = cycle.mul(Math.PI * 2);
@@ -17,7 +19,9 @@ export function foldsNode(context: EffectNodeContext) {
     slope = mix(sign(sin(phase)), sin(phase), u.softness);
   const color = readGradient(
     context,
-    uv().add(direction.mul(profile).mul(size).mul(u.depth).mul(0.12).div(resolution)),
+    pixel
+      .div(resolution)
+      .add(direction.mul(profile).mul(size).mul(u.depth).mul(0.12).div(resolution)),
   );
   const shading = max(slope, 0)
     .mul(u.highlight)

@@ -1,3 +1,8 @@
+import {
+  resolveCompositionEffectMotionProperty,
+  listCompositionEffectMotionTargets,
+  applyCompositionEffectMotionValue,
+} from "./effect-properties";
 import type { Composition } from "../../document/model";
 import { ensure } from "../../errors";
 import { DEFAULT_SPATIAL_SCENE } from "../../spatial/defaults";
@@ -51,7 +56,7 @@ export function sceneMotionAddress(target: SceneMotionPropertyTarget): string {
   return JSON.stringify([
     target.kind,
     target.compositionId,
-    target.kind === "light" ? target.lightId : null,
+    target.kind === "light" ? target.lightId : "effectId" in target ? target.effectId : null,
     target.property,
   ]);
 }
@@ -60,6 +65,8 @@ export function resolveSceneMotionProperty(
   target: SceneMotionPropertyTarget,
 ): SceneMotionPropertyDescriptor | null {
   if (target.compositionId !== page.id || (target.kind === "light" && !page.spatial)) return null;
+  if (target.kind === "compositionEffect" || target.kind === "compositionEffectSetting")
+    return resolveCompositionEffectMotionProperty(page, target);
   const scene = page.spatial ?? DEFAULT_SPATIAL_SCENE;
   const schemas =
     target.kind === "camera"
@@ -98,6 +105,7 @@ export function resolveSceneMotionProperty(
 }
 export function listSceneMotionProperties(page: Composition): SceneMotionPropertyDescriptor[] {
   const targets: SceneMotionPropertyTarget[] = [
+    ...listCompositionEffectMotionTargets(page),
     ...Object.keys(CAMERA_MOTION_SCHEMAS).map(
       (property) =>
         ({ kind: "camera", compositionId: page.id, property }) as SceneMotionPropertyTarget,
@@ -134,6 +142,10 @@ export function applySceneMotionValues(
     ensure(descriptor, "INVALID_COMMAND", "Unknown scene Motion target");
     validateMotionValue(descriptor, value);
     if (Object.is(descriptor.value, value)) continue;
+    if (target.kind === "compositionEffect" || target.kind === "compositionEffectSetting") {
+      result = applyCompositionEffectMotionValue(result, target, value);
+      continue;
+    }
     const scene = result.spatial ?? DEFAULT_SPATIAL_SCENE;
     const spatial =
       target.kind === "camera"

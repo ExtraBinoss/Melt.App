@@ -32,11 +32,13 @@ export function insertSpatialObject(
   engine: EnginePort,
   source: SpatialSource | "text",
   name: string,
+  presentation?: { fill?: string },
 ) {
   const snapshot = engine.getSnapshot(),
     page = snapshot.project.pages.find((item) => item.id === snapshot.pageId)!;
   const size = Math.min(page.width, page.height) * 0.55;
   const layer = spatialLibraryLayer(source, size, name, crypto.randomUUID());
+  if (presentation?.fill) layer.fill = presentation.fill;
   layer.x = (page.width - layer.width) / 2;
   layer.y = (page.height - layer.height) / 2;
   engine.transaction([
@@ -101,6 +103,7 @@ export async function importSpatialModel(
     ...(!page.spatial ? [{ type: "updatePage" as const, patch: { spatial: freshScene() } }] : []),
   ]);
   engine.select([layer.id]);
+  return layer;
 }
 export async function importSpatialEnvironment(
   engine: EnginePort,

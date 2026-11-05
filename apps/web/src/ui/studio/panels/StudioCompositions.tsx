@@ -5,6 +5,7 @@ import type { EnginePort } from "@musart/core";
 import type { EditorServices } from "../../../state/contracts";
 import { useSidebarSnapshot } from "../../../components/workspace/use-sidebar-snapshot";
 import { LayersPresentation } from "../../../components/workspace/LayersPresentation";
+import { CompositionMode } from "../../../components/motion/CompositionMode";
 import { PagesPanel } from "../../../components/pages/PagesPanel";
 import { useMobileLayout } from "../../../components/workspace/mobile/use-mobile";
 import { StudioDock } from "../controls/StudioDock";
@@ -40,6 +41,9 @@ export const StudioCompositions = memo(function StudioCompositions({
       icon={<Layers3 size={15} />}
       className="studio-compositions"
     >
+      <div className="studio-composition-mode">
+        <CompositionMode engine={engine} snapshot={snapshot} />
+      </div>
       <PagesPanel engine={engine} page={page} pages={snapshot.project.pages} run={run} />
       <LayersPresentation engine={engine} services={services} model={model} run={run} />
     </StudioDock>

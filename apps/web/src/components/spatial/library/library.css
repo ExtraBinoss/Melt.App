@@ -1,28 +1,120 @@
 .spatial-library {
-  width: min(350px, calc(100vw - 24px));
-  max-height: min(650px, var(--radix-popover-content-available-height));
+  --spatial-library-gutter: 12px;
+  width: min(370px, calc(100vw - 24px));
+  max-height: min(490px, var(--radix-popover-content-available-height));
   display: flex;
   flex-direction: column;
   gap: 9px;
+  padding: var(--spatial-library-gutter);
   overflow: hidden;
+}
+.spatial-library-search {
+  display: grid;
+  grid-template-columns: minmax(0, 4fr) minmax(0, 1fr);
+  align-items: center;
+  gap: 6px;
+}
+.spatial-library-search > button {
+  min-width: 0;
+  height: 34px;
+  padding-inline: 7px;
+  gap: 4px;
+  font-size: 11px;
+}
+.spatial-library > .scroll-shadow {
+  min-height: 80px;
+  flex: 1 1 auto;
+  margin-inline: calc(-1 * var(--spatial-library-gutter));
+}
+.spatial-library-list {
+  max-height: 330px;
+  min-height: 80px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-inline: var(--spatial-library-gutter);
+}
+.spatial-library .spatial-objects {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  padding-block: 2px;
+}
+.spatial-library .spatial-object {
+  appearance: none;
+  position: relative;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  height: 96px;
+  padding: 3px;
+  gap: 2px;
+  background: color-mix(in srgb, var(--muted) 55%, var(--background));
+  color: var(--foreground);
+  cursor: pointer;
+  overflow: hidden;
+  contain: layout style;
+}
+.spatial-library .spatial-object:hover,
+.spatial-library .spatial-object:focus-visible {
+  border-color: var(--muted-foreground);
+  background: var(--accent);
+}
+.spatial-library .spatial-object:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: -2px;
+}
+.spatial-object-visual {
+  display: block;
+  position: relative;
+  width: 70px;
+  height: 70px;
+  flex: 0 0 70px;
+  overflow: hidden;
+}
+.spatial-object-poster {
+  display: block;
+  width: 70px;
+  height: 70px;
+  background-repeat: no-repeat;
+  filter: grayscale(1);
+}
+.spatial-object-name {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.spatial-object-add {
+  position: absolute;
+  z-index: 1;
+  top: 5px;
+  right: 5px;
+  padding: 2px;
+  width: 20px;
+  height: 20px;
+  border-radius: var(--radius-sm);
+  color: var(--foreground);
+  background: var(--background);
+  opacity: 0;
+  pointer-events: none;
+}
+.spatial-object:hover .spatial-object-add,
+.spatial-object:focus-visible .spatial-object-add {
+  opacity: 1;
 }
 .spatial-library-preview {
   position: relative;
-  flex: 0 0 160px;
-  height: 160px;
   overflow: hidden;
-  border-radius: 10px;
-  background: color-mix(in srgb, var(--primary) 5%, var(--muted));
+  border-radius: var(--radius-md);
+  background: var(--muted);
   touch-action: none;
-  cursor: grab;
-  outline-offset: -2px;
   contain: strict;
 }
-.spatial-library-preview[data-dragging="true"] {
-  cursor: grabbing;
-}
-.spatial-library-preview:focus-visible {
-  outline: 2px solid var(--ring);
+.spatial-tile-preview {
+  position: absolute;
+  inset: 0;
+  width: 70px;
+  height: 70px;
+  background: transparent;
+  pointer-events: none;
 }
 .spatial-library-preview-poster,
 .spatial-library-live {
@@ -33,12 +125,17 @@
   top: 0;
   transform: translateX(-50%);
 }
-.spatial-library-preview-poster,
-.spatial-object-poster {
+.spatial-tile-preview .spatial-library-live {
+  left: 0;
+  transform: scale(0.4375);
+  transform-origin: top left;
+}
+.spatial-library-preview-poster {
   display: block;
   background-repeat: no-repeat;
 }
-.spatial-library-preview[data-ready="true"] .spatial-library-preview-poster {
+.spatial-library-preview[data-ready="true"] .spatial-library-preview-poster,
+.spatial-object-visual:has(.spatial-library-preview[data-ready="true"]) > .spatial-object-poster {
   visibility: hidden;
 }
 .spatial-library-preview:not([data-ready="true"]) .spatial-library-live {
@@ -49,78 +146,9 @@
   width: 160px !important;
   height: 160px !important;
 }
-.spatial-library-heading {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  min-height: 30px;
+.spatial-library-empty {
+  padding: 24px 12px;
+  text-align: center;
+  color: var(--muted-foreground);
   font-size: 12px;
-  font-weight: 500;
-}
-.spatial-library-heading > span {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.spatial-library > .scroll-shadow {
-  min-height: 80px;
-  flex: 1 1 auto;
-}
-.spatial-library-list {
-  max-height: 252px;
-  min-height: 80px;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-}
-.spatial-library .spatial-objects {
-  gap: 4px;
-  padding-block: 4px;
-}
-.spatial-library .spatial-object {
-  appearance: none;
-  border: 1px solid transparent;
-  height: 100px;
-  padding: 4px;
-  gap: 3px;
-  background: transparent;
-  color: var(--foreground);
-  cursor: pointer;
-}
-.spatial-library .spatial-object:hover {
-  background: var(--accent);
-}
-.spatial-library .spatial-object[aria-pressed="true"] {
-  border-color: var(--primary);
-  background: color-mix(in srgb, var(--primary) 7%, transparent);
-}
-.spatial-library .spatial-object:focus-visible {
-  outline: 2px solid var(--ring);
-  outline-offset: -2px;
-}
-.spatial-object-poster {
-  width: 70px;
-  height: 70px;
-  flex: 0 0 70px;
-}
-.spatial-object > span:last-child {
-  max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.spatial-library .spatial-library-actions {
-  margin-top: 0;
-  flex: none;
-}
-@media (max-height: 600px) {
-  .spatial-library-preview {
-    flex-basis: 120px;
-    height: 120px;
-  }
-  .spatial-library-preview-poster,
-  .spatial-library-live {
-    top: -20px;
-  }
 }

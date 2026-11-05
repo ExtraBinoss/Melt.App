@@ -108,7 +108,9 @@ test("Studio 1080p keeps the word framed, exposes basics and presents text and g
   await expect(canvas).toHaveAttribute("data-page-id", "studio-starter-composition");
   await ready(page);
   const frame = (await canvas.boundingBox())!;
-  expect(frame.width / frame.height).toBeCloseTo(16 / 9, 2);
+  const gate = (await page.getByTestId("artboard").boundingBox())!;
+  expect(gate.width / gate.height).toBeCloseTo(16 / 9, 2);
+  expect(frame).toEqual((await page.getByTestId("editor-canvas").boundingBox())!);
   const density = await canvas.evaluate((node) => ({
     renderWidth: Number((node as HTMLCanvasElement).dataset.renderWidth),
     width: node.getBoundingClientRect().width,
@@ -161,8 +163,8 @@ test("Studio 1080p keeps the word framed, exposes basics and presents text and g
   expect(ink.bottom).toBeLessThan(ink.height * 0.8);
   expect(ink.click).toBeGreaterThan(0);
   await page.mouse.click(
-    frame.x + ((ink.click + 3) / ink.width) * frame.width,
-    frame.y + frame.height / 2,
+    gate.x + ((ink.click + 3) / ink.width) * gate.width,
+    gate.y + gate.height / 2,
   );
   await expect
     .poll(() => page.evaluate(() => window.musart!.session().selection))
@@ -242,7 +244,9 @@ test("Studio 1080p keeps the word framed, exposes basics and presents text and g
   await page.setViewportSize({ width: 390, height: 844 });
   await expect.poll(async () => (await canvas.boundingBox())!.width).toBeLessThanOrEqual(391);
   const portraitBox = (await canvas.boundingBox())!;
-  expect(portraitBox.width / portraitBox.height).toBeCloseTo(16 / 9, 2);
+  expect(portraitBox.width / portraitBox.height).toBeCloseTo(390 / 844, 2);
+  const portraitGate = (await page.getByTestId("artboard").boundingBox())!;
+  expect(portraitGate.width / portraitGate.height).toBeCloseTo(16 / 9, 2);
   await ready(page);
   await expect(bar.getByRole("textbox", { name: "Text content", exact: true })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);

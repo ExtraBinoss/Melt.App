@@ -22,7 +22,7 @@ export function SceneCanvasTarget(
   const model = props.model ?? props.host.readModel();
   const key = row.property.keyframes.find((key) => key.id === hit.keyId);
   if (!key) return null;
-  const name = scenePropertyLabel(row.property.target, t);
+  const name = scenePropertyLabel(row.property.target, t, row.effectType);
   const select = () => props.engine.select([]);
   const count = hit.kind === "key" ? hit.afterKeyIndex - hit.firstKeyIndex : 0;
   const x = motionTimeToSeconds(key.time) * model.scale;

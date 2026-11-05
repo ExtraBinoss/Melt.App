@@ -104,12 +104,6 @@
   display: grid;
   gap: 8px;
 }
-.studio-background-presets > [data-slot="accordion"] {
-  max-height: min(300px, 36dvh);
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  scrollbar-width: thin;
-}
 .studio-background-paint {
   display: grid;
   gap: 10px;

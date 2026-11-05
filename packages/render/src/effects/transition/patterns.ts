@@ -16,6 +16,6 @@ export const gridReveal: TransitionOperator = (f) => {
 export const luma: TransitionOperator = (f) =>
   reveal(f, dot(f.original.rgb, vec3(0.2126, 0.7152, 0.0722)).oneMinus());
 export const dissolve: TransitionOperator = (f) => {
-  const grid = f.position.mul(f.context.controls.logicalResolution).div(f.detail.mul(2));
+  const grid = f.position.mul(f.context.controls.contentResolution).div(f.detail.mul(2));
   return reveal(f, noise2d(floor(grid).add(1048576), f.context.controls.randomSeedUint));
 };

@@ -6,14 +6,8 @@ import { motionTimeChanges } from "../../../state/session/motion-edit";
 import { layerSelection } from "../../../components/layers/menu/selection";
 import { useLayerPreview } from "../../../components/layers/controls/use-layer-preview";
 import { MaterialPicker } from "../../../components/spatial/MaterialPicker";
-import { MotionColorControl } from "../../../components/properties/motion/MotionColorControl";
 import { MotionFieldProvider } from "../../../components/properties/motion/context";
-import {
-  Accordion,
-  AccordionItem,
-  AccordionTrigger,
-  AccordionContent,
-} from "../../../components/ui/accordion";
+import { StudioMaterialPaint } from "../controls/StudioMaterialPaint";
 import { StudioSphereDock } from "../controls/StudioSphereDock";
 import { CatalogSwatch } from "../catalog/CatalogSwatch";
 import { useCatalogNames } from "../catalog/names";
@@ -57,9 +51,9 @@ export const StudioMaterial = memo(function StudioMaterial({
     if (commit) edit.commit(value);
     else edit.previewLayer(value);
   }
-  function tint(fill: string): Partial<Layer> {
+  function paint(value: Partial<Layer>): Partial<Layer> {
     return {
-      fill,
+      ...value,
       ...(layer?.vector ? { vector: { ...layer.vector, preserveColors: false } } : {}),
       ...(spatial ? { spatial: { ...spatial, useModelMaterials: false } } : {}),
     };
@@ -88,7 +82,7 @@ export const StudioMaterial = memo(function StudioMaterial({
                   const material = spatialMaterial(id);
                   patch(
                     {
-                      fill: material.color,
+                      ...(layer.fillGradient ? {} : { fill: material.color }),
                       ...(layer.vector
                         ? { vector: { ...layer.vector, preserveColors: false } }
                         : {}),
@@ -108,24 +102,15 @@ export const StudioMaterial = memo(function StudioMaterial({
               aria-label={catalogText("materialProperties")}
             >
               <div className="studio-panel-title">{materialName(spatial.material.preset)}</div>
-              <Accordion type="single" collapsible className="studio-color-disclosure">
-                <AccordionItem value="color">
-                  <AccordionTrigger>{t("color")}</AccordionTrigger>
-                  <AccordionContent>
-                    <MotionColorControl
-                      engine={engine}
-                      target={{ kind: "layer", layerId: layer.id, property: "fill" }}
-                      label={t("color")}
-                      value={layer.fill}
-                      identity={layer.id}
-                      disabled={!selection.editable}
-                      onPreview={(fill) => patch(tint(fill), false)}
-                      onCommit={(fill) => patch(tint(fill), true)}
-                      onCancel={edit.cancel}
-                    />
-                  </AccordionContent>
-                </AccordionItem>
-              </Accordion>
+              <StudioMaterialPaint
+                engine={engine}
+                layer={layer}
+                label={t("color")}
+                disabled={!selection.editable}
+                onPreview={(value) => patch(paint(value), false)}
+                onCommit={(value) => patch(paint(value), true)}
+                onCancel={edit.cancel}
+              />
               {materialParameters(spatialMaterial(spatial.material.preset).category).map((key) => (
                 <StudioSlider
                   key={key}

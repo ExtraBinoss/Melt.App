@@ -1,6 +1,9 @@
 .studio-sphere-trigger-wrap {
   display: inline-flex;
-  border-radius: 12px;
+  align-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-lg);
 }
 .studio-sphere-trigger-wrap:focus-visible {
   outline: 2px solid var(--ring);
@@ -9,8 +12,9 @@
 .studio-dock .studio-sphere-trigger {
   width: 48px;
   height: 48px;
-  padding: 3px;
-  border-radius: 12px;
+  padding: 0;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
   transition:
     background-color 120ms,
     border-color 120ms;
@@ -21,9 +25,9 @@
 }
 .studio-dock .studio-sphere-trigger > .studio-catalog-swatch {
   display: block;
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
 }
 .studio-sphere-content {
   width: min(586px, calc(100vw - 24px));
@@ -44,7 +48,7 @@
 .studio-sphere-properties {
   padding: 14px;
   border: 1px solid var(--border);
-  border-radius: 13px;
+  border-radius: var(--radius-lg);
   background: color-mix(in srgb, var(--card) 94%, transparent);
   backdrop-filter: blur(16px);
   min-width: 0;
@@ -70,7 +74,7 @@
   display: block;
   width: 100%;
   height: 138px;
-  border-radius: 11px;
+  border-radius: var(--radius-md);
   border: 1px solid var(--border);
   background: var(--background);
   overflow: hidden;

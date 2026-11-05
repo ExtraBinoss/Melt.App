@@ -3,6 +3,7 @@ import { ensure } from "../errors";
 import { createLayerGeometryIndex } from "./geometry-index";
 import { releaseUnusedMaskSources } from "./access";
 import type { CommandHandler } from "../session/context";
+import { backgroundLayer } from "../paint/background-recipe";
 
 /** Validate every target before applying any edit, indexing one command draft once. */
 export function applyLayerPatches(
@@ -39,7 +40,17 @@ export function applyLayerPatches(
       "Calque ou groupe parent verrouillé",
     );
   }
-  for (const { id, patch } of patches) Object.assign(geometry.get(id), patch);
+  const background = backgroundLayer(page, false);
+  for (const { id, patch } of patches) {
+    const layer = geometry.get(id);
+    if (
+      background?.id === id &&
+      layer.background === undefined &&
+      Object.entries(patch).some(([key, value]) => !Object.is(layer[key as keyof Layer], value))
+    )
+      layer.background = true;
+    Object.assign(layer, patch);
+  }
   if (patches.some(({ patch }) => patch.mask === null)) releaseUnusedMaskSources(page);
 }
 export const updateLayerPatches: CommandHandler<"updateLayerPatches"> = (

@@ -1,4 +1,4 @@
-import type { Asset, Composition } from "@musart/core";
+import type { Asset, Bounds, Composition } from "@musart/core";
 import { estimatePreviewCost } from "@musart/render/preview-cost";
 export const PREVIEW_MEMORY_BYTES = 192 * 1024 * 1024;
 const HEADROOM_BYTES = 16 * 1024 * 1024;
@@ -8,14 +8,17 @@ export function previewScale(
   density: number,
   maxDimension = 16384,
   assets: Record<string, Asset> = {},
+  viewport?: Bounds,
 ): number {
   const desired = Number.isFinite(density) && density > 0 ? density : 1;
-  const minimum = 1 / Math.max(page.width, page.height);
+  const width = Math.max(page.width, viewport?.width ?? 0),
+    height = Math.max(page.height, viewport?.height ?? 0);
+  const minimum = 1 / Math.max(width, height);
   const limit = Math.min(
     8,
-    16384 / Math.max(page.width, page.height),
-    maxDimension / Math.max(page.width, page.height),
-    Math.sqrt(64_000_000 / (page.width * page.height)),
+    16384 / Math.max(width, height),
+    maxDimension / Math.max(width, height),
+    Math.sqrt(64_000_000 / (width * height)),
   );
   const requested =
     desired < 1
@@ -23,7 +26,7 @@ export function previewScale(
       : Math.ceil((desired - 1e-6) * 4) / 4;
   const upper = Math.max(minimum, Math.min(requested, limit));
   const fits = (scale: number) => {
-    const cost = estimatePreviewCost(page, scale, assets, true);
+    const cost = estimatePreviewCost(page, scale, assets, true, viewport);
     return (
       cost.targetBytes + HEADROOM_BYTES <= PREVIEW_MEMORY_BYTES &&
       cost.bytes + HEADROOM_BYTES <= 384 * 1024 * 1024 &&

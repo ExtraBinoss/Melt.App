@@ -1,4 +1,5 @@
-import { Fn, clamp, mix, uv, vec2, vec4 } from "three/tsl";
+import { authoredFragmentPixelDown } from "../shared/coordinates";
+import { Fn, clamp, mix, uv, vec4 } from "three/tsl";
 import { sampleEffect, type EffectNodeContext } from "../shared/context";
 import { mixEffectCoverage } from "../shared/compositing/node";
 import { receiptInk } from "./printing";
@@ -10,7 +11,7 @@ export function receiptNode(context: EffectNodeContext) {
     u = controls.parameters,
     original = sampleEffect(source, controls, uv());
   const processed = Fn(() => {
-    const pixel = vec2(uv().x, uv().y.oneMinus()).mul(controls.logicalResolution).toVar(),
+    const pixel = authoredFragmentPixelDown(controls).toVar(),
       paper = receiptPaper(pixel, controls).toVar(),
       ink = receiptInk(pixel, context).toVar(),
       color = clamp(

@@ -151,9 +151,9 @@ test("hover blinks and keeps one genuine idle animation chain, then returns to r
   f.step(17);
   const first = f.surface.paint.mock.calls.length;
   f.step(17);
-  expect(f.surface.paint).toHaveBeenCalledTimes(first);
-  f.step(17);
   expect(f.surface.paint).toHaveBeenCalledTimes(first + 1);
+  f.step(17);
+  expect(f.surface.paint).toHaveBeenCalledTimes(first + 2);
   for (let i = 0; i < 12; i++) f.step(100);
   expect(f.surface.paint.mock.calls.length).toBeGreaterThan(5);
   f.playback.setHovered(false);
@@ -161,6 +161,21 @@ test("hover blinks and keeps one genuine idle animation chain, then returns to r
   expect(f.callbacks.size).toBe(0);
   f.reduce(true);
   f.playback.setHovered(true);
+  expect(f.callbacks.size).toBe(0);
+  f.playback.dispose();
+});
+
+test("pending animation samples every display frame at 120 Hz and stops immediately on completion", () => {
+  const f = fixture();
+  f.playback.setState("working");
+  const before = f.surface.paint.mock.calls.length;
+  for (let i = 0; i < 120; i++) f.step(1000 / 120);
+  expect(f.surface.paint).toHaveBeenCalledTimes(before + 120);
+  expect(f.callbacks.size).toBe(1);
+  f.playback.setActive(false);
+  const completed = f.surface.paint.mock.calls.length;
+  f.step(1000 / 120);
+  expect(f.surface.paint).toHaveBeenCalledTimes(completed);
   expect(f.callbacks.size).toBe(0);
   f.playback.dispose();
 });

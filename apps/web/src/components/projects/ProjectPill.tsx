@@ -11,7 +11,7 @@ import { Label } from "../ui/label";
 import { Separator } from "../ui/separator";
 import { Kbd, KbdGroup } from "../ui/kbd";
 import { SelectField } from "../shared/SelectField";
-import { useWorkspaceMode, useSetWorkspaceMode } from "../../ui/studio/workspace-mode";
+import { useRequestedWorkspaceMode, useSetWorkspaceMode } from "../../ui/studio/workspace-mode";
 import "./workspace-mode/messages";
 import { modifierLabel } from "../search/shortcuts";
 import { useKeybindings } from "../../state/keybindings/use-keybindings";
@@ -33,7 +33,7 @@ export function ProjectPill({
 }) {
   const [open, setOpen] = useState(false);
   const navigating = useRef(false);
-  const mode = useWorkspaceMode();
+  const mode = useRequestedWorkspaceMode();
   const setMode = useSetWorkspaceMode();
   const bindings = useKeybindings();
   const save = bindings.bindings.get("action:save")?.[0];
@@ -114,6 +114,7 @@ export function ProjectPill({
           <Label htmlFor={modeId}>{t("workspaceMode:label")}</Label>
           <SelectField
             id={modeId}
+            className="project-workspace-select"
             label={t("workspaceMode:label")}
             value={mode}
             identity={origin}

@@ -1,4 +1,5 @@
 {
   "opening": "Opening your studio…",
+  "openingProject": "Opening {{projectName}}…",
   "dismiss": "Dismiss message"
 }

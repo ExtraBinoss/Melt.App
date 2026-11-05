@@ -74,6 +74,12 @@ export { SnapIndex } from "./layout/snapping/engine";
 export type { SnapCue, SnapResult, SnapKind } from "./layout/snapping/model";
 
 export { EFFECT_CATALOG, getEffectDefinition } from "./effects/catalog";
+export { EFFECT_PREVIEW_SOURCES } from "./effects/sdk/preview";
+export type {
+  EffectPreviewDefinition,
+  EffectPreviewScene,
+  EffectPreviewSource,
+} from "./effects/sdk/preview";
 export type {
   BooleanEffectParameter,
   EffectDefinition,
@@ -347,7 +353,11 @@ export type { SpatialMatrix } from "./spatial/matrix";
 export { canUngroupSpatial } from "./spatial/grouping";
 export { reframeSpatialScene } from "./spatial/framing";
 
-export { SPATIAL_GEOMETRY_DEFINITIONS, SPATIAL_MODEL_EXTENT } from "./spatial/bounds/definitions";
+export {
+  SPATIAL_GEOMETRY_DEFINITIONS,
+  SPATIAL_MODEL_EXTENT,
+  spatialSourceBounds,
+} from "./spatial/bounds/definitions";
 
 export { propertyDependencies, spatialLayerDependencies } from "./spatial/properties";
 export type { PropertyDependency, PropertyCapabilities } from "./spatial/properties";
@@ -413,3 +423,27 @@ export type {
 } from "./paint/background-recipe";
 
 export { SPATIAL_NUMBERS } from "./spatial/validation";
+
+export { EFFECT_DOMAIN_PARAMETERS, EFFECT_DOMAIN_KEYS } from "./effects/sdk/domain";
+export { defineEffect, AMOUNT, SCALE, LEVELS, COLOR, SEED } from "./effects/definition";
+export type {
+  MotionDriver,
+  MotionInputKind,
+  MotionInputEvent,
+  MotionSpringResponse,
+} from "./motion/drivers/model";
+export { compileMotionDriver } from "./motion/drivers/compile";
+export { validateMotionDriver } from "./motion/drivers/validation";
+export { compileAnimationChannel } from "./motion/animations/compile";
+
+export { motionProgramForFrame } from "./motion/evaluate";
+export { effectFields } from "./effects/shared/fields";
+
+export { SpatialSnapIndex } from "./layout/snapping/spatial";
+export type {
+  SnapVector,
+  SnapAxis,
+  SnapBounds3,
+  SnapProjector,
+  SpatialSnapCue,
+} from "./layout/snapping/spatial";

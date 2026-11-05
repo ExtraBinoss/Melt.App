@@ -98,6 +98,7 @@ export function validateLayer(
   assertNumber(value.radius, 0, 32768);
   assertBoolean(value.visible);
   assertBoolean(value.locked);
+  if (value.background !== undefined) assertBoolean(value.background);
   assertColor(value.fill);
   if (value.fillGradient !== undefined) validateFillGradient(value.fillGradient);
   assertColor(value.stroke);
@@ -153,6 +154,11 @@ export function validateLayer(
   assertList(value.effects, 64);
   for (const effect of value.effects) {
     validateEffect(effect, ids);
+    ensure(
+      EFFECT_CATALOG[(effect as Effect).type].requirements?.scope !== "composition",
+      "INVALID_DOCUMENT",
+      "This effect requires a composition surface.",
+    );
     validateEffectInputs(effect as Effect, assets as Record<string, Asset>);
   }
   for (const effect of value.effects) {

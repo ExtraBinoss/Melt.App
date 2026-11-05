@@ -251,7 +251,7 @@ export function ProjectGallery({
                   disabled={disabled}
                   onOpen={() => {
                     if (scope.current.pending || !scope.current.alive || dashboardBusy) return;
-                    const opening = beginProjectOpening();
+                    const opening = beginProjectOpening(undefined, project.name);
                     void mutate(
                       async () => {
                         await opening.painted();

@@ -1,5 +1,6 @@
 import {
   createLayerGeometryIndex,
+  backgroundLayer,
   SnapIndex,
   invertMatrix,
   layerTransform,
@@ -205,6 +206,7 @@ export function boxSelection(
 export function applyPreview(page: Composition, patches: LayerPatch[]): Composition {
   if (!patches.length) return page;
   const byId = new Map<string, Partial<Layer>>();
+  const background = backgroundLayer(page, false);
   for (const { layerId, patch } of patches) {
     const previous = byId.get(layerId);
     byId.set(layerId, previous ? { ...previous, ...patch } : patch);
@@ -214,6 +216,8 @@ export function applyPreview(page: Composition, patches: LayerPatch[]): Composit
     layers: page.layers.map((layer) => {
       const patch = byId.get(layer.id);
       if (!patch) return layer;
+      if (background?.id === layer.id && layer.background === undefined)
+        return { ...layer, background: true, ...patch };
       // Native assign is faster for large gesture batches; preserve data-only prototype keys.
       if (Object.hasOwn(layer, "__proto__") || Object.hasOwn(patch, "__proto__"))
         return { ...layer, ...patch };

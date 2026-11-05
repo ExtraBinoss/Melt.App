@@ -1,0 +1,34 @@
+{
+  "en": {
+    "name": "Trail",
+    "parameter": {
+      "mode": "Echo source",
+      "echoCount": "Echo count",
+      "delay": "Time between echoes",
+      "fade": "Echo opacity decay",
+      "offsetX": "Offset X per echo",
+      "offsetY": "Offset Y per echo",
+      "angle": "Offset direction",
+      "centerX": "Spread center X",
+      "centerY": "Spread center Y",
+      "spread": "Scale change per echo"
+    },
+    "choice": { "temporal": "Previous motion poses", "offset": "Current image offsets" }
+  },
+  "fr": {
+    "name": "Traînée",
+    "parameter": {
+      "mode": "Source des échos",
+      "echoCount": "Nombre d’échos",
+      "delay": "Intervalle entre les échos",
+      "fade": "Décroissance de l’opacité",
+      "offsetX": "Décalage X par écho",
+      "offsetY": "Décalage Y par écho",
+      "angle": "Direction du décalage",
+      "centerX": "Centre de dilatation X",
+      "centerY": "Centre de dilatation Y",
+      "spread": "Variation d’échelle par écho"
+    },
+    "choice": { "temporal": "Poses précédentes du mouvement", "offset": "Décalages de l’image actuelle" }
+  }
+}

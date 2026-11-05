@@ -47,6 +47,21 @@
 .layer-tree {
   flex: 1;
   padding: 2px 6px 10px;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+}
+.layer-tree-window {
+  width: 100%;
+}
+.layer-tree-window > [role="treeitem"] {
+  box-sizing: border-box;
+  min-width: 0;
+  max-width: 100%;
+}
+.layer-tree .attachment-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .layer-artboard-row {
   height: 36px;

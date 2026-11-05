@@ -1,3 +1,4 @@
+import { authoredPixelDown } from "../shared/coordinates";
 import { Fn, If, clamp, float, max, mix, pow, uint, uv, vec2, vec3, vec4 } from "three/tsl";
 import { sampleEffect, type EffectNodeContext } from "../shared/context";
 import { noiseField } from "./fields";
@@ -13,9 +14,7 @@ export function noiseNode({ source, controls }: EffectNodeContext) {
       float(seed.shiftRight(uint(10)).bitAnd(uint(1023))),
       float(seed.shiftRight(uint(20)).bitAnd(uint(2047))),
     ).mul(0.125),
-    pixel = vec2(position.x, position.y.oneMinus())
-      .mul(controls.logicalResolution)
-      .add(vec2(u.offsetX!, u.offsetY!)),
+    pixel = authoredPixelDown(controls, position).add(vec2(u.offsetX!, u.offsetY!)),
     authoredPoint = vec3(
       pixel.div(max(1, controls.scale)),
       u.offsetZ!.add(controls.time.mul(u.speed!)),

@@ -12,6 +12,7 @@ import type { LayerHistoryProperty } from "./model";
 import { ZERO_INSETS } from "../layout/model";
 
 const extra: readonly LayerHistoryProperty[] = [
+  "background",
   "fillGradient.centerX",
   "fillGradient.centerY",
   "fillGradient.radius",

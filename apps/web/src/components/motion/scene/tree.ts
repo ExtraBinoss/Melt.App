@@ -4,17 +4,19 @@ import {
   projectSceneMotionAnimations,
   resolveSceneMotionProperty,
   type Composition,
+  type EffectType,
   type SceneAnimationOwner,
   type SceneMotionAnimation,
   type SceneMotionPropertyTrack,
 } from "@musart/core";
 
-export type SceneSubject = "camera" | "environment" | "light";
+export type SceneSubject = "camera" | "environment" | "light" | "compositionEffect";
 type Common = {
   key: string;
   depth: number;
   owner: SceneAnimationOwner;
   subject: SceneSubject;
+  effectType?: EffectType;
   lightIndex?: number;
   lightType?: string;
   animations: readonly SceneMotionAnimation[];
@@ -46,17 +48,30 @@ export function projectSceneTimelineRows(
     !page.spatial &&
     !page.layers.some((layer) => layer.spatial?.enabled) &&
     !page.motion.sceneProperties?.length &&
-    !page.motion.sceneAnimations?.length
+    !page.motion.sceneAnimations?.length &&
+    !page.effects?.length
   )
     return [];
+  const spatial = !!page.spatial || page.layers.some((layer) => layer.spatial?.enabled);
   const subjects: {
     subject: SceneSubject;
     owner: SceneAnimationOwner;
+    effectType?: EffectType;
     lightIndex?: number;
     lightType?: string;
   }[] = [
-    { subject: "camera", owner: { kind: "camera", compositionId: page.id } },
-    { subject: "environment", owner: { kind: "environment", compositionId: page.id } },
+    ...(["camera", "environment"] as const).flatMap((kind) =>
+      spatial ||
+      page.motion?.sceneProperties?.some(({ target }) => target.kind === kind) ||
+      page.motion?.sceneAnimations?.some(({ owner }) => owner.kind === kind)
+        ? [{ subject: kind, owner: { kind, compositionId: page.id } }]
+        : [],
+    ),
+    ...(page.effects ?? []).map((effect) => ({
+      subject: "compositionEffect" as const,
+      owner: { kind: "compositionEffect" as const, compositionId: page.id, effectId: effect.id },
+      effectType: effect.type,
+    })),
     ...(page.spatial?.lights.map((light, lightIndex) => ({
       subject: "light" as const,
       owner: { kind: "light" as const, compositionId: page.id, lightId: light.id },
@@ -64,10 +79,12 @@ export function projectSceneTimelineRows(
       lightType: light.type,
     })) ?? []),
   ];
-  return subjects.flatMap(({ subject, owner, lightIndex, lightType }) => {
-    const key = `scene:${subject}:${owner.kind === "light" ? owner.lightId : page.id}`;
+  return subjects.flatMap(({ subject, owner, lightIndex, lightType, effectType }) => {
+    const key = `scene:${subject}:${owner.kind === "light" ? owner.lightId : owner.kind === "compositionEffect" ? owner.effectId : page.id}`;
     const properties = projectSceneMotionProperties(page, owner).filter(
-      (property) => property.target.kind === subject,
+      (property) =>
+        property.target.kind === subject ||
+        (subject === "compositionEffect" && property.target.kind === "compositionEffectSetting"),
     );
     const animations = projectSceneMotionAnimations(page, owner);
     const sources = new Map(
@@ -76,7 +93,7 @@ export function projectSceneTimelineRows(
         source.animation,
       ]),
     );
-    const common = { owner, subject, lightIndex, lightType, animations, depth: 0 };
+    const common = { owner, subject, lightIndex, lightType, effectType, animations, depth: 0 };
     const expanded = !collapsed.has(key);
     const rows: SceneTimelineRow[] = [
       {

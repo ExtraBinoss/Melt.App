@@ -1,9 +1,14 @@
+import { transportUv } from "../../shared/coordinates";
 import type { Node } from "three/webgpu";
 import { clamp, max, mix, vec4 } from "three/tsl";
 import { sampleEffect, type EffectNodeContext } from "../../shared/context";
 export function readGradient(context: EffectNodeContext, coord: Node<"vec2">) {
-  const edge = context.controls.resolution.reciprocal().mul(0.5);
-  return sampleEffect(context.source, context.controls, clamp(coord, edge, edge.oneMinus()));
+  const edge = context.controls.pixelFootprint.div(context.controls.contentResolution).mul(0.5);
+  return sampleEffect(
+    context.source,
+    context.controls,
+    transportUv(context.controls, clamp(coord, edge, edge.oneMinus())),
+  );
 }
 export const premultiply = (color: Node<"vec4">) => vec4(color.rgb.mul(color.a), color.a);
 export const unpremultiply = (color: Node<"vec4">) =>

@@ -23,11 +23,15 @@ export function SceneMotionField({
   target,
   label,
   children,
+  disabled = false,
+  onStart,
 }: {
   engine?: EnginePort;
   target?: SceneMotionPropertyTarget;
   label: string;
   children: ReactNode;
+  disabled?: boolean;
+  onStart?: () => void;
 }) {
   const { t } = useTranslation("motionProperties");
   const { t: spatial } = useTranslation("spatial");
@@ -52,7 +56,7 @@ export function SceneMotionField({
       const hidden = state.mode !== "motion" || !animationPresentation(engine).read().details;
       if (slot.current) slot.current.hidden = hidden;
       if (button.current) {
-        button.current.disabled = !descriptor;
+        button.current.disabled = disabled || !descriptor;
         button.current.dataset.animated = String(hasSceneMotionKeys(page, target));
         button.current.dataset.current = String(current);
         button.current.setAttribute("aria-pressed", String(current));
@@ -71,10 +75,20 @@ export function SceneMotionField({
       stop();
       stopPresentation();
     };
-  }, [engine, target, label, t]);
+  }, [engine, target, label, t, disabled]);
   if (!engine || !target) return children;
   return (
-    <div className="motion-property-field">
+    <div
+      className="motion-property-field"
+      onPointerDownCapture={(event) => {
+        if (!disabled && !(event.target as Element).closest(".motion-property-diamond-slot"))
+          onStart?.();
+      }}
+      onFocusCapture={(event) => {
+        if (!disabled && !(event.target as Element).closest(".motion-property-diamond-slot"))
+          onStart?.();
+      }}
+    >
       <div className="motion-property-input">{children}</div>
       <span ref={slot} className="motion-property-diamond-slot" hidden>
         <Tooltip

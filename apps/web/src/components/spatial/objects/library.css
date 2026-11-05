@@ -1,0 +1,94 @@
+.studio-vector-library,
+.studio-pack-library {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  min-width: 0;
+  padding-block: 0.5rem;
+  margin-inline: calc(-1 * var(--spatial-library-gutter, 12px));
+}
+.studio-vector-mode {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-inline: var(--spatial-library-gutter, 12px);
+}
+.studio-library-hint {
+  margin: 0;
+  color: var(--muted-foreground);
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+.studio-pack-license {
+  color: var(--muted-foreground);
+  font-size: 0.75rem;
+  text-decoration: underline;
+}
+.studio-pack-space {
+  position: relative;
+}
+.studio-pack-grid {
+  position: absolute;
+  inset-inline: var(--spatial-library-gutter, 12px);
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  contain: layout style;
+}
+.studio-library-scroll {
+  height: 330px;
+  max-height: 100%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.studio-library-scroll-shadow {
+  flex: 1 1 auto;
+  min-height: 80px;
+}
+.studio-pack-info {
+  display: flex;
+  justify-content: flex-end;
+}
+.studio-pack-library > :not(.scroll-shadow) {
+  margin-inline: var(--spatial-library-gutter, 12px);
+}
+.studio-pack-info button {
+  width: 26px;
+  height: 26px;
+}
+.studio-pack-credits {
+  display: grid;
+  gap: 8px;
+}
+.studio-pack-poster {
+  position: absolute;
+  inset: 0;
+  width: 70px;
+  height: 70px;
+  background-repeat: no-repeat;
+}
+.spatial-object-visual:has(.studio-pack-poster:not([hidden])) > svg {
+  visibility: hidden;
+}
+.spatial-object-visual:has(.spatial-library-preview[data-ready="true"]) > .studio-pack-poster {
+  visibility: hidden;
+}
+.studio-pack-grid .spatial-object {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+}
+.studio-pack-grid .spatial-object-visual {
+  display: grid;
+  place-items: center;
+  color: var(--muted-foreground);
+}
+.studio-pack-library,
+.studio-vector-library {
+  min-height: 0;
+  flex: 1 1 auto;
+  overflow: hidden;
+}

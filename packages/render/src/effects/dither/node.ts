@@ -1,3 +1,4 @@
+import { authoredPixel, transportUv } from "../shared/coordinates";
 import { Fn, If, clamp, dot, float, floor, max, mix, pow, uv, vec3, vec4 } from "three/tsl";
 import { sampleEffect, type EffectNodeContext } from "../shared/context";
 import { bayer4 } from "./bayer";
@@ -11,11 +12,11 @@ export function ditherNode(context: EffectNodeContext) {
   const color = Fn(() => {
     const result = vec3(0).toVar();
     If(u.method!.lessThan(0.5), () => {
-      const cell = floor(position.mul(controls.logicalResolution).div(controls.scale));
+      const cell = floor(authoredPixel(controls, position).div(controls.scale));
       const blocked = sampleEffect(
         source,
         controls,
-        cell.add(0.5).mul(controls.scale).div(controls.logicalResolution),
+        transportUv(controls, cell.add(0.5).mul(controls.scale).div(controls.contentResolution)),
       );
       const luma = vec3(dot(blocked.rgb, vec3(0.2126, 0.7152, 0.0722)));
       const channel = pow(

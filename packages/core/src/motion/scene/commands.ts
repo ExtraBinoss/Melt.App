@@ -15,7 +15,7 @@ export function upsertSceneMotionKeyframe(
 ) {
   const target = command.target as SceneMotionPropertyTarget;
   const motion = page.motion!;
-  if (!page.spatial && target.kind !== "light") {
+  if (!page.spatial && (target.kind === "camera" || target.kind === "environment")) {
     const scene = createSpatialScene();
     page.spatial = {
       ...scene,

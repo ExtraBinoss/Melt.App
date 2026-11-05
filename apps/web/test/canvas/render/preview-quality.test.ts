@@ -123,3 +123,12 @@ it("keeps fifty original photos outside the target soft budget and does not shri
   expect(previewScale(page, 1, 8192, impossible)).toBe(1);
   expect(previewScale(page, 0.5, 8192, impossible)).toBe(0.5);
 });
+
+it("accounts for an expanded immersive root and its background effect surfaces under existing budgets", () => {
+  const page = createPage({ width: 1920, height: 1080, effects: [createEffect("grain")] });
+  const viewport = { x: 0, y: -1500, width: 1920, height: 4080 };
+  const density = previewScale(page, 1, 16384, {}, viewport);
+  const cost = estimatePreviewCost(page, density, {}, true, viewport);
+  expect(density).toBeLessThan(1);
+  expect(cost.targetBytes + 16 * 1024 * 1024).toBeLessThanOrEqual(PREVIEW_MEMORY_BYTES);
+});

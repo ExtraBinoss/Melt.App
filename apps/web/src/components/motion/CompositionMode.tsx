@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { ModeIcon } from "./ModeIcon";
 import { useTranslation } from "react-i18next";
 import {
@@ -34,11 +34,14 @@ export function CompositionMode({
   onMotionEnabled,
   presentation = "segmented",
   buttonLabel,
+  renderMotionButton,
 }: {
   engine: EnginePort;
   onMotionEnabled?: () => void;
   presentation?: "segmented" | "button";
   buttonLabel?: string;
+  /** A persistent entry reuses initialization, then activates the caller's Motion surface. */
+  renderMotionButton?: (activate: () => void) => ReactNode;
 } & ModeOwner) {
   const { t } = useTranslation("motion");
   const owner = state ?? compositionModeState(snapshot);
@@ -88,7 +91,12 @@ export function CompositionMode({
   }
   return (
     <div className="motion-mode" data-canvas-control data-keybinding-capture>
-      {presentation === "button" && current === "static" ? (
+      {renderMotionButton ? (
+        renderMotionButton(() => {
+          if (current === "motion") onMotionEnabled?.();
+          else choose("motion");
+        })
+      ) : presentation === "button" && current === "static" ? (
         <Button size="lg" className="motion-enable-button" onClick={() => choose("motion")}>
           <ModeIcon mode="motion" size={22} />
           {buttonLabel ?? t("motion")}

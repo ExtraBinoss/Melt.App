@@ -54,7 +54,7 @@
   position: absolute;
   left: 4px;
   right: 4px;
-  height: 30px;
+  height: 52px;
   min-height: 0;
   overflow: hidden;
   white-space: nowrap;
@@ -86,8 +86,8 @@
 }
 
 .effect-catalog-virtual .effect-thumbnail {
-  width: 28px;
-  height: 21px;
+  width: 56px;
+  height: 42px;
 }
 .effect-catalog-virtual .effect-catalog-item-label {
   min-width: 0;

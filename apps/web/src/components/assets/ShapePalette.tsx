@@ -1,7 +1,7 @@
 // Virtualized picker adapted from ResumI ShapePicker (MIT); see docs/legal/resumi-MIT.txt.
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Upload } from "lucide-react";
+import { Plus, Upload } from "lucide-react";
 import { createSearchIndex, loadAssets, type AssetKind, type CatalogAsset } from "@musart/assets";
 import type { EnginePort } from "@musart/core";
 import { importSvg } from "../../services/assets/vector/import-svg";
@@ -18,9 +18,13 @@ const EMPTY_ITEMS: readonly CatalogAsset[] = Object.freeze([]);
 export function ShapePalette({
   engine,
   onChoose,
+  searchQuery,
+  compact = false,
 }: {
   engine: EnginePort;
   onChoose: (item: CatalogAsset) => void;
+  searchQuery?: string;
+  compact?: boolean;
 }) {
   const { t } = useTranslation("assets");
   const [category, setCategory] = useState<Category>("shapes");
@@ -42,7 +46,8 @@ export function ShapePalette({
       }
     return [...unique.values()];
   });
-  const [query, setQuery] = useState("");
+  const [ownQuery, setQuery] = useState("");
+  const query = searchQuery ?? ownQuery;
   const [scrollTop, setScrollTop] = useState(0);
 
   const [error, setError] = useState("");
@@ -83,12 +88,18 @@ export function ShapePalette({
     [items, name],
   );
   const filtered = index.search(query, { limit: items.length });
-  const firstRow = Math.max(0, Math.floor(scrollTop / 51) - 1);
-  const visible = filtered.slice(firstRow * 5, (firstRow + 8) * 5);
+  const columns = compact ? 4 : 5,
+    rowHeight = compact ? 102 : 51;
+  const firstRow = Math.max(0, Math.floor(scrollTop / rowHeight) - 1);
+  const visible = filtered.slice(firstRow * columns, (firstRow + 8) * columns);
   function resetScroll() {
     setScrollTop(0);
     if (scroll.current) scroll.current.scrollTop = 0;
   }
+  useEffect(() => {
+    setScrollTop(0);
+    if (scroll.current) scroll.current.scrollTop = 0;
+  }, [searchQuery]);
   async function importFile(file: File | undefined) {
     if (!file) return;
     setError("");
@@ -110,9 +121,9 @@ export function ShapePalette({
     }
   }
   return (
-    <div className={styles.picker}>
+    <div className={`${styles.picker} ${compact ? styles.compact : ""}`}>
       <header>
-        <strong>{t("title")}</strong>
+        {!compact && <strong>{t("title")}</strong>}
         <Button size="sm" variant="ghost" onClick={() => fileInput.current?.click()}>
           <Upload size={14} aria-hidden />
           {t("import")}
@@ -136,29 +147,31 @@ export function ShapePalette({
           </Button>
         ))}
       </ButtonGroup>
-      <div className={styles.search}>
-        <SearchInput
-          aria-label={t("search")}
-          prefix={t("search")}
-          autoFocus
-          captureTyping
-          focusKey={category}
-          value={query}
-          hints={items
-            .slice(0, 6)
-            .map((item) => ({ label: name(item), preview: <PaletteVector item={item} /> }))}
-          onKeyDown={(event) => {
-            if (event.key === "Enter" && filtered[0] && !event.nativeEvent.isComposing) {
-              event.preventDefault();
-              onChoose({ ...filtered[0], name: name(filtered[0]) });
-            }
-          }}
-          onChange={(event) => {
-            setQuery(event.currentTarget.value);
-            resetScroll();
-          }}
-        />
-      </div>
+      {!compact && (
+        <div className={styles.search}>
+          <SearchInput
+            aria-label={t("search")}
+            prefix={t("search")}
+            autoFocus
+            captureTyping
+            focusKey={category}
+            value={query}
+            hints={items
+              .slice(0, 6)
+              .map((item) => ({ label: name(item), preview: <PaletteVector item={item} /> }))}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" && filtered[0] && !event.nativeEvent.isComposing) {
+                event.preventDefault();
+                onChoose({ ...filtered[0], name: name(filtered[0]) });
+              }
+            }}
+            onChange={(event) => {
+              setQuery(event.currentTarget.value);
+              resetScroll();
+            }}
+          />
+        </div>
+      )}
       <input
         ref={fileInput}
         type="file"
@@ -175,7 +188,10 @@ export function ShapePalette({
           {failure}
         </p>
       )}
-      <ScrollShadow>
+      <ScrollShadow
+        fade={compact ? "mask" : "auto"}
+        className={compact ? styles.scrollShadow : undefined}
+      >
         <div
           ref={scroll}
           className={styles.scroller}
@@ -189,9 +205,11 @@ export function ShapePalette({
             <>
               <div
                 className={styles.shapeSpace}
-                style={{ height: Math.ceil(filtered.length / 5) * 51 + 15 }}
+                style={{
+                  height: Math.ceil(filtered.length / columns) * rowHeight + (compact ? 0 : 15),
+                }}
               >
-                <div className={styles.shapeGrid} style={{ top: firstRow * 51 }}>
+                <div className={styles.shapeGrid} style={{ top: firstRow * rowHeight }}>
                   {visible.map((item) => (
                     <button
                       type="button"
@@ -201,19 +219,25 @@ export function ShapePalette({
                       onClick={() => onChoose({ ...item, name: name(item) })}
                     >
                       <PaletteVector item={item} />
+                      {compact && (
+                        <>
+                          <Plus size={15} className={styles.add} aria-hidden />
+                          <span className={styles.name}>{name(item)}</span>
+                        </>
+                      )}
                     </button>
                   ))}
                 </div>
               </div>
               {!filtered.length && <p className={styles.empty}>{t("empty")}</p>}
-              {!!filtered.length && (
+              {!compact && !!filtered.length && (
                 <small className={styles.count}>{t("results", { count: filtered.length })}</small>
               )}
             </>
           )}
         </div>
       </ScrollShadow>
-      <p className={styles.hint}>{t("hint")}</p>
+      {!compact && <p className={styles.hint}>{t("hint")}</p>}
     </div>
   );
 }

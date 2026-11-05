@@ -1,6 +1,6 @@
 import type { CatalogEntry, EffectFamily } from "./model";
 
-export const CATALOG_ROW_HEIGHT = 30;
+export const CATALOG_ROW_HEIGHT = 52;
 export const CATALOG_PADDING = 4;
 export interface CatalogGroup {
   family: EffectFamily;

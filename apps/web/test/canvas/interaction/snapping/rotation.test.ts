@@ -10,6 +10,10 @@ import {
 import { rotationGuide } from "../../../../src/canvas/interaction/snapping/rotation";
 import { SnapFeedback } from "../../../../src/canvas/interaction/snapping/source";
 import { captureGestureOrigin } from "../../../../src/canvas/interaction/gesture-origin";
+import {
+  rotationHandlePoint,
+  ROTATION_HANDLE_OFFSET,
+} from "../../../../src/canvas/selection/rotation-handle";
 it("follows the rotated local axis through nonuniform parents with constant screen offsets", () => {
   const parent = createLayer("group", {
       id: "parent",
@@ -28,7 +32,10 @@ it("follows the rotated local axis through nonuniform parents with constant scre
       posed = { ...page, layers: [parent, { ...layer, rotation: -330 }] },
       matrix = getWorldMatrix(posed, layer.id),
       pivot = transformPoint(matrix, { x: 50, y: 40 }),
-      grip = transformPoint(matrix, { x: 50, y: -19 });
+      grip = rotationHandlePoint(layer.width, matrix, zoom),
+      top = transformPoint(matrix, { x: 50, y: 0 });
+    expect(Math.hypot(grip.x - top.x, grip.y - top.y) * zoom).toBeCloseTo(ROTATION_HANDLE_OFFSET);
+    expect((grip.x - top.x) * matrix[0] + (grip.y - top.y) * matrix[1]).toBeCloseTo(0);
     expect(guide.center).toEqual(pivot);
     expect(guide.angle).toBe(30);
     expect(Math.hypot(guide.to.x - grip.x, guide.to.y - grip.y) * zoom).toBeCloseTo(16);

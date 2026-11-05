@@ -1,6 +1,8 @@
 // TSL port of MIT React-Beautiful-Gradient, ExtraBinoss / Plinka (2026).
+import { authoredUv } from "../shared/coordinates";
+import type { Node } from "three/webgpu";
 import { GRADIENT_STYLES, type GradientStyle } from "@musart/core";
-import { Fn, If, clamp, dot, hue, max, min, mix, uv, vec3, vec4 } from "three/tsl";
+import { Fn, If, clamp, dot, hue, max, min, mix, vec3, vec4 } from "three/tsl";
 import type { EffectNodeContext } from "../shared/context";
 import { fieldContext, type GradientField } from "./shared/field";
 import type { GradientUniforms } from "./shared/uniforms";
@@ -20,7 +22,7 @@ export const GRADIENT_FIELDS: Readonly<Record<GradientStyle, GradientField>> = O
   waves: wavesField,
   stripes: stripesField,
 });
-export function gradientColor(position: ReturnType<typeof uv>, u: GradientUniforms) {
+export function gradientColor(position: Node<"vec2">, u: GradientUniforms) {
   return Fn(() => {
     const raw = fieldContext(position, u);
     // Shared domain temporaries must be emitted outside style branches. Otherwise
@@ -58,5 +60,5 @@ export function gradientColor(position: ReturnType<typeof uv>, u: GradientUnifor
 }
 export function gradientFieldNode({ controls }: EffectNodeContext) {
   if (!controls.gradient) throw new Error("Gradient uniforms are missing.");
-  return vec4(gradientColor(uv(), controls.gradient), 1);
+  return vec4(gradientColor(authoredUv(controls), controls.gradient), 1);
 }

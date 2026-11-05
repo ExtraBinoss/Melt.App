@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { memo, useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { RadialControls } from "./RadialControls";
 import { RetainedPaint } from "./retained-paint";
@@ -60,9 +61,11 @@ export function GradientControl({
   patch,
   preview,
   cancel,
-}: PropertyActions & { layer: Layer; engine?: EnginePort }) {
+  presetContent,
+}: PropertyActions & { layer: Layer; engine?: EnginePort; presetContent?: ReactNode }) {
   return (
     <PaintGradientControl
+      presetContent={presetContent}
       ownerId={layer.id}
       identity={layer}
       layerId={layer.id}
@@ -77,6 +80,7 @@ export function GradientControl({
   );
 }
 export function BackgroundGradientControl({
+  presetContent,
   page,
   engine,
   preview,
@@ -84,6 +88,7 @@ export function BackgroundGradientControl({
   cancel,
 }: {
   page: Pick<Composition, "id" | "background" | "backgroundGradient">;
+  presetContent?: ReactNode;
   engine?: EnginePort;
   preview: (patch: Partial<Composition>) => void;
   patch: (patch: Partial<Composition>) => void;
@@ -108,6 +113,7 @@ export function BackgroundGradientControl({
   return (
     <BackgroundPaintLeaf
       key={ownerId}
+      presetContent={presetContent}
       ownerId={ownerId}
       identity={engine ? ownerId : page}
       engine={engine}
@@ -119,6 +125,7 @@ export function BackgroundGradientControl({
   );
 }
 function PaintGradientControl({
+  presetContent,
   ownerId,
   identity,
   layerId,
@@ -131,6 +138,7 @@ function PaintGradientControl({
   onCancel,
   presentation,
 }: {
+  presetContent?: ReactNode;
   ownerId: string;
   identity: unknown;
   layerId?: string;
@@ -242,6 +250,7 @@ function PaintGradientControl({
     return (
       <div className={styles.editor} inert={disabled || undefined}>
         <GradientPresets
+          presetContent={presetContent}
           identity={ownerId}
           gradient={paint}
           disabled={disabled}
@@ -381,6 +390,7 @@ function PaintGradientControl({
       </div>
     );
   }, [
+    presetContent,
     paint,
     disabled,
     engine,

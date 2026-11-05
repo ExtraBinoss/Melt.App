@@ -46,6 +46,8 @@ test("Studio native recipe previews restore, commit once and export real GPU cro
   const before = await page.evaluate(() => JSON.stringify(window.musart!.snapshot().project));
   const selection = await page.evaluate(() => window.musart!.session().selection);
   await page.getByRole("button", { name: "Background", exact: true }).click();
+  await page.locator(".studio-background-popover").getByRole("button", { name: "Advanced", exact: true }).click();
+  await page.locator(".studio-background-advanced").getByRole("button", { name: "Presets", exact: true }).click();
   const preset = page.locator('[data-background-preset="atmosphere-aurora-mist"]');
   await preset.scrollIntoViewIfNeeded();
   const old = await canvas.getAttribute("data-rendered-revision");
@@ -64,6 +66,8 @@ test("Studio native recipe previews restore, commit once and export real GPU cro
     )
     .toEqual(["grain", "feather"]);
   expect(await page.evaluate(() => window.musart!.session().selection)).toEqual(selection);
+  await page.keyboard.press("Escape");
+  await page.keyboard.press("Escape");
   await page.keyboard.press("Escape");
   await page.evaluate(() => window.musart!.undo());
   expect(await page.evaluate(() => JSON.stringify(window.musart!.snapshot().project))).toBe(before);

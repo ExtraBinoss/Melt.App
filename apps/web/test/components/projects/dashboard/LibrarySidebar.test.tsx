@@ -53,7 +53,7 @@ test("lists at most five recent durable IDs and delegates navigation/open withou
   fireEvent.click(screen.getByRole("button", { name: "Templates" }));
   expect(p.onViewChange).toHaveBeenCalledExactlyOnceWith("templates");
   fireEvent.click(screen.getByRole("button", { name: "Ouvrir le projet récent Recent 3" }));
-  expect(p.onChooseRecent).toHaveBeenCalledExactlyOnceWith("durable-3");
+  expect(p.onChooseRecent).toHaveBeenCalledExactlyOnceWith("durable-3", "Recent 3");
   expect(d.services.openProject).not.toHaveBeenCalled();
   expect(d.services.flushThumbnails).not.toHaveBeenCalled();
   expect(d.services.loadProjectThumbnails).toHaveBeenCalledTimes(5);

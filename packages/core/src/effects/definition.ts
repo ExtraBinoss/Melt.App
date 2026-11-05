@@ -1,4 +1,5 @@
 import type { Effect, EffectType } from "../document/model";
+import type { EffectPreviewDefinition } from "./sdk/preview";
 
 export interface NumberEffectParameter {
   readonly kind: "number";
@@ -61,6 +62,20 @@ export type EffectParameter =
   | ColorEffectParameter
   | TextEffectParameter;
 export interface EffectDefinition {
+  /** Shared SDK services; authors only declare parameters and their native TSL graph. */
+  readonly sdk?: {
+    readonly placement?: boolean;
+    readonly direction?: string;
+    readonly preferredTargets?: readonly string[];
+    /** Photographic source and native scene used by the offline catalog baker. */
+    readonly preview?: EffectPreviewDefinition;
+  };
+  readonly requirements?: {
+    readonly depth?: boolean;
+    readonly history?: boolean;
+    readonly scope?: "composition";
+  };
+
   readonly descriptionKey?: string;
   /** Validation-only compatibility; excluded from authoring and rendering. */
   readonly retired?: boolean;
@@ -152,7 +167,7 @@ export function defineEffect(
   parameters: readonly EffectParameter[],
   category: EffectDefinition["category"] = "effect",
   coverage: EffectDefinition["coverage"] = "preserve",
-  options: Pick<EffectDefinition, "identityAtZero" | "retired"> = {},
+  options: Pick<EffectDefinition, "identityAtZero" | "retired" | "sdk" | "requirements"> = {},
 ): EffectDefinition {
   return Object.freeze({
     ...options,

@@ -9,18 +9,19 @@ import { sameMorph } from "./structural";
 
 export function captureEffects(
   context: HistoryContext,
-  layer: Layer,
+  layer: Layer | undefined,
   proposed: readonly Effect[],
 ): void {
-  const before = new Map(layer.effects.map((effect) => [effect.id, effect]));
+  const readStack = () => (layer ? layer.effects : context.page.effects) ?? [];
+  const before = new Map(readStack().map((effect) => [effect.id, effect]));
   const next = new Map(proposed.map((effect) => [effect.id, effect]));
   const compositionId = context.page.id,
-    layerId = layer.id;
+    location = layer ? { layerId: layer.id } : {};
   for (const [effectId, old] of before) {
     const owner = {
       kind: "effect",
       compositionId,
-      layerId,
+      ...location,
       effectId,
       effectType: old.type,
     } as const;
@@ -34,7 +35,7 @@ export function captureEffects(
       context.history.action("add", { ...owner, effectType: effect.type });
       continue;
     }
-    const read = () => layer.effects.find((item) => item.id === effectId)!;
+    const read = () => readStack().find((item) => item.id === effectId)!;
     for (const property of EFFECT_MOTION_PROPERTIES) {
       const target: HistoryPropertyTarget = { owner, property };
       context.history.watch(
@@ -65,13 +66,18 @@ export function captureEffects(
       context.history.action("add", {
         kind: "effect",
         compositionId,
-        layerId,
+        ...location,
         effectId,
         effectType: effect.type,
       });
   if (
-    layer.effects.length === proposed.length &&
-    layer.effects.some((effect, index) => effect.id !== proposed[index]?.id)
+    readStack().length === proposed.length &&
+    readStack().some((effect, index) => effect.id !== proposed[index]?.id)
   )
-    context.history.action("reorder", { kind: "layer", compositionId, layerId });
+    context.history.action(
+      "reorder",
+      layer
+        ? { kind: "layer", compositionId, layerId: layer.id }
+        : { kind: "composition", compositionId },
+    );
 }

@@ -1,7 +1,12 @@
+.editor-notice-anchor {
+  position: fixed;
+  z-index: 90;
+}
 .editor-notice.notice-card {
+  position: relative;
   left: auto;
-  right: 16px;
-  bottom: 16px;
+  right: auto;
+  bottom: auto;
   max-width: min(540px, calc(100vw - 32px));
   max-height: min(50dvh, 420px);
   transform: none;

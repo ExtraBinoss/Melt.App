@@ -46,7 +46,7 @@ export const addMotionAnimation: CommandHandler<"addMotionAnimation"> = (context
       "INVALID_COMMAND",
       "Scene animation owner is missing or mismatched",
     );
-    if (!page.spatial) {
+    if (!page.spatial && command.owner.kind !== "compositionEffect") {
       const scene = createSpatialScene();
       page.spatial = {
         ...scene,
@@ -67,7 +67,14 @@ export const addMotionAnimation: CommandHandler<"addMotionAnimation"> = (context
     if (compareMotionTime(end, page.motion.duration) > 0) page.motion.duration = end;
     return { pageId };
   }
-  const track = page.motion.tracks.find((track) => track.id === command.trackId);
+  ensure(
+    Boolean(command.trackId) !== Boolean(command.layerId),
+    "INVALID_COMMAND",
+    "Animation needs one occurrence or layer owner",
+  );
+  const track = page.motion.tracks.find((track) =>
+    command.trackId ? track.id === command.trackId : track.layerId === command.layerId,
+  );
   ensure(track, "NOT_FOUND", "Animation occurrence is missing");
   const layer = getLayer(page, track.layerId);
   assertEditable(page, layer);
@@ -85,7 +92,22 @@ export const addMotionAnimation: CommandHandler<"addMotionAnimation"> = (context
     ...cloneValue(effect),
     id: nextId("effect"),
   }));
-  layer.effects.push(...effects);
+  if (command.effectIds) {
+    ensure(
+      command.effectIds.length === command.preset.effects.length &&
+        new Set(command.effectIds).size === command.effectIds.length,
+      "INVALID_COMMAND",
+      "Invalid existing animation effects",
+    );
+    command.effectIds.forEach((id, index) => {
+      const effect = layer.effects.find((effect) => effect.id === id);
+      ensure(
+        effect && effect.type === command.preset.effects[index]!.type,
+        "INVALID_COMMAND",
+        "Existing animation effect is missing or mismatched",
+      );
+    });
+  } else layer.effects.push(...effects);
   (track.animations ??= []).push({
     id: nextId("animation"),
     preset: cloneValue(command.preset),
@@ -93,7 +115,8 @@ export const addMotionAnimation: CommandHandler<"addMotionAnimation"> = (context
     duration: cloneValue(duration),
     strength: command.strength ?? 1,
     enabled: command.enabled ?? true,
-    effectIds: effects.map((effect) => effect.id),
+    effectIds: command.effectIds ? [...command.effectIds] : effects.map((effect) => effect.id),
+    ...(command.effectIds ? { ownsEffects: false } : {}),
   });
   const end = addMotionTime(command.start, duration);
   if (compareMotionTime(end, page.motion.duration) > 0) page.motion.duration = end;
@@ -160,8 +183,9 @@ export const deleteMotionAnimation: CommandHandler<"deleteMotionAnimation"> = (
       ),
     ]),
   );
-  layer.effects = layer.effects.filter(
-    (effect) => !animation.effectIds.includes(effect.id) || used.has(effect.id),
-  );
+  if (animation.ownsEffects !== false)
+    layer.effects = layer.effects.filter(
+      (effect) => !animation.effectIds.includes(effect.id) || used.has(effect.id),
+    );
   return { pageId: context.pageId };
 };

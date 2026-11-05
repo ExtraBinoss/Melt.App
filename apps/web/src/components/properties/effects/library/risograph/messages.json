@@ -1,0 +1,42 @@
+{
+  "en": {
+    "name": "Risograph",
+    "parameter": {
+      "palette": "Ink palette",
+      "inkA": "First ink",
+      "inkB": "Second ink",
+      "inkC": "Third ink",
+      "paperColor": "Paper color",
+      "dotSize": "Print dot size",
+      "contrast": "Separation contrast",
+      "inkDensity": "Ink density",
+      "misregistration": "Ink misregistration",
+      "grain": "Ink grain",
+      "paperTexture": "Paper texture",
+      "centerX": "Print origin X",
+      "centerY": "Print origin Y",
+      "angle": "Print direction"
+    },
+    "choice": { "duotone": "Two inks", "tritone": "Three inks" }
+  },
+  "fr": {
+    "name": "Risographie",
+    "parameter": {
+      "palette": "Palette d’encres",
+      "inkA": "Première encre",
+      "inkB": "Deuxième encre",
+      "inkC": "Troisième encre",
+      "paperColor": "Couleur du papier",
+      "dotSize": "Taille des points",
+      "contrast": "Contraste des séparations",
+      "inkDensity": "Densité d’encre",
+      "misregistration": "Décalage des encres",
+      "grain": "Grain d’encre",
+      "paperTexture": "Texture du papier",
+      "centerX": "Origine d’impression X",
+      "centerY": "Origine d’impression Y",
+      "angle": "Direction d’impression"
+    },
+    "choice": { "duotone": "Deux encres", "tritone": "Trois encres" }
+  }
+}

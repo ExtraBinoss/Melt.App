@@ -14,7 +14,9 @@ export function isSceneMotionPreset(
     (channel) =>
       channel.target.kind === "camera" ||
       channel.target.kind === "environment" ||
-      channel.target.kind === "light",
+      channel.target.kind === "light" ||
+      channel.target.kind === "compositionEffect" ||
+      channel.target.kind === "compositionEffectSetting",
   );
 }
 function validateStoredPreset(preset: StoredMotionPreset) {

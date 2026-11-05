@@ -2,7 +2,7 @@ import { animationPresetName } from "../../spatial/presentation";
 import { MaterialSwatch } from "../../spatial/MaterialPicker";
 import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import { Camera, Sun, Lightbulb, Trash2 } from "lucide-react";
+import { Camera, Sun, Lightbulb, Sparkles, Trash2 } from "lucide-react";
 import type { EnginePort } from "@musart/core";
 import {
   isSceneMotionPreset,
@@ -160,8 +160,10 @@ export function PresetGrid({
                             <Camera size={32} />
                           ) : preset.channels[0]?.target.kind === "environment" ? (
                             <Sun size={32} />
-                          ) : (
+                          ) : preset.channels[0]?.target.kind === "light" ? (
                             <Lightbulb size={32} />
+                          ) : (
+                            <Sparkles size={32} />
                           )
                         ) : preset.id.startsWith("spatial-") ? (
                           <MaterialSwatch index={0} />

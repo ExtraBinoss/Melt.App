@@ -35,10 +35,16 @@ export function shatterNode({ source, controls }: EffectNodeContext) {
   const processed = Fn(() => {
     const position = uv(),
       resolution = controls.logicalResolution,
+      authored = controls.contentResolution,
+      origin = vec2(
+        controls.contentOrigin.x,
+        resolution.y.sub(controls.contentOrigin.y).sub(authored.y),
+      ).toVar(),
       // Portable impact coordinates are Y-down; source/plane UVs are Y-up.
+      // Viewport crops and expanded margins transport the same authored field.
       // Materialize shared expressions before either Fn/branch can cache a temporary.
-      pixel = vec2(position.x, position.y.oneMinus()).mul(resolution).toVar(),
-      center = vec2(u.centerX!, u.centerY!).mul(resolution).toVar(),
+      pixel = vec2(position.x, position.y.oneMinus()).mul(resolution).sub(origin).toVar(),
+      center = vec2(u.centerX!, u.centerY!).mul(authored).toVar(),
       size = max(8, controls.scale).toVar(),
       seed = controls.randomSeedUint;
     const field = vec4(0).toVar();
@@ -62,14 +68,19 @@ export function shatterNode({ source, controls }: EffectNodeContext) {
       ),
       base = field.xy.add(rotated).add(tilt.mul(u.displacement!)),
       incident = vec3(0, 0, -1),
-      halfTexel = vec2(0.5).div(controls.resolution);
+      halfTexel = vec2(0.5).div(controls.resolution),
+      sourceMinimum = halfTexel,
+      sourceMaximum = halfTexel.oneMinus();
     const transmitted = (ior: Node<"float">) => {
       const ray = refract(incident, normal, float(1).div(max(1, ior)));
-      const coord = base.add(ray.xy.div(max(abs(ray.z), 0.05)).mul(u.thickness!)).div(resolution);
+      const coord = base
+        .add(ray.xy.div(max(abs(ray.z), 0.05)).mul(u.thickness!))
+        .add(origin)
+        .div(resolution);
       return vec2(coord.x, coord.y.oneMinus());
     };
     const read = (coord: Node<"vec2">) =>
-      sampleEffect(source, controls, clamp(coord, halfTexel, halfTexel.oneMinus()));
+      sampleEffect(source, controls, clamp(coord, sourceMinimum, sourceMaximum));
     const coord = transmitted(u.ior!),
       middle = read(coord),
       dispersion = u.dispersion!.mul(0.12),
@@ -112,7 +123,7 @@ export function shatterNode({ source, controls }: EffectNodeContext) {
         .oneMinus()
         .mul(min(1, u.crackWidth!)),
       fractured = mix(highlighted, colors.crackColor!, crack.mul(u.cracks!));
-    const distance = length(pixel.sub(center)).div(min(resolution.x, resolution.y)),
+    const distance = length(pixel.sub(center)).div(min(authored.x, authored.y)),
       outer = max(0.05, u.radius!),
       inner = min(u.innerRadius!, outer.mul(0.95)),
       falloff = pow(smoothstep(outer.mul(0.65), outer, distance).oneMinus(), u.falloff!),

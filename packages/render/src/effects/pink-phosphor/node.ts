@@ -1,3 +1,4 @@
+import { authoredPixelDown } from "../shared/coordinates";
 import {
   Fn,
   If,
@@ -13,7 +14,6 @@ import {
   sin,
   uint,
   uv,
-  vec2,
   vec4,
 } from "three/tsl";
 import { sampleEffect, type EffectNodeContext } from "../shared/context";
@@ -27,7 +27,7 @@ export function pinkPhosphorNode(context: EffectNodeContext) {
     original = sampleEffect(source, controls, uv());
   const processed = Fn(() => {
     const position = uv().toVar(),
-      pixel = vec2(position.x, position.y.oneMinus()).mul(controls.logicalResolution).toVar(),
+      pixel = authoredPixelDown(controls, position).toVar(),
       phase = controls.time.mul(u.speed!).toVar(),
       tone = phosphorTone(original.rgb, controls).toVar(),
       color = phosphorPalette(tone, controls).toVar(),

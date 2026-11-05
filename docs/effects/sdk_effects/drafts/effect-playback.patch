@@ -1,0 +1,224 @@
+--- a/apps/web/src/components/properties/effects/EffectPlayback.tsx
++++ b/apps/web/src/components/properties/effects/EffectPlayback.tsx
+@@ -1,103 +1,143 @@
+ import { useEffect, useRef, useState } from "react";
+-import { Play, Pause } from "lucide-react";
+-import type { Effect, EnginePort } from "@musart/core";
++import type { Effect, EnginePort, MotionDriver, MotionInputEvent, MotionInputKind } from "@musart/core";
+ import { useTranslation } from "react-i18next";
+ import { Button } from "../../ui/button";
++import { SelectField } from "../../shared/SelectField";
+ import { startEffectPreview } from "../../../state/session/effect-preview";
+-import "./messages";
++import { addEffectDriver, effectDriverChannel, effectMotionProperties, effectPropertyLabel, motionPropertyKey, previewEffectDriver, type EffectDriverProperty } from "./effect-motion/authoring";
++import { appendMotionInput } from "./effect-motion/input-recording";
++import { InputPad, type EffectPadInput } from "./effect-motion/InputPad";
++import { beginEffectInputSession } from "./effect-motion/input-session";
++import "./effect-motion/messages";
++import "./effect-motion/style.css";
+ 
+-export function EffectPlayback({
+-  engine,
+-  effect,
+-  disabled,
+-  onChange,
+-  onStart,
+-  onCancel,
+-}: {
+-  engine: EnginePort;
+-  effect: Effect;
+-  disabled: boolean;
++const INPUTS: MotionInputKind[] = ["pointerX", "pointerY", "pointerXY", "pointerDrag", "primaryClick", "secondaryClick"];
++
++/** Controls create ordinary editable action blocks; a recording is one undo transaction. */
++export function EffectPlayback({ engine, effect, disabled, onChange, onStart, onCancel }: {
++  engine: EnginePort; effect: Effect; disabled: boolean;
+   onChange(this: void, patch: Partial<Effect>, preview?: boolean): void;
+-  onStart?: () => void;
+-  onCancel?: () => void;
++  onStart?: () => void; onCancel?: () => void;
+ }) {
+   const { t } = useTranslation();
+-  const [playing, setPlaying] = useState(false);
+-  const root = useRef<HTMLDivElement>(null),
+-    output = useRef<HTMLOutputElement>(null);
++  const [propertyKey, setPropertyKey] = useState("");
++  const [secondaryKey, setSecondaryKey] = useState("");
++  const [input, setInput] = useState<MotionInputKind>("pointerX");
++  const [recording, setRecording] = useState(false);
++  const [status, setStatus] = useState<"saved" | "failed" | "">("");
++  const output = useRef<HTMLOutputElement>(null);
++  const root = useRef<HTMLDivElement>(null);
++  const latest = useRef({ onChange, onStart, onCancel });
++  latest.current = { onChange, onStart, onCancel };
+   const finish = useRef<((commit?: boolean) => void) | null>(null);
++  const retireInput = useRef<(() => void) | null>(null);
++  const take = useRef<{ started: number; events: MotionInputEvent[] } | null>(null);
++  const properties = effectMotionProperties(engine, effect).filter((property) => property.kind !== "string");
++  const property = properties.find((property) => motionPropertyKey(property) === propertyKey) ??
++    properties.find((property) => property.target.property === "time") ??
++    properties.find((property) => property.target.property === "amount") ?? properties[0];
++  const secondary = properties.find((item) => motionPropertyKey(item) === secondaryKey && item !== property) ?? properties.find((item) => item !== property && /Y$/.test(item.target.property)) ?? properties.find((item) => item !== property);
++  const snapshot = engine.getSnapshot();
++  const page = snapshot.project.pages.find((page) => page.id === snapshot.pageId);
++
+   useEffect(() => {
+-    const pointer = (event: globalThis.PointerEvent) => {
+-      if ((event.target as Element).closest?.("[data-effect-reset]")) finish.current?.(false);
+-      else if (!root.current?.contains(event.target as Node)) finish.current?.();
++    const pointer = (event: PointerEvent) => {
++      if (!root.current?.contains(event.target as Node) && !(event.target as Element).closest?.("[data-effect-input-surface]")) finish.current?.(false);
+     };
+     const key = (event: KeyboardEvent) => {
+       if (event.key === "Escape" && finish.current) {
+-        event.preventDefault();
+-        event.stopPropagation();
+-        finish.current(false);
+-      } else if (!root.current?.contains(event.target as Node)) finish.current?.();
++        event.preventDefault(); event.stopPropagation(); finish.current(false);
++      }
+     };
+-    const hide = () => {
+-      if (document.hidden) finish.current?.();
+-    };
+-    const blur = () => finish.current?.();
++    const cancel = () => finish.current?.(false);
++    const hide = () => { if (document.hidden) cancel(); };
+     window.addEventListener("pointerdown", pointer, true);
+     window.addEventListener("keydown", key, true);
+-    window.addEventListener("blur", blur);
++    window.addEventListener("blur", cancel);
+     document.addEventListener("visibilitychange", hide);
+     return () => {
+       window.removeEventListener("pointerdown", pointer, true);
+       window.removeEventListener("keydown", key, true);
+-      window.removeEventListener("blur", blur);
++      window.removeEventListener("blur", cancel);
+       document.removeEventListener("visibilitychange", hide);
+       finish.current?.(false);
+     };
+-  }, []);
+-  return (
+-    <div ref={root} className="effect-playback">
+-      <Button
+-        type="button"
+-        size="sm"
+-        variant="secondary"
+-        disabled={disabled}
+-        aria-pressed={playing}
+-        onClick={() => {
+-          if (finish.current) {
+-            finish.current();
+-            return;
+-          }
+-          setPlaying(true);
+-          finish.current = startEffectPreview(engine, {
+-            time: effect.time ?? 0,
+-            clock: {
+-              now: () => performance.now(),
+-              request: (cb) => requestAnimationFrame(cb),
+-              cancel: (id) => cancelAnimationFrame(id),
+-            },
+-            begin: () => onStart?.(),
+-            preview: (time) => {
+-              if (output.current) output.current.value = `${time.toFixed(2)} s`;
+-              onChange({ time }, true);
+-            },
+-            commit: (time) => onChange({ time }),
+-            cancel: () => {
+-              if (output.current) output.current.value = `${(effect.time ?? 0).toFixed(2)} s`;
+-              onCancel?.();
+-            },
+-            stopped: () => {
+-              finish.current = null;
+-              setPlaying(false);
+-            },
+-          });
+-        }}
+-      >
+-        {playing ? <Pause size={13} aria-hidden /> : <Play size={13} aria-hidden />}
+-        {t(playing ? "effectControls:pauseLive" : "effectControls:playLive")}
++  }, [engine, effect.id]);
++
++  function add(kind: "loop" | "pingPong" | "pulse") {
++    if (!property) return;
++    finish.current?.(false);
++    try {
++      addEffectDriver(engine, effect, effectDriverChannel(property, { kind, period: { value: 2, rate: 1 } }), t(`effectMotion:${kind}`));
++      setStatus("saved");
++    } catch { setStatus("failed"); }
++  }
++
++  function record(selected: EffectDriverProperty) {
++    setStatus("");
++    const events: MotionInputEvent[] = [];
++    take.current = { started: performance.now(), events };
++    const driver: MotionDriver = { kind: input, initial: input.endsWith("Click") ? 0 : 0.5, events, response: { frequency: 16, damping: 0.8 } };
++    const channel = effectDriverChannel(selected, input === "pointerXY" ? { ...driver, axis: "x" } : driver);
++    const secondChannel = input === "pointerXY" && secondary ? effectDriverChannel(secondary, { ...driver, axis: "y" }) : null;
++    const channels = secondChannel ? [channel, secondChannel] : [channel];
++    setRecording(true);
++    finish.current = startEffectPreview(engine, {
++      time: 0,
++      sampleOnFinish: true,
++      clock: { now: () => performance.now(), request: (callback) => requestAnimationFrame(callback), cancel: (handle) => cancelAnimationFrame(handle) },
++      begin: () => latest.current.onStart?.(),
++      preview: (seconds) => {
++        if (output.current) output.current.value = t("effectMotion:live", { time: seconds.toFixed(2) });
++        const first = previewEffectDriver(selected, channel, seconds * 1000);
++        const second = secondChannel && secondary ? previewEffectDriver(secondary, secondChannel, seconds * 1000) : {};
++        const patch = { ...first, ...second, ...((first.settings || second.settings) ? { settings: { ...first.settings, ...second.settings } } : {}) };
++        latest.current.onChange(patch.settings ? { settings: { ...effect.settings, ...patch.settings } } : patch, true);
++      },
++      commit: (seconds) => {
++        latest.current.onCancel?.();
++        if (!events.length) return;
++        try {
++          addEffectDriver(engine, effect, channels, t("effectMotion:recorded", { driver: t(`effectMotion:${input}`) }), seconds * 1000);
++          setStatus("saved");
++        } catch { setStatus("failed"); }
++      },
++      cancel: () => latest.current.onCancel?.(),
++      stopped: () => { retireInput.current?.(); retireInput.current = null; finish.current = null; take.current = null; setRecording(false); },
++    });
++    retireInput.current = beginEffectInputSession(engine, { emit, cancel: () => finish.current?.(false) });
++  }
++
++  function emit(event: EffectPadInput) {
++    const current = take.current;
++    if (!current) return;
++    const at = { value: Math.max(0, Math.round((performance.now() - current.started) * 1000)), rate: 1000000 };
++    if (!appendMotionInput(current.events, { ...event, at })) finish.current?.();
++  }
++
++  return <div ref={root} className="effect-playback effect-motion" data-keybinding-capture>
++    {property ? <>
++      <SelectField label={t("effectMotion:property")} value={motionPropertyKey(property)} disabled={disabled || recording}
++        options={properties.map((item) => ({ value: motionPropertyKey(item), label: t(effectPropertyLabel(effect, item), { defaultValue: item.target.property }) }))}
++        onValueChange={setPropertyKey} />
++      <div className="effect-motion-actions">
++        {(["loop", "pingPong", "pulse"] as const).map((kind) => <Button key={kind} size="sm" variant="secondary" disabled={disabled || recording} onClick={() => add(kind)}>
++          {t(page?.motion?.mode === "motion" ? "effectMotion:add" : "effectMotion:enable", { driver: t(`effectMotion:${kind}`) })}
++        </Button>)}
++      </div>
++      <SelectField label={t("effectMotion:input")} value={input} disabled={disabled || recording}
++        options={INPUTS.map((kind) => ({ value: kind, label: t(`effectMotion:${kind}`) }))} onValueChange={(value) => setInput(value as MotionInputKind)} />
++      {input === "pointerXY" && secondary && <SelectField label={t("effectMotion:propertyY")} value={motionPropertyKey(secondary)} disabled={disabled || recording}
++        options={properties.filter((item) => item !== property).map((item) => ({ value: motionPropertyKey(item), label: t(effectPropertyLabel(effect, item), { defaultValue: item.target.property }) }))} onValueChange={setSecondaryKey} />}
++      <Button size="sm" variant="secondary" disabled={disabled} onClick={() => recording ? finish.current?.() : record(property)}>
++        {t(recording ? "effectMotion:stop" : "effectMotion:record")}
+       </Button>
+-      <output ref={output} aria-label={t("effectControls:liveTime")}>
+-        {(effect.time ?? 0).toFixed(2)} s
+-      </output>
+-    </div>
+-  );
++      {recording && <>
++        <Button size="sm" variant="ghost" onClick={() => finish.current?.(false)}>{t("effectMotion:cancel")}</Button>
++        <InputPad emit={emit} cancel={() => finish.current?.(false)} />
++        <output ref={output} aria-live="off" />
++      </>}
++      {status && <p role={status === "failed" ? "alert" : "status"}>{t(`effectMotion:${status}`)}</p>}
++    </> : <p>{t("effectMotion:unavailable")}</p>}
++  </div>;
+ }

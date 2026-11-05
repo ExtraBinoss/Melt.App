@@ -21,6 +21,58 @@ async function counters(page: Page) {
   });
 }
 
+test("horizontal layer scrolling appears only when expanded hierarchy outgrows the viewport", async ({
+  page,
+}) => {
+  test.setTimeout(90000);
+  await page.addInitScript(() => {
+    localStorage.setItem("musart.language", "en");
+    localStorage.setItem("musart.editor-tutorial.v1", "done");
+  });
+  await page.goto("/editor?automation=1&workspace=classic");
+  await page.waitForFunction(() => Boolean(window.musart), undefined, { timeout: 60000 });
+  const shallow = createPage({
+    layers: [createLayer("rectangle", { name: "A long layer name ".repeat(12) })],
+  });
+  await page.evaluate(
+    (project) => window.musart!.load(project),
+    createProject({ pages: [shallow] }),
+  );
+  const tree = page.locator(".layer-tree");
+  await expect(tree).toBeVisible();
+  await expect
+    .poll(() => tree.evaluate((node) => node.scrollWidth - node.clientWidth))
+    .toBeLessThanOrEqual(1);
+  const groups = Array.from({ length: 18 }, (_, index) =>
+    createLayer("group", {
+      id: `scroll-depth-${index}`,
+      parentId: index ? `scroll-depth-${index - 1}` : null,
+      name: `Group ${index}`,
+    }),
+  );
+  const deep = createPage({
+    layers: [
+      ...groups,
+      createLayer("rectangle", { parentId: "scroll-depth-17", name: "Deep artwork" }),
+    ],
+  });
+  await page.evaluate((project) => window.musart!.load(project), createProject({ pages: [deep] }));
+  await expect
+    .poll(() => tree.evaluate((node) => node.scrollWidth - node.clientWidth))
+    .toBeGreaterThan(100);
+  await tree.hover();
+  await page.mouse.wheel(600, 0);
+  await expect.poll(() => tree.evaluate((node) => node.scrollLeft)).toBeGreaterThan(100);
+  await page.evaluate(
+    (project) => window.musart!.load(project),
+    createProject({ pages: [shallow] }),
+  );
+  await expect
+    .poll(() => tree.evaluate((node) => node.scrollWidth - node.clientWidth))
+    .toBeLessThanOrEqual(1);
+  await expect.poll(() => tree.evaluate((node) => node.scrollLeft)).toBe(0);
+});
+
 test("native reverse scrolling preserves focus on a retained row while recycling other shells", async ({
   page,
 }) => {

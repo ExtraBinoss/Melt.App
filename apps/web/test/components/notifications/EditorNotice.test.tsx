@@ -6,6 +6,8 @@ import {
   SUCCESS_NOTICE_MS,
 } from "../../../src/components/notifications/EditorNotice";
 import { setup } from "../../support/ui";
+import { WorkspaceTheme } from "../../../src/ui/brand/WorkspaceTheme";
+import { workspaceNoticePlacement } from "../../../src/ui/brand/notice-placement";
 
 vi.mock("motion/react", async (original) => ({
   ...(await original<typeof import("motion/react")>()),
@@ -19,6 +21,38 @@ const advance = async (ms: number) => {
     vi.advanceTimersByTime(ms);
   });
 };
+
+test("all feedback uses the typed workspace policy through portals without changing inherited page styles", () => {
+  const d = setup(),
+    close = vi.fn(),
+    before = document.body.getAttribute("style"),
+    renderNotice = (mode: "classic" | "studio", error = false) => (
+      <WorkspaceTheme value={mode}>
+        <EditorNotice
+          notice={{ message: error ? "Import failed" : "Sphere added", error }}
+          onClose={close}
+        />
+      </WorkspaceTheme>
+    ),
+    view = d.mount(renderNotice("classic"));
+  expect(workspaceNoticePlacement(undefined)).toBe("top-center");
+  expect(screen.getByRole("status").parentElement).toHaveAttribute(
+    "data-notice-placement",
+    "top-center",
+  );
+  view.rerender(renderNotice("studio", true));
+  const anchor = screen.getByRole("alert").parentElement!;
+  expect(anchor).toHaveAttribute("data-notice-placement", "bottom-right");
+  expect(anchor).toHaveAttribute("data-workspace-theme", "studio");
+  expect(anchor.parentElement).toBe(document.body);
+  expect(document.body.getAttribute("style")).toBe(before);
+  view.rerender(renderNotice("classic", true));
+  expect(screen.getByRole("alert").parentElement).toHaveAttribute(
+    "data-notice-placement",
+    "top-center",
+  );
+  view.unmount();
+});
 
 test("expires success at four seconds and errors at eight; replacing a notice restarts its timer", async () => {
   vi.useFakeTimers();

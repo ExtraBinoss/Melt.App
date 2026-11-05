@@ -7,6 +7,7 @@ import {
   type WebGPURenderer,
   type Node,
   type NodeBuilder,
+  type Vector3,
 } from "three/webgpu";
 import { Fn, pmremTexture, reflectVector, roughness, uniform, vec3 } from "three/tsl";
 import type { CaptureMesh } from "./meshes";
@@ -28,7 +29,15 @@ function makeBinding(renderer: WebGPURenderer, base: Material, texture: Texture)
       context.getTextureLevel?.() ?? roughness,
     );
   })();
-  return { material, mapping, envNode, texture, base, version: -1 };
+  return {
+    material,
+    mapping,
+    envNode,
+    texture,
+    base,
+    version: -1,
+    appearance: undefined as string | undefined,
+  };
 }
 export class ReflectionBindings {
   private readonly copies = new Map<string, ReturnType<typeof makeBinding>>();
@@ -37,8 +46,9 @@ export class ReflectionBindings {
   bind(
     renderer: WebGPURenderer,
     items: CaptureMesh[],
-    probes: { center: import("three").Vector3; texture: Texture }[],
+    probes: { center: Vector3; texture: Texture }[],
     revision: number,
+    appearance?: string,
   ) {
     const active = new Set<string>();
     this.restore();
@@ -61,9 +71,16 @@ export class ReflectionBindings {
           this.copies.set(key, copy);
         }
         const version = base.version;
-        copy.material.envMap = null;
-        copy.material.envNode = null;
-        copySpatialMaterial(copy.material, base);
+        if (
+          appearance === undefined ||
+          copy.appearance !== appearance ||
+          copy.version !== version
+        ) {
+          copy.material.envMap = null;
+          copy.material.envNode = null;
+          copySpatialMaterial(copy.material, base);
+          copy.appearance = appearance;
+        }
         copy.mapping.value.copy(item.mapping);
         copy.material.envMap = probe.texture;
         copy.material.envMapIntensity = 1;

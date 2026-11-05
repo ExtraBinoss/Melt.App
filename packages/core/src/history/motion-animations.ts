@@ -40,7 +40,9 @@ export const addMotionAnimation: HistoryHandlers["addMotionAnimation"] =
       "owner" in command
         ? context.page.motion?.sceneAnimations?.at(-1)
         : context.page.motion?.tracks
-            .find((track) => track.id === command.trackId)
+            .find((track) =>
+              command.trackId ? track.id === command.trackId : track.layerId === command.layerId,
+            )
             ?.animations?.at(-1);
     context.history.action(
       "add",

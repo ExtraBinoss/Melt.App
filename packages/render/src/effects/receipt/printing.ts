@@ -1,3 +1,4 @@
+import { transportUv } from "../shared/coordinates";
 import {
   Fn,
   abs,
@@ -24,7 +25,7 @@ import { bayer4 } from "../dither/bayer";
 export function receiptInk(pixel: Node<"vec2">, { source, controls }: EffectNodeContext) {
   const u = controls.parameters;
   return Fn(() => {
-    const resolution = controls.logicalResolution,
+    const resolution = controls.contentResolution,
       requestedMargin = vec2(u.marginX!, u.marginY!).mul(resolution).toVar(),
       available = resolution.sub(requestedMargin.mul(2)).toVar(),
       fitScale = min(available.x.div(resolution.x), available.y.div(resolution.y)),
@@ -33,13 +34,17 @@ export function receiptInk(pixel: Node<"vec2">, { source, controls }: EffectNode
       point = pixel.sub(margin).div(controls.scale).toVar(),
       cell = floor(point).toVar(),
       ink = float(0).toVar(),
-      halfTexel = vec2(0.5).div(controls.resolution);
+      halfTexel = controls.pixelFootprint.mul(0.5).div(resolution);
     for (const y of [-1, 0, 1])
       for (const x of [-1, 0, 1]) {
         const neighbor = cell.add(vec2(x, y)).toVar(),
           center = neighbor.add(0.5).toVar(),
           coord = clamp(center.mul(controls.scale).div(printSize), halfTexel, halfTexel.oneMinus()),
-          sample = sampleEffect(source, controls, vec2(coord.x, coord.y.oneMinus())),
+          sample = sampleEffect(
+            source,
+            controls,
+            transportUv(controls, vec2(coord.x, coord.y.oneMinus())),
+          ),
           luma = mix(1, dot(sample.rgb, vec3(0.2126, 0.7152, 0.0722)), sample.a),
           tone = clamp(
             pow(luma, float(1).div(u.gamma!)).sub(0.5).mul(u.contrast!).add(0.5).add(u.exposure!),

@@ -80,12 +80,14 @@ export function compileMotionLayers(
               geometrySources: layer.effects
                 .filter((effect) => getEffectDefinition(effect.type).source === "geometry")
                 .map((effect) => {
-                  const owner = track?.animations?.find((animation) =>
-                    animation.effectIds.includes(effect.id),
+                  const owner = track?.animations?.find(
+                    (animation) =>
+                      animation.ownsEffects !== false && animation.effectIds.includes(effect.id),
                   );
                   const owned = authored?.some((occurrence) =>
-                    occurrence.animations?.some((animation) =>
-                      animation.effectIds.includes(effect.id),
+                    occurrence.animations?.some(
+                      (animation) =>
+                        animation.ownsEffects !== false && animation.effectIds.includes(effect.id),
                     ),
                   );
                   return {

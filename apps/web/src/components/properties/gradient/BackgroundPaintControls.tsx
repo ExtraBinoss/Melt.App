@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { useMemo } from "react";
 import { useSetAtom } from "jotai";
 import { useTranslation } from "react-i18next";
@@ -15,8 +16,10 @@ export function BackgroundPaintControls({
   current,
   run,
   cancel,
+  presetContent,
 }: {
   engine: EnginePort;
+  presetContent?: ReactNode;
   page: Composition;
   current: () => boolean;
   run: (action: () => void) => void;
@@ -54,6 +57,7 @@ export function BackgroundPaintControls({
   return (
     <>
       <BackgroundGradientControl
+        presetContent={presetContent}
         key={`gradient:${owner}`}
         page={paint}
         engine={engine}

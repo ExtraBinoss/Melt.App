@@ -14,7 +14,7 @@ export interface LibrarySidebarProps {
   view: "projects" | "templates";
   busy: boolean;
   onViewChange: (view: "projects" | "templates") => void;
-  onChooseRecent: (id: string) => void;
+  onChooseRecent: (id: string, name: string) => void;
   onPreferences: () => void;
 }
 
@@ -113,7 +113,7 @@ export function LibrarySidebar({
                 busy={busy}
                 onTask={onTask}
                 onOpen={() => {
-                  if (!busy) onChooseRecent(project.id);
+                  if (!busy) onChooseRecent(project.id, project.name);
                 }}
               />
             ))}

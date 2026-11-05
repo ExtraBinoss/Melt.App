@@ -10,6 +10,7 @@ import {
 } from "@musart/core";
 import type { TFunction } from "i18next";
 import { historyPropertyLabel } from "./property-label";
+import type { HistoryOwnerNames } from "./owners";
 export { historyPropertyLabel } from "./property-label";
 
 function choiceLabel(value: string, definition: HistoryPropertyDefinition, t: TFunction): string {
@@ -91,9 +92,14 @@ function changeLabel(
   change: HistoryChange,
   direction: "undo" | "redo",
   t: TFunction,
+  name?: string,
 ): string | null {
   if (change.kind === "action") {
     const label = t(change.action, { ns: "historyNotice" });
+    if (name)
+      return change.owner.kind === "effect"
+        ? `${label} ${ownerLabel(change.owner, t)} · ${name}`
+        : `${label} ${name}`;
     return [
       "geometry",
       "spatialTransform",
@@ -117,7 +123,8 @@ function changeLabel(
       ? `${ownerLabel(owner, t)} · `
       : "",
     context = change.context ? `${t(change.context, { ns: "historyNotice" })} · ` : "";
-  return `${prefix}${context}${historyPropertyLabel(definition, t)} ${propertyValue(direction === "undo" ? change.before : change.after, definition, t)}`;
+  const label = `${prefix}${context}${historyPropertyLabel(definition, t)} ${propertyValue(direction === "undo" ? change.before : change.after, definition, t)}`;
+  return name ? `${t("change", { ns: "historyNotice" })} ${label} · ${name}` : label;
 }
 
 /** Authoritative retained semantics only: no engine, current page, selection or document reads. */
@@ -125,10 +132,11 @@ export function formatHistoryDescription(
   description: HistoryDescription | undefined,
   direction: "undo" | "redo",
   t: TFunction,
+  owners?: HistoryOwnerNames,
 ): string {
   let named: string | null = null;
-  for (const change of description?.changes ?? []) {
-    named = changeLabel(change, direction, t);
+  for (const [index, change] of (description?.changes ?? []).entries()) {
+    named = changeLabel(change, direction, t, owners?.[index]);
     if (named !== null) break;
   }
   const label = named ?? t("edit", { ns: "historyNotice" });

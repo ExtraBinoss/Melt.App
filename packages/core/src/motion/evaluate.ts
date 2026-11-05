@@ -44,6 +44,11 @@ export interface MotionEvaluationOptions {
 
 const issuedPlans = new WeakMap<MotionFramePlan, MotionProgram>();
 
+/** Borrowed immutable program for deterministic upstream temporal rendering. */
+export function motionProgramForFrame(plan: MotionFramePlan): MotionProgram | undefined {
+  return issuedPlans.get(plan);
+}
+
 /** Runtime plans belong to one frozen compilation, including across asynchronous adapters. */
 export function isMotionFramePlanFor(program: MotionProgram, plan: MotionFramePlan): boolean {
   return issuedPlans.get(plan) === program;

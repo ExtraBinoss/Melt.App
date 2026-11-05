@@ -1,5 +1,11 @@
 import { expect, test, vi } from "vitest";
-import { createLayer, createPage, createSpatialLayer, createSpatialScene } from "@musart/core";
+import {
+  createLayer,
+  createPage,
+  createSpatialLayer,
+  createSpatialScene,
+  type Bounds,
+} from "@musart/core";
 import {
   BoxGeometry,
   Color,
@@ -10,6 +16,7 @@ import {
   type RenderTarget,
   type WebGPURenderer,
 } from "three/webgpu";
+import { windowProjection } from "../../src/spatial/scene/projection";
 import { CompositionScene } from "../../src/spatial/scene/CompositionScene";
 import { SharedShadows } from "../../src/spatial/scene/SharedShadows";
 import { SpatialResource } from "../../src/spatial/SpatialResource";
@@ -55,7 +62,7 @@ function fixture() {
     ),
   }));
   const stage = new CompositionScene(renderer, settings);
-  const sync = async (next = page) => {
+  const sync = async (next = page, viewport?: Bounds) => {
     for (const source of sources) {
       source.layer = next.layers.find((layer) => layer.id === source.layer.id)!;
       source.resource.update(
@@ -66,7 +73,7 @@ function fixture() {
         1,
       );
     }
-    stage.sync(next, next.spatial!, sources, null, 1);
+    stage.sync(next, next.spatial!, sources, null, 1, viewport);
     await stage.prepare(() => true);
   };
   return {
@@ -134,11 +141,13 @@ test("camera changes redraw projected depth without refreshing unchanged native 
   try {
     await f.sync();
     f.stage.render(f.sources[0]!.layer);
+    const materials = f.stage.bindingStats().synchronizations;
     f.render.mockClear();
     await f.sync({
       ...f.page,
       spatial: { ...f.page.spatial!, camera: { ...f.page.spatial!.camera, yaw: 40 } },
     });
+    expect(f.stage.bindingStats().synchronizations).toBe(materials);
     f.stage.render(f.sources[0]!.layer);
     expect(f.render).toHaveBeenCalledTimes(2);
     expect(shadows).toHaveBeenCalledOnce();
@@ -173,6 +182,36 @@ test("failed depth rendering restores borrowed materials and retries the unavail
     expect(f.render).toHaveBeenCalledTimes(3);
     for (const { resource } of f.sources)
       expect((resource.content as Mesh).material).toBe(resource.material);
+  } finally {
+    f.dispose();
+  }
+});
+
+test("an expanded display gate retains off-artboard native triangles and matching depth while preserving the canonical camera", async () => {
+  const f = fixture();
+  try {
+    const page = { ...f.page, layers: f.page.layers.map((layer) => ({ ...layer, x: 400 })) };
+    await f.sync(page);
+    const canonical = f.stage.camera.projectionMatrix.clone();
+    const before = { ...f.stage.bounds("a")! };
+    const stamp = f.stage.sourceStamp("a");
+    const viewport = { x: -256, y: -128, width: 1024, height: 512 };
+    await f.sync(page, viewport);
+    expect(f.stage.camera.projectionMatrix.equals(canonical)).toBe(true);
+    expect(f.stage.bounds("a")!.width).toBeGreaterThan(before.width);
+    expect(f.stage.sourceStamp("a")).not.toBe(stamp);
+    expect(f.stage.depthTarget).toMatchObject({ width: 1024, height: 512 });
+    const draws: number[][] = [];
+    f.render.mockImplementation(() => {
+      draws.push([...f.stage.camera.projectionMatrix.elements]);
+    });
+    f.stage.render(f.sources[0]!.layer);
+    expect(draws[0]).toEqual(windowProjection(page, viewport).multiply(canonical).elements);
+    expect(draws).toHaveLength(2);
+    expect(f.stage.camera.projectionMatrix.equals(canonical)).toBe(true);
+    await f.sync(page);
+    expect(f.stage.bounds("a")).toEqual(before);
+    expect(f.stage.depthTarget).toMatchObject({ width: 256, height: 256 });
   } finally {
     f.dispose();
   }

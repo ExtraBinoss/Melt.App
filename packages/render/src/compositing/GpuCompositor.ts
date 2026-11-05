@@ -1,14 +1,16 @@
+import { TemporalEffectSources } from "../effects/trail/TemporalEffectSources";
+import { compositionViewport, viewportBackground } from "./composition-viewport";
 import { finishCompositionEffects, prepareEffectStacks } from "./composition-effects";
 import { assetIdentity } from "../cache/keys";
 import { compositionPaintKey } from "../cache/composition-key";
 import { PlaybackSubmissions } from "../cache/playback-submissions";
 import type { RenderFrame } from "./render-frame";
-import { hasEffectTreatment } from "../effects/shared/active";
 import { completeGpuFrame, isGraphicsPlayback } from "./publication";
-import { drawLayerSource, isSrgbLayerSource } from "./layer-source";
+import { renderLayer } from "./layer-renderer";
 import type { SpatialSources } from "../spatial/SpatialSources";
 import {
   createLayerGeometryIndex,
+  getEffectDefinition,
   isPublishedComposition,
   isPublishedAssets,
   type Asset,
@@ -25,7 +27,6 @@ import { gpuTextureLimit } from "../cache/texture-limits";
 import { frameSourceKeys, referenceDensity } from "./frame-source-keys";
 import { SourceKeyCache } from "../cache/source-key-cache";
 import { sameCompositionInput } from "../cache/composition-input";
-import { finishLayerSource, layerEffectCache } from "./finish-layer";
 import { EffectResources } from "./effect-resources";
 import { VectorSources } from "../surface/vector/source";
 import { TextureSources } from "../surface/TextureSources";
@@ -36,7 +37,7 @@ import { isInstancedPrimitive } from "./primitives/eligibility";
 import { NormalBatch } from "./normal-batch";
 import { GpuPasses } from "./passes";
 import { LayerTargets } from "./targets";
-import { groupViewport, type GroupViewport } from "./group-viewport";
+import type { GroupViewport } from "./group-viewport";
 import {
   assertRenderSize,
   rasterExtent,
@@ -54,6 +55,7 @@ export class GpuCompositor {
   private readonly submissions: PlaybackSubmissions;
   private readonly sourceKeys = new SourceKeyCache();
   private effects: EffectResources | null = null;
+  private temporal: TemporalEffectSources | null = null;
   private passes: GpuPasses | null = null;
   private normal: NormalBatch | null = null;
   private primitives: PrimitiveBatch | null = null;
@@ -119,6 +121,8 @@ export class GpuCompositor {
       !input ||
       !sameCompositionInput(input.page.deref(), page) ||
       input.assets.deref() !== assets ||
+      (page.effects?.some((effect) => effect.type === "trail" && effect.enabled) &&
+        input.motionFrame !== motionFrame) ||
       (input.motionFrame !== motionFrame &&
         Boolean(input.motionFrame?.mediaRequests.length || motionFrame?.mediaRequests.length)) ||
       (page.layers.some((layer) => layer.kind === "video") && !motionFrame)
@@ -144,7 +148,21 @@ export class GpuCompositor {
       const scale = options.scale ?? 1;
       const referenceScale = referenceDensity(options);
       assertRenderSize(page, scale);
+      const window = compositionViewport(scale, options.viewport);
       this.cache.beginFrame(this.retainedRoot);
+      if (
+        options.history !== "disabled" &&
+        page.effects?.some((effect) => effect.type === "trail" && effect.enabled)
+      ) {
+        this.temporal ??= new TemporalEffectSources(
+          this.renderer,
+          this.cache.maxBytes,
+          (maxBytes) =>
+            new GpuCompositor(this.renderer, { maxBytes, fontResolver: this.fontResolver }),
+          (bytes) => this.cache.reserveExternal("temporal-effects", bytes),
+        );
+      }
+      const history = await this.temporal?.prepare(page, assets, options);
       this.cache.get("shared-effects");
       this.cache.get("shared-primitives");
       if (options.canRender && !options.canRender())
@@ -177,7 +195,11 @@ export class GpuCompositor {
       };
       const pipelineStarted = options.profileVideo ? performance.now() : 0;
       let proof: PrintProofPass | undefined;
-      if (page.colorSpace === "cmyk" && options.colorOutput !== "source") {
+      if (
+        page.colorSpace === "cmyk" &&
+        options.colorOutput !== "source" &&
+        !options.effectCapture
+      ) {
         proof = this.cache.get<PrintProofPass>("print-proof");
         if (!proof) {
           proof = new PrintProofPass(this.renderer);
@@ -187,7 +209,12 @@ export class GpuCompositor {
       }
       await this.passes.prepare(preparationTarget, canPrepare);
       await prepareEffectStacks(page, this.effects, this.cache, preparationTarget, canPrepare);
-      await this.normal.prepare(page.layers, preparationTarget, canPrepare);
+      await this.normal.prepare(
+        page.layers,
+        preparationTarget,
+        canPrepare,
+        viewportBackground(page, options.viewport),
+      );
       this.sample("pipeline", pipelineStarted, options.profileVideo);
       const sourceStarted = options.profileVideo ? performance.now() : 0;
       await this.sources.prepare(page, assets, options);
@@ -229,6 +256,8 @@ export class GpuCompositor {
       );
       const frame: RenderFrame = {
         page,
+        viewport: options.viewport,
+        backgroundId: viewportBackground(page, options.viewport),
         scale,
         referenceScale,
         vectorAntialias: !!options.vectorAntialias,
@@ -236,10 +265,14 @@ export class GpuCompositor {
         referenceKeyFor,
         geometry,
       };
-      const rootKey = `page:${page.id}:${scale}${options.colorOutput === "source" ? ":source" : ""}${frame.vectorAntialias ? ":vector-aa" : ""}${density}`;
+      const rootKey = `page:${page.id}:${scale}${options.colorOutput === "source" ? ":source" : ""}${frame.vectorAntialias ? ":vector-aa" : ""}${density}${options.effectCapture ? ":capture" : ""}${window ? `:viewport:${window.key}` : ""}`;
       const entry = this.entry(rootKey);
       const roots = geometry.children(null);
-      const signature = compositionPaintKey(page, roots, keyFor, (id) => assetIdentity(assets[id]));
+      const signature =
+        compositionPaintKey(page, roots, keyFor, (id) => assetIdentity(assets[id])) +
+        (history?.size
+          ? `:history:${options.motionFrame?.time.value}/${options.motionFrame?.time.rate}`
+          : "");
       if (entry.signature === signature && entry.output) {
         this.cacheHits++;
         this.frames++;
@@ -258,11 +291,18 @@ export class GpuCompositor {
         entry,
         rootKey,
         frame,
+        window,
       );
       const composed = finishCompositionEffects(page, blended, {
         passes: this.passes,
         effects: this.effects,
         cache: this.cache,
+        history,
+        depth: page.effects?.some(
+          (effect) => effect.enabled && getEffectDefinition(effect.type).requirements?.depth,
+        )
+          ? (this.spatial?.compositionDepth() ?? undefined)
+          : undefined,
         target: (role, width, height) => this.target(entry, rootKey, role, width, height),
       });
       const target = this.target(
@@ -272,13 +312,17 @@ export class GpuCompositor {
         composed.width,
         composed.height,
       );
-      if (proof) {
+      if (options.effectCapture) this.passes.copyTo(composed, target);
+      else if (proof) {
         proof.render(composed, target);
         this.proofPasses++;
       } else if (page.colorSpace === "display-p3") this.color.render(composed, target, "to-srgb");
       else if (page.colorSpace === "cmyk-proof") this.color.render(composed, target, "cmyk-proof");
       else this.passes.copyTo(composed, target);
-      entry.output = await completeGpuFrame(this.renderer, target, options);
+      entry.output = {
+        ...(await completeGpuFrame(this.renderer, target, options)),
+        ...(window ? { bounds: window.bounds } : {}),
+      };
       if (isGraphicsPlayback(options)) this.submissions.submitted();
       entry.signature = signature;
       this.retainedRoot = rootKey;
@@ -329,46 +373,23 @@ export class GpuCompositor {
     return target;
   }
   private layer(layer: Layer, frame: RenderFrame, parentViewport?: Bounds): FrameTexture {
-    const reference =
-      layer.effects.some(hasEffectTreatment) || !!layer.mask?.enabled || !!layer.clipping;
-    // Exact frames retain authored references; previews may request bounded raster density.
-    if (reference && (frame.scale !== frame.referenceScale || frame.vectorAntialias))
-      frame = {
-        ...frame,
-        scale: frame.referenceScale,
-        vectorAntialias: false,
-        keyFor: frame.referenceKeyFor,
-      };
-    const { page, scale, keyFor, geometry, vectorAntialias } = frame;
-    const viewport =
-      layer.kind === "group" && !reference
-        ? groupViewport(layer, scale, parentViewport, this.maxTextureDimension)
-        : null;
-    const key = `layer:${page.id}:${layer.id}:${scale}${viewport ? ":window" : ""}${vectorAntialias ? ":vector-aa" : ""}`;
-    const entry = this.entry(key);
-    const signature = viewport ? JSON.stringify([keyFor(layer), viewport.key]) : keyFor(layer);
-    if (entry.signature === signature && entry.output) {
-      this.cacheHits++;
-      return entry.output;
-    }
-    entry.signature = "";
-    const width = rasterExtent(layer.width, scale);
-    const height = rasterExtent(layer.height, scale);
-    let source = drawLayerSource(layer, {
-      width,
-      height,
-      scale,
-      vectorAntialias,
-      displayP3: page.colorSpace === "display-p3",
-      entry,
+    return renderLayer(layer, frame, parentViewport, {
+      maxTextureDimension: this.maxTextureDimension,
       sources: this.sources,
       texts: this.texts,
       vectors: this.vectors!,
       spatial: this.spatial,
       passes: this.passes!,
-      target: (role, samples = 0, w = width, h = height) =>
-        this.target(entry, key, role, w, h, false, samples),
-      children: () =>
+      effects: this.effects!,
+      color: this.color!,
+      cache: this.cache,
+      cacheHit: () => {
+        this.cacheHits++;
+      },
+      entry: (key) => this.entry(key),
+      target: (...args) => this.target(...args),
+      layer: (...args) => this.layer(...args),
+      children: (layer, entry, key, frame, viewport) =>
         this.children(
           layer.id,
           layer.width,
@@ -380,30 +401,6 @@ export class GpuCompositor {
           viewport,
         ),
     });
-    if (page.colorSpace === "display-p3" && isSrgbLayerSource(layer)) {
-      const converted = this.target(entry, key, "working-color", source.width, source.height);
-      this.color!.render(source, converted, "to-p3");
-      source = { ...source, texture: converted.texture };
-    }
-    if (reference)
-      source = finishLayerSource(layer, page, scale, source, {
-        target: (role, w, h, mipmapped) => this.target(entry, key, role, w, h, mipmapped),
-        passes: this.passes!,
-        effects: this.effects!,
-        cache: this.cache,
-        ...layerEffectCache(layer, entry, keyFor),
-        image: (id, ownerId) =>
-          ownerId ? this.sources.maskImage(id, ownerId) : this.sources.image(id),
-        maskSource: (maskLayer) => this.layer(maskLayer, frame),
-        mask: (id) => {
-          const maskLayer = geometry.byId.get(id);
-          if (!maskLayer) throw new Error(`Calque masque introuvable : ${id}`);
-          return maskLayer;
-        },
-      });
-    entry.output = source;
-    entry.signature = signature;
-    return source;
   }
   private children(
     parentId: string | null,
@@ -422,8 +419,9 @@ export class GpuCompositor {
     let target = this.target(entry, key, "children-a", pixelWidth, pixelHeight);
     this.passes!.clear(
       target,
-      background,
-      parentId === null ? frame.page.backgroundGradient : undefined,
+      parentId === null && frame.backgroundId ? "transparent" : background,
+      parentId === null && !frame.backgroundId ? frame.page.backgroundGradient : undefined,
+      parentId === null && window ? { width, height, region: viewport } : undefined,
     );
     const layers = window?.empty ? [] : geometry.children(parentId);
     let batch: { layer: Layer; source: FrameTexture }[] = [],
@@ -455,7 +453,7 @@ export class GpuCompositor {
     for (const layer of layers) {
       if (!layer.visible || layer.opacity <= 0 || layer.maskSource || layer.spatialContext)
         continue;
-      if (isInstancedPrimitive(layer)) {
+      if (isInstancedPrimitive(layer) && layer.id !== frame.backgroundId) {
         flush();
         primitiveRun.push(layer);
         continue;
@@ -500,6 +498,7 @@ export class GpuCompositor {
   stats(): GpuStats {
     const cache = this.cache.stats();
     const effects = this.effects?.stats();
+    const temporal = this.temporal?.stats();
     return {
       passes:
         this.proofPasses +
@@ -511,9 +510,10 @@ export class GpuCompositor {
         (this.spatial?.passes ?? 0) +
         this.texts.passes +
         (this.color?.passes ?? 0) +
-        (effects?.passes ?? 0),
+        (effects?.passes ?? 0) +
+        (temporal?.passes ?? 0),
       readbacks: 0,
-      effectPasses: effects?.passes ?? 0,
+      effectPasses: (effects?.passes ?? 0) + (temporal?.effectPasses ?? 0),
       sourceDependencies: this.sourceKeys.stats(),
       profile: this.profile
         ? {
@@ -527,8 +527,12 @@ export class GpuCompositor {
       text: this.texts.stats(),
       submission: this.submissions.stats(),
       spatial: this.currentSpatial,
-      uploads: this.sources.uploads + this.texts.parses + (this.spatial?.parses ?? 0),
-      targets: cache.targets,
+      uploads:
+        this.sources.uploads +
+        this.texts.parses +
+        (this.spatial?.parses ?? 0) +
+        (temporal?.uploads ?? 0),
+      targets: cache.targets + (temporal?.targets ?? 0),
       cacheBytes: cache.cacheBytes,
       cacheEntries: cache.entries,
       frames: this.frames,
@@ -552,7 +556,11 @@ export class GpuCompositor {
     this.disposed = true;
     this.disposal = this.queue.then(async () => {
       const failures: unknown[] = [];
-      for (const settle of [() => this.sources.dispose(), () => this.submissions.dispose()]) {
+      for (const settle of [
+        () => this.temporal?.dispose(),
+        () => this.sources.dispose(),
+        () => this.submissions.dispose(),
+      ]) {
         try {
           await settle();
         } catch (error) {

@@ -121,7 +121,13 @@ export class SceneReflections {
         resource.stats.deferred = true;
         this.pending = !!blocked;
       }
-      resource.bindings.bind(this.renderer, receivers, resource.textures(), resource.revision);
+      resource.bindings.bind(
+        this.renderer,
+        receivers,
+        resource.textures(),
+        resource.revision,
+        signature,
+      );
       resource.stats.probes = resource.probes.filter((probe) => probe.target).length;
       resource.stats.receivers = resource.bindings.count;
     } finally {

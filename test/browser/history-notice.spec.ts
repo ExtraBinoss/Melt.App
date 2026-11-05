@@ -26,6 +26,7 @@ test("undo/redo pills match the project pill and canvas center through panel/rul
           layers: [
             createLayer("rectangle", {
               id: "item",
+              name: "Rectangle",
               x: 200,
               y: 100,
               width: 200,
@@ -52,7 +53,7 @@ test("undo/redo pills match the project pill and canvas center through panel/rul
   });
   await page.keyboard.press("Control+z");
   const notice = page.locator(".history-notice[role=status]:not([aria-hidden=true])");
-  await expect(notice).toHaveAttribute("aria-label", "Undid · Fill #8b5cf6");
+  await expect(notice).toHaveAttribute("aria-label", "Undo · Change Fill #8b5cf6 · Rectangle");
   await notice.hover();
   await expect(notice.locator("span")).toHaveJSProperty(
     "scrollWidth",
@@ -79,9 +80,9 @@ test("undo/redo pills match the project pill and canvas center through panel/rul
   await page.waitForTimeout(2200); // Real hover must suspend the two-second reading timer.
   await expect(notice).toBeVisible();
   await page.keyboard.press("Control+Shift+z");
-  await expect(notice).toHaveAttribute("aria-label", "Redid · Fill #ff0000");
+  await expect(notice).toHaveAttribute("aria-label", "Redo · Change Fill #ff0000 · Rectangle");
   await page.keyboard.press("Control+z");
-  await expect(notice).toHaveAttribute("aria-label", "Undid · Fill #8b5cf6");
+  await expect(notice).toHaveAttribute("aria-label", "Undo · Change Fill #8b5cf6 · Rectangle");
   const oldCanvas = (await page.locator(".editor-canvas").boundingBox())!,
     handle = (await page.locator('[role="separator"][aria-controls="workspace"]').boundingBox())!;
   await page.mouse.move(handle.x + handle.width / 2, handle.y + handle.height / 2);
@@ -106,7 +107,7 @@ test("undo/redo pills match the project pill and canvas center through panel/rul
     window.musart!.execute({ type: "updateLayers", ids: ["item"], patch: { x: 205 } });
     window.musart!.undo();
   });
-  await expect(notice).toHaveAttribute("aria-label", "Undid · Position X 200px");
+  await expect(notice).toHaveAttribute("aria-label", "Undo · Change Position X 200px · Rectangle");
   await page.mouse.move(1200, 900);
   await expect(notice).toHaveCount(0, { timeout: 3500 });
   await page.keyboard.press("Control+k");
@@ -145,12 +146,14 @@ test("background color input and numeric/effect edits announce the actual restor
       id: "history-values-native",
       pages: [
         createPage({
+          name: "Composition",
           background: "#123456",
           width: 640,
           height: 400,
           layers: [
             createLayer("rectangle", {
               id: "item",
+              name: "Rectangle",
               x: 200,
               effects: [createEffect("blur", { id: "blur", amount: 0.57 })],
             }),
@@ -173,16 +176,25 @@ test("background color input and numeric/effect edits announce the actual restor
   await hex.press("Enter");
   await page.locator(".editor-canvas").focus();
   await page.keyboard.press("Control+z");
-  await expect(notice).toHaveAttribute("aria-label", "Undid · Background #123456");
+  await expect(notice).toHaveAttribute(
+    "aria-label",
+    "Undo · Change Background #123456 · Composition",
+  );
   await page.keyboard.press("Control+Shift+z");
-  await expect(notice).toHaveAttribute("aria-label", "Redid · Background #654321");
+  await expect(notice).toHaveAttribute(
+    "aria-label",
+    "Redo · Change Background #654321 · Composition",
+  );
   await page.evaluate(() =>
     window.musart!.execute({ type: "updateLayers", ids: ["item"], patch: { x: 212.75 } }),
   );
   await page.keyboard.press("Control+z");
-  await expect(notice).toHaveAttribute("aria-label", "Undid · Position X 200px");
+  await expect(notice).toHaveAttribute("aria-label", "Undo · Change Position X 200px · Rectangle");
   await page.keyboard.press("Control+Shift+z");
-  await expect(notice).toHaveAttribute("aria-label", "Redid · Position X 212.75px");
+  await expect(notice).toHaveAttribute(
+    "aria-label",
+    "Redo · Change Position X 212.75px · Rectangle",
+  );
   await page.evaluate(() => {
     const effect = window.musart!.snapshot().project.pages[0]!.layers[0]!.effects[0]!;
     window.musart!.execute({
@@ -192,7 +204,95 @@ test("background color input and numeric/effect edits announce the actual restor
     });
   });
   await page.keyboard.press("Control+z");
-  await expect(notice).toHaveAttribute("aria-label", "Undid · Blur · Amount 57%");
+  await expect(notice).toHaveAttribute("aria-label", "Undo · Change Blur · Amount 57% · Rectangle");
   await page.keyboard.press("Control+Shift+z");
-  await expect(notice).toHaveAttribute("aria-label", "Redid · Blur · Amount 25%");
+  await expect(notice).toHaveAttribute("aria-label", "Redo · Change Blur · Amount 25% · Rectangle");
 });
+
+for (const mode of ["classic", "studio"] as const)
+  test(`${mode} library successes, undo/redo and actual import errors share a workspace-local feedback slot`, async ({
+    page,
+  }) => {
+    test.setTimeout(60000);
+    await page.addInitScript(() => {
+      localStorage.setItem("musart.language", "en");
+      localStorage.setItem("musart.onboarding.v1", JSON.stringify({ version: 1, completed: true }));
+    });
+    await page.goto(`/editor?automation=1&workspace=${mode}`);
+    await page.waitForFunction(() => Boolean(window.musart));
+    await page.evaluate(
+      (project) => window.musart!.load(project),
+      createProject({
+        id: `feedback-slot-${mode}`,
+        pages: [createPage({ width: 640, height: 400, layers: [] })],
+      }),
+    );
+    const inherited = await page.evaluate(() => ({
+      body: document.body.getAttribute("style"),
+      root: document.documentElement.getAttribute("style"),
+    }));
+    await page.getByRole("button", { name: "3D", exact: true }).click();
+    await page
+      .locator(".spatial-library")
+      .getByRole("button", { name: "Sphere", exact: true })
+      .click();
+    const card = page.locator(".editor-notice.notice-card:not([aria-hidden=true])"),
+      anchor = page.locator(".editor-notice-anchor"),
+      history = page.locator(".history-notice:not([aria-hidden=true])");
+    await expect(card).toContainText("Sphere added");
+    await expect(anchor).toHaveAttribute(
+      "data-notice-placement",
+      mode === "studio" ? "bottom-right" : "top-center",
+    );
+    const aligned = async () => {
+      await expect
+        .poll(() =>
+          page.evaluate((mode) => {
+            const portal = document.querySelector(".editor-notice-anchor")!.getBoundingClientRect(),
+              local = document.querySelector(".history-notice-anchor")!.getBoundingClientRect();
+            return mode === "studio"
+              ? Math.max(
+                  Math.abs(portal.right - local.right),
+                  Math.abs(portal.bottom - local.bottom),
+                )
+              : Math.max(
+                  Math.abs(portal.top - local.top),
+                  Math.abs(portal.left + portal.width / 2 - local.left - local.width / 2),
+                );
+          }, mode),
+        )
+        .toBeLessThan(1.5);
+    };
+    await card.hover();
+    await aligned();
+    if (mode === "studio") {
+      await page.setViewportSize({ width: 390, height: 844 });
+      await card.hover();
+      await aligned();
+      const bounds = (await card.boundingBox())!,
+        bar = (await page.locator(".studio-object-bar-anchor").boundingBox())!;
+      expect(bounds.x).toBeGreaterThanOrEqual(0);
+      expect(bounds.x + bounds.width).toBeLessThanOrEqual(390);
+      expect(bounds.y + bounds.height).toBeLessThanOrEqual(bar.y - 8);
+    }
+    await page.evaluate(() => window.musart!.undo());
+    await expect(history).toContainText("Undo · Add Sphere");
+    await expect(card).toHaveCount(0);
+    await page.evaluate(() => window.musart!.redo());
+    await expect(history).toContainText("Redo · Add Sphere");
+    await page.locator('input[type="file"][multiple]').setInputFiles({
+      name: "broken.png",
+      mimeType: "image/png",
+      buffer: Buffer.from("invalid image bytes"),
+    });
+    await expect(card).toHaveAttribute("role", "alert");
+    await expect(history).toHaveCount(0);
+    await card.hover();
+    await aligned();
+    expect(
+      await page.evaluate(() => ({
+        body: document.body.getAttribute("style"),
+        root: document.documentElement.getAttribute("style"),
+      })),
+    ).toEqual(inherited);
+  });

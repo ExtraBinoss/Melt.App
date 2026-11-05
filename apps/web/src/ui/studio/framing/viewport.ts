@@ -3,6 +3,8 @@ export interface StudioViewport {
   projectId: string;
   pageId: string;
   region: Bounds;
+  /** Entire presented GPU window, including paint beyond the canonical capture gate. */
+  displayRegion: Bounds;
   width: number;
   height: number;
 }
@@ -19,7 +21,7 @@ function createPort() {
       };
     },
     publish(next: StudioViewport | null) {
-      if (next === value) return;
+      if (JSON.stringify(next) === JSON.stringify(value)) return;
       value = next;
       for (const listener of listeners) listener();
     },

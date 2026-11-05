@@ -22,7 +22,10 @@ export function validateSceneMotionProperties(
     const allowed =
       property.target.kind === "light"
         ? ["kind", "compositionId", "lightId", "property"]
-        : ["kind", "compositionId", "property"];
+        : property.target.kind === "compositionEffect" ||
+            property.target.kind === "compositionEffectSetting"
+          ? ["kind", "compositionId", "effectId", "property"]
+          : ["kind", "compositionId", "property"];
     ensure(
       Object.keys(property.target).every((key) => allowed.includes(key)),
       "INVALID_DOCUMENT",

@@ -1,28 +1,38 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import { Box, Plus, Type, Upload } from "lucide-react";
+import { Box, Plus, Upload } from "lucide-react";
 import type { EnginePort } from "@musart/core";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Button } from "../ui/button";
 import { IconButton } from "../shared/IconButton";
 import { ScrollShadow } from "../shared/scroll/ScrollShadow";
 import { SegmentedTabs } from "../shared/segmented/SegmentedTabs";
+import { SearchInput } from "../assets/SearchInput";
 import { importSpatialModel, insertSpatialObject } from "../../services/assets/spatial-import";
 import { SpatialLibraryModels } from "../../services/assets/spatial-library";
+import { publishEditorNotice } from "../notifications/source";
 import {
   SPATIAL_LIBRARY_MODELS,
   SPATIAL_LIBRARY_SHAPES,
   spatialLibrarySwatch,
   type SpatialLibraryEntry,
 } from "./library/catalog";
-import {
-  SpatialLibraryPreview,
-  type SpatialLibraryPreviewHandle,
-} from "./library/SpatialLibraryPreview";
+import { useTilePreview } from "./library/use-tile-preview";
+import "../notifications/messages";
+import "../assets/messages";
 import "./messages";
 import "./spatial.css";
 import "./library/library.css";
+
+export interface SpatialLibraryPanelContext {
+  query: string;
+  close: () => void;
+}
+type LibraryPanel = {
+  label: string;
+  content: ReactNode | ((context: SpatialLibraryPanelContext) => ReactNode);
+};
 export function SpatialLibrary({
   engine,
   tooltipSide,
@@ -31,19 +41,20 @@ export function SpatialLibrary({
 }: {
   engine: EnginePort;
   tooltipSide?: "top" | "right" | "bottom" | "left";
-  vectorLibrary?: { label: string; content: ReactNode };
-  modelPacks?: { label: string; content: ReactNode };
+  vectorLibrary?: LibraryPanel;
+  modelPacks?: LibraryPanel;
 }) {
   const { t } = useTranslation("spatial");
+  const { t: common } = useTranslation();
   const [open, setOpen] = useState(false),
     [busy, setBusy] = useState(false),
     [error, setError] = useState("");
   const [tab, setTab] = useState("shapes"),
-    [selected, setSelected] = useState<SpatialLibraryEntry>(SPATIAL_LIBRARY_SHAPES[0]!);
+    [query, setQuery] = useState("");
   const store = useMemo(() => new SpatialLibraryModels(), []);
   const input = useRef<HTMLInputElement>(null),
-    preview = useRef<SpatialLibraryPreviewHandle>(null),
     pending = useRef<AbortController | null>(null);
+  const preview = useTilePreview(store, () => setError(t("errors.render")));
   useEffect(
     () => () => {
       pending.current?.abort();
@@ -52,8 +63,11 @@ export function SpatialLibrary({
     [store],
   );
   const entries = tab === "models" ? SPATIAL_LIBRARY_MODELS : SPATIAL_LIBRARY_SHAPES;
+  const filtered = entries.filter((entry) =>
+    `${t(entry.nameKey)} ${entry.id}`.toLowerCase().includes(query.trim().toLowerCase()),
+  );
   const native = tab === "shapes" || tab === "models";
-  async function add(entry: SpatialLibraryEntry | "text" | File) {
+  async function add(entry: SpatialLibraryEntry | File) {
     if (busy) return;
     const controller = new AbortController();
     pending.current?.abort();
@@ -62,35 +76,42 @@ export function SpatialLibrary({
     setBusy(true);
     setError("");
     try {
-      await preview.current?.stop().catch(() => {});
+      await preview.stop();
       controller.signal.throwIfAborted();
+      const current = engine.getSnapshot();
       if (
-        engine.getSnapshot().project !== origin.project ||
-        engine.getSnapshot().pageId !== origin.pageId
-      ) {
-        setOpen(false);
+        current.project !== origin.project ||
+        current.pageId !== origin.pageId ||
+        current.revision !== origin.revision
+      )
         return;
-      }
-      setOpen(false);
-      if (entry instanceof File) await importSpatialModel(engine, entry, controller.signal);
-      else if (entry === "text") insertSpatialObject(engine, "text", t("primitives.text"));
-      else if (entry.kind === "shape") insertSpatialObject(engine, entry.source, t(entry.nameKey));
+      let layer;
+      if (entry instanceof File) layer = await importSpatialModel(engine, entry, controller.signal);
+      else if (entry.kind === "shape")
+        layer = insertSpatialObject(engine, entry.source, t(entry.nameKey), { fill: "#b8bcc4" });
       else {
-        const asset = await store.load(entry.model, controller.signal),
-          blob = await (await fetch(asset.dataUrl, { signal: controller.signal })).blob();
+        const asset = await store.load(entry.model, controller.signal);
+        const blob = await (await fetch(asset.dataUrl, { signal: controller.signal })).blob();
         controller.signal.throwIfAborted();
+        const current = engine.getSnapshot();
         if (
-          engine.getSnapshot().project !== origin.project ||
-          engine.getSnapshot().pageId !== origin.pageId
+          current.project !== origin.project ||
+          current.pageId !== origin.pageId ||
+          current.revision !== origin.revision
         )
           return;
-        await importSpatialModel(
+        layer = await importSpatialModel(
           engine,
           new File([blob], `${entry.id}.glb`, { type: "model/gltf-binary" }),
           controller.signal,
-          { name: t(entry.nameKey), useModelMaterials: false },
+          { name: t(entry.nameKey), useModelMaterials: true },
         );
       }
+      publishEditorNotice(engine, {
+        message: common("objectAdded", { ns: "notices", name: layer.name }),
+        error: false,
+      });
+      setOpen(false);
     } catch (cause) {
       if (
         !controller.signal.aborted &&
@@ -104,11 +125,21 @@ export function SpatialLibrary({
       setBusy(false);
     }
   }
+  const close = () => {
+    void preview.stop();
+    setOpen(false);
+  };
+  function panel(value: LibraryPanel | undefined) {
+    return typeof value?.content === "function" ? value.content({ query, close }) : value?.content;
+  }
   return (
     <Popover
       open={open}
       onOpenChange={(next) => {
-        if (!next) pending.current?.abort();
+        if (!next) {
+          pending.current?.abort();
+          void preview.stop();
+        }
         setOpen(next);
       }}
       modal={false}
@@ -119,35 +150,46 @@ export function SpatialLibrary({
         </IconButton>
       </PopoverTrigger>
       <PopoverContent
-        side="right"
+        side={tooltipSide === "bottom" ? "bottom" : "right"}
         align="start"
         className="spatial-library"
         aria-label={t("objects")}
         data-canvas-control
       >
-        {native && (
-          <SpatialLibraryPreview
-            ref={preview}
-            entry={selected}
-            store={store}
-            onError={() => setError(t("errors.render"))}
+        <div className="spatial-library-search">
+          <SearchInput
+            aria-label={common("common.search")}
+            autoFocus
+            captureTyping
+            value={query}
+            hints={entries.slice(0, 6).map((entry) => ({ label: t(entry.nameKey) }))}
+            disabled={busy}
+            onChange={(event) => {
+              preview.hide();
+              setQuery(event.currentTarget.value);
+            }}
+            onKeyDown={(event) => {
+              if (
+                native &&
+                event.key === "Enter" &&
+                filtered[0] &&
+                !event.nativeEvent.isComposing
+              ) {
+                event.preventDefault();
+                void add(filtered[0]);
+              }
+            }}
           />
-        )}
-        {native && (
-          <div className="spatial-library-heading">
-            <span>{t(selected.nameKey)}</span>
-            <Button
-              size="sm"
-              disabled={busy}
-              onClick={() => {
-                void add(selected);
-              }}
-            >
-              <Plus size={14} />
-              {t("add")}
-            </Button>
-          </div>
-        )}
+          <Button
+            variant="outline"
+            disabled={busy}
+            onClick={() => input.current?.click()}
+            title={t("importModel")}
+          >
+            <Upload size={14} aria-hidden />
+            <span>GLB</span>
+          </Button>
+        </div>
         <SegmentedTabs
           mode="choice"
           size="compact"
@@ -161,70 +203,59 @@ export function SpatialLibrary({
             ...(modelPacks ? [{ value: "packs", label: modelPacks.label }] : []),
           ]}
           onValueChange={(value) => {
+            if (value === "shapes" || value === "models") preview.hide();
+            else void preview.stop();
             setTab(value);
-            setSelected((value === "models" ? SPATIAL_LIBRARY_MODELS : SPATIAL_LIBRARY_SHAPES)[0]!);
             setError("");
           }}
         />
         {native && (
           <ScrollShadow fade="mask">
-            <div className="spatial-library-list">
+            <div className="spatial-library-list" onPointerLeave={() => preview.hide()}>
               <div className="spatial-objects">
-                {entries.map((entry) => (
+                {filtered.map((entry) => (
                   <button
                     type="button"
                     key={entry.id}
                     disabled={busy}
                     className="spatial-object"
                     aria-label={t(entry.nameKey)}
-                    aria-pressed={selected.id === entry.id}
+                    title={t(entry.nameKey)}
                     onPointerEnter={(event) => {
-                      if (event.pointerType !== "touch") {
-                        setSelected(entry);
-                        setError("");
-                      }
+                      if (event.pointerType !== "touch")
+                        preview.show(
+                          entry,
+                          event.currentTarget.querySelector<HTMLElement>(".spatial-object-visual")!,
+                        );
                     }}
-                    onFocus={() => {
-                      setSelected(entry);
-                      setError("");
-                    }}
-                    onClick={() => {
-                      setSelected(entry);
-                      setError("");
-                    }}
+                    onFocus={(event) =>
+                      preview.show(
+                        entry,
+                        event.currentTarget.querySelector<HTMLElement>(".spatial-object-visual")!,
+                      )
+                    }
+                    onBlur={() => preview.hide()}
+                    onClick={() => void add(entry)}
                   >
-                    <span
-                      className="spatial-object-poster"
-                      aria-hidden
-                      style={spatialLibrarySwatch(entry.index)}
-                    />
-                    <span>{t(entry.nameKey)}</span>
+                    <span className="spatial-object-visual" aria-hidden>
+                      <span
+                        className="spatial-object-poster"
+                        style={spatialLibrarySwatch(entry.index)}
+                      />
+                    </span>
+                    <Plus size={15} className="spatial-object-add" aria-hidden />
+                    <span className="spatial-object-name">{t(entry.nameKey)}</span>
                   </button>
                 ))}
               </div>
+              {!filtered.length && (
+                <p className="spatial-library-empty">{common("empty", { ns: "assets" })}</p>
+              )}
             </div>
           </ScrollShadow>
         )}
-        {tab === "vectors" && vectorLibrary?.content}
-        {tab === "packs" && modelPacks?.content}
-        {native && (
-          <div className="spatial-library-actions">
-            <Button
-              variant="outline"
-              disabled={busy}
-              onClick={() => {
-                void add("text");
-              }}
-            >
-              <Type size={14} />
-              {t("primitives.text")}
-            </Button>
-            <Button variant="outline" disabled={busy} onClick={() => input.current?.click()}>
-              <Upload size={14} />
-              {t("importModel")}
-            </Button>
-          </div>
-        )}
+        {tab === "vectors" && panel(vectorLibrary)}
+        {tab === "packs" && panel(modelPacks)}
         <input
           ref={input}
           hidden

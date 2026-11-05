@@ -3,6 +3,7 @@ import { spatialReplacementPreservesScope } from "./spatial-scope";
 
 /** Fields whose edits cannot add identities or alter graph/animation addresses. */
 const layerFields = new Set<string>([
+  "background",
   "name",
   "x",
   "y",

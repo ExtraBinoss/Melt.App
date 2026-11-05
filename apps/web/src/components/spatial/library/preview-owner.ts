@@ -12,6 +12,7 @@ export function createSpatialLibraryPreview(
 ) {
   const surface = host.parentElement!;
   let alive = true,
+    active = false,
     generation = 0,
     frameHandle = 0,
     pending = false,
@@ -33,11 +34,12 @@ export function createSpatialLibraryPreview(
     if (alive) session = module.createRenderSession({ maxBytes: 96 * 1024 * 1024 });
   });
   const schedule = () => {
-    if (alive && !frameHandle && !document.hidden) frameHandle = requestAnimationFrame(draw);
+    if (alive && active && !frameHandle && !document.hidden)
+      frameHandle = requestAnimationFrame(draw);
   };
   function draw(now: number) {
     frameHandle = 0;
-    if (!alive || !current || !session || document.hidden) return;
+    if (!alive || !active || !current || !session || document.hidden) return;
     if (pending || now - lastFrame < 1000 / 30) {
       schedule();
       return;
@@ -74,7 +76,7 @@ export function createSpatialLibraryPreview(
           scale: Math.min(320, Math.max(160, 160 * devicePixelRatio)) / 256,
           motionFrame: plan,
           signal,
-          canRender: () => alive && token === generation,
+          canRender: () => alive && active && token === generation,
         },
       )
       .catch((error) => {
@@ -159,7 +161,17 @@ export function createSpatialLibraryPreview(
   document.addEventListener("visibilitychange", visibility);
   reduced.addEventListener("change", changeMotion);
   return {
+    pause() {
+      active = false;
+      source.abort();
+      generation++;
+      current = null;
+      cancelAnimationFrame(frameHandle);
+      frameHandle = 0;
+      surface.dataset.ready = "false";
+    },
     async setEntry(entry: SpatialLibraryEntry) {
+      active = true;
       source.abort();
       source = new AbortController();
       const signal = source.signal,

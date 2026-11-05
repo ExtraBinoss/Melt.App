@@ -1,5 +1,5 @@
 import type { ArtboardWorkspace } from "../artboards/layout";
-import type { View } from "./view";
+import { constrainView, type View } from "./view";
 
 export function immersiveView(
   layout: ArtboardWorkspace,
@@ -22,4 +22,15 @@ export function immersiveView(
     x: Math.min(centerX + dx, Math.max(centerX - dx, current?.x ?? centerX)),
     y: Math.min(centerY + dy, Math.max(centerY - dy, current?.y ?? centerY)),
   };
+}
+
+/** Studio starts fitted, then permits camera-window panning without editing the portable camera. */
+export function constrainStudioView(
+  layout: ArtboardWorkspace,
+  size: { width: number; height: number },
+  pageId: string,
+  next: View,
+): View {
+  const fitted = immersiveView(layout, size, pageId);
+  return constrainView({ ...next, zoom: Math.max(fitted.zoom, next.zoom) }, layout, size);
 }

@@ -1,0 +1,36 @@
+{
+  "en": {
+    "name": "Blocks",
+    "parameter": {
+      "scale": "Stud spacing",
+      "centerX": "Grid center X",
+      "centerY": "Grid center Y",
+      "angle": "Brick direction",
+      "stagger": "Stagger rows",
+      "gap": "Brick gap",
+      "relief": "Raised plastic relief",
+      "lightAngle": "Light direction",
+      "variation": "Brick color variation",
+      "studRadius": "Stud radius",
+      "studHeight": "Stud height",
+      "paletteLevels": "Color levels (0 = source)"
+    }
+  },
+  "fr": {
+    "name": "Briques",
+    "parameter": {
+      "scale": "Espacement des tenons",
+      "centerX": "Centre de grille X",
+      "centerY": "Centre de grille Y",
+      "angle": "Direction des briques",
+      "stagger": "Décaler les rangées",
+      "gap": "Espace entre les briques",
+      "relief": "Relief du plastique",
+      "lightAngle": "Direction de la lumière",
+      "variation": "Variation de couleur des briques",
+      "studRadius": "Rayon des tenons",
+      "studHeight": "Hauteur des tenons",
+      "paletteLevels": "Niveaux de couleur (0 = source)"
+    }
+  }
+}

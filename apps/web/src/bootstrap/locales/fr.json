@@ -1,4 +1,5 @@
 {
   "opening": "Ouverture de votre atelier…",
+  "openingProject": "Ouverture de {{projectName}}…",
   "dismiss": "Fermer le message"
 }

@@ -22,15 +22,34 @@ export interface ApplyBackgroundPresetCommand {
   options?: BackgroundPresetOptions;
 }
 
-/** Full-frame first root rectangles are normal layers and remain editable everywhere. */
-export function backgroundLayer(page: Composition): Layer | undefined {
+// Persisted default names from background layers authored before explicit ownership existed.
+const legacyBackgroundNames = new Set([
+  "background",
+  "arrière-plan",
+  "hintergrund",
+  "fondo",
+  "sfondo",
+  "fundo",
+  "achtergrond",
+  "tło",
+  "背景",
+  "배경",
+  "الخلفية",
+]);
+
+/** Background identity survives a resized frame. Ordinary rectangles can explicitly opt out. */
+export function backgroundLayer(page: Composition, inferFullFrame = true): Layer | undefined {
   const first = page.layers.find((layer) => !layer.parentId);
   return first?.kind === "rectangle" &&
+    first.background !== false &&
     !first.spatial?.enabled &&
-    first.x === 0 &&
-    first.y === 0 &&
-    first.width === page.width &&
-    first.height === page.height &&
+    (first.background === true ||
+      legacyBackgroundNames.has(first.name.trim().toLowerCase()) ||
+      (inferFullFrame &&
+        first.x === 0 &&
+        first.y === 0 &&
+        first.width === page.width &&
+        first.height === page.height)) &&
     first.rotation === 0 &&
     (first.scaleX ?? 1) === 1 &&
     (first.scaleY ?? 1) === 1 &&
@@ -84,6 +103,7 @@ export function backgroundPresetLayer(
     width: page.width,
     height: page.height,
     fill: fillGradient.stops[0]!.color,
+    background: true,
     fillGradient,
     effects: effects.map((effect) =>
       createEffect(effect.type, { ...effect, id: nextId("effect") }),

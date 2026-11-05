@@ -37,7 +37,10 @@ it("keeps source sampling and all continuous controls on one stable GPU graph wi
   expect(fixture.controls.parameters.ior!.value).toBe(1.8);
   expect(fixture.controls.parameters.pattern!.value).toBe(1);
   expect(fixture.controls.parameters.cutout!.value).toBe(1);
-  expect(graphNodes(node).has(fixture.source)).toBe(true);
+  const nodes = graphNodes(node);
+  expect(nodes.has(fixture.source)).toBe(true);
+  expect(nodes.has(fixture.controls.contentOrigin)).toBe(true);
+  expect(nodes.has(fixture.controls.contentResolution)).toBe(true);
   expect(fixture.getGlyphAtlas).not.toHaveBeenCalled();
   fixture.dispose();
 });

@@ -167,7 +167,14 @@
     "window-trails": "Répéter des traînées de fenêtres décalées.",
     "morph": "Interpoler les éléments entre plusieurs états de forme.",
     "transition": "Animer l’entrée ou la sortie d’un calque.",
-    "feather": "Atténuation elliptique de la transparence avec centre, rayon et douceur modifiables."
+    "feather": "Atténuation elliptique de la transparence avec centre, rayon et douceur modifiables.",
+    "risograph": "Imprimer avec deux ou trois encres décalées, des points de trame, du grain et du papier texturé.",
+    "oil-paint": "Simplifier les régions avec un filtre pictural directionnel de type Kuwahara et un détail réglable.",
+    "blocks": "Créer une mosaïque de briques colorées avec des tenons circulaires en relief, des biseaux et un éclairage directionnel.",
+    "chromatic-aberration": "Séparer les canaux rouge et bleu radialement ou dans une direction réglable.",
+    "wind": "Étirer les détails en traînées directionnelles avec des bandes déterministes et des rafales animées.",
+    "depth-of-field": "Régler la netteté de la composition avec la profondeur native, la distance de mise au point et l’ouverture. Nécessite une scène 3D.",
+    "trail": "Mélanger les poses précédentes de la composition en échos temporels, ou répéter l’image actuelle avec des décalages."
   },
   "commandLabels": {
     "togglePlayback": "Lire / mettre en pause Motion",
@@ -272,7 +279,14 @@
     "receipt": "Ticket de caisse",
     "pink-phosphor": "Phosphore rose",
     "transition": "Transition",
-    "morph": "Morphing"
+    "morph": "Morphing",
+    "risograph": "Risographie",
+    "oil-paint": "Peinture à l’huile",
+    "blocks": "Briques",
+    "chromatic-aberration": "Aberration chromatique",
+    "wind": "Vent",
+    "depth-of-field": "Profondeur de champ",
+    "trail": "Traînée"
   },
   "resultCount_many": "{{count}} résultats",
   "language": "Langue"

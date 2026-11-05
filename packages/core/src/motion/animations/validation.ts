@@ -106,6 +106,11 @@ export function validateMotionAnimations(value: unknown, layer: Layer, ids: Set<
     assertNumber(animation.strength, 0, 10);
     assertList(animation.effectIds, 32);
     ensure(
+      animation.ownsEffects === undefined || typeof animation.ownsEffects === "boolean",
+      "INVALID_DOCUMENT",
+      "Invalid animation effect ownership",
+    );
+    ensure(
       animation.effectIds.length === animation.preset.effects.length &&
         new Set(animation.effectIds).size === animation.effectIds.length,
       "INVALID_DOCUMENT",

@@ -1,5 +1,13 @@
-import { useSyncExternalStore } from "react";
-import type { EnginePort, Project } from "@musart/core";
+import { atom, createStore as createAtomStore, useAtomValue } from "jotai";
+import type { EnginePort, Project, SceneAnimationOwner } from "@musart/core";
+
+export interface AnimationEditorRequest {
+  readonly token: number;
+  readonly animationId: string;
+  readonly project: Project;
+  readonly pageId: string;
+  readonly owner: SceneAnimationOwner;
+}
 
 interface Presentation {
   details: boolean;
@@ -7,15 +15,20 @@ interface Presentation {
 }
 const stores = new WeakMap<EnginePort, ReturnType<typeof createStore>>();
 function createStore(engine: EnginePort) {
-  let state: Presentation = { details: false, selected: null };
-  const listeners = new Set<() => void>();
-  const editorListeners = new Set<(animationId: string) => void>();
-  let pendingEditor: { animationId: string; project: Project; pageId: string } | null = null;
-  let stop: (() => void) | undefined;
-  const emit = () => {
-    for (const listener of listeners) listener();
+  const store = createAtomStore();
+  const stateAtom = atom<Presentation>({ details: false, selected: null });
+  const detailsAtom = atom((get) => get(stateAtom).details);
+  stateAtom.onMount = () => {
+    const stop = engine.subscribe(syncSelection);
+    syncSelection();
+    return stop;
   };
+  const editorListeners = new Set<(animationId: string) => void>();
+  let pendingEditor: AnimationEditorRequest | null = null;
+  let editorSequence = 0;
+  let stopEditorWatch: (() => void) | undefined;
   function syncSelection() {
+    const state = store.get(stateAtom);
     if (!state.selected) return;
     const snapshot = engine.getSnapshot();
     const owner = snapshot.project.pages
@@ -30,13 +43,42 @@ function createStore(engine: EnginePort) {
       (!owner || !snapshot.selection.includes(owner.layerId)) &&
       (!sceneOwner || snapshot.selection.length > 0)
     ) {
-      state = { ...state, selected: null };
-      emit();
+      store.set(stateAtom, { ...state, selected: null });
     }
   }
+  function clearEditorRequest() {
+    pendingEditor = null;
+    stopEditorWatch?.();
+    stopEditorWatch = undefined;
+  }
+  function readEditorRequest() {
+    const snapshot = engine.getSnapshot();
+    if (
+      pendingEditor &&
+      (snapshot.project !== pendingEditor.project ||
+        snapshot.pageId !== pendingEditor.pageId ||
+        !snapshot.project.pages
+          .find((page) => page.id === snapshot.pageId)
+          ?.motion?.sceneAnimations?.some(
+            (animation) => animation.id === pendingEditor!.animationId,
+          ))
+    )
+      clearEditorRequest();
+    return pendingEditor;
+  }
   return {
-    read: () => state,
+    store,
+    stateAtom,
+    detailsAtom,
+    read: () => store.get(stateAtom),
+    readEditorRequest,
+    consumeEditorRequest(request: AnimationEditorRequest) {
+      if (readEditorRequest() !== request) return false;
+      clearEditorRequest();
+      return true;
+    },
     requestEditor(animationId: string) {
+      const state = store.get(stateAtom);
       const snapshot = engine.getSnapshot();
       if (
         !snapshot.project.pages
@@ -45,25 +87,28 @@ function createStore(engine: EnginePort) {
       )
         return;
       if (state.selected !== animationId) {
-        state = { ...state, selected: animationId };
-        emit();
+        store.set(stateAtom, { ...state, selected: animationId });
       }
-      pendingEditor = { animationId, project: snapshot.project, pageId: snapshot.pageId };
+      const animation = snapshot.project.pages
+        .find((page) => page.id === snapshot.pageId)!
+        .motion!.sceneAnimations!.find((item) => item.id === animationId)!;
+      clearEditorRequest();
+      pendingEditor = {
+        token: ++editorSequence,
+        animationId,
+        project: snapshot.project,
+        pageId: snapshot.pageId,
+        owner: animation.owner,
+      };
+      stopEditorWatch = engine.subscribe(() => {
+        readEditorRequest();
+      });
       for (const listener of editorListeners) listener(animationId);
-      if (editorListeners.size) pendingEditor = null;
     },
     takeEditorRequest() {
-      const requested = pendingEditor;
-      pendingEditor = null;
-      const snapshot = engine.getSnapshot();
-      return requested &&
-        snapshot.project === requested.project &&
-        snapshot.pageId === requested.pageId &&
-        snapshot.project.pages
-          .find((page) => page.id === snapshot.pageId)
-          ?.motion?.sceneAnimations?.some((animation) => animation.id === requested.animationId)
-        ? requested.animationId
-        : null;
+      const request = readEditorRequest();
+      clearEditorRequest();
+      return request?.animationId ?? null;
     },
     subscribeEditor(listener: (animationId: string) => void) {
       editorListeners.add(listener);
@@ -72,22 +117,13 @@ function createStore(engine: EnginePort) {
       };
     },
     subscribe(this: void, listener: () => void) {
-      listeners.add(listener);
-      if (!stop) stop = engine.subscribe(syncSelection);
-      syncSelection();
-      return () => {
-        listeners.delete(listener);
-        if (!listeners.size) {
-          stop?.();
-          stop = undefined;
-        }
-      };
+      return store.sub(stateAtom, listener);
     },
     set(patch: Partial<Presentation>) {
+      const state = store.get(stateAtom);
       const next = { ...state, ...patch };
       if (next.details === state.details && next.selected === state.selected) return;
-      state = next;
-      emit();
+      store.set(stateAtom, next);
     },
   };
 }
@@ -101,5 +137,11 @@ export function animationPresentation(engine: EnginePort) {
 }
 export function useAnimationPresentation(engine: EnginePort) {
   const store = animationPresentation(engine);
-  return useSyncExternalStore(store.subscribe, store.read, store.read);
+  return useAtomValue(store.stateAtom, { store: store.store });
+}
+
+/** Selection changes never rebuild the dock or timeline controls. */
+export function useAnimationDetails(engine: EnginePort) {
+  const state = animationPresentation(engine);
+  return useAtomValue(state.detailsAtom, { store: state.store });
 }

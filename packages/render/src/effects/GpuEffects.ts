@@ -1,3 +1,4 @@
+import { applyEffectDomain } from "./sdk/domain";
 import { hasEffectTreatment } from "./shared/active";
 import { compileGpuScene } from "../compositing/compile";
 import {
@@ -10,6 +11,7 @@ import {
 } from "@musart/core";
 import {
   DataTexture,
+  DepthTexture,
   RGBAFormat,
   UnsignedByteType,
   Mesh,
@@ -30,7 +32,13 @@ import type { GlyphAtlasBinding } from "./ascii/binding";
 import { assertTextureSize, gpuTextureLimit } from "../cache/texture-limits";
 import { effectStages, type EffectStage } from "./pipeline";
 import { compositeEffect } from "./shared/compositing/node";
-import { sampleEffect, type EffectDimensions } from "./shared/context";
+import { sampleEffect } from "./shared/context";
+import type {
+  EffectAuxiliaryInputs,
+  EffectDepthBinding,
+  EffectDimensions,
+  EffectHistoryBinding,
+} from "./shared/context";
 import { createEffectUniforms, updateEffectUniforms, type EffectUniforms } from "./shared/uniforms";
 import { EffectTargetPool } from "./shared/target-pool";
 
@@ -52,6 +60,8 @@ interface EffectPass {
     string,
     { texture: TextureNode<"vec4">; enabled: UniformNode<"float", number> }
   >;
+  readonly depth: EffectDepthBinding | null;
+  readonly history: Map<number, EffectHistoryBinding & { readonly fallback: DataTexture }>;
   readonly glyph: { characters: string; binding: GlyphAtlasBinding | null };
 }
 export interface GpuEffectStats {
@@ -117,6 +127,7 @@ export class GpuEffects {
     height: number,
     logical: EffectDimensions,
     bindImages = true,
+    auxiliary: EffectAuxiliaryInputs = {},
   ): EffectPass {
     const advanced =
       stage.final &&
@@ -130,7 +141,38 @@ export class GpuEffects {
       const controls = createEffectUniforms(uniformEffect, width, height, logical);
       const glyph: EffectPass["glyph"] = { characters: this.characters(effect), binding: null };
       const images: EffectPass["images"] = new Map();
+      const history: EffectPass["history"] = new Map();
+      let depth: EffectDepthBinding | null = null;
       const node = stage.builder({
+        bindDepthInput: () => {
+          if (!auxiliary.depth) throw Error("Native composition depth is unavailable");
+          return (depth ??= {
+            texture: texture(auxiliary.depth.texture),
+            available: uniform(1),
+            near: uniform(auxiliary.depth.near),
+            far: uniform(auxiliary.depth.far),
+            perspective: uniform(auxiliary.depth.perspective ? 1 : 0),
+          });
+        },
+        bindHistoryInput: (slot) => {
+          if (!Number.isInteger(slot) || slot < 0 || slot >= 8)
+            throw Error("Effect history slot must be between zero and seven");
+          let binding = history.get(slot);
+          if (!binding) {
+            // Distinct placeholders prevent Three from deduplicating unbound history samplers.
+            const fallback = new DataTexture(new Uint8Array(4), 1, 1, RGBAFormat, UnsignedByteType);
+            fallback.needsUpdate = true;
+            const input = auxiliary.history?.get(effect.id)?.[slot];
+            binding = {
+              texture: texture(input?.texture ?? fallback),
+              available: uniform(0),
+              flipY: uniform(0),
+              fallback,
+            };
+            history.set(slot, binding);
+          }
+          return binding;
+        },
         bindImageInput: (key) => {
           let binding = images.get(key);
           if (!binding) {
@@ -157,14 +199,18 @@ export class GpuEffects {
       });
       material.name = passKey;
       material.fragmentNode = stage.final
-        ? compositeEffect(
+        ? applyEffectDomain(
             sampleEffect(backdrop, { ...controls, sourceFlipY: controls.backdropFlipY }, uv()),
-            node,
+            compositeEffect(
+              sampleEffect(backdrop, { ...controls, sourceFlipY: controls.backdropFlipY }, uv()),
+              node,
+              controls,
+              advanced,
+            ),
             controls,
-            advanced,
           )
         : node;
-      pass = { material, source, backdrop, controls, glyph, images };
+      pass = { material, source, backdrop, controls, glyph, images, depth, history };
       this.passes.set(passKey, pass);
     }
     for (const [key, binding] of pass.images) {
@@ -174,6 +220,20 @@ export class GpuEffects {
       binding.texture.value =
         assetId && bindImages ? this.imageInput!(assetId) : this.neutralImage();
       binding.enabled.value = assetId ? 1 : 0;
+    }
+    if (pass.depth) {
+      if (!auxiliary.depth) throw Error("Native composition depth is unavailable");
+      pass.depth.texture.value = auxiliary.depth.texture;
+      pass.depth.available.value = 1;
+      pass.depth.near.value = auxiliary.depth.near;
+      pass.depth.far.value = auxiliary.depth.far;
+      pass.depth.perspective.value = auxiliary.depth.perspective ? 1 : 0;
+    }
+    for (const [slot, binding] of pass.history) {
+      const input = auxiliary.history?.get(effect.id)?.[slot];
+      binding.texture.value = input?.texture ?? binding.fallback;
+      binding.available.value = input?.available ? 1 : 0;
+      binding.flipY.value = input?.flipY ? 1 : 0;
     }
     pass.source.value = input;
     pass.backdrop.value = original;
@@ -199,7 +259,12 @@ export class GpuEffects {
     canContinue?: () => boolean,
   ): Promise<void> {
     if (this.disposed) throw new Error("L’opérateur d’effets a été fermé.");
-    const blocks = effects.map((effect) => ({ effect, stages: effectStages(effect) }));
+    const blocks = effects
+      .filter((effect) => {
+        const requirements = getEffectDefinition(effect.type).requirements;
+        return !requirements?.depth && !requirements?.history;
+      })
+      .map((effect) => ({ effect, stages: effectStages(effect) }));
     // Warmup attachments can be 1×1 while width/height describe logical uniforms.
     // Only distinct multi-stage sampler identities need a pooled texture here.
     const needsBackdrop = blocks.some(
@@ -276,6 +341,9 @@ export class GpuEffects {
     return (
       this.surfaces.projectedBytes(width, height, count) +
       this.atlases.projectedBytes(glyphs) +
+      this.historyBytes() +
+      enabled.filter((effect) => getEffectDefinition(effect.type).requirements?.history).length *
+        32 +
       (this.neutral || enabled.some((effect) => getEffectDefinition(effect.type).inputs?.length)
         ? 4
         : 0)
@@ -294,6 +362,7 @@ export class GpuEffects {
     effects: readonly Effect[],
     output: RenderTarget,
     logical: EffectDimensions = { width, height },
+    auxiliary: EffectAuxiliaryInputs = {},
   ): Texture {
     if (this.disposed) throw new Error("L’opérateur d’effets a été fermé.");
     if (!Number.isInteger(width) || !Number.isInteger(height) || width < 1 || height < 1)
@@ -310,6 +379,23 @@ export class GpuEffects {
         hasEffectTreatment(effect) && getEffectDefinition(effect.type).source !== "geometry",
     );
     if (!enabled.length) return source;
+    for (const effect of enabled) {
+      const requirements = getEffectDefinition(effect.type).requirements;
+      if (requirements?.scope === "composition" && auxiliary.scope !== "composition")
+        throw Error(`${effect.type} is available only on the composition`);
+      if (requirements?.depth) {
+        const depth = auxiliary.depth;
+        if (
+          !depth ||
+          !(depth.texture instanceof DepthTexture) ||
+          !Number.isFinite(depth.near) ||
+          !Number.isFinite(depth.far) ||
+          depth.near <= 0 ||
+          depth.far <= depth.near
+        )
+          throw Error("Depth of field is unavailable without native composition depth");
+      }
+    }
     if (source === output.texture)
       throw new Error("La source et la cible GPU doivent être distinctes.");
     assertTextureSize(width, height, gpuTextureLimit(this.renderer));
@@ -337,7 +423,7 @@ export class GpuEffects {
             final: false,
           };
           this.draw(
-            this.getPass(block.effect, copy, input, input, width, height, logical),
+            this.getPass(block.effect, copy, input, input, width, height, logical, true, auxiliary),
             backdrop!,
           );
           original = backdrop!.texture;
@@ -345,7 +431,17 @@ export class GpuEffects {
         for (const stage of block.stages) {
           const target = (total - index++) % 2 === 1 ? output : scratch!;
           this.draw(
-            this.getPass(block.effect, stage, input, original, width, height, logical),
+            this.getPass(
+              block.effect,
+              stage,
+              input,
+              original,
+              width,
+              height,
+              logical,
+              true,
+              auxiliary,
+            ),
             target,
           );
           input = target.texture;
@@ -357,11 +453,18 @@ export class GpuEffects {
     }
   }
 
+  private historyBytes(): number {
+    let bytes = 0;
+    for (const pass of this.passes.values()) bytes += pass.history.size * 4;
+    return bytes;
+  }
+
   stats(): GpuEffectStats {
     return {
       passes: this.renderedPasses,
       targets: this.surfaces.targets,
-      bytes: this.surfaces.bytes + this.atlases.bytes() + (this.neutral ? 4 : 0),
+      bytes:
+        this.surfaces.bytes + this.atlases.bytes() + this.historyBytes() + (this.neutral ? 4 : 0),
       materials: this.passes.size,
     };
   }
@@ -372,7 +475,10 @@ export class GpuEffects {
     this.atlases.dispose();
     this.neutral?.dispose();
     this.neutral = null;
-    for (const pass of this.passes.values()) pass.material.dispose();
+    for (const pass of this.passes.values()) {
+      pass.material.dispose();
+      for (const binding of pass.history.values()) binding.fallback.dispose();
+    }
     this.passes.clear();
     if (this.mesh) this.scene.remove(this.mesh);
     this.mesh = null;

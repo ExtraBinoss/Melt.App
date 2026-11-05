@@ -157,11 +157,27 @@
   top: calc(50% - 4px);
   cursor: ew-resize;
 }
-.canvas-handle-rotate {
-  left: calc(50% - 4px);
-  top: -23px;
+.canvas-handle.canvas-handle-rotate {
+  left: 50%;
+  top: 0;
+  width: 8px;
+  height: 8px;
+  margin: -4px 0 0 -4px;
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
   border-radius: 50%;
+  touch-action: none;
   cursor: grab;
+}
+.canvas-handle-rotate::after {
+  content: "";
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+}
+.canvas-handle-rotate:active {
+  cursor: grabbing;
 }
 .canvas-selection-size {
   position: absolute;

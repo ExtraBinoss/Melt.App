@@ -44,11 +44,11 @@ export function receiptPaper(pixel: Node<"vec2">, controls: EffectUniforms) {
         .toVar(),
       distance = min(
         pixel.y.sub(topOffset),
-        controls.logicalResolution.y.sub(pixel.y).sub(bottomOffset),
+        controls.contentResolution.y.sub(pixel.y).sub(bottomOffset),
       ).toVar(),
       coverage = smoothstep(u.edgeSoftness!.mul(-0.5), u.edgeSoftness!.mul(0.5), distance).toVar(),
       edgeLight = float(1).sub(exp(abs(distance).negate().div(1.5)).mul(u.edgeShade!)),
-      fold = pixel.y.sub(controls.logicalResolution.y.mul(u.foldPosition!)).div(u.foldWidth!),
+      fold = pixel.y.sub(controls.contentResolution.y.mul(u.foldPosition!)).div(u.foldWidth!),
       folded = float(1).add(
         fold
           .mul(exp(abs(fold).negate()))

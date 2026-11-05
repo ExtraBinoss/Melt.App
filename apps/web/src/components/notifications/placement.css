@@ -1,0 +1,25 @@
+.workspace-notice-anchor {
+  --notice-gap: 18px;
+  width: max-content;
+  max-width: calc(100% - 24px);
+  pointer-events: none;
+}
+.workspace-notice-anchor[data-notice-placement="top-center"] {
+  top: var(--notice-top, max(var(--notice-gap), env(safe-area-inset-top)));
+  bottom: auto;
+  left: var(--notice-center, 50%);
+  right: auto;
+  transform: translateX(-50%);
+}
+.workspace-notice-anchor[data-notice-placement="bottom-right"] {
+  top: auto;
+  bottom: var(--notice-bottom, calc(max(var(--notice-gap), env(safe-area-inset-bottom)) + 60px));
+  left: auto;
+  right: var(--notice-right, max(var(--notice-gap), env(safe-area-inset-right)));
+  transform: none;
+}
+@media (max-width: 760px) {
+  .workspace-notice-anchor {
+    --notice-gap: 12px;
+  }
+}

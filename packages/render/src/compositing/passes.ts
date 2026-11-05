@@ -32,6 +32,7 @@ import { textureFlip } from "./nodes/uv";
 import { shapeControls, shapeNode, updateShape } from "../surface/shapes";
 import type { MaskMapping } from "./mask-binding";
 import type { FrameTexture } from "./types";
+import { ProjectionPass } from "./projection-pass";
 
 function material() {
   return new MeshBasicNodeMaterial({
@@ -44,6 +45,7 @@ function material() {
 }
 export class GpuPasses {
   passes = 0;
+  private projection: ProjectionPass | null = null;
   private readonly compiled = new WeakSet<MeshBasicNodeMaterial>();
   private readonly scene = new Scene();
   private readonly camera = new OrthographicCamera(-1, 1, 1, -1, 0, 1);
@@ -51,6 +53,7 @@ export class GpuPasses {
   private readonly mesh = new Mesh(this.geometry, material());
   private readonly clearColor = uniform(new Vector4(0, 0, 0, 0));
   private readonly backgroundPaint = paintControls();
+  private readonly backgroundRegion = uniform(new Vector4(0, 0, 1, 1));
   private readonly backgroundMaterial = material();
   private readonly clearMaterial = material();
   private readonly copy = copyControls();
@@ -75,7 +78,7 @@ export class GpuPasses {
     this.cornerMaterial.fragmentNode = mediaCornerNode(this.corners);
     const background = paintNode(
       this.backgroundPaint,
-      vec2(uv().x, uv().y.oneMinus()).mul(this.backgroundPaint.size),
+      vec2(uv().x, uv().y.oneMinus()).mul(this.backgroundRegion.zw).add(this.backgroundRegion.xy),
     );
     this.backgroundMaterial.name = "melt:background-gradient";
     this.backgroundMaterial.fragmentNode = vec4(background.rgb.mul(background.a), background.a);
@@ -164,9 +167,27 @@ export class GpuPasses {
       this.renderer.autoClear = auto;
     }
   }
-  clear(target: RenderTarget, color = "transparent", gradient?: FillGradient): void {
+  clear(
+    target: RenderTarget,
+    color = "transparent",
+    gradient?: FillGradient,
+    domain?: { width: number; height: number; region: Bounds },
+  ): void {
     if (gradient) {
-      updatePaintControls(this.backgroundPaint, color, target.width, target.height, gradient);
+      updatePaintControls(
+        this.backgroundPaint,
+        color,
+        domain?.width ?? target.width,
+        domain?.height ?? target.height,
+        gradient,
+      );
+      const region = domain?.region;
+      this.backgroundRegion.value.set(
+        region?.x ?? 0,
+        region?.y ?? 0,
+        region?.width ?? target.width,
+        region?.height ?? target.height,
+      );
       this.draw(this.backgroundMaterial, target);
     } else {
       const rgba = parseColor(color);
@@ -195,6 +216,17 @@ export class GpuPasses {
       region?.height ?? 1,
     );
     this.draw(this.copyMaterial, target);
+  }
+  projectTo(
+    source: FrameTexture,
+    sourceBounds: Bounds,
+    target: RenderTarget,
+    targetBounds: Bounds,
+    targetToSource: readonly number[],
+  ): void {
+    this.projection ??= new ProjectionPass(this.renderer);
+    this.projection.render(source, sourceBounds, target, targetBounds, targetToSource);
+    this.passes++;
   }
   maskTo(
     source: FrameTexture,
@@ -266,6 +298,8 @@ export class GpuPasses {
     this.draw(this.blendMaterial, target);
   }
   dispose(): void {
+    this.projection?.dispose();
+    this.projection = null;
     this.geometry.dispose();
     for (const mat of [
       this.clearMaterial,

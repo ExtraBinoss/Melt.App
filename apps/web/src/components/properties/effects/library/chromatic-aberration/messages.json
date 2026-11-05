@@ -1,0 +1,28 @@
+{
+  "en": {
+    "name": "Chromatic Aberration",
+    "parameter": {
+      "mode": "Separation mode",
+      "centerX": "Center X",
+      "centerY": "Center Y",
+      "angle": "Separation direction",
+      "separation": "Channel separation",
+      "radius": "Falloff radius",
+      "falloff": "Distance falloff"
+    },
+    "choice": { "radial": "Radial", "directional": "Directional" }
+  },
+  "fr": {
+    "name": "Aberration chromatique",
+    "parameter": {
+      "mode": "Mode de séparation",
+      "centerX": "Centre X",
+      "centerY": "Centre Y",
+      "angle": "Direction de séparation",
+      "separation": "Séparation des canaux",
+      "radius": "Rayon d’atténuation",
+      "falloff": "Atténuation avec la distance"
+    },
+    "choice": { "radial": "Radiale", "directional": "Directionnelle" }
+  }
+}

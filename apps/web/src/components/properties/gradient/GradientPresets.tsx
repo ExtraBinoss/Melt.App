@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Dice5, Plus, Trash2, SwatchBook } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -17,6 +18,7 @@ interface Props {
   identity: string;
   gradient: FillGradient;
   disabled?: boolean;
+  presetContent?: ReactNode;
   onPreview: (paint: FillGradient) => void;
   onCommit: (paint: FillGradient) => void;
   onCancel: () => void;
@@ -62,6 +64,7 @@ function Library({
   onCommit,
   onCancel,
   close,
+  presetContent,
 }: Props & { close: () => void }) {
   const { t } = useTranslation("gradient");
   const [tab, setTab] = useState("base");
@@ -206,51 +209,55 @@ function Library({
       )}
       <ScrollShadow className="gradient-library-shadow">
         <div className="gradient-library-scroll" aria-busy={busy || loading}>
-          <div
-            className="gradient-library-grid"
-            onPointerLeave={cancel}
-            onBlur={(event) => {
-              if (!event.currentTarget.contains(event.relatedTarget as Node | null)) cancel();
-            }}
-          >
-            {choices.map((preset) => (
-              <div className="gradient-library-entry" key={preset.id}>
-                <button
-                  type="button"
-                  className="gradient-library-preset"
-                  aria-label={preset.name}
-                  aria-pressed={sameGradient(gradient, preset.paint)}
-                  title={preset.name}
-                  disabled={disabled}
-                  style={{ backgroundImage: gradientPreview(preset.paint) }}
-                  onPointerEnter={(event) => {
-                    if (event.pointerType !== "touch") preview(preset.paint);
-                  }}
-                  onFocus={() => preview(preset.paint)}
-                  onClick={() => {
-                    draft.current = false;
-                    onCommit(structuredClone(preset.paint));
-                    close();
-                  }}
-                />
-                {tab === "saved" && (
-                  <IconButton
-                    className="gradient-library-delete"
-                    label={t("remove", { name: preset.name })}
-                    disabled={busy}
-                    onFocus={cancel}
-                    onPointerEnter={cancel}
-                    onClick={() => {
-                      cancel();
-                      void mutate((owned) => owned.remove(preset.id));
+          {tab === "base" && presetContent ? (
+            presetContent
+          ) : (
+            <div
+              className="gradient-library-grid"
+              onPointerLeave={cancel}
+              onBlur={(event) => {
+                if (!event.currentTarget.contains(event.relatedTarget as Node | null)) cancel();
+              }}
+            >
+              {choices.map((preset) => (
+                <div className="gradient-library-entry" key={preset.id}>
+                  <button
+                    type="button"
+                    className="gradient-library-preset"
+                    aria-label={preset.name}
+                    aria-pressed={sameGradient(gradient, preset.paint)}
+                    title={preset.name}
+                    disabled={disabled}
+                    style={{ backgroundImage: gradientPreview(preset.paint) }}
+                    onPointerEnter={(event) => {
+                      if (event.pointerType !== "touch") preview(preset.paint);
                     }}
-                  >
-                    <Trash2 size={12} />
-                  </IconButton>
-                )}
-              </div>
-            ))}
-          </div>
+                    onFocus={() => preview(preset.paint)}
+                    onClick={() => {
+                      draft.current = false;
+                      onCommit(structuredClone(preset.paint));
+                      close();
+                    }}
+                  />
+                  {tab === "saved" && (
+                    <IconButton
+                      className="gradient-library-delete"
+                      label={t("remove", { name: preset.name })}
+                      disabled={busy}
+                      onFocus={cancel}
+                      onPointerEnter={cancel}
+                      onClick={() => {
+                        cancel();
+                        void mutate((owned) => owned.remove(preset.id));
+                      }}
+                    >
+                      <Trash2 size={12} />
+                    </IconButton>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
           {tab === "saved" && !loading && !items.length && (
             <p className="gradient-library-empty">{t("empty")}</p>
           )}

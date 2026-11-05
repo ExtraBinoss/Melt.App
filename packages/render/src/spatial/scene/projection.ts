@@ -7,6 +7,28 @@ import {
   SpatialGeometry,
 } from "@musart/core";
 import { Box3, Matrix4, Vector3, type Camera, type Object3D } from "three/webgpu";
+/** Map the canonical camera's clip plane into a presentation window without changing its world. */
+export function windowProjection(page: Composition, viewport?: Bounds): Matrix4 {
+  if (!viewport) return new Matrix4();
+  return new Matrix4().set(
+    page.width / viewport.width,
+    0,
+    0,
+    (page.width - 2 * viewport.x) / viewport.width - 1,
+    0,
+    page.height / viewport.height,
+    0,
+    1 - (page.height - 2 * viewport.y) / viewport.height,
+    0,
+    0,
+    1,
+    0,
+    0,
+    0,
+    0,
+    1,
+  );
+}
 /** Clip-space mapping of a source-local transport rectangle into the composition gate. */
 export function transportProjection(
   page: Composition,
@@ -46,6 +68,7 @@ export function projectedTransport(
   root: Object3D,
   camera: Camera,
   geometry: SpatialGeometry,
+  viewport?: Bounds,
 ): Bounds {
   const inverse = invertMatrix(geometry.layoutMatrix(layer.id));
   const box = new Box3().setFromObject(root),
@@ -81,11 +104,12 @@ export function projectedTransport(
     );
   return { x, y, width: Math.max(1, right - x), height: Math.max(1, bottom - y) };
   function gate(): Bounds {
+    const region = viewport ?? { x: 0, y: 0, width: page.width, height: page.height };
     const corners = [
-      { x: 0, y: 0 },
-      { x: page.width, y: 0 },
-      { x: 0, y: page.height },
-      { x: page.width, y: page.height },
+      { x: region.x, y: region.y },
+      { x: region.x + region.width, y: region.y },
+      { x: region.x, y: region.y + region.height },
+      { x: region.x + region.width, y: region.y + region.height },
     ].map((p) => transformPoint(inverse, p));
     const x = Math.min(...corners.map((p) => p.x)) - 2,
       y = Math.min(...corners.map((p) => p.y)) - 2;

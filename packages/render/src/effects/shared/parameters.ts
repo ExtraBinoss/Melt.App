@@ -25,9 +25,10 @@ function numberValue(parameter: EffectParameter, value: number | boolean | strin
 export function createParameterUniforms(effect: Effect): ParameterUniforms {
   const parameters: ParameterUniforms["parameters"] = {},
     colors: ParameterUniforms["colors"] = {};
-  if (effect.type === "gradient") return { parameters, colors };
   const settings = resolveEffectSettings(effect);
-  for (const parameter of getEffectDefinition(effect.type).parameters.filter(scoped)) {
+  for (const parameter of getEffectDefinition(effect.type).parameters.filter(
+    (p) => scoped(p) && (effect.type !== "gradient" || p.key.startsWith("domain")),
+  )) {
     const value = settings[parameter.key];
     validateEffectParameter(parameter, value, "INVALID_DOCUMENT");
     if (parameter.kind === "text") continue;
@@ -40,9 +41,10 @@ export function createParameterUniforms(effect: Effect): ParameterUniforms {
 }
 
 export function updateParameterUniforms(controls: ParameterUniforms, effect: Effect): void {
-  if (effect.type === "gradient") return;
   const settings = resolveEffectSettings(effect);
-  for (const parameter of getEffectDefinition(effect.type).parameters.filter(scoped)) {
+  for (const parameter of getEffectDefinition(effect.type).parameters.filter(
+    (p) => scoped(p) && (effect.type !== "gradient" || p.key.startsWith("domain")),
+  )) {
     const value = settings[parameter.key];
     validateEffectParameter(parameter, value, "INVALID_DOCUMENT");
     if (parameter.kind === "text") continue;

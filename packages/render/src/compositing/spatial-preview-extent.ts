@@ -4,6 +4,7 @@ import {
   SpatialGeometry,
   invertMatrix,
   transformPoint,
+  type Bounds,
   type Composition,
   type Layer,
   type SpatialPrimitive,
@@ -14,7 +15,7 @@ import { createSpatialCamera, updateCompositionCamera } from "../spatial/camera"
 /** Conservative primitive transport sizes, matching the native world-AABB crop.
  * Unprepared glyphs, SVG paths and animated imports keep their authored fallback.
  */
-export function spatialPreviewExtents(page: Composition) {
+export function spatialPreviewExtents(page: Composition, viewport?: Bounds) {
   let geometry: SpatialGeometry | undefined;
   let camera: ReturnType<typeof createSpatialCamera> | undefined;
   return (layer: Layer): { width: number; height: number } => {
@@ -33,11 +34,12 @@ export function spatialPreviewExtents(page: Composition) {
       new Vector3(halfSize[0], halfSize[1], halfSize[2]),
     ).applyMatrix4(new Matrix4().fromArray(geometry.worldMatrix(layer.id)));
     const inverse = invertMatrix(geometry.layoutMatrix(layer.id));
+    const region = viewport ?? { x: 0, y: 0, width: page.width, height: page.height };
     const gate = [
-      { x: 0, y: 0 },
-      { x: page.width, y: 0 },
-      { x: 0, y: page.height },
-      { x: page.width, y: page.height },
+      { x: region.x, y: region.y },
+      { x: region.x + region.width, y: region.y },
+      { x: region.x, y: region.y + region.height },
+      { x: region.x + region.width, y: region.y + region.height },
     ].map((point) => transformPoint(inverse, point));
     const left = Math.min(...gate.map((point) => point.x)) - 2;
     const top = Math.min(...gate.map((point) => point.y)) - 2;

@@ -1,3 +1,4 @@
+import { authoredPixelDown, transportUv } from "../shared/coordinates";
 import {
   Break,
   Fn,
@@ -34,8 +35,8 @@ export function windowTrailsNode(context: EffectNodeContext) {
   const original = sampleEffect(source, controls, uv());
   const atlas = context.bindGlyphAtlas?.();
   const processed = Fn(() => {
-    const resolution = controls.logicalResolution.toVar();
-    const pixel = vec2(uv().x, uv().y.oneMinus()).mul(resolution).toVar();
+    const resolution = controls.contentResolution.toVar();
+    const pixel = authoredPixelDown(controls).toVar();
     const size = max(vec2(24), vec2(u.width!, u.height!)).toVar();
     const background = original.toVar();
     If(u.asciiBackground!.greaterThan(0.5), () => {
@@ -102,7 +103,11 @@ export function windowTrailsNode(context: EffectNodeContext) {
               local.x.div(size.x),
               local.y.sub(title).div(max(1, size.y.sub(title))),
             ).toVar();
-            const coord = mix(uv(), vec2(bodyUV.x, bodyUV.y.oneMinus()), u.sampling!).toVar();
+            const coord = mix(
+              uv(),
+              transportUv(controls, vec2(bodyUV.x, bodyUV.y.oneMinus())),
+              u.sampling!,
+            ).toVar();
             const sample = sampleEffect(source, controls, coord).toVar();
             const tone = dot(sample.rgb, vec3(0.2126, 0.7152, 0.0722))
               .mul(sample.a)
@@ -128,8 +133,8 @@ export function windowTrailsNode(context: EffectNodeContext) {
               color.assign(mix(paper, ink, density));
             })
               .ElseIf(treatment.greaterThan(1.5), () => {
-                const dx = vec2(1.5, 0).div(controls.resolution),
-                  dy = vec2(0, 1.5).div(controls.resolution);
+                const dx = vec2(1.5, 0).div(controls.logicalResolution),
+                  dy = vec2(0, 1.5).div(controls.logicalResolution);
                 const a = sampleEffect(source, controls, coord.add(dx)),
                   b = sampleEffect(source, controls, coord.sub(dx));
                 const c = sampleEffect(source, controls, coord.add(dy)),

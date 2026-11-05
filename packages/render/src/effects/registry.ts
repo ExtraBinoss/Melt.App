@@ -1,3 +1,10 @@
+import { depthOfFieldNode } from "./depth-of-field/node";
+import { trailNode } from "./trail/node";
+import { risographNode } from "./risograph/node";
+import { oilPaintNode } from "./oil-paint/node";
+import { blocksNode } from "./blocks/node";
+import { chromaticAberrationNode } from "./chromatic-aberration/node";
+import { windNode } from "./wind/node";
 import { featherNode } from "./feather/node";
 import { liquifyNode } from "./liquify/node";
 import { tornEdgesNode } from "./torn-edges/node";
@@ -51,6 +58,13 @@ export const EFFECT_NODES: Readonly<
     EffectNodeBuilder
   >
 > = Object.freeze({
+  "depth-of-field": depthOfFieldNode,
+  trail: trailNode,
+  risograph: risographNode,
+  "oil-paint": oilPaintNode,
+  blocks: blocksNode,
+  "chromatic-aberration": chromaticAberrationNode,
+  wind: windNode,
   feather: featherNode,
   terminal: terminalNode,
   liquify: liquifyNode,

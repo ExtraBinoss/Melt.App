@@ -5,6 +5,8 @@ import {
   extractSceneMotionAnimationPreset,
   motionTimeToSeconds,
   projectSceneMotionAnimations,
+  sceneAnimationOwner,
+  sceneAnimationOwnerKey,
   type Composition,
   type EnginePort,
   type SceneAnimationOwner,
@@ -188,10 +190,8 @@ export function SceneAnimations({
       })}
       {page.motion.sceneProperties?.some(
         (property) =>
-          property.target.kind === owner.kind &&
-          (owner.kind !== "light" ||
-            (property.target.kind === "light" && property.target.lightId === owner.lightId)) &&
-          property.keyframes.length >= 2,
+          sceneAnimationOwnerKey(sceneAnimationOwner(property.target)) ===
+            sceneAnimationOwnerKey(owner) && property.keyframes.length >= 2,
       ) && (
         <SavePreset
           label={t("saveTimeline")}

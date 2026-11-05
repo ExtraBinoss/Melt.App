@@ -158,7 +158,9 @@ export const upsertMotionKeyframe: CommandHandler<"upsertMotionKeyframe"> = (
   if (
     command.target.kind === "camera" ||
     command.target.kind === "environment" ||
-    command.target.kind === "light"
+    command.target.kind === "light" ||
+    command.target.kind === "compositionEffect" ||
+    command.target.kind === "compositionEffectSetting"
   )
     return upsertSceneMotionKeyframe(page, command, nextId, pageId);
   const target = command.target;

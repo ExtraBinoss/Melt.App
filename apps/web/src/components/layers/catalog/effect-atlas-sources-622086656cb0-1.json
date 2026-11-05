@@ -1,0 +1,206 @@
+[
+  {
+    "type": "depth-of-field",
+    "title": "depth-of-field: studio-still-life (depth)",
+    "source": "studio-still-life",
+    "scene": "depth",
+    "effect": {
+      "id": "catalog-effect-depth-of-field",
+      "type": "depth-of-field",
+      "enabled": true,
+      "amount": 1,
+      "scale": 2,
+      "levels": 2,
+      "color": false,
+      "seed": 42,
+      "settings": {
+        "focusDistance": 4.5,
+        "focusRange": 0.06,
+        "aperture": 0.8,
+        "maxBlur": 12,
+        "edgeProtection": 0.75
+      }
+    },
+    "placement": "composition"
+  },
+  {
+    "type": "trail",
+    "title": "trail: editorial-portrait (temporal)",
+    "source": "editorial-portrait",
+    "scene": "temporal",
+    "effect": {
+      "id": "catalog-effect-trail",
+      "type": "trail",
+      "enabled": true,
+      "amount": 1,
+      "scale": 2,
+      "levels": 2,
+      "color": false,
+      "seed": 42,
+      "settings": {
+        "mode": "temporal",
+        "echoCount": 4,
+        "delay": 0.13,
+        "fade": 0.75
+      }
+    },
+    "placement": "composition",
+    "sampleTime": 0.9
+  },
+  {
+    "type": "risograph",
+    "title": "risograph: editorial-portrait (photo)",
+    "source": "editorial-portrait",
+    "scene": "photo",
+    "effect": {
+      "id": "catalog-effect-risograph",
+      "type": "risograph",
+      "enabled": true,
+      "amount": 1,
+      "scale": 2,
+      "levels": 2,
+      "color": false,
+      "seed": 42
+    },
+    "placement": "layer"
+  },
+  {
+    "type": "oil-paint",
+    "title": "oil-paint: alpine-lake (photo)",
+    "source": "alpine-lake",
+    "scene": "photo",
+    "effect": {
+      "id": "catalog-effect-oil-paint",
+      "type": "oil-paint",
+      "enabled": true,
+      "amount": 1,
+      "scale": 2,
+      "levels": 2,
+      "color": false,
+      "seed": 42
+    },
+    "placement": "layer"
+  },
+  {
+    "type": "blocks",
+    "title": "blocks: editorial-portrait (photo)",
+    "source": "editorial-portrait",
+    "scene": "photo",
+    "effect": {
+      "id": "catalog-effect-blocks",
+      "type": "blocks",
+      "enabled": true,
+      "amount": 1,
+      "scale": 24,
+      "levels": 2,
+      "color": false,
+      "seed": 42
+    },
+    "placement": "layer"
+  },
+  {
+    "type": "chromatic-aberration",
+    "title": "chromatic-aberration: neon-city (photo)",
+    "source": "neon-city",
+    "scene": "photo",
+    "effect": {
+      "id": "catalog-effect-chromatic-aberration",
+      "type": "chromatic-aberration",
+      "enabled": true,
+      "amount": 1,
+      "scale": 2,
+      "levels": 2,
+      "color": false,
+      "seed": 42
+    },
+    "placement": "layer"
+  },
+  {
+    "type": "wind",
+    "title": "wind: editorial-portrait (photo)",
+    "source": "editorial-portrait",
+    "scene": "photo",
+    "effect": {
+      "id": "catalog-effect-wind",
+      "type": "wind",
+      "enabled": true,
+      "amount": 1,
+      "scale": 2,
+      "levels": 2,
+      "color": false,
+      "seed": 42,
+      "time": 0
+    },
+    "placement": "layer"
+  },
+  {
+    "type": "feather",
+    "title": "feather: editorial-portrait (photo)",
+    "source": "editorial-portrait",
+    "scene": "photo",
+    "effect": {
+      "id": "catalog-effect-feather",
+      "type": "feather",
+      "enabled": true,
+      "amount": 1,
+      "scale": 2,
+      "levels": 2,
+      "color": false,
+      "seed": 42,
+      "settings": {
+        "centerX": 0.5,
+        "centerY": 0.5,
+        "radius": 0.46,
+        "softness": 0.4
+      }
+    },
+    "placement": "layer"
+  },
+  {
+    "type": "terminal",
+    "title": "terminal: neon-city (typography)",
+    "source": "neon-city",
+    "scene": "typography",
+    "effect": {
+      "id": "catalog-effect-terminal",
+      "type": "terminal",
+      "enabled": true,
+      "amount": 1,
+      "scale": 2,
+      "levels": 2,
+      "color": false,
+      "seed": 42,
+      "time": 1.2,
+      "settings": {
+        "progress": 0.82,
+        "columns": 20,
+        "rows": 6,
+        "cursor": "block"
+      }
+    },
+    "placement": "layer"
+  },
+  {
+    "type": "torn-edges",
+    "title": "torn-edges: editorial-portrait (photo)",
+    "source": "editorial-portrait",
+    "scene": "photo",
+    "effect": {
+      "id": "catalog-effect-torn-edges",
+      "type": "torn-edges",
+      "enabled": true,
+      "amount": 1,
+      "scale": 2,
+      "levels": 2,
+      "color": false,
+      "seed": 42,
+      "settings": {
+        "technique": "paper",
+        "tearWidth": 12,
+        "roughness": 0.65,
+        "sourceColor": 1
+      }
+    },
+    "placement": "layer"
+  }
+]

@@ -6,6 +6,7 @@ import { paintArtboards } from "../artboards/presentation";
 import type { ViewMotion } from "./motion";
 import { selectionSizeLabel } from "../selection/size-label";
 import { paintSelectionHandleInk } from "../selection/handle-color";
+import { rotationHandlePlacement } from "../selection/rotation-handle";
 import { sourceGeometry } from "../selection/frame-geometry";
 import { paintCanvasStyle } from "../shared/paint-style";
 
@@ -81,7 +82,10 @@ function createPresentation({ controller, workspace, motion, viewport, beforePai
         });
       }
       for (const handle of overlay.querySelectorAll<HTMLButtonElement>(".canvas-handle")) {
-        const transform = `scale(${1 / view.zoom})`;
+        const transform =
+          handle.dataset.handle === "rotate"
+            ? rotationHandlePlacement(world, view.zoom).transform
+            : `scale(${1 / view.zoom})`;
         paintCanvasStyle(handle, { transform });
         if (handle.disabled !== inert) handle.disabled = inert;
       }

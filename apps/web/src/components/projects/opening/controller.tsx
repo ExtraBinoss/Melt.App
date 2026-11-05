@@ -13,7 +13,7 @@ let active: ProjectOpening | undefined;
 export const currentProjectOpening = () => active;
 
 /** A small independent surface spans library unmount and the first real canvas presentation. */
-export function beginProjectOpening(cancel?: () => void): ProjectOpening {
+export function beginProjectOpening(cancel?: () => void, projectName?: string): ProjectOpening {
   active?.close();
   // Read the source geometry before adding any presentation DOM.
   const { x, y } = openingOrigin();
@@ -118,6 +118,7 @@ export function beginProjectOpening(cancel?: () => void): ProjectOpening {
   active = owner;
   root.render(
     <OpeningSurface
+      projectName={projectName}
       cancel={
         cancel
           ? () => {

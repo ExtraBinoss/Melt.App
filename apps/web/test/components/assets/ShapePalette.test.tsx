@@ -98,6 +98,22 @@ test("imports local SVGs, restores document imports and reports invalid or overs
     expect.objectContaining({ name: "custom", parts: expect.any(Array) }),
   );
 });
+test("compact SVG catalog retains virtual scrolling and resets after external search", async () => {
+  vi.mocked(loadAssets).mockResolvedValue(artworks);
+  const d = setup(),
+    choose = vi.fn();
+  const view = d.mount(<ShapePalette engine={d.engine} onChoose={choose} compact searchQuery="" />);
+  await screen.findByRole("button", { name: "Utiliser Artwork 0" });
+  const region = screen.getByRole("region", { name: "Formes" });
+  expect(region.closest(".scroll-shadow")).toHaveAttribute("data-scroll-shadow-fade", "mask");
+  fireEvent.scroll(region, { target: { scrollTop: 1530 } });
+  expect(screen.queryByRole("button", { name: "Utiliser Artwork 0" })).toBeNull();
+  view.rerender(
+    <ShapePalette engine={d.engine} onChoose={choose} compact searchQuery="Artwork 119" />,
+  );
+  fireEvent.click(await screen.findByRole("button", { name: "Utiliser Artwork 119" }));
+  expect(choose).toHaveBeenCalledWith(expect.objectContaining({ id: "art-119" }));
+});
 test("cancels stale category loads and exposes load errors without publishing stale items", async () => {
   let resolveIcons!: (value: readonly CatalogAsset[]) => void;
   vi.mocked(loadAssets).mockImplementation((kind) =>

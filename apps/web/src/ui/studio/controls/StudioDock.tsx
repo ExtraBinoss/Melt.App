@@ -22,7 +22,7 @@ export function StudioDock({
         <PopoverTrigger asChild>
           <IconButton
             label={title}
-            tooltipSide={className === "studio-compositions" ? "bottom" : "top"}
+            tooltipSide="top"
             className="studio-dock-heading studio-surface"
             aria-controls={id}
           >
@@ -31,7 +31,7 @@ export function StudioDock({
         </PopoverTrigger>
         <PopoverContent
           id={id}
-          side={className === "studio-compositions" ? "bottom" : "top"}
+          side="top"
           align={className === "studio-environment" ? "end" : "start"}
           collisionPadding={12}
           sideOffset={10}

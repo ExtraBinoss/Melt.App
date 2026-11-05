@@ -1,3 +1,11 @@
+import { DEPTH_OF_FIELD_DEFINITION } from "./depth-of-field/definition";
+import { TRAIL_DEFINITION } from "./trail/definition";
+import { RISOGRAPH_DEFINITION } from "./risograph/definition";
+import { OIL_PAINT_DEFINITION } from "./oil-paint/definition";
+import { BLOCKS_DEFINITION } from "./blocks/definition";
+import { CHROMATIC_ABERRATION_DEFINITION } from "./chromatic-aberration/definition";
+import { WIND_DEFINITION } from "./wind/definition";
+import { withEffectSdk } from "./sdk/domain";
 import { FEATHER_DEFINITION } from "./feather/definition";
 import { HALFTONE_DEFINITION } from "./halftone/definition";
 import { TORN_EDGES_DEFINITION } from "./torn-edges/definition";
@@ -44,7 +52,14 @@ import { MORPH_DEFINITION } from "./morph/definition";
 import { ASCII_DEFINITION } from "./ascii/definition";
 import { DITHER_DEFINITION } from "./dither/definition";
 /** Portable effect metadata shared by factories, validation and client controls. */
-export const EFFECT_CATALOG: Readonly<Record<EffectType, EffectDefinition>> = Object.freeze({
+const BUILTIN_EFFECTS: Readonly<Record<EffectType, EffectDefinition>> = Object.freeze({
+  "depth-of-field": DEPTH_OF_FIELD_DEFINITION,
+  trail: TRAIL_DEFINITION,
+  risograph: RISOGRAPH_DEFINITION,
+  "oil-paint": OIL_PAINT_DEFINITION,
+  blocks: BLOCKS_DEFINITION,
+  "chromatic-aberration": CHROMATIC_ABERRATION_DEFINITION,
+  wind: WIND_DEFINITION,
   feather: FEATHER_DEFINITION,
   terminal: TERMINAL_DEFINITION,
   "torn-edges": TORN_EDGES_DEFINITION,
@@ -96,6 +111,13 @@ export const EFFECT_CATALOG: Readonly<Record<EffectType, EffectDefinition>> = Ob
   "pink-phosphor": PINK_PHOSPHOR_DEFINITION,
   transition: TRANSITION_DEFINITION,
 });
+
+/** Every built-in consumes the same authoring, validation and placement contract. */
+export const EFFECT_CATALOG = Object.freeze(
+  Object.fromEntries(
+    Object.entries(BUILTIN_EFFECTS).map(([type, definition]) => [type, withEffectSdk(definition)]),
+  ),
+) as Readonly<Record<EffectType, EffectDefinition>>;
 
 export function getEffectDefinition(type: EffectType): EffectDefinition {
   ensure(Object.hasOwn(EFFECT_CATALOG, type), "INVALID_COMMAND", "Effet inconnu");

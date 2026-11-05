@@ -1,5 +1,6 @@
 {
   "label": "Workspace",
   "classic": "Classic",
-  "studio": "Studio"
+  "studio": "Studio",
+  "switching": "Switching to {{workspace}}…"
 }

@@ -1,5 +1,6 @@
 {
   "close": "Dismiss notification",
   "copy": "Copy message and diagnostics",
-  "details": "Technical details"
+  "details": "Technical details",
+  "objectAdded": "{{name}} added"
 }

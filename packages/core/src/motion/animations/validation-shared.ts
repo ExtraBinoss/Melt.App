@@ -3,6 +3,7 @@ import { ensure } from "../../errors";
 import { validateMotionEasing } from "../easing";
 import { validateMotionValue } from "../properties/validation";
 import type { MotionPropertySchema } from "../properties/model";
+import { validateMotionDriver } from "../drivers/validation";
 export const ANIMATION_CATEGORIES = [
   "typography",
   "move",
@@ -45,6 +46,7 @@ export function validateAnimationChannelPoints(
   channel: Record<string, unknown>,
   schema: MotionPropertySchema,
 ): void {
+  if (channel.driver !== undefined) validateMotionDriver(channel.driver);
   ensure(
     ["add", "multiply", "replace"].includes(String(channel.operation)),
     "INVALID_DOCUMENT",

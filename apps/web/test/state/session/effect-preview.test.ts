@@ -126,3 +126,12 @@ it("cancels a stale editor even when load preserves IDs, while equivalent select
   expect(next.options.cancel).toHaveBeenCalledOnce();
   expect(next.pending.size).toBe(0);
 });
+
+it("retains a recording's final native input time without requiring a presentation frame", () => {
+  const d = fixture();
+  const finish = startEffectPreview(d.engine, { ...d.options, sampleOnFinish: true });
+  finish();
+  expect(d.options.commit).toHaveBeenCalledExactlyOnceWith(2);
+  expect(d.options.cancel).not.toHaveBeenCalled();
+  expect(d.pending.size).toBe(0);
+});

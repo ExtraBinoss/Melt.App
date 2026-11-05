@@ -1,5 +1,6 @@
 import type { Composition, Effect } from "@musart/core";
 import type { RenderTarget } from "three/webgpu";
+import type { EffectAuxiliaryInputs } from "../effects/shared/context";
 import type { GpuResourceCache } from "../cache/GpuResourceCache";
 import { hasEffectTreatment } from "../effects/shared/active";
 import type { EffectResources } from "./effect-resources";
@@ -37,6 +38,8 @@ export function finishCompositionEffects(
     passes: GpuPasses;
     effects: EffectResources;
     cache: GpuResourceCache;
+    depth?: EffectAuxiliaryInputs["depth"];
+    history?: EffectAuxiliaryInputs["history"];
     target(role: string, width: number, height: number): RenderTarget;
   },
 ): FrameTexture {
@@ -52,10 +55,22 @@ export function finishCompositionEffects(
   );
   let texture;
   try {
-    texture = context.effects.apply(straight.texture, width, height, stack, output, {
-      width: page.width,
-      height: page.height,
-    });
+    const viewport = input.bounds;
+    texture = context.effects.apply(
+      straight.texture,
+      width,
+      height,
+      stack,
+      output,
+      {
+        width: viewport?.width ?? page.width,
+        height: viewport?.height ?? page.height,
+        ...(viewport
+          ? { content: { x: -viewport.x, y: -viewport.y, width: page.width, height: page.height } }
+          : {}),
+      },
+      { scope: "composition", depth: context.depth, history: context.history },
+    );
   } finally {
     context.cache.synchronize("shared-effects");
   }

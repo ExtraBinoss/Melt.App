@@ -69,12 +69,13 @@ test("real tool children skip command updates while tools, language and shortcut
   );
   try {
     const hand = screen.getByLabelText("Main");
-    expect(renders.tools).toHaveBeenCalledTimes(5);
+    const initialToolRenders = renders.tools.mock.calls.length;
+    expect(initialToolRenders).toBeGreaterThanOrEqual(5);
     expect(renders.shape).toHaveBeenCalledOnce();
     act(() => d.engine.select([d.rectangle.id]));
     act(() => d.engine.execute({ type: "updateLayers", ids: [d.rectangle.id], patch: { x: 81 } }));
     expect(screen.getByLabelText("Main")).toBe(hand);
-    expect(renders.tools).toHaveBeenCalledTimes(5);
+    expect(renders.tools).toHaveBeenCalledTimes(initialToolRenders);
     expect(renders.shape).toHaveBeenCalledOnce();
     expect(screen.getByLabelText("Annuler")).toBeEnabled();
     fireEvent.click(hand);
@@ -104,6 +105,43 @@ test("real tool children skip command updates while tools, language and shortcut
     await act(async () => {
       await i18n.changeLanguage("fr");
     });
+    view.unmount();
+  }
+});
+
+test("Classic exposes the complete shared object library and routes vector insertion through its task runner", async () => {
+  const d = setup();
+  const view = d.mount(
+    <Toolbar
+      engine={d.engine}
+      services={d.services}
+      onTask={d.onTask}
+      onImport={vi.fn()}
+      onProjects={vi.fn()}
+      onExport={vi.fn()}
+      onPanelMode={vi.fn()}
+    />,
+  );
+  try {
+    fireEvent.click(screen.getByRole("button", { name: "3D", exact: true }));
+    expect(screen.getAllByRole("radio")).toHaveLength(4);
+    expect(screen.getByRole("radio", { name: "Packs", exact: true })).toBeVisible();
+    fireEvent.click(screen.getByRole("radio", { name: "SVG", exact: true }));
+    const choice = (await screen.findAllByRole("button", { name: /^Utiliser / }))[0]!;
+    const before = d.engine.getSnapshot().project;
+    const tasks = d.onTask.mock.calls.length;
+    await act(async () => fireEvent.click(choice));
+    expect(d.onTask).toHaveBeenCalledTimes(tasks + 1);
+    const after = d.engine.getSnapshot();
+    const layer = after.project.pages[0]!.layers.at(-1)!;
+    expect(layer.kind).toBe("vector");
+    expect(layer.spatial?.source).toBe("extrude");
+    expect(after.selection).toEqual([layer.id]);
+    expect(screen.queryByRole("radio", { name: "SVG", exact: true })).toBeNull();
+    act(() => d.engine.undo());
+    expect(d.engine.getSnapshot().project).toEqual(before);
+    expect(d.engine.getSnapshot().canUndo).toBe(false);
+  } finally {
     view.unmount();
   }
 });

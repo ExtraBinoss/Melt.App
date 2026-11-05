@@ -1,4 +1,5 @@
-import { useCallback, useLayoutEffect, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import type { EnginePort } from "@musart/core";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion, useIsPresent, useReducedMotion } from "motion/react";
 import { AlertCircle, CheckCircle2, X } from "lucide-react";
@@ -7,8 +8,13 @@ import { Button } from "../ui/button";
 import { CopyButton } from "../ui/copy-button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 import { createNoticeTimer } from "./notice-timer";
+import { useWorkspaceTheme } from "../../ui/brand/WorkspaceTheme";
+import { workspaceNoticePlacement } from "../../ui/brand/notice-placement";
+import { publishNoticeActivity, subscribeNoticeActivity } from "./source";
+import { useNoticeAnchor } from "./use-notice-anchor";
 import "./messages";
 import "./notices.css";
+import "./placement.css";
 
 export interface EditorNoticeValue {
   message: string;
@@ -22,14 +28,36 @@ export const SUCCESS_NOTICE_MS = 4000,
 export function EditorNotice({
   notice,
   onClose,
+  engine,
 }: {
   notice: EditorNoticeValue | null;
   onClose: () => void;
+  engine?: EnginePort;
 }) {
+  const mode = useWorkspaceTheme(),
+    placement = workspaceNoticePlacement(mode),
+    anchor = useRef<HTMLDivElement>(null);
+  useNoticeAnchor(anchor, Boolean(notice), placement);
+  useEffect(() => {
+    if (engine && notice) publishNoticeActivity(engine, "editor");
+  }, [engine, notice]);
+  useEffect(() => {
+    if (!engine) return;
+    return subscribeNoticeActivity(engine, (source) => {
+      if (source === "history") onClose();
+    });
+  }, [engine, onClose]);
   return createPortal(
-    <AnimatePresence>
-      {notice && <NoticeCard key="notice" notice={notice} onClose={onClose} />}
-    </AnimatePresence>,
+    <div
+      ref={anchor}
+      className="editor-notice-anchor workspace-notice-anchor"
+      data-workspace-theme={mode}
+      data-notice-placement={placement}
+    >
+      <AnimatePresence>
+        {notice && <NoticeCard key="notice" notice={notice} onClose={onClose} />}
+      </AnimatePresence>
+    </div>,
     document.body,
   );
 }

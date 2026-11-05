@@ -72,6 +72,7 @@ export function drawLayerSource(layer: Layer, context: SourceContext): FrameText
     layer.width,
     layer.height,
     layer.fill,
+    layer.fillGradient,
     layer.stroke,
     layer.strokeWidth,
     layer.radius,

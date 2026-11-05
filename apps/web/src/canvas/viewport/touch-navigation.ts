@@ -1,5 +1,6 @@
 import { zoomAt, type Point, type View } from "./view";
 import type { ViewMotion } from "./motion";
+import { readCameraNavigation, type CameraNavigation } from "./camera-navigation";
 
 /** Two fingers temporarily own navigation; a cancelled document drag never commits. */
 export function installTouchNavigation(
@@ -10,6 +11,8 @@ export function installTouchNavigation(
   const touches = new Map<number, Point>();
   let origin: { center: Point; distance: number; view: View } | null = null;
   let navigating = false;
+  let camera: CameraNavigation | undefined;
+  let distance = 0;
   const pose = () => {
     const [a, b] = [...touches.values()];
     if (!a || !b) return null;
@@ -31,9 +34,11 @@ export function installTouchNavigation(
       cancelGesture();
       motion.stop();
       navigating = true;
+      camera = readCameraNavigation(element);
+      camera?.begin();
     }
     const next = pose();
-    if (next && !origin) origin = { ...next, view: motion.read() };
+    if (next && !origin) { origin = { ...next, view: motion.read() }; distance = next.distance; }
     block(event);
   }
   function move(event: PointerEvent) {
@@ -44,7 +49,9 @@ export function installTouchNavigation(
     const next = pose();
     if (!next || !origin) return;
     const rect = element.getBoundingClientRect();
-    const view = zoomAt(origin.view, next.distance / origin.distance, {
+    if (camera) camera.zoomBy(next.distance / distance);
+    distance = next.distance;
+    const view = camera ? origin.view : zoomAt(origin.view, next.distance / origin.distance, {
       x: origin.center.x - rect.left - rect.width / 2,
       y: origin.center.y - rect.top - rect.height / 2,
     });
@@ -60,7 +67,12 @@ export function installTouchNavigation(
   function end(event: PointerEvent) {
     if (!touches.delete(event.pointerId)) return;
     if (navigating) block(event);
-    if (touches.size < 2) origin = null;
+    if (touches.size < 2) {
+      origin = null;
+      if (event.type === "pointercancel") camera?.cancel();
+      else camera?.end();
+      camera = undefined;
+    }
     if (!touches.size && navigating) {
       navigating = false;
       motion.stop();
@@ -76,6 +88,7 @@ export function installTouchNavigation(
     element.removeEventListener("pointerup", end, true);
     element.removeEventListener("pointercancel", end, true);
     touches.clear();
+    camera?.cancel();
     if (navigating) motion.stop();
   };
 }

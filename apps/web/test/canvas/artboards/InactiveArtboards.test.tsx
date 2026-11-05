@@ -1,7 +1,13 @@
 import { createRef } from "react";
 import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, expect, it, vi } from "vitest";
-import { createPage, createProject, EditorEngine, type EnginePort } from "@musart/core";
+import {
+  createLayer,
+  createPage,
+  createProject,
+  EditorEngine,
+  type EnginePort,
+} from "@musart/core";
 import { InactiveArtboards } from "../../../src/canvas/artboards/InactiveArtboards";
 import { arrangeArtboards } from "../../../src/canvas/artboards/layout";
 vi.mock("react-i18next", () => ({
@@ -237,4 +243,39 @@ it("supports a minimal EnginePort without detailed observers or synchronous repl
   expect(detailed).not.toHaveBeenCalled();
   expect(summary).not.toHaveBeenCalled();
   view.unmount();
+});
+
+it("keeps obsolete page paint out from beneath an owned background thumbnail", () => {
+  const gradient = {
+    kind: "linear" as const,
+    angle: 90,
+    stops: [
+      { offset: 0, color: "#CCBBDD" },
+      { offset: 1, color: "#6F40CB" },
+    ],
+  };
+  const owned = createPage({
+    name: "Owned",
+    backgroundGradient: gradient,
+    layers: [createLayer("rectangle", { name: "Arrière-plan", x: 20, width: 40, height: 40 })],
+  });
+  const ordinary = createPage({ name: "Ordinary", backgroundGradient: gradient });
+  const engine = new EditorEngine(createProject({ pages: [owned, ordinary] }));
+  const viewport = createRef<HTMLDivElement>();
+  viewport.current = document.createElement("div");
+  const view = render(
+    <InactiveArtboards
+      engine={engine}
+      workspace={arrangeArtboards([owned, ordinary])}
+      activeId={owned.id}
+      projectId={engine.getSnapshot().project.id}
+      view={{ x: 0, y: 0, zoom: 1 }}
+      viewport={viewport}
+    />,
+  );
+  const board = view.container.querySelector<HTMLElement>(`[data-artboard-id="${owned.id}"]`)!;
+  expect(board.style.getPropertyValue("--artboard-background")).toBe("transparent");
+  expect(board.style.getPropertyValue("--artboard-paint")).toBe("");
+  const normal = view.container.querySelector<HTMLElement>(`[data-artboard-id="${ordinary.id}"]`)!;
+  expect(normal.style.getPropertyValue("--artboard-paint")).toContain("linear-gradient");
 });

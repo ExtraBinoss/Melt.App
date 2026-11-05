@@ -159,10 +159,10 @@ function ProjectDashboard({
     },
     [onTask],
   );
-  function complete(task: () => void | Promise<void>) {
+  function complete(task: () => void | Promise<void>, projectName?: string) {
     if (scope.current.pending || !scope.current.alive) return;
     const request = templateRequest.current;
-    beginProjectOpening(request ? () => request.abort() : undefined);
+    beginProjectOpening(request ? () => request.abort() : undefined, projectName);
     void perform(task).then((ok) => {
       if (ok && scope.current.alive) onClose();
     });
@@ -238,7 +238,7 @@ function ProjectDashboard({
         else
           complete(async () => {
             await Promise.all([onPrepareEditor?.(), services.openProject(item.id)]);
-          });
+          }, item.name);
       }}
       onLinkedError={(error) => {
         void onTask(() => {
@@ -321,10 +321,10 @@ function ProjectDashboard({
               view={view}
               busy={busy}
               onViewChange={changeView}
-              onChooseRecent={(id) =>
+              onChooseRecent={(id, name) =>
                 complete(async () => {
                   await Promise.all([onPrepareEditor?.(), services.openProject(id)]);
-                })
+                }, name)
               }
               onPreferences={() => preferenceStore.set(preferences, true)}
             />
@@ -452,7 +452,7 @@ function ProjectDashboard({
             state={creation}
             trigger={creationTrigger}
             busy={busy}
-            onCreate={(options) => complete(() => services.createProject(options))}
+            onCreate={(options) => complete(() => services.createProject(options), options.name)}
           />
           <PreferencesHost state={preferences} />
           <input

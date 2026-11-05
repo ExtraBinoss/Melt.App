@@ -1,18 +1,6 @@
 // MIT: ExtraBinoss / Plinka (2026), React-Beautiful-Gradient blocks pass.
-import {
-  abs,
-  clamp,
-  floor,
-  fract,
-  length,
-  max,
-  min,
-  pow,
-  smoothstep,
-  uv,
-  vec2,
-  vec4,
-} from "three/tsl";
+import { authoredFragmentPixel } from "../../../shared/coordinates";
+import { abs, clamp, floor, fract, length, max, min, pow, smoothstep, vec2, vec4 } from "three/tsl";
 import type { Node } from "three/webgpu";
 import type { EffectNodeContext } from "../../../shared/context";
 import { rotate } from "../../shared/field";
@@ -20,10 +8,12 @@ import { gradientHash } from "../../shared/noise";
 import { mixRGBA, readGradient, treatmentControls } from "../shared";
 export function blocksNode(context: EffectNodeContext) {
   const u = treatmentControls(context),
-    resolution = context.controls.logicalResolution;
+    resolution = context.controls.contentResolution;
   const size = max(vec2(u.size.mul(u.aspect), u.size), 2),
     angle = u.treatmentRotation.mul(Math.PI / 180);
-  const coord = rotate(uv().mul(resolution).sub(resolution.mul(0.5)), angle).div(size);
+  const coord = rotate(authoredFragmentPixel(context.controls).sub(resolution.mul(0.5)), angle).div(
+    size,
+  );
   const origin = floor(coord),
     fraction = fract(coord),
     feather = max(u.feather.mul(0.5), 0.0001);

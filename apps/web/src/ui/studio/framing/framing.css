@@ -22,7 +22,7 @@
   line-height: 1.15;
   text-align: center;
   border: 1px solid transparent;
-  border-radius: 9px;
+  border-radius: var(--radius-md);
   color: var(--muted-foreground);
 }
 .studio-format-grid > button[aria-pressed="true"] {
@@ -86,6 +86,6 @@
   color: white;
   background: #222c;
   padding: 3px 6px;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   white-space: nowrap;
 }

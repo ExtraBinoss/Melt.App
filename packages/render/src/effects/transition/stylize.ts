@@ -5,14 +5,14 @@ import { reveal, revealCoverage, withCoverage, type TransitionOperator } from ".
 
 export const pixelate: TransitionOperator = (f) => {
   const block = max(1, f.remaining.mul(f.detail).mul(f.strength).mul(12));
-  const cells = max(vec2(1), f.context.controls.logicalResolution.div(block));
+  const cells = max(vec2(1), f.context.controls.contentResolution.div(block));
   const center = floor(f.position.mul(cells)).add(0.5).div(cells);
   return withCoverage(f.read(mix(center, f.position, f.progress)), f.progress);
 };
 /** Nine taps total including the shared exact center, mixed in premultiplied space. */
 export const defocus: TransitionOperator = (f) => {
   const radius = f.remaining.mul(f.remaining).mul(f.strength).mul(f.detail).mul(1.5);
-  const step = radius.div(f.context.controls.logicalResolution);
+  const step = radius.div(f.context.controls.contentResolution);
   let rgb: Node<"vec3"> = f.original.rgb.mul(f.original.a).mul(4);
   let alpha: Node<"float"> = f.original.a.mul(4);
   const taps = [

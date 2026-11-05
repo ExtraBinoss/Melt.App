@@ -167,7 +167,14 @@
     "window-trails": "Repeat offset window-like trails.",
     "morph": "Interpolate artwork between shape states.",
     "transition": "Animate the entrance or exit of a layer.",
-    "feather": "Soft elliptical alpha falloff with editable center, radius and softness."
+    "feather": "Soft elliptical alpha falloff with editable center, radius and softness.",
+    "risograph": "Print with two or three misregistered inks, dot screens, grain and textured paper.",
+    "oil-paint": "Simplify image regions with a directional Kuwahara-style painterly filter and adjustable detail.",
+    "blocks": "Build a source-colored toy-brick mosaic with raised circular studs, bevels and directional lighting.",
+    "chromatic-aberration": "Separate red and blue channels radially or along an adjustable direction.",
+    "wind": "Stretch source detail into directional streaks with seeded bands and animated gusts.",
+    "depth-of-field": "Focus the composition using native camera depth, manual focus distance and aperture blur. Requires a 3D scene.",
+    "trail": "Blend previous authored composition poses into temporal echoes, or repeat the current image with offsets."
   },
   "commandLabels": {
     "togglePlayback": "Play / pause Motion",
@@ -272,7 +279,14 @@
     "receipt": "Receipt",
     "pink-phosphor": "Pink Phosphor",
     "transition": "Transition",
-    "morph": "Morph"
+    "morph": "Morph",
+    "risograph": "Risograph",
+    "oil-paint": "Oil Painter",
+    "blocks": "Blocks",
+    "chromatic-aberration": "Chromatic Aberration",
+    "wind": "Wind",
+    "depth-of-field": "Depth of Field",
+    "trail": "Trail"
   },
   "language": "Language"
 }

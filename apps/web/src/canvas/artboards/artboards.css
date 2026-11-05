@@ -27,6 +27,13 @@
 .canvas-artboard.canvas-artboard-editor {
   background: transparent;
 }
+.canvas-artboard-backdrop[data-backdrop-active="true"][data-gpu-covered="true"] {
+  background-image: repeating-conic-gradient(
+    color-mix(in srgb, var(--workspace) 92%, var(--foreground)) 0% 25%,
+    color-mix(in srgb, var(--workspace) 97%, var(--foreground)) 0% 50%
+  );
+  background-size: 16px 16px;
+}
 .canvas-artboard-backdrop > img {
   width: 100%;
   height: 100%;

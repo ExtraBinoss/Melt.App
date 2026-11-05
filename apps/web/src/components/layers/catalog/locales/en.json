@@ -51,7 +51,14 @@
     "shadow": "Cast an offset silhouette with adjustable softness, spread and color.",
     "transition": "Reveal or conceal the image with fades, wipes and other transition patterns.",
     "liquify": "Paint reversible round-brush deformations: push, pinch, inflate and twirl.",
-    "torn-edges": "Create rough torn graphics or ragged paper silhouettes with controllable fibers and colors."
+    "torn-edges": "Create rough torn graphics or ragged paper silhouettes with controllable fibers and colors.",
+    "risograph": "Print with two or three misregistered inks, dot screens, grain and textured paper.",
+    "oil-paint": "Simplify image regions with a directional Kuwahara-style painterly filter and adjustable detail.",
+    "blocks": "Build a source-colored toy-brick mosaic with raised circular studs, bevels and directional lighting.",
+    "chromatic-aberration": "Separate red and blue channels radially or along an adjustable direction.",
+    "wind": "Stretch source detail into directional streaks with seeded bands and animated gusts.",
+    "depth-of-field": "Focus the composition using native camera depth, manual focus distance and aperture blur. Requires a 3D scene.",
+    "trail": "Blend previous authored composition poses into temporal echoes, or repeat the current image with offsets."
   },
   "family": {
     "tone": "Light & tone",

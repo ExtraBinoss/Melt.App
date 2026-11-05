@@ -1,15 +1,12 @@
 import { memo, useCallback, type ReactNode } from "react";
-import { useSetAtom } from "jotai";
-import { Crosshair, Download, ImagePlus, SlidersHorizontal, Type } from "lucide-react";
+import { Crosshair, Download, ImagePlus, SlidersHorizontal } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import type { EnginePort } from "@musart/core";
 import type { EditorServices } from "../../state/contracts";
 import type { TaskRunner } from "../../components/projects/ProjectDialog";
-import { toolAtom } from "../../state/session/editor";
-import { Popover, PopoverContent, PopoverTrigger } from "../../components/ui/popover";
-import { SpatialLibrary } from "../../components/spatial/SpatialLibrary";
-import { ShapeToolSlot } from "../../components/assets/ShapeToolSlot";
-import { insertSpatialObject } from "../../services/assets/spatial-import";
+import { TextTool } from "../../components/text/TextTool";
+import { StudioPropertyPopover } from "./controls/StudioPropertyPopover";
+import { ObjectLibrary } from "../../components/spatial/objects/ObjectLibrary";
 import { StudioCompositions } from "./panels/StudioCompositions";
 import { StudioMaterial } from "./panels/StudioMaterial";
 import { StudioEnvironment } from "./panels/StudioEnvironment";
@@ -49,7 +46,6 @@ export const StudioChrome = memo(function StudioChrome({
   const { t } = useTranslation("studioChrome");
   const { t: common } = useTranslation();
   const viewport = createViewportActions(engine);
-  const setTool = useSetAtom(toolAtom);
   const run = useCallback(
     (task: () => void) => {
       void onTask(task);
@@ -60,31 +56,15 @@ export const StudioChrome = memo(function StudioChrome({
     <div className="studio-chrome" data-studio-chrome>
       <nav className="studio-quick-add studio-surface" aria-label={t("add")} data-canvas-control>
         <div className="studio-tool-group">
-          <IconButton
-            label={t("text")}
-            tooltipSide="bottom"
-            onClick={() =>
-              run(() => {
-                insertSpatialObject(engine, "text", t("newText"));
-                setTool("pointer");
-              })
-            }
-          >
-            <Type size={17} />
-          </IconButton>
-          {library ?? (
-            <>
-              <SpatialLibrary engine={engine} tooltipSide="bottom" />
-              <ShapeToolSlot engine={engine} tooltipSide="bottom" />
-            </>
-          )}
+          <TextTool defaultMode="3d" tooltipSide="bottom" />
+          {library ?? <ObjectLibrary engine={engine} onTask={onTask} tooltipSide="bottom" />}
           <IconButton label={t("media")} tooltipSide="bottom" onClick={onImport}>
             <ImagePlus size={17} />
           </IconButton>
         </div>
         <span className="studio-toolbar-divider" aria-hidden />
         <div className="studio-tool-group">
-          <StudioEffects engine={engine} run={run} />
+          <StudioEffects engine={engine} services={services} run={run} />
         </div>
         <span className="studio-toolbar-divider" aria-hidden />
         <div className="studio-tool-group studio-view-shortcuts">
@@ -100,24 +80,22 @@ export const StudioChrome = memo(function StudioChrome({
         </div>
       </nav>
       <div className="studio-actions" data-canvas-control>
-        <Popover modal={false}>
-          <PopoverTrigger asChild>
+        <StudioPropertyPopover
+          trigger={
             <IconButton label={t("advanced")} tooltipSide="bottom" className="studio-surface">
               <SlidersHorizontal size={17} />
             </IconButton>
-          </PopoverTrigger>
-          <PopoverContent
-            side="bottom"
-            align="end"
-            collisionPadding={12}
-            className="studio-advanced-popover"
-            data-canvas-control
-            aria-label={t("advanced")}
-            initialFocus="content"
-          >
-            <StudioAdvanced engine={engine} run={run} />
-          </PopoverContent>
-        </Popover>
+          }
+          side="bottom"
+          align="end"
+          collisionPadding={12}
+          className="studio-advanced-popover"
+          data-canvas-control
+          aria-label={t("advanced")}
+          initialFocus="content"
+        >
+          <StudioAdvanced engine={engine} run={run} />
+        </StudioPropertyPopover>
         {exportControl ?? (
           <IconButton
             label={t("export")}

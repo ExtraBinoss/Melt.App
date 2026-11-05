@@ -13,7 +13,9 @@ const motion = vi.hoisted(() => ({
 }));
 vi.mock("motion/mini", () => motion);
 vi.mock("../../../../src/components/projects/opening/OpeningSurface", () => ({
-  OpeningSurface: () => <div role="status">Opening</div>,
+  OpeningSurface: ({ projectName }: { projectName?: string }) => (
+    <div role="status">Opening {projectName}</div>
+  ),
 }));
 afterEach(() => {
   act(() => currentProjectOpening()?.close());
@@ -93,4 +95,17 @@ test("reduced motion has no artificial delay; cancellation and replacement relea
   });
   expect(document.querySelector(".project-opening-surface")).toBeNull();
   window.matchMedia = original;
+});
+
+test("passes the selected name to its own opening and drops it when another project replaces it", () => {
+  act(() => {
+    beginProjectOpening(undefined, "Summer study");
+  });
+  expect(document.querySelector('[role="status"]')).toHaveTextContent("Opening Summer study");
+  act(() => {
+    beginProjectOpening(undefined, "Winter study");
+  });
+  expect(document.querySelectorAll(".project-opening-surface")).toHaveLength(1);
+  expect(document.querySelector('[role="status"]')).toHaveTextContent("Opening Winter study");
+  expect(document.body).not.toHaveTextContent("Summer study");
 });

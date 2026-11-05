@@ -1,4 +1,4 @@
-import type { Asset, Composition, MotionFramePlan } from "@musart/core";
+import type { Asset, Bounds, Composition, MotionFramePlan } from "@musart/core";
 import type { MediaSourceResolver, RenderOptions } from "@musart/render";
 import type {
   CanonicalOrigin,
@@ -24,6 +24,7 @@ export interface PreviewRequest {
   assets: Record<string, Asset>;
   revision: number;
   scale: number;
+  viewport?: Bounds;
   ticket?: PresentationTicket;
   motionFrame?: MotionFramePlan;
   origin?: CanonicalOrigin;

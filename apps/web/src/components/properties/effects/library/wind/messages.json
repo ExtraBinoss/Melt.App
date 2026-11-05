@@ -1,0 +1,34 @@
+{
+  "en": {
+    "name": "Wind",
+    "parameter": {
+      "centerX": "Field center X",
+      "centerY": "Field center Y",
+      "angle": "Wind direction",
+      "length": "Streak length",
+      "bandSize": "Band width",
+      "variation": "Band variation",
+      "gust": "Gust strength",
+      "speed": "Gust speed",
+      "phase": "Phase",
+      "sourceMix": "Original detail",
+      "time": "Time"
+    }
+  },
+  "fr": {
+    "name": "Vent",
+    "parameter": {
+      "centerX": "Centre du champ X",
+      "centerY": "Centre du champ Y",
+      "angle": "Direction du vent",
+      "length": "Longueur des traînées",
+      "bandSize": "Largeur des bandes",
+      "variation": "Variation des bandes",
+      "gust": "Force des rafales",
+      "speed": "Vitesse des rafales",
+      "phase": "Phase",
+      "sourceMix": "Détails d’origine",
+      "time": "Temps"
+    }
+  }
+}

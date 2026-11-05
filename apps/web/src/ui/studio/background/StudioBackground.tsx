@@ -110,6 +110,7 @@ function BackgroundEditor({ engine, onTask }: { engine: EnginePort; onTask: Task
                 current={current}
                 run={run}
                 cancel={cancel}
+                presetContent={<BackgroundPresets engine={engine} page={page} run={run} />}
               />
             }
           />
@@ -127,7 +128,6 @@ function BackgroundEditor({ engine, onTask }: { engine: EnginePort; onTask: Task
           </Button>
         </>
       )}
-      <BackgroundPresets engine={engine} page={page} run={run} />
     </div>
   );
 }
@@ -167,6 +167,7 @@ function LayerBackground({
               patch={edit.commit}
               preview={edit.previewLayer}
               cancel={edit.cancel}
+              presetContent={<BackgroundPresets engine={engine} page={page} run={run} />}
             />
           }
         />

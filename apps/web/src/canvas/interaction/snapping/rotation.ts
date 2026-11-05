@@ -8,6 +8,7 @@ import {
   type Layer,
   type Point,
 } from "@musart/core";
+import { rotationHandlePoint } from "../../selection/rotation-handle";
 export interface RotationGuide {
   center: Point;
   from: Point;
@@ -26,7 +27,7 @@ export function rotationGuide(
     parent = layer.parentId ? geometry.worldMatrix(layer.parentId) : IDENTITY,
     matrix = multiplyMatrices(parent, layerTransform({ ...layer, rotation }));
   const center = transformPoint(matrix, { x: layer.width / 2, y: layer.height / 2 }),
-    grip = transformPoint(matrix, { x: layer.width / 2, y: -19 });
+    grip = rotationHandlePoint(layer.width, matrix, zoom);
   const length = Math.max(1e-8, Math.hypot(grip.x - center.x, grip.y - center.y)),
     unit = { x: (grip.x - center.x) / length, y: (grip.y - center.y) / length };
   return {

@@ -1,3 +1,4 @@
+import { authoredPixel } from "../shared/coordinates";
 import type { Node } from "three/webgpu";
 import {
   float,
@@ -71,14 +72,12 @@ export function thermalNode({ source, controls }: EffectNodeContext) {
     );
   const grain = fract(
     sin(
-      dot(floor(p.mul(controls.logicalResolution)), vec2(12.9898, 78.233)).add(
+      dot(floor(authoredPixel(controls, p)), vec2(12.9898, 78.233)).add(
         controls.time.mul(u.speed!),
       ),
     ).mul(43758.5453),
   ).sub(0.5);
-  const scan = sin(
-    p.y.mul(controls.logicalResolution.y).mul(Math.PI).add(controls.time.mul(u.speed!)),
-  )
+  const scan = sin(authoredPixel(controls, p).y.mul(Math.PI).add(controls.time.mul(u.speed!)))
     .mul(0.5)
     .add(0.5);
   color = clamp(

@@ -113,6 +113,24 @@ it("uses immutable deleted-owner metadata and respects the engine's actual histo
   ).toBe(true);
   d.stop();
 });
+it("retains bounded real object names across add/delete, branching, renaming and observer remounts", () => {
+  const d = fixture(),
+    layer = createLayer("text", { id: "word", name: "MELT" });
+  d.engine.execute({ type: "addLayers", layers: [layer] });
+  d.engine.undo();
+  expect(d.publish.mock.calls.at(-1)![0]!.owners).toEqual(["MELT"]);
+  d.engine.redo();
+  expect(d.publish.mock.calls.at(-1)![0]!.owners).toEqual(["MELT"]);
+  d.engine.execute({ type: "deleteLayers", ids: [layer.id] });
+  d.stop();
+  const stop = observeHistoryNotices(d.engine, d.publish);
+  d.engine.undo();
+  expect(d.publish.mock.calls.at(-1)![0]!.owners).toEqual(["MELT"]);
+  d.engine.execute({ type: "updateLayers", ids: [layer.id], patch: { name: "😀".repeat(125) } });
+  d.engine.undo();
+  expect(d.publish.mock.calls.at(-1)![0]!.owners).toEqual([`${"😀".repeat(120)}…`]);
+  stop();
+});
 it("leaves missing/custom metadata genuinely absent and cleans up the lightweight subscription", () => {
   const d = fixture(false);
   let listener: ((event: CommandCommitInfo) => void) | undefined;

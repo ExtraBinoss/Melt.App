@@ -1,3 +1,4 @@
+import { authoredUv } from "../shared/coordinates";
 import { Fn, clamp, floor, fract, max, mix, uv, vec2, vec4 } from "three/tsl";
 import { sampleEffect, type EffectNodeContext } from "../shared/context";
 import { mixEffectCoverage } from "../shared/compositing/node";
@@ -10,7 +11,9 @@ export function terminalNode({ source, controls }: EffectNodeContext) {
       progress = clamp(u.progress!, 0, 1),
       columns = max(1, floor(u.columns!)),
       rows = max(1, floor(u.rows!)),
-      position = vec2(uv().x, uv().y.oneMinus()).mul(vec2(columns, rows)),
+      position = vec2(authoredUv(controls).x, authoredUv(controls).y.oneMinus()).mul(
+        vec2(columns, rows),
+      ),
       cell = floor(position),
       rank = cell.y.mul(columns).add(cell.x),
       count = floor(progress.mul(columns).mul(rows)),

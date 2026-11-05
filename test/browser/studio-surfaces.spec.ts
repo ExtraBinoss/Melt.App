@@ -43,7 +43,7 @@ test("Studio visual tools stay compact, use shared previews and edit the canonic
   await expect(page.getByRole("tooltip")).toContainText("3D");
   await expect(page.getByRole("tooltip")).toHaveAttribute("data-side", "top");
   await page.mouse.move(500, 100);
-  const backdrop = (await page.locator("[data-studio-backdrop]").boundingBox())!;
+  const backdrop = (await canvas.boundingBox())!;
   const viewport = (await page.getByTestId("editor-canvas").boundingBox())!;
   expect(backdrop).toEqual(viewport);
   await page.evaluate(() => window.musart!.select(["studio-title"]));

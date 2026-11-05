@@ -12,10 +12,13 @@ import type { LayerPatch } from "./gestures";
 export interface TransformAuthoring {
   origin: GestureOrigin;
   motionEdit?: MotionEditOrigin;
+  backgroundLayerId?: string;
 }
 
 /** Bind the authored time and canonical document once; displayed geometry stays separate. */
-export function captureTransformAuthoring(engine: EnginePort): Required<TransformAuthoring> {
+export function captureTransformAuthoring(
+  engine: EnginePort,
+): TransformAuthoring & { motionEdit: MotionEditOrigin } {
   const motionEdit = captureMotionEdit(engine);
   const { project, pageId, revision } = motionEdit.snapshot;
   return { origin: { project, pageId, revision }, motionEdit };

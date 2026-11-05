@@ -147,6 +147,9 @@ export function pasteContent(
                     owner: {
                       ...animation.owner,
                       compositionId: ids.get(page.id)!,
+                      ...(animation.owner.kind === "compositionEffect"
+                        ? { effectId: ids.get(animation.owner.effectId)! }
+                        : {}),
                       ...(animation.owner.kind === "light"
                         ? { lightId: ids.get(animation.owner.lightId)! }
                         : {}),
@@ -162,6 +165,9 @@ export function pasteContent(
                     target: {
                       ...property.target,
                       compositionId: ids.get(page.id)!,
+                      ...("effectId" in property.target
+                        ? { effectId: ids.get(property.target.effectId)! }
+                        : {}),
                       ...(property.target.kind === "light"
                         ? { lightId: ids.get(property.target.lightId)! }
                         : {}),

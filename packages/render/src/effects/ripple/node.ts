@@ -1,3 +1,4 @@
+import { authoredPixelDown } from "../shared/coordinates";
 import {
   clamp,
   fract,
@@ -22,7 +23,9 @@ export function rippleNode({ source, controls }: EffectNodeContext) {
   const original = sampleEffect(source, controls, position);
   const size = controls.logicalResolution;
   // Portable centers use document coordinates (Y down); plane UVs have Y up.
-  const delta = vec2(position.x, position.y.oneMinus()).sub(vec2(u.centerX!, u.centerY!)).mul(size);
+  const delta = authoredPixelDown(controls, position).sub(
+    vec2(u.centerX!, u.centerY!).mul(controls.contentResolution),
+  );
   const distance = length(delta);
   const radius = max(1, u.radius!);
   const inner = min(u.innerRadius!, radius);

@@ -1,8 +1,10 @@
 import { createContext, useContext, useLayoutEffect, useMemo, useRef, type ReactNode } from "react";
+import type { SceneMotionPropertyTarget } from "@musart/core";
 import type { MotionEditTarget } from "../../../state/session/motion-edit";
 
 export interface MotionFieldEditor {
   begin(this: void, target?: MotionEditTarget): void;
+  beginScene?(this: void, target: SceneMotionPropertyTarget): void;
   start?(this: void, target?: MotionEditTarget): void;
 }
 const MotionEditing = createContext<MotionFieldEditor | null>(null);
@@ -23,6 +25,7 @@ export function MotionFieldProvider({
   const port = useMemo<MotionFieldEditor>(
     () => ({
       begin: (target) => committed.current.begin(target),
+      beginScene: (target) => committed.current.beginScene?.(target),
       start: (target) => (committed.current.start ?? committed.current.begin)(target),
     }),
     [],

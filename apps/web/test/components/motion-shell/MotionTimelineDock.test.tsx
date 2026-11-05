@@ -144,8 +144,8 @@ test("only a successful canonical Static to Motion switch auto-pins, and each la
   const pause = vi.spyOn(createMotionTransport(d.engine), "pause");
   act(() => d.engine.execute({ type: "setCompositionMode", mode: "static" }));
   expect(pause).toHaveBeenCalled();
-  // Canonical mode edits invalidate the retained document, unlike navigation alone.
-  expect(dock()).toBeNull();
+  // Static keeps its controls retained, inert and outside the accessibility tree.
+  expect(dock()).toHaveAttribute("aria-hidden", "true");
   expect(screen.queryByRole("region", { name: "Timeline" })).toBeNull();
   expect(d.engine.getSnapshot().project.pages[0]!.motion!.tracks).toEqual(motion.tracks);
   act(() => d.engine.execute({ type: "setCompositionMode", mode: "motion" }));
@@ -312,4 +312,24 @@ test("ordinary navigation to a peek performs no viewport reservation reads", () 
   expect(capture).not.toHaveBeenCalled();
   view.unmount();
   stop();
+});
+
+test("Static/Motion commits retain the same live timeline and controls", () => {
+  const d = setup();
+  d.engine.execute({ type: "setCompositionMode", mode: "motion" });
+  const view = d.mount(<MotionTimelineDock engine={d.engine} />);
+  const panel = document.querySelector(".motion-timeline");
+  const zoom = screen.getByRole("slider", { name: "Zoom de la timeline" });
+  try {
+    for (let i = 0; i < 3; i++) {
+      act(() => d.engine.execute({ type: "setCompositionMode", mode: "static" }));
+      expect(document.querySelector(".motion-timeline")).toBe(panel);
+      expect(dock()).toHaveAttribute("aria-hidden", "true");
+      act(() => d.engine.execute({ type: "setCompositionMode", mode: "motion" }));
+      expect(document.querySelector(".motion-timeline")).toBe(panel);
+      expect(screen.getByRole("slider", { name: "Zoom de la timeline" })).toBe(zoom);
+    }
+  } finally {
+    view.unmount();
+  }
 });

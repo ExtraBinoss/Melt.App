@@ -8,14 +8,21 @@ No conversion, flattening, new document version or implicit history entry occurs
 Older projects default to Classic. Both workspaces retain the normal import,
 portable-project, image/video export and headless command paths.
 
+The workspace selector spans its project-menu row. Switching crossfades the
+outgoing controls and presents a compact Melt loading surface while lazy chrome
+and the current GPU frame become ready. It keeps the existing canvas visible and
+uses no fixed completion delay or second renderer. Rapid choices cancel older
+transitions; reduced motion presents the new controls without choreography.
+
 ## Composition workflow
 
 Studio fits the complete active composition inside the viewport with uniform scale.
 Landscape projects retain their aspect ratio on portrait screens. This presentation
 zoom does not change the portable composition or its camera.
-The surrounding workspace continues ordinary background paint to the window edges;
-it does not enlarge the composition or stretch its objects. Native effects and exact
-output remain evaluated inside the canonical capture gate.
+The native GPU presentation extends background paint, native sources and final
+composition effects to the window edges. It does not enlarge the portable
+composition or stretch its objects. Canonical exports retain the original capture
+gate unless explicit output framing is supplied.
 Switching back restores the Classic view. Objects outside a capture guide remain
 editable and are retained in the project.
 
@@ -44,12 +51,18 @@ editable and are retained in the project.
 - Slider drags remain relative outside their tracks. Shift uses increments of five
   or ten useful units according to speed (scaled to the parameter range); slow
   movement refines ordinary input. Dashed markers indicate snapping. Help uses
-  compact shared tooltips with keycaps instead of browser titles.
+  shared tooltips instead of browser titles.
 - Sliders preview imperatively, commit once on release and restore on cancellation,
   owner changes or unmount. Neutral surfaces use the shared theme without glows.
-- Recenter restores the immersive view. Wheel/trackpad navigation and pointer zoom
-  retain the existing canvas behavior. Classic retains its fit and 100% controls.
-- Advanced opens the regular Inspector. There is no agent activity surface in Studio;
+- Recenter restores the immersive view. Vertical wheel input, Ctrl/Cmd+wheel and
+  touch pinch zoom the shared Studio camera. Native orbit follows the pointer
+  directly and carries bounded elapsed-time momentum after release, with one
+  undo entry after settling. Escape, pointer cancellation and owner changes
+  restore the original pose. Reduced motion disables the tail. Classic retains
+  its existing navigation, fit and 100% controls.
+- Advanced opens the regular Inspector. Property popovers prepare on pointer/focus
+  intent and retain one editor with React Activity; closing suspends effects and
+  cancels active drafts while preserving ordinary control state. There is no agent activity surface in Studio;
   opt-in automation remains available without interrupting manual composition.
 
 Studio picks actual prepared native triangles, including glyph counters and imported
@@ -61,10 +74,38 @@ a static contour. A primary click hands the existing hover contour directly to
 selection; selected contours remain steady. No extra native render target, GPU
 readback or perpetual idle animation is required. Dragging empty space or a native object orbits the single
 composition camera; selected gizmo handles retain native transforms. Hand/Space,
-wheel navigation and direct dragging of ordinary 2D artwork retain their behavior.
+horizontal wheel navigation and direct dragging of ordinary 2D artwork retain their behavior.
+A secondary-pointer drag pans the displayed camera window in both axes without
+changing object poses, the portable camera or document history. A stationary right
+click opens the usual context menu; cancellation restores the starting view.
+Native translation gizmos attract to composition and other-object centers/bounds,
+with screen-space tolerance, retained targets and Alt bypass; see [snapping](snapping.md).
 
-Studio does not add a separate Motion editor. Existing animated compositions remain
-animated and editable through shared advanced controls or Classic.
+The shared text tool defaults to 3D in Studio and 2D in Classic. Choosing either
+source arms pointer placement. The compact model catalog combines search and GLB
+import, category tabs and immediately insertable tiles. One retained native preview
+follows the hovered tile, rather than creating a renderer for every item.
+
+Actual solid/gradient object paint stays directly accessible in simple material
+properties and the contextual bar. Choosing a material finish preserves an active
+gradient; explicitly switching to Solid removes it. Composition-wide effects also
+appear as editable real-ID stack entries in the shared Layers tree.
+
+Insertion, error and history notices share the typed brand placement policy:
+Classic uses the canvas top center, Studio the bottom right above its scene tools.
+Mobile feedback clears the contextual bar. Undo/Redo includes its direction and
+retained object/effect details. Notices share one visible feedback slot without
+changing body styles. Workspace radius tokens likewise reach portaled controls
+without mutating global page state.
+
+Studio uses the same Motion timeline as Classic. The labeled Motion button at the
+bottom of the canvas stays visible in Static mode. Click it to enable animation
+with the existing validated conversion flow and open the timeline. The dock
+below the canvas retains transport, scrubbing, blocks and detailed keys. Pin it to
+reserve canvas space, or unpin it for the hover/peek presentation. On touch screens,
+the Motion button opens the same dock. Studio's bottom controls remain above the
+retracted transport; capture guides follow the available canvas viewport.
+Desktop workspace switches retain the dock and its transport.
 
 ## Capture guides and export
 
@@ -96,8 +137,9 @@ undo entry, so shrinking it cannot reveal an older gradient underneath.
 The compact controls expose transparent, solid and gradient modes. Linear direction
 and radial position use the same captured-pointer pad as the camera, with live
 previews, cancellation and one undo entry. The advanced paint popover retains the
-shared full gradient editor. Effect menus in both workspaces share 45 static native
-thumbnail exports; opening a catalog starts no GPU preview work. Regenerate them
+shared full gradient editor and its categorized preset collection. Effect menus
+in both workspaces share 45 static native thumbnails with distinct authored source
+artwork; opening a catalog starts no GPU preview work. Regenerate them
 with `bun scripts/effects/render-catalog.ts` against a running local editor.
 
 The 65 gradient recipes are grouped into glossy plastic, cinematic, social,
@@ -122,10 +164,20 @@ engine.execute({
 });
 ```
 
-A full-frame untransformed root rectangle at the bottom of the stack is recognized
-structurally as the background. Its gradients, stack, blending, visibility and locks
-remain ordinary layer data. Moving or transforming it out of that position returns
-the Background control to composition paint. Existing locked backgrounds reject edits.
+Background rectangles retain their paint ownership when moved or resized: their
+frame controls the gradient domain while their paint and effects continue over the
+composition and the Studio window. Transparent mode clears that complete paint
+surface instead of exposing an older composition gradient. Preview, export and
+undo use the same renderer-owned source.
+
+New backgrounds carry the portable `Layer.background: true` marker. Older first
+root rectangles with their original localized Background name are recognized even
+when already resized; a real edit retains that ownership under their existing ID.
+Explicit `background: false` keeps an ordinary rectangle. Untagged full-frame
+rectangles retain Studio's legacy inference, which is captured when a Studio
+resize begins. Rotation, nonunit scale, masks or nesting retain ordinary layer
+semantics. Gradients, effects, blending, visibility and locks remain editable layer
+data.
 
 The direct Effect and Color grade controls target the selected editable layer, or
 the whole composition when nothing is selected. Composition effects are an ordinary
@@ -147,10 +199,25 @@ The catalog uses one metadata record followed by one model per line in a pinned 
 The installer verifies the manifest and ZIP SHA-256 values, unpacks in a bounded
 worker, verifies every self-contained GLB and publishes an offline-cache marker
 only after all entries are installed. Missing cache entries report failure instead
-of silently using the network. The picker shows at most 24 search results per page
-and one retained native preview with the original material. Import embeds the
+of silently using the network. The picker uses a continuous virtual grid with
+shared scroll fades. Source/license information sits behind its information button.
+All 474 model thumbnails are pre-rendered through the native graph into one
+400,248-byte WebP atlas. The picker verifies and decodes that image once, caches it
+for offline use and revokes its object URL on disposal. Scrolling performs no GLB
+downloads, model decoding or GPU preparation. Only hover starts the retained
+native rotating preview. Import embeds the
 original into the project through the standard validated model import, so the
 project remains portable even after the optional library cache is cleared.
+
+The SVG tab shares the compact grid geometry and scroll fades. Stroked icons are
+converted into editable filled contours through renderer-owned SVG preparation before 3D
+extrusion, including caps, joins, holes, paint and transforms. This preparation
+preserves the existing 256-part native limit and rejects oversized geometry before
+publishing a project edit; flat insertion keeps the original SVG description.
+
+Catalog scroll gutters reach the popover border while their content retains its
+padding. The shared layer tree expands its row width only for actual hierarchy
+depth; long shallow names truncate without creating a horizontal scrollbar.
 
 Source bytes, archive and original/output hashes, author, source links and CC0
 licenses are retained in `public/spatial/packs`. Rebuild from the pinned archives

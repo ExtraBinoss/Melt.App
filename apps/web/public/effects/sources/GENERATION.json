@@ -1,0 +1,22 @@
+{
+  "tool": "OpenAI built-in image_gen",
+  "intent": "Original source photography for pre-baked Melt effect previews",
+  "prompts": [
+    {
+      "id": "editorial-portrait",
+      "prompt": "Use case: photorealistic-natural. Asset type: original professional editorial photograph used as the source of creative image-effect thumbnails. Create a beautiful, crisp, real-looking high-fashion K-pop-inspired portrait of one adult East Asian woman aged 25, original model identity, polished contemporary styling, long dark hair with a few wispy strands, delicate metallic eye makeup, understated silver earrings and structured black and silver jacket. Bust portrait, face large and centered, plenty of shoulders within frame, editorial direct gaze, pale cool studio backdrop with a gentle magenta light on one side and cool daylight on the other, carefully balanced natural skin tones, visible fine skin texture and sharp hair details. Vogue-quality studio fashion photography, natural anatomy, striking but tasteful. Landscape 4:3 composition, head entirely inside the middle 75% so a small 4:3 crop remains legible. No text, logo, watermark, collage, graphic overlays or simulated filters; a clean original full-color photograph that will receive real GPU effects later."
+    },
+    {
+      "id": "alpine-lake",
+      "prompt": "Use case: photorealistic-natural. Asset type: original premium landscape photograph used as source material for a creative effects catalog. A breathtaking real-looking alpine turquoise lake in the Dolomites, dramatic sculptural pale mountain peaks, evergreen forest and a small red lakeside cabin, autumn golden grasses in the near foreground, luminous soft clouds and warm late-afternoon light. Professional travel editorial photography, rich but realistic greens, cyan water, warm rust-orange foreground and cool blue sky, detailed rocks and trees, clear depth from foreground to distant peaks, balanced contrast with bright highlights and detailed shadows. Landscape 4:3, strong composition instantly readable in a tiny thumbnail, no people needed. No words, watermark, logo, borders, collage, fake film grain or stylized image effects; clean high-quality photographic source."
+    },
+    {
+      "id": "studio-still-life",
+      "prompt": "Use case: product-mockup. Asset type: original premium professional still-life photograph for source material in an image-effect catalog. A sculptural still life on a warm pale-cream studio surface: a bold cobalt-blue folded paper arch, one glossy tangerine-orange ceramic vase with a simple cylindrical neck, a polished chrome sphere and a small red textured fabric fold, art-directed as a luxury magazine product shoot. Photorealistic materials with crisp silhouettes, readable shadows, fine tactile textures and beautiful reflections. Soft daylight from upper left and a delicate hard rim, restrained yet vivid colors and clear tonal separation. Landscape 4:3 framing, objects large and centered with breathing room. No typography, logo, branding, watermark, collage or applied filters; clean photographic base for later actual rendering of effects."
+    },
+    {
+      "id": "neon-city",
+      "prompt": "Use case: photorealistic-natural. Asset type: original professional cinematic urban photograph for an image-effects preview library. A rainy Seoul-style modern city street at blue hour, wet dark pavement with vivid magenta, cyan and warm amber reflections, glass facades and rows of softly glowing vertical light panels with no readable words, one adult woman wearing a dark coat under a transparent umbrella seen in three-quarter side view in the middle distance. Elegant contemporary night street photography, realistic photographic detail, strong depth and crisp high-contrast edges, vivid yet believable light, composition appealing as a small thumbnail. Landscape 4:3 with the umbrella figure large enough to read and plenty of environmental detail. No text, recognizable brands, watermarks, collage, glitch effects or grain overlay; clean photographic source."
+    }
+  ]
+}

@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { immersiveView } from "../../../src/canvas/viewport/immersive";
+import { immersiveView, constrainStudioView } from "../../../src/canvas/viewport/immersive";
 const layout = {
   width: 1800,
   height: 1080,
@@ -41,4 +41,16 @@ test("a 1920 × 1080 composition stays completely visible on portrait screens", 
   expect(1080 * view.zoom).toBeLessThan(844);
   expect(view.x).toBeCloseTo(0);
   expect(view.y).toBeCloseTo(0);
+});
+
+test("fitted Studio navigation pans both axes while retaining a reachable composition", () => {
+  const size = { width: 1920, height: 1080 };
+  const start = immersiveView(layout, size, "a");
+  const moved = constrainStudioView(layout, size, "a", { ...start, x: start.x + 90, y: 40 });
+  expect(moved.x).toBeCloseTo(start.x + 90);
+  expect(moved.y).toBe(40);
+  expect(moved.zoom).toBe(start.zoom);
+  expect(
+    Math.abs(constrainStudioView(layout, size, "a", { ...start, x: 1e6, y: 1e6 }).x),
+  ).toBeLessThan(1e6);
 });

@@ -1,0 +1,15 @@
+.studio-material-paint {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.studio-material-paint > button {
+  justify-content: flex-start;
+  font-size: 11px;
+}
+.studio-material-paint-popover {
+  width: min(320px, calc(100vw - 24px));
+  max-height: min(620px, 75dvh);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}

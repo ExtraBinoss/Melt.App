@@ -1,3 +1,5 @@
+import { EFFECT_CATALOG } from "../../../effects/catalog";
+import { effectMotionSchema } from "../../properties/effect";
 import type { Composition } from "../../../document/model";
 import { assertList, assertNumber, assertRecord, assertUniqueId } from "../../../document/guards";
 import { ensure } from "../../../errors";
@@ -48,24 +50,51 @@ export function validateSceneMotionAnimationPreset(
           : target.kind === "light"
             ? LIGHT_MOTION_SCHEMAS
             : null;
+    const effectSchemas =
+      target.kind === "compositionEffect" || target.kind === "compositionEffectSetting"
+        ? Object.values(EFFECT_CATALOG).flatMap((definition) => {
+            const schema = effectMotionSchema(
+              { ...definition.defaults, id: "preset-validation", type: definition.type },
+              target.property as string,
+              target.kind === "compositionEffectSetting",
+            );
+            return schema ? [schema] : [];
+          })
+        : [];
     ensure(
-      schemas && Object.hasOwn(schemas, target.property),
+      (schemas && Object.hasOwn(schemas, target.property)) || effectSchemas.length > 0,
       "INVALID_DOCUMENT",
       "Unknown scene animation property",
     );
+    const channelOwnerKind =
+      target.kind === "compositionEffectSetting" ? "compositionEffect" : target.kind;
     ensure(
-      ownerKind === undefined || ownerKind === target.kind,
+      ownerKind === undefined || ownerKind === channelOwnerKind,
       "INVALID_DOCUMENT",
       "Scene animation channels must share their owner kind",
     );
-    ownerKind = String(target.kind);
+    ownerKind = String(channelOwnerKind);
     const address = JSON.stringify([target.kind, target.property]);
     ensure(!addresses.has(address), "INVALID_DOCUMENT", "Duplicate animation channel");
     addresses.add(address);
-    validateAnimationChannelPoints(
-      channel,
-      (schemas as Record<string, MotionPropertySchema>)[target.property]!,
-    );
+    if (effectSchemas.length) {
+      ensure(
+        effectSchemas.some((schema) => {
+          try {
+            validateAnimationChannelPoints(channel, schema);
+            return true;
+          } catch {
+            return false;
+          }
+        }),
+        "INVALID_DOCUMENT",
+        "Invalid composition effect animation values",
+      );
+    } else
+      validateAnimationChannelPoints(
+        channel,
+        (schemas as Record<string, MotionPropertySchema>)[target.property]!,
+      );
   }
 }
 export function validateSceneMotionAnimations(
@@ -83,7 +112,15 @@ export function validateSceneMotionAnimations(
     const owner = animation.owner;
     ensure(
       Object.keys(owner).every((key) =>
-        ["kind", "compositionId", ...(owner.kind === "light" ? ["lightId"] : [])].includes(key),
+        [
+          "kind",
+          "compositionId",
+          ...(owner.kind === "light"
+            ? ["lightId"]
+            : owner.kind === "compositionEffect"
+              ? ["effectId"]
+              : []),
+        ].includes(key),
       ),
       "INVALID_DOCUMENT",
       "Unexpected scene animation owner field",

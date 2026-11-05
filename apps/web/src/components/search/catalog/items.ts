@@ -18,7 +18,8 @@ export const SEARCH_COMMAND_IDS: readonly string[] = Object.freeze([
     .filter(
       (type) =>
         !EFFECT_CATALOG[type as keyof typeof EFFECT_CATALOG].source &&
-        !EFFECT_CATALOG[type as keyof typeof EFFECT_CATALOG].retired,
+        !EFFECT_CATALOG[type as keyof typeof EFFECT_CATALOG].retired &&
+        EFFECT_CATALOG[type as keyof typeof EFFECT_CATALOG].requirements?.scope !== "composition",
     )
     .map((type) => `effect:${type}`),
 ]);
@@ -64,7 +65,9 @@ export function createSearchCommandItems(
     target: { kind: "action", action: item.action },
   }));
   const effects: SearchItem[] = Object.values(EFFECT_CATALOG)
-    .filter((effect) => !effect.source && !effect.retired)
+    .filter(
+      (effect) => !effect.source && !effect.retired && effect.requirements?.scope !== "composition",
+    )
     .map((effect) => ({
       id: `effect:${effect.type}`,
       label: t(`search:effectLabels.${effect.type}`),

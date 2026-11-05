@@ -1,16 +1,13 @@
 .history-notice-anchor {
   position: absolute;
-  left: 50%;
-  top: max(var(--workspace-gap, 18px), env(safe-area-inset-top));
-  transform: translateX(-50%);
-  width: max-content;
   min-width: min(var(--history-min-width, 150px), calc(100% - 24px));
   height: var(--floating-size, 42px);
   max-width: min(420px, calc(100% - 24px));
   z-index: 30;
   pointer-events: none;
 }
-.workspace:has(.canvas-rulers:not([hidden])) .history-notice-anchor {
+.workspace:has(.canvas-rulers:not([hidden]))
+  .history-notice-anchor[data-notice-placement="top-center"] {
   top: calc(max(var(--workspace-gap, 18px), env(safe-area-inset-top)) + 20px);
 }
 .history-notice {

@@ -1,7 +1,13 @@
 import type { ComponentProps } from "react";
 import { act, fireEvent, screen } from "@testing-library/react";
 import { expect, test, vi } from "vitest";
-import { createLayer, createSpatialLayer, createSpatialScene } from "@musart/core";
+import {
+  createLayer,
+  createSpatialLayer,
+  createSpatialScene,
+  spatialMaterial,
+  type FillGradient,
+} from "@musart/core";
 import { StudioMaterial } from "../../../src/ui/studio/panels/StudioMaterial";
 import { StudioEnvironment } from "../../../src/ui/studio/panels/StudioEnvironment";
 import { StudioSlider } from "../../../src/ui/studio/controls/StudioSlider";
@@ -24,10 +30,17 @@ function control(label: string) {
     .reverse()
     .find(([props]) => props.label === label)![0] as ComponentProps<typeof StudioSlider>;
 }
-function fixture() {
+function fixture(gradient?: FillGradient) {
   const d = setup();
   d.engine.transaction([
-    { type: "updateLayers", ids: [d.rectangle.id], patch: { spatial: createSpatialLayer("box") } },
+    {
+      type: "updateLayers",
+      ids: [d.rectangle.id],
+      patch: {
+        spatial: createSpatialLayer("box"),
+        ...(gradient ? { fillGradient: gradient } : {}),
+      },
+    },
     { type: "updatePage", patch: { spatial: createSpatialScene() } },
   ]);
   d.engine.load(d.engine.getSnapshot().project);
@@ -45,6 +58,108 @@ function fixture() {
     },
   };
 }
+
+const paint: FillGradient = {
+  kind: "linear",
+  angle: 30,
+  stops: [
+    { offset: 0, color: "#8757ff" },
+    { offset: 1, color: "#5623a0" },
+  ],
+};
+
+test("material presets and finish edits preserve active gradient paint", () => {
+  const d = fixture(paint);
+  d.mount(<StudioMaterial engine={d.engine} run={d.run} />);
+  const original = d.engine.getSnapshot().project;
+  const roughness = control("Rugosité");
+  act(() => roughness.onStart?.());
+  act(() => roughness.onPreview(0.9));
+  expect(d.store.get(previewAtom)).toMatchObject({
+    patch: { spatial: { material: { roughness: 0.9 } } },
+  });
+  act(() => roughness.onCommit(0.9));
+  expect(d.engine.getSnapshot().project.pages[0]!.layers[0]!.fillGradient).toEqual(paint);
+  act(() => d.engine.undo());
+  expect(d.engine.getSnapshot().project).toEqual(original);
+  fireEvent.click(screen.getByRole("button", { name: "Verre · Corail" }));
+  const layer = d.engine.getSnapshot().project.pages[0]!.layers[0]!;
+  expect(layer.spatial?.material).toEqual(spatialMaterial("glassCoral").settings);
+  expect(layer.fillGradient).toEqual(paint);
+  expect(layer.fill).toBe(original.pages[0]!.layers[0]!.fill);
+  act(() => d.engine.undo());
+  expect(d.engine.getSnapshot().project).toEqual(original);
+  expect(d.engine.getSnapshot().canUndo).toBe(false);
+});
+
+test("the visible material color row previews without parent renders, cancels paint and commits one solid-color undo", () => {
+  const d = fixture(paint);
+  let renders = 0;
+  function Parent() {
+    renders++;
+    return <StudioMaterial engine={d.engine} run={d.run} />;
+  }
+  d.mount(<Parent />);
+  const original = d.engine.getSnapshot().project;
+  expect(screen.getByRole("radio", { name: "Dégradé" })).toBeChecked();
+  fireEvent.click(screen.getByRole("radio", { name: "Uni" }));
+  const solid = d.engine.getSnapshot().project;
+  expect(solid.pages[0]!.layers[0]!.fillGradient).toBeUndefined();
+  expect(solid.pages[0]!.layers[0]!.fill).toBe(paint.stops[0]!.color);
+  fireEvent.click(screen.getByRole("button", { name: "Couleur" }));
+  const before = renders;
+  const input = screen.getByRole("textbox", { name: "Couleur hexadécimale" });
+  fireEvent.change(input, { target: { value: "#22cc55" } });
+  expect(d.engine.getSnapshot().project).toBe(solid);
+  expect(renders).toBe(before);
+  const preview = d.store.get(previewAtom);
+  expect(preview).toMatchObject({
+    target: "layer",
+    layerId: d.rectangle.id,
+    patch: { fill: "#22cc55" },
+  });
+  if (preview?.target !== "layer") throw new Error("Expected the selected layer preview.");
+  expect(Object.hasOwn(preview.patch, "fillGradient")).toBe(false);
+  fireEvent.keyDown(input, { key: "Escape" });
+  expect(d.store.get(previewAtom)).toBeNull();
+  expect(d.engine.getSnapshot().project).toBe(solid);
+  const colorButton = screen.getByRole("button", { name: "Couleur" });
+  expect(colorButton).toHaveAttribute("aria-expanded", "false");
+  fireEvent.click(colorButton);
+  const resumedInput = screen.getByRole("textbox", { name: "Couleur hexadécimale" });
+  fireEvent.change(resumedInput, { target: { value: "#22cc55" } });
+  fireEvent.keyUp(resumedInput, { key: "Enter" });
+  const layer = d.engine.getSnapshot().project.pages[0]!.layers[0]!;
+  expect(layer.fill).toBe("#22cc55");
+  expect(layer.fillGradient).toBeUndefined();
+  expect(d.run).toHaveBeenCalledTimes(2);
+  act(() => d.engine.undo());
+  expect(d.engine.getSnapshot().project).toEqual(solid);
+  act(() => d.engine.undo());
+  expect(d.engine.getSnapshot().project).toEqual(original);
+  expect(d.engine.getSnapshot().canUndo).toBe(false);
+});
+
+test("the primary gradient swatch opens real editable stops and preserves the gradient kind", () => {
+  const d = fixture(paint);
+  d.mount(<StudioMaterial engine={d.engine} run={d.run} />);
+  const original = d.engine.getSnapshot().project;
+  expect(screen.getByRole("radio", { name: "Dégradé" })).toBeChecked();
+  fireEvent.click(screen.getByRole("button", { name: "Dégradé" }));
+  const stop = screen.getByRole("textbox", { name: "Couleur hexadécimale du point 1" });
+  fireEvent.change(stop, { target: { value: "#22cc55" } });
+  expect(d.engine.getSnapshot().project).toBe(original);
+  fireEvent.blur(stop);
+  const gradient = d.engine.getSnapshot().project.pages[0]!.layers[0]!.fillGradient;
+  expect(gradient).toEqual({
+    ...paint,
+    stops: [{ ...paint.stops[0], color: "#22cc55" }, paint.stops[1]],
+  });
+  expect(d.run).toHaveBeenCalledOnce();
+  act(() => d.engine.undo());
+  expect(d.engine.getSnapshot().project).toEqual(original);
+  expect(d.engine.getSnapshot().canUndo).toBe(false);
+});
 
 test("material sliders preview outside document and parent renders, release once, and undo restores the material", () => {
   const d = fixture();

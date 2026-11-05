@@ -13,6 +13,8 @@ interface Options {
   commit(time: number): void;
   cancel(): void;
   stopped(): void;
+  /** Input takes retain native events between the final preview and the explicit save. */
+  sampleOnFinish?: boolean;
 }
 const active = new WeakMap<EnginePort, Set<(commit?: boolean) => void>>();
 const observers = new WeakMap<EnginePort, Set<() => void>>();
@@ -54,12 +56,14 @@ export function startEffectPreview(engine: EnginePort, options: Options) {
     closed = true;
     if (frame !== null) options.clock.cancel(frame);
     frame = null;
+    if (commit && options.sampleOnFinish)
+      time = (options.time + (options.clock.now() - started) / 1000) % 86400;
     stopEngine();
     listeners.delete(finish);
     notify(engine);
     // Clear UI state even when a validated command reports an error.
     options.stopped();
-    if (commit && time !== options.time) options.commit(time);
+    if (commit && (time !== options.time || options.sampleOnFinish)) options.commit(time);
     else options.cancel();
   };
   const step = () => {

@@ -159,3 +159,46 @@ test("binding preserves skinned/morphed mesh ownership, masks, and disposes remo
     f.dispose();
   }
 });
+
+test("certified camera-only samples retain material graphs, with invalidation for values, shader and reflection inputs", () => {
+  const f = fixture(1),
+    base = f.materials[0]!;
+  const copy = vi.spyOn(copies, "copySpatialMaterial");
+  const firstEnvironment = new Texture(),
+    nextEnvironment = new Texture();
+  try {
+    base.envMap = firstEnvironment;
+    f.bindings.sync(f.meshes, "appearance-1");
+    f.bindings.bind(f.meshes, "color");
+    const color = f.meshes[0]!.material as MeshStandardNodeMaterial;
+    const shaderKey = vi.spyOn(color, "customProgramCacheKey");
+    f.bindings.restore();
+    const initial = copy.mock.calls.length;
+    for (let i = 0; i < 30; i++) f.bindings.sync(f.meshes, "appearance-1");
+    expect(copy).toHaveBeenCalledTimes(initial);
+    expect(shaderKey).not.toHaveBeenCalled();
+    base.color.set("#ff0000");
+    f.bindings.sync(f.meshes, "appearance-2");
+    expect(copy).toHaveBeenCalledTimes(initial + 3);
+    expect(color.color.getHex()).toBe(0xff0000);
+    base.envMap = nextEnvironment;
+    f.bindings.sync(f.meshes, "appearance-2");
+    expect(color.envMap).toBe(nextEnvironment);
+    expect(copy).toHaveBeenCalledTimes(initial + 6);
+    base.needsUpdate = true;
+    f.bindings.sync(f.meshes, "appearance-2");
+    expect(copy).toHaveBeenCalledTimes(initial + 9);
+    base.maskNode = uniform(true);
+    f.bindings.sync(f.meshes, "appearance-2");
+    expect(color.maskNode).not.toBe(base.maskNode);
+    expect(copy).toHaveBeenCalledTimes(initial + 12);
+    f.bindings.sync([]);
+    expect(f.bindings.stats().meshes).toBe(0);
+    expect(f.bindings.bytes).toBe(0);
+  } finally {
+    copy.mockRestore();
+    firstEnvironment.dispose();
+    nextEnvironment.dispose();
+    f.dispose();
+  }
+});

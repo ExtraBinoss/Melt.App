@@ -6,7 +6,7 @@ import {
   type CSSProperties,
   type KeyboardEvent,
 } from "react";
-import { HsvColorPicker, type HsvColor } from "react-colorful";
+import { HsvColorPicker } from "react-colorful";
 import { useTranslation } from "react-i18next";
 import { Slider } from "../../ui/slider";
 import { hexToHsva, hsvaToHex, type Hsva } from "./conversion";
@@ -48,6 +48,7 @@ export function ColorPalette({
     box: DOMRect;
   } | null>(null);
   const samplePointer = useRef<(event: PointerEvent) => boolean>(() => false);
+  const keyboard = useRef(false);
   useLayoutEffect(() => {
     current.current = color;
   }, [color]);
@@ -88,6 +89,7 @@ export function ColorPalette({
   useLayoutEffect(
     () => () => {
       pointer.current = null;
+      keyboard.current = false;
     },
     [origin],
   );
@@ -140,6 +142,7 @@ export function ColorPalette({
     return () => {
       mounted.current = false;
       pointer.current = null;
+      keyboard.current = false;
       samplePointer.current = () => false;
       window.removeEventListener("pointermove", move, true);
       window.removeEventListener("pointerup", release, true);
@@ -176,9 +179,32 @@ export function ColorPalette({
         // Pointer sampling below owns native mouse, pen and touch gestures.
         // Letting react-colorful also start its compatibility mouse/touch
         // gesture reads geometry after the pointer preview has written styles.
-        // Keep its genuine focused slider and keyboard interaction intact.
+        // Keep the genuine focused slider; our handlers are the sole HSV writer
+        // for pointer and keyboard input. Delayed widget echoes must never rewind
+        // an independently sampled Radix hue/alpha gesture.
         onMouseDownCapture={(event) => event.stopPropagation()}
         onTouchStartCapture={(event) => event.stopPropagation()}
+        onKeyDownCapture={(event) => {
+          if (event.key === "Escape") keyboard.current = false;
+          const changes: Record<string, Partial<Hsva>> = {
+            ArrowLeft: { s: Math.max(0, current.current.s - 5) },
+            ArrowRight: { s: Math.min(100, current.current.s + 5) },
+            ArrowUp: { v: Math.min(100, current.current.v + 5) },
+            ArrowDown: { v: Math.max(0, current.current.v - 5) },
+          };
+          const change = changes[event.key];
+          if (!change || disabled) return;
+          event.preventDefault();
+          event.stopPropagation();
+          keyboard.current = preview(change);
+        }}
+        onKeyUpCapture={(event) => {
+          if (!event.key.startsWith("Arrow")) return;
+          event.stopPropagation();
+          if (!keyboard.current) return;
+          keyboard.current = false;
+          onCommit();
+        }}
         onPointerDownCapture={(event) => {
           if (disabled || event.button !== 0) return;
           const box = pad.current
@@ -196,26 +222,6 @@ export function ColorPalette({
         <HsvColorPicker
           key={`${resetKey}:${value}:${cycle}`}
           color={{ h: color.h, s: color.s, v: color.v }}
-          onChange={(next: HsvColor) => {
-            if (
-              mounted.current &&
-              !pointer.current &&
-              epoch.current === cycle &&
-              latest.current.origin === origin &&
-              !latest.current.disabled
-            )
-              latest.current.preview(next);
-          }}
-          onChangeEnd={() => {
-            if (
-              mounted.current &&
-              !pointer.current &&
-              epoch.current === cycle &&
-              latest.current.origin === origin &&
-              !latest.current.disabled
-            )
-              latest.current.onCommit();
-          }}
         />
       </div>
       <Slider

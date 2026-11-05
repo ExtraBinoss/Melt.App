@@ -14,6 +14,7 @@ import type { EffectResources } from "./effect-resources";
 import type { GpuPasses } from "./passes";
 import type { LayerTargets } from "./targets";
 import { rasterExtent, type FrameTexture } from "./types";
+import { prepareProjectedEffects } from "./projected-effects";
 
 interface Context {
   target(role: string, width: number, height: number, mipmapped?: boolean): RenderTarget;
@@ -24,6 +25,7 @@ interface Context {
   maskSource(layer: Layer): FrameTexture;
   image(id: string, ownerId?: string): FrameTexture["texture"];
   effectCache?: { entry: LayerTargets; signature: string };
+  effectProjection?: readonly number[];
 }
 const translate = (x: number, y: number): Matrix => [1, 0, 0, 1, x, y];
 
@@ -59,22 +61,27 @@ export function finishLayerSource(
     // The owned target may be overwritten before an operator throws. A failed
     // render must never leave its previous signature attached to partial pixels.
     if (context.effectCache) context.effectCache.entry.effectSource = null;
+    const projected = context.effectProjection
+      ? prepareProjectedEffects(source, original, layer, scale, context.effectProjection, context)
+      : null;
+    if (projected) source = projected.source;
+    const effectOriginal = projected?.bounds ?? original;
     const outset = effectFootprint(effects);
     bounds = {
-      x: original.x - outset.left,
-      y: original.y - outset.top,
-      width: original.width + outset.left + outset.right,
-      height: original.height + outset.top + outset.bottom,
+      x: effectOriginal.x - outset.left,
+      y: effectOriginal.y - outset.top,
+      width: effectOriginal.width + outset.left + outset.right,
+      height: effectOriginal.height + outset.top + outset.bottom,
     };
     const width = rasterExtent(bounds.width, scale),
       height = rasterExtent(bounds.height, scale);
     if (source.premultiplied || outset.left || outset.top || outset.right || outset.bottom) {
       const straight = context.target("straight", width, height);
       context.passes.copyTo(source, straight, source.premultiplied, false, {
-        x: (bounds.x - original.x) / original.width,
-        y: 1 - (bounds.y - original.y + bounds.height) / original.height,
-        width: bounds.width / original.width,
-        height: bounds.height / original.height,
+        x: (bounds.x - effectOriginal.x) / effectOriginal.width,
+        y: 1 - (bounds.y - effectOriginal.y + bounds.height) / effectOriginal.height,
+        width: bounds.width / effectOriginal.width,
+        height: bounds.height / effectOriginal.height,
       });
       source = { texture: straight.texture, width, height, premultiplied: false };
     }
@@ -88,11 +95,13 @@ export function finishLayerSource(
         texture: context.effects.apply(source.texture, width, height, effects, output, {
           width: bounds.width,
           height: bounds.height,
+          // Transport bounds may be a viewport crop or expansion. Effect fields
+          // and their area controls remain anchored to the authored layer frame.
           content: {
-            x: original.x - bounds.x,
-            y: original.y - bounds.y,
-            width: original.width,
-            height: original.height,
+            x: -bounds.x,
+            y: -bounds.y,
+            width: layer.width,
+            height: layer.height,
           },
         }),
         width,
@@ -104,6 +113,14 @@ export function finishLayerSource(
     }
     if (bounds.x || bounds.y || bounds.width !== layer.width || bounds.height !== layer.height)
       source.bounds = bounds;
+    if (projected) {
+      source = projected.restore(
+        source,
+        bounds,
+        Boolean(outset.left || outset.top || outset.right || outset.bottom),
+      );
+      bounds = source.bounds!;
+    }
     if (context.effectCache)
       context.effectCache.entry.effectSource = {
         signature: context.effectCache.signature,

@@ -1,4 +1,5 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useLayoutEffect, useMemo, useRef, useSyncExternalStore } from "react";
+import { useReducedMotion } from "motion/react";
 import type { ReactNode } from "react";
 import type { EnginePort } from "@musart/core";
 import type { EditorServices } from "../../state/contracts";
@@ -6,8 +7,22 @@ import type { TaskRunner } from "../../components/projects/ProjectDialog";
 import { ExportActions } from "../../components/export/ExportActions";
 import { MagicSearch, type MagicSearchProps } from "../../components/search/MagicSearch";
 import { WorkspaceTheme } from "../brand/WorkspaceTheme";
-import { useWorkspaceMode } from "./workspace-mode";
+import { useProjectPreferences } from "../../components/workspace/preferences/context";
+import {
+  readRequestedWorkspaceMode,
+  useWorkspaceMode,
+  useRequestedWorkspaceMode,
+} from "./workspace-mode";
+import { PresentedWorkspaceMode, WorkspaceChromeReadiness } from "./transition/context";
+import { WorkspaceTransition } from "./transition/controller";
+import { createWorkspaceChromeMotion, createWorkspaceReadiness } from "./transition/presentation";
+import {
+  WorkspaceChromePending,
+  WorkspaceTransitionSurface,
+} from "./transition/WorkspaceTransitionSurface";
 import "./workspace-mode.css";
+
+export { WorkspaceChromePending } from "./transition/WorkspaceTransitionSurface";
 
 const StudioChrome = lazy(() =>
   import("./StudioChrome").then((module) => ({ default: module.StudioChrome })),
@@ -15,19 +30,62 @@ const StudioChrome = lazy(() =>
 const StudioBackground = lazy(() =>
   import("./background/StudioBackground").then((module) => ({ default: module.StudioBackground })),
 );
-const StudioLibrary = lazy(() =>
-  import("./library/StudioLibrary").then((module) => ({ default: module.StudioLibrary })),
+const ObjectLibrary = lazy(() =>
+  import("../../components/spatial/objects/ObjectLibrary").then((module) => ({
+    default: module.ObjectLibrary,
+  })),
 );
 
 /** A presentation-only leaf: switching chrome never replaces the engine or canvas. */
-export function WorkspaceModeBoundary({ children }: { children: ReactNode }) {
-  const mode = useWorkspaceMode();
+export function WorkspaceModeBoundary({
+  children,
+  engine,
+}: {
+  children: ReactNode;
+  engine: EnginePort;
+}) {
+  const requested = useRequestedWorkspaceMode();
+  const preferences = useProjectPreferences();
+  const root = useRef<HTMLDivElement>(null);
+  const reduced = useReducedMotion();
+  const reduceMotion = useRef(reduced);
+  useLayoutEffect(() => {
+    reduceMotion.current = reduced;
+  }, [reduced]);
+  const readiness = useMemo(() => createWorkspaceReadiness(engine, () => root.current), [engine]);
+  const transition = useMemo(() => {
+    const motion = createWorkspaceChromeMotion(
+      () => root.current,
+      () => Boolean(reduceMotion.current),
+    );
+    // A replacement project starts directly in its own saved presentation.
+    return new WorkspaceTransition(readRequestedWorkspaceMode(preferences), {
+      ...motion,
+      ready: readiness.ready,
+    });
+  }, [preferences, readiness]);
+  const state = useSyncExternalStore(transition.subscribe, transition.read, transition.read);
+  useLayoutEffect(() => {
+    transition.request(requested);
+  }, [transition, requested]);
+  useLayoutEffect(() => () => transition.dispose(), [transition]);
   return (
-    <WorkspaceTheme value={mode}>
-      <div className="workspace-mode-root" data-workspace-mode={mode} data-workspace-theme={mode}>
-        {children}
-      </div>
-    </WorkspaceTheme>
+    <PresentedWorkspaceMode value={state.mode}>
+      <WorkspaceChromeReadiness value={readiness.pending}>
+        <WorkspaceTheme value={state.mode}>
+          <div
+            ref={root}
+            className="workspace-mode-root"
+            data-workspace-mode={state.mode}
+            data-workspace-theme={state.mode}
+            data-workspace-transition={state.phase}
+          >
+            {children}
+            <WorkspaceTransitionSurface state={state} />
+          </div>
+        </WorkspaceTheme>
+      </WorkspaceChromeReadiness>
+    </PresentedWorkspaceMode>
   );
 }
 
@@ -48,7 +106,7 @@ export function StudioWorkspaceChrome(props: {
   const mode = useWorkspaceMode();
   const { exportControl, onProjects, onPanelMode, ...chromeProps } = props;
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<WorkspaceChromePending />}>
       {mode === "studio" && (
         <>
           <StudioChrome
@@ -62,7 +120,9 @@ export function StudioWorkspaceChrome(props: {
                 tooltipSide="bottom"
               />
             }
-            library={<StudioLibrary engine={props.engine} onTask={props.onTask} />}
+            library={
+              <ObjectLibrary engine={props.engine} onTask={props.onTask} tooltipSide="bottom" />
+            }
             background={<StudioBackground engine={props.engine} onTask={props.onTask} />}
           />
         </>

@@ -87,5 +87,6 @@
   "more_one": "+ 변경 {{count}}개",
   "align": "정렬",
   "distribute": "분배",
-  "spatialTransform": "3D 변환"
+  "spatialTransform": "3D 변환",
+  "change": "변경"
 }

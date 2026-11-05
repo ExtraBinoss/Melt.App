@@ -1,4 +1,5 @@
 // MIT: ExtraBinoss / Plinka (2026), React-Beautiful-Gradient finishing pass.
+import { authoredUv, transportUv } from "../shared/coordinates";
 import type { Node } from "three/webgpu";
 import {
   abs,
@@ -11,7 +12,6 @@ import {
   min,
   mix,
   smoothstep,
-  uv,
   vec3,
   vec4,
 } from "three/tsl";
@@ -21,8 +21,8 @@ import { gradientHash } from "./shared/noise";
 import { readGradient, treatmentControls } from "./treatments/shared";
 export function gradientFinishNode(context: EffectNodeContext) {
   const u = treatmentControls(context),
-    position = uv(),
-    resolution = context.controls.logicalResolution;
+    position = authoredUv(context.controls),
+    resolution = context.controls.contentResolution;
   const sample = readGradient(context, position),
     offset = position.sub(0.5).mul(u.chromaticShift);
   let color: Node<"vec3"> = vec3(
@@ -55,7 +55,7 @@ export function gradientFinishNode(context: EffectNodeContext) {
     ? sampleEffect(
         context.backdrop,
         { ...context.controls, sourceFlipY: context.controls.backdropFlipY },
-        position,
+        transportUv(context.controls, position),
       )
     : sample;
   return vec4(clamp(color, 0, 1), sample.a.mul(original.a).mul(rounded));

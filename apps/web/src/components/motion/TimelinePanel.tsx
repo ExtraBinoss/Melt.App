@@ -2,7 +2,7 @@ import { useTimelineRows } from "./rows/use-timeline-rows";
 import { TimelineCollapseControl } from "./TimelineCollapseControl";
 import { SimpleTimelineRows } from "./animations/SimpleTimelineRows";
 import { AnimationViewToggle } from "./animations/AnimationViewToggle";
-import { useAnimationPresentation } from "./animations/presentation";
+import { useAnimationDetails } from "./animations/presentation";
 import {
   useCallback,
   useEffect,
@@ -64,7 +64,7 @@ export function TimelinePanel({
   active?: boolean;
   compact?: boolean;
 }) {
-  const { details } = useAnimationPresentation(engine);
+  const details = useAnimationDetails(engine);
   const GUTTER = compact ? 120 : 244;
   const rowHeight = compact ? 32 : 24;
   const { t } = useTranslation("motion");

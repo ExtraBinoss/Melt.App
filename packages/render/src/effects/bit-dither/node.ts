@@ -1,3 +1,4 @@
+import { authoredPixelDown, transportUv } from "../shared/coordinates";
 import {
   Fn,
   If,
@@ -33,11 +34,13 @@ export function bitDitherColor(
     // Shared operands must be assigned before any algorithm branch: Three's
     // expression cache must not leave sibling branches reading an unset variable.
     const size = max(1, controls.scale).toVar(),
-      cell = floor(
-        vec2(position.x, position.y.oneMinus()).mul(controls.logicalResolution).div(size),
+      cell = floor(authoredPixelDown(controls, position).div(size)).toVar(),
+      center = cell.add(0.5).mul(size).div(controls.contentResolution).toVar(),
+      blocked = sampleEffect(
+        source,
+        controls,
+        transportUv(controls, vec2(center.x, center.y.oneMinus())),
       ).toVar(),
-      center = cell.add(0.5).mul(size).div(controls.logicalResolution).toVar(),
-      blocked = sampleEffect(source, controls, vec2(center.x, center.y.oneMinus())).toVar(),
       seed = uint(controls.randomSeedUint),
       foldedSeed = seed.bitXor(seed.shiftRight(uint(20))),
       point = cell

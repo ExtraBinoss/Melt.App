@@ -18,8 +18,8 @@
   "guides": "Guides",
   "mask": "Mask",
   "motion": "Motion",
-  "undo": "Undid",
-  "redo": "Redid",
+  "undo": "Undo",
+  "redo": "Redo",
   "close": "Dismiss notification",
   "mixed": "Mixed",
   "missing": "Unset",
@@ -87,5 +87,6 @@
   "more_one": "+ {{count}} change",
   "align": "Align",
   "distribute": "Distribute",
-  "spatialTransform": "3D transform"
+  "spatialTransform": "3D transform",
+  "change": "Change"
 }

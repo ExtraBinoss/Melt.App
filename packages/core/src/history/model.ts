@@ -21,7 +21,8 @@ export type HistoryOwner =
   | {
       readonly kind: "effect";
       readonly compositionId: string;
-      readonly layerId: string;
+      /** Missing for effects on the composition surface. */
+      readonly layerId?: string;
       readonly effectId: string;
       readonly effectType: EffectType;
     }
@@ -46,6 +47,7 @@ type Target<K extends HistoryOwner["kind"], P extends string> = {
   readonly property: P;
 };
 export type LayerHistoryProperty =
+  | "background"
   | `fillGradient.${"centerX" | "centerY" | "radius" | "radialShape"}`
   | LayerMotionProperty
   | "name"

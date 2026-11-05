@@ -1,9 +1,10 @@
 import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { useAtom, useStore } from "jotai";
+import { useAtom, useAtomValue, useStore } from "jotai";
 import { animate as animateFallback, useReducedMotion } from "motion/react";
 import { animate } from "motion/mini";
 import { spring } from "motion";
 import type { EnginePort, SessionSnapshot } from "@musart/core";
+import { motionDockAtoms, rememberDockPin as rememberChoice } from "../../state/motion/dock-state";
 import { timelineOpenAtom } from "../../state/motion/timeline-state";
 import { useDocumentSnapshot } from "../../state/session/use-document-snapshot";
 import { createMotionTransport } from "../../services/motion/transport";
@@ -15,53 +16,57 @@ import { DockViewportReservation } from "./DockViewportReservation";
 import { observeDockInteraction } from "./dock-interaction";
 import { type ViewportResizeLease } from "../../canvas/session/viewport-resize";
 import { presentationSpring } from "../shared/motion/presentation-spring";
-import { useAnimationPresentation } from "../motion/animations/presentation";
+import { useAnimationDetails } from "../motion/animations/presentation";
+import { useWorkspaceMode } from "../../ui/studio/workspace-mode";
+import { useMobileLayout } from "../workspace/mobile/use-mobile";
 import "./motion-shell.css";
 
 const RetainedPanel = memo(TimelinePanel);
 const peekTransform = "translateY(calc(100% - 32px))";
-function rememberChoice(previous: ReadonlyMap<string, boolean>, key: string, pinned: boolean) {
-  if (previous.get(key) === pinned) return previous;
-  const next = new Map(previous);
-  next.delete(key);
-  next.set(key, pinned);
-  if (next.size > 32) next.delete(next.keys().next().value!);
-  return next;
-}
-
 /** Hover and pin are local presentation state; the editor roots never subscribe to them. */
 export const MotionTimelineDock = memo(function MotionTimelineDock({
   engine,
 }: {
   engine: EnginePort;
 }) {
-  const { details } = useAnimationPresentation(engine);
+  const workspace = useWorkspaceMode();
+  const mobile = useMobileLayout();
+  return mobile && workspace === "classic" ? null : <RetainedMotionTimelineDock engine={engine} />;
+});
+
+const RetainedMotionTimelineDock = memo(function RetainedMotionTimelineDock({
+  engine,
+}: {
+  engine: EnginePort;
+}) {
+  const details = useAnimationDetails(engine);
   const snapshot = useDocumentSnapshot(engine, details);
   const transport = useMemo(() => createMotionTransport(engine), [engine]);
-  const [choices, setChoices] = useState<ReadonlyMap<string, boolean>>(() => new Map());
+  const atoms = motionDockAtoms(engine);
+  const [choices, setChoices] = useAtom(atoms.pinChoices);
   const scope = JSON.stringify([snapshot.project.id, snapshot.pageId]);
   const mode =
     snapshot.project.pages.find((page) => page.id === snapshot.pageId)?.motion?.mode ?? "static";
-  const [observed, setObserved] = useState({ scope, mode, pin: 0 });
-  if (observed.scope !== scope) setObserved({ scope, mode, pin: 0 });
-  else if (observed.mode !== mode) {
-    setObserved({ scope, mode, pin: observed.pin + (mode === "motion" ? 1 : 0) });
-    if (mode === "motion") setChoices((current) => rememberChoice(current, scope, true));
-  }
-  const remember = useCallback((key: string, pinned: boolean) => {
-    setChoices((current) => rememberChoice(current, key, pinned));
-  }, []);
+  const observed = useAtomValue(atoms.transition);
+  const enteringMotion = observed.scope === scope && observed.mode !== mode && mode === "motion";
+  const remember = useCallback(
+    (key: string, pinned: boolean) => {
+      setChoices((current) => rememberChoice(current, key, pinned));
+    },
+    [setChoices],
+  );
   useEffect(() => {
     if (mode !== "motion") transport.pause();
   }, [mode, transport]);
-  // Retain the last Motion surface while Static is active: its controls need not remount.
-  const [retained, setRetained] = useState<SessionSnapshot | null>(null);
-  const reusable =
-    retained?.project === snapshot.project &&
-    snapshot.project.pages.some((page) => page.id === retained.pageId);
-  const shown = mode === "motion" ? snapshot : reusable ? retained : null;
-  if (mode === "motion" && retained !== snapshot) setRetained(snapshot);
-  else if (retained && !reusable) setRetained(null);
+  // Retain one owner ID, never a stale document graph. Canonical mode edits keep its DOM.
+  const lastMotion = useAtomValue(atoms.lastMotionPage);
+  const currentPage = snapshot.project.pages.find((page) => page.id === snapshot.pageId)!;
+  const retainedPage = snapshot.project.pages.find((page) => page.id === lastMotion);
+  const shown = currentPage.motion
+    ? snapshot
+    : retainedPage?.motion
+      ? { ...snapshot, pageId: retainedPage.id }
+      : null;
   const content =
     shown?.project.id === snapshot.project.id ? (
       <DockSurface
@@ -72,7 +77,7 @@ export const MotionTimelineDock = memo(function MotionTimelineDock({
         transport={transport}
         visible={mode === "motion"}
         initialPinned={choices.get(scope) ?? false}
-        pinRequest={observed.scope === scope ? observed.pin : 0}
+        pinRequest={observed.scope === scope ? observed.pin + Number(enteringMotion) : 0}
         remember={remember}
       />
     ) : null;
@@ -81,7 +86,7 @@ export const MotionTimelineDock = memo(function MotionTimelineDock({
       engine={engine}
       projectId={snapshot.project.id}
       layoutKey={JSON.stringify([scope, mode])}
-      reserved={mode === "motion" && (choices.get(scope) ?? false)}
+      reserved={mode === "motion" && (enteringMotion || (choices.get(scope) ?? false))}
     >
       {content}
     </DockViewportReservation>
@@ -317,7 +322,7 @@ function DockSurface({
       aria-hidden={!present || undefined}
       data-motion-presence={expanded ? "present" : "peek"}
       data-motion-expanded={String(expanded)}
-      data-motion-pinned={String(pinned)}
+      data-motion-pinned={String(visible && pinned)}
       data-motion-body-hidden="true"
       data-motion-grip-ready="false"
       data-motion-scope={scope}

@@ -114,6 +114,7 @@ test("guards two concurrent opens and suppresses completion callbacks after unmo
   await screen.findByRole("article", { name: "Study" });
   fireEvent.click(screen.getByRole("button", { name: "Study" }));
   fireEvent.click(screen.getByRole("button", { name: "Second" }));
+  expect(await screen.findByText("Ouverture de Study…")).toBeVisible();
   expect(d.services.openProject).toHaveBeenCalledExactlyOnceWith("project-a");
   expect(screen.getByRole("button", { name: "Second" })).toBeDisabled();
   view.unmount();

@@ -14,6 +14,14 @@ The generated image is an original Melt asset.
 
 ## Object library
 
+`bun scripts/spatial/render-pack.ts` bakes all 474 installed-pack models with their
+original materials into a hash-named native WebP atlas. It reads the pinned local
+pack archive and manifest, uses one bounded render session and writes matching
+dimensions/provenance to `services/assets/studio/posters.json`. The picker uses
+this static image for every virtual tile, with no runtime model preparation on
+scroll. Run this generator with the workstation CPU/memory limits described in
+`docs/performance/protocol.md`; generation is not part of editor startup.
+
 `bun scripts/spatial/render-library.ts` renders the 37 real shape/model previews
 into `apps/web/public/spatial/library.webp` using one bounded native session.
 It records GPU cache accounting and zero-readback instrumentation under ignored

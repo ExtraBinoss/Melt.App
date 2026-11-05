@@ -16,7 +16,12 @@ export function createEffectUniforms(
 ) {
   const parameters = createParameterUniforms(effect);
   const windowTrails = effect.type === "window-trails" ? createWindowTrailsLayout() : null;
-  windowTrails?.update(parameters.parameters, effect.time ?? 0, logical.width, logical.height);
+  windowTrails?.update(
+    parameters.parameters,
+    effect.time ?? 0,
+    logical.content?.width ?? logical.width,
+    logical.content?.height ?? logical.height,
+  );
   const liquify = effect.type === "liquify" ? createLiquifyUniforms() : null;
   liquify?.update(effect);
   return {
@@ -69,8 +74,8 @@ export function updateEffectUniforms(
   controls.windowTrails?.update(
     controls.parameters,
     effect.time ?? 0,
-    logical.width,
-    logical.height,
+    logical.content?.width ?? logical.width,
+    logical.content?.height ?? logical.height,
   );
   controls.time.value = effect.time ?? 0;
   if (controls.gradient) updateGradientUniforms(controls.gradient, effect);

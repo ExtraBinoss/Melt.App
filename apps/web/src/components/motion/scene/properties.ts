@@ -8,6 +8,13 @@ import {
 } from "@musart/core";
 export function sceneTimelineProperties(page: Composition) {
   return [
+    ...(page.effects ?? []).flatMap((effect) =>
+      projectSceneMotionProperties(page, {
+        kind: "compositionEffect",
+        compositionId: page.id,
+        effectId: effect.id,
+      }),
+    ),
     ...projectSceneMotionProperties(page, { kind: "camera", compositionId: page.id }),
     ...projectSceneMotionProperties(page, { kind: "environment", compositionId: page.id }),
     ...(page.spatial?.lights.flatMap((light) =>

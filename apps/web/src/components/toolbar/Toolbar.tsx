@@ -9,20 +9,24 @@ import {
   Redo2,
 } from "lucide-react";
 import { useAtom } from "jotai";
-import { memo } from "react";
+import { createContext, memo, useContext } from "react";
 import type { EnginePort } from "@musart/core";
 import { useTranslation } from "react-i18next";
 import { toolAtom } from "../../state/session/editor";
 import { ToolbarScroll } from "./dock/ToolbarScroll";
 import { IconButton } from "../shared/IconButton";
-import { SpatialLibrary } from "../spatial/SpatialLibrary";
+import { ObjectLibrary } from "../spatial/objects/ObjectLibrary";
+import type { TaskRunner } from "../projects/ProjectDialog";
 import { ShapeToolSlot } from "../assets/ShapeToolSlot";
+import { TextTool } from "../text/TextTool";
 import { Separator } from "../ui/separator";
 import { MagicSearch, type MagicSearchProps, type SearchSurface } from "../search/MagicSearch";
 import { PinnedCommands } from "./dock/PinnedCommands";
 import { ToolbarCommand } from "./ToolbarCommand";
 import { useKeybindings } from "../../state/keybindings/use-keybindings";
 import { bindingLabel } from "../search/shortcuts";
+
+const ToolbarTasks = createContext<TaskRunner | null>(null);
 
 const tools = [
   ["pointer", MousePointer2, "action:toolPointer"],
@@ -31,7 +35,11 @@ const tools = [
   ["wand", WandSparkles, "action:toolWand"],
 ] as const;
 export function Toolbar(props: MagicSearchProps) {
-  return <MagicSearch {...props}>{ToolbarContents}</MagicSearch>;
+  return (
+    <ToolbarTasks value={props.onTask}>
+      <MagicSearch {...props}>{ToolbarContents}</MagicSearch>
+    </ToolbarTasks>
+  );
 }
 function ToolbarContents(surface: SearchSurface) {
   const { engine, commands } = surface;
@@ -87,23 +95,28 @@ function ToolbarContents(surface: SearchSurface) {
 const StaticTools = memo(function StaticTools({ engine }: { engine: EnginePort }) {
   const { t } = useTranslation();
   const [tool, setTool] = useAtom(toolAtom);
+  const onTask = useContext(ToolbarTasks)!;
   const bindings = useKeybindings();
   return (
     <>
-      {tools.map(([id, Icon, shortcut]) => (
-        <IconButton
-          key={id}
-          label={t(id)}
-          shortcut={bindingLabel(shortcut, bindings)}
-          active={tool === id}
-          onClick={() => setTool(id)}
-          className="tool-button"
-        >
-          <Icon strokeWidth={1.65} />
-        </IconButton>
-      ))}
+      {tools.map(([id, Icon, shortcut]) =>
+        id === "text" ? (
+          <TextTool key={id} defaultMode="2d" />
+        ) : (
+          <IconButton
+            key={id}
+            label={t(id)}
+            shortcut={bindingLabel(shortcut, bindings)}
+            active={tool === id}
+            onClick={() => setTool(id)}
+            className="tool-button"
+          >
+            <Icon strokeWidth={1.65} />
+          </IconButton>
+        ),
+      )}
       <ShapeToolSlot engine={engine} />
-      <SpatialLibrary engine={engine} />
+      <ObjectLibrary engine={engine} onTask={onTask} />
     </>
   );
 });

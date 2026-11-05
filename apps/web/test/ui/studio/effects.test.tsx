@@ -1,6 +1,6 @@
 import type { ComponentProps } from "react";
-import { act, fireEvent, screen } from "@testing-library/react";
-import { expect, test, vi } from "vitest";
+import { act, fireEvent, screen, waitFor, within } from "@testing-library/react";
+import { afterEach, expect, test, vi } from "vitest";
 import { createEffect } from "@musart/core";
 import { StudioEffects } from "../../../src/ui/studio/effects/StudioEffects";
 import type { EffectParameters } from "../../../src/components/properties/effects/EffectParameters";
@@ -8,6 +8,7 @@ import { previewAtom } from "../../../src/state/session/editor";
 import { setup } from "../../support/ui";
 
 const controls = vi.hoisted(() => ({ parameters: vi.fn() }));
+afterEach(() => vi.unstubAllGlobals());
 vi.mock("../../../src/components/properties/effects/EffectParameters", () => ({
   EffectParameters: (props: ComponentProps<typeof EffectParameters>) => {
     controls.parameters(props);
@@ -20,6 +21,57 @@ function field() {
 function open(label = "Ajouter un étalonnage") {
   fireEvent.click(screen.getByRole("button", { name: label }));
 }
+
+test.each(["Ajouter un effet", "Ajouter un étalonnage"])(
+  "%s shows the actual selected owner thumbnail and retires it when its scope changes",
+  async (label) => {
+    let sequence = 0;
+    vi.stubGlobal(
+      "URL",
+      class extends URL {
+        static createObjectURL = vi.fn(() => `blob:effect-owner-${++sequence}`);
+        static revokeObjectURL = vi.fn();
+      },
+    );
+    const d = setup();
+    const previewExport = vi.fn(async () => ({
+      blob: new Blob(["native preview"]),
+      width: 96,
+      height: 96,
+    }));
+    const services = { previewExport };
+    d.engine.select([d.rectangle.id]);
+    d.mount(<StudioEffects engine={d.engine} services={services} run={d.run} />);
+    open(label);
+    let owner = screen.getByRole("group", { name: "Appliqué à l’objet sélectionné" });
+    expect(owner.textContent).toBe(d.rectangle.name);
+    await waitFor(() =>
+      expect(within(owner).getByRole("presentation")).toHaveAttribute(
+        "src",
+        "blob:effect-owner-1",
+      ),
+    );
+    expect(previewExport).toHaveBeenCalledWith(
+      { selection: [d.rectangle.id], pageId: d.page.id, edge: 96, priority: "visible" },
+      expect.any(AbortSignal),
+    );
+    act(() => d.engine.select([d.text.id]));
+    owner = screen.getByRole("group", { name: "Appliqué à l’objet sélectionné" });
+    expect(owner.textContent).toBe(d.text.name);
+    await waitFor(() =>
+      expect(within(owner).getByRole("presentation")).toHaveAttribute(
+        "src",
+        "blob:effect-owner-2",
+      ),
+    );
+    expect(URL.revokeObjectURL).toHaveBeenCalledWith("blob:effect-owner-1");
+    act(() => d.engine.select([]));
+    owner = screen.getByRole("group", { name: "Appliqué à toute la composition" });
+    expect(within(owner).queryByRole("presentation")).toBeNull();
+    expect(owner.querySelector(".layer-thumbnail")).toBeNull();
+    expect(URL.revokeObjectURL).toHaveBeenCalledWith("blob:effect-owner-2");
+  },
+);
 
 test("Studio color grades target a selected item, otherwise the whole composition, and undo restores", () => {
   const d = setup();

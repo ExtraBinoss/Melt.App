@@ -157,7 +157,7 @@ test("a background recipe owns its paint once, so resizing its rectangle cannot 
     patches: [{ id, patch: { width: 700, height: 400 } }],
   });
   const page = engine.getSnapshot().project.pages[0]!;
-  expect(backgroundLayer(page)).toBeUndefined();
+  expect(backgroundLayer(page)?.id).toBe(id);
   expect(page.backgroundGradient).toBeUndefined();
   expect(page.background).toBe("#00000000");
   expect(page.layers[0]!.fillGradient).toEqual(recipe.gradient);

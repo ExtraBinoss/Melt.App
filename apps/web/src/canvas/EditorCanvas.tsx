@@ -15,6 +15,9 @@ export type { EditorCanvasProps } from "./session/canvas-contracts";
 import { shapeChoiceAtom } from "../components/assets/selection";
 import { createArtworkLayer } from "./interaction/shapes";
 import { completeDrawing, resizeDrawing } from "./interaction/drawing";
+import { createTextDrawing, commitDrawing } from "./interaction/text-insertion";
+import { textInsertionModeAtom } from "../state/session/text-insertion";
+import { toolAtom } from "../state/session/editor";
 import { createCanvasTransfers } from "./interaction/transfers";
 import { CanvasContextMenu } from "./selection/CanvasContextMenu";
 import { readReleasePoint } from "./interaction/release";
@@ -23,6 +26,7 @@ import { useTranslation } from "react-i18next";
 import {
   createLayer,
   createLayerGeometryIndex,
+  backgroundLayer,
   invertMatrix,
   transformPoint,
   type Layer,
@@ -40,6 +44,7 @@ import {
 } from "./interaction/gestures";
 import { clientToPage, type Point } from "./viewport/view";
 import type { Gesture } from "./interaction/gesture-state";
+import { useCanvasEffectInput } from "./interaction/effect-input";
 import { installTouchNavigation } from "./viewport/touch-navigation";
 import { useViewport } from "./viewport/use-viewport";
 import { ViewportControls } from "./viewport/ViewportControls";
@@ -62,7 +67,7 @@ import { useWorkspaceMode } from "../ui/studio/workspace-mode";
 import { useCanvasHover } from "./selection/use-canvas-hover";
 import { sourcePagePoint } from "./selection/frame-geometry";
 import { canvasHit } from "./selection/hit";
-import { pickCanvasPointer } from "./interaction/pointer-pick";
+import * as pointerPick from "./interaction/pointer-pick";
 import { editablePresentedLayer, pickMotionPlayback } from "./selection/presented-pick";
 import { useMarquee } from "./selection/use-marquee";
 import { useLiveMarquee } from "./selection/use-live-marquee";
@@ -138,11 +143,15 @@ export function EditorCanvas({
   const cancelWand = wand.cancel;
   const pixelSelection = services?.pixelSelection;
   const cancelGesture = useCallback(
-    (capturedPointerId?: number) => {
+    (capturedPointerId?: number, completed = false) => {
       liveMarquee.cancel();
       cancelWand();
-      const pointerId = gesture.current?.pointerId ?? capturedPointerId;
+      const active = gesture.current;
+      const pointerId = active?.pointerId ?? capturedPointerId;
       gesture.current = null;
+      const restore =
+        !completed && active?.mode === "pan" && isTransformAuthoringCurrent(engine, active);
+      if (restore && active) motion.jump(active.view);
       if (pointerId !== undefined && viewport.current?.hasPointerCapture(pointerId))
         viewport.current.releasePointerCapture(pointerId);
       patchesRef.current = [];
@@ -151,8 +160,9 @@ export function EditorCanvas({
       controller.setGesture([]);
       marquee.clear();
     },
-    [motion, controller, cancelWand, snapFeedback, marquee, liveMarquee],
+    [engine, motion, controller, cancelWand, snapFeedback, marquee, liveMarquee],
   );
+  useCanvasEffectInput(engine, viewport, controller, pageViewSource, cancelGesture);
   useEffect(
     () =>
       viewport.current
@@ -176,20 +186,17 @@ export function EditorCanvas({
   function pagePoint(event: { clientX: number; clientY: number }): Point {
     return sourcePagePoint(controller, viewport.current!, pageViewSource, event);
   }
-  function capture(event: ReactPointerEvent) {
-    viewport.current?.focus({ preventScroll: true });
-    viewport.current?.setPointerCapture(event.pointerId);
-  }
   function beginHandle(event: ReactPointerEvent, layer: Layer, handle: Handle) {
     event.preventDefault();
     event.stopPropagation();
-    capture(event);
+    pointerPick.captureCanvasPointer(viewport.current, event.pointerId);
     const point = pagePoint(event);
     gesture.current = {
       ...captureTransformAuthoring(engine),
       presentation: controller.read().page,
       pointerId: event.pointerId,
       mode: "resize",
+      backgroundLayerId: studio ? backgroundLayer(controller.read().page)?.id : undefined,
       from: point,
       current: point,
       client: { x: event.clientX, y: event.clientY },
@@ -216,7 +223,7 @@ export function EditorCanvas({
       return;
     }
     event.preventDefault();
-    capture(event);
+    pointerPick.captureCanvasPointer(viewport.current, event.pointerId);
     const point = pagePoint(event);
     const base = {
       origin: captureGestureOrigin(engine),
@@ -228,7 +235,7 @@ export function EditorCanvas({
       view: viewRef.current,
       layers: [] as Layer[],
     };
-    if (event.button !== 2 && (tool === "hand" || space || event.button === 1)) {
+    if (pointerPick.canvasPointerPans(event.button, tool, space, studio)) {
       gesture.current = { ...base, mode: "pan" };
       return;
     }
@@ -274,15 +281,11 @@ export function EditorCanvas({
         tool === "shape"
           ? createArtworkLayer(store.get(shapeChoiceAtom), point)
           : tool === "text"
-            ? createLayer("text", {
-                x: point.x,
-                y: point.y,
-                width: 1,
-                height: 1,
-                text: t("newText"),
-                fontSize: 48,
-                fill: "#202024",
-              })
+            ? createTextDrawing(
+                point,
+                t("newText"),
+                store.get(textInsertionModeAtom) ?? (studio ? "3d" : "2d"),
+              )
             : createLayer(tool, {
                 x: point.x,
                 y: point.y,
@@ -296,7 +299,7 @@ export function EditorCanvas({
       return;
     }
     const currentPage = controller.read().page;
-    const picked = pickCanvasPointer(engine, controller, point, tool, additive, studio),
+    const picked = pointerPick.pickCanvasPointer(engine, controller, point, tool, additive, studio),
       hit = picked?.layer;
     if (tool === "wand" || tool === "segment") {
       if (hit?.kind === "image") {
@@ -418,7 +421,7 @@ export function EditorCanvas({
       liveMarquee.commit();
     }
     const commands = transformAuthoringCommands(engine, active, patchesRef.current);
-    cancelGesture();
+    cancelGesture(undefined, true);
     try {
       if (active.mode === "move" || active.mode === "resize") {
         if (Math.hypot(event.clientX - active.client.x, event.clientY - active.client.y) > 1)
@@ -430,8 +433,8 @@ export function EditorCanvas({
             : active.shape,
           Math.hypot(event.clientX - active.client.x, event.clientY - active.client.y) > 3,
         );
-        engine.execute({ type: "addLayers", layers: [shape] });
-        engine.select([shape.id]);
+        commitDrawing(engine, shape);
+        if (shape.kind === "text") store.set(toolAtom, "pointer");
       }
     } catch (error) {
       onError?.(error instanceof Error ? error.message : String(error));
@@ -464,6 +467,7 @@ export function EditorCanvas({
       <div
         className="editor-canvas"
         data-testid="editor-canvas"
+        data-effect-input-surface
         data-canvas-tool={tool}
         data-navigation-held={space || undefined}
         aria-label={t("canvas")}

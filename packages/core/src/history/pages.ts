@@ -1,6 +1,7 @@
 import type { HistoryHandlers, HistoryContext } from "./collector";
 import { watchFields } from "./collector";
 import { captureScene } from "./scene";
+import { captureEffects } from "./effects";
 import type { CompositionHistoryProperty } from "./model";
 const fields: readonly CompositionHistoryProperty[] = [
   "name",
@@ -49,7 +50,8 @@ export const updatePage: HistoryHandlers["updatePage"] = (context, command) => {
       );
     watchFields(context, owner, paintFields, () => page, { ...page, ...command.patch });
   }
-  if (Object.hasOwn(command.patch, "effects")) context.history.action("geometry", owner);
+  if (Object.hasOwn(command.patch, "effects"))
+    captureEffects({ ...context, page }, undefined, command.patch.effects ?? []);
   if (Object.hasOwn(command.patch, "spatial"))
     captureScene({ ...context, page }, () => page.spatial, command.patch.spatial);
   if (Object.hasOwn(command.patch, "guides"))

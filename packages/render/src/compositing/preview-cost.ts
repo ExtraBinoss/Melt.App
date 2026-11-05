@@ -1,6 +1,7 @@
 import { hasEffectTreatment } from "../effects/shared/active";
 import {
   ASCII_DEFAULT_CHARACTERS,
+  backgroundLayer,
   createLayerGeometryIndex,
   effectAssetIds,
   getEffectDefinition,
@@ -41,10 +42,14 @@ export function estimatePreviewCost(
   scale: number,
   assets: Record<string, Asset> = {},
   vectorAntialias = false,
+  viewport?: Bounds,
 ): PreviewCost {
   if (!Number.isFinite(scale) || scale <= 0) throw new RangeError("Invalid preview density.");
+  const rootWidth = viewport?.width ?? page.width,
+    rootHeight = viewport?.height ?? page.height;
+  const backgroundId = backgroundLayer(page, Boolean(viewport))?.id;
   const geometry = createLayerGeometryIndex(page),
-    spatialExtent = spatialPreviewExtents(page),
+    spatialExtent = spatialPreviewExtents(page, viewport),
     seen = new Set<string>(),
     originals = new Set<string>();
   let originalBytes = 0,
@@ -82,7 +87,7 @@ export function estimatePreviewCost(
     if (list.some((l) => l.blendMode !== "normal")) target(w, h, fixed);
     const bounds = window?.bounds ?? { x: 0, y: 0, width, height };
     for (const l of list) {
-      if (isInstancedPrimitive(l)) {
+      if (isInstancedPrimitive(l) && l.id !== backgroundId) {
         primitiveCount++;
         continue;
       }
@@ -90,8 +95,9 @@ export function estimatePreviewCost(
     }
   }
   function layer(l: Layer, density: number, fixed: boolean, parent?: Bounds) {
+    const continued = l.id === backgroundId;
     const reference = l.effects.some(hasEffectTreatment) || !!l.mask?.enabled || !!l.clipping;
-    if (reference) {
+    if (reference && !continued) {
       density = 1;
       fixed = true;
     }
@@ -99,8 +105,10 @@ export function estimatePreviewCost(
     const key = `${l.id}:${density}:${window?.key ?? "full"}:${vectorAntialias && !fixed}`;
     if (seen.has(key)) return;
     seen.add(key);
-    let w = rasterExtent(l.width, density),
-      h = rasterExtent(l.height, density);
+    const width = continued ? rootWidth : l.width,
+      height = continued ? rootHeight : l.height;
+    let w = rasterExtent(width, density),
+      h = rasterExtent(height, density);
     if (l.kind === "group") children(l.id, l.width, l.height, density, fixed, window);
     else if (l.spatial?.enabled) {
       const extent = spatialExtent(l);
@@ -126,9 +134,9 @@ export function estimatePreviewCost(
     if (effects.length) {
       const footprint = effectFootprint(effects);
       const expanded = footprint.left || footprint.right || footprint.top || footprint.bottom;
-      w = rasterExtent(l.width + footprint.left + footprint.right, density);
-      h = rasterExtent(l.height + footprint.top + footprint.bottom, density);
-      if (expanded || l.kind === "group" || l.kind === "text" || l.kind === "vector")
+      w = rasterExtent(width + footprint.left + footprint.right, density);
+      h = rasterExtent(height + footprint.top + footprint.bottom, density);
+      if (expanded || continued || l.kind === "group" || l.kind === "text" || l.kind === "vector")
         target(w, h, fixed);
       target(w, h, fixed);
       const stages = effects.reduce((n, effect) => n + effectStages(effect).length, 0);
@@ -158,12 +166,27 @@ export function estimatePreviewCost(
       const base = geometry.byId.get(l.clipping.layerId);
       if (base?.visible && base.opacity > 0) layer(base, density, fixed);
     }
-    if (reference) target(w, h, true, true);
+    if (reference) target(w, h, fixed, true);
   }
-  children(null, page.width, page.height, scale, false);
-  target(rasterExtent(page.width, scale), rasterExtent(page.height, scale), false);
+  children(
+    null,
+    rootWidth,
+    rootHeight,
+    scale,
+    false,
+    viewport
+      ? {
+          bounds: viewport,
+          pixelWidth: rasterExtent(rootWidth, scale),
+          pixelHeight: rasterExtent(rootHeight, scale),
+          key: "display",
+          empty: false,
+        }
+      : undefined,
+  );
+  target(rasterExtent(rootWidth, scale), rasterExtent(rootHeight, scale), false);
   // A front/back pair keeps the visible texture intact until its successor is ready.
-  target(rasterExtent(page.width, scale), rasterExtent(page.height, scale), false);
+  target(rasterExtent(rootWidth, scale), rasterExtent(rootHeight, scale), false);
   if (primitiveCount)
     fixedBytes +=
       BASE_GEOMETRY_BYTES +
@@ -174,11 +197,23 @@ export function estimatePreviewCost(
   if (page.effects?.length) {
     const effects = page.effects.filter(hasEffectTreatment);
     if (effects.length) {
-      const w = rasterExtent(page.width, scale),
-        h = rasterExtent(page.height, scale);
+      const w = rasterExtent(rootWidth, scale),
+        h = rasterExtent(rootHeight, scale);
       // Final artboard roles: straight input, effect output and premultiplied result.
       // Unlike source-local effects, this stack is clipped to the artboard gate.
       for (let index = 0; index < 3; index++) target(w, h, false);
+      if (page.motion?.mode === "motion") {
+        const snapshots = effects
+          .filter(
+            (effect) =>
+              effect.type === "trail" && resolveEffectSettings(effect).mode === "temporal",
+          )
+          .reduce((count, effect) => count + Number(resolveEffectSettings(effect).echoCount), 0);
+        if (snapshots) {
+          fixedBytes += 64 * 1024 * 1024;
+          scaledBytes += w * h * 8 * Math.min(32, snapshots);
+        }
+      }
       const blocks = effects.map(effectStages);
       const stages = blocks.reduce((count, block) => count + block.length, 0);
       const count =
@@ -241,7 +276,7 @@ export function estimatePreviewCost(
         layer.effects.some(hasEffectTreatment) || layer.mask?.enabled || layer.clipping ? 1 : scale,
       ),
     );
-    const depthBytes = rasterExtent(page.width, density) * rasterExtent(page.height, density) * 8;
+    const depthBytes = rasterExtent(rootWidth, density) * rasterExtent(rootHeight, density) * 8;
     if (density !== scale) fixedBytes += depthBytes;
     else scaledBytes += depthBytes;
   }

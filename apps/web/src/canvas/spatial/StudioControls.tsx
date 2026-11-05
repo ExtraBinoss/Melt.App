@@ -1,9 +1,10 @@
+import { installSpatialSnapping } from "./snapping/controls";
 import { useEffect, useMemo, useRef } from "react";
 import { useStore } from "jotai";
 import { useFrame, useThree } from "@react-three/fiber";
 import { Group, MathUtils, Scene, Vector3, type WebGPURenderer } from "three/webgpu";
 import { TransformControls } from "three/addons/controls/TransformControls.js";
-import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { StudioOrbit } from "./StudioOrbit";
 import {
   createSpatialCamera,
   updateCompositionCamera,
@@ -24,6 +25,10 @@ import { canvasSpatialSource } from "../render/plane-resources";
 import { canvasHit } from "../selection/hit";
 import { clickSelection } from "../interaction/gestures";
 import { SpatialGesture } from "./gesture";
+import { wheelZoomFactor } from "../viewport/view";
+import { registerCameraNavigation } from "../viewport/camera-navigation";
+import { getStudioViewport } from "../../ui/studio/framing/viewport";
+import { applyStudioCameraWindow } from "./display-camera";
 
 interface Props {
   engine: EnginePort;
@@ -63,23 +68,51 @@ export default function StudioControls({ engine, controller, target }: Props) {
       page.width / page.height,
     );
     updateCompositionCamera(camera, page, renderer.coordinateSystem);
-    const transform = new TransformControls(camera, canvas),
-      orbit = new OrbitControls(camera, surface);
+    const displayCamera = camera.clone();
+    const windowPort = getStudioViewport(engine);
+    const displayRegion = () => {
+      const frame = controller.read(),
+        view = windowPort.read();
+      return view?.pageId === frame.page.id && view.projectId === engine.getSnapshot().project.id
+        ? view.displayRegion
+        : { x: 0, y: 0, width: frame.page.width, height: frame.page.height };
+    };
+    const presentCamera = () => {
+      updateCompositionCamera(displayCamera, controller.read().page, renderer.coordinateSystem);
+      applyStudioCameraWindow(displayCamera, controller.read().page, displayRegion());
+    };
+    const transform = new TransformControls(displayCamera, canvas);
     transform.setSize(0.72);
     transform.attach(proxy);
     transform.enabled = false;
     helper.add(anchor, transform.getHelper());
-    orbit.enableDamping = false;
-    orbit.enablePan = false;
-    orbit.enableZoom = false;
-    orbit.minDistance = 0.2;
-    orbit.maxDistance = 100;
-    orbit.minPolarAngle = 0.002;
-    orbit.maxPolarAngle = Math.PI - 0.002;
-    orbit.enabled = false;
     const hover = createTimelineHoverSource(engine);
     const contours = new Map<string, SpatialSelectionContour>();
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const diagnostic = new URLSearchParams(location.search).has("profile3d");
+    const orbit = new StudioOrbit(camera, surface, {
+      begin: () => gesture.beginOrbit(),
+      preview: () => {
+        gesture.camera(camera);
+        invalidate();
+      },
+      commit: () => {
+        gesture.commit();
+        invalidate();
+      },
+      cancel: () => {
+        gesture.cancel();
+        invalidate();
+      },
+      current: () => gesture.active,
+      reducedMotion: () => reducedMotion.matches,
+    });
+    let interruptedPointer: number | null = null;
+    const interruptPointer = (event: PointerEvent) => {
+      interruptedPointer = orbit.coasting ? event.pointerId : null;
+      if (orbit.coasting) orbit.finish();
+    };
+
     let hoverId: string | null = null,
       hoverStart = 0;
     let pointer: {
@@ -116,12 +149,13 @@ export default function StudioControls({ engine, controller, target }: Props) {
       !controller.read().playback;
     const pick = (event: PointerEvent) => {
       const current = source(),
-        box = canvas.getBoundingClientRect();
+        box = canvas.getBoundingClientRect(),
+        region = displayRegion();
       return canvasHit(
         current.frame.page,
         {
-          x: ((event.clientX - box.left) / box.width) * current.frame.page.width,
-          y: ((event.clientY - box.top) / box.height) * current.frame.page.height,
+          x: region.x + ((event.clientX - box.left) / box.width) * region.width,
+          y: region.y + ((event.clientY - box.top) / box.height) * region.height,
         },
         true,
         current.index,
@@ -129,12 +163,30 @@ export default function StudioControls({ engine, controller, target }: Props) {
       );
     };
     const draw = () => {
+      if (!gesture.active)
+        updateCompositionCamera(camera, controller.read().page, renderer.coordinateSystem);
+      if (diagnostic) {
+        const p = camera.position;
+        canvas.dataset.spatialOrbitState = orbit.state;
+        canvas.dataset.spatialGizmo = JSON.stringify({
+          axis: transform.axis,
+          dragging: transform.dragging,
+          mode: transform.mode,
+        });
+        canvas.dataset.spatialCamera = JSON.stringify({
+          yaw: Math.atan2(p.x, p.z),
+          pitch: Math.asin(p.y / p.length()),
+          distance: p.length() / camera.zoom,
+        });
+      }
       if (!ready()) return;
-      // Use the post-transform CSS size, independently of framebuffer density.
+      // Read the actual post-transform CSS size once for every selected silhouette.
+      // Framebuffer density can differ while a zoom is settling.
       const contourSize = canvas.getBoundingClientRect();
       const current = source();
       if (!gesture.active)
         updateCompositionCamera(camera, current.frame.page, renderer.coordinateSystem);
+      presentCamera();
       const layer = current.layer;
       transform.enabled = Boolean(layer);
       transform.getHelper().visible = Boolean(layer);
@@ -146,8 +198,8 @@ export default function StudioControls({ engine, controller, target }: Props) {
         if (!transform.dragging) updateSpatialObject(proxy, layer.spatial!);
         const tool = targetRef.current?.tool ?? "translate";
         if (tool !== transform.mode) transform.setMode(tool);
-        if (new URLSearchParams(location.search).has("profile3d")) {
-          const point = proxy.getWorldPosition(new Vector3()).project(camera);
+        if (diagnostic) {
+          const point = proxy.getWorldPosition(new Vector3()).project(displayCamera);
           canvas.dataset.spatialProjection = camera.type;
           canvas.dataset.spatialCenter = JSON.stringify({
             x: (point.x + 1) / 2,
@@ -194,47 +246,68 @@ export default function StudioControls({ engine, controller, target }: Props) {
           contour = new SpatialSelectionContour(resource);
           contours.set(id, contour);
         }
-        const opacity =
-          animateHover
-            ? 0.65 + 0.3 * (0.5 + 0.5 * Math.cos((elapsed * Math.PI) / 350))
-            : 0.9;
-        contour.render(renderer, resource, camera, opacity, contourSize);
+        const opacity = animateHover
+          ? 0.65 + 0.3 * (0.5 + 0.5 * Math.cos((elapsed * Math.PI) / 350))
+          : 0.9;
+        contour.render(renderer, resource, displayCamera, opacity, contourSize);
       }
       if (pulsing) invalidate();
-      if (layer) renderer.render(helper, camera);
+      if (layer) renderer.render(helper, displayCamera);
     };
     active.current = { draw };
     const change = () => {
       invalidate();
     };
+    const snapping = installSpatialSnapping({
+      engine,
+      controller,
+      store,
+      canvas,
+      camera: displayCamera,
+      proxy,
+      transform,
+      preview: () => {
+        gesture.object(proxy);
+        invalidate();
+      },
+    });
     const objectChange = () => {
+      snapping.change();
       gesture.object(proxy);
       invalidate();
     };
     const down = () => {
       const layer = source().layer;
-      if (layer) gesture.begin(layer.id, targetRef.current?.tool ?? "translate");
+      if (layer) {
+        gesture.begin(layer.id, targetRef.current?.tool ?? "translate");
+        snapping.begin(layer.id);
+      }
       orbit.enabled = false;
     };
     const up = () => {
+      snapping.clear();
       gesture.commit();
-      invalidate();
-    };
-    const orbitStart = () => gesture.beginOrbit();
-    const orbitChange = () => {
-      if (gesture.active) gesture.camera(camera);
       invalidate();
     };
     transform.addEventListener("change", change);
     transform.addEventListener("objectChange", objectChange);
     transform.addEventListener("mouseDown", down);
     transform.addEventListener("mouseUp", up);
-    orbit.addEventListener("start", orbitStart);
-    orbit.addEventListener("change", orbitChange);
-    orbit.addEventListener("end", up);
     const gate = (event: PointerEvent) => {
+      if (event.pointerType === "touch" && !event.isPrimary) {
+        if (!event.defaultPrevented) {
+          orbit.finish();
+          cancel();
+        }
+        admitted = false;
+        return;
+      }
       admitted =
-        ready() &&
+        (ready() ||
+          (interruptedPointer === event.pointerId &&
+            !controller.read().playback &&
+            canvas.dataset.pageId === controller.read().page.id)) &&
+        !event.defaultPrevented &&
         !(event.target as Element).closest("[data-canvas-control]") &&
         event.button === 0 &&
         viewport?.dataset.canvasTool === "pointer" &&
@@ -244,6 +317,7 @@ export default function StudioControls({ engine, controller, target }: Props) {
         return;
       }
       const current = source();
+      presentCamera();
       transform.enabled = Boolean(current.layer);
       const box = canvas.getBoundingClientRect();
       if (transform.enabled)
@@ -293,11 +367,10 @@ export default function StudioControls({ engine, controller, target }: Props) {
       admitted = false;
     };
     const cancel = () => {
-      gesture.cancel();
+      snapping.clear();
+      orbit.cancel();
       transform.reset();
       transform.dragging = false;
-      orbit.disconnect();
-      orbit.connect(surface);
       if (pointer && surface.hasPointerCapture(pointer.id))
         surface.releasePointerCapture(pointer.id);
       pointer = null;
@@ -329,6 +402,43 @@ export default function StudioControls({ engine, controller, target }: Props) {
         transform.setScaleSnap(null);
       }
     };
+    const interruptKey = (event: KeyboardEvent) => {
+      if (!orbit.coasting) return;
+      if (event.key === "Escape") {
+        event.preventDefault();
+        event.stopPropagation();
+        cancel();
+      } else orbit.finish();
+    };
+    const visibility = () => {
+      if (document.hidden) cancel();
+    };
+    const wheel = (event: WheelEvent) => {
+      if (
+        event.deltaY === 0 ||
+        controller.read().playback ||
+        (event.target as Element).closest("[data-canvas-control]") ||
+        canvas.dataset.pageId !== controller.read().page.id
+      )
+        return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      orbit.zoomWheel(wheelZoomFactor(event.deltaY, event.deltaMode, surface.clientHeight));
+    };
+    const stopCameraNavigation = registerCameraNavigation(surface, {
+      begin: () => {
+        orbit.finish();
+        cancel();
+        orbit.beginZoom();
+      },
+      zoomBy: (factor) => orbit.zoomBy(factor),
+      end: () => orbit.endZoom(),
+      cancel,
+    });
+    surface.addEventListener("wheel", wheel, { capture: true, passive: false });
+    document.addEventListener("pointerdown", interruptPointer, true);
+    document.addEventListener("keydown", interruptKey, true);
+    document.addEventListener("visibilitychange", visibility);
     canvas.setAttribute("tabindex", "0");
     surface.addEventListener("pointerdown", gate, true);
     surface.addEventListener("pointerdown", block);
@@ -339,21 +449,33 @@ export default function StudioControls({ engine, controller, target }: Props) {
     window.addEventListener("blur", cancel);
     const stop = controller.subscribe(() => {
       gesture.invalidate();
+      orbit.invalidate();
       invalidate();
     });
     const stopEngine = engine.subscribe(() => {
       gesture.invalidate();
+      orbit.invalidate();
       invalidate();
     });
     const stopHover = hover.subscribe(invalidate);
+    const stopWindow = windowPort.subscribe(invalidate);
     invalidate();
     return () => {
       active.current = null;
       stop();
       stopEngine();
       stopHover();
+      stopWindow();
+      stopCameraNavigation();
       cancel();
+      surface.removeEventListener("wheel", wheel, true);
+      document.removeEventListener("pointerdown", interruptPointer, true);
+      document.removeEventListener("keydown", interruptKey, true);
+      document.removeEventListener("visibilitychange", visibility);
       canvas.removeAttribute("tabindex");
+      delete canvas.dataset.spatialOrbitState;
+      delete canvas.dataset.spatialGizmo;
+      delete canvas.dataset.spatialCamera;
       delete canvas.dataset.spatialCenter;
       delete canvas.dataset.spatialProjection;
       surface.removeEventListener("pointerdown", gate, true);
@@ -363,13 +485,14 @@ export default function StudioControls({ engine, controller, target }: Props) {
       viewport?.removeEventListener("keydown", key, true);
       viewport?.removeEventListener("keyup", keyUp, true);
       window.removeEventListener("blur", cancel);
+      snapping.dispose();
       transform.dispose();
       orbit.dispose();
       for (const contour of contours.values()) contour.dispose();
       contours.clear();
       helper.clear();
     };
-  }, [controller, engine, gesture, invalidate, renderer]);
+  }, [controller, engine, gesture, invalidate, renderer, store]);
   useFrame(() => {
     renderer.render(baseScene, baseCamera);
     const autoClear = renderer.autoClear;

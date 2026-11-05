@@ -31,6 +31,7 @@ export const SPATIAL_LIBRARY_MODELS: readonly SpatialLibraryEntry[] = SPATIAL_MO
     id: model.id,
     kind: "model",
     model,
+    originalMaterials: true,
     nameKey: model.nameKey,
     index: index + SPATIAL_LIBRARY_SHAPES.length,
   }),

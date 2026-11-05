@@ -37,6 +37,20 @@ supplies the canvas CSS size once per draw; the contour quad includes the stroke
 margin and guards sampling beyond the used rectangle. No extra GPU target or
 pixel readback is required.
 
+Interactive previews keep native half-float/MSAA storage in 64-pixel buckets,
+with one bucket of shrink hysteresis. The viewport and source crop remain exact;
+the output pass samples only that used rectangle, so effect dimensions, seeds
+and exported pixels do not depend on storage capacity. Cache admission precedes
+resize, and insufficient padding budget falls back to exact storage. Exact jobs
+always use tight storage. Camera-only samples retain depth/reflection material
+graphs; appearance, geometry, pose, lighting and native shader changes invalidate
+their synchronization certificates.
+
+Studio coalesces pointer camera drafts once per animation frame and bounds wheel
+lookahead around the displayed pose, discarding the old target on reversal.
+Pinch ratios retain their full authored travel. Canvas hover picking is suspended
+during drafts and resumes from the retained pointer on return to canonical state.
+
 Separate native objects share opaque depth and cast shadows onto one another.
 Classic paint, blending, post-effects and masks retain their document ordering.
 Fractional layer opacity does not write an opaque shared-depth holdout. A faded

@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { createLayer, createPage, createProject } from "@musart/core";
+import { createEffect, createLayer, createPage, createProject } from "@musart/core";
 import { projectLayerWorkspace } from "../../../../src/components/layers/tree/project";
 
 test("projects every artboard as a stable root with independent collapsed children", () => {
@@ -54,4 +54,30 @@ test("large projects retain one flat virtualizable projection instead of per-art
     entries = projectLayerWorkspace(createProject({ pages }), new Set(), new Set(), new Set());
   expect(entries).toHaveLength(10002);
   expect(entries.filter((entry) => entry.kind === "artboard")).toHaveLength(2);
+});
+
+test("composition effects are virtual tree attachments with real IDs above artwork, never fabricated layers", () => {
+  const effect = createEffect("grain", { id: "global-grain" });
+  const page = createPage({ id: "canvas", effects: [effect], layers: [createLayer("rectangle")] });
+  const project = createProject({ pages: [page] });
+  const entries = projectLayerWorkspace(project, new Set(), new Set(), new Set());
+  expect(entries.map((entry) => entry.kind)).toEqual([
+    "artboard",
+    "composition-effects",
+    "composition-effect",
+    "layer",
+  ]);
+  expect(entries[2]).toMatchObject({ page, effectId: effect.id });
+  expect(entries[2]).not.toHaveProperty("layer");
+  expect(
+    projectLayerWorkspace(
+      project,
+      new Set(),
+      new Set(),
+      new Set(),
+      undefined,
+      new Set([page.id]),
+    ).map((entry) => entry.kind),
+  ).toEqual(["artboard", "composition-effects", "layer"]);
+  expect(page.layers).toHaveLength(1);
 });

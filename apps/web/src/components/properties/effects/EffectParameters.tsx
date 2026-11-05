@@ -1,3 +1,5 @@
+import { EffectPositionPad } from "./EffectPositionPad";
+import "./sdk/messages";
 import { LiquifyControls } from "./LiquifyControls";
 import { EffectImageInputs } from "./inputs/EffectImageInputs";
 import "./gradient-messages";
@@ -7,6 +9,7 @@ import "./parameter-layout.css";
 import { memo, useCallback, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { RotateCcw } from "lucide-react";
 import {
+  EFFECT_DOMAIN_KEYS,
   getEffectDefinition,
   getEffectParameter,
   isEffectParameterVisible,
@@ -15,12 +18,15 @@ import {
   type Effect,
   type EffectParameter,
   type EnginePort,
-  type MotionPropertyTarget,
+  type EffectMotionProperty,
 } from "@musart/core";
 import { useTranslation } from "react-i18next";
-import { MotionNumberInput as NumberInput } from "../motion/MotionNumberInput";
-import { MotionField } from "../motion/MotionField";
-import { MotionValueField } from "../motion/MotionValueField";
+import {
+  EffectMotionNumberInput as NumberInput,
+  EffectMotionField as MotionField,
+  EffectMotionValueField as MotionValueField,
+  type EffectFieldTarget,
+} from "./effect-motion/fields";
 import { createMotionTransport } from "../../../services/motion/transport";
 import { motionTimeChanges } from "../../../state/session/motion-edit";
 import { SelectField } from "../../shared/SelectField";
@@ -43,6 +49,7 @@ export function EffectParameters({
   deferOffscreen = false,
   parameterKeys,
   resetDefaults,
+  hideActions = false,
 }: {
   effect: Effect;
   engine?: EnginePort;
@@ -56,6 +63,7 @@ export function EffectParameters({
   parameterKeys?: readonly string[];
   /** Specialized surfaces can retain structural settings such as a hard shadow's zero blur. */
   resetDefaults?: Partial<Pick<Effect, "amount" | "settings">>;
+  hideActions?: boolean;
 }) {
   const { t } = useTranslation();
   const definition = getEffectDefinition(effect.type);
@@ -67,20 +75,24 @@ export function EffectParameters({
     layerId ??
     ownerPage?.layers.find((layer) => layer.effects.some((item) => item.id === effect.id))?.id;
   const transport = engine ? createMotionTransport(engine) : null;
-  const displayed = useCallback(
-    () =>
-      transport
-        ?.readFrame()
-        ?.layers.find((layer) => layer.id === ownLayerId)
-        ?.effects.find((item) => item.id === effect.id) ?? effect,
-    [transport, ownLayerId, effect],
-  );
+  const displayed = useCallback(() => {
+    const frame = transport?.readFrame();
+    return (
+      (ownLayerId
+        ? frame?.layers
+            .find((layer) => layer.id === ownLayerId)
+            ?.effects.find((item) => item.id === effect.id)
+        : frame?.effects?.find((item) => item.id === effect.id)) ?? effect
+    );
+  }, [transport, ownLayerId, effect]);
   const shape = useCallback(
     () =>
       definition.parameters
         .filter(
           (parameter) =>
-            (!parameterKeys || parameterKeys.includes(parameter.key)) &&
+            (parameterKeys
+              ? parameterKeys.includes(parameter.key)
+              : !EFFECT_DOMAIN_KEYS.includes(parameter.key)) &&
             isEffectParameterVisible(displayed(), parameter),
         )
         .map((parameter) => `${parameter.scope}:${parameter.key}`)
@@ -103,7 +115,9 @@ export function EffectParameters({
   const feedback = useResetFeedback(root);
   const parameters = definition.parameters.filter(
     (parameter) =>
-      (!parameterKeys || parameterKeys.includes(parameter.key)) &&
+      (parameterKeys
+        ? parameterKeys.includes(parameter.key)
+        : !EFFECT_DOMAIN_KEYS.includes(parameter.key)) &&
       isEffectParameterVisible(displayed(), parameter),
   );
   const window = useParameterWindow(list, owner, parameters.length, deferOffscreen);
@@ -134,63 +148,62 @@ export function EffectParameters({
         <LiquifyControls engine={engine} layerId={ownLayerId} effect={effect} onChange={onChange} />
       )}
       <EffectImageInputs engine={engine} layerId={ownLayerId} effect={effect} disabled={disabled} />
-      <div className="effect-controls-actions">
-        <IconButton
-          label={t("effectControls:resetAll")}
-          disabled={disabled}
-          data-effect-reset=""
-          onPointerDown={(event) => {
-            if (event.button === 0) event.preventDefault();
-          }}
-          onClick={() => {
-            if (engine) freezeEffectPreviews(engine, false);
-            onCancel?.();
-            setOpenColorKey(null);
-            setResetVersion((version) => version + 1);
-            const changed =
-              definition.parameters.some(
-                (parameter) =>
-                  getEffectParameter(displayed(), parameter) !==
-                  getEffectParameter(defaults, parameter),
-              ) ||
-              Object.keys(displayed().inputs ?? {}).length > 0 ||
-              (displayed().opacity ?? 1) !== 1 ||
-              (displayed().blendMode ?? "normal") !== "normal" ||
-              displayed().composite !== undefined;
-            if (changed)
-              onChange(
-                {
-                  ...definition.defaults,
-                  amount: defaults.amount,
-                  inputs: undefined,
-                  enabled: displayed().enabled,
-                  settings: defaults.settings ? { ...defaults.settings } : undefined,
-                  time: defaults.time,
-                  opacity: 1,
-                  blendMode: "normal",
-                  composite: undefined,
-                },
-                false,
-              );
-            if (!matchMedia("(prefers-reduced-motion: reduce)").matches) feedback();
-          }}
-        >
-          <RotateCcw size={14} aria-hidden="true" />
-        </IconButton>
-      </div>
-      {engine &&
-        getEffectDefinition(effect.type).parameters.some(
-          (p) => p.key === "time" && p.scope !== "settings",
-        ) && (
-          <EffectPlayback
-            engine={engine}
-            effect={effect}
+      {!hideActions && (
+        <div className="effect-controls-actions">
+          <IconButton
+            label={t("effectControls:resetAll")}
             disabled={disabled}
-            onChange={onChange}
-            onStart={onStart}
-            onCancel={onCancel}
-          />
-        )}
+            data-effect-reset=""
+            onPointerDown={(event) => {
+              if (event.button === 0) event.preventDefault();
+            }}
+            onClick={() => {
+              if (engine) freezeEffectPreviews(engine, false);
+              onCancel?.();
+              setOpenColorKey(null);
+              setResetVersion((version) => version + 1);
+              const changed =
+                definition.parameters.some(
+                  (parameter) =>
+                    getEffectParameter(displayed(), parameter) !==
+                    getEffectParameter(defaults, parameter),
+                ) ||
+                Object.keys(displayed().inputs ?? {}).length > 0 ||
+                (displayed().opacity ?? 1) !== 1 ||
+                (displayed().blendMode ?? "normal") !== "normal" ||
+                displayed().composite !== undefined;
+              if (changed)
+                onChange(
+                  {
+                    ...definition.defaults,
+                    amount: defaults.amount,
+                    inputs: undefined,
+                    enabled: displayed().enabled,
+                    settings: defaults.settings ? { ...defaults.settings } : undefined,
+                    time: defaults.time,
+                    opacity: 1,
+                    blendMode: "normal",
+                    composite: undefined,
+                  },
+                  false,
+                );
+              if (!matchMedia("(prefers-reduced-motion: reduce)").matches) feedback();
+            }}
+          >
+            <RotateCcw size={14} aria-hidden="true" />
+          </IconButton>
+        </div>
+      )}
+      {!hideActions && engine && !definition.retired && definition.source !== "geometry" && (
+        <EffectPlayback
+          engine={engine}
+          effect={effect}
+          disabled={disabled}
+          onChange={onChange}
+          onStart={onStart}
+          onCancel={onCancel}
+        />
+      )}
       <div
         ref={list}
         className={`effect-parameter-list ${window.virtual ? "is-virtual" : ""}`}
@@ -220,6 +233,7 @@ export function EffectParameters({
               <ParameterField
                 engine={engine}
                 layerId={ownLayerId}
+                compositionId={ownerPage?.id}
                 effect={effect}
                 parameter={parameter}
                 defaults={defaults}
@@ -235,6 +249,31 @@ export function EffectParameters({
           );
         })}
       </div>
+      {!parameterKeys && definition.sdk?.placement && (
+        <details className="effect-placement">
+          <summary>{t("effectDomain:title")}</summary>
+          <EffectPositionPad
+            effect={effect}
+            engine={engine}
+            layerId={ownLayerId}
+            disabled={disabled}
+            onChange={onChange}
+            onStart={onStart}
+            onCancel={onCancel}
+          />
+          <EffectParameters
+            effect={effect}
+            engine={engine}
+            layerId={ownLayerId}
+            disabled={disabled}
+            onChange={onChange}
+            onStart={onStart}
+            onCancel={onCancel}
+            parameterKeys={EFFECT_DOMAIN_KEYS}
+            hideActions
+          />
+        </details>
+      )}
     </div>
   );
 }
@@ -244,6 +283,7 @@ const ParameterField = memo(function ParameterField({
   effect,
   engine,
   layerId,
+  compositionId,
   parameter,
   defaults,
   disabled,
@@ -257,6 +297,7 @@ const ParameterField = memo(function ParameterField({
   effect: Effect;
   engine?: EnginePort;
   layerId?: string;
+  compositionId?: string;
   parameter: EffectParameter;
   defaults: Effect;
   disabled: boolean;
@@ -269,7 +310,7 @@ const ParameterField = memo(function ParameterField({
 }) {
   const label = t(parameter.labelKey);
   const value = getEffectParameter(effect, parameter);
-  const target: MotionPropertyTarget | undefined = layerId
+  const target: EffectFieldTarget | undefined = layerId
     ? parameter.scope === "settings"
       ? {
           kind: "effectSetting",
@@ -281,9 +322,23 @@ const ParameterField = memo(function ParameterField({
           kind: "effect",
           layerId,
           effectId: effect.id,
-          property: parameter.key as Extract<MotionPropertyTarget, { kind: "effect" }>["property"],
+          property: parameter.key as EffectMotionProperty,
         }
-    : undefined;
+    : compositionId
+      ? parameter.scope === "settings"
+        ? {
+            kind: "compositionEffectSetting",
+            compositionId,
+            effectId: effect.id,
+            property: parameter.key,
+          }
+        : {
+            kind: "compositionEffect",
+            compositionId,
+            effectId: effect.id,
+            property: parameter.key as EffectMotionProperty,
+          }
+      : undefined;
   const change = (next: number | boolean | string, preview = false) =>
     onChange(patchEffectParameter(effect, parameter, next), preview);
   if (parameter.kind === "text")

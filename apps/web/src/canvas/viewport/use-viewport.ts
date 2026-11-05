@@ -14,7 +14,7 @@ import { animatePresentationProgress } from "../../components/shared/motion/pres
 import { createResizeAnchor } from "./resize-anchor";
 import { createViewportMetrics } from "./viewport-metrics";
 import { ViewMotion } from "./motion";
-import { immersiveView } from "./immersive";
+import { immersiveView, constrainStudioView } from "./immersive";
 import { useWorkspaceMode } from "../../ui/studio/workspace-mode";
 import type { ArtboardWorkspace } from "../artboards/layout";
 import {
@@ -62,7 +62,7 @@ function createMotion(
     reduced: () => media.matches,
     constrain: (next) => {
       return immersive.read()
-        ? immersiveView(workspace.read(), metrics.read(), engine.getSnapshot().pageId, next)
+        ? constrainStudioView(workspace.read(), metrics.read(), engine.getSnapshot().pageId, next)
         : constrainView(next, workspace.read(), metrics.read());
     },
   });

@@ -22,6 +22,7 @@ export function spatialLibraryDocument(entry: SpatialLibraryEntry, asset?: Scene
     entry.id,
     "library-object",
   );
+  layer.fill = "#b8bcc4";
   layer.spatial!.castShadow = false;
   layer.spatial!.receiveShadow = false;
   if (asset) {

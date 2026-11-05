@@ -1,0 +1,177 @@
+[
+  {
+    "type": "temperature",
+    "title": "temperature: editorial-portrait (photo)",
+    "source": "editorial-portrait",
+    "scene": "photo",
+    "effect": {
+      "id": "catalog-effect-temperature",
+      "type": "temperature",
+      "enabled": true,
+      "amount": 0.88,
+      "scale": 2,
+      "levels": 2,
+      "color": false,
+      "seed": 42
+    },
+    "placement": "layer"
+  },
+  {
+    "type": "tint",
+    "title": "tint: editorial-portrait (photo)",
+    "source": "editorial-portrait",
+    "scene": "photo",
+    "effect": {
+      "id": "catalog-effect-tint",
+      "type": "tint",
+      "enabled": true,
+      "amount": 0.82,
+      "scale": 2,
+      "levels": 2,
+      "color": false,
+      "seed": 42
+    },
+    "placement": "layer"
+  },
+  {
+    "type": "gamma",
+    "title": "gamma: studio-still-life (photo)",
+    "source": "studio-still-life",
+    "scene": "photo",
+    "effect": {
+      "id": "catalog-effect-gamma",
+      "type": "gamma",
+      "enabled": true,
+      "amount": 0.73,
+      "scale": 2,
+      "levels": 2,
+      "color": false,
+      "seed": 42
+    },
+    "placement": "layer"
+  },
+  {
+    "type": "invert",
+    "title": "invert: neon-city (photo)",
+    "source": "neon-city",
+    "scene": "photo",
+    "effect": {
+      "id": "catalog-effect-invert",
+      "type": "invert",
+      "enabled": true,
+      "amount": 1,
+      "scale": 2,
+      "levels": 2,
+      "color": false,
+      "seed": 42
+    },
+    "placement": "layer"
+  },
+  {
+    "type": "sepia",
+    "title": "sepia: editorial-portrait (photo)",
+    "source": "editorial-portrait",
+    "scene": "photo",
+    "effect": {
+      "id": "catalog-effect-sepia",
+      "type": "sepia",
+      "enabled": true,
+      "amount": 1,
+      "scale": 2,
+      "levels": 2,
+      "color": false,
+      "seed": 42
+    },
+    "placement": "layer"
+  },
+  {
+    "type": "threshold",
+    "title": "threshold: editorial-portrait (photo)",
+    "source": "editorial-portrait",
+    "scene": "photo",
+    "effect": {
+      "id": "catalog-effect-threshold",
+      "type": "threshold",
+      "enabled": true,
+      "amount": 0.52,
+      "scale": 2,
+      "levels": 2,
+      "color": false,
+      "seed": 42
+    },
+    "placement": "layer"
+  },
+  {
+    "type": "posterize",
+    "title": "posterize: alpine-lake (photo)",
+    "source": "alpine-lake",
+    "scene": "photo",
+    "effect": {
+      "id": "catalog-effect-posterize",
+      "type": "posterize",
+      "enabled": true,
+      "amount": 1,
+      "scale": 2,
+      "levels": 4,
+      "color": false,
+      "seed": 42
+    },
+    "placement": "layer"
+  },
+  {
+    "type": "grain",
+    "title": "grain: editorial-portrait (photo)",
+    "source": "editorial-portrait",
+    "scene": "photo",
+    "effect": {
+      "id": "catalog-effect-grain",
+      "type": "grain",
+      "enabled": true,
+      "amount": 0.38,
+      "scale": 2,
+      "levels": 2,
+      "color": false,
+      "seed": 42
+    },
+    "placement": "layer"
+  },
+  {
+    "type": "halftone",
+    "title": "halftone: editorial-portrait (photo)",
+    "source": "editorial-portrait",
+    "scene": "photo",
+    "effect": {
+      "id": "catalog-effect-halftone",
+      "type": "halftone",
+      "enabled": true,
+      "amount": 1,
+      "scale": 5,
+      "levels": 2,
+      "color": true,
+      "seed": 42,
+      "settings": {
+        "pattern": "color-screen",
+        "dotSize": 0.92,
+        "softness": 0.2
+      }
+    },
+    "placement": "layer"
+  },
+  {
+    "type": "vignette",
+    "title": "vignette: editorial-portrait (photo)",
+    "source": "editorial-portrait",
+    "scene": "photo",
+    "effect": {
+      "id": "catalog-effect-vignette",
+      "type": "vignette",
+      "enabled": true,
+      "amount": 0.83,
+      "scale": 2,
+      "levels": 2,
+      "color": false,
+      "seed": 42
+    },
+    "placement": "layer"
+  }
+]

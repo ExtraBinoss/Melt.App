@@ -1,3 +1,4 @@
+import { validateAnimationChannelPoints } from "../../animations/validation-shared";
 import type { Composition } from "../../../document/model";
 import { ensure } from "../../../errors";
 import type { SceneMotionPropertyTarget } from "../model";
@@ -8,6 +9,12 @@ import type {
   SceneMotionAnimationPreset,
 } from "./model";
 export function sceneAnimationOwner(target: SceneMotionPropertyTarget): SceneAnimationOwner {
+  if (target.kind === "compositionEffect" || target.kind === "compositionEffectSetting")
+    return {
+      kind: "compositionEffect",
+      compositionId: target.compositionId,
+      effectId: target.effectId,
+    };
   return target.kind === "light"
     ? { kind: "light", compositionId: target.compositionId, lightId: target.lightId }
     : { kind: target.kind, compositionId: target.compositionId };
@@ -16,7 +23,11 @@ export function sceneAnimationOwnerKey(owner: SceneAnimationOwner): string {
   return JSON.stringify([
     owner.kind,
     owner.compositionId,
-    owner.kind === "light" ? owner.lightId : null,
+    owner.kind === "light"
+      ? owner.lightId
+      : owner.kind === "compositionEffect"
+        ? owner.effectId
+        : null,
   ]);
 }
 export function sceneAnimationTarget(
@@ -24,10 +35,16 @@ export function sceneAnimationTarget(
   target: SceneAnimationTarget,
 ): SceneMotionPropertyTarget {
   ensure(
-    owner.kind === target.kind,
+    owner.kind === target.kind ||
+      (owner.kind === "compositionEffect" && target.kind === "compositionEffectSetting"),
     "INVALID_COMMAND",
     "Animation channel does not match scene owner",
   );
+  if (
+    owner.kind === "compositionEffect" &&
+    (target.kind === "compositionEffect" || target.kind === "compositionEffectSetting")
+  )
+    return { ...owner, ...target };
   if (owner.kind === "light" && target.kind === "light")
     return { ...owner, property: target.property };
   if (owner.kind === "camera" && target.kind === "camera")
@@ -41,14 +58,24 @@ export function canApplySceneMotionAnimationPreset(
   owner: SceneAnimationOwner,
   preset: SceneMotionAnimationPreset,
 ): boolean {
-  return (
-    owner.compositionId === page.id &&
-    preset.effects.length === 0 &&
-    preset.channels.length > 0 &&
-    preset.channels.every(
-      (channel) =>
-        channel.target.kind === owner.kind &&
-        resolveSceneMotionProperty(page, sceneAnimationTarget(owner, channel.target)),
+  if (owner.compositionId !== page.id || preset.effects.length !== 0 || !preset.channels.length)
+    return false;
+  return preset.channels.every((channel) => {
+    if (
+      channel.target.kind !== owner.kind &&
+      !(owner.kind === "compositionEffect" && channel.target.kind === "compositionEffectSetting")
     )
-  );
+      return false;
+    const descriptor = resolveSceneMotionProperty(
+      page,
+      sceneAnimationTarget(owner, channel.target),
+    );
+    if (!descriptor) return false;
+    try {
+      validateAnimationChannelPoints(channel as unknown as Record<string, unknown>, descriptor);
+      return true;
+    } catch {
+      return false;
+    }
+  });
 }

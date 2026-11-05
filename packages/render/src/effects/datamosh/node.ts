@@ -1,3 +1,4 @@
+import { authoredPixelDown, transportUv } from "../shared/coordinates";
 import type { Node } from "three/webgpu";
 import { Fn, clamp, cos, floor, max, mix, mod, sin, uv, vec2, vec3, vec4 } from "three/tsl";
 import { sampleEffect, type EffectNodeContext } from "../shared/context";
@@ -5,8 +6,12 @@ import { noise2d } from "../shared/noise";
 
 /** Native source lookup in Y-down authored document pixels. */
 function read(context: EffectNodeContext, pixel: Node<"vec2">) {
-  const coord = pixel.div(context.controls.logicalResolution);
-  return sampleEffect(context.source, context.controls, vec2(coord.x, coord.y.oneMinus()));
+  const coord = pixel.div(context.controls.contentResolution);
+  return sampleEffect(
+    context.source,
+    context.controls,
+    transportUv(context.controls, vec2(coord.x, coord.y.oneMinus())),
+  );
 }
 
 /** Spatial codec-inspired corruption; no previous frame or decoder state exists. */
@@ -16,7 +21,7 @@ export function datamoshNode(context: EffectNodeContext) {
   const original = sampleEffect(source, controls, uv());
   const processed = Fn(() => {
     const position = uv(),
-      pixel = vec2(position.x, position.y.oneMinus()).mul(controls.logicalResolution).toVar();
+      pixel = authoredPixelDown(controls, position).toVar();
     const phase = mod(floor(controls.time.mul(u.rate!)), 4096).toVar();
     const cell = floor(pixel.div(max(2, u.blockSize!))).toVar();
     const phaseOffset = vec2(phase.mul(37), phase.mul(71)).toVar();

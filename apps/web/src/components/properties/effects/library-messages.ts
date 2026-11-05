@@ -1,3 +1,10 @@
+import depthOfField from "./library/depth-of-field/messages.json";
+import trail from "./library/trail/messages.json";
+import risograph from "./library/risograph/messages.json";
+import oilPaint from "./library/oil-paint/messages.json";
+import blocks from "./library/blocks/messages.json";
+import chromaticAberration from "./library/chromatic-aberration/messages.json";
+import wind from "./library/wind/messages.json";
 import feather from "./library/feather/messages.json";
 import halftone from "./library/halftone/messages.json";
 import liquify from "./library/liquify/messages.json";
@@ -31,6 +38,13 @@ import receipt from "./library/receipt/messages.json";
 import pinkPhosphor from "./library/pink-phosphor/messages.json";
 /** UI resources stay on the web side; the core catalog only contains stable label keys. */
 export const libraryMessages = {
+  "depth-of-field": depthOfField,
+  trail,
+  risograph: risograph,
+  "oil-paint": oilPaint,
+  blocks: blocks,
+  "chromatic-aberration": chromaticAberration,
+  wind: wind,
   feather,
   terminal,
   halftone,

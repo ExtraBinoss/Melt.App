@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { ArrowDown, ArrowUp, Plus, SlidersHorizontal, Sparkles, Trash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import {
@@ -8,9 +8,13 @@ import {
   type Effect,
   type EnginePort,
   type Layer,
+  type Project,
 } from "@musart/core";
+import type { EditorServices } from "../../../state/contracts";
 import { useDocumentSnapshot } from "../../../state/session/use-document-snapshot";
 import { layerSelection } from "../../../components/layers/menu/selection";
+import { LayerThumbnail } from "../../../components/layers/rows/LayerThumbnail";
+import { SelectionPreviewIdentity } from "../../../services/projects/thumbnails/selection-identity";
 import { useLayerPreview } from "../../../components/layers/controls/use-layer-preview";
 import { MotionFieldProvider } from "../../../components/properties/motion/context";
 import { EffectParameters } from "../../../components/properties/effects/EffectParameters";
@@ -18,7 +22,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "../../../components/ui/
 import { Button } from "../../../components/ui/button";
 import { Switch } from "../../../components/ui/switch";
 import { IconButton } from "../../../components/shared/IconButton";
-import type { EffectCategory } from "../../../components/layers/catalog/model";
+import { compositionHasDepth, type EffectCategory } from "../../../components/layers/catalog/model";
 import {
   Accordion,
   AccordionItem,
@@ -26,11 +30,19 @@ import {
   AccordionContent,
 } from "../../../components/ui/accordion";
 import { StudioEffectCatalog } from "./StudioEffectCatalog";
-import { useCompositionEffects } from "./use-composition-effects";
+import { useCompositionEffectMotionRequest } from "../../../components/motion/scene/effect-navigation";
+import { useCompositionEffects } from "../../../components/layers/controls/use-composition-effects";
 import "./messages";
 import "./effects.css";
+import "../../../components/layers/rows/layer-row.css";
 
-export function StudioEffects(props: { engine: EnginePort; run: (task: () => void) => void }) {
+interface StudioEffectsProps {
+  engine: EnginePort;
+  services?: Pick<EditorServices, "previewExport">;
+  run: (task: () => void) => void;
+}
+
+export function StudioEffects(props: StudioEffectsProps) {
   return (
     <>
       <EffectButton {...props} category="effect" />
@@ -40,18 +52,28 @@ export function StudioEffects(props: { engine: EnginePort; run: (task: () => voi
 }
 function EffectButton({
   engine,
+  services,
   run,
   category,
-}: {
-  engine: EnginePort;
-  run: (task: () => void) => void;
+}: StudioEffectsProps & {
   category: EffectCategory;
 }) {
   const { t } = useTranslation("studioEffects");
+  const [open, setOpen] = useState(false);
+  const [request, setRequest] = useState<{ token: number; effectId: string } | null>(null);
+  useCompositionEffectMotionRequest(engine, (request) => {
+    if (request.category !== category) {
+      setOpen(false);
+      return;
+    }
+    engine.select([]);
+    setRequest({ token: request.token, effectId: request.effectId });
+    setOpen(true);
+  });
   const Icon = category === "effect" ? Sparkles : SlidersHorizontal;
   const label = t(category === "effect" ? "addEffect" : "addGrade");
   return (
-    <Popover modal={false}>
+    <Popover modal={false} open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <IconButton label={label} tooltipSide="bottom" data-studio-effect-category={category}>
           <Icon size={15} />
@@ -66,52 +88,77 @@ function EffectButton({
         aria-label={label}
         data-canvas-control
       >
-        <EffectEditor engine={engine} run={run} category={category} />
+        <EffectEditor
+          engine={engine}
+          services={services}
+          run={run}
+          category={category}
+          request={request}
+        />
       </PopoverContent>
     </Popover>
   );
 }
 function EffectEditor({
   engine,
+  services,
   run,
   category,
-}: {
-  engine: EnginePort;
-  run: (task: () => void) => void;
+  request,
+}: StudioEffectsProps & {
   category: EffectCategory;
+  request: { token: number; effectId: string } | null;
 }) {
   const snapshot = useDocumentSnapshot(engine, true);
   const page = snapshot.project.pages.find((item) => item.id === snapshot.pageId)!;
   const layer = page.layers.find((item) => item.id === snapshot.selection[0]);
+  const identities = useMemo(() => new SelectionPreviewIdentity(), [engine]);
+  const previewKey = layer
+    ? `${snapshot.project.id}:${page.id}:${identities.read(page, snapshot.project.assets, [layer.id])}`
+    : "";
   return (
     <OwnedEditor
-      key={`${snapshot.project.id}:${page.id}:${snapshot.selection.join(",")}`}
+      key={`${snapshot.project.id}:${page.id}:${snapshot.selection.join(",")}:${request?.token ?? "manual"}`}
       engine={engine}
+      services={services}
       run={run}
       category={category}
       page={page}
       layer={layer}
+      assets={snapshot.project.assets}
+      previewKey={previewKey}
       selectionCount={snapshot.selection.length}
+      requestedEffectId={request?.effectId}
     />
   );
 }
 function OwnedEditor({
   engine,
+  services,
   run,
   category,
   page,
   layer,
+  assets,
+  previewKey,
   selectionCount,
-}: {
-  engine: EnginePort;
-  run: (task: () => void) => void;
+  requestedEffectId,
+}: StudioEffectsProps & {
   category: EffectCategory;
   page: Composition;
   layer?: Layer;
+  assets: Project["assets"];
+  previewKey: string;
   selectionCount: number;
+  requestedEffectId?: string;
 }) {
   const { t } = useTranslation();
-  const [view, setView] = useState<"catalog" | "stack">("catalog");
+  const [view, setView] = useState<"catalog" | "stack">(requestedEffectId ? "stack" : "catalog");
+  const [expanded, setExpanded] = useState<string[]>(
+    requestedEffectId
+      ? [requestedEffectId]
+      : (layer?.effects ?? page.effects ?? []).slice(-1).map((effect) => effect.id),
+  );
   const local = useLayerPreview(engine, page, layer ? [layer.id] : [], run, true);
   const whole = useCompositionEffects(engine, page, run);
   const effects = layer?.effects ?? page.effects ?? [];
@@ -141,9 +188,21 @@ function OwnedEditor({
   }
   return (
     <MotionFieldProvider editor={editor}>
-      <div className="studio-effects-owner">
+      <div
+        className="studio-effects-owner"
+        role="group"
+        aria-label={t(layer ? "studioEffects:layerScope" : "studioEffects:compositionScope")}
+      >
+        {layer && (
+          <LayerThumbnail
+            layer={layer}
+            asset={layer.assetId ? assets[layer.assetId] : undefined}
+            services={services}
+            previewKey={previewKey}
+            pageId={page.id}
+          />
+        )}
         <strong>{layer?.name ?? t("studioEffects:composition")}</strong>
-        <span>{t(layer ? "studioEffects:layerScope" : "studioEffects:compositionScope")}</span>
       </div>
       {disabled && (
         <p className="muted-description">
@@ -170,6 +229,10 @@ function OwnedEditor({
       {view === "catalog" ? (
         <StudioEffectCatalog
           category={category}
+          owner={{
+            scope: layer ? "layer" : "composition",
+            depthAvailable: !layer && compositionHasDepth(page),
+          }}
           disabled={disabled || effects.length >= 64}
           onAdd={(type) => {
             change([...effects, createEffect(type)]);
@@ -179,7 +242,8 @@ function OwnedEditor({
       ) : (
         <Accordion
           type="multiple"
-          defaultValue={effects.length ? [effects.at(-1)!.id] : []}
+          value={expanded}
+          onValueChange={setExpanded}
           className="studio-effects-stack"
         >
           {!effects.length && <p className="muted-description">{t("noEffects")}</p>}
@@ -216,17 +280,15 @@ function OwnedEditor({
                     <Trash2 size={13} />
                   </IconButton>
                 </div>
-                {effect.enabled && (
-                  <EffectParameters
-                    engine={layer ? engine : undefined}
-                    layerId={layer?.id}
-                    effect={effect}
-                    disabled={disabled}
-                    onStart={editor.begin}
-                    onChange={(patch, preview) => update(effect, patch, preview)}
-                    onCancel={editor.cancel}
-                  />
-                )}
+                <EffectParameters
+                  engine={engine}
+                  layerId={layer?.id}
+                  effect={effect}
+                  disabled={disabled}
+                  onStart={editor.begin}
+                  onChange={(patch, preview) => update(effect, patch, preview)}
+                  onCancel={editor.cancel}
+                />
               </AccordionContent>
             </AccordionItem>
           ))}

@@ -104,7 +104,7 @@ export function SimpleSceneTimelineRow({
     );
   const name = animation
     ? animationPresetName(animation.preset, t)
-    : scenePropertyLabel(property!.target, t);
+    : scenePropertyLabel(property!.target, t, row.effectType);
   const choose = () => {
     engine.select([]);
     animationPresentation(engine).set({ selected: animation?.id ?? null });

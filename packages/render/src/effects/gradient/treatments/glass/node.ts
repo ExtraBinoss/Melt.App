@@ -1,20 +1,21 @@
 // MIT: ExtraBinoss / Plinka (2026), React-Beautiful-Gradient glass pass.
+import { authoredUv } from "../../../shared/coordinates";
 import type { Node } from "three/webgpu";
-import { abs, clamp, floor, fract, max, mix, pow, sin, uv, vec2, vec3, vec4 } from "three/tsl";
+import { abs, clamp, floor, fract, max, mix, pow, sin, vec2, vec3, vec4 } from "three/tsl";
 import type { EffectNodeContext } from "../../../shared/context";
 import { rotate } from "../../shared/field";
 import { gradientHash } from "../../shared/noise";
 import { premultiply, readGradient, treatmentControls, unpremultiply } from "../shared";
 export function glassNode(context: EffectNodeContext) {
   const u = treatmentControls(context),
-    resolution = context.controls.logicalResolution,
+    resolution = context.controls.contentResolution,
     size = max(2, u.size);
-  const px = uv().mul(resolution),
+  const px = authoredUv(context.controls).mul(resolution),
     angle = u.treatmentRotation.mul(Math.PI / 180);
   const p = rotate(px.sub(resolution.mul(0.5)), angle),
     direction = rotate(vec2(1, 0), angle.negate());
   const normal = sin(fract(p.x.div(size).add(0.5)).sub(0.5).mul(Math.PI));
-  const coord = uv().add(
+  const coord = authoredUv(context.controls).add(
     direction.mul(normal).mul(size).mul(u.refraction).mul(0.28).div(resolution),
   );
   const radius = u.blur.mul(size).mul(0.18),

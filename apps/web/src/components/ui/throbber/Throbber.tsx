@@ -63,7 +63,16 @@ export function Throbber({
               <MeltMark size={size} state={state} activity={playback} />
             )}
           </span>
-          {label && <span className="ui-throbber-label">{label}</span>}
+          {label && (
+            <span className="ui-throbber-label">
+              {label}
+              {variant === "shimmer" && (
+                <span className="ui-throbber-sweep" aria-hidden="true">
+                  <span className="ui-throbber-sweep-text" data-label={label} />
+                </span>
+              )}
+            </span>
+          )}
         </>
       )}
     </span>

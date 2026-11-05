@@ -1,3 +1,4 @@
+import { authoredPixelDown, transportUv } from "../shared/coordinates";
 import type { Node } from "three/webgpu";
 import {
   clamp,
@@ -30,14 +31,18 @@ export function circleNode({ source, controls }: EffectNodeContext) {
     colors = controls.colors;
   const position = uv(),
     original = sampleEffect(source, controls, position);
-  const size = controls.logicalResolution,
+  const size = controls.contentResolution,
     spacing = max(2, u.spacing!);
   const angle = u.rotation!.mul(Math.PI / 180);
-  const documentPosition = vec2(position.x, position.y.oneMinus()).mul(size);
+  const documentPosition = authoredPixelDown(controls, position);
   const grid = rotate(documentPosition.sub(size.mul(0.5)), angle.negate());
   const cellCenter = floor(grid.div(spacing)).add(0.5).mul(spacing);
   const center = rotate(cellCenter, angle).add(size.mul(0.5)).div(size);
-  const sample = sampleEffect(source, controls, vec2(center.x, center.y.oneMinus()));
+  const sample = sampleEffect(
+    source,
+    controls,
+    transportUv(controls, vec2(center.x, center.y.oneMinus())),
+  );
   const luma = clamp(dot(sample.rgb, vec3(0.2126, 0.7152, 0.0722)), 0, 1);
   const tone = pow(mix(luma.oneMinus(), luma, u.polarity!), u.gamma!);
   const radius = sqrt(tone).mul(spacing).mul(Math.SQRT1_2).mul(u.dotSize!);

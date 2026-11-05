@@ -25,6 +25,13 @@ export type LayerKind = "rectangle" | "ellipse" | "text" | "image" | "video" | "
 import type { LiquifyDab } from "../effects/liquify/strokes";
 
 export type EffectType =
+  | "depth-of-field"
+  | "trail"
+  | "risograph"
+  | "oil-paint"
+  | "blocks"
+  | "chromatic-aberration"
+  | "wind"
   | "liquify"
   | "torn-edges"
   | "terminal"
@@ -104,6 +111,8 @@ export interface LayerMask {
   inverted: boolean;
 }
 export interface Layer {
+  /** Root rectangle paint continues across the composition; false opts out of legacy inference. */
+  background?: boolean;
   spatial?: SpatialLayer;
   id: string;
   kind: LayerKind;

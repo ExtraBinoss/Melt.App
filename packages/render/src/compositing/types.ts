@@ -13,6 +13,10 @@ export interface BackgroundGpuActivity {
   ready?(): void;
 }
 export interface RenderOptions {
+  /** Upstream captures never recurse into temporal operators. */
+  history?: "disabled";
+  /** Internal upstream snapshots retain working-space pixels before presentation proofing. */
+  effectCapture?: boolean;
   /** Explicit adapter ownership: all nested render data stays immutable for this
    * frame's lifetime. Must reference the exact page passed to render().
    */
@@ -20,6 +24,8 @@ export interface RenderOptions {
   /** Admission for optional GPU work; preview interactions can defer captures without React. */
   backgroundGpu?: BackgroundGpuActivity;
   scale?: number;
+  /** Interactive root transport window in canonical pixels; never changes the document/world camera. */
+  viewport?: Bounds;
   /** Final texture crop/output format; source composition remains unchanged. */
   framing?: OutputFraming;
   /** Preview-only native image preparation cap; exact exports retain original image pixels. */

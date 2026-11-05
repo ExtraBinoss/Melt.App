@@ -158,7 +158,7 @@ export function commitEasing(
   }
   const { target } = origin.property;
   const fields = { time: origin.key.time, value: origin.key.value, easing };
-  if (target.kind === "camera" || target.kind === "environment" || target.kind === "light")
+  if ("compositionId" in target)
     engine.transaction([{ type: "upsertMotionKeyframe", target, ...fields }]);
   else
     engine.transaction([

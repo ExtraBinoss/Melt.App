@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "provider": "OpenAI built-in image_gen",
+  "generated": "2026-11-05",
+  "sources": [
+    {
+      "id": "editorial-portrait",
+      "file": "editorial-portrait.webp",
+      "width": 960,
+      "height": 720,
+      "sha256": "46700c03af1542a6d05f86926faa4c962b9fee2069cf87e021ca45a0855adc79",
+      "bytes": 78178
+    },
+    {
+      "id": "alpine-lake",
+      "file": "alpine-lake.webp",
+      "width": 960,
+      "height": 720,
+      "sha256": "cbc6b89ca4ae37c3662f36e21c5c74e3941279b96ea14e4ca08bb2f81a4cde20",
+      "bytes": 265352
+    },
+    {
+      "id": "studio-still-life",
+      "file": "studio-still-life.webp",
+      "width": 960,
+      "height": 720,
+      "sha256": "17d7ad8a670adacbb10c07bd1280fd9aff636a5093f8b6725a3b63b0b1c18e77",
+      "bytes": 68948
+    },
+    {
+      "id": "neon-city",
+      "file": "neon-city.webp",
+      "width": 960,
+      "height": 720,
+      "sha256": "2ceb698cab4dfc5fe415c4794729f6d6bffb217d95f348b0a8fbede7dff86810",
+      "bytes": 220334
+    }
+  ]
+}

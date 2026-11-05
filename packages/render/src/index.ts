@@ -41,3 +41,15 @@ export type { PrintExportOptions, ManagedImageOptions } from "./export/print/mod
 export { selectionFrameScope } from "./export/motion/selection";
 
 export { usesVideoSources } from "./renderer/video-backend";
+
+export { prepareVectorStrokeOutlines, VectorOutlineError } from "./surface/vector/stroke-outlines";
+export type {
+  EffectNodeBuilder,
+  EffectNodeContext,
+  EffectDimensions,
+  EffectAuxiliaryInputs,
+  EffectHistoryInput,
+} from "./effects/shared/context";
+export type { EffectUniforms } from "./effects/shared/uniforms";
+export { sampleEffect } from "./effects/shared/context";
+export { mixEffectCoverage } from "./effects/shared/compositing/node";

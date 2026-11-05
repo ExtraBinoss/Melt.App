@@ -97,7 +97,7 @@ test("Studio uses native contours and geometry, and a single camera orbits with 
   expect(await page.evaluate(() => JSON.stringify(window.musart!.snapshot().project))).toBe(before);
   await page.mouse.up();
   await ready(page);
-  expect(await page.evaluate(() => window.musart!.session().revision)).toBe(revision + 1);
+  await expect.poll(() => page.evaluate(() => window.musart!.session().revision)).toBe(revision + 1);
   await page.evaluate(() => window.musart!.undo());
   await ready(page);
   expect(await page.evaluate(() => JSON.stringify(window.musart!.snapshot().project))).toBe(before);

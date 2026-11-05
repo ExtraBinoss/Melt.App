@@ -16,6 +16,7 @@ export function createBackgroundLayer(engine: EnginePort, name: string) {
     width: page.width,
     height: page.height,
     fill: page.background,
+    background: true,
     ...(page.backgroundGradient ? { fillGradient: structuredClone(page.backgroundGradient) } : {}),
   });
   engine.transaction([

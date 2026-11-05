@@ -24,6 +24,29 @@ The web catalog indexes localized names, families, internal descriptions and bil
 | Phase precision     | Periodic phases are reduced before multiplication by 2π or combination with spatial coordinates, avoiding Float32 loss at large valid times.                                     |
 | Readback accounting | Test-only PNG decoding is isolated from production readback accounting.                                                                                                          |
 
+Spatial fields must use the authored content rectangle even when a transport texture covers an infinite-canvas viewport or expanded effect margins. `shared/coordinates.ts` provides authored Y-up/Y-down pixels and normalized UVs, plus the inverse mapping back to texture UVs. Keep original texture reads and document-pixel convolution offsets in transport coordinates; map authored cell centers and transformed image positions back before sampling. Normalized centers, aspect ratios, paper/screen bounds, generated layouts and seed grids must never use the changing transport extent as their authored domain. Color-only operators and native depth lookups keep their existing texture coordinates.
+
+Discontinuous fields can place an exact fragment center on a `floor`, `fract` or sign boundary. Receipt fibers and Gradient Blocks/Folds derive their authored pixels from Three's target fragment coordinates and the document-pixel footprint, avoiding the small interpolated-UV cancellation error that otherwise changes those boundary decisions when the transport extent changes. This preserves subpixel geometry without adding quantization or a boundary bias.
+
+`test/browser/effect-viewport.spec.ts` exercises the related spatial operators on both composition and infinite-background owners. Its fixed authored interior keeps nonlocal sampling inputs available in both transports; Shatter's separate viewport witness also covers complete borders and cropped windows. These are native GPU pixel checks, separate from native wheel gesture checks.
+
+### Native object planes
+
+Native extruded text and SVGs provide a renderer-owned homography for their front
+plane. Before the raster-effect stack, the compositor reframes the lit source onto
+an authored pixel lattice. It then runs every effect and SDK influence area through
+the existing operator and projects the premultiplied result back before masks and
+composition. Authors write the same TSL and parameters; no effect-specific camera
+code, document metadata or second renderer is involved. Camera zoom changes the
+presentation size while local pattern coordinates remain attached to the object.
+
+The source-plane and shared-stack regressions cover camera/projection changes,
+parent/content transforms and the local reference lattice. A bounded native Studio
+wheel witness also exercised Shatter, Grain and Halftone on real extruded text on
+WebGPU and WebGL, retaining a 340 × 120 authored input through all nine camera
+steps per backend. Captures and the report live under
+`artifacts/studio/spatial-effects-source-report.json`.
+
 ### Radial gizmos
 
 | Authoring topic    | Contract                                                                                                                                                                                      |
@@ -37,20 +60,72 @@ The web catalog indexes localized names, families, internal descriptions and bil
 | Pointer tolerance  | Transparent hit radius is `14 / zoom` around the existing `6 / zoom` knob. Preserve the grab offset so near-edge clicks and drags do not jump; interactions retain the owning effect popover. |
 | Handle help        | Shared Radix tooltips wait 500 ms on every hover, explain the handle and keyboard controls in all twelve app languages, and close when a gesture begins.                                      |
 
-### Live playback lifecycle
+### SDK placement and Motion
 
-| Authoring topic  | Contract                                                                                                                    |
-| ---------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| Eligibility      | Effects with a top-level `time` parameter receive explicit live playback controls.                                          |
-| Preview rate     | Playback publishes at most thirty phase previews per second through the existing imperative preview adapter.                |
-| React boundary   | It creates no per-frame App, Inspector or canvas React state.                                                               |
-| Pause and Escape | Pause commits the most recently requested phase once; Escape cancels.                                                       |
-| Outside input    | Outside input, hiding the tab and window blur stop playback.                                                                |
-| Unmount          | Unmount releases listeners and the pending RAF and cancels an unfinished preview.                                           |
-| Export freeze    | Export opening and native image/project export freeze active phases for that engine before capturing the canonical project. |
-| Engine isolation | Other editor instances are isolated.                                                                                        |
+All raster built-ins and adjustments pass through the same SDK catalog adapter.
+Authors declare ordinary typed parameters and a TSL `EffectNodeBuilder`; Melt
+provides the generated controls, validated commands, shared area field and Motion
+bindings. `defineEffect` and `effectFields` are exported by `@musart/core`; builder,
+context, uniforms and sampling/coverage helpers are exported by `@musart/render`.
+Optional `sdk` metadata identifies native direction and preferred animation targets.
 
-The live control does not invent simulation history. A shader with explicit phase can be deterministic and animated; a static photographic approximation such as compression-style Datamosh is documented as such. GPU output, resource bounds, actual decoded exports and real input gestures must be verified separately from graph topology tests.
+### Photographic catalog previews
+
+Every built-in effect and adjustment declares a photographic catalog source through
+`sdk.preview`. The SDK supplies intentional defaults from
+`packages/core/src/effects/sdk/preview.ts`; an effect's own `sdk.preview` declaration
+takes priority. New effects must extend that exhaustive registry or declare their
+own source when introducing their portable type. This is build-time presentation
+metadata and does not add settings to existing user documents.
+
+```ts
+sdk: {
+  preview: {
+    source: "editorial-portrait",
+    scene: "photo",
+    effect: { amount: 0.8, settings: { /* declared effect parameters only */ } },
+  },
+}
+```
+
+The exported `EffectPreviewSource` accepts four stable source IDs:
+`editorial-portrait` for original adult fashion/editorial portraiture,
+`alpine-lake` for landscape detail and tonal/color grading,
+`studio-still-life` for controlled product lighting and clean object silhouettes,
+and `neon-city` for luminous urban detail and digital treatments. The corresponding
+assets live under `apps/web/public/effects/sources/<source>.webp`; source IDs carry
+no browser, asset loading or GPU dependency into core.
+
+`scene` defaults to `photo`. Use `depth` for native camera-depth staging,
+`temporal` for deterministic authored movement and history, and `typography` for
+source content that demonstrates text reveals. Depth of field uses real scene
+depth; Trail uses actual prior authored poses. ASCII and Receipt retain
+photographic content so their character and print treatments remain recognizable.
+Optional `effect` values are ordinary validated effect overrides for the baker;
+they must use declared parameters and do not replace the effect's creation defaults.
+Do not mimic an effect with a decorative thumbnail filter. Catalog images must be
+rendered by the registered production effect and pre-baked into the static atlas.
+
+The shared area uses owner-local `domainX/Y/Angle/Radius/Aspect/Feather/Enabled`
+settings. Defaults are resolved lazily and do not rewrite old portable effects.
+The GPU finishing stage preserves upstream pixels outside that area, in
+premultiplied coverage, including expanded transport margins and viewport crops.
+Native algorithm directions remain separate from the application-area angle.
+
+| Authoring topic      | Contract                                                                                                                                           |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Eligibility          | Numeric, integer, color, choice, boolean and text parameters use existing typed Motion adapters.                                                   |
+| Time drivers         | Loop, Ping-pong and Pulse create ordinary editable action blocks with sparse output points.                                                        |
+| Input drivers        | Pointer X/Y/XY, displacement Drag and Click record bounded semantic input; scrub/export use the same evaluator.                                    |
+| Response             | Spring/rebound response is analytic and seek-safe; playback writes no document keys.                                                               |
+| Input ownership      | Explicit recording owns consuming canvas input, excluding controls, orbit and gizmos; Escape, blur, visibility changes and cancellation retire it. |
+| History              | A completed block/recording commits atomically; cancelled previews restore the original values.                                                    |
+| Timeline             | Classic and Studio reuse the same dock, owners, block/key controls and transport.                                                                  |
+| Auxiliary GPU inputs | Real depth and prior authored poses use declared renderer-owned capability ports, with bounded allocation and disposal.                            |
+
+See [the implementation checkpoint](../../effects/sdk_effects/IMPLEMENTATION.md)
+for current limits and validation status. Shader graph construction and TypeScript
+checks do not establish native pixel correctness.
 
 ## Delivery checklist
 

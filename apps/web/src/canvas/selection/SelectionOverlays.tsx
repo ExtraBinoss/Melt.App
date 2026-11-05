@@ -11,6 +11,7 @@ import { selectionSizeLabel } from "./size-label";
 import { sourceGeometry } from "./frame-geometry";
 import { selectionHandleInk } from "./handle-color";
 import { paintCanvasStyle } from "../shared/paint-style";
+import { rotationHandlePlacement } from "./rotation-handle";
 
 interface Props {
   page: Composition;
@@ -225,7 +226,12 @@ export function SelectionOverlays({
                     key={handle}
                     className={`canvas-handle canvas-handle-${handle}`}
                     aria-label={`${handle === "rotate" ? t("rotate") : t("resize")} ${layer.name} ${handle}`}
-                    style={{ transform: `scale(${1 / zoom})` }}
+                    style={{
+                      transform:
+                        handle === "rotate"
+                          ? rotationHandlePlacement(index.worldMatrix(layer.id), zoom).transform
+                          : `scale(${1 / zoom})`,
+                    }}
                     data-layer-id={layer.id}
                     data-handle={handle}
                     onPointerDown={(event) => {

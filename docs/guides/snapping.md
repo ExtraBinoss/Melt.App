@@ -63,3 +63,37 @@ Holding Alt/Option temporarily bypasses attraction. Modifier changes refresh the
 Exact mirrors cover candidate filtering, transformed guides, deterministic priority ties, ten-thousand-object bounded comparisons, collective/nested transforms, constrained resize, idle overlay suppression, modifier changes, stale origin cancellation and one undo entry. `test/browser/snapping.spec.ts` drives the actual canvas at 100% and 200%, verifies the six-pixel boundary, Alt and persisted command-search toggles, resizes to a manual guide, captures engaged cues, checks editor React counters during preview, and instruments actual GPU/Canvas read APIs.
 
 Run these checks through the repository's bounded, single-process verification coordinator. Constructor time and first-drag latency must be reported separately from bounded query comparisons; no unit wall-time assertion is a substitute for a native load cohort.
+
+## Native 3D translation
+
+`SpatialSnapIndex` extends the shared sorted coordinate indices to three axes. It
+captures moving bounds and reference bounds once per gesture. The native adapter
+uses already prepared CPU mesh bounds, falling back to portable source geometry;
+it does not prepare meshes, read pixels or traverse vertices on each pointer move.
+Moving descendants, ancestors containing the moving selection, hidden and
+zero-opacity subtrees and mask sources are excluded. Locked visible objects remain
+references. Composition bounds and its origin supply page-center constraints.
+
+The native translation gizmo supplies its active world axis or plane. Corrections
+are solved there, then mapped through the inherited inverse matrix into the
+object's authored local position. The free center handle solves two constraints
+inside its camera-facing drag plane, rather than snapping depth independently.
+Parent transforms, affine bases and group pivots
+remain intact. This aligns real world coordinates, rather than silently changing
+depth merely to make two projected objects overlap.
+
+Attraction uses the shared pixel threshold (six CSS pixels by default), measured
+through the actual display camera, including perspective, zoom and Studio's camera
+window. View-parallel and behind-camera constraints do not attract. An engaged
+constraint holds until 1.6 times the attraction radius, avoiding flicker between
+nearby targets. Alt clears both correction and feedback immediately; releasing it
+re-evaluates the last raw pose without requiring a pointer move.
+
+Feedback is transient data in an engine-scoped Jotai atom. The bounded SVG guide
+surface subscribes imperatively, outside App, Inspector and scene React renders.
+Only engaged constraints are drawn, with constant CSS-pixel strokes and endpoint
+markers. Pointer completion commits through the existing validated spatial/Motion
+transaction; Escape, blur, pointer cancellation, owner changes and teardown discard
+the draft and guides. No preview creates document keys or history entries.
+
+Native rotation and scale retain their existing optional Shift increments.

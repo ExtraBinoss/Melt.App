@@ -11,10 +11,12 @@ import { NumberInput, type NumberInputProps } from "../shared/NumberInput";
 export function SceneNumberInput({
   engine,
   target,
+  displayScale = 1,
   ...props
 }: NumberInputProps & {
   engine?: EnginePort;
   target?: SceneMotionPropertyTarget;
+  displayScale?: number;
 }) {
   const address = JSON.stringify(target);
   const presentation = useMemo(() => {
@@ -27,7 +29,7 @@ export function SceneNumberInput({
         transport.readFrame() ??
         snapshot.project.pages.find((page) => page.id === snapshot.pageId)!;
       const value = resolveSceneMotionProperty(page, target)?.value;
-      return typeof value === "number" ? value : props.value;
+      return typeof value === "number" ? value * displayScale : props.value;
     };
     return {
       read,
@@ -48,7 +50,7 @@ export function SceneNumberInput({
         });
       },
     };
-  }, [engine, address, props.value]);
+  }, [engine, address, props.value, displayScale]);
   return (
     <NumberInput
       {...props}

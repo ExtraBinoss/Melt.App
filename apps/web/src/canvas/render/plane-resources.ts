@@ -1,3 +1,4 @@
+import { bindDisplayPlane } from "./display-plane";
 import {
   reportProjectPresentation,
   reportProjectRenderFailure,
@@ -9,7 +10,7 @@ import {
   type MediaSourceResolver,
   type FrameTexture,
 } from "@musart/render";
-import type { Asset, Composition, MotionFramePlan } from "@musart/core";
+import type { Asset, Bounds, Composition, MotionFramePlan } from "@musart/core";
 import {
   DataTexture,
   Mesh,
@@ -103,6 +104,7 @@ export class PlaneResources {
   private onError?: (message: string, details?: string) => void;
   private onScale?: (scale: number, width: number, height: number) => void;
   private density = 1;
+  private viewport: Bounds | undefined;
   private readonly maxTextureDimension: number;
   private presentationId: string | null = null;
   private presentationProjectId: string | undefined;
@@ -231,7 +233,8 @@ export class PlaneResources {
       page,
       assets,
       revision: ++this.revision,
-      scale: previewScale(page, this.density, this.maxTextureDimension, assets),
+      scale: this.scale(page, assets),
+      viewport: this.viewport,
       playback,
       ...(presentation?.preview && !presentation.canonical && !playback
         ? { preview: presentation.preview }
@@ -270,7 +273,6 @@ export class PlaneResources {
       this.preparedRequest = null;
       this.renderer.domElement.dataset.compositionPrepared = "false";
       this.renderer.domElement.dataset.presentationReady = "false";
-      // The stable destination backdrop stays visible until this canvas contains its own page.
       this.renderer.domElement.style.visibility = "hidden";
       syncArtboardBackdrops(this.renderer.domElement.closest(".editor-canvas"));
       this.mesh.visible = false;
@@ -278,6 +280,7 @@ export class PlaneResources {
     }
     if (this.profile.active) this.profile.begin(this.revision);
     const retained =
+      !this.viewport &&
       !presentation?.baseContinuation &&
       !this.awaitingPresentation() &&
       this.users > 0 &&
@@ -319,28 +322,24 @@ export class PlaneResources {
     );
     return this.revision;
   }
-  /** Navigation changes the raster target density, never font outlines or image uploads. */
+  private scale(page: Composition, assets: Record<string, Asset>, density = this.density) {
+    return previewScale(page, density, this.maxTextureDimension, assets, this.viewport);
+  }
+  setViewport(viewport?: Bounds) {
+    if (JSON.stringify(viewport) === JSON.stringify(this.viewport)) return;
+    this.viewport = viewport;
+    this.refreshFrame();
+  }
   setDensity(density: number): void {
     if (this.disposed || !Number.isFinite(density) || density <= 0 || density === this.density)
       return;
     const current = this.current;
-    const before = current
-      ? previewScale(current.page, this.density, this.maxTextureDimension, current.assets)
-      : 1;
+    const before = current ? this.scale(current.page, current.assets) : 1;
     this.density = density;
-    if (
-      current &&
-      before !== previewScale(current.page, density, this.maxTextureDimension, current.assets)
-    )
-      this.submit(
-        current.page,
-        current.assets,
-        current.presentation,
-        current.motionFrame,
-        current.playback,
-        current.immutableFrame,
-      );
+    if (current && before !== this.scale(current.page, current.assets, density))
+      this.refreshFrame();
   }
+
   private schedule() {
     if (
       !this.users ||
@@ -381,6 +380,7 @@ export class PlaneResources {
       const result = await this.compositor!.render(request.page, request.assets, {
         ...(request.immutableFrame ? { immutableFrame: request.immutableFrame } : {}),
         scale: request.scale,
+        viewport: request.viewport,
         vectorAntialias: true,
         mediaResolver: request.mediaResolver,
         motionFrame: request.motionFrame,
@@ -420,7 +420,13 @@ export class PlaneResources {
     }
   }
   private canPresent(request: PreviewRequest): boolean {
-    if (!this.users || this.disposed || this.deviceLost || request.revision < this.preparedRevision)
+    if (
+      request.viewport !== this.viewport ||
+      !this.users ||
+      this.disposed ||
+      this.deviceLost ||
+      request.revision < this.preparedRevision
+    )
       return false;
     if (request.revision === this.revision) return true;
     return continuesPresentation(request, this.current);
@@ -434,14 +440,7 @@ export class PlaneResources {
     );
   }
   private bindFrame(request: PreviewRequest, result: FrameTexture): void {
-    this.sample.value = result.texture;
-    this.mesh.scale.set(request.page.width, request.page.height, 1);
-    const camera = this.camera!;
-    camera.left = -request.page.width / 2;
-    camera.right = request.page.width / 2;
-    camera.top = request.page.height / 2;
-    camera.bottom = -request.page.height / 2;
-    camera.updateProjectionMatrix();
+    bindDisplayPlane(this.sample, this.mesh, this.camera!, request.page, result, request.viewport);
     this.onScale?.(request.scale, result.width, result.height);
   }
   private preparedFrame(request: PreviewRequest, result: FrameTexture): void {
@@ -467,7 +466,6 @@ export class PlaneResources {
     this.publish();
     this.invalidate();
   }
-  /** Called after Three finishes the display scene's render pass, never before the draw. */
   present() {
     if (!this.users || this.deviceLost || this.disposed) return;
     this.frames++;

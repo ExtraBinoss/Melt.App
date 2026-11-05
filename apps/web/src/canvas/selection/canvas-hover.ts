@@ -39,7 +39,7 @@ export function installCanvasHover(
   function paint() {
     pending = null;
     const frame = controller.read();
-    if (!point || active() || !frame.presentation.canonical) {
+    if (!point || active() || frame.presentation?.canonical === false) {
       clear();
       return;
     }
@@ -56,7 +56,7 @@ export function installCanvasHover(
   }
   function schedule() {
     if (pressed) return;
-    if (!controller.read().presentation.canonical) {
+    if (controller.read().presentation?.canonical === false) {
       clear();
       return;
     }

@@ -1,4 +1,9 @@
-import { EFFECT_CATALOG, type EffectType } from "@musart/core";
+import {
+  createLayerGeometryIndex,
+  EFFECT_CATALOG,
+  type Composition,
+  type EffectType,
+} from "@musart/core";
 import { EFFECT_SEARCH_ALIASES } from "./search-metadata";
 
 export type EffectFamily =
@@ -11,6 +16,18 @@ export type EffectFamily =
   | "retro"
   | "motion";
 export type EffectCategory = "effect" | "adjustment";
+export interface EffectCatalogOwner {
+  readonly scope: "layer" | "composition";
+  readonly depthAvailable?: boolean;
+}
+/** UI admission follows actual native source availability; rendering verifies the borrowed depth port. */
+export function compositionHasDepth(page: Composition): boolean {
+  const geometry = createLayerGeometryIndex(page);
+  return page.layers.some(
+    (layer) =>
+      layer.spatial?.enabled && layer.spatial.source !== "group" && geometry.isVisible(layer.id),
+  );
+}
 export const EFFECT_FAMILIES: readonly EffectFamily[] = [
   "tone",
   "color",
@@ -24,6 +41,13 @@ export const EFFECT_FAMILIES: readonly EffectFamily[] = [
 
 /** Presentation-only families; the portable effect/adjustment taxonomy stays authoritative. */
 export const EFFECT_FAMILY = {
+  "depth-of-field": "blur",
+  trail: "motion",
+  risograph: "texture",
+  "oil-paint": "texture",
+  blocks: "texture",
+  "chromatic-aberration": "distortion",
+  wind: "motion",
   terminal: "motion",
   liquify: "distortion",
   "torn-edges": "texture",
@@ -86,11 +110,17 @@ export function effectCatalogEntries(
   category: EffectCategory,
   translate: (key: string) => string,
   language: string,
+  owner: EffectCatalogOwner = { scope: "layer" },
 ): readonly CatalogEntry[] {
   const collator = new Intl.Collator(language, { sensitivity: "base", numeric: true });
   return Object.values(EFFECT_CATALOG)
     .filter(
-      (definition) => definition.category === category && !definition.source && !definition.retired,
+      (definition) =>
+        definition.category === category &&
+        !definition.source &&
+        !definition.retired &&
+        (definition.requirements?.scope !== "composition" || owner.scope === "composition") &&
+        (!definition.requirements?.depth || Boolean(owner.depthAvailable)),
     )
     .map((definition) => {
       const family = EFFECT_FAMILY[definition.type],

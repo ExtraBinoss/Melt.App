@@ -136,3 +136,64 @@ All five monitored outer React counters stay unchanged in every measured opening
 Focused unit checks cover the real Radix menus/popovers, bounded/expired leases, nested lifetime cleanup, `asChild`, category hover and localization. Native checks cover both French/English catalogue filtering and effect insertion/undo, photographic effect-color handoff/reset/cancellation, and real GPU hue/alpha preview with one commit, exact undo and unchanged editor counters.
 
 An initial rapid-reopen timing attempt overlapped retired exit content and failed to observe a useful opening. A separate isolated native reopen witness passes on the baseline, so this is not reported as a confirmed product defect or a fixed bug. Those logs are retained. Earlier pointerover-only measurements and one probe variable-shadowing failure are also retained but excluded from the table. The completed driver waits for genuine close/unmount between ordinary openings; it never labels closing content as the newly requested menu.
+
+## Studio properties, Motion and native snapping — 2026-11-05
+
+The production cohort uses `artifacts/studio-improvements/dist-complete`, Chromium
+156.0.8078.4 on Linux, an Intel Xe-LPG WebGPU adapter, a 1600 × 1000 viewport and
+DPR 1. Browser jobs ran serially in a scope capped at 200% CPU, 2300 MiB memory
+and zero swap, with a 1700 MiB memory-high threshold. Studio Starter contains the
+single selected MELT word. Preparation of that canonical GPU frame precedes the
+property-opening measurements; the first Inspector opening remains a cold sample.
+
+The measured boundary is the native pointer timestamp through the second RAF after
+click dispatch. It is a browser presentation opportunity, not field INP, GPU duration
+or a physical-display measurement. The entrance animation's full duration is a
+separate quantity. No full-document snapshot is taken inside a measured RAF.
+
+| Interaction                          | Samples |  Median | Maximum |
+| ------------------------------------ | ------: | ------: | ------: |
+| Full properties, first opening       |       1 | 88.4 ms | 88.4 ms |
+| Full properties, subsequent openings |       4 | 30.0 ms | 30.9 ms |
+| Object properties                    |       5 | 29.8 ms | 30.4 ms |
+| Enable Motion for the first time     |       1 | 96.9 ms | 96.9 ms |
+| Animations / Keyframes               |       8 | 30.1 ms | 30.7 ms |
+| Static / Motion                      |       6 | 32.0 ms | 55.2 ms |
+
+A separate cohort observes RAF cadence for 600 ms after each input, without tracing.
+Animations/Keyframes have a maximum 16.8 ms RAF gap. The first Static return has a
+99.9 ms gap after its initial presentation; the five subsequent Static/Motion changes
+stay at or below 16.8 ms. The first full Inspector opening has an 83.3 ms gap. These
+cold-path outliers are retained rather than reported as uniformly smooth frames.
+Main editor-root commit counters remain unchanged during property openings and
+Animations/Keyframes changes. Canonical Static/Motion edits legitimately publish a
+new document mode and canvas reservation.
+
+The earlier diagnostic used Vite development mode, Chromium 140 and WebGL, with
+1.38–1.89 s warm full-property openings and 376–504 ms animation-view changes.
+Those runs have different build/browser/backend conditions and are not a controlled
+production speedup ratio. The retained traces attribute synchronous style/layout
+work to mounting/positioning controls and timeline overlay measurements.
+
+The implementation keeps small interface choices in engine-scoped Jotai atoms,
+bridges canonical mode changes through a mounted atom write transaction, and uses
+a derived animation-view subscription. It retains one live dock owner instead of
+project snapshots, suspends closed property editors with React Activity, isolates
+popover layout, and captures overlay geometry before style writes.
+
+`test/browser/studio-interactions-snapping.spec.ts` exercises actual secondary-input
+pan and stationary context menus, property DOM/focus retention, both Motion switches,
+inter-object snapping, modifier-only Alt bypass, editor-root commits, exact undo and
+Escape cancellation. A second native translation uses the center handle under an
+inclined perspective camera and verifies that snapping preserves Three's camera-
+quaternion drag plane. Instrumented GPUBuffer.mapAsync, WebGL.readPixels,
+Canvas2D.getImageData and VideoFrame.copyTo all remain zero.
+
+Raw input samples, both cadence cohorts, source hashes, matching compiled output,
+regression logs and screenshots are retained under `artifacts/studio-improvements`.
+`latency.mjs` records immediate inputs and `latency-pacing.mjs` records isolated
+600 ms cadence windows. Changed-source and strict core typechecks, targeted lint,
+formatting, focused tests, the native scenario and the production build pass.
+This is not the full repository CI gate: the existing generated effect atlas exceeds
+600 lines, and the optional whole-repository typecheck retry was stopped after
+sustained reclaim at its bounded memory limit. No coverage result is claimed.

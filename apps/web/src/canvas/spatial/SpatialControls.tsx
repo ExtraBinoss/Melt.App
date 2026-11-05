@@ -1,3 +1,4 @@
+import { installSpatialSnapping } from "./snapping/controls";
 import { useEffect, useMemo, useRef } from "react";
 import { useStore } from "jotai";
 import { useFrame, useThree } from "@react-three/fiber";
@@ -139,15 +140,31 @@ export default function SpatialControls({ engine, controller, target }: Props) {
       invalidate();
     };
     transform.addEventListener("change", changed);
+    const snapping = installSpatialSnapping({
+      engine,
+      controller,
+      store,
+      canvas,
+      camera: camera,
+      proxy,
+      transform,
+      preview: () => {
+        gesture.object(proxy);
+        invalidate();
+      },
+    });
     const objectChange = () => {
+      snapping.change();
       gesture.object(proxy);
       invalidate();
     };
     const down = () => {
       gesture.begin(target.layerId, tool.current);
+      snapping.begin(target.layerId);
       orbit.enabled = false;
     };
     const up = () => {
+      snapping.clear();
       gesture.commit();
       invalidate();
     };
@@ -214,6 +231,7 @@ export default function SpatialControls({ engine, controller, target }: Props) {
       pointers.delete(event.pointerId);
     };
     const cancel = () => {
+      snapping.clear();
       if (!gesture.active) return;
       gesture.cancel();
       transform.reset();
@@ -312,6 +330,7 @@ export default function SpatialControls({ engine, controller, target }: Props) {
       window.removeEventListener("blur", cancel);
       for (const id of pointers) if (canvas.hasPointerCapture(id)) canvas.releasePointerCapture(id);
       pointers.clear();
+      snapping.dispose();
       transform.dispose();
       orbit.dispose();
       helper.clear();

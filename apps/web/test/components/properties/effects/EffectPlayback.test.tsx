@@ -3,22 +3,18 @@ import { afterEach, expect, it, vi } from "vitest";
 import { createEffect } from "@musart/core";
 import { setup } from "../../../support/ui";
 import { EffectPlayback } from "../../../../src/components/properties/effects/EffectPlayback";
+import { effectInputSession } from "../../../../src/components/properties/effects/effect-motion/input-session";
+import { timelineOpenAtom } from "../../../../src/state/motion/timeline-state";
+import { createMotionTransport } from "../../../../src/services/motion/transport";
 import { freezeEffectPreviews } from "../../../../src/state/session/effect-preview";
 
 afterEach(() => vi.restoreAllMocks());
-it("animates explicit phase imperatively, freezes on outside input, and cancels on Escape", () => {
+function fixture() {
   const d = setup(),
-    effect = createEffect("ripple"),
-    change = vi.fn(),
-    cancel = vi.fn();
-  let now = 0,
-    callback: FrameRequestCallback | undefined;
-  vi.spyOn(performance, "now").mockImplementation(() => now);
-  vi.spyOn(window, "requestAnimationFrame").mockImplementation((cb) => {
-    callback = cb;
-    return 1;
-  });
-  const canceled = vi.spyOn(window, "cancelAnimationFrame").mockImplementation(() => {});
+    effect = createEffect("ripple");
+  d.engine.execute({ type: "updateLayers", ids: [d.rectangle.id], patch: { effects: [effect] } });
+  const cancel = vi.fn(),
+    change = vi.fn();
   const result = d.mount(
     <EffectPlayback
       engine={d.engine}
@@ -28,23 +24,78 @@ it("animates explicit phase imperatively, freezes on outside input, and cancels 
       onCancel={cancel}
     />,
   );
-  fireEvent.click(screen.getByRole("button", { name: "Animer" }));
+  fireEvent.click(screen.getByRole("button", { name: "Motion" }));
+  return {
+    ...d,
+    effect,
+    result,
+    cancel,
+    change,
+    page: () => d.engine.getSnapshot().project.pages[0]!,
+  };
+}
+
+it("adds a real Motion block atomically and preserves the bound user effect on delete", () => {
+  const d = fixture();
+  expect(screen.queryByRole("combobox")).toBeNull();
+  expect(screen.queryByRole("spinbutton")).toBeNull();
+  for (const label of [
+    "Boucle",
+    "Aller-retour",
+    "Pulsation",
+    "Horizontal",
+    "Vertical",
+    "Libre",
+    "Glisser",
+    "Clic",
+  ])
+    expect(
+      screen.getByRole("button", { name: label, exact: true }).querySelector("svg"),
+    ).not.toBeNull();
+  fireEvent.click(screen.getByRole("button", { name: "Boucle", exact: true }));
+  expect(d.store.get(timelineOpenAtom)).toBe(true);
+  expect(createMotionTransport(d.engine).read().playing).toBe(true);
+  const track = d.page().motion!.tracks.find((item) => item.layerId === d.rectangle.id)!;
+  const animation = track.animations![0]!;
+  expect(animation.preset.channels[0]!.driver?.kind).toBe("loop");
+  expect(animation.effectIds).toEqual([d.effect.id]);
+  expect(animation.ownsEffects).toBe(false);
+  d.engine.execute({ type: "deleteMotionAnimation", animationId: animation.id });
+  expect(d.page().layers.find((item) => item.id === d.rectangle.id)!.effects).toHaveLength(1);
+  d.engine.undo();
+  expect(
+    d.page().motion!.tracks.find((item) => item.layerId === d.rectangle.id)!.animations,
+  ).toHaveLength(1);
+  d.engine.undo();
+  expect(d.page().motion).toBeUndefined();
+});
+
+it("records semantic keyboard input, saves one block, and cancels unfinished takes", () => {
+  let now = 0;
+  vi.spyOn(performance, "now").mockImplementation(() => now);
+  vi.spyOn(window, "requestAnimationFrame").mockReturnValue(1);
+  const canceled = vi.spyOn(window, "cancelAnimationFrame").mockImplementation(() => {});
+  const d = fixture();
+  fireEvent.click(screen.getByRole("button", { name: "Horizontal", exact: true }));
+  expect(effectInputSession(d.engine).read()?.owner?.layerId).toBe(d.rectangle.id);
   now = 100;
-  act(() => callback?.(now));
-  expect(change).toHaveBeenLastCalledWith({ time: 0.1 }, true);
-  expect(screen.getByLabelText("Phase affichée")).toHaveTextContent("0.10 s");
-  fireEvent.pointerDown(document.body);
-  expect(change).toHaveBeenLastCalledWith({ time: 0.1 });
-  expect(canceled).toHaveBeenCalled();
-  fireEvent.click(screen.getByRole("button", { name: "Animer" }));
+  fireEvent.keyDown(screen.getByRole("application"), { key: "ArrowRight" });
+  now = 200;
+  fireEvent.keyUp(screen.getByRole("application"), { key: "ArrowRight" });
   now = 300;
-  act(() => callback?.(now));
+  fireEvent.click(screen.getByRole("button", { name: "Terminer", exact: true }));
+  const animation = d.page().motion!.tracks.find((item) => item.layerId === d.rectangle.id)!
+    .animations![0]!;
+  const driver = animation.preset.channels[0]!.driver!;
+  expect("events" in driver && driver.events.length).toBeGreaterThan(0);
+  expect(effectInputSession(d.engine).read()).toBeNull();
+  expect(canceled).toHaveBeenCalled();
+  fireEvent.click(screen.getByRole("button", { name: "Horizontal", exact: true }));
   fireEvent.keyDown(document.body, { key: "Escape" });
-  expect(cancel).toHaveBeenCalledOnce();
-  expect(screen.getByLabelText("Phase affichée")).toHaveTextContent("0.00 s");
-  fireEvent.click(screen.getByRole("button", { name: "Animer" }));
-  result.unmount();
-  expect(cancel).toHaveBeenCalledTimes(2);
-  freezeEffectPreviews(d.engine);
-  expect(cancel).toHaveBeenCalledTimes(2);
+  expect(effectInputSession(d.engine).read()).toBeNull();
+  expect(
+    d.page().motion!.tracks.find((item) => item.layerId === d.rectangle.id)!.animations,
+  ).toHaveLength(1);
+  act(() => freezeEffectPreviews(d.engine));
+  d.result.unmount();
 });

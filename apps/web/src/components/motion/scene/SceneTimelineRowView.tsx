@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Camera, ChevronDown, ChevronRight, Diamond, Lightbulb, Sun } from "lucide-react";
+import { Camera, ChevronDown, ChevronRight, Diamond, Lightbulb, Sparkles, Sun } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import type { Composition, EnginePort } from "@musart/core";
 import type { TimelineGestures } from "../gestures";
@@ -43,10 +43,12 @@ export function SceneTimelineRowView({
         ? Camera
         : row.subject === "environment"
           ? Sun
-          : Lightbulb;
+          : row.subject === "compositionEffect"
+            ? Sparkles
+            : Lightbulb;
   const name =
     row.kind === "sceneProperty"
-      ? `${row.animation ? `${animationPresetName(row.animation.preset, t)} · ` : ""}${scenePropertyLabel(row.property.target, t)}`
+      ? `${row.animation ? `${animationPresetName(row.animation.preset, t)} · ` : ""}${scenePropertyLabel(row.property.target, t, row.effectType)}`
       : sceneRowName(row, t);
   return (
     <div
@@ -54,6 +56,9 @@ export function SceneTimelineRowView({
       style={{ top, height, pointerEvents: labelsOnly ? "none" : undefined }}
       data-motion-row-key={row.key}
       data-motion-scene-owner={row.subject}
+      data-motion-effect-id={
+        row.owner.kind === "compositionEffect" ? row.owner.effectId : undefined
+      }
       data-motion-light-id={row.owner.kind === "light" ? row.owner.lightId : undefined}
       data-labels-only={labelsOnly || undefined}
       data-motion-property-id={row.kind === "sceneProperty" ? row.property.id : undefined}

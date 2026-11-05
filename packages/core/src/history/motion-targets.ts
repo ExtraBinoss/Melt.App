@@ -1,3 +1,4 @@
+import { sceneAnimationTarget } from "../motion/scene/animations/targets";
 import type { Composition } from "../document/model";
 import type { MotionPropertyTarget } from "../motion/properties/model";
 import type { SceneMotionPropertyTarget } from "../motion/scene/model";
@@ -32,6 +33,23 @@ export function historyTarget(
           },
           property:
             target.kind === "effectSetting" ? `settings.${target.property}` : target.property,
+        }
+      : null;
+  }
+  if (target.kind === "compositionEffect" || target.kind === "compositionEffectSetting") {
+    const effect = context.page.effects?.find((effect) => effect.id === target.effectId);
+    return effect
+      ? {
+          owner: {
+            kind: "effect",
+            compositionId: target.compositionId,
+            effectId: effect.id,
+            effectType: effect.type,
+          },
+          property:
+            target.kind === "compositionEffectSetting"
+              ? `settings.${target.property}`
+              : target.property,
         }
       : null;
   }
@@ -108,10 +126,7 @@ export function visitKeys(
         if (!ids.has(id)) continue;
         visit({
           id,
-          target: {
-            ...animation.owner,
-            property: channel.target.property,
-          } as SceneMotionPropertyTarget,
+          target: sceneAnimationTarget(animation.owner, channel.target),
           read: () => {
             const current = page.motion?.sceneAnimations?.find((item) => item.id === animation.id);
             const point = current?.preset.channels[ci]?.points[pi];

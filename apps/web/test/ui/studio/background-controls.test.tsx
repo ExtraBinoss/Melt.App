@@ -103,6 +103,16 @@ test("background cancellation restores its draft and solid mode uses a visible g
   expect(d.engine.getSnapshot().project.pages[0]).toMatchObject({ background: "#00000000" });
 });
 
+test("background recipes belong to the existing Advanced paint Presets popover", () => {
+  fixture();
+  expect(document.querySelector("[data-background-preset]")).toBeNull();
+  act(() => screen.getByRole("button", { name: "Avancé" }).click());
+  expect(document.querySelector("[data-background-preset]")).toBeNull();
+  act(() => screen.getByRole("button", { name: "Préréglages" }).click());
+  expect(document.querySelectorAll("[data-background-preset]")).toHaveLength(65);
+  expect(document.querySelector(".gradient-library [data-slot=accordion]")).not.toBeNull();
+});
+
 test("switching radial and linear repeatedly gives each pad a live captured thumb and one commit", () => {
   const d = fixture();
   for (const kind of ["Linéaire", "Radial", "Linéaire"]) {

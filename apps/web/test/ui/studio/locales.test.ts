@@ -2,17 +2,17 @@ import { expect, test } from "vitest";
 import { i18n } from "../../../src/state/i18n";
 import { supportedLocales } from "../../../src/state/i18n/locales";
 import { resources as workspaceModes } from "../../../src/components/projects/workspace-mode/messages";
-import "../../../src/ui/studio/library/messages";
+import "../../../src/components/spatial/objects/messages";
 import "../../../src/ui/studio/background/messages";
 import "../../../src/ui/studio/effects/messages";
 import "../../../src/ui/studio/framing/messages";
 
 const modules = import.meta.glob(
-  "../../../src/ui/studio/{library,background,effects,framing}/locales/*.json",
-  {
-    eager: true,
-    import: "default",
-  },
+  [
+    "../../../src/components/spatial/objects/locales/*.json",
+    "../../../src/ui/studio/{background,effects,framing}/locales/*.json",
+  ],
+  { eager: true, import: "default" },
 );
 const features = {
   studioLibrary: "library",
@@ -32,10 +32,8 @@ function strings(value: Record<string, unknown>, prefix = ""): Record<string, st
 }
 
 function resource(feature: string, language: string): Record<string, string> {
-  return modules[`../../../src/ui/studio/${feature}/locales/${language}.json`] as Record<
-    string,
-    string
-  >;
+  const directory = feature === "library" ? "components/spatial/objects" : `ui/studio/${feature}`;
+  return modules[`../../../src/${directory}/locales/${language}.json`] as Record<string, string>;
 }
 
 test("Studio library and background copy covers every locale and preserves interpolation", () => {

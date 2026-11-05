@@ -1,3 +1,4 @@
+import { authoredPixelDown, transportUv } from "../shared/coordinates";
 import {
   clamp,
   cos,
@@ -25,19 +26,23 @@ export function circularHalftone({
 }: Pick<EffectNodeContext, "source" | "controls">) {
   const p = uv(),
     u = controls.parameters,
-    size = controls.logicalResolution,
+    size = controls.contentResolution,
     spacing = max(1, controls.scale);
   const angle = u.rotation!.mul(Math.PI / 180),
     c = cos(angle),
     s = sin(angle);
   const offset = vec2(u.offsetX!, u.offsetY!),
-    point = vec2(p.x, p.y.oneMinus()).mul(size).sub(offset);
+    point = authoredPixelDown(controls, p).sub(offset);
   const grid = vec2(point.x.mul(c).add(point.y.mul(s)), point.y.mul(c).sub(point.x.mul(s)));
   const cell = floor(grid.div(spacing)).add(0.5).mul(spacing);
   const center = vec2(cell.x.mul(c).sub(cell.y.mul(s)), cell.x.mul(s).add(cell.y.mul(c)))
     .add(offset)
     .div(size);
-  const color = sampleEffect(source, controls, clamp(vec2(center.x, center.y.oneMinus()), 0, 1));
+  const color = sampleEffect(
+    source,
+    controls,
+    transportUv(controls, clamp(vec2(center.x, center.y.oneMinus()), 0, 1)),
+  );
   const tone = pow(clamp(dot(color.rgb, vec3(0.2126, 0.7152, 0.0722)).oneMinus(), 0, 1), u.gamma!);
   const mosaic = u.pattern!.greaterThan(1.5);
   const radius = mosaic.select(1, sqrt(tone)).mul(spacing).mul(0.5).mul(u.dotSize!);
@@ -75,7 +80,11 @@ export function circularHalftone({
     )
       .add(offset)
       .div(size);
-    const color = sampleEffect(source, controls, clamp(vec2(q.x, q.y.oneMinus()), 0, 1));
+    const color = sampleEffect(
+      source,
+      controls,
+      transportUv(controls, clamp(vec2(q.x, q.y.oneMinus()), 0, 1)),
+    );
     const r = sqrt(pow(clamp(color[index].oneMinus(), 0, 1), u.gamma!))
       .mul(spacing)
       .mul(Math.SQRT1_2)

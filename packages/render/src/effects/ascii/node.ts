@@ -1,3 +1,4 @@
+import { authoredPixel, authoredUv, transportUv } from "../shared/coordinates";
 import {
   clamp,
   abs,
@@ -27,13 +28,13 @@ export function asciiNode({ source, controls, getGlyphAtlas, bindGlyphAtlas }: E
     modern = !!u.contrast;
   const position = uv(),
     sample = sampleEffect(source, controls, position);
-  const pixel = position.mul(controls.logicalResolution);
+  const pixel = authoredPixel(controls, position);
   const size = vec2(controls.scale.mul(modern ? u.cellAspect! : 0.65), controls.scale);
   const cell = floor(pixel.div(size));
   const blocked = sampleEffect(
     source,
     controls,
-    cell.add(0.5).mul(size).div(controls.logicalResolution),
+    transportUv(controls, cell.add(0.5).mul(size).div(controls.contentResolution)),
   );
   const adjusted = modern
     ? pow(
@@ -78,7 +79,12 @@ export function asciiNode({ source, controls, getGlyphAtlas, bindGlyphAtlas }: E
         controls.colors.foreground!,
         controls.colors.gradientEnd!,
         clamp(
-          dot(vec2(position.x, position.y.oneMinus()).sub(0.5), direction)
+          dot(
+            vec2(authoredUv(controls, position).x, authoredUv(controls, position).y.oneMinus()).sub(
+              0.5,
+            ),
+            direction,
+          )
             .div(max(0.0001, abs(direction.x).add(abs(direction.y))))
             .add(0.5),
           0,

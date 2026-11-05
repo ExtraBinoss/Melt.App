@@ -1,0 +1,38 @@
+{
+  "en": {
+    "name": "Depth of Field",
+    "parameter": {
+      "focusDistance": "Focus distance",
+      "focusRange": "Focal range",
+      "aperture": "Aperture",
+      "maxBlur": "Maximum blur",
+      "blades": "Aperture blades",
+      "angle": "Aperture direction",
+      "edgeProtection": "Depth edge protection",
+      "quality": "Sampling quality"
+    },
+    "choice": {
+      "low": "Low (8 samples)",
+      "medium": "Medium (16 samples)",
+      "high": "High (24 samples)"
+    }
+  },
+  "fr": {
+    "name": "Profondeur de champ",
+    "parameter": {
+      "focusDistance": "Distance de mise au point",
+      "focusRange": "Plage de netteté",
+      "aperture": "Ouverture",
+      "maxBlur": "Flou maximal",
+      "blades": "Lamelles du diaphragme",
+      "angle": "Direction du diaphragme",
+      "edgeProtection": "Protection des contours de profondeur",
+      "quality": "Qualité d’échantillonnage"
+    },
+    "choice": {
+      "low": "Faible (8 échantillons)",
+      "medium": "Moyenne (16 échantillons)",
+      "high": "Élevée (24 échantillons)"
+    }
+  }
+}

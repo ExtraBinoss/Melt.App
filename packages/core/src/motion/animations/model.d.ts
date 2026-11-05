@@ -3,6 +3,7 @@ import type { Effect, Layer } from "../../document/model";
 import type { MotionEasing } from "../easing";
 import type { LayerMotionProperty, EffectMotionProperty, MotionValue } from "../properties/model";
 import type { MotionTime } from "../time";
+import type { MotionDriver } from "../drivers/model";
 
 export type AnimationCategory =
   | "typography"
@@ -30,6 +31,8 @@ export interface AnimationChannel<Target = AnimationTarget> {
   /** Relative distances adapt to the target, including the shared preview image. */
   unit?: "width" | "height";
   points: AnimationPoint[];
+  /** Maps a portable time/input driver through the same typed point interpolation. */
+  driver?: MotionDriver;
 }
 export interface MotionAnimationPreset<Target = AnimationTarget> {
   version: 1;
@@ -49,6 +52,8 @@ export interface MotionAnimation<Target = AnimationTarget> {
   strength: number;
   enabled: boolean;
   effectIds: string[];
+  /** False for bindings to existing user effects; removing a block preserves its effect. */
+  ownsEffects?: boolean;
 }
 export type MotionAnimationCommand =
   | {
@@ -62,8 +67,12 @@ export type MotionAnimationCommand =
     }
   | {
       type: "addMotionAnimation";
-      trackId: string;
+      trackId?: string;
+      /** Resolves the occurrence after initialization in the same atomic transaction. */
+      layerId?: string;
       preset: MotionAnimationPreset;
+      /** Bind existing effect slots atomically instead of creating duplicate effects. */
+      effectIds?: string[];
       start: MotionTime;
       duration?: MotionTime;
       strength?: number;

@@ -120,14 +120,24 @@ export function patchEffectParameter(
     return {
       seed: preset.seed,
       scale: preset.scale,
-      settings: { ...GRADIENT_DEFAULT_SETTINGS, ...gradientPresetSettings(preset) },
+      settings: {
+        ...GRADIENT_DEFAULT_SETTINGS,
+        ...gradientPresetSettings(preset),
+        ...Object.fromEntries(
+          Object.entries(effect.settings ?? {}).filter(([key]) => key.startsWith("domain")),
+        ),
+      },
     };
   }
   return {
     settings: {
-      ...resolveEffectSettings(effect),
+      ...(effect.type === "gradient" && !canonical.key.startsWith("domain")
+        ? resolveGradientSettings(effect.settings)
+        : effect.settings),
       [canonical.key]: value,
-      ...(effect.type === "gradient" ? { preset: "custom" } : {}),
+      ...(effect.type === "gradient" && !canonical.key.startsWith("domain")
+        ? { preset: "custom" }
+        : {}),
     },
   };
 }

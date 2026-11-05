@@ -5,11 +5,22 @@ import "../../../bootstrap/messages";
 import "../templates/messages";
 import "./opening.css";
 
-export function OpeningSurface({ cancel }: { cancel?: () => void }) {
+export function OpeningSurface({
+  cancel,
+  projectName,
+}: {
+  cancel?: () => void;
+  projectName?: string;
+}) {
   const { t } = useTranslation("startup");
   return (
     <div className="project-opening-content">
-      <Throbber size={80} variant="shimmer" label={t("opening")} delayMs={0} />
+      <Throbber
+        size={80}
+        variant="shimmer"
+        label={projectName ? t("openingProject", { projectName }) : t("opening")}
+        delayMs={0}
+      />
       {cancel && (
         <Button variant="ghost" onClick={cancel}>
           {t("templates:cancel")}

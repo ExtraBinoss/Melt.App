@@ -48,7 +48,11 @@ export function channelPresentation(
       item.key === property && (item.scope === "settings") === (target.kind === "effectSetting"),
   );
   const name =
-    target.kind === "camera" || target.kind === "environment" || target.kind === "light"
+    target.kind === "camera" ||
+    target.kind === "environment" ||
+    target.kind === "light" ||
+    target.kind === "compositionEffect" ||
+    target.kind === "compositionEffectSetting"
       ? scenePropertyLabel(target, t)
       : target.kind === "layer"
         ? property.startsWith("spatial.")
@@ -60,8 +64,9 @@ export function channelPresentation(
   const percent =
     !!channel.unit ||
     ["scaleX", "scaleY", "opacity"].includes(property) ||
-    (target.kind === "effect" && property === "amount") ||
-    (target.kind === "effectSetting" && property === "progress");
+    ((target.kind === "effect" || target.kind === "compositionEffect") && property === "amount") ||
+    ((target.kind === "effectSetting" || target.kind === "compositionEffectSetting") &&
+      property === "progress");
   const factor = percent ? 100 : 1;
   const unit = percent
     ? "%"

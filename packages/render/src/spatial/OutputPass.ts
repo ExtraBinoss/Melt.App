@@ -6,6 +6,7 @@ import {
   PlaneGeometry,
   Scene,
   Texture,
+  Vector2,
   type Node,
   type RenderTarget,
   type WebGPURenderer,
@@ -26,6 +27,7 @@ import { compileGpuScene } from "../compositing/compile";
 export class SpatialOutputPass {
   private readonly placeholder = new Texture();
   private readonly source = texture(this.placeholder);
+  private readonly sourceScale = uniform(new Vector2(1, 1));
   private readonly material = new MeshBasicNodeMaterial({
     depthTest: false,
     depthWrite: false,
@@ -37,7 +39,7 @@ export class SpatialOutputPass {
   private readonly camera = new OrthographicCamera(-1, 1, 1, -1, 0, 1);
   private compiled = false;
   constructor(private readonly renderer: WebGPURenderer) {
-    const sample = this.source.sample(textureUv(uniform(1)));
+    const sample = this.source.sample(textureUv(uniform(1)).mul(this.sourceScale));
     const linear = sample.rgb.div(max(sample.a, 0.000001));
     this.material.fragmentNode = vec4(
       vec3(sRGBTransferOETF(acesFilmicToneMapping(linear, float(1))) as Node<"vec3">).mul(sample.a),
@@ -51,8 +53,9 @@ export class SpatialOutputPass {
     await compileGpuScene(this.renderer, this.scene, this.camera, target, canContinue);
     this.compiled = true;
   }
-  render(source: Texture, target: RenderTarget) {
-    this.source.value = source;
+  render(source: RenderTarget, target: RenderTarget) {
+    this.source.value = source.texture;
+    this.sourceScale.value.set(source.viewport.z / source.width, source.viewport.w / source.height);
     const previous = this.renderer.getRenderTarget(),
       auto = this.renderer.autoClear;
     try {

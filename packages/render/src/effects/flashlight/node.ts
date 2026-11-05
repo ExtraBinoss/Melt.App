@@ -1,3 +1,4 @@
+import { authoredPixelDown } from "../shared/coordinates";
 import {
   clamp,
   cos,
@@ -23,8 +24,8 @@ export function flashlightNode({ source, controls }: EffectNodeContext) {
   const p = controls.parameters,
     position = uv(),
     original = sampleEffect(source, controls, position),
-    pixel = vec2(position.x, position.y.oneMinus()).mul(controls.logicalResolution),
-    center = vec2(p.centerX!, p.centerY!).mul(controls.logicalResolution),
+    pixel = authoredPixelDown(controls, position),
+    center = vec2(p.centerX!, p.centerY!).mul(controls.contentResolution),
     delta = pixel.sub(center),
     angle = p.rotation!.mul(Math.PI / 180),
     c = cos(angle),
@@ -33,7 +34,7 @@ export function flashlightNode({ source, controls }: EffectNodeContext) {
     distance = vec2(rotated.x.div(max(0.2, p.aspect!)), rotated.y).length(),
     radius = max(
       0.001,
-      p.radius!.mul(min(controls.logicalResolution.x, controls.logicalResolution.y)),
+      p.radius!.mul(min(controls.contentResolution.x, controls.contentResolution.y)),
     ),
     feather = min(radius, max(0.001, radius.mul(p.softness!))),
     shape = smoothstep(radius.sub(feather), radius, distance).oneMinus(),

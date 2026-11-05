@@ -39,6 +39,48 @@ function description(
 const format = (target: HistoryPropertyTarget, value: string | number | boolean) =>
   formatHistoryDescription(description(target, scalar(value), scalar(value)), "undo", t);
 
+it("adds the real object/effect name and operation while preserving restored values and aggregate counts", () => {
+  const change = description({ owner: layer, property: "spatial.depth" }, scalar(12), scalar(24));
+  expect(formatHistoryDescription(change, "undo", t, ["MELT"])).toBe("Change Depth 12 · MELT");
+  expect(formatHistoryDescription(change, "redo", t, ["MELT"])).toBe("Change Depth 24 · MELT");
+  expect(
+    formatHistoryDescription(
+      {
+        changes: [{ kind: "action", action: "add", owner: layer }],
+        additionalChanges: false,
+      },
+      "redo",
+      t,
+      ["Sphere"],
+    ),
+  ).toBe("Add Sphere");
+  const blur = {
+    kind: "effect",
+    compositionId: "page",
+    effectId: "blur",
+    effectType: "blur",
+  } as const;
+  expect(
+    formatHistoryDescription(
+      {
+        changes: [{ kind: "action", action: "add", owner: blur }],
+        additionalChanges: false,
+      },
+      "undo",
+      t,
+      ["Composition"],
+    ),
+  ).toBe("Add Blur · Composition");
+  expect(
+    formatHistoryDescription(
+      { ...change, changes: [...change.changes, ...change.changes] },
+      "undo",
+      t,
+      ["MELT", "Sphere"],
+    ),
+  ).toBe("Change Depth 12 · MELT · + 1 change");
+});
+
 it("names background, paints, typography, transforms, SVG flags and exact numeric restored values", () => {
   const cases: [HistoryPropertyTarget, string | number | boolean, string][] = [
     [{ owner: composition, property: "background" }, "#123456", "Background #123456"],

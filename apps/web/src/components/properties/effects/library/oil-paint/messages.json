@@ -1,0 +1,28 @@
+{
+  "en": {
+    "name": "Oil Painter",
+    "parameter": {
+      "brushScale": "Brush scale",
+      "elongation": "Brush elongation",
+      "directionality": "Radial brush direction",
+      "edgePreservation": "Edge preservation",
+      "detail": "Original detail",
+      "centerX": "Brush center X",
+      "centerY": "Brush center Y",
+      "angle": "Brush angle"
+    }
+  },
+  "fr": {
+    "name": "Peinture à l’huile",
+    "parameter": {
+      "brushScale": "Taille du pinceau",
+      "elongation": "Allongement du pinceau",
+      "directionality": "Direction radiale du pinceau",
+      "edgePreservation": "Préservation des contours",
+      "detail": "Détail d’origine",
+      "centerX": "Centre du pinceau X",
+      "centerY": "Centre du pinceau Y",
+      "angle": "Angle du pinceau"
+    }
+  }
+}

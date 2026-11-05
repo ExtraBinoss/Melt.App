@@ -4,10 +4,12 @@ import { compileMotionInterpolator } from "../interpolation";
 import { resolveMotionProperty } from "../properties/registry";
 import type { MotionPropertySchema, MotionPropertyTarget, MotionValue } from "../properties/model";
 import type { SceneMotionPropertyTarget } from "../scene/model";
-import { addMotionTime, motionTimeProgress, type MotionTime } from "../time";
+import { addMotionTime, motionTimeProgress, compareMotionTime, subtractMotionTime } from "../time";
+import type { MotionTime } from "../time";
 import type { MotionLayerTrack } from "../model";
 import type { AnimationChannel, MotionAnimation } from "./model";
 import { animationAddress, animationTarget } from "./targets";
+import { compileMotionDriver } from "../drivers/compile";
 export type AnimationPropertyTarget = MotionPropertyTarget | SceneMotionPropertyTarget;
 export type AnimationPropertyDescriptor<Target = MotionPropertyTarget> = MotionPropertySchema & {
   readonly target: Target;
@@ -43,13 +45,20 @@ export function compileAnimationChannel<Target extends AnimationPropertyTarget>(
       compileMotionInterpolator(interpolation, points[index]!.value, point.value, point.easing),
     );
   const end = addMotionTime(animation.start, animation.duration);
+  const driver = channel.driver ? compileMotionDriver(channel.driver) : undefined;
   return {
     descriptor,
     address: animationAddress(descriptor.target),
     operation: channel.operation,
     strength: animation.strength,
     sample(time) {
-      const progress = motionTimeProgress(time, animation.start, end);
+      const progress = driver
+        ? driver(
+            compareMotionTime(time, animation.start) <= 0
+              ? { value: 0, rate: 1 }
+              : subtractMotionTime(compareMotionTime(time, end) > 0 ? end : time, animation.start),
+          )
+        : motionTimeProgress(time, animation.start, end);
       if (progress <= 0) return points[0]!.value;
       if (progress >= 1) return points[points.length - 1]!.value;
       let index = 1;

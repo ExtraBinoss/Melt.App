@@ -13,6 +13,116 @@
   display: block;
   padding: 2px 2px 8px;
 }
+.studio-object-paint {
+  flex: 0 0 36px;
+}
+.studio-object-paint .icon-button {
+  width: 36px;
+  height: 36px;
+  padding: 5px;
+  border: 1px solid var(--input);
+  border-radius: var(--radius-md);
+}
+.studio-object-paint-swatch {
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-sm);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--foreground) 12%, transparent);
+}
+.studio-object-paint-popover {
+  width: min(300px, calc(100vw - 24px));
+  max-height: 70dvh;
+  overflow: auto;
+  padding: 14px;
+  border-radius: var(--radius-lg);
+}
+
+/* Keep CSS centering separate from Motion's measured layout transforms. */
+.studio-object-bar-anchor {
+  position: absolute;
+  left: 50%;
+  bottom: var(--studio-bottom);
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: min(980px, calc(100% - 400px));
+  pointer-events: none;
+}
+.studio-object-bar-anchor > .studio-object-bar {
+  position: relative;
+  left: auto;
+  bottom: auto;
+  transform: none;
+  max-width: 100%;
+  pointer-events: auto;
+  overflow: hidden;
+}
+.studio-object-bar[data-studio-object-present="false"] {
+  pointer-events: none;
+}
+.studio-object-field {
+  min-width: 0;
+}
+.studio-object-text {
+  flex: 1 1 160px;
+  min-width: 140px;
+  max-width: 220px;
+  width: 180px;
+}
+.studio-object-text > input {
+  width: 100%;
+  height: 36px;
+  background: var(--background);
+  color: var(--foreground);
+  font-size: 12px;
+  border: 1px solid var(--input);
+  border-radius: var(--radius-md);
+  box-shadow: none;
+}
+.studio-object-basics > .studio-object-property {
+  flex: 1 1 112px;
+  min-width: 112px;
+  max-width: 144px;
+}
+.studio-object-field > .studio-slider {
+  width: 100%;
+  margin: 0;
+}
+.studio-object-rotation {
+  display: flex;
+  flex: 2 1 232px;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-width: 112px;
+  max-width: 296px;
+}
+.studio-object-rotation > .studio-slider {
+  flex: 1 1 112px;
+  min-width: 112px;
+  max-width: 144px;
+}
+.studio-object-label {
+  max-width: 130px;
+}
+.studio-object-label > .studio-object-name {
+  display: block;
+}
+.studio-object-advanced {
+  flex: 0 0 auto;
+}
+.studio-object-advanced > button {
+  height: 32px;
+}
+@media (max-width: 1200px) {
+  .studio-object-bar-anchor {
+    max-width: calc(100% - 32px);
+    bottom: calc(78px + var(--studio-timeline-clearance));
+  }
+}
+@media (max-width: 760px) {
+  .studio-object-bar-anchor {
+    bottom: calc(70px + var(--studio-timeline-clearance));
+  }
+}
 
 .studio-scale-inputs {
   display: grid;

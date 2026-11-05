@@ -1,3 +1,4 @@
+import { authoredUv, transportUv } from "../shared/coordinates";
 import type { Node } from "three/webgpu";
 import { clamp, max, mix, pow, smoothstep, vec2, vec4, uv } from "three/tsl";
 import { sampleEffect, type EffectNodeContext } from "../shared/context";
@@ -6,7 +7,7 @@ import { sampleEffect, type EffectNodeContext } from "../shared/context";
 export function transitionField(context: EffectNodeContext) {
   const controls = context.controls,
     u = controls.parameters,
-    position = uv();
+    position = authoredUv(controls);
   const progress = clamp(u.progress!, 0, 1);
   const remaining = progress.oneMinus();
   const strength = clamp(u.strength!, 0, 2);
@@ -16,10 +17,10 @@ export function transitionField(context: EffectNodeContext) {
   const positive = u.direction!.equal(1).or(u.direction!.equal(2));
   const sign = positive.select(1, -1);
   const axis = horizontal.select(vec2(sign, 0), vec2(0, sign));
-  const aspect = controls.logicalResolution.x.div(max(0.0001, controls.logicalResolution.y));
+  const aspect = controls.contentResolution.x.div(max(0.0001, controls.contentResolution.y));
   const centered = position.sub(0.5),
     physical = centered.mul(vec2(aspect, 1));
-  const original: Node<"vec4"> = sampleEffect(context.source, controls, position);
+  const original: Node<"vec4"> = sampleEffect(context.source, controls, uv());
   function rank(coord: Node<"vec2"> = position) {
     const along = horizontal.select(coord.x, coord.y);
     return positive.select(along.oneMinus(), along);
@@ -30,7 +31,9 @@ export function transitionField(context: EffectNodeContext) {
       .and(coord.x.lessThanEqual(1))
       .and(coord.y.greaterThanEqual(0))
       .and(coord.y.lessThanEqual(1));
-    return sampleEffect(context.source, controls, clamp(coord, 0, 1)).mul(inside.select(1, 0));
+    return sampleEffect(context.source, controls, transportUv(controls, clamp(coord, 0, 1))).mul(
+      inside.select(1, 0),
+    );
   }
   function fromAxes(along: Node<"float">, perpendicular: Node<"float">) {
     return horizontal.select(vec2(along, perpendicular), vec2(perpendicular, along)).add(0.5);

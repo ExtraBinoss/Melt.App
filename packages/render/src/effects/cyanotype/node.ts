@@ -1,3 +1,4 @@
+import { authoredPixelDown } from "../shared/coordinates";
 import type { Node } from "three/webgpu";
 import {
   clamp,
@@ -35,7 +36,7 @@ export function cyanotypeNode({ source, controls }: EffectNodeContext) {
   const p = controls.parameters,
     position = uv(),
     original = sampleEffect(source, controls, position);
-  const pixel = vec2(position.x, position.y.oneMinus()).mul(controls.logicalResolution);
+  const pixel = authoredPixelDown(controls, position);
   const luminance = dot(original.rgb, vec3(0.2126, 0.7152, 0.0722)).mul(pow(2, p.exposure!));
   const normalized = luminance.sub(p.blackPoint!).div(p.whitePoint!.sub(p.blackPoint!));
   const corrected = pow(
@@ -56,7 +57,7 @@ export function cyanotypeNode({ source, controls }: EffectNodeContext) {
   ).sub(0.5);
   const edge = min(
     min(pixel.x, pixel.y),
-    min(controls.logicalResolution.x.sub(pixel.x), controls.logicalResolution.y.sub(pixel.y)),
+    min(controls.contentResolution.x.sub(pixel.x), controls.contentResolution.y.sub(pixel.y)),
   );
   const fading = mix(1, smoothstep(0, p.edgeWidth!, edge), p.edgeFade!);
   const coverage = clamp(

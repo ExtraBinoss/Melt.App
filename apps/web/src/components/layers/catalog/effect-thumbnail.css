@@ -8,3 +8,9 @@
   background-color: #17191f;
   background-repeat: no-repeat;
 }
+
+.effect-thumbnail-fallback {
+  display: grid;
+  place-items: center;
+  color: #a7a9b1;
+}

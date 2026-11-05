@@ -87,5 +87,6 @@
   "more_one": "+ {{count}} cambio",
   "align": "Alinear",
   "distribute": "Distribuir",
-  "spatialTransform": "Transformación 3D"
+  "spatialTransform": "Transformación 3D",
+  "change": "Cambiar"
 }

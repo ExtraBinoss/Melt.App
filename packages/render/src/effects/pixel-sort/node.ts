@@ -1,3 +1,4 @@
+import { authoredUv, transportUv } from "../shared/coordinates";
 import {
   Fn,
   If,
@@ -22,7 +23,7 @@ export function pixelSortStep(size: number, span: number, stride: number): Effec
   return ({ source, controls }) =>
     Fn(() => {
       const u = controls.parameters,
-        p = uv(),
+        p = authoredUv(controls),
         vertical = u.axis!;
       const footprint = mix(controls.pixelFootprint.x, controls.pixelFootprint.y, vertical);
       const count = exp2(
@@ -32,7 +33,7 @@ export function pixelSortStep(size: number, span: number, stride: number): Effec
       );
       // Lower-density previews use fewer cells while retaining the authored segment width.
       const cell = float(size).mul(u.cellSize!).div(count);
-      const dimensions = controls.logicalResolution.div(cell);
+      const dimensions = controls.contentResolution.div(cell);
       const axisSize = floor(mix(dimensions.x, dimensions.y, vertical));
       const index = floor(mix(p.x.mul(dimensions.x), p.y.mul(dimensions.y), vertical));
       const offset = floor(u.offset!.mul(count.sub(1)));
@@ -45,8 +46,8 @@ export function pixelSortStep(size: number, span: number, stride: number): Effec
           mix(i.add(0.5).div(dimensions.x), p.x, vertical),
           mix(p.y, i.add(0.5).div(dimensions.y), vertical),
         );
-      const a = sampleEffect(source, controls, coord(index)).toVar();
-      const b = sampleEffect(source, controls, coord(partner)).toVar();
+      const a = sampleEffect(source, controls, transportUv(controls, coord(index))).toVar();
+      const b = sampleEffect(source, controls, transportUv(controls, coord(partner))).toVar();
       const key = (s: Node<"vec4">) => {
         const value = dot(s.rgb, vec3(0.2126, 0.7152, 0.0722)).toVar();
         for (const [i, channel] of [s.r, s.g, s.b].entries())
@@ -71,7 +72,7 @@ export function pixelSortStep(size: number, span: number, stride: number): Effec
         result.assign(b);
       });
       If(valid.not(), () => {
-        result.assign(sampleEffect(source, controls, p));
+        result.assign(sampleEffect(source, controls, transportUv(controls, p)));
       });
       return result;
     })();

@@ -4,7 +4,7 @@ import { useProjectPreference } from "../../../components/workspace/preferences/
 import { useWorkspaceMode } from "../workspace-mode";
 import type { SpatialCanvasProps } from "../../../canvas/spatial/CanvasSpatialEditing";
 import { getStudioViewport } from "./viewport";
-import { StudioBackdrop } from "./StudioBackdrop";
+import "./backdrop.css";
 import "./framing.css";
 
 /** One imperative projection: camera input paints only the guide, never the editor React tree. */
@@ -58,6 +58,12 @@ export function StudioCanvasViewport({
         projectId: snapshot.project.id,
         pageId: frame.page.id,
         region,
+        displayRegion: {
+          x: frame.page.width / 2 - (size.width / 2 + view.x) / view.zoom,
+          y: frame.page.height / 2 - (size.height / 2 + view.y) / view.zoom,
+          width: size.width / view.zoom,
+          height: size.height / view.zoom,
+        },
         width: Math.round(width),
         height: Math.round(height),
       });
@@ -94,13 +100,6 @@ export function StudioCanvasViewport({
   }, [active, engine, controller, viewSource, viewport]);
   return active ? (
     <>
-      <StudioBackdrop
-        engine={engine}
-        controller={controller}
-        viewSource={viewSource}
-        viewport={viewport}
-        enabled
-      />
       <div className="studio-capture-overlay" aria-hidden="true">
         <div
           ref={window}

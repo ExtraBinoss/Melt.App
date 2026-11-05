@@ -46,6 +46,21 @@ export function useTransformSnapping({
         active.mode === "resize"
           ? session.resize(active.handle!, active.from, point, shift, enabled, threshold)
           : session.move(active.from, point, enabled, threshold);
+      if (active.backgroundLayerId) {
+        const owner = result.patches.find((item) => item.layerId === active.backgroundLayerId);
+        const original = active.layers.find((item) => item.id === active.backgroundLayerId);
+        if (
+          owner &&
+          original &&
+          Object.entries(owner.patch).some(([key, value]) => {
+            const previous = original[key as keyof Layer];
+            return typeof value === "number" && typeof previous === "number"
+              ? Math.abs(value - previous) > 1e-9
+              : !Object.is(value, previous);
+          })
+        )
+          owner.patch = { ...owner.patch, background: true };
+      }
       active.modifiers = { alt, shift };
       patchesRef.current = result.patches;
       const layer = active.layers[0],

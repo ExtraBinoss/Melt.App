@@ -3,10 +3,12 @@ import { act, fireEvent, render, screen } from "@testing-library/react";
 import { ProjectPreferencesProvider } from "../../../src/components/workspace/preferences/context";
 import {
   useWorkspaceMode,
+  useRequestedWorkspaceMode,
   useSetWorkspaceMode,
   workspaceModeFromSearch,
 } from "../../../src/ui/studio/workspace-mode";
 import type { ProjectLayoutPreferences } from "../../../src/services/projects/preferences/model";
+import { PresentedWorkspaceMode } from "../../../src/ui/studio/transition/context";
 
 function Probe() {
   const mode = useWorkspaceMode();
@@ -23,6 +25,33 @@ function Probe() {
 test("ordinary and legacy projects default to Classic without a document or storage write", () => {
   render(<Probe />);
   expect(screen.getByTestId("mode")).toHaveTextContent("classic");
+});
+
+test("a pending choice publishes immediately while chrome and canvas consumers retain their presented mode", async () => {
+  const port = {
+    read: vi.fn().mockResolvedValue({}),
+    update: vi.fn().mockResolvedValue(undefined),
+  };
+  function Choice() {
+    const requested = useRequestedWorkspaceMode();
+    const choose = useSetWorkspaceMode();
+    return <button onClick={() => choose("studio")}>Requested {requested}</button>;
+  }
+  render(
+    <ProjectPreferencesProvider projectId="transition" port={port} onError={vi.fn()}>
+      <PresentedWorkspaceMode value="classic">
+        <Choice />
+        <Probe />
+      </PresentedWorkspaceMode>
+    </ProjectPreferencesProvider>,
+  );
+  fireEvent.click(screen.getByRole("button", { name: "Requested classic" }));
+  expect(screen.getByRole("button", { name: "Requested studio" })).toBeInTheDocument();
+  expect(screen.getByTestId("mode")).toHaveTextContent("classic");
+  await act(async () => {
+    await Promise.resolve();
+  });
+  expect(port.update).toHaveBeenCalledExactlyOnceWith("transition", { workspaceMode: "studio" });
 });
 
 test("late preference hydration cannot replace a user choice and unrelated consumers stay idle", async () => {

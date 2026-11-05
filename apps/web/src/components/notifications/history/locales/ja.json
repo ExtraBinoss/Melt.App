@@ -87,5 +87,6 @@
   "more_one": "+ {{count}} 件の変更",
   "align": "整列",
   "distribute": "均等配置",
-  "spatialTransform": "3D変換"
+  "spatialTransform": "3D変換",
+  "change": "変更"
 }

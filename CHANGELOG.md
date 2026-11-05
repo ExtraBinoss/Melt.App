@@ -4,19 +4,52 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ## [Unreleased]
 
+- Separate the 2D rotation grip from resize handles by a constant screen-space offset. Keep its visual as a matching small circle with a larger invisible pointer target, preserve its size through zoom and transformed parents, and align rotation feedback with the actual grip.
+
+- Anchor complete raster-effect stacks and SDK influence areas to native text/vector front-face coordinates during Studio camera zoom. Reframe lit object images onto a stable authored pixel lattice on the GPU, run the existing shared effects pipeline once, and reproject its premultiplied result before masks and composition. The fix applies to every effect without shader-specific camera handling.
+
 - Fix black RVM video masks on browsers with native Float16Array by decoding the underlying half-float bytes rather than treating decimal alpha values as encoded integers. Preserve typed-array byte offsets, retain Uint16Array compatibility, and add regressions using a real ONNX tensor, native Float16Array alpha and sliced binary views.
 
-- Refine Studio property interactions while preserving the contextual bar layout: expose linked X/Y/Z scale and text wrapping bounds in advanced controls, coalesce rapid text preview samples per frame, use relative slider drags with speed-sensitive Shift increments and snap guides, and replace numeric reset titles with shared tooltips. Keep color swatch corners on workspace theme tokens, compact gradient direction controls with distinct linear/radial icons and fresh pointer ownership after mode switches, and open blank-canvas insertion at the actual pointer inside Studio compositions.
+- Keep the Motion dock mounted across canonical Static/Motion edits, with bounded owner IDs and pin choices in Jotai atoms. Derive the animation-view subscription independently from animation selection and batch timeline geometry reads before writes.
+- Prepare Studio property controls on pointer/focus intent and retain one editor with React Activity, suspending effects and cancelling drafts while closed. Isolate popover layout from the canvas.
+- Use secondary-pointer drags to pan Studio in both axes while preserving object poses, the portable camera, selection and undo history. Keep stationary right clicks for context menus and restore cancelled pans.
+- Add indexed 3D translation snapping to composition/object centers and bounds, constrained world axes/planes, camera-projected pixel tolerance, a larger release radius, imperative Jotai-backed guides, Alt bypass and one undoable commit.
 
+- Anchor Shatter fractures and 22 related spatial effect families to authored content coordinates instead of canvas pan/zoom transport windows, including expanded margins and infinite backgrounds. Keep original texture/depth sampling in transport coordinates and size Window Trails from its authored content. Native WebGPU/WebGL witnesses pass 100 spatial-effect and 48 Shatter viewport comparisons with zero production pixel readbacks.
+- Keep the engine and canvas mounted during Classic/Studio switches, crossfade workspace controls through existing Motion springs, and show a compact Melt status while actual chrome and GPU presentation are pending. Make the workspace selector fill its project-menu row; cancel superseded transitions and honor reduced motion.
+- Include the project name in startup and project-opening status, using existing listing metadata or one bounded record read with cancellation and connection cleanup. Move loading-text shimmer to composited transforms, add subtle mascot breathing, and remove the mascot's 30 Hz sampling cap so visible active marks follow the display refresh clock, including 120 Hz.
+
+- Replace abstract effect samples with 53 photographic previews baked through the production GPU renderer from four original editorial portrait, landscape, studio and city sources. Let each effect select its source, native staging and representative values through typed SDK preview metadata. Share one content-hashed 967,160-byte WebP atlas across both workspaces; browsing loads no originals and starts no effect renderer. Show large two-column photo cards in Studio and larger thumbnails in Classic. The serial native bake completed with zero production pixel readbacks.
+
+- Simplify effect Motion authoring into icon tiles with immediate Loop, Back-and-forth, Pulse and pointer/drag/click actions. Keep ranges and technical options under Settings, open the shared timeline and start playback after adding an animation, and shorten the recording controls.
+- Keep an icon-and-label Motion entry visible at the bottom of Static Studio. Reuse validated composition initialization and its confirmation, then open the existing ruler/timeline; subsequent clicks toggle the same dock without changing the document.
+
+- Preserve background paint ownership across rectangle resizing and translation. Continue the same solid/gradient/effect source over the full display window and canonical output, suppress obsolete composition underlays, and keep Transparent genuinely transparent. Recognize already-resized legacy background layers and retain explicit ownership through edits, undo and portable serialization without changing ordinary Classic rectangles.
+
+- Introduce the shared effects SDK on the existing engine: typed author metadata, lazily resolved owner-local placement/area settings, generic XY/scalar controls, optional shared radial handles, and one premultiplied GPU application stage for raster built-ins and adjustments. Preserve legacy effect IDs, sparse settings and Gradient preset behavior.
+- Replace temporary phase-only effect animation with editable Motion blocks for Loop, Ping-pong, Pulse, Pointer X/Y/XY, Drag and Click. Add sparse semantic input recording, deterministic analytic spring replay, scoped canvas test input, composition-effect owners, timeline projection, history pruning and identity remapping through the existing Motion evaluator.
+- Register Risograph, Oil Painter, Chromatic Aberration, source-colored LEGO-style Blocks with raised studs and palette controls, and directional Wind through the SDK. Add composition-only native-depth DOF with manual focus and bounded sampling, plus temporal Trail using exact upstream authored poses, recursive-history exclusion and GPU-budgeted snapshots. New catalog entries currently use neutral fallback icons until native thumbnails are baked.
+
+- Expose the existing Motion timeline dock in Studio on desktop and touch layouts, with shared transport, pin/peek behavior and Static/Motion selection in Compositions. Reserve clearance for the unpinned transport above Studio controls while pinned panels use their existing viewport reservation.
+
+- Refine Studio property interactions while preserving the contextual bar layout: expose linked X/Y/Z scale and text wrapping bounds in advanced controls, coalesce rapid text preview samples per frame, use relative slider drags with speed-sensitive Shift increments and snap guides, and replace numeric reset titles with shared tooltips. Keep color swatch corners on workspace theme tokens, compact gradient direction controls with distinct linear/radial icons and fresh pointer ownership after mode switches, and open blank-canvas insertion at the actual pointer inside Studio compositions.
 - Transfer background recipe paint ownership to its editable rectangle atomically, clearing the previous composition paint so resizing or feathering the rectangle cannot uncover an old gradient. Undo restores both paint owners.
 
 - Keep a Studio object's white contour continuous from hover through primary press and selection. Retain the same silhouette until pointer-up selection takes ownership, cancel hover normally on drags/cancellation, and keep selected contours steady instead of restarting hover pulses.
 
 - Align native 3D selection contours with the used source viewport instead of padded texture storage. Keep white selection strokes at a stable CSS-pixel width across zoom and preview density, including rotated sources, glyph counters and contour margins.
 
+- Bound Studio wheel zoom lookahead and coalesce native orbit drafts per animation frame. Suspend canvas hover picking during drafts, retain unchanged depth/reflection material graphs across camera samples, and reuse bucketed native 3D preview storage with exact viewports and budget admission before allocation. Exact exports keep their authored resolution.
+
 - Restore document undo/redo after moving gradient stops, including inside nonmodal paint popovers. Make stop percentage suffixes horizontal scrub handles and open the selected stop's color picker on double-click in the gradient ramp.
 
 ### Added
+
+- Document the proposed effects SDK, shared spatial controls, Studio timeline, typed Motion/input drivers and missing-effect delivery plan in `docs/effects/sdk_effects/`. Record the unintegrated implementation drafts and their validation gaps in a session handoff.
+- Pre-render all 474 offline-pack model thumbnails into one 400,248-byte native atlas. Decode and integrity-check it once, retain an offline cache and start no model downloads or GPU preparation while scrolling; preserve native hover rotation.
+- Add one shared 2D/3D text insertion tool with workspace-specific defaults, pointer placement and atomic undo. Compact the native object library into searchable categories with whole-tile insertion, neutral primitive previews and one retained hover renderer; preserve original imported model materials.
+- Share a typed workspace placement policy across insertion, error and history notices. Display localized Undo/Redo direction, named objects, effect properties and restored values; represent composition-effect history through the existing effect domain.
+- Expose composition-wide effects as real editable stack entries in the shared Layers tree, including visibility, parameters, reordering, removal and undo without creating synthetic document layers.
 
 - Add 65 categorized editable background recipes, native circle/ellipse gradient positioning and radius, and a reusable GPU Feather effect. Preview complete native grain/Feather recipes on hover or focus with cancellation and commit through one typed headless-compatible command with atomic undo.
 - Expand native catalogs to 134 materials and 62 environments with generated sphere atlases, initially expanded remembered categories, simple contextual controls and exact compatibility for legacy environment lighting.
@@ -64,6 +97,13 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 - Add the 3-minute Melt promotional film in `films/melt-promo` (Remotion, 1920×1080): real homepage and dashboard captures with continuous camera moves, a faithful editor recreation, the travelling Melt mascot, the retained Melt Mascot export, and a code-generated music + UI-effects soundtrack.
 
 ### Changed
+
+- Move model, SVG and pack scrollbar gutters to the popover's right border while retaining internal content padding. Keep shallow layer trees free of horizontal overflow and reserve horizontal scrolling for expanded hierarchies that actually exceed the viewport.
+- Replace Kenney's descriptive header and pagination with compact source/license information and a virtual continuous grid with shared scroll fades. Give Studio SVGs matching full-width tiles, virtual scrolling and mask fades. Convert stroked SVG icons into bounded editable filled outlines before native extrusion, preserving paint, transforms, caps, joins and holes with atomic undo and clearer localized budget errors.
+- Present the entire Studio window through the native GPU graph, including extended background paint, off-gate native sources and final composition effects, while preserving canonical project dimensions and export framing. Include layer gradients in source cache invalidation and move categorized background recipes into the existing advanced preset picker.
+- Add bounded, elapsed-time orbit momentum after direct native dragging, shared Studio wheel/pinch camera zoom and cancellation with one history entry. Keep Classic navigation unchanged and stop idle animation clocks.
+- Refine Studio sliders with themed tracks and subtle pointer-owned pill feedback; align dock tools and export icons, share workspace-specific radius tokens through portaled controls, and clip contextual controls inside their measured layout transitions.
+- Expose actual solid/gradient object paint directly in simple Studio controls, preserve active gradients when choosing material finishes, and remove competing delayed color-picker writebacks. Give every static effect thumbnail its own authored native source scene.
 
 - Refine Studio into separated icon toolbars with directional tooltips, translucent theme surfaces, visible hover states and a primary export action. Native material/environment sphere controls expose adjacent properties, camera direction, distance and field of view; disabled material tools explain the required 3D selection in all twelve languages.
 - Pick prepared 3D geometry in Studio instead of authored 2D frames, ignore structural background paint during canvas picking, and display GPU silhouette contours. One composition camera orbits without a selected object; hover pulses settle instead of running continuously. Classic interaction and canonical export remain shared.

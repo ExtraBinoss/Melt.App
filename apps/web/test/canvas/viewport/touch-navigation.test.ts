@@ -1,6 +1,7 @@
 import { expect, test, vi } from "vitest";
 import { installTouchNavigation } from "../../../src/canvas/viewport/touch-navigation";
 import type { View } from "../../../src/canvas/viewport/view";
+import { registerCameraNavigation } from "../../../src/canvas/viewport/camera-navigation";
 
 function pointer(
   element: HTMLElement,
@@ -68,4 +69,24 @@ test("mouse and canvas controls keep their interactions, and interrupted navigat
   expect(cancel).toHaveBeenCalledOnce();
   dispose();
   expect(stop).toHaveBeenCalledTimes(2);
+});
+
+test("Studio pinch leases the camera without changing artboard zoom and stale workspace owners are inert", () => {
+  const canvas = document.createElement("div");
+  vi.spyOn(canvas, "getBoundingClientRect").mockReturnValue({ left: 0, top: 0, width: 400, height: 400 } as DOMRect);
+  const camera = { begin: vi.fn(), zoomBy: vi.fn(), end: vi.fn(), cancel: vi.fn() };
+  const stopCamera = registerCameraNavigation(canvas, camera);
+  const view: View = { x: 0, y: 0, zoom: 1 };
+  const jump = vi.fn();
+  const dispose = installTouchNavigation(canvas, { read: () => view, jump, stop: vi.fn() }, vi.fn());
+  pointer(canvas, "pointerdown", 1, 100, 200); pointer(canvas, "pointerdown", 2, 300, 200);
+  expect(camera.begin).toHaveBeenCalledOnce();
+  pointer(canvas, "pointermove", 1, 50, 200);
+  expect(camera.zoomBy).toHaveBeenLastCalledWith(1.25);
+  expect(jump.mock.lastCall![0].zoom).toBe(1);
+  stopCamera();
+  pointer(canvas, "pointermove", 2, 350, 200); pointer(canvas, "pointerup", 2); pointer(canvas, "pointerup", 1);
+  expect(camera.zoomBy).toHaveBeenCalledOnce();
+  expect(camera.end).not.toHaveBeenCalled(); expect(camera.cancel).toHaveBeenCalledOnce();
+  dispose();
 });

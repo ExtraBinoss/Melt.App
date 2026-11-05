@@ -2,6 +2,7 @@ import {
   Matrix4,
   Mesh,
   type Material,
+  type MeshStandardNodeMaterial,
   type NodeMaterial,
   type Node,
   type Scene,
@@ -21,6 +22,9 @@ interface Copy {
   sourceMask: Node | null;
   sourceOpacity: Node | null;
   programKey: string;
+  revision?: string;
+  environment: Texture | null;
+  sourceEnv: Node | null;
 }
 interface Binding {
   original: Mesh["material"];
@@ -60,7 +64,13 @@ export class DepthBindings {
     if (material.maskNode && mask) mask = bool(material.maskNode as Node<"bool">).and(mask);
     return mask;
   }
-  private copy(base: Material, mode: Mode, writesDepth: boolean, synced: Set<string>) {
+  private copy(
+    base: Material,
+    mode: Mode,
+    writesDepth: boolean,
+    synced: Set<string>,
+    revision?: string,
+  ) {
     const key = `${mode}:${mode === "depth" ? writesDepth : ""}:${base.uuid}`;
     let entry = this.copies.get(key);
     if (!entry) {
@@ -76,11 +86,24 @@ export class DepthBindings {
         sourceMask: null,
         sourceOpacity: null,
         programKey: "",
+        environment: null,
+        sourceEnv: null,
       };
       this.copies.set(key, entry);
     }
     if (synced.has(key)) return entry.material;
     synced.add(key);
+    const source = base as MeshStandardNodeMaterial;
+    if (
+      revision !== undefined &&
+      entry.revision === revision &&
+      entry.version === base.version &&
+      entry.environment === (source.envMap ?? null) &&
+      entry.sourceEnv === (source.envNode ?? null) &&
+      entry.sourceMask === (source.maskNode ?? null) &&
+      entry.sourceOpacity === (source.opacityNode ?? null)
+    )
+      return entry.material;
     const material = entry.material;
     // A version is a shader signal, not a value revision: color/uniform edits often keep it.
     copySpatialMaterial(material, base);
@@ -106,10 +129,15 @@ export class DepthBindings {
       entry.version = base.version;
       entry.programKey = programKey;
     }
+    entry.revision = revision;
+    entry.environment = source.envMap ?? null;
+    entry.sourceEnv = source.envNode ?? null;
     return material;
   }
-  /** Call after reflection material bindings are ready, never once for each sibling pass. */
-  sync(meshes: Iterable<Mesh>) {
+  /** Call after reflection bindings. An optional certified revision covers all material
+   * values (including unversioned uniforms); omit it for arbitrary mutable materials.
+   */
+  sync(meshes: Iterable<Mesh>, revision?: string) {
     this.restore();
     this.bindings.clear();
     const active = new Set<Material>(),
@@ -119,7 +147,9 @@ export class DepthBindings {
       const materials = Array.isArray(original) ? original : [original];
       for (const material of materials) active.add(material);
       const variant = (mode: Mode, writes: boolean): Mesh["material"] => {
-        const result = materials.map((material) => this.copy(material, mode, writes, synced));
+        const result = materials.map((material) =>
+          this.copy(material, mode, writes, synced, revision),
+        );
         return Array.isArray(original) ? result : result[0]!;
       };
       this.bindings.set(mesh, {

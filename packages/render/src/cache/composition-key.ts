@@ -1,4 +1,4 @@
-import type { Composition, Layer } from "@musart/core";
+import { backgroundLayer, type Composition, type Layer } from "@musart/core";
 import { isInstancedPrimitive, primitivePaintKey } from "../compositing/primitives/eligibility";
 /** Root paint/placement dependencies. Editing-only page metadata does not invalidate pixels. */
 export function compositionPaintKey(
@@ -8,6 +8,7 @@ export function compositionPaintKey(
   effectInputKey?: (id: string) => unknown,
 ): string {
   return JSON.stringify([
+    backgroundLayer(page, false)?.id,
     page.width,
     page.height,
     page.background,

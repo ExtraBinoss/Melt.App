@@ -92,7 +92,7 @@
   flex-shrink: 0;
   padding: 4px 7px;
   border: 1px solid var(--border);
-  border-radius: 5px;
+  border-radius: var(--radius-item);
   color: var(--foreground);
   background: var(--field);
   font-size: 10px;
@@ -126,7 +126,7 @@
   margin: 1px 6px;
   padding: 0 9px;
   text-align: left;
-  border-radius: 5px;
+  border-radius: var(--radius-item);
   background: transparent;
   color: var(--foreground);
 }
@@ -199,5 +199,5 @@
 
 .listShadow {
   min-height: 0;
-  border-radius: 7px;
+  border-radius: var(--radius-scroll);
 }

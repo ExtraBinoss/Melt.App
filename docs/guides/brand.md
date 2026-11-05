@@ -165,13 +165,20 @@ animations release their RAF, listeners, observers and retained SVG nodes. Reduc
 motion and JavaScript-disabled pages show the complete native heading immediately.
 
 The branded playback adapter owns at most one RAF and updates retained SVG
-attributes at most 30 times per second. Geometry sampling and path morphing run
+attributes at the display's refresh cadence, including 120 Hz. Geometry sampling and path morphing run
 on the CPU; the browser owns SVG painting and compositing. Idle requests no
 frames. Document visibility, reduced motion,
 intersection visibility and actual operation activity stop unnecessary work.
 Resuming does not advance a hidden clock or queue missed frames. Completed
 operations stop immediately, and every instance releases observers, callbacks,
 SVG nodes and pending frames on unmount, including StrictMode replay.
+
+The shared `Throbber` keeps its label readable as native muted text. Its violet
+highlight uses a static gradient/mask and two opposite CSS transforms: the mask
+travels while the text stays aligned. No animated background repaint or JavaScript
+frame callback drives that sweep. A subtle composited float accompanies the native
+mascot morph; reduced motion removes both decorations. Project opening supplies
+the known project name, with a bounded cancellable metadata lookup for direct routes.
 
 ## Verification scope
 
@@ -211,3 +218,9 @@ visible while the animation module loads, then crossfades only after the first S
 frame has been painted. There is no simulated progress or extra completion delay.
 `BrandStatus` displays immediately beside an existing pending label; standalone
 `Throbber` keeps its configurable reveal delay for short operations.
+
+The focused compositor witness (`test/browser/throbber-compositor.spec.ts`) records
+actual browser frames during an intentional 1.6-second JavaScript task and compares
+label pixels in a separate inspection page. It confirms that the violet highlight
+keeps moving and that reduced motion removes the decoration. The 120 Hz clock
+regression is synthetic; it is not a measured 120 fps guarantee on physical hardware.

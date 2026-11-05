@@ -27,21 +27,39 @@
   color: var(--brand-primary);
 }
 .ui-throbber[data-variant="shimmer"] .ui-throbber-label {
+  position: relative;
+  overflow: hidden;
+  font-weight: 500;
+}
+/* A static mask travels over counter-translated text. Both animations only change
+   transforms, so the violet sweep does not wait for main-thread background paints. */
+.ui-throbber-sweep {
+  position: absolute;
+  inset: 0;
+  color: var(--brand-primary);
+  mask-image: linear-gradient(105deg, transparent 25%, #000 47%, #000 53%, transparent 75%);
+  animation: melt-text-sweep 3s linear infinite;
+}
+.ui-throbber-sweep-text {
+  display: block;
+  width: 100%;
+  height: 100%;
+  animation: melt-text-sweep-counter 3s linear infinite;
+}
+.ui-throbber-sweep-text::before {
+  content: attr(data-label);
+  display: block;
   background: linear-gradient(
     105deg,
-    var(--muted-foreground) 35%,
-    color-mix(in srgb, var(--muted-foreground) 55%, var(--brand-primary)) 43%,
-    var(--brand-primary) 49%,
-    color-mix(in srgb, var(--brand-primary) 78%, var(--primary-foreground)) 50%,
-    var(--brand-primary) 51%,
-    color-mix(in srgb, var(--muted-foreground) 55%, var(--brand-primary)) 59%,
-    var(--muted-foreground) 67%
+    var(--brand-primary) 30%,
+    color-mix(in srgb, var(--brand-primary) 65%, var(--primary-foreground)) 50%,
+    var(--brand-primary) 70%
   );
-  background-size: 260% 100%;
   background-clip: text;
   color: transparent;
-  font-weight: 500;
-  animation: melt-text-shimmer 3s linear infinite;
+}
+.ui-throbber[data-variant="shimmer"] .ui-throbber-mark {
+  animation: melt-mark-float 5.2s ease-in-out infinite;
 }
 .ui-throbber-dots {
   display: flex;
@@ -64,12 +82,20 @@
 .ui-throbber[data-active="false"] * {
   animation-play-state: paused;
 }
-@keyframes melt-text-shimmer {
+@keyframes melt-text-sweep {
   from {
-    background-position: 120% 0;
+    transform: translateX(-125%);
   }
   to {
-    background-position: -120% 0;
+    transform: translateX(125%);
+  }
+}
+@keyframes melt-text-sweep-counter {
+  from {
+    transform: translateX(125%);
+  }
+  to {
+    transform: translateX(-125%);
   }
 }
 @keyframes melt-dot-pulse {
@@ -84,14 +110,22 @@
     transform: scale(1.2);
   }
 }
+@keyframes melt-mark-float {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-1.5px) scale(1.025);
+  }
+}
 @media (prefers-reduced-motion: reduce) {
   .ui-throbber,
   .ui-throbber * {
     animation: none !important;
     transition: none;
   }
-  .ui-throbber[data-variant="shimmer"] .ui-throbber-label {
-    background: none;
-    color: var(--muted-foreground);
+  .ui-throbber-sweep {
+    display: none;
   }
 }

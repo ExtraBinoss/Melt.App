@@ -8,6 +8,7 @@ import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { ProjectDialog } from "../components/projects/ProjectDialog";
 import { TooltipProvider } from "../components/ui/tooltip";
 import { useStudioSession } from "./use-studio-session";
+import { useOpeningProjectName } from "./use-opening-project-name";
 import { formatUiError } from "../state/i18n/errors/format";
 import type { StudioRouting } from "../state/contracts";
 import { createProjectFromTemplate } from "../services/projects/templates/catalog";
@@ -25,6 +26,10 @@ export function Studio({ routing }: { routing?: StudioRouting } = {}) {
   const { runtime, services, ensureRuntime, publishRuntime, peek } = useStudioSession(
     routing,
     (failure) => setError(formatUiError(failure)),
+  );
+  const openingProjectName = useOpeningProjectName(
+    routing?.view === "editor" ? routing.projectId : undefined,
+    runtime?.engine.getSnapshot().project,
   );
   const initialRouting = useRef(routing);
   const cancelBackgroundHold = useRef<(() => void) | null>(null);
@@ -145,7 +150,7 @@ export function Studio({ routing }: { routing?: StudioRouting } = {}) {
           />
         </TooltipProvider>
       ) : runtime ? (
-        <Suspense fallback={<StudioPreparation />}>
+        <Suspense fallback={<StudioPreparation projectName={openingProjectName} />}>
           <App
             engine={runtime.engine}
             services={runtime.services}
@@ -158,7 +163,7 @@ export function Studio({ routing }: { routing?: StudioRouting } = {}) {
           <MeltMark size={52} />
         </div>
       ) : (
-        <StudioPreparation />
+        <StudioPreparation projectName={openingProjectName} />
       )}
       {error && (
         <div className="runtime-error" role="alert">

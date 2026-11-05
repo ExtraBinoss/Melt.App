@@ -1,3 +1,4 @@
+import { getStudioViewport } from "../../ui/studio/framing/viewport";
 import { installExactCanvasTarget } from "./exact-canvas-target";
 import { videoNeedsWebGL } from "@musart/render/renderer-policy";
 import { SpatialControlsSlot } from "../spatial/SpatialControlsSlot";
@@ -78,6 +79,7 @@ export async function makeRenderer(
   return renderer;
 }
 export function CompositionPlane({
+  engine,
   controller,
   onError,
   zoom = 1,
@@ -114,6 +116,18 @@ export function CompositionPlane({
     // explicitly return to the canvas after those asynchronous GPU passes.
     renderer.setRenderTarget(null);
   }, -1);
+  useEffect(() => {
+    if (!engine) return;
+    const viewport = getStudioViewport(engine);
+    const update = () => {
+      const value = viewport.read(),
+        page = controller.read().page;
+      resources.setViewport(value?.pageId === page.id ? value.displayRegion : undefined);
+    };
+    const stop = viewport.subscribe(update);
+    update();
+    return stop;
+  }, [engine, controller, resources]);
   useEffect(() => {
     const presenter = controller.presentation.acquire();
     const fontPresenter = controller.fontPresentation.acquire();
@@ -232,6 +246,24 @@ export const EditorScene = memo(function EditorScene({
     }),
     [controller],
   );
+  useEffect(() => {
+    if (!engine) return;
+    const viewport = getStudioViewport(engine);
+    const update = () => {
+      const root = element.current,
+        value = viewport.read(),
+        page = controller.read().page;
+      if (!root) return;
+      const region = value?.pageId === page.id ? value.displayRegion : null;
+      root.style.left = region ? `${region.x}px` : "";
+      root.style.top = region ? `${region.y}px` : "";
+      root.style.width = region ? `${region.width}px` : "";
+      root.style.height = region ? `${region.height}px` : "";
+    };
+    const stop = viewport.subscribe(update);
+    update();
+    return stop;
+  }, [engine, controller]);
   useRenderMetrics(element);
   return (
     <GpuBoundary
@@ -265,6 +297,7 @@ export const EditorScene = memo(function EditorScene({
         >
           {engine && <SpatialControlsSlot engine={engine} controller={controller} />}
           <CompositionPlane
+            engine={engine}
             controller={controller}
             onError={onError}
             zoom={zoom}

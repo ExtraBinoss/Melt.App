@@ -57,20 +57,30 @@ export function CanvasTimelineOverlay(props: CanvasTimelineOverlayProps) {
     const sync = () => {
       const node = target.current;
       if (!node) return;
-      node.style.transform = `translate(${-viewport.scrollLeft}px, ${-viewport.scrollTop}px)`;
+      const x = viewport.scrollLeft,
+        y = viewport.scrollTop;
+      node.style.transform = `translate(${-x}px, ${-y}px)`;
     };
     const measure = () => {
       const node = target.current;
       if (!node) return;
       const model = props.model ?? host.readModel();
-      node.style.width = `${Math.max(viewport.clientWidth - model.gutter, Math.min(1_000_000, model.duration * model.scale + 64))}px`;
-      sync();
+      // Capture all geometry before any style write. ResizeObserver owns later layout changes.
+      const width = Math.max(
+        viewport.clientWidth - model.gutter,
+        Math.min(1_000_000, model.duration * model.scale + 64),
+      );
+      const x = viewport.scrollLeft,
+        y = viewport.scrollTop;
+      node.style.width = `${width}px`;
+      node.style.transform = `translate(${-x}px, ${-y}px)`;
     };
-    measure();
+    const frame = requestAnimationFrame(measure);
     viewport.addEventListener("scroll", sync, { passive: true });
     const resize = new ResizeObserver(measure);
     resize.observe(viewport);
     return () => {
+      cancelAnimationFrame(frame);
       viewport.removeEventListener("scroll", sync);
       resize.disconnect();
     };

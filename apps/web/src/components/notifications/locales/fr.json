@@ -1,5 +1,6 @@
 {
   "close": "Fermer la notification",
   "copy": "Copier le message et le diagnostic",
-  "details": "Détails techniques"
+  "details": "Détails techniques",
+  "objectAdded": "{{name}} ajouté"
 }

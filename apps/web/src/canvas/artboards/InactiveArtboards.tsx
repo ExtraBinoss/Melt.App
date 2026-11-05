@@ -8,7 +8,12 @@ import {
   type RefObject,
 } from "react";
 import { useTranslation } from "react-i18next";
-import type { CommandCommitInfo, EnginePort, Project } from "@musart/core";
+import {
+  backgroundLayer,
+  type CommandCommitInfo,
+  type EnginePort,
+  type Project,
+} from "@musart/core";
 import type { View } from "../viewport/view";
 import type { ArtboardWorkspace } from "./layout";
 import { artboardStyle } from "./presentation";
@@ -84,6 +89,8 @@ export function InactiveArtboards({
     const image = previews.items.find((item) => item.pageId === board.id);
     const failed = !!(image && broken.has(image.url));
     const active = board.id === activeId;
+    const paint = backgrounds.get(board.id);
+    const ownedBackground = paint && backgroundLayer(paint, false);
     return (
       <div
         key={board.id}
@@ -97,10 +104,13 @@ export function InactiveArtboards({
         style={
           {
             ...artboardStyle(board, workspace, view),
-            "--artboard-background": backgrounds.get(board.id)?.background ?? "transparent",
-            "--artboard-paint": backgrounds.get(board.id)?.backgroundGradient
-              ? gradientPreview(backgrounds.get(board.id)!.backgroundGradient!)
-              : undefined,
+            "--artboard-background": ownedBackground
+              ? "transparent"
+              : (paint?.background ?? "transparent"),
+            "--artboard-paint":
+              !ownedBackground && paint?.backgroundGradient
+                ? gradientPreview(paint.backgroundGradient)
+                : undefined,
           } as CSSProperties
         }
         role={active ? undefined : "button"}

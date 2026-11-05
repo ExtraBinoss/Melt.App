@@ -19,8 +19,11 @@ import { spatialGeometryJob, spatialGeometryKey } from "./outlines";
 import { EnvironmentSources } from "./EnvironmentSources";
 import { SpatialResource } from "./SpatialResource";
 import { SpatialOutputPass } from "./OutputPass";
+import { prepareSpatialTarget } from "./target-size";
+import { gpuTextureLimit } from "../cache/texture-limits";
 import { disposeModels, glbMetadata, loadGlb, normalizeModel } from "./glb";
 interface Prepared {
+  key: string;
   resource: SpatialResource;
   settings: SpatialScene;
 }
@@ -143,7 +146,7 @@ export class SpatialSources {
       );
       this.cache.synchronize(key);
       this.check(canContinue);
-      this.prepared.set(layer.id, { resource, settings });
+      this.prepared.set(layer.id, { resource, settings, key });
       this.retained.set(layer.id, new WeakRef(resource));
     }
     const stageKey = `spatial:composition:${page.id}`;
@@ -167,21 +170,31 @@ export class SpatialSources {
     this.cache.ensureCapacity(
       stageKey,
       stage.projectedBytes(
-        Math.ceil(page.width * density),
-        Math.ceil(page.height * density),
+        Math.ceil((options.viewport?.width ?? page.width) * density),
+        Math.ceil((options.viewport?.height ?? page.height) * density),
         sources.length,
       ),
     );
-    stage.sync(page, settings, sources, environment, scale);
-    for (const { layer, resource } of sources) {
-      const original = layer.assetId ? assets[layer.assetId] : undefined;
-      const key = `spatial:source:${layer.id}:${layer.spatial!.source === "glb" ? assetIdentity(original) : spatialGeometryKey(layer)}`;
-      this.cache.ensureCapacity(
-        key,
-        resource.projectedBytes(resource.target.width, resource.target.height),
-      );
-      this.cache.synchronize(key);
-    }
+    stage.sync(
+      page,
+      settings,
+      sources,
+      environment,
+      scale,
+      options.viewport,
+      (layer, resource, width, height) => {
+        const key = this.prepared.get(layer.id)!.key;
+        prepareSpatialTarget(
+          resource.target,
+          width,
+          height,
+          options.mediaMode === "preview",
+          gpuTextureLimit(this.renderer),
+          (w, h) => this.cache.ensureCapacity(key, resource.projectedBytes(w, h)),
+        );
+        this.cache.synchronize(key);
+      },
+    );
     await this.reflections.prepare(
       page,
       settings,
@@ -221,6 +234,17 @@ export class SpatialSources {
   bounds(layerId: string) {
     return this.stage?.bounds(layerId);
   }
+  effectProjection(layerId: string): readonly number[] | undefined {
+    return this.stage?.effectProjection(layerId);
+  }
+  /** Borrowed camera depth for the current root viewport; owned and released by the scene cache. */
+  compositionDepth() {
+    if (!this.stage || this.closed) return null;
+    const before = this.stage.depthPasses,
+      depth = this.stage.compositionDepth();
+    this.passes += this.stage.depthPasses - before;
+    return depth;
+  }
   peek(layerId: string): SpatialResource | null {
     const value = this.retained.get(layerId)?.deref();
     return value && !value.closed ? value : null;
@@ -230,7 +254,7 @@ export class SpatialSources {
     if (!prepared || prepared.resource.closed) throw Error("3D source is not prepared");
     if (!this.stage) throw Error("Composition 3D scene is not prepared");
     this.stage.render(layer);
-    this.output.render(prepared.resource.target.texture, target);
+    this.output.render(prepared.resource.target, target);
     this.passes += 2;
   }
   private check(canContinue: () => boolean) {

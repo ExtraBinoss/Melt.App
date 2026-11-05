@@ -30,3 +30,13 @@ export function pickCanvasPointer(
     tool === "pointer",
   );
 }
+
+/** Studio secondary drags navigate the displayed camera window, preserving authored poses. */
+export function canvasPointerPans(button: number, tool: Tool, space: boolean, studio: boolean) {
+  return (studio && button === 2) || (button !== 2 && (tool === "hand" || space || button === 1));
+}
+
+export function captureCanvasPointer(viewport: HTMLElement | null, pointerId: number) {
+  viewport?.focus({ preventScroll: true });
+  viewport?.setPointerCapture(pointerId);
+}

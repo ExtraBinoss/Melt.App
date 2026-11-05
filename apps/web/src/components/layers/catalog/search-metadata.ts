@@ -4,6 +4,15 @@ import type { EffectType } from "@musart/core";
  * Descriptions live in the catalog locales; selectable techniques are indexed from their definitions.
  */
 export const EFFECT_SEARCH_ALIASES = {
+  "depth-of-field":
+    "depth of field dof focus aperture camera native depth profondeur champ mise point ouverture caméra",
+  trail: "trail echoes temporal motion history poses traînée échos temporel mouvement historique",
+  risograph: "risograph riso print ink registration duotone tritone risographie encre impression",
+  "oil-paint": "oil paint painter painterly kuwahara brush peinture huile pinceau",
+  blocks: "blocks bricks lego toy studs plastic mosaic briques tenons plastique mosaïque",
+  "chromatic-aberration":
+    "chromatic aberration rgb separation fringe lens aberration chromatique séparation",
+  wind: "wind streak stretch gust direction vent traînées étirement rafale",
   liquify:
     "liquify fluidite fluidité brush pinceau warp push pinch bloat twirl déformation peinture",
   "torn-edges": "torn edges paper tear ripped déchiré papier photoshop fibres graphic",

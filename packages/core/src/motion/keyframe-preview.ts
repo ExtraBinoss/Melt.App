@@ -218,8 +218,10 @@ export function createMotionKeyframePreview(
             ...(layer.geometrySources
               ? {
                   geometrySources: layer.geometrySources.map((source) => {
-                    const owner = draft.track.animations?.find((animation) =>
-                      animation.effectIds.includes(source.effectId),
+                    const owner = draft.track.animations?.find(
+                      (animation) =>
+                        animation.ownsEffects !== false &&
+                        animation.effectIds.includes(source.effectId),
                     );
                     return owner ? { ...source, start: owner.start } : source;
                   }),

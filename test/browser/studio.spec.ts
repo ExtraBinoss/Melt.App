@@ -248,18 +248,22 @@ test("Studio downloads its optional library explicitly, imports editable SVGs an
       () => window.musart!.snapshot().project.pages[0]!.layers.at(-1)!.spatial?.source,
     ),
   ).toBe("extrude");
+  await expect(library).toHaveCount(0);
+  await page.getByRole("button", { name: "3D", exact: true }).click();
   await library.getByRole("radio", { name: "Packs", exact: true }).click();
   expect(requests).toBe(0);
   await library.getByRole("button", { name: /Download ·/ }).click();
-  await expect(library.getByText("Available offline", { exact: true })).toBeVisible({
+  await expect(library.locator(".studio-pack-grid .spatial-object").first()).toBeVisible({
     timeout: 60000,
   });
   expect(requests).toBe(2);
+  const packTile = library.locator(".studio-pack-grid .spatial-object").first();
+  await packTile.hover();
   await expect(library.locator(".spatial-library-preview")).toHaveAttribute("data-ready", "true", {
     timeout: 30000,
   });
   await page.context().setOffline(true);
-  await library.getByRole("button", { name: "Add model", exact: true }).click();
+  await packTile.click();
   await expect
     .poll(() =>
       page.evaluate(

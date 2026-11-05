@@ -3,7 +3,7 @@ import { useProjectTitle } from "./components/workspace/use-project-title";
 import { dashboardHref, isPlainPrimaryClick, dialogLinkKeyDown } from "./ui/navigation/activation";
 import { ExportLeaveGuard } from "./components/export/ExportLeaveGuard";
 import { guardExportNavigation, ExportLeaveCancelled } from "./services/export/leave";
-import { lazy, Suspense, useCallback, useMemo, useRef, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { atom, useStore } from "jotai";
 import { EditorDialogVisibility } from "./components/workspace/EditorDialogVisibility";
 import { useRenderMetrics } from "./state/session/render-metrics";
@@ -18,6 +18,7 @@ import {
   useEngine,
   useTheme,
 } from "./state/session/editor";
+import { subscribeEditorNotices } from "./components/notifications/source";
 import { useShortcuts } from "./state/session/shortcuts";
 import { formatUiError } from "./state/i18n/errors/format";
 import "./state/i18n";
@@ -54,6 +55,7 @@ import {
   StudioWorkspaceChrome,
   StudioExportActions,
   WorkspaceModeBoundary,
+  WorkspaceChromePending,
 } from "./ui/studio/WorkspaceModeBoundary";
 import { freezeEffectPreviews } from "./state/session/effect-preview";
 import { ToolSettings } from "./components/toolbar/ToolSettings";
@@ -103,6 +105,7 @@ export function App({ engine, services, welcome = false, routing }: AppProps) {
   const [dialogs] = useState(() => atom({ exportOpen: false, timelapseOpen: false }));
   const motionTransport = useMemo(() => createMotionTransport(engine), [engine]);
   const [notice, setNotice] = useState<EditorNoticeValue | null>(null);
+  useEffect(() => subscribeEditorNotices(engine, setNotice), [engine]);
   const [processing, setProcessing] = useState<"wand" | "segment" | null>(null);
   const selectionPending = useRef(false);
   const input = useRef<HTMLInputElement>(null);
@@ -204,7 +207,7 @@ export function App({ engine, services, welcome = false, routing }: AppProps) {
             port={services.projectPreferences}
             onError={onPreferencesError}
           >
-            <WorkspaceModeBoundary>
+            <WorkspaceModeBoundary engine={engine}>
               <main className="musart-app" ref={element}>
                 <ExportLeaveGuard />
                 <MotionImportConfirmation engine={engine} />
@@ -286,7 +289,7 @@ export function App({ engine, services, welcome = false, routing }: AppProps) {
                         />
                         {!mobile && (
                           <ClassicWorkspaceOnly>
-                            <Suspense fallback={null}>
+                            <Suspense fallback={<WorkspaceChromePending />}>
                               <Toolbar
                                 engine={engine}
                                 services={services}
@@ -335,7 +338,7 @@ export function App({ engine, services, welcome = false, routing }: AppProps) {
                             className="sidebar"
                           >
                             <ClassicWorkspaceOnly>
-                              <Suspense fallback={null}>
+                              <Suspense fallback={<WorkspaceChromePending />}>
                                 <EditorDialogVisibility state={dialogs}>
                                   <EditorSidebar
                                     engine={engine}
@@ -356,7 +359,7 @@ export function App({ engine, services, welcome = false, routing }: AppProps) {
                     </ProjectPanelGroup>
                     <ClassicWorkspaceOnly>
                       {mobile ? (
-                        <Suspense fallback={null}>
+                        <Suspense fallback={<WorkspaceChromePending />}>
                           <EditorDialogVisibility state={dialogs}>
                             <MobileEditor
                               engine={engine}
@@ -369,7 +372,7 @@ export function App({ engine, services, welcome = false, routing }: AppProps) {
                               onTimelapseOpenChange={showTimelapse}
                               tools={
                                 <>
-                                  <Suspense fallback={null}>
+                                  <Suspense fallback={<WorkspaceChromePending />}>
                                     <Toolbar
                                       engine={engine}
                                       services={services}
@@ -392,12 +395,11 @@ export function App({ engine, services, welcome = false, routing }: AppProps) {
                             />
                           </EditorDialogVisibility>
                         </Suspense>
-                      ) : (
-                        <Suspense fallback={null}>
-                          <MotionTimelineDock engine={engine} />
-                        </Suspense>
-                      )}
+                      ) : null}
                     </ClassicWorkspaceOnly>
+                    <Suspense fallback={null}>
+                      <MotionTimelineDock engine={engine} />
+                    </Suspense>
                     <input
                       ref={input}
                       type="file"
@@ -418,7 +420,7 @@ export function App({ engine, services, welcome = false, routing }: AppProps) {
                   hidden={choosingProject || !!projectMenu}
                   onProjectCreated={routing ? (id) => routing.navigate("editor", id) : undefined}
                 />
-                <EditorNotice notice={notice} onClose={dismissNotice} />
+                <EditorNotice engine={engine} notice={notice} onClose={dismissNotice} />
                 {projectMenu && (
                   <ProjectMenu
                     engine={engine}
