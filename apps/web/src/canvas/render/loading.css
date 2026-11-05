@@ -18,31 +18,8 @@
   flex-direction: column;
   gap: 18px;
 }
-.canvas-loading-orbit {
-  position: absolute;
-  top: -8px;
-  width: 72px;
-  height: 72px;
-  border-radius: 50%;
-  border: 1px solid color-mix(in srgb, var(--primary) 12%, transparent);
-  border-top-color: color-mix(in srgb, var(--primary) 55%, transparent);
-  opacity: 0;
-  transition: opacity 160ms ease;
-  animation: canvas-preparation-orbit 2.4s linear infinite;
-}
-.canvas-loading-feedback:has(.ui-throbber[data-visible="true"]) > .canvas-loading-orbit {
-  opacity: 1;
-}
 .editor-gpu-scene:has(canvas[data-display-initialized="true"]) > .canvas-loading {
   animation: canvas-loading-dismiss 240ms ease-out both;
-}
-.editor-gpu-scene:has(canvas[data-display-initialized="true"]) .canvas-loading-orbit {
-  animation-play-state: paused;
-}
-@keyframes canvas-preparation-orbit {
-  to {
-    transform: rotate(360deg);
-  }
 }
 @keyframes canvas-loading-dismiss {
   to {
@@ -51,9 +28,6 @@
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .canvas-loading-orbit {
-    animation: none;
-  }
   .editor-gpu-scene:has(canvas[data-display-initialized="true"]) > .canvas-loading {
     animation: none;
     visibility: hidden;

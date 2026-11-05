@@ -1,34 +1,22 @@
-.workspace-transition-surface {
+.workspace-transition-surface.canvas-loading-feedback {
   position: fixed;
   z-index: 45;
   top: 50%;
   left: 50%;
   translate: -50% -50%;
-  display: flex;
-  align-items: center;
-  gap: 13px;
   width: max-content;
   max-width: calc(100dvw - 36px);
-  padding: 14px 20px 14px 15px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
-  background: color-mix(in srgb, var(--card) 96%, transparent);
-  color: var(--foreground);
   pointer-events: none;
 }
-.workspace-transition-copy {
-  display: grid;
-  gap: 3px;
-  min-width: 0;
+.workspace-transition-surface .ui-throbber-label {
+  font-size: 14px;
 }
-.workspace-transition-copy > strong {
-  font-family: var(--font-brand-display);
-  font-size: 17px;
-  font-weight: 600;
-}
-.workspace-transition-copy > span {
-  color: var(--muted-foreground);
-  font-size: 11px;
+.workspace-mode-root:is(
+    [data-workspace-transition="preparing"],
+    [data-workspace-transition="entering"]
+  )
+  .canvas-loading {
+  visibility: hidden;
 }
 .workspace-mode-root[data-workspace-transition="preparing"]
   :is(

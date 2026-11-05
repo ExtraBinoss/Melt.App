@@ -9,7 +9,6 @@ export function CanvasPreparation({ activity }: { activity?: BrandActivity }) {
   return (
     <div className="canvas-loading">
       <div className="canvas-loading-feedback">
-        <span className="canvas-loading-orbit" aria-hidden="true" />
         <Throbber size={56} variant="shimmer" label={t("loadingCanvas")} activity={activity} />
       </div>
     </div>

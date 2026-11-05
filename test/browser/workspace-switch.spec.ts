@@ -11,9 +11,10 @@ async function choose(page: Page, mode: "Classic" | "Studio") {
 test("workspace changes retain the canvas and document, with a full-width native selector and compact pending status", async ({
   page,
 }) => {
-  test.setTimeout(120000);
+  test.setTimeout(60000);
   await page.addInitScript(() => {
     localStorage.setItem("musart.language", "en");
+    localStorage.setItem("musart.editor-tutorial.v1", "done");
     localStorage.setItem("musart.onboarding.v1", JSON.stringify({ version: 1, completed: true }));
   });
   await page.goto("/editor?automation=1&workspace=classic", { waitUntil: "domcontentloaded" });
@@ -41,7 +42,10 @@ test("workspace changes retain the canvas and document, with a full-width native
   expect(
     await selector.evaluate((node) => {
       const parent = node.parentElement!;
-      return Math.abs(node.getBoundingClientRect().width - parent.getBoundingClientRect().width);
+      const style = getComputedStyle(parent);
+      const contentWidth =
+        parent.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
+      return Math.abs(node.getBoundingClientRect().width - contentWidth);
     }),
   ).toBeLessThan(2);
   let release!: () => void;
@@ -59,7 +63,11 @@ test("workspace changes retain the canvas and document, with a full-width native
     const dimensions = await loading.boundingBox();
     expect(dimensions!.width).toBeLessThan(360);
     expect(dimensions!.height).toBeLessThan(120);
-    await expect(loading).toContainText("Melt");
+    await expect(loading).toContainText("Switching to Studio");
+    await expect(loading).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+    await expect(loading).toHaveCSS("box-shadow", "none");
+    await expect(loading.locator(".ui-throbber")).toHaveCount(1);
+    await expect(page.locator(".canvas-loading:visible")).toHaveCount(0);
     await page.screenshot({ path: "artifacts/studio/workspace-switch-loading.png" });
   } finally {
     release();
