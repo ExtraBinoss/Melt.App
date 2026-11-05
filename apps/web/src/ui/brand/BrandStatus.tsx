@@ -4,6 +4,7 @@ import type { BrandActivity } from "./playback";
 export function BrandStatus({
   size = 24,
   activity,
+  state = "loading",
 }: {
   size?: number;
   state?: "loading" | "preparing";
@@ -11,7 +12,7 @@ export function BrandStatus({
 }) {
   return (
     <span className="melt-status" aria-hidden>
-      <Throbber size={size} activity={activity} decorative delayMs={0} />
+      <Throbber size={size} activity={activity} state={state} decorative delayMs={0} />
     </span>
   );
 }

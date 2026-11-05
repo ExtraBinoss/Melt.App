@@ -1,37 +1,60 @@
+import { useLayoutEffect, useSyncExternalStore } from "react";
 import type { EnginePort } from "@musart/core";
 import { ObjectSelectionOptions } from "./segmentation/ObjectSelectionOptions";
-import { useAtomValue } from "jotai";
+import { useAtom } from "jotai";
 import { useTranslation } from "react-i18next";
 import { toolAtom } from "../../state/session/editor";
 import type { EditorServices } from "../../state/contracts";
 import type { TaskRunner } from "../projects/ProjectDialog";
 import { WandOptions } from "./wand/WandOptions";
-import { SelectionModels } from "./segmentation/SelectionModels";
-
+const emptySubscribe = () => () => {},
+  emptyRead = () => null;
 export function ToolSettings({
   services,
-  engine,
   onTask,
 }: {
   services: EditorServices;
   engine?: EnginePort;
   onTask: TaskRunner;
 }) {
-  const { t } = useTranslation(),
-    tool = useAtomValue(toolAtom);
-  if (tool !== "wand" && tool !== "segment") return null;
-  return (
-    <aside className="tool-settings floating-panel" data-tool={tool} aria-label={t(tool)}>
-      {tool === "wand" ? (
+  const { t } = useTranslation();
+  const [tool, setTool] = useAtom(toolAtom);
+  const port = services.objectSelection;
+  useLayoutEffect(() => port?.retainPresentation?.(), [port]);
+  const state = useSyncExternalStore(
+    port?.subscribe ?? emptySubscribe,
+    port?.read ?? emptyRead,
+    emptyRead,
+  );
+  if (tool === "wand" && !state?.automatic)
+    return (
+      <aside className="tool-settings floating-panel" data-tool="wand" aria-label={t("wand")}>
         <WandOptions />
-      ) : (
-        <div>
-          {services.objectSelection && (
-            <ObjectSelectionOptions port={services.objectSelection} engine={engine} />
-          )}
-          <SelectionModels services={services} onTask={onTask} />
-        </div>
-      )}
+      </aside>
+    );
+  if (!port || !state) return null;
+  return (
+    <aside className="tool-settings floating-panel" data-tool="segment" aria-label={t("segment")}>
+      <ObjectSelectionOptions
+        port={port}
+        model={
+          state.mediaKind === "video"
+            ? services.videoBackgroundModel
+            : state.automatic
+              ? services.backgroundModel
+              : services.segmentationModel
+        }
+        onTask={onTask}
+        refining={tool === "segment"}
+        onRefine={() => {
+          port.refine();
+          setTool("segment");
+        }}
+        onClose={() => {
+          port.reset();
+          if (tool === "segment") setTool("pointer");
+        }}
+      />
     </aside>
   );
 }

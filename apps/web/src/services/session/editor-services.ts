@@ -38,6 +38,7 @@ import { importMediaFiles } from "../assets/media-import";
 import { importBatch, readDataUrl } from "../assets/imports";
 import { downloadBlob, safeName } from "../files/download";
 import { ObjectSelectionController } from "../selection/object/controller";
+import { VideoBackgroundController } from "../selection/video/controller";
 import { SelectionClient } from "../selection/selection";
 import { PixelSelectionController } from "../selection/wand/controller";
 import { i18n } from "../../state/i18n";
@@ -74,7 +75,19 @@ export function createEditorServices(
     copyEmpty: () => i18n.t("pixelSelection:copyEmpty"),
     reselectEmpty: () => i18n.t("pixelSelection:reselectEmpty"),
   });
-  const objectSelection = new ObjectSelectionController(engine, selection, pixelSelection);
+  const videoBackground = new VideoBackgroundController(engine, selection, {
+    store,
+    flush: dependencies.flush,
+    probe: async (blob) => (await renderer()).probeVideoOriginal(blob),
+    maskName: () => i18n.t("pixelSelection:maskName"),
+  });
+  const objectSelection = new ObjectSelectionController(
+    engine,
+    selection,
+    pixelSelection,
+    () => i18n.t("pixelSelection:maskName"),
+    videoBackground,
+  );
   const mediaResolvers = new Map<string, import("@musart/render").MediaSourceResolver>();
   const mediaResolverFor = (projectId: string) => {
     let resolver = mediaResolvers.get(projectId);
@@ -441,6 +454,7 @@ export function createEditorServices(
     },
     segmentationModel: selection.model,
     backgroundModel: selection.backgroundModel,
+    videoBackgroundModel: selection.videoBackgroundModel,
     prepareSegmentation: () => (selection.model ? selection.model.prepare() : selection.prepare()),
   };
 }

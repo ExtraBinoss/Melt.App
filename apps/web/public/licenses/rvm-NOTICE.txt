@@ -1,0 +1,8 @@
+Robust Video Matting (RVM) — MobileNetV3 FP16 ONNX weights
+Authors: Shanchuan Lin, Linjie Yang, Imran Saleemi, Soumyadip Sengupta.
+Upstream project and model source: https://github.com/PeterL1n/RobustVideoMatting
+License: GNU General Public License v3.0 (see rvm-GPL-3.0.txt).
+Pinned model mirror: https://huggingface.co/inverseaibd/rvm_mobilenetv3_fp16/tree/fc453688f604d0896e12f48df578fdd69ea2b4ac
+SHA-256: 6a0d5ce6cc17702613be548559879b4521ed424cfe14ddc48d1acaa44d616f64
+These weights are downloaded separately at runtime; they are not Melt MIT-licensed assets.
+Melt's adapter is independently written. No RVM inference implementation was copied.

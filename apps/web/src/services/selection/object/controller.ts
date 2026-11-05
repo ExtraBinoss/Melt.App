@@ -1,8 +1,12 @@
+import { SelectionPresentation } from "./presentation";
+import { readDataUrl } from "../../assets/imports";
+import { selectionMaskCommands } from "../wand/mask-commands";
 import {
   createLayerGeometryIndex,
   isImageAsset,
   type EnginePort,
   type ImageAsset,
+  type Layer,
 } from "@musart/core";
 import {
   captureGestureOrigin,
@@ -13,7 +17,9 @@ import type { SelectionClient } from "../selection";
 import { MAX_SELECTION_POINTS, type SelectionBox, type SelectionPrompt } from "../prompts";
 import type { MaskSelectionPort } from "../preview";
 import type { ObjectSelectionPort, ObjectSelectionState } from "./model";
+import type { VideoBackgroundController } from "../video/controller";
 interface Target {
+  layer: Layer;
   asset: ImageAsset;
   width: number;
   height: number;
@@ -34,20 +40,57 @@ export class ObjectSelectionController implements ObjectSelectionPort {
   private history: (SelectionPrompt & { automatic?: boolean })[] = [];
   private choice: "points" | "box" = "points";
   private readonly stop: () => void;
+  private readonly stopEngine: () => void;
+  private readonly stopVideo?: () => void;
+  private committing = false;
+  private readonly presentation = new SelectionPresentation();
+  retainPresentation = () => {
+    const image = this.presentation.retain(),
+      video = this.video?.presentation.retain();
+    return () => {
+      image();
+      video?.();
+    };
+  };
+  presented = (id: string) => {
+    this.presentation.painted(id);
+    this.video?.presentation.painted(id);
+  };
   constructor(
     private readonly engine: EnginePort,
     private readonly client: SelectionClient,
     private readonly pixels: MaskSelectionPort,
+    private readonly maskName = () => "Selection mask",
+    private readonly video?: VideoBackgroundController,
   ) {
+    this.stopVideo = video?.subscribe(() => {
+      for (const listener of this.listeners) listener();
+    });
     this.stop = pixels.subscribe(() => {
-      if (!this.state || this.preparing) return;
+      if (!this.state || this.preparing || this.state.automatic) return;
       const selection = pixels.read();
       if (!selection) this.clear();
       else if (Boolean(this.state.applying) !== Boolean(selection.applying))
         this.publish({ ...this.state, applying: Boolean(selection.applying) });
     });
+    this.stopEngine = engine.subscribe(() => {
+      if (!this.state || !this.target || this.committing) return;
+      const snapshot = engine.getSnapshot();
+      if (this.state.automatic) {
+        if (!this.automaticCurrent(this.target)) this.reset();
+        else if (this.target.origin.project !== snapshot.project)
+          this.target.origin = captureGestureOrigin(engine);
+        return;
+      }
+      if (
+        !isGestureOriginCurrent(engine, this.target.origin) ||
+        snapshot.selection.length !== 1 ||
+        snapshot.selection[0] !== this.state.layerId
+      )
+        this.reset();
+    });
   }
-  read = () => this.state;
+  read = () => this.video?.read() ?? this.state;
   mode = () => this.choice;
   subscribe = (listener: () => void) => {
     this.listeners.add(listener);
@@ -93,6 +136,7 @@ export class ObjectSelectionController implements ObjectSelectionPort {
       });
     this.engine.select([layerId]);
     this.target = {
+      layer,
       asset,
       width: layer.width,
       height: layer.height,
@@ -100,6 +144,8 @@ export class ObjectSelectionController implements ObjectSelectionPort {
     };
     this.publish({
       layerId,
+      targetName: layer.name,
+      thumbnail: asset.dataUrl,
       width: asset.width,
       height: asset.height,
       points: [],
@@ -109,6 +155,20 @@ export class ObjectSelectionController implements ObjectSelectionPort {
       error: "",
       mode: this.choice,
     });
+  }
+  private automaticCurrent(target: Target) {
+    const snapshot = this.engine.getSnapshot();
+    if (
+      snapshot.project.id !== target.origin.project.id ||
+      snapshot.pageId !== target.origin.pageId
+    )
+      return false;
+    const page = snapshot.project.pages.find((item) => item.id === target.origin.pageId);
+    return Boolean(
+      page &&
+      createLayerGeometryIndex(page).byId.get(target.layer.id) === target.layer &&
+      snapshot.project.assets[target.asset.id] === target.asset,
+    );
   }
   private position(x: number, y: number) {
     const { asset, width, height } = this.target!;
@@ -150,6 +210,95 @@ export class ObjectSelectionController implements ObjectSelectionPort {
     });
     return this.request();
   }
+  /** The common action never decodes original pixels or constructs preview contours on the UI thread. */
+  async removeBackground(layerId: string) {
+    const snapshot = this.engine.getSnapshot();
+    const layer = snapshot.project.pages
+      .find((page) => page.id === snapshot.pageId)
+      ?.layers.find((layer) => layer.id === layerId);
+    if (layer?.kind === "video" && this.video) {
+      if (this.running) throw Error("Background removal is already running for another layer.");
+      this.clear();
+      return this.video.removeBackground(layerId);
+    }
+    if (this.video?.read()?.busy)
+      throw Error("Background removal is already running for another layer.");
+    if (this.running && this.state?.automatic) {
+      if (this.state.layerId === layerId) return this.running;
+      throw Error("Background removal is already running for another layer.");
+    }
+    const replaceAssetId = this.state?.layerId === layerId ? this.state.automaticMask : undefined;
+    this.reset();
+    this.attach(layerId);
+    const generation = this.generation,
+      target = this.target!;
+    const current = () =>
+      generation === this.generation && this.target === target && this.automaticCurrent(target);
+    const presented = this.presentation.wait(layerId);
+    this.publish({ ...this.state!, automatic: true, completed: false, busy: true, error: "" });
+    const task = (async () => {
+      if (presented) await presented;
+      if (!current()) throw abort();
+      const result = await this.client.backgroundEncoded(target.asset.dataUrl);
+      if (!current()) throw abort();
+      const dataUrl = await readDataUrl(result.blob);
+      if (!current()) throw abort();
+      const snapshot = this.engine.getSnapshot(),
+        page = snapshot.project.pages.find((item) => item.id === snapshot.pageId)!;
+      const asset = {
+        id: crypto.randomUUID(),
+        name: this.maskName(),
+        mime: "image/png",
+        width: result.width,
+        height: result.height,
+        dataUrl,
+      };
+      this.committing = true;
+      try {
+        this.engine.transaction(selectionMaskCommands(page, layerId, asset, false, replaceAssetId));
+        this.engine.select(snapshot.selection);
+      } finally {
+        this.committing = false;
+      }
+      const committed = this.engine.getSnapshot(),
+        committedPage = committed.project.pages.find((item) => item.id === committed.pageId)!;
+      this.target = {
+        ...target,
+        layer: createLayerGeometryIndex(committedPage).get(layerId),
+        origin: captureGestureOrigin(this.engine),
+      };
+      this.publish({
+        ...this.state!,
+        busy: false,
+        completed: true,
+        automaticMask: asset.id,
+        points: result.seed ? [result.seed] : [],
+        selected: undefined,
+      });
+    })()
+      .catch((error: unknown) => {
+        if (generation === this.generation) {
+          if (error instanceof DOMException && error.name === "AbortError") this.reset();
+          else
+            this.publish({
+              ...this.state!,
+              busy: false,
+              error: error instanceof Error ? error.message : String(error),
+            });
+        }
+        throw error;
+      })
+      .finally(() => {
+        if (this.running === task) this.running = null;
+      });
+    this.running = task;
+    return task;
+  }
+  refine() {
+    if (!this.state?.completed || this.state.busy) return;
+    this.engine.select([this.state.layerId]);
+    this.publish({ ...this.state, automatic: false, completed: false, selected: 0 });
+  }
   async background(layerId: string) {
     this.attach(layerId);
     this.remember();
@@ -187,7 +336,7 @@ export class ObjectSelectionController implements ObjectSelectionPort {
   }
   async apply() {
     if (!this.state || this.state.busy || this.state.error || this.state.hovering) throw abort();
-    await this.pixels.createMask();
+    await this.pixels.createMask(this.state.automaticMask);
   }
   async scan(layerId: string) {
     this.attach(layerId);
@@ -325,6 +474,7 @@ export class ObjectSelectionController implements ObjectSelectionPort {
     }
   }
   private clear() {
+    this.presentation.cancel();
     this.generation++;
     this.version++;
     this.wanted = false;
@@ -341,6 +491,7 @@ export class ObjectSelectionController implements ObjectSelectionPort {
     if (busy) this.pixels.cancel();
   };
   reset = () => {
+    this.video?.reset();
     this.clear();
     this.pixels.deselect();
   };
@@ -348,6 +499,9 @@ export class ObjectSelectionController implements ObjectSelectionPort {
     if (this.closed) return;
     this.closed = true;
     this.stop();
+    this.stopEngine();
+    this.stopVideo?.();
+    this.video?.dispose();
     this.reset();
     this.listeners.clear();
   };

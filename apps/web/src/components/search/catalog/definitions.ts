@@ -10,7 +10,7 @@ export interface ActionDefinition {
   terms: string;
   descriptionKey?: string;
   shortcut?: string[];
-  gate?: "selection" | "editable" | "group" | "ungroup" | "undo" | "redo" | "motion";
+  gate?: "image" | "selection" | "editable" | "group" | "ungroup" | "undo" | "redo" | "motion";
 }
 export const ACTIONS: readonly ActionDefinition[] = [
   {
@@ -60,7 +60,8 @@ export const ACTIONS: readonly ActionDefinition[] = [
     action: "toolSegment",
     category: "tools",
     label: "search:commandLabels.toolSegment",
-    terms: "segment object selection intelligence mask",
+    terms: "remove background cutout detourage birefnet sam segment object selection mask",
+    gate: "image",
     shortcut: ["S"],
   },
   {

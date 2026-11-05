@@ -81,5 +81,13 @@
   "objectGestureHelp": "Dopo il caricamento di SAM 3, passa il puntatore per l’anteprima. Fai clic sul soggetto o traccia un rettangolo intorno.",
   "objectApply": "Applica maschera",
   "objectApplyHelp": "Applica per conservare il soggetto e nascondere lo sfondo. Annulla per scartare l’anteprima.",
-  "objectModels": "Modelli IA locali"
+  "objectModels": "Modelli IA locali",
+  "backgroundDone": "Sfondo rimosso",
+  "refineBackground": "Perfeziona",
+  "refineGestureHint": "Fai clic per includere.\nAlt + clic o clic destro per escludere.\nTraccia un rettangolo intorno al soggetto.",
+  "removingBackground": "Rimozione dello sfondo…",
+  "preparingVideo": "Preparazione del video…",
+  "removingPeople": "Ritaglio delle persone…",
+  "selectMediaFirst": "Seleziona prima un’immagine o un video.",
+  "videoExistingMask": "Rimuovi la maschera esistente prima di ritagliare le persone nel video."
 }

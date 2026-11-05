@@ -174,3 +174,45 @@ it("routes automatic matting separately and releases the previous GPU algorithm"
   });
   expect(background.prepareBackground).toHaveBeenCalled();
 });
+
+it("encodes a luminance matte in the model worker without sending raw pixels to the UI", async () => {
+  const putImageData = vi.fn(),
+    blob = new Blob(["png"], { type: "image/png" });
+  const canvas = {
+    width: 1,
+    height: 1,
+    getContext: () => ({ putImageData }),
+    convertToBlob: async () => blob,
+  };
+  vi.stubGlobal(
+    "OffscreenCanvas",
+    vi.fn(function () {
+      return canvas;
+    }),
+  );
+  vi.stubGlobal(
+    "ImageData",
+    vi.fn(function (data, width, height) {
+      return { data, width, height };
+    }),
+  );
+  const data = new Uint8ClampedArray([255, 255, 255, 128]);
+  background.removeBackground.mockResolvedValueOnce({
+    data,
+    width: 1,
+    height: 1,
+    seed: { x: 0, y: 0, label: 1 },
+  });
+  const result = await processSelection({
+    id: 72,
+    type: "background",
+    dataUrl: "source",
+    encode: true,
+  });
+  expect(result).toEqual({
+    id: 72,
+    result: { blob, width: 1, height: 1, seed: { x: 0, y: 0, label: 1 } },
+  });
+  expect(Array.from(putImageData.mock.calls[0]![0].data)).toEqual([128, 128, 128, 255]);
+  expect(canvas.width).toBe(1);
+});

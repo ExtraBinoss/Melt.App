@@ -81,5 +81,13 @@
   "objectGestureHelp": "Hover to preview after loading SAM 3. Click a subject, or drag a rectangle around it.",
   "objectApply": "Apply mask",
   "objectApplyHelp": "Apply to keep the subject and hide the background. Cancel to discard the preview.",
-  "objectModels": "Local AI models"
+  "objectModels": "Local AI models",
+  "backgroundDone": "Background removed",
+  "refineBackground": "Refine",
+  "refineGestureHint": "Click to include.\nAlt-click or right-click to exclude.\nDrag a rectangle to frame a subject.",
+  "removingBackground": "Removing background…",
+  "preparingVideo": "Preparing the video…",
+  "removingPeople": "Removing people’s background…",
+  "selectMediaFirst": "Select an image or video first.",
+  "videoExistingMask": "Remove the existing mask before generating a video person matte."
 }

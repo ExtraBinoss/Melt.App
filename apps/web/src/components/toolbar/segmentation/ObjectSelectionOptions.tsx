@@ -1,126 +1,196 @@
-import { useSyncExternalStore, useState } from "react";
+import { useTargetPresentation } from "./use-target-presentation";
+import { useSyncExternalStore } from "react";
 import { useTranslation } from "react-i18next";
-import { Copy, Blend, Undo2, X, Check } from "lucide-react";
-import { createLayerGeometryIndex, type EnginePort } from "@musart/core";
+import { Check, Copy, Info, Undo2, X, Film } from "lucide-react";
+import { Progress } from "radix-ui";
 import type { ObjectSelectionPort } from "../../../services/selection/object/model";
+import type { LocalModelPort } from "../../../services/selection/model/contract";
+import type { TaskRunner } from "../../projects/ProjectDialog";
 import { Button } from "../../ui/button";
 import { Throbber } from "../../ui/throbber/Throbber";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../../ui/tooltip";
 import "../../../services/selection/wand/messages";
+import "./messages";
 import "./object-options.css";
-import { ObjectSelectionGuide } from "./ObjectSelectionGuide";
 const emptySubscribe = () => () => {},
   emptyRead = () => null;
 export function ObjectSelectionOptions({
   port,
-  engine,
+  model,
+  onTask,
+  refining,
+  onRefine,
+  onClose,
 }: {
   port: ObjectSelectionPort;
-  engine?: EnginePort;
+  model?: LocalModelPort;
+  onTask: TaskRunner;
+  refining: boolean;
+  onRefine: () => void;
+  onClose: () => void;
 }) {
-  const { t } = useTranslation("pixelSelection"),
-    state = useSyncExternalStore(port.subscribe, port.read, emptyRead),
-    snapshot = useSyncExternalStore(
-      engine?.subscribe ?? emptySubscribe,
-      engine?.getSnapshot ?? emptyRead,
-      emptyRead,
-    ),
-    [error, setError] = useState("");
-  const page = snapshot?.project.pages.find((item) => item.id === snapshot.pageId);
-  const geometry = page ? createLayerGeometryIndex(page) : undefined;
-  const selected =
-    snapshot?.selection.length === 1 ? geometry?.byId.get(snapshot.selection[0]!) : undefined;
-  const target =
-    selected?.kind === "image" &&
-    !selected.spatial &&
-    geometry?.isVisible(selected.id) &&
-    !geometry.isLocked(selected.id)
-      ? selected.id
-      : undefined;
+  const { t, i18n } = useTranslation("pixelSelection");
+  const state = useSyncExternalStore(port.subscribe, port.read, emptyRead);
+  const status = useSyncExternalStore(
+    model?.subscribe ?? emptySubscribe,
+    model?.read ?? emptyRead,
+    emptyRead,
+  );
+  const thumbnail = useTargetPresentation(port, state);
+  if (!state) return null;
+  const loading = status?.phase === "loading" || status?.phase === "idle",
+    initializing = status?.phase === "initializing";
+  const percent = status ? Math.min(100, Math.floor((100 * status.loaded) / status.total)) : 0;
+  const label = state.preparingSource
+    ? t("preparingVideo")
+    : loading
+      ? t("localModel:downloading")
+      : initializing
+        ? t("localModel:initializing")
+        : t(
+            state.mediaKind === "video"
+              ? "removingPeople"
+              : state.automatic
+                ? "removingBackground"
+                : "working",
+          );
+  const videoPercent = state.videoProgress
+    ? Math.min(100, Math.floor((100 * state.videoProgress.completed) / state.videoProgress.total))
+    : undefined;
   function run(action: () => Promise<void>) {
-    setError("");
-    void action().catch((failure: unknown) => {
-      if (!(failure instanceof DOMException && failure.name === "AbortError"))
-        setError(failure instanceof Error ? failure.message : String(failure));
+    void onTask(async () => {
+      try {
+        await action();
+      } catch (error) {
+        if (!(error instanceof DOMException && error.name === "AbortError")) throw error;
+      }
     });
   }
+  const stage = loading ? 1 : initializing ? 2 : 3;
+  const number = new Intl.NumberFormat(i18n.language, { maximumFractionDigits: 1 });
+  const mb = (bytes: number) =>
+    t("localModel:megabytes", { value: number.format(bytes / 1_000_000) });
   return (
     <section className="object-selection-options" aria-label={t("objectTitle")}>
-      <p>{target ? t("objectTarget") : t("translation:selectImageFirst")}</p>
-      <Button
-        disabled={!target || state?.busy || state?.applying}
-        onClick={() => {
-          if (target) run(() => port.background(target));
-        }}
-      >
-        <Blend size={14} />
-        {t("objectBackground")}
-      </Button>
-      <p>{t("objectBackgroundHint")}</p>
-      <ObjectSelectionGuide />
-      {state && !state.hovering && (
-        <Button
-          disabled={state.busy || state.applying || Boolean(state.error) || state.selected === 0}
-          onClick={() => run(() => port.apply())}
-        >
-          <Check size={14} />
-          {t("objectApply")}
-        </Button>
-      )}
-      {state?.busy && (
-        <div className="object-selection-working" role="status">
-          <Throbber
-            delayMs={0}
-            size={14}
-            label={t(state.scanning ? "objectScanning" : "working")}
-          />
-          <Button
-            variant="ghost"
-            size="icon-xs"
-            aria-label={t("objectCancel")}
-            onClick={() => {
-              port.reset();
-              setError("");
-            }}
-          >
-            <X size={14} />
-          </Button>
-        </div>
-      )}
-      {state && (
-        <div className="object-selection-actions">
-          <Button
-            variant="outline"
-            size="sm"
-            disabled={state.busy || state.applying}
-            onClick={() => run(() => port.removeLast())}
-          >
-            <Undo2 size={14} />
-            {t("objectRemove")}
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => {
-              port.reset();
-              setError("");
-            }}
-          >
-            <X size={14} />
+      <div className="background-action-heading">
+        <strong>{t("translation:segment")}</strong>
+        {state.busy ? (
+          <Button size="sm" variant="ghost" onClick={onClose}>
             {t("translation:cancel")}
           </Button>
+        ) : (
+          <Button size="icon-xs" variant="ghost" aria-label={t("objectCancel")} onClick={onClose}>
+            <X size={14} />
+          </Button>
+        )}
+      </div>
+      <div className="background-action-row">
+        {state.thumbnail ? (
+          <img
+            ref={thumbnail}
+            className="background-target-thumbnail"
+            src={state.thumbnail}
+            alt=""
+            decoding="async"
+          />
+        ) : (
+          <span className="background-target-thumbnail background-target-placeholder" aria-hidden>
+            <Film size={20} />
+          </span>
+        )}
+        <div className="background-target-status">
+          <span className="background-target-name">{state.targetName}</span>
+          {state.busy ? (
+            <div className="background-phase">
+              <Throbber
+                delayMs={0}
+                size={20}
+                variant="shimmer"
+                state={loading || initializing ? "loading" : "preparing"}
+                label={label}
+              />
+              <span className="background-step" dir="ltr">
+                {videoPercent !== undefined
+                  ? `${number.format(videoPercent)} %`
+                  : `${number.format(stage)}/${number.format(3)}`}
+              </span>
+            </div>
+          ) : state.completed ? (
+            <small>{t("backgroundDone")}</small>
+          ) : null}
+        </div>
+      </div>
+      <div className="background-action-buttons">
+        {state.completed && state.mediaKind !== "video" && !state.error && (
+          <Button size="sm" variant="secondary" onClick={onRefine}>
+            {t("refineBackground")}
+          </Button>
+        )}
+        {refining && !state.completed && !state.busy && (
+          <>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button size="icon-xs" variant="ghost" aria-label={t("objectRefineTitle")}>
+                  <Info size={14} />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent className="background-refine-hint">
+                {t("refineGestureHint")}
+              </TooltipContent>
+            </Tooltip>
+            <Button
+              size="icon-xs"
+              variant="ghost"
+              aria-label={t("objectRemove")}
+              disabled={state.applying}
+              onClick={() => run(() => port.removeLast())}
+            >
+              <Undo2 size={14} />
+            </Button>
+            <Button
+              size="sm"
+              disabled={state.applying || Boolean(state.error) || !state.selected}
+              onClick={() =>
+                run(async () => {
+                  await port.apply();
+                  onClose();
+                })
+              }
+            >
+              <Check size={14} />
+              {t("objectApply")}
+            </Button>
+          </>
+        )}
+      </div>
+      {state.busy && !state.preparingSource && loading && status && (
+        <div className="background-download-bytes">
+          <span>
+            {mb(status.loaded)} / {mb(status.total)}
+          </span>
+          <span>{number.format(percent)} %</span>
         </div>
       )}
-      {(error || state?.error) && (
+      {state.busy && !state.preparingSource && loading && status && (
+        <Progress.Root
+          className="background-action-progress"
+          value={percent}
+          aria-label={t("localModel:downloadProgress")}
+        >
+          <Progress.Indicator style={{ transform: `translateX(-${100 - percent}%)` }} />
+        </Progress.Root>
+      )}
+      {state.error && (
         <div className="object-selection-error" role="alert">
           <p>{t("objectError")}</p>
           <details>
             <summary>{t("objectDetails")}</summary>
-            <pre>{error || state?.error}</pre>
+            <pre>{state.error}</pre>
           </details>
           <Button
-            variant="outline"
             size="sm"
-            onClick={() => run(() => navigator.clipboard.writeText(error || state?.error || ""))}
+            variant="outline"
+            onClick={() => run(() => navigator.clipboard.writeText(state!.error))}
           >
             <Copy size={14} />
             {t("objectCopy")}

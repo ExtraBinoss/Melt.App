@@ -81,5 +81,13 @@
   "objectGestureHelp": "SAM 3를 불러온 뒤 마우스를 올려 미리 보세요. 피사체를 클릭하거나 주위에 사각형을 그리세요.",
   "objectApply": "마스크 적용",
   "objectApplyHelp": "적용하면 피사체를 유지하고 배경을 숨깁니다. 취소하면 미리보기를 버립니다.",
-  "objectModels": "로컬 AI 모델"
+  "objectModels": "로컬 AI 모델",
+  "backgroundDone": "배경 제거됨",
+  "refineBackground": "다듬기",
+  "refineGestureHint": "클릭하여 포함합니다.\nAlt + 클릭 또는 오른쪽 클릭하여 제외합니다.\n사각형을 드래그해 피사체를 둘러싸세요.",
+  "removingBackground": "배경 제거 중…",
+  "preparingVideo": "동영상 준비 중…",
+  "removingPeople": "인물 배경 제거 중…",
+  "selectMediaFirst": "먼저 이미지나 동영상을 선택하세요.",
+  "videoExistingMask": "동영상에서 인물을 분리하기 전에 기존 마스크를 제거하세요."
 }

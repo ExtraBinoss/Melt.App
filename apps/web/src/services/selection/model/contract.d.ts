@@ -1,6 +1,6 @@
 export interface ModelDownloadEvent {
   file: string;
-  status: "progress" | "done";
+  status: "progress" | "done" | "ready";
   loaded?: number;
   total?: number;
 }

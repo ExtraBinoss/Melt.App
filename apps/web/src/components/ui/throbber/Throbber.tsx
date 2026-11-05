@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState, useSyncExternalStore, type CSSProperties } from "react";
 import { MeltMark } from "../../../ui/brand/MeltMark";
+import type { BrandState } from "../../../ui/brand/dahlia";
 import type { BrandActivity } from "../../../ui/brand/playback";
 import "./throbber.css";
 const noSubscription = () => () => {};
@@ -7,6 +8,7 @@ const pending = () => true;
 /** Presentation delay suppresses flashes; it never postpones the operation or its result. */
 export function Throbber({
   active = true,
+  state = "working",
   activity,
   label,
   size = 24,
@@ -16,6 +18,7 @@ export function Throbber({
   decorative = false,
 }: {
   active?: boolean;
+  state?: BrandState;
   activity?: BrandActivity;
   label?: string;
   size?: number;
@@ -57,7 +60,7 @@ export function Throbber({
                 <i />
               </span>
             ) : (
-              <MeltMark size={size} state="working" activity={playback} />
+              <MeltMark size={size} state={state} activity={playback} />
             )}
           </span>
           {label && <span className="ui-throbber-label">{label}</span>}

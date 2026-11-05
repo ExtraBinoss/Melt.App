@@ -12,6 +12,7 @@ export async function prepareBackground(onProgress?: (event: ModelDownloadEvent)
     await downloadModelFile(Object.keys(BACKGROUND_MODEL.files)[0]!, onProgress, BACKGROUND_MODEL),
     { executionProviders: runtime.executionProviders },
   );
+  onProgress?.({ file: Object.keys(BACKGROUND_MODEL.files)[0]!, status: "ready" });
   return { ...runtime, session };
 }
 /** One dedicated matting pass, preserving soft alpha instead of a 16-prompt object scan. */
@@ -20,12 +21,12 @@ export async function removeBackground(
   onProgress?: (event: ModelDownloadEvent) => void,
 ): Promise<MaskResult> {
   const { ort, session } = await prepareBackground(onProgress);
-  const image = await prepareImage(url, 1024, [0.485, 0.456, 0.406], [0.229, 0.224, 0.225]);
-  const input = new ort.Tensor("float32", image.data, [1, 3, 1024, 1024]);
+  const image = await prepareImage(url, 512, [0.485, 0.456, 0.406], [0.229, 0.224, 0.225]);
+  const input = new ort.Tensor("float32", image.data, [1, 3, 512, 512]);
   let outputs: Awaited<ReturnType<InferenceSession["run"]>> | undefined;
   try {
     outputs = await session.run({ input_image: input });
-    const logits = outputs.output_image;
+    const logits = outputs[session.outputNames[0]!];
     if (!logits || logits.type !== "float32")
       throw Error("BiRefNet returned no valid alpha matte.");
     const data = alphaMatte(logits.data as Float32Array, logits.dims, image.width, image.height);

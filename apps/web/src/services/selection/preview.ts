@@ -33,7 +33,7 @@ export interface PixelSelectionPort {
   accept(): Promise<void>;
   cancel(): void;
   invert(): Promise<void>;
-  createMask(): Promise<void>;
+  createMask(replaceAssetId?: string): Promise<void>;
   copyPixels(): Promise<void>;
   cutPixels(): Promise<void>;
   reselect(): Promise<void>;

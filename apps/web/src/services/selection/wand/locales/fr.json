@@ -81,5 +81,13 @@
   "objectGestureHelp": "Survolez pour prévisualiser après le chargement de SAM 3. Cliquez sur un sujet ou tracez un rectangle autour.",
   "objectApply": "Appliquer le masque",
   "objectApplyHelp": "Appliquez pour garder le sujet et masquer le fond. Annulez pour abandonner l’aperçu.",
-  "objectModels": "Modèles IA locaux"
+  "objectModels": "Modèles IA locaux",
+  "backgroundDone": "Fond supprimé",
+  "refineBackground": "Affiner",
+  "refineGestureHint": "Cliquez pour inclure.\nAlt + clic ou clic droit pour exclure.\nTracez un rectangle pour encadrer un sujet.",
+  "removingBackground": "Suppression du fond…",
+  "preparingVideo": "Préparation de la vidéo…",
+  "removingPeople": "Détourage des personnes…",
+  "selectMediaFirst": "Sélectionnez d’abord une image ou une vidéo.",
+  "videoExistingMask": "Retirez le masque existant avant de détourer les personnes de la vidéo."
 }

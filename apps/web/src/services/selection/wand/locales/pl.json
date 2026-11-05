@@ -81,5 +81,13 @@
   "objectGestureHelp": "Po załadowaniu SAM 3 najedź, aby zobaczyć podgląd. Kliknij obiekt lub narysuj wokół niego prostokąt.",
   "objectApply": "Zastosuj maskę",
   "objectApplyHelp": "Zastosuj, aby zachować obiekt i ukryć tło. Anuluj, aby odrzucić podgląd.",
-  "objectModels": "Lokalne modele AI"
+  "objectModels": "Lokalne modele AI",
+  "backgroundDone": "Tło usunięte",
+  "refineBackground": "Dopracuj",
+  "refineGestureHint": "Kliknij, aby dodać.\nAlt + kliknięcie lub prawy przycisk, aby wykluczyć.\nNarysuj prostokąt wokół obiektu.",
+  "removingBackground": "Usuwanie tła…",
+  "preparingVideo": "Przygotowywanie filmu…",
+  "removingPeople": "Wycinanie osób…",
+  "selectMediaFirst": "Najpierw zaznacz obraz lub film.",
+  "videoExistingMask": "Usuń istniejącą maskę przed wycięciem osób z filmu."
 }

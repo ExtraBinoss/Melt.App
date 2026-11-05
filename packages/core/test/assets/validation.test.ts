@@ -59,7 +59,12 @@ it("binds timed video masks through a layer interval rather than an untimed orig
     assets: { [asset.id]: asset },
     pages: [createPage({ layers: [owner, clip] })],
   });
-  expect(() => validateProject(project)).toThrow("mask asset must be an image");
+  expect(() => validateProject(project)).toThrow("video owner");
+  owner.kind = "video";
+  owner.assetId = asset.id;
+  expect(() => validateProject(project)).not.toThrow();
+  owner.kind = "rectangle";
+  owner.assetId = null;
   owner.mask = { layerId: clip.id, enabled: true, inverted: false };
   expect(() => validateProject(project)).not.toThrow();
 });

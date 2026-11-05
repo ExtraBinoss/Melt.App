@@ -15,6 +15,7 @@ import { MediaVideoSources } from "../sources/media/video-sources";
 import type { RenderOptions } from "../compositing/types";
 import { assertTextureSize } from "../cache/texture-limits";
 import { imageFootprints, prepareAssetImage } from "./image-preparation";
+import { prepareVideoMasks } from "./video-masks";
 
 class ImageResource implements GpuResource {
   readonly targets = 0;
@@ -43,6 +44,7 @@ function configure(texture: Texture): Texture {
 export class TextureSources {
   private imageUploads = 0;
   private videos: MediaVideoSources | null = null;
+  private videoMasks = new Map<string, string>();
   get uploads(): number {
     return this.imageUploads + (this.videos?.uploads ?? 0);
   }
@@ -109,8 +111,6 @@ export class TextureSources {
       const asset = assets[id];
       if (!asset) throw new Error(`Ressource introuvable : ${id}`);
       if (isVideoAsset(asset)) {
-        if (visible.some((layer) => layer.mask?.enabled && layer.mask.assetId === id))
-          throw Error("A timed video mask must reference a video layer, not an untimed asset.");
         continue;
       }
       if (isSceneAsset(asset)) continue;
@@ -148,10 +148,18 @@ export class TextureSources {
       if (!this.renderer) throw Error("Video textures require an initialized Three.js renderer.");
       this.videos ??= new MediaVideoSources(this.renderer, this.cache, this.maxDimension);
     }
-    await this.videos?.prepare(page.id, visible, assets, options);
+    const video = prepareVideoMasks(visible, assets, options);
+    this.videoMasks = video.ids;
+    await this.videos?.prepare(page.id, video.layers, assets, video.options);
   }
   videoStamp(layerId: string): string | null {
-    return this.videos?.stamp(layerId) ?? null;
+    const own = this.videos?.stamp(layerId) ?? null;
+    const mask = this.videoMasks.get(layerId);
+    return mask ? JSON.stringify([own, this.videos?.stamp(mask)]) : own;
+  }
+  maskImage(assetId: string, ownerId: string): Texture {
+    const mask = this.videoMasks.get(ownerId);
+    return mask ? this.image(assetId, mask) : this.image(assetId);
   }
   videoStats() {
     return this.videos?.stats() ?? null;
@@ -161,6 +169,7 @@ export class TextureSources {
   }
   async dispose(): Promise<void> {
     this.prepared.clear();
+    this.videoMasks.clear();
     await this.videos?.dispose();
   }
   image(assetId: string | null, videoLayerId?: string): Texture {

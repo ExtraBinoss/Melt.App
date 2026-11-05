@@ -579,7 +579,7 @@ export function EditorCanvas({
           viewport={viewport}
         />
         <ViewportControls engine={engine} view={shown} actions={viewportActions} />
-        <PixelSelectionToolbar port={services?.pixelSelection} onError={onError} />
+        <PixelSelectionToolbar tool={tool} port={pixelSelection} onError={onError} />
         <QuickAdd
           engine={engine}
           viewport={viewport}

@@ -1,3 +1,4 @@
+import { backgroundImage } from "../../../services/selection/background-action";
 import { i18n } from "../../../state/i18n";
 import { shortcutTerms, commandDescription, effectSearchTerms } from "./shortcut-search";
 import { supportedLocales } from "../../../state/i18n/locales";
@@ -37,6 +38,7 @@ export function createSearchCommandItems(
     snapshot.project.pages[0]!;
   const { selected, editable, canGroup, canUngroup } = layerSelection(page, snapshot.selection);
   const disabled = {
+    image: backgroundImage(snapshot) ? undefined : t("pixelSelection:selectMediaFirst"),
     motion: page.motion?.mode === "motion" ? undefined : t("motion:requiresMotion"),
     selection: selected.length ? undefined : t("search:noSelection"),
     editable: editable ? undefined : t("search:noSelection"),

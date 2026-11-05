@@ -138,7 +138,7 @@ export function validateLayer(
       "Layer and original media kinds do not match",
     );
   }
-  if (value.mask !== null) validateMaskSource(value.mask, assets);
+  if (value.mask !== null) validateMaskSource(value.mask, assets, value.kind);
   if (value.clipping !== undefined) {
     assertRecord(value.clipping);
     assertText(value.clipping.layerId);

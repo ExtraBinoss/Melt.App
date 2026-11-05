@@ -52,6 +52,7 @@ export async function loadSam(
         ],
       },
     );
+    onProgress?.({ file: DECODER_FILE, status: "ready" });
     return {
       ort,
       encoder,

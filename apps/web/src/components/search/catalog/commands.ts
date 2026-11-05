@@ -1,3 +1,4 @@
+import { backgroundImage } from "../../../services/selection/background-action";
 import { isPublishedComposition, type Composition, type SessionSnapshot } from "@musart/core";
 import type { BindingSnapshot } from "../../../state/keybindings/model";
 import { layerSelection } from "../../layers/menu/selection";
@@ -62,6 +63,7 @@ export class SearchCommands {
     }
     const state = this.selectionState;
     const allowed: Record<Gate, boolean> = {
+      image: Boolean(backgroundImage(snapshot)),
       motion: page.motion?.mode === "motion",
       selection: state.selected.length > 0,
       editable: state.editable,

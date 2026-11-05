@@ -81,5 +81,13 @@
   "objectGestureHelp": "Após carregar o SAM 3, passa o cursor para pré-visualizar. Clica num sujeito ou desenha um retângulo à volta.",
   "objectApply": "Aplicar máscara",
   "objectApplyHelp": "Aplica para manter o sujeito e ocultar o fundo. Cancela para descartar a pré-visualização.",
-  "objectModels": "Modelos de IA locais"
+  "objectModels": "Modelos de IA locais",
+  "backgroundDone": "Fundo removido",
+  "refineBackground": "Refinar",
+  "refineGestureHint": "Clica para incluir.\nAlt + clique ou botão direito para excluir.\nDesenha um retângulo à volta do sujeito.",
+  "removingBackground": "A remover o fundo…",
+  "preparingVideo": "A preparar o vídeo…",
+  "removingPeople": "A recortar as pessoas…",
+  "selectMediaFirst": "Seleciona primeiro uma imagem ou um vídeo.",
+  "videoExistingMask": "Remove a máscara existente antes de recortar as pessoas do vídeo."
 }

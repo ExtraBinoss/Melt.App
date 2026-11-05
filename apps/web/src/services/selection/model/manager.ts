@@ -48,6 +48,10 @@ export class LocalModelManager implements LocalModelPort {
   note = (event: ModelDownloadEvent): void => {
     if (this.snapshot.phase === "removing") return;
     const file = modelFile(event.file, this.manifest);
+    if (file && event.status === "ready") {
+      this.ready();
+      return;
+    }
     if (!file || (event.status !== "done" && (!Number.isFinite(event.loaded) || event.loaded! < 0)))
       return;
     this.progress.set(

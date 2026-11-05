@@ -6,6 +6,9 @@ import { WandClient, type WandWorkerPort } from "../../../../src/services/select
 import { createWandHost } from "../../../../src/services/selection/wand/worker-host";
 import type { SelectionClient, MaskResult } from "../../../../src/services/selection/selection";
 import type { SelectionPrompt } from "../../../../src/services/selection/prompts";
+vi.mock("../../../../src/services/assets/imports", () => ({
+  readDataUrl: vi.fn(async () => "data:image/png;base64,BBBB"),
+}));
 const dispose: (() => void)[] = [];
 afterEach(() => {
   for (const stop of dispose.splice(0)) stop();
@@ -66,6 +69,12 @@ function fixture() {
     client: workerClient,
   });
   const client = {
+    backgroundEncoded: vi.fn(async (_url: string) => ({
+      blob: new Blob(["png"], { type: "image/png" }),
+      width: 3,
+      height: 3,
+      seed: { x: 1, y: 1, label: 1 as const },
+    })),
     model: { read: () => ({ phase: "ready" }) },
     background: vi.fn(async (_url: string) => mask([255, 128, 0])),
     prompt: vi.fn(async (_url: string, _prompt: SelectionPrompt) => mask()),
@@ -258,4 +267,117 @@ it("locks prompts to the selected layer and keeps hover hints out of committed p
   expect(d.engine.getSnapshot().canUndo).toBe(false);
   await d.objects.removeLast();
   expect(d.objects.read()).toBeNull();
+});
+
+it("applies one-click removal without source decoding or preview contours and only refines on explicit request", async () => {
+  const d = fixture(),
+    before = d.engine.getSnapshot().project;
+  const preview = vi.spyOn(d.pixels, "prepareMask");
+  d.engine.select(["image"]);
+  await d.objects.removeBackground("image");
+  expect(d.client.backgroundEncoded).toHaveBeenCalledWith("data:image/png;base64,AAAA");
+  expect(d.client.prompt).not.toHaveBeenCalled();
+  expect(preview).not.toHaveBeenCalled();
+  expect(d.workers).toHaveLength(0);
+  expect(d.objects.read()).toMatchObject({ completed: true, automatic: true, busy: false });
+  expect(d.engine.getSnapshot().project.pages[0]!.layers[0]!.mask).toBeDefined();
+  d.objects.refine();
+  expect(d.client.prompt).not.toHaveBeenCalled();
+  await d.objects.point("image", 15, 15, true);
+  expect(d.client.prompt.mock.lastCall![1].points).toHaveLength(2);
+  await d.objects.apply();
+  expect(d.engine.getSnapshot().project.pages[0]!.layers).toHaveLength(1);
+  d.engine.undo();
+  expect(d.engine.getSnapshot().project.pages[0]!.layers[0]!.mask).toBeDefined();
+  d.engine.undo();
+  expect(d.engine.getSnapshot().project).toEqual(before);
+});
+it("cancellation rejects a late automatic result without modifying the project", async () => {
+  const d = fixture(),
+    before = d.engine.getSnapshot().project;
+  let finish!: (value: Awaited<ReturnType<typeof d.client.backgroundEncoded>>) => void;
+  d.client.backgroundEncoded.mockImplementationOnce(
+    () =>
+      new Promise((resolve) => {
+        finish = resolve;
+      }),
+  );
+  d.engine.select(["image"]);
+  const pending = d.objects.removeBackground("image");
+  const cancelled = expect(pending).rejects.toMatchObject({ name: "AbortError" });
+  d.objects.reset();
+  finish({ blob: new Blob(["png"]), width: 3, height: 3, seed: { x: 1, y: 1, label: 1 } });
+  await cancelled;
+  expect(d.engine.getSnapshot().project).toEqual(before);
+  expect(d.engine.getSnapshot().canUndo).toBe(false);
+});
+
+it("keeps an automatic job pinned through deselection and unrelated edits without stealing selection", async () => {
+  const d = fixture();
+  const other = createLayer("rectangle", { id: "other" });
+  d.engine.execute({ type: "addLayers", layers: [other] });
+  d.engine.select(["image"]);
+  let finish!: (value: Awaited<ReturnType<typeof d.client.backgroundEncoded>>) => void;
+  d.client.backgroundEncoded.mockImplementationOnce(
+    () =>
+      new Promise((resolve) => {
+        finish = resolve;
+      }),
+  );
+  const pending = d.objects.removeBackground("image");
+  d.engine.select(["other"]);
+  d.engine.execute({ type: "updateLayers", ids: ["other"], patch: { name: "Still editable" } });
+  d.engine.select([]);
+  const beforeCommit = d.engine.getSnapshot().project;
+  expect(d.objects.read()).toMatchObject({ layerId: "image", busy: true });
+  expect(d.client.cancel).not.toHaveBeenCalled();
+  finish({ blob: new Blob(["png"]), width: 3, height: 3, seed: { x: 1, y: 1, label: 1 } });
+  await pending;
+  expect(d.engine.getSnapshot().selection).toEqual([]);
+  expect(d.objects.read()).toMatchObject({ layerId: "image", completed: true });
+  expect(
+    d.engine.getSnapshot().project.pages[0]!.layers.find((layer) => layer.id === "image")!.mask,
+  ).toBeDefined();
+  d.engine.undo();
+  expect(d.engine.getSnapshot().project).toEqual(beforeCommit);
+});
+
+it("waits for the retained thumbnail presentation before starting the model and releases the lease", async () => {
+  const d = fixture(),
+    release = d.objects.retainPresentation();
+  d.engine.select(["image"]);
+  const pending = d.objects.removeBackground("image");
+  expect(d.objects.read()).toMatchObject({ busy: true, thumbnail: "data:image/png;base64,AAAA" });
+  expect(d.client.backgroundEncoded).not.toHaveBeenCalled();
+  d.objects.presented("another-layer");
+  await Promise.resolve();
+  expect(d.client.backgroundEncoded).not.toHaveBeenCalled();
+  d.objects.presented("image");
+  await pending;
+  expect(d.client.backgroundEncoded).toHaveBeenCalledOnce();
+  release();
+});
+it("cancels an unpainted job without starting the worker", async () => {
+  const d = fixture(),
+    release = d.objects.retainPresentation();
+  d.engine.select(["image"]);
+  const pending = d.objects.removeBackground("image");
+  const cancelled = expect(pending).rejects.toMatchObject({ name: "AbortError" });
+  d.objects.reset();
+  await cancelled;
+  expect(d.client.backgroundEncoded).not.toHaveBeenCalled();
+  release();
+});
+
+it("continues a queued automatic job when its card unmounts", async () => {
+  const d = fixture(),
+    release = d.objects.retainPresentation();
+  d.engine.select(["image"]);
+  const pending = d.objects.removeBackground("image");
+  expect(d.client.backgroundEncoded).not.toHaveBeenCalled();
+  release();
+  release();
+  await pending;
+  expect(d.client.backgroundEncoded).toHaveBeenCalledOnce();
+  expect(d.objects.read()?.completed).toBe(true);
 });

@@ -1,11 +1,15 @@
 import type { SelectionPrompt, ObjectCandidate, SelectionPoint } from "./prompts";
-import { BACKGROUND_MODEL } from "./model/manifest";
+import { BACKGROUND_MODEL, VIDEO_BACKGROUND_MODEL } from "./model/manifest";
+import type { VideoAsset } from "@musart/core";
+import type { VideoMatteProgress } from "./video/process";
 import { LocalModelManager } from "./model/manager";
 import type { ModelDownloadEvent } from "./model/contract";
 
 export type SelectionRequest =
+  | { id: number; type: "video-background"; original: Blob; asset: VideoAsset }
+  | { id: number; type: "video-poster"; original: Blob; asset: VideoAsset }
   | { id: number; type: "prepare"; background?: boolean }
-  | { id: number; type: "background"; dataUrl: string }
+  | { id: number; type: "background"; dataUrl: string; encode?: boolean }
   | { id: number; type: "prompt"; dataUrl: string; prompt: SelectionPrompt }
   | { id: number; type: "scan"; dataUrl: string }
   | { id: number; type: "segment"; dataUrl: string; x: number; y: number; encode?: boolean }
@@ -28,12 +32,14 @@ export interface MaskResult {
   height: number;
 }
 export interface EncodedMaskResult {
+  seed?: SelectionPoint;
   blob: Blob;
   width: number;
   height: number;
 }
 type SelectionResult = MaskResult | EncodedMaskResult;
 export type SelectionResponse =
+  | { id: number; activity: VideoMatteProgress }
   | { id: number; progress: ModelDownloadEvent }
   | { id: number; result: SelectionResult | null }
   | { id: number; error: string };
@@ -48,6 +54,8 @@ export interface WorkerPort {
 export class SelectionClient {
   readonly model: LocalModelManager;
   readonly backgroundModel: LocalModelManager;
+  readonly videoBackgroundModel: LocalModelManager;
+  private activity?: (progress: VideoMatteProgress) => void;
   private worker: WorkerPort | undefined;
   private nextId = 0;
   private workerGeneration = 0;
@@ -66,6 +74,15 @@ export class SelectionClient {
     private readonly createWorker = (): WorkerPort =>
       new Worker(new URL("./selection.worker.ts", import.meta.url), { type: "module" }),
   ) {
+    this.videoBackgroundModel = new LocalModelManager(
+      {
+        prepare: async () => {
+          throw Error("Select a video to prepare person background removal.");
+        },
+        cancel: () => this.resetWorker(),
+      },
+      VIDEO_BACKGROUND_MODEL,
+    );
     this.backgroundModel = new LocalModelManager(
       {
         prepare: () => this.prepare(true),
@@ -83,12 +100,12 @@ export class SelectionClient {
     this.worker = this.createWorker();
     this.worker.onmessage = ({ data }) => {
       if (!this.pending || this.pending.id !== data.id) return;
+      if ("activity" in data) {
+        this.activity?.(data.activity);
+        return;
+      }
       if ("progress" in data) {
-        (this.pending.type === "background" ||
-        (this.pending.type === "prepare" && this.preparingBackground)
-          ? this.backgroundModel
-          : this.model
-        ).note(data.progress);
+        this.manager(this.pending.type).note(data.progress);
         return;
       }
       const pending = this.pending;
@@ -96,13 +113,11 @@ export class SelectionClient {
       if ("error" in data) {
         this.model.failed(data.error);
         this.backgroundModel.failed(data.error);
+        this.videoBackgroundModel.failed(data.error);
         pending.reject(new Error(data.error));
       } else {
-        if (pending.type !== "wand")
-          (pending.type === "background" || (pending.type === "prepare" && this.preparingBackground)
-            ? this.backgroundModel
-            : this.model
-          ).ready();
+        if (pending.type !== "wand" && pending.type !== "video-poster")
+          this.manager(pending.type).ready();
         pending.resolve(data.result);
       }
     };
@@ -125,11 +140,12 @@ export class SelectionClient {
     if (this.pending) return Promise.reject(new Error("Une sélection est déjà en cours."));
     return new Promise((resolve, reject) => {
       const worker = this.connect();
-      if (request.type !== "wand") {
-        const background =
-          request.type === "background" || (request.type === "prepare" && request.background);
-        (background ? this.model : this.backgroundModel).deactivate();
-        (background ? this.backgroundModel : this.model).start();
+      if (request.type !== "wand" && request.type !== "video-poster") {
+        const manager = this.manager(request.type);
+        if (request.type === "video-background") manager.deactivate();
+        for (const other of [this.model, this.backgroundModel, this.videoBackgroundModel])
+          if (other !== manager) other.deactivate();
+        manager.start();
       }
       this.pending = { id: request.id, type: request.type, resolve, reject };
       try {
@@ -144,6 +160,37 @@ export class SelectionClient {
     });
   }
   private preparingBackground = false;
+  private manager(type: SelectionRequest["type"]) {
+    return type === "video-background"
+      ? this.videoBackgroundModel
+      : type === "background" || (type === "prepare" && this.preparingBackground)
+        ? this.backgroundModel
+        : this.model;
+  }
+  async videoPoster(original: Blob, asset: VideoAsset): Promise<EncodedMaskResult> {
+    const result = await this.request({ id: ++this.nextId, type: "video-poster", original, asset });
+    if (!result || !("blob" in result)) throw Error("The video thumbnail is missing.");
+    return result;
+  }
+  async videoBackground(
+    original: Blob,
+    asset: VideoAsset,
+    activity: (progress: VideoMatteProgress) => void,
+  ): Promise<EncodedMaskResult> {
+    this.activity = activity;
+    try {
+      const result = await this.request({
+        id: ++this.nextId,
+        type: "video-background",
+        original,
+        asset,
+      });
+      if (!result || !("blob" in result)) throw Error("The video background mask is missing.");
+      return result;
+    } finally {
+      if (this.activity === activity) this.activity = undefined;
+    }
+  }
   async prepare(background = false) {
     if (this.pending) throw Error("A selection is already running.");
     this.preparingBackground = background;
@@ -156,6 +203,16 @@ export class SelectionClient {
   async background(dataUrl: string): Promise<MaskResult> {
     const result = await this.request({ id: ++this.nextId, type: "background", dataUrl });
     if (!result || !("data" in result)) throw Error("Background removal mask is missing.");
+    return result;
+  }
+  async backgroundEncoded(dataUrl: string): Promise<EncodedMaskResult> {
+    const result = await this.request({
+      id: ++this.nextId,
+      type: "background",
+      dataUrl,
+      encode: true,
+    });
+    if (!result || !("blob" in result)) throw Error("Background removal mask is missing.");
     return result;
   }
   async segment(dataUrl: string, x: number, y: number) {
@@ -189,6 +246,7 @@ export class SelectionClient {
   cancel() {
     this.model.cancel();
     this.backgroundModel.cancel();
+    this.videoBackgroundModel.cancel();
   }
   async wand(
     pixels: Uint8ClampedArray,
@@ -215,6 +273,7 @@ export class SelectionClient {
     this.workerGeneration++;
     this.model.deactivate();
     this.backgroundModel.deactivate();
+    this.videoBackgroundModel.deactivate();
     this.pending?.reject(new DOMException("Sélection annulée.", "AbortError"));
     this.pending = undefined;
     if (this.worker) {
@@ -229,5 +288,6 @@ export class SelectionClient {
     this.resetWorker();
     this.model.dispose();
     this.backgroundModel.dispose();
+    this.videoBackgroundModel.dispose();
   }
 }

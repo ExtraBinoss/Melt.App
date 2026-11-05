@@ -123,9 +123,11 @@ function SelectionAction({
 export function PixelSelectionToolbar({
   port,
   onError,
+  tool,
 }: {
   port?: PixelSelectionPort;
   onError?: (message: string) => void;
+  tool?: string;
 }) {
   const { t } = useTranslation("pixelSelection"),
     bindings = useKeybindings(),
@@ -134,7 +136,7 @@ export function PixelSelectionToolbar({
       port?.read ?? emptyRead,
       emptyRead,
     );
-  if (!state) return null;
+  if (!state || tool === "segment") return null;
   const busy = state.busy || state.dragging || Boolean(state.error);
   async function run(action: () => Promise<void>) {
     try {
