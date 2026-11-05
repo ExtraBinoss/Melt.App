@@ -4,6 +4,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ## [Unreleased]
 
+- Refine Studio property interactions while preserving the contextual bar layout: expose linked X/Y/Z scale and text wrapping bounds in advanced controls, coalesce rapid text preview samples per frame, use relative slider drags with speed-sensitive Shift increments and snap guides, and replace numeric reset titles with shared tooltips. Keep color swatch corners on workspace theme tokens, compact gradient direction controls with distinct linear/radial icons and fresh pointer ownership after mode switches, and open blank-canvas insertion at the actual pointer inside Studio compositions.
+
 - Transfer background recipe paint ownership to its editable rectangle atomically, clearing the previous composition paint so resizing or feathering the rectangle cannot uncover an old gradient. Undo restores both paint owners.
 
 - Keep a Studio object's white contour continuous from hover through primary press and selection. Retain the same silhouette until pointer-up selection takes ownership, cancel hover normally on drags/cancellation, and keep selected contours steady instead of restarting hover pulses.

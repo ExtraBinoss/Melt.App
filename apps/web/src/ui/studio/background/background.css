@@ -2,7 +2,7 @@
   width: 48px;
   height: 48px;
   padding: 0;
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
 }
 .studio-background-popover {
   width: min(390px, calc(100vw - 24px));
@@ -68,7 +68,7 @@
   min-width: 0;
   gap: 4px;
   border: 1px solid var(--border);
-  border-radius: 6px;
+  border-radius: var(--radius-md);
   overflow: hidden;
   padding: 0 0 6px;
   text-align: left;
@@ -121,13 +121,13 @@
   gap: 4px;
   padding: 4px;
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   background: color-mix(in srgb, var(--foreground) 5%, transparent);
 }
 .studio-background-modes > button,
 .studio-background-types > button {
   flex: 1;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
 }
 .studio-background-modes > button:last-child {
   flex: 0 0 32px;
@@ -137,8 +137,22 @@
   width: 20px;
   height: 20px;
   border: 1px solid color-mix(in srgb, var(--foreground) 25%, transparent);
-  border-radius: 50%;
+  border-radius: 4px;
   background: linear-gradient(180deg, var(--foreground), transparent);
+}
+.studio-gradient-icon[data-gradient-kind="radial"] {
+  background: radial-gradient(circle, var(--foreground), transparent 75%);
+}
+.studio-background-fields > .studio-direction-pad {
+  width: 104px;
+  height: 104px;
+  justify-self: center;
+  overflow: visible;
+}
+.studio-background-fields > .studio-direction-pad .studio-direction-position {
+  width: 14px;
+  height: 14px;
+  background: var(--card);
 }
 .studio-background-advanced {
   width: min(350px, calc(100vw - 24px));

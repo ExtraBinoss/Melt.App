@@ -25,7 +25,12 @@ vi.mock("react-i18next", async (original) => ({
   ...(await original<typeof import("react-i18next")>()),
   useTranslation: () => ({ t: (key: string) => key, i18n: { dir: () => "ltr" } }),
 }));
-afterEach(() => vi.restoreAllMocks());
+const mode = vi.hoisted(() => ({ value: "classic" }));
+vi.mock("../../../src/ui/studio/workspace-mode", () => ({ useWorkspaceMode: () => mode.value }));
+afterEach(() => {
+  vi.restoreAllMocks();
+  mode.value = "classic";
+});
 
 function fixture() {
   const page = createPage({ width: 200, height: 160 }),
@@ -218,4 +223,19 @@ it("does no catalog construction or search normalization while closed through do
     d.view.unmount();
     d.viewport.current?.remove();
   }
+});
+
+it("opens on blank artboard paint in Studio and preserves claimed text double clicks", () => {
+  mode.value = "studio";
+  const d = fixture();
+  fireEvent.doubleClick(d.viewport.current!, { clientX: 500, clientY: 400, button: 0 });
+  expect(screen.getByRole("dialog")).toBeInTheDocument();
+  fireEvent.wheel(d.viewport.current!);
+  d.viewport.current!.addEventListener("dblclick", (event) => event.preventDefault(), {
+    capture: true,
+  });
+  fireEvent.doubleClick(d.viewport.current!, { clientX: 500, clientY: 400, button: 0 });
+  expect(screen.queryByRole("dialog")).toBeNull();
+  d.view.unmount();
+  d.viewport.current?.remove();
 });

@@ -14,5 +14,8 @@
   "scene": "Scène",
   "environment": "Environnement",
   "intensity": "Intensité",
-  "rotation": "Rotation"
+  "rotation": "Rotation",
+  "linkScale": "Lier les axes de l’échelle",
+  "unlinkScale": "Délier les axes de l’échelle",
+  "preciseHint": "Crans 5 / 10 · Geste lent : précision"
 }

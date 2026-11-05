@@ -1,0 +1,12 @@
+[data-slot="tooltip-content"].control-hint {
+  width: max-content;
+  max-width: min(280px, calc(100vw - 24px));
+  gap: 6px;
+  text-wrap: wrap;
+}
+.control-hint > span {
+  min-width: 0;
+}
+.control-hint > kbd {
+  flex-shrink: 0;
+}

@@ -4,6 +4,7 @@ import { Button } from "../../ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "../../ui/popover";
 import { useResetFeedback } from "../../shared/use-reset-feedback";
 import { ColorControl } from "../ColorControl";
+import { ControlHint } from "../../shared/ControlHint";
 /** One parent-owned palette slot, with a standalone fallback for isolated controls. */
 export function EffectColor({
   label,
@@ -86,25 +87,26 @@ export function EffectColor({
   return (
     <div ref={row} className="effect-color-field reset-feedback">
       {onReset ? (
-        <button
-          type="button"
-          className="effect-color-label"
-          aria-label={`${t("reset")} · ${label}`}
-          title={resetValue?.toUpperCase()}
-          disabled={disabled}
-          onPointerDown={(event) => {
-            if (event.button === 0) {
-              event.preventDefault();
-              changeOpen(false);
-            }
-          }}
-          onClick={(event) => {
-            if (event.detail === 0) reset();
-          }}
-          onDoubleClick={reset}
-        >
-          {label}
-        </button>
+        <ControlHint content={resetValue?.toUpperCase() ?? t("reset")}>
+          <button
+            type="button"
+            className="effect-color-label"
+            aria-label={`${t("reset")} · ${label}`}
+            disabled={disabled}
+            onPointerDown={(event) => {
+              if (event.button === 0) {
+                event.preventDefault();
+                changeOpen(false);
+              }
+            }}
+            onClick={(event) => {
+              if (event.detail === 0) reset();
+            }}
+            onDoubleClick={reset}
+          >
+            {label}
+          </button>
+        </ControlHint>
       ) : (
         <span>{label}</span>
       )}

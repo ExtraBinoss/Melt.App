@@ -5,6 +5,7 @@ import type { EditorServices } from "../../state/contracts";
 import type { TaskRunner } from "../../components/projects/ProjectDialog";
 import { ExportActions } from "../../components/export/ExportActions";
 import { MagicSearch, type MagicSearchProps } from "../../components/search/MagicSearch";
+import { WorkspaceTheme } from "../brand/WorkspaceTheme";
 import { useWorkspaceMode } from "./workspace-mode";
 import "./workspace-mode.css";
 
@@ -22,9 +23,11 @@ const StudioLibrary = lazy(() =>
 export function WorkspaceModeBoundary({ children }: { children: ReactNode }) {
   const mode = useWorkspaceMode();
   return (
-    <div className="workspace-mode-root" data-workspace-mode={mode}>
-      {children}
-    </div>
+    <WorkspaceTheme value={mode}>
+      <div className="workspace-mode-root" data-workspace-mode={mode} data-workspace-theme={mode}>
+        {children}
+      </div>
+    </WorkspaceTheme>
   );
 }
 

@@ -14,5 +14,8 @@
   "scene": "Scene",
   "environment": "Environment",
   "intensity": "Intensity",
-  "rotation": "Rotation"
+  "rotation": "Rotation",
+  "linkScale": "Link scale axes",
+  "unlinkScale": "Unlink scale axes",
+  "preciseHint": "Steps 5 / 10 · Slow drag: precision"
 }

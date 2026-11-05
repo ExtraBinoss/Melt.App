@@ -12,6 +12,7 @@ import { FontPicker } from "../../../components/properties/fonts/FontPicker";
 import { Popover, PopoverContent, PopoverTrigger } from "../../../components/ui/popover";
 import { IconButton } from "../../../components/shared/IconButton";
 import { StudioSlider } from "../controls/StudioSlider";
+import { NumberInput } from "../../../components/shared/NumberInput";
 import { StudioObjectTransform } from "./StudioObjectTransform";
 import "./object-controls.css";
 import "../messages";
@@ -72,6 +73,7 @@ export const StudioObjectBar = memo(function StudioObjectBar({
             target={{ kind: "layer", layerId: layer.id, property: "text" }}
             label={common("textContent")}
             value={layer.text}
+            coalescePreview
             disabled={!selection.editable}
             onPreview={(text) => patch({ text }, false)}
             onCommit={(text) => patch({ text }, true)}
@@ -199,7 +201,7 @@ export const StudioObjectBar = memo(function StudioObjectBar({
             />
           )}
         </div>
-        {source?.enabled && (
+        {(source?.enabled || layer.kind === "text") && (
           <Popover modal={false}>
             <PopoverTrigger asChild>
               <IconButton label={spatialText("advanced")} tooltipSide="top">
@@ -215,7 +217,32 @@ export const StudioObjectBar = memo(function StudioObjectBar({
               initialFocus="content"
             >
               <strong className="studio-field-title">{layer.name}</strong>
-              {source.source === "extrude" &&
+              {layer.kind === "text" && (
+                <div className="studio-text-bounds">
+                  {(["width", "height"] as const).map((key) => (
+                    <NumberInput
+                      key={key}
+                      identity={identity}
+                      label={common(key)}
+                      scrubLabel={common(key)}
+                      value={layer[key]}
+                      min={1}
+                      max={16384}
+                      step={1}
+                      unit="px"
+                      disabled={!selection.editable}
+                      onStart={() => {
+                        if (current())
+                          edit.start({ kind: "layer", layerId: layer.id, property: key });
+                      }}
+                      onPreview={(value) => patch({ [key]: value }, false)}
+                      onCommit={(value) => patch({ [key]: value }, true)}
+                      onCancel={edit.cancel}
+                    />
+                  ))}
+                </div>
+              )}
+              {source?.source === "extrude" &&
                 (["bevelSegments", "curveSegments"] as const).map((key) => (
                   <StudioSlider
                     key={key}

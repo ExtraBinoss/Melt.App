@@ -139,14 +139,14 @@
   height: 148px;
 }
 .color-control .react-colorful__saturation {
-  border-radius: 5px;
+  border-radius: var(--radius-item);
   border-bottom: none;
   margin-bottom: 10px;
 }
 .color-control .react-colorful__hue,
 .color-control .react-colorful__alpha {
   height: 9px;
-  border-radius: 5px;
+  border-radius: var(--radius-item);
   margin: 0 3px 8px;
 }
 .color-control .react-colorful__pointer {
@@ -172,7 +172,7 @@
   height: 26px;
   width: 26px;
   border: 1px solid var(--border);
-  border-radius: 5px;
+  border-radius: var(--radius-item);
   flex-shrink: 0;
 }
 .color-value input {

@@ -28,6 +28,9 @@ import { clientToPage } from "../viewport/view";
 import type { ViewSource } from "../viewport/motion";
 import type { WorkspaceSource } from "../artboards/workspace";
 import { artboardAt } from "../artboards/layout";
+import { sourceGeometry } from "../selection/frame-geometry";
+import { canvasHit } from "../selection/hit";
+import { useWorkspaceMode } from "../../ui/studio/workspace-mode";
 import type { SceneController } from "../session/scene-controller";
 import { createQuickAddItems } from "./catalog";
 import { createQuickLayer, isQuickLayerAction } from "./layers";
@@ -56,6 +59,7 @@ export function QuickAdd({
 }) {
   const { t } = useTranslation(),
     setTool = useSetAtom(toolAtom);
+  const studio = useWorkspaceMode() === "studio";
   const commands = useMemo(() => createCommandPort(engine), [engine]);
   const handoff = useRef(false);
   const showing = useRef(false);
@@ -77,11 +81,25 @@ export function QuickAdd({
         return;
       const rect = element.getBoundingClientRect(),
         layout = workspace.read();
+      if (event.defaultPrevented) return;
+      const point = clientToPage(
+        { x: event.clientX, y: event.clientY },
+        rect,
+        viewSource.read(),
+        layout,
+      );
+      const board = layout.boards.find((item) => item.id === controller.read().page.id);
       if (
-        artboardAt(
-          layout,
-          clientToPage({ x: event.clientX, y: event.clientY }, rect, viewSource.read(), layout),
-        )
+        studio
+          ? board &&
+            canvasHit(
+              controller.read().page,
+              { x: point.x - board.x, y: point.y - board.y },
+              true,
+              sourceGeometry(controller),
+              true,
+            )
+          : artboardAt(layout, point)
       )
         return;
       event.preventDefault();
@@ -89,8 +107,8 @@ export function QuickAdd({
       setCategory("all");
       setSession({
         origin: captureGestureOrigin(engine),
-        x: event.clientX - rect.left,
-        y: event.clientY - rect.top,
+        x: event.clientX,
+        y: event.clientY,
       });
     };
     const close = () => setSession(null);
@@ -111,7 +129,15 @@ export function QuickAdd({
       stopEngine();
       stopScene();
     };
-  }, [engine, viewport, workspace, viewSource, controller]);
+  }, [engine, viewport, workspace, viewSource, controller, studio]);
+  const anchor = useMemo(
+    () => ({
+      current: {
+        getBoundingClientRect: () => new DOMRect(session?.x ?? 0, session?.y ?? 0, 0, 0),
+      },
+    }),
+    [session],
+  );
   const items = useMemo(
     () => (session ? createQuickAddItems(engine.getSnapshot(), t) : []),
     [session, engine, t],
@@ -162,14 +188,7 @@ export function QuickAdd({
           if (!open) setSession(null);
         }}
       >
-        <PopoverAnchor asChild>
-          <span
-            className="quick-add-anchor"
-            aria-hidden
-            data-canvas-control
-            style={{ left: session?.x ?? 0, top: session?.y ?? 0 }}
-          />
-        </PopoverAnchor>
+        <PopoverAnchor virtualRef={anchor} />
         <PopoverContent
           align="start"
           sideOffset={4}

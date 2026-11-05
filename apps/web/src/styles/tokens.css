@@ -21,10 +21,10 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --radius-sm: 4px;
-  --radius-md: 6px;
-  --radius-lg: 10px;
-  --radius-xl: 14px;
+  --radius-sm: var(--brand-radius-sm);
+  --radius-md: var(--brand-radius-md);
+  --radius-lg: var(--brand-radius-lg);
+  --radius-xl: var(--brand-radius-xl);
   --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
 }
 :root {
@@ -49,7 +49,6 @@
   --destructive: #db4349;
   --border: #e3e4e9;
   --input: #e4e5eb;
-  --radius: 10px;
   --workspace: #eef0f2;
   --workspace-dots: #c9cdd4;
   --selection-fill: #e8e8e8;

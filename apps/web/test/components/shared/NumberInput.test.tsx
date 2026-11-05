@@ -1,7 +1,13 @@
 import { i18n } from "../../../src/state/i18n";
 import { useState, Profiler } from "react";
 import { expect, test, vi } from "vitest";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render as renderBase, screen } from "@testing-library/react";
+import type { ReactNode } from "react";
+import { TooltipProvider } from "../../../src/components/ui/tooltip";
+const render = (node: ReactNode) =>
+  renderBase(node, {
+    wrapper: ({ children }) => <TooltipProvider skipDelayDuration={0}>{children}</TooltipProvider>,
+  });
 import { NumberInput } from "../../../src/components/shared/NumberInput";
 beforeEach(async () => {
   await i18n.changeLanguage("fr");

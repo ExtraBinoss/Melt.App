@@ -70,3 +70,52 @@ test("validates native string drafts, cancels Escape and commits one completed e
   fireEvent.blur(field);
   expect(commit).toHaveBeenCalledExactlyOnceWith("#abcdef");
 });
+
+test("coalesces rapid native typing into the next frame and retires pending work on blur, Escape and unmount", () => {
+  const d = setup(),
+    preview = vi.fn(),
+    commit = vi.fn(),
+    cancel = vi.fn();
+  const frames = new Map<number, FrameRequestCallback>();
+  let sequence = 0;
+  const request = vi.spyOn(window, "requestAnimationFrame").mockImplementation((callback) => {
+    frames.set(++sequence, callback);
+    return sequence;
+  });
+  const stop = vi.spyOn(window, "cancelAnimationFrame").mockImplementation((id) => {
+    frames.delete(id);
+  });
+  const view = d.mount(
+    <MotionStringInput
+      value="A"
+      label="Text"
+      coalescePreview
+      target={{ kind: "layer", layerId: d.text.id, property: "text" }}
+      onPreview={preview}
+      onCommit={commit}
+      onCancel={cancel}
+    />,
+  );
+  const field = screen.getByLabelText("Text");
+  for (const value of ["AB", "ABC", "ABCD"]) fireEvent.change(field, { target: { value } });
+  expect(field).toHaveValue("ABCD");
+  expect(preview).not.toHaveBeenCalled();
+  expect(frames.size).toBe(1);
+  act(() => {
+    for (const callback of frames.values()) callback(16);
+    frames.clear();
+  });
+  expect(preview).toHaveBeenCalledExactlyOnceWith("ABCD");
+  fireEvent.change(field, { target: { value: "ABCDE" } });
+  fireEvent.blur(field);
+  expect(frames.size).toBe(0);
+  expect(commit).toHaveBeenCalledExactlyOnceWith("ABCDE");
+  fireEvent.change(field, { target: { value: "bad" } });
+  fireEvent.keyDown(field, { key: "Escape" });
+  expect(frames.size).toBe(0);
+  fireEvent.change(field, { target: { value: "late" } });
+  view.unmount();
+  expect(frames.size).toBe(0);
+  request.mockRestore();
+  stop.mockRestore();
+});

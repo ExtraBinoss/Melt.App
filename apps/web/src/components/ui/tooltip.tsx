@@ -2,6 +2,7 @@
 "use client";
 
 import * as React from "react";
+import { useWorkspaceTheme } from "../../ui/brand/WorkspaceTheme";
 import { cn } from "./utils";
 import { Tooltip as TooltipPrimitive } from "radix-ui";
 
@@ -71,6 +72,7 @@ function TooltipContent({
   forceMount,
   ...props
 }: React.ComponentProps<typeof TooltipPrimitive.Content>) {
+  const workspaceTheme = useWorkspaceTheme();
   const visited = React.useContext(VisitedTooltip);
   // Unvisited help owns no portal/presence controller tree. Visited help retains Radix exit behavior.
   if (!visited && !forceMount) return null;
@@ -79,6 +81,7 @@ function TooltipContent({
       <TooltipPrimitive.Content
         forceMount={forceMount}
         data-slot="tooltip-content"
+        data-workspace-theme={workspaceTheme}
         sideOffset={sideOffset}
         className={cn(
           "themed-tooltip z-50 w-fit max-w-72 origin-(--radix-tooltip-content-transform-origin) animate-in rounded-md border border-border bg-popover px-2.5 py-1.5 text-[11px] leading-4 text-balance text-popover-foreground shadow-md duration-100 fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 motion-reduce:animate-none",

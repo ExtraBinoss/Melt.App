@@ -28,7 +28,10 @@ editable and are retained in the project.
 - Selecting text reveals an outlined text input, font, font size, depth and bevel
   directly in the centered object bar. Models and primitives expose proportional
   size and X/Y rotation. Position, axis scales and Z rotation are available in the
-  contextual popover alongside extrusion tessellation quality when applicable.
+  contextual popover alongside extrusion tessellation quality when applicable. Axis
+  scales share a link toggle (linked by default) and commit proportionally in one
+  undo entry. Text wrapping width and visible height are editable there too; the
+  contextual bar retains its existing compact arrangement.
 - Material and scene controls open on demand. Their 134 materials and 62 environment
   entries are grouped into initially expanded categories; each project's preferences
   remember collapsed categories. Sphere atlases are rendered with the native engine
@@ -38,6 +41,10 @@ editable and are retained in the project.
   Material editing requires one unlocked native object; its disabled tool explains
   this requirement. Material properties sit beside the catalog. The scene panel's
   direction pad, distance and focal-angle controls edit the composition camera.
+- Slider drags remain relative outside their tracks. Shift uses increments of five
+  or ten useful units according to speed (scaled to the parameter range); slow
+  movement refines ordinary input. Dashed markers indicate snapping. Help uses
+  compact shared tooltips with keycaps instead of browser titles.
 - Sliders preview imperatively, commit once on release and restore on cancellation,
   owner changes or unmount. Neutral surfaces use the shared theme without glows.
 - Recenter restores the immersive view. Wheel/trackpad navigation and pointer zoom
@@ -252,6 +259,9 @@ Native text, typography, scene and object properties use certified preview linea
 A same-owner in-flight preparation may finish while the most recent sample is
 coalesced; changing selection, source, project, document or cancelling invalidates
 that lineage immediately. This avoids starving geometry during continuous input.
+Studio coalesces text input received within a single animation frame before
+submitting a geometry preview; the native input remains immediate and blur commits
+the final string once. Pending samples are retired on cancellation or unmount.
 Empty and whitespace-only text create real zero-triangle native geometry through
 the existing worker path. Valid typing resumes without a fabricated success or
 replacement image. Source/font/vector failures still report actual errors.

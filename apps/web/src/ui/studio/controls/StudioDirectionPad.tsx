@@ -14,6 +14,8 @@ export interface StudioDirectionPadProps {
   minY: number;
   maxY: number;
   step?: number;
+  /** Project a sampled point onto the parameter domain, e.g. a unit direction. */
+  projectValue?: (value: DirectionValue) => DirectionValue;
   invalidation: { subscribe(listener: () => void): () => void };
   onStart: () => void;
   onPreview: (value: DirectionValue) => void;
@@ -34,7 +36,7 @@ export function StudioDirectionPad(props: StudioDirectionPadProps) {
       if (active.current) callbacks.current.onCancel();
       active.current = null;
     };
-  }, [props.identity]);
+  }, [props.identity, props.minX, props.maxX, props.minY, props.maxY]);
   useEffect(
     () =>
       props.invalidation.subscribe(() => {
@@ -51,7 +53,8 @@ export function StudioDirectionPad(props: StudioDirectionPadProps) {
   const clampY = (value: number) => Math.max(minY, Math.min(maxY, value));
   const snap = (value: number) => Math.round(value / step) * step;
   function cancel() {
-    if (active.current) callbacks.current.onCancel();
+    if (!active.current) return;
+    callbacks.current.onCancel();
     active.current = null;
     setDraft(null);
   }
@@ -59,10 +62,11 @@ export function StudioDirectionPad(props: StudioDirectionPadProps) {
     const session = active.current;
     if (!session || session.pointer !== event.pointerId) return;
     const { bounds } = session;
-    const value = {
+    const point = {
       x: clampX(snap(minX + ((event.clientX - bounds.left) / bounds.width) * (maxX - minX))),
       y: clampY(snap(maxY - ((event.clientY - bounds.top) / bounds.height) * (maxY - minY))),
     };
+    const value = callbacks.current.projectValue?.(point) ?? point;
     session.value = value;
     setDraft({ identity: props.identity, value });
     callbacks.current.onPreview(value);
@@ -114,13 +118,14 @@ export function StudioDirectionPad(props: StudioDirectionPadProps) {
         const delta = deltas[event.key];
         if (!delta || active.current) return;
         event.preventDefault();
-        const value =
+        const point =
           event.key === "Home"
             ? { x: clampX(0), y: clampY(0) }
             : {
                 x: clampX(shown.x + delta[0]),
                 y: clampY(shown.y + delta[1]),
               };
+        const value = callbacks.current.projectValue?.(point) ?? point;
         callbacks.current.onStart();
         callbacks.current.onPreview(value);
         callbacks.current.onCommit(value);

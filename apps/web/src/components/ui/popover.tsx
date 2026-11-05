@@ -2,6 +2,7 @@
 "use client";
 
 import * as React from "react";
+import { useWorkspaceTheme } from "../../ui/brand/WorkspaceTheme";
 import { cn } from "./utils";
 import "../shared/overlays/surface.css";
 import { withPresentationBoundary } from "../shared/overlays/PresentationBoundary";
@@ -33,12 +34,14 @@ function PopoverContent({
   /** Parameter editors can accept focus without starting their first field gesture. */
   initialFocus?: "first-control" | "content";
 }) {
+  const workspaceTheme = useWorkspaceTheme();
   return (
     <PopoverPrimitive.Portal container={portalContainer} forceMount={forceMount}>
       <PopoverPrimitive.Content
         forceMount={forceMount}
         asChild={asChild}
         data-slot="popover-content"
+        data-workspace-theme={workspaceTheme}
         align={align}
         sideOffset={sideOffset}
         className={cn(

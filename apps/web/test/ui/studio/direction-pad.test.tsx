@@ -91,3 +91,32 @@ test("keyboard arrows use the same preview and atomic commit with adjustable pre
   expect(d.props.onCommit).toHaveBeenLastCalledWith({ x: 10, y: 0 });
   expect(d.props.onStart).toHaveBeenCalledOnce();
 });
+
+test("projects preview and commit onto the same directional domain", () => {
+  const d = fixture();
+  const projectValue = ({ x, y }: { x: number; y: number }) => {
+    const length = Math.hypot(x, y);
+    return length ? { x: x / length, y: y / length } : { x: 1, y: 0 };
+  };
+  d.view.rerender(
+    <StudioDirectionPad
+      {...d.props}
+      minX={-1}
+      maxX={1}
+      minY={-1}
+      maxY={1}
+      step={0.01}
+      projectValue={projectValue}
+    />,
+  );
+  d.pointer("pointerDown", 170, 35);
+  const value = vi.mocked(d.props.onPreview).mock.calls.at(-1)![0];
+  expect(value.x).toBeCloseTo(Math.SQRT1_2);
+  expect(value.y).toBeCloseTo(Math.SQRT1_2);
+  const thumb = d.pad.querySelector<HTMLElement>(".studio-direction-position")!;
+  expect(parseFloat(thumb.style.left)).toBeCloseTo((1 + Math.SQRT1_2) * 50);
+  d.pointer("pointerUp", 170, 35);
+  expect(d.props.onCommit).toHaveBeenCalledExactlyOnceWith(value);
+  fireEvent.lostPointerCapture(d.pad, { pointerId: 1 });
+  expect(d.props.onCancel).not.toHaveBeenCalled();
+});

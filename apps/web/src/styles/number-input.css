@@ -109,3 +109,7 @@
     animation: none !important;
   }
 }
+
+.number-field[data-snapped] .number-scrub {
+  border-bottom: 1px dashed var(--muted-foreground);
+}

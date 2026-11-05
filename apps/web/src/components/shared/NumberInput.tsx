@@ -15,6 +15,9 @@ import { MobileControlsContext } from "../workspace/mobile/use-mobile";
 import { MobileNumberInput } from "../workspace/mobile/MobileNumberInput";
 import { Input } from "../ui/input";
 import { useResetFeedback } from "./use-reset-feedback";
+import { ControlHint } from "./ControlHint";
+import { useWorkspaceTheme } from "../../ui/brand/WorkspaceTheme";
+import { gestureGain, gestureQuantum, snapNumericValue } from "./numeric-gesture";
 
 export interface NumberInputProps {
   label: string;
@@ -65,6 +68,7 @@ function DesktopNumberInput({
   presentation,
 }: NumberInputProps) {
   const { t } = useTranslation();
+  const studio = useWorkspaceTheme() === "studio";
   const id = useId();
   const element = useRef<HTMLDivElement>(null);
   const resetFeedback = useResetFeedback(element);
@@ -77,6 +81,9 @@ function DesktopNumberInput({
     origin: object;
     handle: HTMLButtonElement;
     pointerId: number;
+    lastX: number;
+    time: number;
+    precise: number;
   } | null>(null);
   const heldKey = useRef<object | null>(null),
     blockedKey = useRef(false),
@@ -101,6 +108,7 @@ function DesktopNumberInput({
         heldKey.current = null;
         typing.current = false;
         active?.handle.parentElement?.removeAttribute("data-dragging");
+        active?.handle.parentElement?.removeAttribute("data-snapped");
         if (active?.handle.hasPointerCapture(active.pointerId))
           active.handle.releasePointerCapture(active.pointerId);
         cancelRef.current?.();
@@ -130,6 +138,7 @@ function DesktopNumberInput({
         heldKey.current = null;
         typing.current = false;
         active?.handle.parentElement?.removeAttribute("data-dragging");
+        active?.handle.parentElement?.removeAttribute("data-snapped");
         if (active?.handle.hasPointerCapture(active.pointerId))
           active.handle.releasePointerCapture(active.pointerId);
         cancelRef.current?.();
@@ -148,7 +157,7 @@ function DesktopNumberInput({
     return stop;
   }, [presentation, precision, t]);
   function bounded(next: number) {
-    return Math.round(Math.min(max, Math.max(min, next)) * precision) / precision;
+    return Math.min(max, Math.max(min, Math.round(next * precision) / precision));
   }
   function parse(raw: string) {
     const parsed = Number(raw);
@@ -195,6 +204,9 @@ function DesktopNumberInput({
       origin,
       handle: event.currentTarget,
       pointerId: event.pointerId,
+      lastX: event.clientX,
+      time: event.timeStamp,
+      precise: initial,
     };
     event.currentTarget.setPointerCapture(event.pointerId);
   }
@@ -207,6 +219,27 @@ function DesktopNumberInput({
     let next = bounded(
       Math.round((active.value + distance * step * (event.shiftKey ? 2 : 0.2)) / step) * step,
     );
+    if (studio) {
+      const delta = event.clientX - active.lastX;
+      const elapsed = event.timeStamp - active.time;
+      const quantum = gestureQuantum(min, max, step, elapsed > 0 ? Math.abs(delta) / elapsed : 1);
+      active.precise +=
+        delta *
+        (event.shiftKey
+          ? Math.max(step * 0.2, quantum / 10)
+          : Math.max(step * 0.2, 0.01) * gestureGain(false, delta, elapsed));
+      active.precise = Math.min(max, Math.max(min, active.precise));
+      active.lastX = event.clientX;
+      active.time = event.timeStamp;
+      const sampled = event.shiftKey
+        ? {
+            value: Math.max(min, Math.min(max, Math.round(active.precise / quantum) * quantum)),
+            target: active.precise,
+          }
+        : snapNumericValue(active.precise, min, max, step, Math.max(step, 0.01) * 2);
+      next = bounded(sampled.value);
+      event.currentTarget.parentElement?.toggleAttribute("data-snapped", sampled.target !== null);
+    }
     const snapped = snapPoints?.find((point) => Math.abs(point - next) <= snapThreshold);
     next = bounded(snapped ?? next);
     active.next = next;
@@ -218,6 +251,7 @@ function DesktopNumberInput({
     if (!active) return;
     gesture.current = null;
     event.currentTarget.parentElement?.removeAttribute("data-dragging");
+    event.currentTarget.parentElement?.removeAttribute("data-snapped");
     if (cancel || active.origin !== origin) {
       if (field.current) field.current.value = originalDisplay();
       onCancel?.();
@@ -237,6 +271,7 @@ function DesktopNumberInput({
     heldKey.current = null;
     typing.current = false;
     active?.handle.parentElement?.removeAttribute("data-dragging");
+    active?.handle.parentElement?.removeAttribute("data-snapped");
     if (active?.handle.hasPointerCapture(active.pointerId))
       active.handle.releasePointerCapture(active.pointerId);
     onCancel?.();
@@ -261,26 +296,27 @@ function DesktopNumberInput({
       className="number-field reset-feedback"
       data-disabled={disabled || undefined}
     >
-      <button
-        type="button"
-        className="number-scrub"
-        tabIndex={-1}
-        disabled={disabled}
-        aria-label={t("adjustValue", { label })}
-        title={t("adjustHint")}
-        onDoubleClick={(event) => {
-          event.preventDefault();
-          event.stopPropagation();
-          reset();
-        }}
-        onPointerDown={start}
-        onPointerMove={move}
-        onPointerUp={finish}
-        onPointerCancel={(event) => finish(event, true)}
-        onLostPointerCapture={(event) => finish(event, true)}
-      >
-        {scrubLabel ?? label}
-      </button>
+      <ControlHint content={t("adjustHint")}>
+        <button
+          type="button"
+          className="number-scrub"
+          tabIndex={-1}
+          disabled={disabled}
+          aria-label={t("adjustValue", { label })}
+          onDoubleClick={(event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            reset();
+          }}
+          onPointerDown={start}
+          onPointerMove={move}
+          onPointerUp={finish}
+          onPointerCancel={(event) => finish(event, true)}
+          onLostPointerCapture={(event) => finish(event, true)}
+        >
+          {scrubLabel ?? label}
+        </button>
+      </ControlHint>
       <Input
         id={id}
         ref={field}
@@ -322,6 +358,7 @@ function DesktopNumberInput({
             const active = gesture.current;
             gesture.current = null;
             active?.handle.parentElement?.removeAttribute("data-dragging");
+            active?.handle.parentElement?.removeAttribute("data-snapped");
             if (active?.handle.hasPointerCapture(active.pointerId))
               active.handle.releasePointerCapture(active.pointerId);
             skipBlur.current = true;

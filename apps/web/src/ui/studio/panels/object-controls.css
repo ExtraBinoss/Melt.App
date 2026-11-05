@@ -13,3 +13,30 @@
   display: block;
   padding: 2px 2px 8px;
 }
+
+.studio-scale-inputs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) 28px;
+  gap: 4px;
+  align-items: center;
+}
+.studio-scale-inputs .number-field {
+  min-width: 0;
+}
+.studio-scale-inputs input {
+  min-width: 0;
+  width: 100%;
+  padding-inline: 2px;
+}
+.studio-scale-inputs .number-scrub {
+  padding-inline: 5px;
+  text-transform: uppercase;
+}
+.studio-scale-inputs .icon-button {
+  width: 28px;
+  height: 28px;
+}
+.studio-text-bounds {
+  display: grid;
+  gap: 8px;
+}

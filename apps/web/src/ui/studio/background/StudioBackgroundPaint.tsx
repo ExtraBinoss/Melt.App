@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import { Circle, CircleDashed, CircleDot, Settings2 } from "lucide-react";
+import { Circle, CircleDashed, Settings2 } from "lucide-react";
 import type { EnginePort, FillGradient } from "@musart/core";
 import { IconButton } from "../../../components/shared/IconButton";
 import { Popover, PopoverContent, PopoverTrigger } from "../../../components/ui/popover";
@@ -9,6 +9,7 @@ import { motionTimeChanges } from "../../../state/session/motion-edit";
 import { StudioDirectionPad } from "../controls/StudioDirectionPad";
 import { StudioSlider } from "../controls/StudioSlider";
 import "../../../components/properties/gradient/messages";
+import "../../../components/spatial/messages";
 import "../catalog/scene-controls.css";
 
 export interface StudioPaint {
@@ -133,16 +134,13 @@ export function StudioBackgroundPaint({
                 disabled={disabled}
                 onClick={() => change({ ...gradient, kind }, true)}
               >
-                {kind === "radial" ? (
-                  <CircleDot size={18} />
-                ) : (
-                  <span className="studio-gradient-icon" />
-                )}
+                <span className="studio-gradient-icon" data-gradient-kind={kind} />
               </IconButton>
             ))}
           </div>
           <fieldset className="studio-background-fields" disabled={disabled}>
             <StudioDirectionPad
+              key={gradient.kind}
               label={gradient.kind === "radial" ? t("position") : g("angle")}
               identity={identity}
               invalidation={invalidation}
@@ -159,6 +157,19 @@ export function StudioBackgroundPaint({
               minY={gradient.kind === "radial" ? 0 : -1}
               maxY={1}
               step={0.01}
+              projectValue={
+                gradient.kind === "linear"
+                  ? ({ x, y }) => {
+                      const length = Math.hypot(x, y);
+                      return length > 0.001
+                        ? { x: x / length, y: y / length }
+                        : {
+                            x: Math.cos((gradient.angle * Math.PI) / 180),
+                            y: -Math.sin((gradient.angle * Math.PI) / 180),
+                          };
+                    }
+                  : undefined
+              }
               onStart={() => {}}
               onPreview={({ x, y }) =>
                 change(

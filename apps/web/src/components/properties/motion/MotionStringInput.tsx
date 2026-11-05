@@ -20,6 +20,7 @@ export function MotionStringInput({
   label,
   disabled,
   multiline = false,
+  coalescePreview = false,
   validate,
   onPreview,
   onCommit,
@@ -31,6 +32,7 @@ export function MotionStringInput({
   label: string;
   disabled?: boolean;
   multiline?: boolean;
+  coalescePreview?: boolean;
   validate?: (value: string) => boolean;
   onPreview?: (value: string) => void;
   onCommit(this: void, value: string): void;
@@ -40,10 +42,27 @@ export function MotionStringInput({
   const committed = useRef(value),
     dirty = useRef(false),
     cancel = useRef(onCancel);
+  const pending = useRef<{ frame: number; value: string } | null>(null);
+  const preview = useRef(onPreview);
+  useLayoutEffect(() => {
+    preview.current = onPreview;
+  });
+  function clearPending() {
+    if (pending.current) cancelAnimationFrame(pending.current.frame);
+    pending.current = null;
+  }
+  useLayoutEffect(
+    () => () => {
+      clearPending();
+      if (dirty.current) cancel.current();
+    },
+    [],
+  );
   useLayoutEffect(() => {
     cancel.current = onCancel;
   }, [onCancel]);
   useLayoutEffect(() => {
+    clearPending();
     committed.current = value;
     if (field.current) field.current.value = value;
     if (dirty.current) {
@@ -54,6 +73,7 @@ export function MotionStringInput({
   useEffect(() => {
     if (!engine) return;
     return motionTimeChanges(engine).subscribe(() => {
+      clearPending();
       if (!dirty.current) return;
       dirty.current = false;
       if (field.current) field.current.value = committed.current;
@@ -69,13 +89,26 @@ export function MotionStringInput({
     defaultValue: value,
     onChange: (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       dirty.current = true;
-      if (!validate || validate(event.currentTarget.value)) onPreview?.(event.currentTarget.value);
-      else onCancel();
+      const next = event.currentTarget.value;
+      if (validate && !validate(next)) {
+        clearPending();
+        onCancel();
+      } else if (!coalescePreview) onPreview?.(next);
+      else if (pending.current) pending.current.value = next;
+      else {
+        const frame = requestAnimationFrame(() => {
+          const next = pending.current;
+          pending.current = null;
+          if (next && dirty.current) preview.current?.(next.value);
+        });
+        pending.current = { frame, value: next };
+      }
     },
     onKeyDown: (event: KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       if (event.key === "Enter" && !multiline) event.currentTarget.blur();
       if (event.key === "Escape") {
         event.preventDefault();
+        clearPending();
         dirty.current = false;
         event.currentTarget.value = committed.current;
         onCancel();
@@ -83,6 +116,7 @@ export function MotionStringInput({
       }
     },
     onBlur: (event: FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      clearPending();
       dirty.current = false;
       const next = event.currentTarget.value;
       if ((!validate || validate(next)) && next !== committed.current) {

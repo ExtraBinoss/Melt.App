@@ -1,0 +1,44 @@
+/* Central corner vocabulary. Classic defaults preserve the existing application. */
+:root {
+  --brand-classic-radius-sm: 4px;
+  --brand-classic-radius-md: 6px;
+  --brand-classic-radius-lg: 10px;
+  --brand-classic-radius-xl: 14px;
+  --brand-classic-radius-item: 5px;
+  --brand-classic-radius-scroll: 7px;
+  --brand-studio-radius-sm: 8px;
+  --brand-studio-radius-md: 12px;
+  --brand-studio-radius-lg: 18px;
+  --brand-studio-radius-xl: 24px;
+  --brand-studio-radius-item: 8px;
+  --brand-studio-radius-scroll: 12px;
+  --radius-full: 999px;
+}
+:root,
+[data-workspace-theme="classic"] {
+  --brand-radius-sm: var(--brand-classic-radius-sm);
+  --brand-radius-md: var(--brand-classic-radius-md);
+  --brand-radius-lg: var(--brand-classic-radius-lg);
+  --brand-radius-xl: var(--brand-classic-radius-xl);
+  --brand-radius-item: var(--brand-classic-radius-item);
+  --brand-radius-scroll: var(--brand-classic-radius-scroll);
+}
+[data-workspace-theme="studio"] {
+  --brand-radius-sm: var(--brand-studio-radius-sm);
+  --brand-radius-md: var(--brand-studio-radius-md);
+  --brand-radius-lg: var(--brand-studio-radius-lg);
+  --brand-radius-xl: var(--brand-studio-radius-xl);
+  --brand-radius-item: var(--brand-studio-radius-item);
+  --brand-radius-scroll: var(--brand-studio-radius-scroll);
+}
+/* Define aliases on each boundary: inherited var() aliases otherwise resolve upstream. */
+:root,
+[data-workspace-theme] {
+  --radius-sm: var(--brand-radius-sm);
+  --radius-md: var(--brand-radius-md);
+  --radius-lg: var(--brand-radius-lg);
+  --radius-xl: var(--brand-radius-xl);
+  --radius-item: var(--brand-radius-item);
+  --radius-scroll: var(--brand-radius-scroll);
+  --radius: var(--brand-radius-lg);
+}

@@ -102,3 +102,29 @@ test("background cancellation restores its draft and solid mode uses a visible g
   act(() => screen.getByRole("button", { name: "Transparent" }).click());
   expect(d.engine.getSnapshot().project.pages[0]).toMatchObject({ background: "#00000000" });
 });
+
+test("switching radial and linear repeatedly gives each pad a live captured thumb and one commit", () => {
+  const d = fixture();
+  for (const kind of ["Linéaire", "Radial", "Linéaire"]) {
+    fireEvent.click(screen.getByRole("button", { name: kind, exact: true }));
+    const pad = screen.getByRole("button", {
+      name: kind === "Radial" ? "Position du dégradé" : "Angle du dégradé",
+    });
+    vi.spyOn(pad, "getBoundingClientRect").mockReturnValue({
+      left: 0,
+      top: 0,
+      width: 100,
+      height: 100,
+    } as DOMRect);
+    const before = d.engine.getSnapshot().revision;
+    fireEvent.pointerDown(pad, { button: 0, pointerId: 1, clientX: 90, clientY: 50 });
+    fireEvent.pointerMove(pad, { pointerId: 1, clientX: 50, clientY: 10 });
+    expect(
+      parseFloat(pad.querySelector<HTMLElement>(".studio-direction-position")!.style.top),
+    ).toBeCloseTo(kind === "Radial" ? 10 : 0);
+    expect(d.engine.getSnapshot().revision).toBe(before);
+    fireEvent.pointerUp(pad, { button: 0, pointerId: 1, clientX: 50, clientY: 10 });
+    expect(d.engine.getSnapshot().revision).toBe(before + 1);
+    expect(d.store.get(previewAtom)).toBeNull();
+  }
+});

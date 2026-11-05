@@ -12,6 +12,8 @@ const layerPaint = new Set([
   "radius",
   "effects",
   "text",
+  "width",
+  "height",
   "fontFamily",
   "fontSize",
   "fontWeight",
