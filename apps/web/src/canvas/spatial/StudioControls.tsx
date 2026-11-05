@@ -187,14 +187,15 @@ export default function StudioControls({ engine, controller, target }: Props) {
           current.index.isMaskSource(id)
         )
           continue;
-        if (id === hoverId && pulse) pulsing = true;
+        const animateHover = id === hoverId && !current.snapshot.selection.includes(id) && pulse;
+        if (animateHover) pulsing = true;
         let contour = contours.get(id);
         if (!contour) {
           contour = new SpatialSelectionContour(resource);
           contours.set(id, contour);
         }
         const opacity =
-          id === hoverId && pulse
+          animateHover
             ? 0.65 + 0.3 * (0.5 + 0.5 * Math.cos((elapsed * Math.PI) / 350))
             : 0.9;
         contour.render(renderer, resource, camera, opacity, contourSize);

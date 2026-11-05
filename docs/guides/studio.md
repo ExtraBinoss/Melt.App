@@ -50,8 +50,9 @@ model geometry, and omits their ordinary 2D selection frames. Structural backgro
 paint is selected from the layer tree rather than stealing blank-canvas clicks.
 Native hover/selection contours sample retained GPU coverage before ordinary
 post-composite effects/masks. Hover pulses twice then settles; reduced motion uses
-a static contour. No extra native render target, GPU readback or perpetual idle
-animation is required. Dragging empty space or a native object orbits the single
+a static contour. A primary click hands the existing hover contour directly to
+selection; selected contours remain steady. No extra native render target, GPU
+readback or perpetual idle animation is required. Dragging empty space or a native object orbits the single
 composition camera; selected gizmo handles retain native transforms. Hand/Space,
 wheel navigation and direct dragging of ordinary 2D artwork retain their behavior.
 

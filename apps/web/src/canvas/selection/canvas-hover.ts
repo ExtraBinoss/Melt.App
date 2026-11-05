@@ -28,6 +28,7 @@ export function installCanvasHover(
   let pending: number | null = null;
   let release: (() => void) | null = null;
   let layerId: string | null = null;
+  let pressed: { id: number; x: number; y: number } | null = null;
   function clear() {
     if (pending !== null) clock.cancel(pending);
     pending = null;
@@ -37,13 +38,13 @@ export function installCanvasHover(
   }
   function paint() {
     pending = null;
-    if (!point || active()) {
+    const frame = controller.read();
+    if (!point || active() || !frame.presentation.canonical) {
       clear();
       return;
     }
     // Read all layout before the hover lease synchronously paints its outline.
     const rect = node.getBoundingClientRect();
-    const frame = controller.read();
     const location = clientToPage(point, rect, view.read(), frame.page);
     const picked = canvasHit(frame.page, location, true, sourceGeometry(controller), studio);
     const id = picked?.layer.id ?? null;
@@ -54,9 +55,24 @@ export function installCanvasHover(
     previous?.();
   }
   function schedule() {
+    if (pressed) return;
+    if (!controller.read().presentation.canonical) {
+      clear();
+      return;
+    }
     if (point && pending === null) pending = clock.request(paint);
   }
   function move(event: PointerEvent) {
+    if (pressed) {
+      if (
+        event.pointerId === pressed.id &&
+        event.buttons === 1 &&
+        Math.hypot(event.clientX - pressed.x, event.clientY - pressed.y) <= 3
+      )
+        return;
+      leave();
+      return;
+    }
     if (
       event.pointerType === "touch" ||
       event.buttons ||
@@ -72,12 +88,45 @@ export function installCanvasHover(
     schedule();
   }
   function leave() {
+    pressed = null;
     point = null;
     clear();
   }
+  function down(event: PointerEvent) {
+    if (
+      !studio ||
+      event.button !== 0 ||
+      event.pointerType === "touch" ||
+      (event.target instanceof Element &&
+        event.target.closest("[data-canvas-control],.canvas-handle"))
+    ) {
+      leave();
+      return;
+    }
+    // A press is still a click candidate: keep its existing silhouette until
+    // actual movement starts a drag, or release transfers it to selection.
+    if (pending !== null) clock.cancel(pending);
+    pending = null;
+    point = null;
+    pressed = { id: event.pointerId, x: event.clientX, y: event.clientY };
+  }
+  function up(event: PointerEvent) {
+    const owner = pressed;
+    if (!owner || event.pointerId !== owner.id) return;
+    // Native selection publishes during pointerup. Retire only our lease after
+    // those synchronous listeners, so no empty hover/selection state is exposed.
+    queueMicrotask(() => {
+      if (pressed !== owner) return;
+      pressed = null;
+      clear();
+    });
+  }
   node.addEventListener("pointermove", move);
   node.addEventListener("pointerleave", leave);
-  node.addEventListener("pointerdown", leave, true);
+  node.addEventListener("pointerdown", down, true);
+  node.addEventListener("pointerup", up, true);
+  node.addEventListener("pointercancel", leave, true);
+  window.addEventListener("blur", leave);
   const stopScene = controller.subscribe(schedule),
     stopView = view.subscribe(schedule);
   return () => {
@@ -86,6 +135,9 @@ export function installCanvasHover(
     stopView();
     node.removeEventListener("pointermove", move);
     node.removeEventListener("pointerleave", leave);
-    node.removeEventListener("pointerdown", leave, true);
+    node.removeEventListener("pointerdown", down, true);
+    node.removeEventListener("pointerup", up, true);
+    node.removeEventListener("pointercancel", leave, true);
+    window.removeEventListener("blur", leave);
   };
 }

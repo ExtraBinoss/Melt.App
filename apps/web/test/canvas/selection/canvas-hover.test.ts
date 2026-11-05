@@ -5,12 +5,12 @@ import { EMPTY_PREVIEW_SOURCE } from "../../../src/state/session/preview-source"
 import { createTimelineHoverSource } from "../../../src/state/motion/hover";
 import { installCanvasHover } from "../../../src/canvas/selection/canvas-hover";
 
-function setup() {
+function setup(preview = EMPTY_PREVIEW_SOURCE, studio = false) {
   const layer = createLayer("ellipse", { id: "ellipse", x: 0, y: 0, width: 100, height: 100 });
   const engine = new EditorEngine(
     createProject({ pages: [createPage({ width: 100, height: 100, layers: [layer] })] }),
   );
-  const controller = new SceneController(engine, EMPTY_PREVIEW_SOURCE);
+  const controller = new SceneController(engine, preview);
   const node = document.createElement("div");
   document.body.append(node);
   vi.spyOn(node, "getBoundingClientRect").mockReturnValue({
@@ -42,6 +42,7 @@ function setup() {
         callbacks.delete(id);
       },
     },
+    studio,
   );
   const move = (x: number, y: number, buttons = 0) =>
     node.dispatchEvent(
@@ -116,4 +117,116 @@ test("gesture start, pointer leave, controls and disposal release only their own
   d.stop();
   expect(d.callbacks.size).toBe(0);
   expect(d.hover.read()).toBeNull();
+});
+
+test("camera drafts suspend picking and resume from the last pointer after cancellation", () => {
+  let value: ReturnType<typeof EMPTY_PREVIEW_SOURCE.read> = null;
+  const listeners = new Set<() => void>();
+  const d = setup({
+    read: () => value,
+    subscribe: (listener) => {
+      listeners.add(listener);
+      return () => {
+        listeners.delete(listener);
+      };
+    },
+  });
+  const publish = () => {
+    for (const listener of listeners) listener();
+  };
+  try {
+    d.move(50, 50);
+    d.flush();
+    expect(d.hover.read()?.layerId).toBe("ellipse");
+    value = { target: "page", patch: { background: "#000000" } };
+    publish();
+    expect(d.callbacks.size).toBe(0);
+    expect(d.hover.read()).toBeNull();
+    for (let i = 0; i < 20; i++) {
+      value = { ...value };
+      publish();
+    }
+    expect(d.callbacks.size).toBe(0);
+    value = null;
+    publish();
+    expect(d.callbacks.size).toBe(1);
+    d.flush();
+    expect(d.hover.read()?.layerId).toBe("ellipse");
+  } finally {
+    d.stop();
+  }
+});
+
+test("Studio hover hands its existing silhouette to selection without an empty publication", async () => {
+  const d = setup(EMPTY_PREVIEW_SOURCE, true);
+  const visible: string[][] = [];
+  const record = () =>
+    visible.push([
+      ...new Set([
+        ...d.engine.getSnapshot().selection,
+        ...(d.hover.read() ? [d.hover.read()!.layerId] : []),
+      ]),
+    ]);
+  d.move(50, 50);
+  d.flush();
+  const original = d.hover.read();
+  const stopHover = d.hover.subscribe(record),
+    stopEngine = d.engine.subscribe(record);
+  try {
+    d.node.dispatchEvent(
+      new PointerEvent("pointerdown", { button: 0, bubbles: true, clientX: 50, clientY: 50 }),
+    );
+    expect(d.hover.read()).toBe(original);
+    d.move(51, 50, 1);
+    expect(d.hover.read()).toBe(original);
+    expect(d.callbacks.size).toBe(0);
+    d.node.dispatchEvent(new PointerEvent("pointerup", { button: 0, bubbles: true }));
+    d.engine.select(["ellipse"]);
+    await Promise.resolve();
+    expect(d.hover.read()).toBeNull();
+    expect(visible).toEqual([["ellipse"], ["ellipse"]]);
+    expect(d.engine.getSnapshot().canUndo).toBe(false);
+    d.node.dispatchEvent(new PointerEvent("pointerleave"));
+    expect(d.engine.getSnapshot().selection).toEqual(["ellipse"]);
+  } finally {
+    stopHover();
+    stopEngine();
+    d.stop();
+  }
+});
+
+test("Studio click retention ends on real movement, cancellation, blur and disposal", async () => {
+  const d = setup(EMPTY_PREVIEW_SOURCE, true);
+  const press = () => {
+    d.move(50, 50);
+    d.flush();
+    d.node.dispatchEvent(
+      new PointerEvent("pointerdown", { button: 0, bubbles: true, clientX: 50, clientY: 50 }),
+    );
+  };
+  try {
+    press();
+    d.move(60, 50, 1);
+    expect(d.hover.read()).toBeNull();
+    press();
+    d.node.dispatchEvent(new PointerEvent("pointercancel", { bubbles: true }));
+    expect(d.hover.read()).toBeNull();
+    press();
+    window.dispatchEvent(new Event("blur"));
+    expect(d.hover.read()).toBeNull();
+    press();
+    d.node.dispatchEvent(new PointerEvent("pointerup", { bubbles: true }));
+    const newer = d.hover.show(d.engine.getSnapshot().pageId, "ellipse");
+    await Promise.resolve();
+    expect(d.hover.read()?.layerId).toBe("ellipse");
+    newer();
+    press();
+    d.node.dispatchEvent(new PointerEvent("pointerup", { bubbles: true }));
+    d.stop();
+    await Promise.resolve();
+    expect(d.hover.read()).toBeNull();
+    expect(d.callbacks.size).toBe(0);
+  } finally {
+    d.stop();
+  }
 });
