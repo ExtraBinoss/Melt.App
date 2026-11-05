@@ -1,7 +1,7 @@
 import type { Composition, Project } from "@musart/core";
 import type { PreviewValue } from "../../state/session/preview-source";
 
-const pagePaint = new Set(["background", "backgroundGradient"]);
+const pagePaint = new Set(["background", "backgroundGradient", "spatial", "effects"]);
 const layerPaint = new Set([
   "fill",
   "stroke",
@@ -11,9 +11,17 @@ const layerPaint = new Set([
   "visible",
   "radius",
   "effects",
+  "text",
+  "fontFamily",
+  "fontSize",
+  "fontWeight",
+  "lineHeight",
+  "letterSpacing",
+  "textAlign",
+  "spatial",
 ]);
 
-/** Certifies one contiguous property gesture, never arbitrary still/structural previews. */
+/** Lets real property frames finish while newer samples coalesce, including async glyph geometry. */
 export class PaintPreviewLineage {
   private current: {
     project: Project;
@@ -52,7 +60,13 @@ export class PaintPreviewLineage {
       this.clear();
       return undefined;
     }
-    const scope = JSON.stringify([preview.target, ids, keys]);
+    // Native source replacement is a new scope; depth, bevel, transforms and material
+    // values remain one gesture even though some require asynchronous preparation.
+    const nativeSource =
+      preview.target !== "page" && preview.patch.spatial
+        ? [preview.patch.spatial.enabled, preview.patch.spatial.source]
+        : null;
+    const scope = JSON.stringify([preview.target, ids, keys, nativeSource]);
     const previous = this.current;
     if (
       previous?.project === project &&

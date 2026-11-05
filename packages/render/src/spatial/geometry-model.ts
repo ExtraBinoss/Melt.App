@@ -14,6 +14,8 @@ export interface SpatialGeometryJob {
   bevel: number;
   bevelSegments: number;
   curveSegments: number;
+  /** A valid text source with no ink, including an intermediate deletion draft. */
+  emptyText?: boolean;
   paths?: PathCommand[][];
   pathParts?: number[];
   pathFillRules?: ("nonzero" | "evenodd")[];

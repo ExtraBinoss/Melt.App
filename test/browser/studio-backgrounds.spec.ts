@@ -39,8 +39,9 @@ test("Studio native recipe previews restore, commit once and export real GPU cro
     .locator('.canvas-artboard-editor[data-artboard-id="studio-starter-composition"]')
     .boundingBox();
   if (bounds && artboard) {
-    expect(artboard.width).toBeGreaterThanOrEqual(bounds.width - 1);
-    expect(artboard.height).toBeGreaterThanOrEqual(bounds.height - 1);
+    expect(artboard.width).toBeLessThanOrEqual(bounds.width + 1);
+    expect(artboard.height).toBeLessThanOrEqual(bounds.height + 1);
+    expect(artboard.width / artboard.height).toBeCloseTo(1920 / 1080, 2);
   }
   const before = await page.evaluate(() => JSON.stringify(window.musart!.snapshot().project));
   const selection = await page.evaluate(() => window.musart!.session().selection);

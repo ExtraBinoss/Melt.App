@@ -19,6 +19,12 @@ import { Button } from "../../../components/ui/button";
 import { Switch } from "../../../components/ui/switch";
 import { IconButton } from "../../../components/shared/IconButton";
 import type { EffectCategory } from "../../../components/layers/catalog/model";
+import {
+  Accordion,
+  AccordionItem,
+  AccordionTrigger,
+  AccordionContent,
+} from "../../../components/ui/accordion";
 import { StudioEffectCatalog } from "./StudioEffectCatalog";
 import { useCompositionEffects } from "./use-composition-effects";
 import "./messages";
@@ -171,58 +177,60 @@ function OwnedEditor({
           }}
         />
       ) : (
-        <div className="studio-effects-stack">
+        <Accordion
+          type="multiple"
+          defaultValue={effects.length ? [effects.at(-1)!.id] : []}
+          className="studio-effects-stack"
+        >
           {!effects.length && <p className="muted-description">{t("noEffects")}</p>}
           {effects.map((effect, index) => (
-            <details
-              key={effect.id}
-              className="studio-effect-card"
-              open={index === effects.length - 1}
-            >
-              <summary>{t(getEffectDefinition(effect.type).nameKey)}</summary>
-              <div className="studio-effect-actions">
-                <Switch
-                  checked={effect.enabled}
-                  disabled={disabled}
-                  aria-label={t(effect.enabled ? "disableEffect" : "enableEffect")}
-                  onCheckedChange={(enabled) => update(effect, { enabled })}
-                />
-                <IconButton
-                  label={t("moveEffectUp")}
-                  disabled={disabled || !index}
-                  onClick={() => move(index, -1)}
-                >
-                  <ArrowUp size={13} />
-                </IconButton>
-                <IconButton
-                  label={t("moveEffectDown")}
-                  disabled={disabled || index === effects.length - 1}
-                  onClick={() => move(index, 1)}
-                >
-                  <ArrowDown size={13} />
-                </IconButton>
-                <IconButton
-                  label={t("removeEffect")}
-                  disabled={disabled}
-                  onClick={() => change(effects.filter((item) => item.id !== effect.id))}
-                >
-                  <Trash2 size={13} />
-                </IconButton>
-              </div>
-              {effect.enabled && (
-                <EffectParameters
-                  engine={layer ? engine : undefined}
-                  layerId={layer?.id}
-                  effect={effect}
-                  disabled={disabled}
-                  onStart={editor.begin}
-                  onChange={(patch, preview) => update(effect, patch, preview)}
-                  onCancel={editor.cancel}
-                />
-              )}
-            </details>
+            <AccordionItem key={effect.id} className="studio-effect-card" value={effect.id}>
+              <AccordionTrigger>{t(getEffectDefinition(effect.type).nameKey)}</AccordionTrigger>
+              <AccordionContent>
+                <div className="studio-effect-actions">
+                  <Switch
+                    checked={effect.enabled}
+                    disabled={disabled}
+                    aria-label={t(effect.enabled ? "disableEffect" : "enableEffect")}
+                    onCheckedChange={(enabled) => update(effect, { enabled })}
+                  />
+                  <IconButton
+                    label={t("moveEffectUp")}
+                    disabled={disabled || !index}
+                    onClick={() => move(index, -1)}
+                  >
+                    <ArrowUp size={13} />
+                  </IconButton>
+                  <IconButton
+                    label={t("moveEffectDown")}
+                    disabled={disabled || index === effects.length - 1}
+                    onClick={() => move(index, 1)}
+                  >
+                    <ArrowDown size={13} />
+                  </IconButton>
+                  <IconButton
+                    label={t("removeEffect")}
+                    disabled={disabled}
+                    onClick={() => change(effects.filter((item) => item.id !== effect.id))}
+                  >
+                    <Trash2 size={13} />
+                  </IconButton>
+                </div>
+                {effect.enabled && (
+                  <EffectParameters
+                    engine={layer ? engine : undefined}
+                    layerId={layer?.id}
+                    effect={effect}
+                    disabled={disabled}
+                    onStart={editor.begin}
+                    onChange={(patch, preview) => update(effect, patch, preview)}
+                    onCancel={editor.cancel}
+                  />
+                )}
+              </AccordionContent>
+            </AccordionItem>
           ))}
-        </div>
+        </Accordion>
       )}
     </MotionFieldProvider>
   );

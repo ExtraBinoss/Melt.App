@@ -5,8 +5,8 @@ import {
   ExtrudeGeometry,
   ShapeGeometry,
   ShapePath,
+  BufferGeometry,
   type Shape,
-  type BufferGeometry,
 } from "three";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import { spatialPrimitiveGeometry } from "./primitives";
@@ -14,6 +14,18 @@ import type { GeometryPayload, SpatialGeometryJob } from "./geometry-model";
 export function buildSpatialGeometry(job: SpatialGeometryJob): BufferGeometry {
   const primitive = spatialPrimitiveGeometry(job);
   if (primitive) return primitive;
+  if (job.emptyText) {
+    // Preserve the normal native attribute contract, with no triangles to paint,
+    // occlude, shadow or pick. These zero-length buffers cross the worker normally.
+    const geometry = new BufferGeometry();
+    for (const [name, itemSize] of [
+      ["position", 3],
+      ["normal", 3],
+      ["uv", 2],
+    ] as const)
+      geometry.setAttribute(name, new BufferAttribute(new Float32Array(0), itemSize));
+    return geometry;
+  }
   const paths = spatialMorphPaths(job) ?? job.paths ?? [];
   const commands = paths.reduce((count, path) => count + path.length, 0);
   if (commands * (job.morph ? 1 : job.curveSegments) * (job.bevelSegments * 2 + 4) > 800_000)

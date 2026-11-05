@@ -11,7 +11,6 @@ test("model/primitive size preserves proportions within every native axis limit 
   d.engine.select([d.rectangle.id]);
   const before = d.engine.getSnapshot().project;
   d.mount(<StudioObjectBar engine={d.engine} run={d.run} />);
-  fireEvent.click(screen.getByRole("button", { name: "Propriétés" }));
   const slider = screen.getByRole("slider", { name: "Échelle" });
   expect(slider).toHaveAttribute("aria-valuemin", "0.03");
   expect(screen.queryByRole("slider", { name: "Profondeur" })).toBeNull();

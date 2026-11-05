@@ -20,6 +20,8 @@ test("the still starter replays, round-trips and retains editable native sources
   expect(JSON.parse(await manifest()).project).toEqual(project);
   const page = project.pages[0]!;
   expect(page.motion).toBeUndefined();
+  expect(page).toMatchObject({ width: 1920, height: 1080 });
+  expect(page.layers).toHaveLength(1);
   expect(isMotionTemplateId("studio-starter")).toBe(false);
   expect(Object.keys(project.assets)).toHaveLength(0);
   expect(page.spatial).toMatchObject({ shadows: true, environment: { preset: "softbox" } });
@@ -32,7 +34,7 @@ test("the still starter replays, round-trips and retains editable native sources
   });
   expect(
     new Set(page.layers.flatMap((layer) => (layer.spatial ? [layer.spatial.source] : []))),
-  ).toEqual(new Set(["box", "torus", "sphere", "extrude"]));
+  ).toEqual(new Set(["extrude"]));
   expect(project).not.toHaveProperty("workspaceMode");
   expect(page).not.toHaveProperty("workspaceMode");
   const title = page.layers.find((layer) => layer.kind === "text" && layer.spatial)!;

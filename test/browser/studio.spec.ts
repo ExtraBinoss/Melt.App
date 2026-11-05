@@ -94,12 +94,8 @@ test("Studio retains the native canvas and byte-exact exports across mode switch
     ),
   ).toBe("Melt Studio");
   await page.evaluate(() => window.musart!.undo());
-  await page
-    .locator(".studio-object-bar")
-    .getByRole("button", { name: "Properties", exact: true })
-    .click();
   const depth = page
-    .locator(".studio-object-popover")
+    .locator(".studio-object-bar")
     .getByRole("slider", { name: "Depth", exact: true });
   const originalDepth = await page.evaluate(
     () =>
@@ -180,17 +176,13 @@ test("Studio retains the native canvas and byte-exact exports across mode switch
   await page.keyboard.press("Escape");
   await page.locator(".studio-compositions .studio-dock-heading").click();
   await expect(page.locator("[data-layers-presentation]")).toHaveAttribute("aria-busy", "false");
-  await page
-    .getByRole("button", { name: "Lock layer · Editable 3D lettering", exact: true })
-    .click();
+  await page.getByRole("button", { name: "Lock layer · MELT", exact: true }).click();
   await page.keyboard.press("Escape");
   await page.locator(".studio-material .studio-dock-heading").click();
   await expect(slider).toHaveAttribute("data-disabled");
   await page.keyboard.press("Escape");
   await page.locator(".studio-compositions .studio-dock-heading").click();
-  await page
-    .getByRole("button", { name: "Unlock layer · Editable 3D lettering", exact: true })
-    .click();
+  await page.getByRole("button", { name: "Unlock layer · MELT", exact: true }).click();
   await page.keyboard.press("Escape");
   await page.getByRole("button", { name: "Export", exact: true }).click();
   await expect(page.locator(".export-dialog")).toBeVisible();
@@ -201,7 +193,7 @@ test("Studio retains the native canvas and byte-exact exports across mode switch
   const background = await page.evaluate(
     () => window.musart!.snapshot().project.pages[0]!.layers[0]!,
   );
-  expect(background).toMatchObject({ kind: "rectangle", x: 0, y: 0, width: 1440, height: 1080 });
+  expect(background).toMatchObject({ kind: "rectangle", x: 0, y: 0, width: 1920, height: 1080 });
   await page.keyboard.press("Escape");
   await page.evaluate(
     ({ id, effect }) =>

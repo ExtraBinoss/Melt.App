@@ -89,6 +89,12 @@ export function spatialGeometryJob(layer: Layer, font?: OutlineFont): SpatialGeo
     curveSegments: s.curveSegments,
   };
   if (s.source !== "extrude" && s.source !== "shape") return job;
+  if (layer.kind === "text") {
+    if (layer.text.length > 4096) throw new RangeError("3D text exceeds the outline budget");
+    // Empty text has no geometry to shape or morph. Keep it a real transparent
+    // source so deleting the last character does not strand a live preview.
+    if (!layer.text.trim()) return { ...job, emptyText: true };
+  }
   const effect = sourceMorph(layer);
   if (effect && (layer.kind === "text" || effect.shapeMorph)) {
     const key = morphResourceKey(layer, effect);
@@ -154,7 +160,6 @@ export function spatialGeometryJob(layer: Layer, font?: OutlineFont): SpatialGeo
   ];
   if (layer.kind === "text") {
     if (!font) throw new Error("3D text outlines are unavailable");
-    if (layer.text.length > 4096) throw new RangeError("3D text exceeds the outline budget");
     job.paths = layoutText(layer, font).map(({ glyph, x, baseline }) =>
       transform(glyph.getPath(x, baseline, layer.fontSize).commands, normalized),
     );

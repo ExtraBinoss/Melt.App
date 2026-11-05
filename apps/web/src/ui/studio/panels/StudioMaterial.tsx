@@ -9,6 +9,12 @@ import { useLayerPreview } from "../../../components/layers/controls/use-layer-p
 import { MaterialPicker } from "../../../components/spatial/MaterialPicker";
 import { MotionColorControl } from "../../../components/properties/motion/MotionColorControl";
 import { MotionFieldProvider } from "../../../components/properties/motion/context";
+import {
+  Accordion,
+  AccordionItem,
+  AccordionTrigger,
+  AccordionContent,
+} from "../../../components/ui/accordion";
 import { StudioDock } from "../controls/StudioDock";
 import { StudioSlider } from "../controls/StudioSlider";
 import { materialParameters } from "../catalog/material-parameters";
@@ -81,20 +87,24 @@ export const StudioMaterial = memo(function StudioMaterial({
               );
             }}
           />
-          <details className="studio-color-disclosure">
-            <summary>{t("color")}</summary>
-            <MotionColorControl
-              engine={engine}
-              target={{ kind: "layer", layerId: layer.id, property: "fill" }}
-              label={t("color")}
-              value={layer.fill}
-              identity={layer.id}
-              disabled={!selection.editable}
-              onPreview={(fill) => patch(tint(fill), false)}
-              onCommit={(fill) => patch(tint(fill), true)}
-              onCancel={edit.cancel}
-            />
-          </details>
+          <Accordion type="single" collapsible className="studio-color-disclosure">
+            <AccordionItem value="color">
+              <AccordionTrigger>{t("color")}</AccordionTrigger>
+              <AccordionContent>
+                <MotionColorControl
+                  engine={engine}
+                  target={{ kind: "layer", layerId: layer.id, property: "fill" }}
+                  label={t("color")}
+                  value={layer.fill}
+                  identity={layer.id}
+                  disabled={!selection.editable}
+                  onPreview={(fill) => patch(tint(fill), false)}
+                  onCommit={(fill) => patch(tint(fill), true)}
+                  onCancel={edit.cancel}
+                />
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
           {materialParameters(spatialMaterial(spatial.material.preset).category).map((key) => (
             <StudioSlider
               key={key}

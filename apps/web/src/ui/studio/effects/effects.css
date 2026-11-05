@@ -48,16 +48,6 @@
   overflow-y: auto;
   overscroll-behavior: contain;
 }
-.studio-effect-card {
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 8px;
-}
-.studio-effect-card summary {
-  cursor: pointer;
-  font-size: 12px;
-  font-weight: 500;
-}
 .studio-effect-actions {
   display: flex;
   align-items: center;

@@ -25,6 +25,7 @@ import { effectFootprint } from "../effects/shared/footprint";
 import { rasterExtent } from "./types";
 import { maskLayerMapping } from "./mask-binding";
 import { PRINT_PROOF_BYTES } from "../color/proof/table";
+import { spatialPreviewExtents } from "./spatial-preview-extent";
 
 export interface PreviewCost {
   readonly bytes: number;
@@ -43,6 +44,7 @@ export function estimatePreviewCost(
 ): PreviewCost {
   if (!Number.isFinite(scale) || scale <= 0) throw new RangeError("Invalid preview density.");
   const geometry = createLayerGeometryIndex(page),
+    spatialExtent = spatialPreviewExtents(page),
     seen = new Set<string>(),
     originals = new Set<string>();
   let originalBytes = 0,
@@ -99,11 +101,15 @@ export function estimatePreviewCost(
     seen.add(key);
     let w = rasterExtent(l.width, density),
       h = rasterExtent(l.height, density);
-    if (l.spatial?.enabled) {
-      if (fixed) fixedBytes += w * h * 60;
-      else scaledBytes += w * h * 60;
-    } else if (l.kind === "group") children(l.id, l.width, l.height, density, fixed, window);
-    else if (l.kind !== "image" && l.kind !== "video")
+    if (l.kind === "group") children(l.id, l.width, l.height, density, fixed, window);
+    else if (l.spatial?.enabled) {
+      const extent = spatialExtent(l);
+      const nativeWidth = rasterExtent(extent.width, density),
+        nativeHeight = rasterExtent(extent.height, density);
+      maxDimension = Math.max(maxDimension, nativeWidth, nativeHeight);
+      if (fixed) fixedBytes += nativeWidth * nativeHeight * 60;
+      else scaledBytes += nativeWidth * nativeHeight * 60;
+    } else if (l.kind !== "image" && l.kind !== "video")
       target(w, h, fixed, false, vectorAntialias && !fixed && l.kind === "vector" ? 4 : 0);
     else {
       const asset = l.assetId ? assets[l.assetId] : undefined;
@@ -224,7 +230,20 @@ export function estimatePreviewCost(
   }
   fixedBytes += sharedFixed;
   if (page.colorSpace === "cmyk") fixedBytes += PRINT_PROOF_BYTES;
-  if (page.layers.some((layer) => layer.spatial?.enabled)) fixedBytes += 40 * 1024 * 1024;
+  const native = page.layers.filter((layer) => layer.spatial?.enabled && layer.kind !== "group");
+  if (native.length) {
+    fixedBytes += 40 * 1024 * 1024;
+    // One shared RGBA/depth prepass follows the highest native reference density.
+    const density = Math.max(
+      scale,
+      ...native.map((layer) =>
+        layer.effects.some(hasEffectTreatment) || layer.mask?.enabled || layer.clipping ? 1 : scale,
+      ),
+    );
+    const depthBytes = rasterExtent(page.width, density) * rasterExtent(page.height, density) * 8;
+    if (density !== scale) fixedBytes += depthBytes;
+    else scaledBytes += depthBytes;
+  }
   return {
     bytes: originalBytes + fixedBytes + scaledBytes,
     originalBytes,

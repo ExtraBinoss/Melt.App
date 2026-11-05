@@ -9,7 +9,10 @@ export function immersiveView(
 ): View {
   const board = layout.boards.find((item) => item.id === pageId) ?? layout.boards[0];
   if (!board || size.width <= 0 || size.height <= 0) return current ?? { x: 0, y: 0, zoom: 1 };
-  const zoom = Math.max(current?.zoom ?? 0, size.width / board.width, size.height / board.height);
+  const zoom = Math.max(
+    current?.zoom ?? 0,
+    Math.min(size.width / board.width, size.height / board.height),
+  );
   const centerX = -(board.x + board.width / 2 - layout.width / 2) * zoom;
   const centerY = -(board.y + board.height / 2 - layout.height / 2) * zoom;
   const dx = Math.max(0, (board.width * zoom - size.width) / 2),

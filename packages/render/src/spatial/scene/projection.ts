@@ -50,12 +50,15 @@ export function projectedTransport(
   const inverse = invertMatrix(geometry.layoutMatrix(layer.id));
   const box = new Box3().setFromObject(root),
     points: { x: number; y: number }[] = [];
+  // A valid empty text mesh has an empty Box3 with infinite sentinels. Do not
+  // project those sentinels or allocate a full-artboard MSAA target for zero triangles.
+  if (box.isEmpty()) return { x: 0, y: 0, width: 1, height: 1 };
   for (const x of [box.min.x, box.max.x])
     for (const y of [box.min.y, box.max.y])
       for (const z of [box.min.z, box.max.z]) {
         const view = new Vector3(x, y, z).applyMatrix4(camera.matrixWorldInverse);
         // A box crossing the near plane can project beyond every corner: use the full gate.
-        if (view.z >= -0.01 || box.isEmpty()) return gate();
+        if (view.z >= -0.01) return gate();
         const p = new Vector3(x, y, z).project(camera);
         points.push(
           transformPoint(inverse, {

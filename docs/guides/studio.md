@@ -10,8 +10,9 @@ portable-project, image/video export and headless command paths.
 
 ## Composition workflow
 
-Studio covers the full viewport with the active composition. This is a presentation
-zoom and pan constraint, not a change to the portable composition or its camera.
+Studio fits the complete active composition inside the viewport with uniform scale.
+Landscape projects retain their aspect ratio on portrait screens. This presentation
+zoom does not change the portable composition or its camera.
 Switching back restores the Classic view. Objects outside a capture guide remain
 editable and are retained in the project.
 
@@ -19,9 +20,10 @@ editable and are retained in the project.
   images, video and audio services. The regular gizmos handle move/rotate/scale.
 - The closed composition control opens the existing pages and layer components,
   including visibility, locks, nested effects and ordering.
-- Selecting text reveals content and typography; extruded sources expose depth and
-  bevel. Models and primitives expose proportional size instead of irrelevant
-  extrusion parameters. Properties open above the centered object controls.
+- Selecting text reveals an outlined text input, font, font size, depth and bevel
+  directly in the centered object bar. Models and primitives expose proportional
+  size instead of irrelevant extrusion parameters. Advanced tessellation quality
+  remains in the small contextual popover.
 - Material and scene controls open on demand. Their 134 materials and 62 environment
   entries are grouped into initially expanded categories; each project's preferences
   remember collapsed categories. Sphere atlases are rendered with the native engine
@@ -122,8 +124,8 @@ not a claim of integration with an external asset service.
 
 ## Starter and automation
 
-The template gallery includes **Studio Starter**, a static 1440 × 1080 composition
-with editable extruded text, native objects, shared lights and gradients. Its Studio
+The template gallery includes **Studio Starter**, a static 1920 × 1080 composition
+with one centered editable MELT word, shared lights and gradient paint. Its Studio
 preference is stored before the newly allocated project is published. Other
 existing templates keep their behavior and can be opened in either workspace.
 
@@ -158,7 +160,8 @@ lint, formatting and contribution rules are checked separately from release CI.
 An isolated production build with source maps was served on port 4186. Chromium
 156.0.8078.4 used the Three.js WebGPU backend on Linux / Intel Core Ultra 5 125H,
 1600 × 1000, one worker, with the browser runner limited to 200% CPU and 2.9 GiB
-memory (no swap). The retained five-object Studio Starter scene was used.
+memory (no swap). This historical cohort used the earlier five-object starter,
+before it was replaced by the current single-word template.
 
 | Native gesture to acknowledged preview | Samples | Median  | Maximum |
 | -------------------------------------- | ------- | ------- | ------- |
@@ -214,3 +217,31 @@ render-blocking resources. No optional model packs, sphere atlases, ONNX or WASM
 were requested at startup. These are a different backend/scene from the Studio
 WebGPU gesture cohort. The local trace summary is
 `artifacts/studio/devtools-startup-summary.json`.
+
+## Continuous native controls
+
+Native text, typography, scene and object properties use certified preview lineage.
+A same-owner in-flight preparation may finish while the most recent sample is
+coalesced; changing selection, source, project, document or cancelling invalidates
+that lineage immediately. This avoids starving geometry during continuous input.
+Empty and whitespace-only text create real zero-triangle native geometry through
+the existing worker path. Valid typing resumes without a fabricated success or
+replacement image. Source/font/vector failures still report actual errors.
+
+The starter uses a compact frame derived from the bundled Inter uppercase metrics,
+so the visible word and native transform/orbit origin align. Its one native source
+keeps the preview within existing GPU budgets. The document/export dimensions stay
+1920 × 1080; browser pixel density follows the actual viewport and device ratio,
+independently of print DPI. Existing projects are not silently resized.
+
+The focused native flow regression (`studio-flow.spec.ts`) also validates real
+triangle picking, a projected gizmo center within the word’s ink bounds, a 1600px
+native render for a 1600px displayed canvas at DPR1, constant parent React counters
+during preview, intermediate geometry frames before pointer release, intermediate
+text frames before blur, empty-text recovery, one undo entry, portrait resizing
+without cropping and zero production pixel readbacks. Its final production run
+recorded 36 intermediate geometry frames during 90 pointer moves and four text
+frames during typing; first acknowledged updates were 66.2 ms and 51.1 ms respectively
+on the constrained local runner. These are frame acknowledgements, not a guarantee
+of physical-display latency or a constant frame rate. Captures and evidence remain
+under ignored `artifacts/studio/flow-live-evidence.json`.

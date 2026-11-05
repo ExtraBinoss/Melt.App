@@ -43,6 +43,10 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Rebuild Studio Starter as a focused 1920 × 1080 composition with one editable MELT text object, an ink-centered transform origin, a compact authoring frame and native-resolution-friendly lighting. Fit the complete composition in Studio without stretching/cropping; show text, font, size and native depth/bevel/scale controls inline, reserving the popover for geometry quality.
+- Keep asynchronous 3D, text and typography preview work alive during continuous gestures while coalescing newer samples, with canonical cancellation and one undoable commit. Budget known primitives from conservative projected native crops, retaining unknown-source fallbacks and existing GPU memory limits; render empty/whitespace 3D text as genuine zero-triangle geometry so typing can resume.
+- Use the existing shadcn/Radix accordion for Studio color disclosures and effect stacks, removing duplicate HTML disclosure behavior and local accordion-trigger skins.
+
 - Render rectangle and ellipse fill gradients through Melt’s shared GPU paint uniforms, preserving solid primitive instancing and stroke coverage. Verify exported recipe color variation as well as native Feather alpha.
 
 - Make Studio immersive and quieter: full-viewport active composition, icon-only quick insertion, closed contextual panels, centered object properties, flat neutral sliders, equal export controls and no visible agent activity panel. Keep the original Classic view and canonical document when switching interfaces; constrain proportional model size against every native axis limit.

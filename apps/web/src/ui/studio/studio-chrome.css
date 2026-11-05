@@ -236,20 +236,43 @@
   bottom: var(--studio-gap);
   transform: translateX(-50%);
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 4px;
-  padding: 4px;
-  max-width: calc(100% - 700px);
+  justify-content: center;
+  gap: 8px;
+  padding: 8px;
+  width: max-content;
+  max-width: min(980px, calc(100% - 400px));
 }
-.studio-object-bar input {
-  min-width: 0;
+.studio-object-basics {
+  display: contents;
+}
+.studio-object-bar > input {
+  flex: 1 1 160px;
+  min-width: 140px;
+  max-width: 220px;
   width: 180px;
-  height: 32px;
-  background: transparent;
+  height: 36px;
+  background: var(--background);
   color: var(--foreground);
   font-size: 12px;
-  border: 0;
+  border: 1px solid var(--input);
+  border-radius: var(--radius-md);
   box-shadow: none;
+}
+.studio-object-font {
+  width: 132px;
+  flex: 0 1 132px;
+}
+.studio-object-font > button {
+  width: 100%;
+  height: 36px;
+}
+.studio-object-basics > .studio-slider {
+  margin: 0;
+  flex: 1 1 112px;
+  min-width: 112px;
+  max-width: 144px;
 }
 .studio-object-name {
   padding: 0 9px;
@@ -372,9 +395,6 @@
   }
   .studio-object-bar {
     bottom: 70px;
-  }
-  .studio-object-bar input {
-    width: 130px;
   }
 }
 .studio-actions .export-trigger-caption {

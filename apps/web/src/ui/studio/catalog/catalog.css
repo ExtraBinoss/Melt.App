@@ -23,13 +23,6 @@
 .studio-catalog-groups [data-slot="accordion-item"] {
   border-color: var(--border);
 }
-.studio-catalog-groups [data-slot="accordion-trigger"] {
-  gap: 8px;
-  padding-block: 10px;
-  font-size: 11px;
-  font-weight: 500;
-  text-decoration: none;
-}
 .studio-catalog-count {
   margin-inline-start: auto;
   color: var(--muted-foreground);
@@ -95,16 +88,4 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-.studio-color-disclosure > summary {
-  padding-block: 6px;
-  cursor: pointer;
-  color: var(--muted-foreground);
-  font-size: 11px;
-}
-.studio-color-disclosure > summary:focus-visible {
-  outline: 2px solid var(--ring);
-}
-.studio-color-disclosure[open] > summary {
-  margin-bottom: 8px;
 }

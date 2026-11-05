@@ -290,9 +290,18 @@ export function useViewport({
         }, PAN_SETTLE_MS);
       }
     };
+    let observedSize = metrics.read();
     const observer = new ResizeObserver(() => {
-      metrics.measure();
-      if (!resizeAnchor.resizeHandled()) motion.jump(motion.read());
+      const rect = metrics.measure();
+      if (!rect) return;
+      const resized = rect.width !== observedSize.width || rect.height !== observedSize.height;
+      observedSize = metrics.read();
+      if (!resizeAnchor.resizeHandled())
+        motion.jump(
+          immersive.read() && resized
+            ? immersiveView(workspace.read(), rect, engine.getSnapshot().pageId)
+            : motion.read(),
+        );
     });
     const interrupt = () => {
       clearPanIdle(panIdle);
@@ -308,6 +317,6 @@ export function useViewport({
       element.removeEventListener("pointerdown", interrupt, true);
       clearPanIdle(panIdle);
     };
-  }, [motion, viewport, metrics, panIdle, resizeAnchor]);
+  }, [motion, viewport, metrics, panIdle, resizeAnchor, immersive, workspace, engine]);
   return { view, viewRef, motion, actions };
 }

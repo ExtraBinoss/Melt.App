@@ -4,7 +4,7 @@ export const DESIGNED_TEMPLATES = Object.freeze(
       {
         id: "studio-starter",
         nameKey: "templates:studioStarter",
-        width: 1440,
+        width: 1920,
         height: 1080,
         mode: "static",
         descriptionKey: "templates:studioStarterDescription",
