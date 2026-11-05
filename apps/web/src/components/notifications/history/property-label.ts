@@ -11,8 +11,18 @@ import "../../properties/effects/gradient-messages";
 import "../../properties/effects/library-messages";
 import "../../properties/gradient/messages";
 import "./messages";
+import "../../../ui/studio/framing/messages";
 
 const labels: Readonly<Record<string, string>> = {
+  "captureGuides.preset": "studioFraming:format",
+  "captureGuides.width": "studioFraming:width",
+  "captureGuides.height": "studioFraming:height",
+  "captureGuides.full": "studioFraming:full",
+  "captureGuides.visible": "studioFraming:showGuide",
+  "captureGuides.color": "studioFraming:guideColor",
+  "captureGuides.center": "studioFraming:centerLines",
+  "captureGuides.safeArea": "studioFraming:safeArea",
+  "captureGuides.margin": "studioFraming:margin",
   x: "motion:positionX",
   y: "motion:positionY",
   radius: "motion:radius",

@@ -46,8 +46,14 @@ test("Studio native recipe previews restore, commit once and export real GPU cro
   const before = await page.evaluate(() => JSON.stringify(window.musart!.snapshot().project));
   const selection = await page.evaluate(() => window.musart!.session().selection);
   await page.getByRole("button", { name: "Background", exact: true }).click();
-  await page.locator(".studio-background-popover").getByRole("button", { name: "Advanced", exact: true }).click();
-  await page.locator(".studio-background-advanced").getByRole("button", { name: "Presets", exact: true }).click();
+  await page
+    .locator(".studio-background-popover")
+    .getByRole("button", { name: "Advanced", exact: true })
+    .click();
+  await page
+    .locator(".studio-background-advanced")
+    .getByRole("button", { name: "Presets", exact: true })
+    .click();
   const preset = page.locator('[data-background-preset="atmosphere-aurora-mist"]');
   await preset.scrollIntoViewIfNeeded();
   const old = await canvas.getAttribute("data-rendered-revision");
@@ -72,6 +78,7 @@ test("Studio native recipe previews restore, commit once and export real GPU cro
   await page.evaluate(() => window.musart!.undo());
   expect(await page.evaluate(() => JSON.stringify(window.musart!.snapshot().project))).toBe(before);
   await page.getByRole("button", { name: "Capture guides", exact: true }).click();
+  await page.getByRole("switch", { name: "Show guides", exact: true }).click();
   await page.locator('.studio-capture-popover [data-preset-id="custom"]').click();
   await page
     .locator(".studio-capture-popover")
@@ -93,7 +100,9 @@ test("Studio native recipe previews restore, commit once and export real GPU cro
   await expect(page.locator("[data-studio-capture]")).toBeVisible();
   const capture = (await page.locator("[data-studio-capture]").boundingBox())!;
   expect(capture.width / capture.height).toBeCloseTo(2 / 3, 2);
-  expect(await page.evaluate(() => JSON.stringify(window.musart!.snapshot().project))).toBe(before);
+  const framed = await page.evaluate(() => window.musart!.snapshot().project.pages[0]!);
+  expect(framed.layers).toEqual((JSON.parse(before) as Project).pages[0]!.layers);
+  expect(framed.captureGuides).toMatchObject({ width: 320, height: 480, visible: true });
   await page.getByRole("button", { name: "Export", exact: true }).click();
   await expect(page.locator(".export-dialog")).toBeVisible();
   await expect(

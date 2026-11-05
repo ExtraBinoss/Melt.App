@@ -73,9 +73,56 @@
 }
 .studio-capture-window {
   position: absolute;
-  border: 1px solid color-mix(in srgb, white 85%, transparent);
+  --studio-guide-color: #67e8f9;
+  border: 1px solid var(--studio-guide-color);
   outline: 1px solid #0005;
   box-shadow: 0 0 0 100vmax #0007;
+}
+.studio-safe-area {
+  position: absolute;
+  border: 1px dashed var(--studio-guide-color);
+  filter: drop-shadow(0 1px 1px #0009);
+}
+.studio-guide-center {
+  position: absolute;
+  inset: 0;
+  opacity: 0.7;
+  filter: drop-shadow(0 1px 1px #0009);
+}
+.studio-guide-center > i {
+  position: absolute;
+  border-color: var(--studio-guide-color);
+  border-style: dashed;
+  border-width: 0;
+}
+.studio-guide-center > i:first-child {
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  border-left-width: 1px;
+}
+.studio-guide-center > i:last-child {
+  top: 50%;
+  left: 0;
+  right: 0;
+  border-top-width: 1px;
+}
+.studio-guide-appearance {
+  display: grid;
+  gap: 10px;
+  border-top: 1px solid var(--border);
+  margin-top: 14px;
+  padding-top: 14px;
+}
+.studio-guide-setting {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 11px;
+}
+.studio-guide-setting > button[role="combobox"] {
+  width: 145px;
 }
 .studio-capture-window > span {
   position: absolute;
@@ -88,4 +135,17 @@
   padding: 3px 6px;
   border-radius: var(--radius-sm);
   white-space: nowrap;
+}
+
+.studio-guide-color-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.studio-guide-color-option > i {
+  width: 12px;
+  height: 12px;
+  border: 1px solid #0003;
+  border-radius: 50%;
+  flex-shrink: 0;
 }

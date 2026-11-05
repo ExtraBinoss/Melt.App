@@ -4,6 +4,7 @@ import { useProjectPreference } from "../../../components/workspace/preferences/
 import { useWorkspaceMode } from "../workspace-mode";
 import type { SpatialCanvasProps } from "../../../canvas/spatial/CanvasSpatialEditing";
 import { getStudioViewport } from "./viewport";
+import { DEFAULT_STUDIO_GUIDES, STUDIO_GUIDE_COLORS, studioSafeInsets } from "./guide-settings";
 import "./backdrop.css";
 import "./framing.css";
 
@@ -18,6 +19,8 @@ export function StudioCanvasViewport({
   const capture = useProjectPreference("studioCapture");
   const window = useRef<HTMLDivElement>(null);
   const label = useRef<HTMLSpanElement>(null);
+  const safe = useRef<HTMLDivElement>(null);
+  const center = useRef<HTMLDivElement>(null);
   const config = useRef(capture);
   const paint = useRef<(() => void) | null>(null);
   useLayoutEffect(() => {
@@ -67,7 +70,8 @@ export function StudioCanvasViewport({
         width: Math.round(width),
         height: Math.round(height),
       });
-      const choice = config.current;
+      const choice = frame.page.captureGuides ?? config.current;
+      const guides = frame.page.captureGuides ?? DEFAULT_STUDIO_GUIDES;
       const target =
         choice && !choice.full ? fitOutputRegion(region, choice.width, choice.height) : region;
       const guide = window.current;
@@ -78,6 +82,18 @@ export function StudioCanvasViewport({
       guide.style.top = `${size.height / 2 + view.y + (target.y - frame.page.height / 2) * view.zoom}px`;
       guide.style.width = `${target.width * view.zoom}px`;
       guide.style.height = `${target.height * view.zoom}px`;
+      guide.style.setProperty("--studio-guide-color", STUDIO_GUIDE_COLORS[guides.color]);
+      const insets = studioSafeInsets(choice, guides);
+      if (safe.current) {
+        safe.current.hidden = !insets;
+        if (insets) {
+          safe.current.style.top = `${insets.top * 100}%`;
+          safe.current.style.right = `${insets.right * 100}%`;
+          safe.current.style.bottom = `${insets.bottom * 100}%`;
+          safe.current.style.left = `${insets.left * 100}%`;
+        }
+      }
+      if (center.current) center.current.hidden = !guides.center;
       if (label.current)
         label.current.textContent = `${choice?.full ? Math.round(width) : choice?.width} × ${choice?.full ? Math.round(height) : choice?.height}`;
     };
@@ -108,6 +124,11 @@ export function StudioCanvasViewport({
           data-studio-capture
         >
           <span ref={label} />
+          <div ref={safe} className="studio-safe-area" data-studio-safe-area />
+          <div ref={center} className="studio-guide-center" hidden>
+            <i />
+            <i />
+          </div>
         </div>
       </div>
     </>

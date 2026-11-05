@@ -40,6 +40,7 @@ const pageFields = new Set([
   "backgroundGradient",
   "margins",
   "rulers",
+  "captureGuides",
   "colorSpace",
   "canvasPosition",
 ]);

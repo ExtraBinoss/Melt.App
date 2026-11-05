@@ -58,7 +58,7 @@ export const ExportWorkspace = memo(function ExportWorkspace({
     return workspace === "studio" &&
       view?.projectId === origin.project.id &&
       view.pageId === page.id
-      ? { view, choice: preferences?.read("studioCapture") }
+      ? { view, choice: page.captureGuides ?? preferences?.read("studioCapture") }
       : null;
   });
   const [frameChoice, setFrameChoice] = useState<FrameChoice>(

@@ -11,10 +11,12 @@ import { snappingPreferences } from "../../state/snapping/preferences";
 import type { SearchAction, SearchItem, SearchTranslate } from "./catalog/model";
 import { capturePresentationDelete, attachmentSelection } from "../../state/selection/attachments";
 import { createClipboardController } from "../../services/clipboard/controller";
+import type { WorkspaceMode } from "../../services/projects/preferences/model";
 
 export type ProjectView = "projects" | "newProject" | "settings" | "settingsEditor";
 export type PanelMode = "design" | "animate";
 export interface SearchActions {
+  workspaceMode?: WorkspaceMode;
   engine: EnginePort;
   services: EditorServices;
   t: SearchTranslate;
@@ -155,8 +157,10 @@ export function createSearchActions(context: SearchActions) {
     zoomOut: () => {
       view.run("zoomOut");
     },
-    rulers: () =>
-      engine.execute({ type: "updatePage", patch: { rulers: !selection(engine).page.rulers } }),
+    rulers: () => {
+      if (context.workspaceMode === "studio") return;
+      engine.execute({ type: "updatePage", patch: { rulers: !selection(engine).page.rulers } });
+    },
     design: () => context.onPanelMode("design"),
     animate: () => context.onPanelMode("animate"),
     togglePlayback: () => {

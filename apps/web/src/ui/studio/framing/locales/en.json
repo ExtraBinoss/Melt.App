@@ -5,7 +5,7 @@
   "custom": "Custom",
   "width": "Width",
   "height": "Height",
-  "showGuide": "Show capture guide",
+  "showGuide": "Show guides",
   "exportFrame": "Output framing",
   "original": "Original composition",
   "format": "Format",
@@ -14,5 +14,16 @@
   "landscape": "Landscape",
   "square": "Square",
   "captureHint": "Only the highlighted area is exported.",
-  "customHint": "Choose output dimensions without changing the composition."
+  "customHint": "Choose output dimensions without changing the composition.",
+  "safeArea": "Safe margin",
+  "formatSafeArea": "Format default",
+  "customMargin": "Custom margin",
+  "none": "None",
+  "margin": "Margin",
+  "guideColor": "Guide color",
+  "centerLines": "Center lines",
+  "cyan": "Cyan",
+  "magenta": "Magenta",
+  "lime": "Lime",
+  "white": "White"
 }

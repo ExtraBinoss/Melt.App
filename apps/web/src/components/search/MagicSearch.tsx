@@ -40,6 +40,7 @@ import {
 } from "../../canvas/interaction/gesture-origin";
 import { bindingLabel } from "./shortcuts";
 import { SearchCommandSurface } from "./SearchCommandSurface";
+import { useWorkspaceMode } from "../../ui/studio/workspace-mode";
 import "./messages";
 import "./search.css";
 
@@ -75,6 +76,7 @@ export function MagicSearch({
   const locale = i18n.resolvedLanguage ?? i18n.language;
   const reducedMotion = useReducedMotion();
   const bindings = useKeybindings();
+  const workspaceMode = useWorkspaceMode();
   const catalog = useMemo(() => new SearchCatalog(), []),
     timing = useMemo(() => browserSearchTiming(), []);
   const setTool = useSetAtom(toolAtom),
@@ -138,6 +140,7 @@ export function MagicSearch({
     }
   }, [open, timing, recordOpen]);
   const actions: SearchActions = {
+    workspaceMode,
     engine,
     services,
     t,

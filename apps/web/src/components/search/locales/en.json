@@ -88,7 +88,7 @@
     "recenter": "Center the artwork without changing zoom.",
     "zoomIn": "Increase the canvas magnification.",
     "zoomOut": "Reduce the canvas magnification.",
-    "rulers": "Show rulers and alignment guides.",
+    "rulers": "Show rulers and alignment guides in the Classic workspace.",
     "design": "Edit the visual properties of the artwork.",
     "animate": "Open motion controls and the animation timeline.",
     "togglePlayback": "Play or pause the motion timeline.",

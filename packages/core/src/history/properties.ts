@@ -57,6 +57,9 @@ const percent = new Set([
   "spatial.material.opacity",
 ]);
 const booleans = new Set([
+  "captureGuides.full",
+  "captureGuides.visible",
+  "captureGuides.center",
   "locked",
   "maskSource",
   "spatialContext",
@@ -74,6 +77,7 @@ const booleans = new Set([
   "loop",
 ]);
 const text = new Set([
+  "captureGuides.preset",
   "name",
   "parentId",
   "assetId",
@@ -83,6 +87,8 @@ const text = new Set([
   "preset",
 ]);
 const choices: Readonly<Record<string, readonly string[]>> = {
+  "captureGuides.color": ["cyan", "magenta", "lime", "white"],
+  "captureGuides.safeArea": ["format", "custom", "none"],
   "backgroundGradient.kind": ["linear", "radial"],
   "backgroundGradient.radialShape": ["ellipse", "circle"],
   colorSpace: ["srgb", "display-p3", "cmyk", "cmyk-proof"],
@@ -259,16 +265,19 @@ export function getHistoryPropertyDefinition(target: HistoryPropertyTarget): Def
         ? { unit: "s" }
         : property === "volume" || property === "strength" || property === "reverb.mix"
           ? { displayScale: 100, unit: "%" }
-          : /^backgroundGradient\.(centerX|centerY|radius)$/.test(property) ||
-              /^backgroundGradient\.stops\.\d+\.offset$/.test(property)
-            ? { displayScale: 100, unit: "%" }
-            : property === "backgroundGradient.angle"
-              ? { unit: "°" }
-              : ["width", "height", "position"].includes(property) ||
-                  property.startsWith("margins.") ||
-                  property.startsWith("canvasPosition.")
-                ? { unit: "px" }
-                : {}),
+          : property === "captureGuides.margin"
+            ? { unit: "%" }
+            : /^backgroundGradient\.(centerX|centerY|radius)$/.test(property) ||
+                /^backgroundGradient\.stops\.\d+\.offset$/.test(property)
+              ? { displayScale: 100, unit: "%" }
+              : property === "backgroundGradient.angle"
+                ? { unit: "°" }
+                : ["width", "height", "position"].includes(property) ||
+                    ["captureGuides.width", "captureGuides.height"].includes(property) ||
+                    property.startsWith("margins.") ||
+                    property.startsWith("canvasPosition.")
+                  ? { unit: "px" }
+                  : {}),
     };
   }
   return result ? freezeValue(result) : null;

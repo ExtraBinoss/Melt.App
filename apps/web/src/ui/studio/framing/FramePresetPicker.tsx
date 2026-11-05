@@ -55,11 +55,17 @@ export function FramePresetPicker({
   onChange,
   bounds,
   disabled,
+  onPreview,
+  onCancel,
+  identity,
 }: {
   value: FrameChoice;
   onChange: (value: FrameChoice) => void;
   bounds: { width: number; height: number };
   disabled?: boolean;
+  onPreview?: (value: FrameChoice) => void;
+  onCancel?: () => void;
+  identity?: unknown;
 }) {
   const { t } = useTranslation("studioFraming");
   const { t: common } = useTranslation();
@@ -116,6 +122,7 @@ export function FramePresetPicker({
       </div>
       <div className="studio-frame-dimensions">
         <NumberInput
+          identity={identity}
           label={t("width")}
           value={value.width}
           min={1}
@@ -123,12 +130,20 @@ export function FramePresetPicker({
           step={1}
           unit="px"
           disabled={disabled || value.full}
+          onPreview={
+            onPreview
+              ? (width) =>
+                  onPreview({ ...value, width: Math.round(width), preset: "custom", full: false })
+              : undefined
+          }
+          onCancel={onCancel}
           onCommit={(width) =>
             onChange({ ...value, width: Math.round(width), preset: "custom", full: false })
           }
         />
         <span aria-hidden="true">×</span>
         <NumberInput
+          identity={identity}
           label={t("height")}
           value={value.height}
           min={1}
@@ -136,6 +151,13 @@ export function FramePresetPicker({
           step={1}
           unit="px"
           disabled={disabled || value.full}
+          onPreview={
+            onPreview
+              ? (height) =>
+                  onPreview({ ...value, height: Math.round(height), preset: "custom", full: false })
+              : undefined
+          }
+          onCancel={onCancel}
           onCommit={(height) =>
             onChange({ ...value, height: Math.round(height), preset: "custom", full: false })
           }

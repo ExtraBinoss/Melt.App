@@ -76,6 +76,7 @@ export type CompositionHistoryProperty =
   | `backgroundGradient.${"centerX" | "centerY" | "radius" | "radialShape"}`
   | `backgroundGradient.stops.${number}.${"color" | "offset"}`
   | "rulers"
+  | `captureGuides.${"preset" | "width" | "height" | "full" | "visible" | "color" | "center" | "safeArea" | "margin"}`
   | "colorSpace"
   | `margins.${"top" | "right" | "bottom" | "left"}`
   | `canvasPosition.${"x" | "y"}`

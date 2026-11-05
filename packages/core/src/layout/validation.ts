@@ -1,4 +1,5 @@
 import { ensure } from "../errors";
+import { validateCaptureGuides } from "./capture-guides";
 import {
   assertRecord,
   assertNumber,
@@ -37,6 +38,7 @@ export function validateLayerLayout(layer: Record<string, unknown>, ids: Set<str
   }
 }
 export function validatePageLayout(page: Record<string, unknown>): void {
+  if (page.captureGuides !== undefined) validateCaptureGuides(page.captureGuides);
   if (page.canvasPosition !== undefined) {
     assertRecord(page.canvasPosition);
     assertNumber(page.canvasPosition.x, -1_000_000, 1_000_000);

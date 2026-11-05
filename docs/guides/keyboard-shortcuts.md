@@ -55,7 +55,7 @@ For Photoshop users: check the MusArt defaults before relying on muscle memory. 
 | Reset view / 100%  | `Ctrl+1`             | Restore the default view at 100% zoom.                                                                |
 | Zoom in            | `Ctrl++` or `Ctrl+=` | Increase canvas zoom.                                                                                 |
 | Zoom out           | `Ctrl+-`             | Decrease canvas zoom.                                                                                 |
-| Toggle rulers      | `Ctrl+R`             | Show or hide rulers.                                                                                  |
+| Toggle rulers      | `Ctrl+R`             | Show or hide rulers in Classic. Studio reserves this shortcut without changing the view.              |
 | Magic Search       | `Ctrl+K`             | Find and run tools, effects, adjustments, project actions and settings, or jump to an artboard/layer. |
 | Keyboard shortcuts | `?`                  | Open the searchable shortcut editor.                                                                  |
 

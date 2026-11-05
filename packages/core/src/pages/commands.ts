@@ -22,6 +22,7 @@ export const updatePage: CommandHandler<"updatePage"> = ({ project, page, pageId
         "effects",
         "margins",
         "rulers",
+        "captureGuides",
         "colorSpace",
         "guides",
         "canvasPosition",

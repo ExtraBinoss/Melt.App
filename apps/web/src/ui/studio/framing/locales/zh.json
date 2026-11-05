@@ -5,7 +5,7 @@
   "custom": "自定义",
   "width": "宽度",
   "height": "高度",
-  "showGuide": "显示捕获参考线",
+  "showGuide": "显示参考线",
   "exportFrame": "输出取景",
   "original": "原始合成",
   "format": "格式",
@@ -14,5 +14,16 @@
   "landscape": "横向",
   "square": "正方形",
   "captureHint": "仅导出高亮显示的区域。",
-  "customHint": "选择输出尺寸，无需更改合成。"
+  "customHint": "选择输出尺寸，无需更改合成。",
+  "safeArea": "安全边距",
+  "formatSafeArea": "格式默认值",
+  "customMargin": "自定义边距",
+  "none": "无",
+  "margin": "边距",
+  "guideColor": "参考线颜色",
+  "centerLines": "中心线",
+  "cyan": "青色",
+  "magenta": "品红色",
+  "lime": "青柠色",
+  "white": "白色"
 }

@@ -5,7 +5,7 @@
   "custom": "Personnalisé",
   "width": "Largeur",
   "height": "Hauteur",
-  "showGuide": "Afficher le repère de capture",
+  "showGuide": "Afficher les repères",
   "exportFrame": "Cadrage de sortie",
   "original": "Composition originale",
   "format": "Format",
@@ -14,5 +14,16 @@
   "landscape": "Paysage",
   "square": "Carré",
   "captureHint": "Seule la zone mise en évidence est exportée.",
-  "customHint": "Choisissez les dimensions de sortie sans modifier la composition."
+  "customHint": "Choisissez les dimensions de sortie sans modifier la composition.",
+  "safeArea": "Marge de sécurité",
+  "formatSafeArea": "Selon le format",
+  "customMargin": "Marge personnalisée",
+  "none": "Aucune",
+  "margin": "Marge",
+  "guideColor": "Couleur des repères",
+  "centerLines": "Axes centraux",
+  "cyan": "Cyan",
+  "magenta": "Magenta",
+  "lime": "Citron vert",
+  "white": "Blanc"
 }

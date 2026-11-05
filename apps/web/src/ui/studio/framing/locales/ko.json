@@ -5,7 +5,7 @@
   "custom": "사용자 지정",
   "width": "너비",
   "height": "높이",
-  "showGuide": "캡처 가이드 표시",
+  "showGuide": "가이드 표시",
   "exportFrame": "출력 프레이밍",
   "original": "원본 컴포지션",
   "format": "형식",
@@ -14,5 +14,16 @@
   "landscape": "가로",
   "square": "정사각형",
   "captureHint": "강조 표시된 영역만 내보냅니다.",
-  "customHint": "컴포지션을 변경하지 않고 출력 크기를 선택하세요."
+  "customHint": "컴포지션을 변경하지 않고 출력 크기를 선택하세요.",
+  "safeArea": "안전 여백",
+  "formatSafeArea": "형식 기본값",
+  "customMargin": "사용자 지정 여백",
+  "none": "없음",
+  "margin": "여백",
+  "guideColor": "가이드 색상",
+  "centerLines": "중심선",
+  "cyan": "청록색",
+  "magenta": "자홍색",
+  "lime": "라임색",
+  "white": "흰색"
 }

@@ -5,7 +5,7 @@
   "custom": "Własne",
   "width": "Szerokość",
   "height": "Wysokość",
-  "showGuide": "Pokaż prowadnicę kadrowania",
+  "showGuide": "Pokaż prowadnice",
   "exportFrame": "Kadr wyjściowy",
   "original": "Oryginalna kompozycja",
   "format": "Format",
@@ -14,5 +14,16 @@
   "landscape": "Poziomy",
   "square": "Kwadratowy",
   "captureHint": "Eksportowany jest tylko wyróżniony obszar.",
-  "customHint": "Wybierz wymiary wyjściowe bez zmiany kompozycji."
+  "customHint": "Wybierz wymiary wyjściowe bez zmiany kompozycji.",
+  "safeArea": "Bezpieczny margines",
+  "formatSafeArea": "Domyślny dla formatu",
+  "customMargin": "Własny margines",
+  "none": "Brak",
+  "margin": "Margines",
+  "guideColor": "Kolor prowadnic",
+  "centerLines": "Linie środkowe",
+  "cyan": "Cyjan",
+  "magenta": "Magenta",
+  "lime": "Limonka",
+  "white": "Biały"
 }

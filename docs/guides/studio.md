@@ -112,7 +112,19 @@ Desktop workspace switches retain the dock and its transport.
 Capture guides and the export workspace share the existing social/video format
 catalog, SVG aspect thumbnails and custom dimensions. A guide highlights the
 centered capture rectangle within the current visible composition window. Full view
-captures that entire window. Guide preferences never modify layers or history.
+captures that entire window. Capture settings never resize layers or the composition.
+
+The existing capture popover contains **Show guides**. Format, color, optional
+center lines and margin controls appear only while guides are enabled. Color choices
+show a swatch and preview on hover or keyboard focus; dismissing restores the committed
+color. Format default uses catalog safe-area metadata when present (for example,
+the YouTube banner), otherwise a 10% composition margin for Instagram, TikTok and other
+formats. This is an adjustable composition aid; platform overlays vary by placement
+and device. All committed capture inputs use validated `updatePage` commands and the
+ordinary Undo/Redo stack. Drafts cancel without a history entry. Guide appearance
+never changes rendered pixels; changing capture dimensions updates output framing,
+without resizing the composition. Studio has no rulers: Ctrl/Cmd+R is reserved without
+editing the document or shifting its view; Classic retains its ruler shortcut.
 
 Opening export in Studio captures the visible window and defaults to its guide's
 format. Preview, still image, motion and timelapse paths pass the same typed

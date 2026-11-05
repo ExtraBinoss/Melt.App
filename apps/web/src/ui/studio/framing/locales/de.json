@@ -5,7 +5,7 @@
   "custom": "Benutzerdefiniert",
   "width": "Breite",
   "height": "Höhe",
-  "showGuide": "Aufnahmehilfe anzeigen",
+  "showGuide": "Hilfslinien anzeigen",
   "exportFrame": "Ausgabebildausschnitt",
   "original": "Originalkomposition",
   "format": "Format",
@@ -14,5 +14,16 @@
   "landscape": "Querformat",
   "square": "Quadrat",
   "captureHint": "Nur der hervorgehobene Bereich wird exportiert.",
-  "customHint": "Wähle die Ausgabegröße, ohne die Komposition zu ändern."
+  "customHint": "Wähle die Ausgabegröße, ohne die Komposition zu ändern.",
+  "safeArea": "Sicherheitsrand",
+  "formatSafeArea": "Formatstandard",
+  "customMargin": "Eigener Rand",
+  "none": "Keiner",
+  "margin": "Rand",
+  "guideColor": "Hilfslinienfarbe",
+  "centerLines": "Mittellinien",
+  "cyan": "Cyan",
+  "magenta": "Magenta",
+  "lime": "Limette",
+  "white": "Weiß"
 }

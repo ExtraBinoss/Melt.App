@@ -40,6 +40,19 @@ const item = (target: SearchItem["target"]): SearchItem => ({
   terms: "",
   target,
 });
+test("Studio consumes the ruler command without changing the document, view or undo history", () => {
+  const d = context();
+  const original = d.engine.getSnapshot();
+  const notify = vi.fn();
+  const stop = d.engine.subscribe(notify);
+  const actions = createSearchActions({ ...d.context, workspaceMode: "studio" });
+  actions.rulers();
+  actions.rulers();
+  expect(d.engine.getSnapshot()).toBe(original);
+  expect(notify).not.toHaveBeenCalled();
+  expect(d.engine.getSnapshot().canUndo).toBe(false);
+  stop();
+});
 test("search clipboard actions share the actual engine clipboard port", async () => {
   const d = context(),
     controller = createClipboardController(d.engine);

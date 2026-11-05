@@ -8,6 +8,7 @@ export { compactShapeMorph } from "./effects/morph/compact";
 export { prepareMorphShape, prepareMorphShapeSteps } from "./effects/morph/geometry";
 export { validateShapeMorph } from "./effects/morph/validation";
 export { FORMAT_VERSION } from "./document/model";
+export type { CaptureGuides } from "./layout/model";
 export type { PreparedEngineTransaction } from "./session/reservation";
 export type { ImageAsset, VideoAsset, AudioAsset, OriginalMediaAsset } from "./assets/model";
 export {

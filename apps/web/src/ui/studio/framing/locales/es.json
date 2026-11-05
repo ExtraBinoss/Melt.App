@@ -5,7 +5,7 @@
   "custom": "Personalizado",
   "width": "Ancho",
   "height": "Alto",
-  "showGuide": "Mostrar guía de captura",
+  "showGuide": "Mostrar guías",
   "exportFrame": "Encuadre de salida",
   "original": "Composición original",
   "format": "Formato",
@@ -14,5 +14,16 @@
   "landscape": "Horizontal",
   "square": "Cuadrado",
   "captureHint": "Solo se exporta el área resaltada.",
-  "customHint": "Elige las dimensiones de salida sin cambiar la composición."
+  "customHint": "Elige las dimensiones de salida sin cambiar la composición.",
+  "safeArea": "Margen de seguridad",
+  "formatSafeArea": "Predeterminado del formato",
+  "customMargin": "Margen personalizado",
+  "none": "Ninguno",
+  "margin": "Margen",
+  "guideColor": "Color de guías",
+  "centerLines": "Líneas centrales",
+  "cyan": "Cian",
+  "magenta": "Magenta",
+  "lime": "Lima",
+  "white": "Blanco"
 }

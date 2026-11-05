@@ -5,7 +5,7 @@
   "custom": "カスタム",
   "width": "幅",
   "height": "高さ",
-  "showGuide": "キャプチャガイドを表示",
+  "showGuide": "ガイドを表示",
   "exportFrame": "出力フレーミング",
   "original": "元のコンポジション",
   "format": "形式",
@@ -14,5 +14,16 @@
   "landscape": "横長",
   "square": "正方形",
   "captureHint": "ハイライトされた範囲のみが書き出されます。",
-  "customHint": "コンポジションを変更せずに出力サイズを選択できます。"
+  "customHint": "コンポジションを変更せずに出力サイズを選択できます。",
+  "safeArea": "セーフマージン",
+  "formatSafeArea": "形式の既定値",
+  "customMargin": "カスタムマージン",
+  "none": "なし",
+  "margin": "マージン",
+  "guideColor": "ガイドの色",
+  "centerLines": "中心線",
+  "cyan": "シアン",
+  "magenta": "マゼンタ",
+  "lime": "ライム",
+  "white": "白"
 }

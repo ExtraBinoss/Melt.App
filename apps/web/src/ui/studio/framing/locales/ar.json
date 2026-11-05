@@ -5,7 +5,7 @@
   "custom": "مخصص",
   "width": "العرض",
   "height": "الارتفاع",
-  "showGuide": "إظهار دليل الالتقاط",
+  "showGuide": "إظهار الأدلة",
   "exportFrame": "تأطير الإخراج",
   "original": "التركيب الأصلي",
   "format": "التنسيق",
@@ -14,5 +14,16 @@
   "landscape": "أفقي",
   "square": "مربع",
   "captureHint": "تُصدّر المنطقة المميزة فقط.",
-  "customHint": "اختر أبعاد الإخراج دون تغيير التركيب."
+  "customHint": "اختر أبعاد الإخراج دون تغيير التركيب.",
+  "safeArea": "هامش آمن",
+  "formatSafeArea": "افتراضي التنسيق",
+  "customMargin": "هامش مخصص",
+  "none": "بلا",
+  "margin": "الهامش",
+  "guideColor": "لون الأدلة",
+  "centerLines": "خطوط المركز",
+  "cyan": "سماوي",
+  "magenta": "أرجواني",
+  "lime": "ليموني",
+  "white": "أبيض"
 }

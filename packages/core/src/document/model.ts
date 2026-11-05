@@ -2,7 +2,13 @@ import type { SpatialLayer, SpatialScene } from "../spatial/model";
 import type { BlendMode } from "../layers/blending/catalog";
 import type { VectorDefinition } from "../vector/model";
 import type { ShapeMorph } from "../effects/morph/model";
-import type { Insets, WorkingColorSpace, Alignment, LayoutReference } from "../layout/model";
+import type {
+  Insets,
+  WorkingColorSpace,
+  Alignment,
+  LayoutReference,
+  CaptureGuides,
+} from "../layout/model";
 import type { ReplaySpec } from "../animation/model";
 import type { ApplyBackgroundPresetCommand } from "../paint/background-recipe";
 import type { FillGradient } from "../paint/gradient";
@@ -178,6 +184,8 @@ export interface Composition {
   guides: Guide[];
   margins?: Insets;
   rulers?: boolean;
+  /** Editor overlays and authored output framing. Guides themselves are never rendered. */
+  captureGuides?: CaptureGuides;
   colorSpace?: WorkingColorSpace;
   motion?: CompositionMotion;
   /** Artboard placement on the workspace; independent of its exported content. */

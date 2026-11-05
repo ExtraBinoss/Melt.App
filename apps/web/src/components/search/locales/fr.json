@@ -88,7 +88,7 @@
     "recenter": "Centrer la composition sans modifier le zoom.",
     "zoomIn": "Agrandir l’affichage du canvas.",
     "zoomOut": "Réduire l’affichage du canvas.",
-    "rulers": "Afficher les règles et les repères d’alignement.",
+    "rulers": "Afficher les règles et les repères d’alignement dans l’espace Classique.",
     "design": "Modifier les propriétés visuelles de la composition.",
     "animate": "Ouvrir les contrôles de mouvement et la timeline.",
     "togglePlayback": "Lire ou mettre en pause la timeline.",
