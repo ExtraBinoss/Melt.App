@@ -1,4 +1,6 @@
 {
+  "keepCreationTool": "作成ツールを有効のままにする",
+  "keepCreationToolDescription": "配置後もテキストと図形のツールを有効にします。終了するには V キーを押すか、選択ツールを選んでください。",
   "showCanvasZoom": "キャンバスのズーム操作を表示",
   "showCanvasZoomDescription": "キャンバスにズームボタンと倍率を表示します。",
   "marqueeContain": "レイヤー全体を囲んで選択",

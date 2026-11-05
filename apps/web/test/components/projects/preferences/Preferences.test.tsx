@@ -3,6 +3,7 @@ import { act, screen, fireEvent, waitFor } from "@testing-library/react";
 import { Preferences } from "../../../../src/components/projects/preferences/Preferences";
 import { accentAtom } from "../../../../src/state/session/accent";
 import { themeAtom } from "../../../../src/state/session/editor";
+import { keepCreationToolAtom } from "../../../../src/state/tools/preferences";
 import { choose } from "../../../support/select";
 import { setup } from "../../../support/ui";
 import {
@@ -100,6 +101,26 @@ test("canvas zoom UI is opt-in and persists without changing the document", () =
   expect(localStorage.getItem("musart.canvas-zoom-controls.v1")).toBe("true");
   expect(d.engine.getSnapshot()).toBe(before);
   fireEvent.click(control);
+});
+
+test("keeping creation tools active is opt-in and persists without changing the document", () => {
+  const d = setup(),
+    before = d.engine.getSnapshot();
+  d.store.set(keepCreationToolAtom, false);
+  const view = d.mount(<Preferences initialSection="editor" />);
+  const control = screen.getByRole("switch", { name: "Garder l’outil de création actif" });
+  expect(control).not.toBeChecked();
+  fireEvent.click(control);
+  expect(control).toBeChecked();
+  expect(d.store.get(keepCreationToolAtom)).toBe(true);
+  expect(localStorage.getItem("musart.keep-creation-tool.v1")).toBe("true");
+  expect(d.engine.getSnapshot()).toBe(before);
+  view.unmount();
+  d.mount(<Preferences initialSection="editor" />);
+  const restored = screen.getByRole("switch", { name: "Garder l’outil de création actif" });
+  expect(restored).toBeChecked();
+  fireEvent.click(restored);
+  expect(d.store.get(keepCreationToolAtom)).toBe(false);
 });
 
 test("full enclosure is opt-in, persisted locally, and illustrated beside touching selection", () => {

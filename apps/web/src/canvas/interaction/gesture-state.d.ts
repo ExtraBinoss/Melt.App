@@ -11,6 +11,7 @@ export interface Gesture extends TransformGesture, MarqueeScope {
   layers: Layer[];
   handle?: Handle;
   shape?: Layer;
+  clickTargetId?: string;
   current: Point;
   boxStarted?: boolean;
 }

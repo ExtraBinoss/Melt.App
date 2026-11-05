@@ -1,4 +1,6 @@
 {
+  "keepCreationTool": "Garder l’outil de création actif",
+  "keepCreationToolDescription": "Gardez les outils de texte et de forme actifs après chaque insertion. Appuyez sur V ou choisissez Sélection pour terminer.",
   "clipboardImages": "Inclure les images à la copie",
   "clipboardImagesDescription": "Intégrez les images originales pour coller dans un autre projet ou partager les éléments. Désactivez pour des références limitées à ce projet.",
   "categories": "Catégories des préférences",

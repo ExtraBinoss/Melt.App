@@ -4,6 +4,10 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ## [Unreleased]
 
+- Let a simple Classic canvas click select visible foreground artwork over an already-selected background, including native 3D text. Preserve selected-layer drag targeting, additive selection and undo behavior.
+
+- Return text and shape creation tools to Selection after one successful placement by default. Add a device-local Keep creation tool active switch in Editor preferences, translated into every supported language, for repeated insertion until V or Selection is chosen.
+
 - Reuse the shared blinking face/thinking-dots cycle throughout background removal. Crossfade the mascot into a green completion check with a two-second accent, retain a readable success label, and respect reduced motion without delaying results or cancellation.
 
 - Bring the 2D rotation grip closer to the resize handles, reducing its screen-space offset from 36 px to 18 px while retaining its small circle and independent hit target.

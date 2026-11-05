@@ -32,3 +32,13 @@ test("shape aspect constraints keep the opposite corner anchored and retain clic
     completeDrawing(resizeDrawing(layer, { x: 0, y: 0 }, { x: 0, y: 0 }, false), false),
   ).toMatchObject({ width: 180, height: 140 });
 });
+
+test("text completion includes its final pointer release even without a last move sample", () => {
+  const text = createLayer("text", { x: 200, y: 150, width: 1, height: 1 });
+  expect(
+    completeDrawing(text, true, { from: { x: 200, y: 150 }, to: { x: 40, y: 90 } }),
+  ).toMatchObject({ x: 40, y: 90, width: 160, height: 60 });
+  expect(
+    completeDrawing(text, false, { from: { x: 200, y: 150 }, to: { x: 200, y: 150 } }),
+  ).toMatchObject({ x: 200, y: 150, width: 360, height: 100 });
+});

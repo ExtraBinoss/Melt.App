@@ -82,7 +82,10 @@ test("a selected native source raycasts its real triangles through a nearer mesh
   vi.mocked(canvasSpatialSource).mockImplementation((_canvas, id) => resources.get(id) ?? null);
   try {
     expect(canvasHit(page, { x: 128, y: 128 }, true)?.layer.id).toBe("front");
-    expect(canvasSelectionHit(page, { x: 128, y: 128 }, ["back"])?.layer.id).toBe("back");
+    expect(canvasSelectionHit(page, { x: 128, y: 128 }, ["back"])).toMatchObject({
+      layer: { id: "back" },
+      clickTargetId: "front",
+    });
     expect(canvasSelectionHit(page, { x: 0, y: 0 }, ["back"])?.layer.id).not.toBe("back");
     resources.get("back")!.dispose();
     expect(canvasSelectionHit(page, { x: 128, y: 128 }, ["back"])?.layer.id).toBe("front");

@@ -14,7 +14,14 @@ export function resizeDrawing(layer: Layer, from: Point, to: Point, square: bool
   };
 }
 
-export function completeDrawing(layer: Layer, dragged: boolean): Layer {
-  if (layer.kind === "text") return dragged ? layer : { ...layer, width: 360, height: 100 };
+export function completeDrawing(
+  layer: Layer,
+  dragged: boolean,
+  release?: { from: Point; to: Point },
+): Layer {
+  if (layer.kind === "text") {
+    const frame = release ? resizeDrawing(layer, release.from, release.to, false) : layer;
+    return dragged ? frame : { ...frame, width: 360, height: 100 };
+  }
   return layer.width > 3 && layer.height > 3 ? layer : { ...layer, width: 180, height: 140 };
 }

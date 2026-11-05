@@ -1,4 +1,6 @@
 {
+  "keepCreationTool": "保持创建工具启用",
+  "keepCreationToolDescription": "每次放置后继续使用文本和形状工具。按 V 或选择“选择”工具以结束。",
   "showCanvasZoom": "显示画布缩放控件",
   "showCanvasZoomDescription": "在画布上显示缩放按钮和缩放百分比。",
   "marqueeContain": "完全框住图层才选中",

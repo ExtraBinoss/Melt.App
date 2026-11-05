@@ -10,6 +10,13 @@ import type { Point } from "../viewport/view";
 import { pickSpatialLayer } from "@musart/render/spatial";
 import { canvasNativeRenderer, canvasSpatialSource } from "../render/plane-resources";
 
+export interface CanvasSelectionHit {
+  layer: Layer;
+  locked: boolean;
+  /** Retain the selected drag target, but let an unmodified click choose visible artwork. */
+  clickTargetId?: string;
+}
+
 /** Pointer selection can explain a locked foreground without granting an editing gesture. */
 function nativeSpatialHit(
   page: Composition,
@@ -66,7 +73,7 @@ export function canvasSelectionHit(
   selection: readonly string[],
   index: LayerGeometryIndex = createLayerGeometryIndex(page),
   includeLocked = true,
-) {
+): CanvasSelectionHit | null {
   const foreground = canvasHit(page, point, includeLocked, index);
   if (!selection.length || (foreground && selection.includes(foreground.layer.id)))
     return foreground;
@@ -113,7 +120,11 @@ export function canvasSelectionHit(
       (picked.id === layer.id ||
         (spatial && isolated.ancestors(picked.id).some((item) => item.id === layer.id)))
     )
-      return { layer, locked: false };
+      return {
+        layer,
+        locked: false,
+        ...(foreground ? { clickTargetId: foreground.layer.id } : {}),
+      };
   }
   return foreground;
 }

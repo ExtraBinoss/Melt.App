@@ -18,6 +18,7 @@ import { completeDrawing, resizeDrawing } from "./interaction/drawing";
 import { createTextDrawing, commitDrawing } from "./interaction/text-insertion";
 import { textInsertionModeAtom } from "../state/session/text-insertion";
 import { toolAtom } from "../state/session/editor";
+import { keepCreationToolAtom } from "../state/tools/preferences";
 import { useCanvasTransfers } from "./interaction/library-drop";
 import { CanvasContextMenu } from "./selection/CanvasContextMenu";
 import { readReleasePoint } from "./interaction/release";
@@ -331,6 +332,7 @@ export function EditorCanvas({
       ...base,
       ...captureTransformAuthoring(engine),
       mode: "move",
+      clickTargetId: picked?.clickTargetId,
       layers: selectedRoots(currentPage, ids),
     };
   }
@@ -421,20 +423,19 @@ export function EditorCanvas({
       liveMarquee.commit();
     }
     const commands = transformAuthoringCommands(engine, active, patchesRef.current);
+    const distance = Math.hypot(event.clientX - active.client.x, event.clientY - active.client.y);
     cancelGesture(undefined, true);
     try {
       if (active.mode === "move" || active.mode === "resize") {
-        if (Math.hypot(event.clientX - active.client.x, event.clientY - active.client.y) > 1)
-          engine.transaction(commands);
+        if (distance > 1) engine.transaction(commands);
+        else if (active.clickTargetId) engine.select([active.clickTargetId]);
       } else if (active.mode === "draw" && active.shape) {
-        const shape = completeDrawing(
-          active.shape.kind === "text"
-            ? resizeDrawing(active.shape, active.from, pagePoint(event), false)
-            : active.shape,
-          Math.hypot(event.clientX - active.client.x, event.clientY - active.client.y) > 3,
-        );
+        const shape = completeDrawing(active.shape, distance > 3, {
+          from: active.from,
+          to: pagePoint(event),
+        });
         commitDrawing(engine, shape);
-        if (shape.kind === "text") store.set(toolAtom, "pointer");
+        if (!store.get(keepCreationToolAtom)) store.set(toolAtom, "pointer");
       }
     } catch (error) {
       onError?.(error instanceof Error ? error.message : String(error));
@@ -532,7 +533,7 @@ export function EditorCanvas({
               engine={engine}
               viewSource={pageViewSource}
               viewport={viewport}
-              showHandles={tool !== "wand" && tool !== "segment"}
+              showHandles={tool === "pointer" || tool === "hand"}
               onHandle={handlePointerDown}
             />
             <Measurements

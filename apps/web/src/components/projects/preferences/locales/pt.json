@@ -1,4 +1,6 @@
 {
+  "keepCreationTool": "Manter a ferramenta de criação ativa",
+  "keepCreationToolDescription": "Mantenha as ferramentas de texto e formas ativas após cada inserção. Prima V ou escolha Seleção para terminar.",
   "showCanvasZoom": "Mostrar controlos de zoom",
   "showCanvasZoomDescription": "Mostrar os botões e a percentagem de zoom na tela.",
   "marqueeContain": "Abranger as camadas por inteiro",

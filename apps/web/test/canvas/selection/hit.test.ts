@@ -62,6 +62,30 @@ test("a tree-selected shape retains the move target only inside its exact geomet
   expect(canvasSelectionHit(page, { x: 250, y: 250 }, ["selected"], index)).toBeNull();
 });
 
+test.each(["rectangle", "image"] as const)(
+  "a selected %s backdrop keeps its drag target but a click resolves to the foreground",
+  (kind) => {
+    const page = createPage({
+      width: 300,
+      height: 200,
+      layers: [
+        createLayer(kind, { id: "background", x: 0, y: 0, width: 300, height: 200 }),
+        createLayer("text", { id: "title", x: 40, y: 30, width: 150, height: 80 }),
+      ],
+    });
+    expect(canvasSelectionHit(page, { x: 100, y: 60 }, ["background"])).toMatchObject({
+      layer: { id: "background" },
+      clickTargetId: "title",
+    });
+    expect(canvasSelectionHit(page, { x: 250, y: 160 }, ["background"])).toMatchObject({
+      layer: { id: "background" },
+    });
+    expect(
+      canvasSelectionHit(page, { x: 250, y: 160 }, ["background"])?.clickTargetId,
+    ).toBeUndefined();
+  },
+);
+
 test("a selected group moves as the group and ordinary picks preserve isolated hierarchy order", () => {
   const page = createPage({
     layers: [

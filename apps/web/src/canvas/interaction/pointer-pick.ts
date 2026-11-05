@@ -13,7 +13,7 @@ export function pickCanvasPointer(
   tool: Tool,
   additive: boolean,
   studio = false,
-) {
+): ReturnType<typeof canvasSelectionHit> {
   if (studio)
     return canvasHit(
       controller.read().page,

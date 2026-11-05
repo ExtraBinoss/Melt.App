@@ -1,4 +1,6 @@
 {
+  "keepCreationTool": "Mantieni attivo lo strumento di creazione",
+  "keepCreationToolDescription": "Mantieni attivi gli strumenti di testo e forme dopo ogni inserimento. Premi V o scegli Selezione per terminare.",
   "showCanvasZoom": "Mostra controlli di zoom",
   "showCanvasZoomDescription": "Mostra i pulsanti e la percentuale di zoom sulla tela.",
   "marqueeContain": "Racchiudere interamente i livelli",

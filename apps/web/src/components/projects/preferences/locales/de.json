@@ -1,4 +1,6 @@
 {
+  "keepCreationTool": "Erstellungswerkzeug aktiv lassen",
+  "keepCreationToolDescription": "Text- und Formwerkzeuge nach jeder Platzierung aktiv lassen. Zum Beenden V drücken oder Auswahl wählen.",
   "showCanvasZoom": "Zoomsteuerung anzeigen",
   "showCanvasZoomDescription": "Zoomtasten und Zoomfaktor auf der Zeichenfläche anzeigen.",
   "marqueeContain": "Ebenen vollständig einschließen",

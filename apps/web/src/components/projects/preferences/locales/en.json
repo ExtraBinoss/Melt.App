@@ -1,4 +1,6 @@
 {
+  "keepCreationTool": "Keep creation tool active",
+  "keepCreationToolDescription": "Keep text and shape tools active after each placement. Press V or choose Selection to stop.",
   "clipboardImages": "Include images when copying",
   "clipboardImagesDescription": "Embed original images so copied items can be pasted into another project or shared. Turn off for references within this project only.",
   "categories": "Preferences categories",

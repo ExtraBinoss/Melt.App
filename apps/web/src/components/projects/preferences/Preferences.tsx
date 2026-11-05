@@ -9,6 +9,7 @@ import { changeLanguage } from "../../../state/i18n";
 import { isSupportedLocale, supportedLocales } from "../../../state/i18n/locales";
 import { snappingAtom, DEFAULT_SNAPPING } from "../../../state/snapping/preferences";
 import { zoomControlsAtom } from "../../../state/viewport/preferences";
+import { keepCreationToolAtom } from "../../../state/tools/preferences";
 import { clipboardAtom } from "../../../state/clipboard/preferences";
 import { SegmentedTabs } from "../../shared/segmented/SegmentedTabs";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "../../ui/tabs";
@@ -61,6 +62,7 @@ export function Preferences({
   const [theme, setTheme] = useAtom(themeAtom),
     [snapping, setSnapping] = useAtom(snappingAtom),
     [clipboard, setClipboard] = useAtom(clipboardAtom),
+    [keepCreationTool, setKeepCreationTool] = useAtom(keepCreationToolAtom),
     [showZoom, setShowZoom] = useAtom(zoomControlsAtom);
   const modes = [
     ["system", Laptop],
@@ -160,6 +162,19 @@ export function Preferences({
           )}
           <MarqueePreference />
           <div className="preferences-card">
+            <label className="preferences-setting-row">
+              <span>
+                <strong>{t("preferences:keepCreationTool")}</strong>
+                <small className="preferences-setting-description">
+                  {t("preferences:keepCreationToolDescription")}
+                </small>
+              </span>
+              <Switch
+                aria-label={t("preferences:keepCreationTool")}
+                checked={keepCreationTool}
+                onCheckedChange={setKeepCreationTool}
+              />
+            </label>
             <label className="preferences-setting-row">
               <span>
                 <strong>{t("preferences:showCanvasZoom")}</strong>

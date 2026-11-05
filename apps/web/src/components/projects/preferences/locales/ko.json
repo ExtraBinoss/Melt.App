@@ -1,4 +1,6 @@
 {
+  "keepCreationTool": "만들기 도구 유지",
+  "keepCreationToolDescription": "배치 후에도 텍스트 및 도형 도구를 유지합니다. 마치려면 V 키를 누르거나 선택 도구를 선택하세요.",
   "showCanvasZoom": "캔버스 확대/축소 컨트롤 표시",
   "showCanvasZoomDescription": "캔버스에 확대/축소 버튼과 배율을 표시합니다.",
   "marqueeContain": "레이어 전체를 감싸야 선택",

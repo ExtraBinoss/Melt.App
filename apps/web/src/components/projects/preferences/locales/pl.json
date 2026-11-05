@@ -1,4 +1,6 @@
 {
+  "keepCreationTool": "Pozostaw narzędzie tworzenia aktywne",
+  "keepCreationToolDescription": "Pozostaw narzędzia tekstu i kształtów aktywne po każdym wstawieniu. Naciśnij V lub wybierz Zaznaczanie, aby zakończyć.",
   "showCanvasZoom": "Pokaż sterowanie powiększeniem",
   "showCanvasZoomDescription": "Wyświetl przyciski i procent powiększenia na płótnie.",
   "marqueeContain": "Obejmuj warstwy w całości",

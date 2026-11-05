@@ -1,4 +1,6 @@
 {
+  "keepCreationTool": "إبقاء أداة الإنشاء نشطة",
+  "keepCreationToolDescription": "أبقِ أدوات النص والأشكال نشطة بعد كل إدراج. اضغط V أو اختر التحديد للانتهاء.",
   "showCanvasZoom": "إظهار عناصر تكبير اللوحة",
   "showCanvasZoomDescription": "عرض أزرار التكبير ونسبته على اللوحة.",
   "marqueeContain": "اشتراط إحاطة الطبقات بالكامل",

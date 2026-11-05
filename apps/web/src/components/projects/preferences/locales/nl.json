@@ -1,4 +1,6 @@
 {
+  "keepCreationTool": "Aanmaakgereedschap actief houden",
+  "keepCreationToolDescription": "Houd tekst- en vormgereedschappen actief na elke plaatsing. Druk op V of kies Selectie om te stoppen.",
   "showCanvasZoom": "Zoombediening tonen",
   "showCanvasZoomDescription": "Toon zoomknoppen en het zoompercentage op het canvas.",
   "marqueeContain": "Lagen volledig omsluiten",

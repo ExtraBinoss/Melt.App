@@ -1,4 +1,6 @@
 {
+  "keepCreationTool": "Mantener activa la herramienta de creación",
+  "keepCreationToolDescription": "Mantén activas las herramientas de texto y formas tras cada inserción. Pulsa V o elige Selección para terminar.",
   "showCanvasZoom": "Mostrar controles de zoom",
   "showCanvasZoomDescription": "Mostrar los botones y el porcentaje de zoom en el lienzo.",
   "marqueeContain": "Incluir las capas por completo",
