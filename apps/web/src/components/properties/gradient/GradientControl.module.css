@@ -119,7 +119,8 @@
   outline-color: var(--primary);
   outline-offset: 2px;
 }
-.thumb[aria-disabled="true"] {
+.thumb[aria-disabled="true"],
+.thumb[data-fixed] {
   cursor: default;
 }
 .thumb[data-dragging] {
@@ -171,7 +172,14 @@
   background: var(--field);
 }
 .row :global(.number-scrub) {
-  display: none;
+  display: flex;
+  order: 1;
+  min-width: 16px;
+  max-width: none;
+  padding-inline: 2px 4px;
+  border: 0;
+  background: transparent;
+  font-size: 11px;
 }
 .row :global(.number-field input) {
   padding-inline: 3px;

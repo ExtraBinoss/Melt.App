@@ -173,3 +173,40 @@ test("disables segmented, gradient and stop controls for a locked layer", () => 
   expect(screen.getByRole("slider", { name: "Point 2" })).toBeDisabled();
   expect(screen.getByRole("img", { name: "Aperçu du dégradé" }).closest("[inert]")).not.toBeNull();
 });
+
+test("double-clicking a ramp point selects it and opens its color picker, including endpoints", () => {
+  const data = mount(gradient);
+  const point = screen.getByRole("slider", { name: "Point 2" });
+  fireEvent.doubleClick(point);
+  expect(point).toHaveAttribute("data-selected", "true");
+  expect(screen.getByRole("dialog", { name: "Couleur du point 2" })).toBeVisible();
+  const color = screen.getByLabelText("Couleur hexadécimale", { exact: true });
+  fireEvent.change(color, { target: { value: "#aabbcc" } });
+  fireEvent.blur(color);
+  expect(data.layer().fillGradient?.stops[1]?.color).toBe("#aabbcc");
+  act(() => data.engine.undo());
+  expect(data.layer().fillGradient?.stops[1]?.color).toBe("#00ff00");
+  fireEvent.doubleClick(screen.getByRole("slider", { name: "Point 1" }));
+  expect(screen.getByRole("dialog", { name: "Couleur du point 1" })).toBeVisible();
+  expect(screen.queryByRole("dialog", { name: "Couleur du point 2" })).toBeNull();
+});
+
+test("percentage suffixes scrub stop positions and opacity with one undo per gesture", () => {
+  const data = mount(gradient);
+  const position = screen.getByRole("button", { name: "Ajuster Position du point 2" });
+  expect(position).toHaveTextContent("%");
+  fireEvent.pointerDown(position, { button: 0, clientX: 100, pointerId: 1 });
+  fireEvent.pointerMove(position, { clientX: 150, pointerId: 1 });
+  expect(data.layer().fillGradient?.stops[1]?.offset).toBe(0.5);
+  fireEvent.pointerUp(position, { clientX: 150, pointerId: 1 });
+  expect(data.layer().fillGradient?.stops[1]?.offset).toBe(0.6);
+  expect(data.changed).toHaveBeenCalledTimes(1);
+  act(() => data.engine.undo());
+  expect(data.layer().fillGradient?.stops[1]?.offset).toBe(0.5);
+  const opacity = screen.getByRole("button", { name: "Ajuster Opacité du point 2" });
+  fireEvent.pointerDown(opacity, { button: 0, clientX: 100, pointerId: 2 });
+  fireEvent.pointerMove(opacity, { clientX: 50, pointerId: 2 });
+  fireEvent.pointerCancel(opacity, { pointerId: 2 });
+  expect(data.layer().fillGradient?.stops[1]?.color).toBe("#00ff00");
+  expect(data.store.get(previewAtom)).toBeNull();
+});

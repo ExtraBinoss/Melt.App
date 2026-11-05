@@ -145,6 +145,10 @@ function PaintGradientControl({
 }) {
   const { t } = useTranslation("gradient");
   const [selection, setSelection] = useState({ ownerId, index: 0 });
+  const [colorPicker, setColorPicker] = useState<{ ownerId: string; index: number | null }>({
+    ownerId,
+    index: null,
+  });
   const [remembered, setRemembered] = useState<FillGradient | undefined>(() =>
     layerId
       ? undefined
@@ -315,6 +319,7 @@ function PaintGradientControl({
           disabled={disabled}
           invalidation={invalidation}
           onSelect={select}
+          onEditColor={(index) => setColorPicker({ ownerId, index })}
           onPreview={previewPaint}
           onCommit={commitPaint}
           onCancel={cancelPaint}
@@ -345,6 +350,11 @@ function PaintGradientControl({
               ownerId={ownerId}
               identity={identity}
               selected={at === index}
+              colorOpen={colorPicker.ownerId === ownerId && colorPicker.index === at}
+              onColorOpenChange={(open) => {
+                if (open) select(at);
+                setColorPicker({ ownerId, index: open ? at : null });
+              }}
               disabled={disabled}
               invalidation={invalidation}
               onSelect={() => select(at)}
@@ -378,6 +388,7 @@ function PaintGradientControl({
     identity,
     ownerId,
     index,
+    colorPicker,
     invalidation,
     anglePresentation,
     select,
@@ -387,7 +398,13 @@ function PaintGradientControl({
     t,
   ]);
   return (
-    <div ref={root} className={styles.control} aria-disabled={disabled || undefined}>
+    <div
+      ref={root}
+      className={styles.control}
+      data-keybinding-capture
+      data-document-shortcuts
+      aria-disabled={disabled || undefined}
+    >
       <SegmentedTabs
         mode="choice"
         size="compact"

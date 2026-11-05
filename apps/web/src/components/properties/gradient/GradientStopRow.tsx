@@ -16,6 +16,8 @@ interface Props {
   ownerId: string;
   identity: unknown;
   selected: boolean;
+  colorOpen?: boolean;
+  onColorOpenChange?: (open: boolean) => void;
   disabled?: boolean;
   invalidation?: { subscribe(listener: () => void): () => void };
   onSelect: () => void;
@@ -31,6 +33,8 @@ export function GradientStopRow({
   ownerId,
   identity,
   selected,
+  colorOpen,
+  onColorOpenChange,
   disabled,
   invalidation,
   onSelect,
@@ -79,14 +83,14 @@ export function GradientStopRow({
           max={max * 100}
           resetValue={(min + max) * 50}
           disabled={disabled || min === max}
-          unit="%"
+          scrubLabel="%"
           onPreview={(offset) => onPreview({ offset: offset / 100 })}
           onCommit={(offset) => onCommit({ offset: offset / 100 })}
           onCancel={onCancel}
         />
       </div>
       <div className={styles.hexField}>
-        <Popover>
+        <Popover open={colorOpen} onOpenChange={onColorOpenChange}>
           <PopoverTrigger asChild>
             <button
               type="button"
@@ -134,7 +138,7 @@ export function GradientStopRow({
           min={0}
           max={100}
           resetValue={100}
-          unit="%"
+          scrubLabel="%"
           disabled={disabled}
           onPreview={(opacity) => onPreview({ color: withOpacity(stop.color, opacity) })}
           onCommit={(opacity) => onCommit({ color: withOpacity(stop.color, opacity) })}

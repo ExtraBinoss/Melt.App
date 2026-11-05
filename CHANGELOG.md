@@ -4,6 +4,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ## [Unreleased]
 
+- Restore document undo/redo after moving gradient stops, including inside nonmodal paint popovers. Make stop percentage suffixes horizontal scrub handles and open the selected stop's color picker on double-click in the gradient ramp.
+
 ### Added
 
 - Add 65 categorized editable background recipes, native circle/ellipse gradient positioning and radius, and a reusable GPU Feather effect. Preview complete native grain/Feather recipes on hover or focus with cancellation and commit through one typed headless-compatible command with atomic undo.

@@ -138,7 +138,11 @@ test("opted-in document scopes honor customized history bindings and isolate nes
   scope.setAttribute("data-document-shortcuts", "");
   nested.setAttribute("data-keybinding-capture", "");
   scope.append(control, nested);
-  document.body.append(scope);
+  const popover = document.createElement("div");
+  popover.setAttribute("role", "dialog");
+  popover.dataset.slot = "popover-content";
+  popover.append(scope);
+  document.body.append(popover);
   try {
     fireEvent.keyDown(control, { key: "z", ctrlKey: true });
     fireEvent.keyDown(control, { key: "r" });
@@ -151,7 +155,7 @@ test("opted-in document scopes honor customized history bindings and isolate nes
     await act(() => fireEvent.keyDown(control, { key: "u", ctrlKey: true, altKey: true }));
     expect(d.engine.getSnapshot().project.pages[0]!.layers[0]!.x).toBe(20);
   } finally {
-    scope.remove();
+    popover.remove();
     hook.unmount();
   }
 });

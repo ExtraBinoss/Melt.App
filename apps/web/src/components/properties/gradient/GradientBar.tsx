@@ -11,6 +11,7 @@ interface Props {
   disabled?: boolean;
   invalidation?: { subscribe(listener: () => void): () => void };
   onSelect: (index: number) => void;
+  onEditColor?: (index: number) => void;
   onPreview: (gradient: FillGradient) => void;
   onCommit: (gradient: FillGradient) => void;
   onCancel: () => void;
@@ -179,12 +180,20 @@ export function GradientBar(props: Props) {
             aria-valuenow={stop.offset * 100}
             aria-valuetext={`${Math.round(stop.offset * 100)}%`}
             aria-orientation="horizontal"
-            aria-disabled={disabled || min === max || undefined}
+            aria-disabled={disabled || undefined}
+            data-fixed={min === max || undefined}
             data-selected={selected === index || undefined}
             disabled={disabled}
             className={styles.thumb}
             style={{ left: `${stop.offset * 100}%`, backgroundColor: stop.color }}
             onClick={() => onSelect(index)}
+            onDoubleClick={(event) => {
+              if (disabled || event.button !== 0) return;
+              event.preventDefault();
+              finish(true);
+              onSelect(index);
+              props.onEditColor?.(index);
+            }}
             onPointerDown={(event) => start(event, index)}
             onPointerMove={move}
             onPointerUp={(event) => release(event)}

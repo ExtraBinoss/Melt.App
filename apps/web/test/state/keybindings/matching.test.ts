@@ -62,3 +62,24 @@ test("document scopes allow non-text widgets while retaining text and modal owne
     expect(isEditingShortcutTarget(field, { documentScope: true })).toBe(true);
   }
 });
+
+test("document shortcuts cross nonmodal property popovers but preserve modal and text ownership", () => {
+  const popover = document.createElement("div");
+  popover.setAttribute("role", "dialog");
+  popover.dataset.slot = "popover-content";
+  const point = document.createElement("button");
+  point.setAttribute("role", "slider");
+  popover.append(point);
+  expect(isEditingShortcutTarget(point)).toBe(true);
+  expect(isEditingShortcutTarget(point, { documentScope: true })).toBe(false);
+  const input = document.createElement("input");
+  popover.append(input);
+  expect(isEditingShortcutTarget(input, { documentScope: true })).toBe(true);
+  popover.setAttribute("aria-modal", "true");
+  expect(isEditingShortcutTarget(point, { documentScope: true })).toBe(true);
+  popover.removeAttribute("aria-modal");
+  const dialog = document.createElement("div");
+  dialog.setAttribute("role", "dialog");
+  dialog.append(popover);
+  expect(isEditingShortcutTarget(point, { documentScope: true })).toBe(true);
+});

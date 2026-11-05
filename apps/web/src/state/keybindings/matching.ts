@@ -23,8 +23,12 @@ export function isEditingShortcutTarget(
   target: EventTarget | null,
   options: { documentScope?: boolean } = {},
 ): boolean {
-  const editing =
-    'input,textarea,select,[contenteditable="true"],[role="dialog"],[role="alertdialog"],[role="combobox"],[role="listbox"],[role="menu"]';
+  // Opted-in document controls may live in a nonmodal property popover.
+  // Explicit dialogs and editable fields retain their own keyboard ownership.
+  const dialog = options.documentScope
+    ? '[role="dialog"]:not([data-slot="popover-content"]),[role="dialog"][aria-modal="true"]'
+    : '[role="dialog"]';
+  const editing = `input,textarea,select,[contenteditable="true"],${dialog},[role="alertdialog"],[role="combobox"],[role="listbox"],[role="menu"]`;
   const widgets = ',[role="slider"],[role="spinbutton"],[data-keybinding-capture]';
   return (
     target instanceof HTMLElement &&
