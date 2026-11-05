@@ -23,11 +23,14 @@ function finite(value: unknown, min: number, max: number): value is number {
 
 /** Only small presentation fields are accepted; documents and assets cannot enter it. */
 export function validateProjectPreferences(value: unknown): ProjectLayoutPreferences {
-  if (
-    !record(value) ||
-    Object.keys(value).some((key) => !preferenceFields.some((field) => field === key))
-  )
-    throw new Error("Invalid project layout preferences.");
+  if (!record(value)) throw new Error("Invalid project layout preferences: expected an object.");
+  const unknownFields = Object.keys(value).filter(
+    (key) => !preferenceFields.some((field) => field === key),
+  );
+  if (unknownFields.length)
+    throw new Error(
+      `Invalid project layout preferences: unknown fields ${JSON.stringify(unknownFields.sort())}.`,
+    );
   const result: ProjectLayoutPreferences = {};
   if (value.studioCatalogOpen !== undefined) {
     const open = value.studioCatalogOpen;
@@ -100,10 +103,24 @@ export function validateProjectPreferences(value: unknown): ProjectLayoutPrefere
   return result;
 }
 
-export function parseProjectPreferences(raw: string | undefined): ProjectLayoutPreferences {
-  if (raw === undefined) return {};
+/** Retain opaque fields from another running v1 client when merging an update. */
+export function parseProjectPreferencesRecord(raw: string | undefined): {
+  values: ProjectLayoutPreferences;
+  storedValues: Record<string, unknown>;
+} {
+  if (raw === undefined) return { values: {}, storedValues: {} };
   const stored: unknown = JSON.parse(raw);
   if (!record(stored) || stored.version !== 1 || !record(stored.values))
     throw new Error("Unsupported project layout preferences.");
-  return validateProjectPreferences(stored.values);
+  const known = Object.fromEntries(
+    Object.entries(stored.values).filter(([key]) =>
+      preferenceFields.some((field) => field === key),
+    ),
+  );
+  return { values: validateProjectPreferences(known), storedValues: stored.values };
+}
+
+/** Stored v1 fields may grow across clients; only validated known fields enter the UI. */
+export function parseProjectPreferences(raw: string | undefined): ProjectLayoutPreferences {
+  return parseProjectPreferencesRecord(raw).values;
 }

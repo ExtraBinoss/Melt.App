@@ -27,8 +27,12 @@ The IndexedDB `preferences` store contains one small record keyed by
 }
 ```
 
-The schema admits only these fields and finite values. Reads are lazy, shared by
-the project's consumers, and independent of manifests, assets and journal bodies.
+New write patches admit only known fields and finite values. Stored version 1
+records may contain additional fields from another running client: reads restore
+validated known fields, and atomic updates preserve opaque extra fields unchanged.
+Invalid known values and malformed envelopes still fail without replacing the
+stored record. Reads are lazy, shared by the project's consumers, and independent
+of manifests, assets and journal bodies.
 The UI subscribes to individual fields; restoring preferences does not subscribe
 the application or canvas roots to pointer updates.
 

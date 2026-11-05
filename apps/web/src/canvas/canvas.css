@@ -262,6 +262,11 @@
   position: absolute;
   inset: 0;
 }
+/* Native 3D controls focus this renderer for modifier keys. The enclosing
+ * viewport owns canvas focus presentation; retain focus rings on UI controls. */
+.editor-gpu-scene canvas {
+  outline: none;
+}
 
 .editor-canvas .canvas-controls {
   top: calc(var(--workspace-gap, 18px) + var(--ruler-inset, 0px));

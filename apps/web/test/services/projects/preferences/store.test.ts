@@ -34,6 +34,68 @@ test("restores per-project values and atomically merges concurrent independent f
   expect(await db.count("journalEvents")).toBe(0);
 });
 
+test("workspace switches restore legacy v1 values and preserve another client's extra fields", async () => {
+  const { db, store } = await fixture();
+  const key = projectPreferencesKey("shared-version");
+  const legacy = {
+    workspaceMode: "studio" as const,
+    studioCatalogOpen: { "material:metal": false },
+    studioCapture: { preset: "custom", width: 1080, height: 1920, full: false, visible: true },
+    workspaceLayout: { workspace: 75, inspector: 25 },
+    sidebarLayout: { properties: 60, layers: 40 },
+    timelineHeight: 0.35,
+    timelineZoom: 240,
+  };
+  const futurePanel = { expanded: true, width: 320 };
+  await db.put(
+    "preferences",
+    JSON.stringify({ version: 1, values: { ...legacy, futurePanel } }),
+    key,
+  );
+  expect(await store.read("shared-version")).toEqual(legacy);
+  for (const mode of ["classic", "studio", "classic"] as const) {
+    await Promise.all([
+      store.update("shared-version", { workspaceMode: mode }),
+      store.update("shared-version", { timelineZoom: 360 }),
+    ]);
+    const reopened = new ProjectPreferencesStore(() => Promise.resolve(db));
+    expect(await reopened.read("shared-version")).toEqual({
+      ...legacy,
+      workspaceMode: mode,
+      timelineZoom: 360,
+    });
+    expect(JSON.parse((await db.get("preferences", key))!)).toEqual({
+      version: 1,
+      values: { ...legacy, futurePanel, workspaceMode: mode, timelineZoom: 360 },
+    });
+  }
+  const before = await db.get("preferences", key);
+  const unknownPatch = { ...legacy, futurePanel };
+  await expect(store.update("shared-version", unknownPatch)).rejects.toMatchObject({
+    code: "PROJECT_PREFERENCES_SAVE_FAILED",
+  });
+  expect(await db.get("preferences", key)).toBe(before);
+});
+
+test("extra persisted fields do not conceal invalid known values or permit replacement writes", async () => {
+  const { db, store } = await fixture();
+  const key = projectPreferencesKey("invalid-known");
+  const raw = JSON.stringify({
+    version: 1,
+    values: { workspaceMode: "studio", timelineZoom: 0, futurePanel: true },
+  });
+  await db.put("preferences", raw, key);
+  await expect(store.read("invalid-known")).rejects.toMatchObject({
+    code: "PROJECT_PREFERENCES_LOAD_FAILED",
+    cause: { message: "Invalid timeline zoom preference." },
+  });
+  await expect(store.update("invalid-known", { workspaceMode: "classic" })).rejects.toMatchObject({
+    code: "PROJECT_PREFERENCES_SAVE_FAILED",
+    cause: { message: "Invalid timeline zoom preference." },
+  });
+  expect(await db.get("preferences", key)).toBe(raw);
+});
+
 test("retirement rejects queued writes and cannot recreate the removed preference", async () => {
   const { db, store } = await fixture();
   await store.update("retired", { timelineZoom: 320, workspaceMode: "studio" });

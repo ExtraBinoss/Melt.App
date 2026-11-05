@@ -4,6 +4,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ## [Unreleased]
 
+- Restore known project layout preferences across Classic/Studio switches when another client added version 1 fields; preserve extra fields atomically while retaining strict validation of edits and known values.
+- Prevent native renderer focus outlines from framing the Studio canvas when holding Shift, while keeping keyboard focus and control focus indicators.
 - Align Classic 3D selection, hover and the 2D/3D toolbar with prepared glyph bounds; resize visible content without changing text wrapping and rotate around its visible center in one undoable gesture.
 - Share Studio’s measured contextual toolbar growth with Classic, preserving the toolbar shell across object changes and honoring reduced motion.
 - Round numeric Undo/Redo descriptions to at most two decimal places while preserving full document and history precision.

@@ -4,6 +4,7 @@ import { assertProjectWritable } from "../lifecycle";
 import type { ProjectLayoutPreferences, ProjectPreferencesPort } from "./model";
 import {
   parseProjectPreferences,
+  parseProjectPreferencesRecord,
   projectPreferencesKey,
   validateProjectPreferences,
 } from "./schema";
@@ -53,9 +54,9 @@ export class ProjectPreferencesStore implements ProjectPreferencesPort {
       try {
         await assertProjectWritable(transaction.store, projectId);
         const key = projectPreferencesKey(projectId);
-        const current = parseProjectPreferences(await transaction.store.get(key));
+        const current = parseProjectPreferencesRecord(await transaction.store.get(key));
         await transaction.store.put(
-          JSON.stringify({ version: 1, values: { ...current, ...captured } }),
+          JSON.stringify({ version: 1, values: { ...current.storedValues, ...captured } }),
           key,
         );
         await done;

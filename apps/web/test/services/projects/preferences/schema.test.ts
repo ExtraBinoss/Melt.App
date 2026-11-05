@@ -51,6 +51,24 @@ test("legacy layout records stay compatible and both presentation modes are expl
   });
 });
 
+test("reads known v1 fields across clients while keeping write patches strict", () => {
+  const values = {
+    workspaceMode: "studio",
+    timelineZoom: 240,
+    futurePanel: { expanded: true, width: 320 },
+  };
+  expect(parseProjectPreferences(JSON.stringify({ version: 1, values }))).toEqual({
+    workspaceMode: "studio",
+    timelineZoom: 240,
+  });
+  expect(() => validateProjectPreferences(values)).toThrow(
+    'Invalid project layout preferences: unknown fields ["futurePanel"].',
+  );
+  expect(() =>
+    parseProjectPreferences(JSON.stringify({ version: 1, values: { ...values, timelineZoom: 0 } })),
+  ).toThrow("Invalid timeline zoom preference.");
+});
+
 test("Studio stores bounded category choices and validated capture formats independently of documents", () => {
   const studioCapture = { preset: "custom", width: 1080, height: 1920, full: false, visible: true };
   const studioCatalogOpen = { "material:plastic": false, "environment:studio": true };
