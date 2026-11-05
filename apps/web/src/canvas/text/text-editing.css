@@ -22,4 +22,7 @@
 }
 .canvas-text-editor::selection {
   background: color-mix(in srgb, var(--media-image) 25%, transparent);
+  /* The native field owns selection and caret; the GPU keeps painting the glyphs. */
+  color: transparent;
+  -webkit-text-fill-color: transparent;
 }
