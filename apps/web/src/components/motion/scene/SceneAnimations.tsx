@@ -78,13 +78,13 @@ export function SceneAnimations({
   return (
     <section
       className="layer-animations"
-      aria-label={t("title")}
+      aria-label={t(`sceneTitle.${owner.kind}`)}
       data-scene-animations={owner.kind}
     >
       <div className="section-title">
         <h3>
           <Sparkles size={13} />
-          {t("title")}
+          {t(`sceneTitle.${owner.kind}`)}
         </h3>
         <SceneMotionPopover
           engine={engine}

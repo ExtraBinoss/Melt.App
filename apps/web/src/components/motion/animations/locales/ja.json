@@ -1,5 +1,12 @@
 {
   "animatedBy": "{{name}} のアニメーションを継承",
   "editKeyframes": "キーフレームを編集",
-  "turns": "回転数"
+  "turns": "回転数",
+  "sceneTitle": {
+    "camera": "カメラのアニメーション",
+    "environment": "環境のアニメーション",
+    "light": "ライトのアニメーション",
+    "compositionEffect": "エフェクトのアニメーション"
+  },
+  "previewFailed": "このアニメーションのプレビューを描画できませんでした。もう一度お試しください。"
 }

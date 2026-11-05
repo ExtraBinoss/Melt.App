@@ -1,5 +1,12 @@
 {
   "animatedBy": "Animiert durch {{name}}",
   "editKeyframes": "Keyframes bearbeiten",
-  "turns": "Umdrehungen"
+  "turns": "Umdrehungen",
+  "sceneTitle": {
+    "camera": "Kameraanimationen",
+    "environment": "Umgebungsanimationen",
+    "light": "Lichtanimationen",
+    "compositionEffect": "Effektanimationen"
+  },
+  "previewFailed": "Diese Animationsvorschau konnte nicht gerendert werden. Bitte versuche es erneut."
 }

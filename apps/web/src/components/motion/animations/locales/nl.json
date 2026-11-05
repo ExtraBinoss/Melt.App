@@ -1,5 +1,12 @@
 {
   "animatedBy": "Geanimeerd door {{name}}",
   "editKeyframes": "Keyframes bewerken",
-  "turns": "Omwentelingen"
+  "turns": "Omwentelingen",
+  "sceneTitle": {
+    "camera": "Camera-animaties",
+    "environment": "Omgevingsanimaties",
+    "light": "Lichtanimaties",
+    "compositionEffect": "Effectanimaties"
+  },
+  "previewFailed": "Deze animatievoorvertoning kan niet worden weergegeven. Probeer het opnieuw."
 }

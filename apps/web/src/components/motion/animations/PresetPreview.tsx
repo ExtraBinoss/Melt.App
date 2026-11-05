@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useReducedMotion } from "motion/react";
-import type { EnginePort, MotionAnimationPreset } from "@musart/core";
+import type { EnginePort, MotionAnimationPreset, SceneMotionAnimationPreset } from "@musart/core";
 import { createTransitionPreviewSession } from "../transitions/preview-session";
 
 /** A single retained GPU session moves its canvas between hovered cards. Idle tiles own no loop. */
@@ -9,20 +9,32 @@ export function PresetPreview({
   preset,
   mount,
   onError,
+  onReady,
 }: {
   engine: EnginePort;
-  preset?: MotionAnimationPreset;
+  preset?: MotionAnimationPreset | SceneMotionAnimationPreset;
   mount: HTMLDivElement | null;
   onError: () => void;
+  onReady?: () => void;
 }) {
   const destination = useRef<HTMLDivElement | null>(null);
   const source = useRef<ReturnType<typeof createTransitionPreviewSession> | null>(null);
   const reduced = useReducedMotion();
+  const acknowledged = useRef(false);
+  const ready = useRef(onReady);
+  useEffect(() => {
+    ready.current = onReady;
+  }, [onReady]);
   useEffect(() => {
     const session = createTransitionPreviewSession(engine, {
       onFrame(canvas) {
         const host = destination.current;
-        if (host && canvas.parentElement !== host) host.replaceChildren(canvas);
+        if (!host) return;
+        if (canvas.parentElement !== host) host.replaceChildren(canvas);
+        if (!acknowledged.current) {
+          acknowledged.current = true;
+          ready.current?.();
+        }
       },
       onError,
     });
@@ -37,6 +49,7 @@ export function PresetPreview({
     const session = source.current;
     destination.current?.replaceChildren();
     destination.current = mount;
+    acknowledged.current = false;
     if (!session || !preset || !mount) {
       session?.play(false);
       session?.visible(false);

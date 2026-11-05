@@ -1,5 +1,12 @@
 {
   "animatedBy": "Animado por {{name}}",
   "editKeyframes": "Editar quadros-chave",
-  "turns": "Voltas"
+  "turns": "Voltas",
+  "sceneTitle": {
+    "camera": "Animações da câmera",
+    "environment": "Animações do ambiente",
+    "light": "Animações de luz",
+    "compositionEffect": "Animações do efeito"
+  },
+  "previewFailed": "Não foi possível renderizar a prévia desta animação. Tente novamente."
 }

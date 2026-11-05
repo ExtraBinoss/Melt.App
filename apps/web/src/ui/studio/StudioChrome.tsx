@@ -11,6 +11,7 @@ import { StudioCompositions } from "./panels/StudioCompositions";
 import { MaterialControl } from "../../components/spatial/MaterialControl";
 import { EnvironmentControl } from "../../components/spatial/EnvironmentControl";
 import { StudioAdvanced } from "./panels/StudioAdvanced";
+import { useSceneAnimationNavigation } from "./panels/use-scene-animation-navigation";
 import { StudioObjectBar } from "./panels/StudioObjectBar";
 import { createViewportActions } from "../../canvas/session/viewport-actions";
 import { StudioGuides } from "./framing/StudioGuides";
@@ -46,6 +47,7 @@ export const StudioChrome = memo(function StudioChrome({
   const { t } = useTranslation("studioChrome");
   const { t: common } = useTranslation();
   const viewport = createViewportActions(engine);
+  const advancedRequest = useSceneAnimationNavigation(engine);
   const run = useCallback(
     (task: () => void) => {
       void onTask(task);
@@ -81,6 +83,7 @@ export const StudioChrome = memo(function StudioChrome({
       </nav>
       <div className="studio-actions" data-canvas-control>
         <StudioPropertyPopover
+          openRequest={advancedRequest}
           trigger={
             <IconButton label={t("advanced")} tooltipSide="bottom" className="studio-surface">
               <SlidersHorizontal size={17} />

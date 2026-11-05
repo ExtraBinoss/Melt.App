@@ -4,6 +4,12 @@
   "spring": "Spring",
   "hold": "Hold",
   "title": "Animations",
+  "sceneTitle": {
+    "camera": "Camera animations",
+    "environment": "Environment animations",
+    "light": "Light animations",
+    "compositionEffect": "Effect animations"
+  },
   "add": "Add motion",
   "library": "Library",
   "mine": "My presets",
@@ -14,6 +20,7 @@
   "emptyLibrary": "Save an animation to find it here, in every project.",
   "noResults": "No matching animations",
   "preview": "Preview {{name}}",
+  "previewFailed": "Unable to render this animation preview. Please try again.",
   "hover": "Hover to preview",
   "duration": "Duration",
   "start": "Start",

@@ -1,5 +1,12 @@
 {
   "animatedBy": "{{name}}의 애니메이션 상속",
   "editKeyframes": "키프레임 편집",
-  "turns": "회전 수"
+  "turns": "회전 수",
+  "sceneTitle": {
+    "camera": "카메라 애니메이션",
+    "environment": "환경 애니메이션",
+    "light": "조명 애니메이션",
+    "compositionEffect": "효과 애니메이션"
+  },
+  "previewFailed": "이 애니메이션 미리보기를 렌더링할 수 없습니다. 다시 시도하세요."
 }

@@ -1,5 +1,12 @@
 {
   "animatedBy": "تحريك بواسطة {{name}}",
   "editKeyframes": "تعديل الإطارات الرئيسية",
-  "turns": "الدورات"
+  "turns": "الدورات",
+  "sceneTitle": {
+    "camera": "حركات الكاميرا",
+    "environment": "حركات البيئة",
+    "light": "حركات الضوء",
+    "compositionEffect": "حركات التأثير"
+  },
+  "previewFailed": "تعذر عرض معاينة هذه الحركة. حاول مرة أخرى."
 }

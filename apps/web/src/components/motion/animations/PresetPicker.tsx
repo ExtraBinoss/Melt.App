@@ -70,7 +70,9 @@ export function PresetPicker({
   const [store, setStore] = useState<MotionPresetStore | null>(null);
   const [error, setError] = useState(false);
   const [busy, setBusy] = useState(false);
-  const previewError = useCallback(() => setError(true), []);
+  const [previewFailed, setPreviewFailed] = useState(false);
+  const previewError = useCallback(() => setPreviewFailed(true), []);
+  const previewReady = useCallback(() => setPreviewFailed(false), []);
   useEffect(() => {
     if (source !== "mine") return;
     const owner = new MotionPresetStore();
@@ -226,6 +228,7 @@ export function PresetPicker({
         }}
         busy={busy}
         onError={previewError}
+        onReady={previewReady}
         empty={t(source === "mine" && !saved.length ? "emptyLibrary" : "noResults")}
         remove={
           source === "mine"
@@ -249,6 +252,7 @@ export function PresetPicker({
         )}
       </PresetGrid>
       {error && <p role="alert">{t("failed")}</p>}
+      {previewFailed && <p role="alert">{t("previewFailed")}</p>}
     </div>
   );
 }

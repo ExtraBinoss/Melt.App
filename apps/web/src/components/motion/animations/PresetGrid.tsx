@@ -24,6 +24,7 @@ export function PresetGrid({
   busy,
   empty,
   onError,
+  onReady,
   children,
 }: {
   engine: EnginePort;
@@ -33,6 +34,7 @@ export function PresetGrid({
   busy: boolean;
   empty: string;
   onError: () => void;
+  onReady?: () => void;
   children?: ReactNode;
 }) {
   const { t } = useTranslation("animations");
@@ -74,9 +76,15 @@ export function PresetGrid({
     return () => intent.dispose();
   }, [entries]);
   const visible = entries.slice(first * 2, last * 2);
-  const hoveredCandidate = hover && visible.find((preset) => preset.id === hover.id);
+  const candidate = hover && visible.find((preset) => preset.id === hover.id);
   const hovered =
-    hoveredCandidate && !isSceneMotionPreset(hoveredCandidate) ? hoveredCandidate : undefined;
+    candidate &&
+    (!isSceneMotionPreset(candidate) ||
+      candidate.channels.every((channel) =>
+        ["camera", "environment", "light"].includes(channel.target.kind),
+      ))
+      ? candidate
+      : undefined;
   useLayoutEffect(() => {
     if (pendingFocus.current === null) return;
     const button = viewport.current?.querySelector<HTMLButtonElement>(
@@ -205,6 +213,7 @@ export function PresetGrid({
         preset={hovered || undefined}
         mount={hovered ? hover!.mount : null}
         onError={onError}
+        onReady={onReady}
       />
     </>
   );

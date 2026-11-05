@@ -1,5 +1,10 @@
 import { expect, it, vi } from "vitest";
-import { createProject, EditorEngine, type Composition } from "@musart/core";
+import {
+  createProject,
+  EditorEngine,
+  SCENE_MOTION_ANIMATION_PRESETS,
+  type Composition,
+} from "@musart/core";
 import type { createRenderSession } from "@musart/render";
 import { createTransitionPreviewSession } from "../../../../src/components/motion/transitions/preview-session";
 
@@ -73,7 +78,7 @@ it("retains one bounded renderer across choices and leaves the user's engine unt
   d.source.update(fade);
   await d.step(0);
   expect(d.create).toHaveBeenCalledOnce();
-  expect(d.create).toHaveBeenCalledWith({ maxBytes: 32 * 1024 * 1024 });
+  expect(d.create).toHaveBeenCalledWith({ maxBytes: 96 * 1024 * 1024 });
   expect(d.onFrame.mock.calls[0]![0].dataset.transitionStyle).toBe("fade");
   expect(d.frames.size).toBe(0);
   d.source.update({ ...fade, style: "wipe" });
@@ -188,4 +193,29 @@ it("publishes the first acknowledged frame when cold hover ends before the GPU j
   expect(d.onFrame).toHaveBeenCalledOnce();
   expect(d.frames.size).toBe(0);
   await d.source.dispose();
+});
+
+it("retains the native scene action sampler and renderer through successive live orbit samples", async () => {
+  const d = fixture();
+  const preset = SCENE_MOTION_ANIMATION_PRESETS.find(
+    (preset) => preset.id === "scene-camera-orbit",
+  )!;
+  const before = d.engine.getSnapshot();
+  d.source.update({ ...fade, preset, duration: preset.duration });
+  d.source.play(true);
+  await d.step(0);
+  await d.step(2000);
+  expect(d.create).toHaveBeenCalledOnce();
+  expect(d.render).toHaveBeenCalledTimes(2);
+  const first = d.render.mock.calls[0]![0];
+  const second = d.render.mock.calls[1]![0];
+  expect(first.spatial!.camera.yaw).toBe(5);
+  expect(second.spatial!.camera.yaw).toBeLessThan(5);
+  expect(second.layers).toEqual(first.layers);
+  expect(d.engine.getSnapshot()).toBe(before);
+  d.source.visible(false);
+  expect(d.frames.size).toBe(0);
+  await d.source.dispose();
+  expect(d.dispose).toHaveBeenCalledOnce();
+  expect(d.onError).not.toHaveBeenCalled();
 });

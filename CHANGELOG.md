@@ -4,6 +4,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ## [Unreleased]
 
+- Fix live camera, light and environment Motion playback by including scene values in retained-pose invalidation. Preview scene animations with the existing Motion evaluator and retained native GPU renderer, using a bounded budget that admits native environment preparation. Distinguish preview failures from preset storage errors and clear preview errors after a successfully presented frame. Keep scene animation controls outside object properties, name each section for its owner, and open the matching Studio scene editor from timeline requests.
+
 - Retain the last selected Studio material thumbnail after deselection while keeping editing disabled without a current editable object. Reset presentation memory when switching projects or pages.
 
 - Share the complete material and environment popovers between Classic and Studio, including thumbnail catalogs and property controls. Retain the latest hover/focus preview across tile gaps and property areas, restore uncommitted changes on dismissal, and commit selections with one undo. Hide duplicate material and environment controls in Studio's advanced inspector.

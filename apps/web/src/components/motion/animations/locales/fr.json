@@ -4,6 +4,12 @@
   "spring": "Ressort",
   "hold": "Maintien",
   "title": "Animations",
+  "sceneTitle": {
+    "camera": "Animations de la caméra",
+    "environment": "Animations de l’environnement",
+    "light": "Animations de la lumière",
+    "compositionEffect": "Animations de l’effet"
+  },
   "add": "Ajouter une animation",
   "library": "Bibliothèque",
   "mine": "Mes presets",
@@ -14,6 +20,7 @@
   "emptyLibrary": "Enregistre une animation pour la retrouver ici, dans tous tes projets.",
   "noResults": "Aucune animation correspondante",
   "preview": "Aperçu de {{name}}",
+  "previewFailed": "Impossible d’afficher l’aperçu de cette animation. Réessaie.",
   "hover": "Survoler pour prévisualiser",
   "duration": "Durée",
   "start": "Début",

@@ -1,6 +1,13 @@
 import { describe, expect, test, vi } from "vitest";
 import { createStore } from "jotai";
-import { createLayer, createPage, createProject, EditorEngine } from "@musart/core";
+import {
+  createLayer,
+  createPage,
+  createProject,
+  createSpatialScene,
+  EditorEngine,
+  SCENE_MOTION_ANIMATION_PRESETS,
+} from "@musart/core";
 import { SceneController } from "../../../src/canvas/session/scene-controller";
 import { createPreviewSource } from "../../../src/state/session/preview-source";
 import { previewAtom } from "../../../src/state/session/editor";
@@ -391,3 +398,76 @@ test("labels stable playback frames as transient rather than useful canonical pr
   playback.set(null);
   expect(d.controller.read().presentation?.canonical).toBe(true);
 });
+
+test.each(["camera", "light", "environment"] as const)(
+  "publishes changing %s action poses during playback before any pause",
+  (kind) => {
+    let time = 0,
+      sequence = 0;
+    const frames = new Map<number, FrameRequestCallback>();
+    const now = vi.spyOn(performance, "now").mockImplementation(() => time);
+    const request = vi.spyOn(globalThis, "requestAnimationFrame").mockImplementation((callback) => {
+      frames.set(++sequence, callback);
+      return sequence;
+    });
+    const cancel = vi.spyOn(globalThis, "cancelAnimationFrame").mockImplementation((id) => {
+      frames.delete(id);
+    });
+    const d = fixture();
+    const scene = createSpatialScene();
+    d.engine.execute({ type: "updatePage", patch: { spatial: scene } });
+    d.engine.execute({ type: "setCompositionMode", mode: "motion" });
+    d.engine.execute({
+      type: "setMotionDuration",
+      duration: { value: 8, rate: 1 },
+    });
+    const compositionId = d.engine.getSnapshot().pageId;
+    d.engine.execute({
+      type: "addMotionAnimation",
+      owner:
+        kind === "light"
+          ? { kind, compositionId, lightId: scene.lights[0]!.id }
+          : { kind, compositionId },
+      preset: SCENE_MOTION_ANIMATION_PRESETS.find(
+        (preset) => preset.channels[0]!.target.kind === kind,
+      )!,
+      start: { value: 0, rate: 1 },
+    });
+    const motion = createMotionTransport(d.engine);
+    const changed = vi.fn();
+    const stop = d.controller.subscribe(changed);
+    const snapshot = d.engine.getSnapshot();
+    const sample = () => {
+      const frame = d.controller.read();
+      expect(motion.read().playing).toBe(true);
+      expect(frame.playback).toBe(true);
+      expect(frame.page.spatial).toEqual(motion.readFrame()!.spatial);
+      return frame;
+    };
+    try {
+      motion.play();
+      const initial = sample();
+      const advance = (milliseconds: number) => {
+        time = milliseconds;
+        const pending = [...frames.values()];
+        frames.clear();
+        pending.forEach((callback) => callback(time));
+        return sample();
+      };
+      const first = advance(500);
+      const second = advance(1000);
+      expect(first).not.toBe(initial);
+      expect(second).not.toBe(first);
+      expect(first.page.spatial).not.toEqual(initial.page.spatial);
+      expect(second.page.spatial).not.toEqual(first.page.spatial);
+      expect(changed).toHaveBeenCalledTimes(3);
+      expect(d.engine.getSnapshot()).toBe(snapshot);
+    } finally {
+      stop();
+      motion.dispose();
+      request.mockRestore();
+      cancel.mockRestore();
+      now.mockRestore();
+    }
+  },
+);

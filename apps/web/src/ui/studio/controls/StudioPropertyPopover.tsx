@@ -1,4 +1,4 @@
-import { Activity, useMemo, type ReactNode } from "react";
+import { Activity, useEffect, useMemo, type ReactNode } from "react";
 import { atom, useAtom, useSetAtom } from "jotai";
 import { Popover, PopoverContent, PopoverTrigger } from "../../../components/ui/popover";
 import type { ComponentProps } from "react";
@@ -9,15 +9,22 @@ type ContentProps = Omit<ComponentProps<typeof PopoverContent>, "children" | "fo
 export function StudioPropertyPopover({
   trigger,
   children,
+  openRequest,
   ...content
 }: ContentProps & {
   trigger: ReactNode;
   children: ReactNode;
+  openRequest?: object | null;
 }) {
   const atoms = useMemo(() => ({ open: atom(false), prepared: atom(false) }), []);
   const [open, setOpen] = useAtom(atoms.open);
   const [prepared] = useAtom(atoms.prepared);
   const prepare = useSetAtom(atoms.prepared);
+  useEffect(() => {
+    if (!openRequest) return;
+    prepare(true);
+    setOpen(true);
+  }, [openRequest, prepare, setOpen]);
   return (
     <Popover
       modal={false}

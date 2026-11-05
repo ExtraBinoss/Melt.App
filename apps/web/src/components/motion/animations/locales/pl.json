@@ -1,5 +1,12 @@
 {
   "animatedBy": "Animowane przez {{name}}",
   "editKeyframes": "Edytuj klatki kluczowe",
-  "turns": "Obroty"
+  "turns": "Obroty",
+  "sceneTitle": {
+    "camera": "Animacje kamery",
+    "environment": "Animacje otoczenia",
+    "light": "Animacje światła",
+    "compositionEffect": "Animacje efektu"
+  },
+  "previewFailed": "Nie można wyrenderować podglądu tej animacji. Spróbuj ponownie."
 }

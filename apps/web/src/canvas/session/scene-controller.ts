@@ -38,6 +38,11 @@ function sameMotionPose(before: MotionFramePlan | null, after: MotionFramePlan |
   return (
     before.activeLayerIds.length === after.activeLayerIds.length &&
     before.values.length === after.values.length &&
+    (before.sceneValues?.length ?? 0) === (after.sceneValues?.length ?? 0) &&
+    (before.sceneValues ?? []).every((value, index) => {
+      const next = after.sceneValues![index]!;
+      return value.target === next.target && Object.is(value.value, next.value);
+    }) &&
     before.activeLayerIds.every((id, index) => id === after.activeLayerIds[index]) &&
     before.values.every((value, index) => {
       const next = after.values[index]!;

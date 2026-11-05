@@ -1,5 +1,12 @@
 {
   "animatedBy": "Animado por {{name}}",
   "editKeyframes": "Editar fotogramas clave",
-  "turns": "Vueltas"
+  "turns": "Vueltas",
+  "sceneTitle": {
+    "camera": "Animaciones de cámara",
+    "environment": "Animaciones del entorno",
+    "light": "Animaciones de luz",
+    "compositionEffect": "Animaciones del efecto"
+  },
+  "previewFailed": "No se pudo renderizar la vista previa de esta animación. Inténtalo de nuevo."
 }

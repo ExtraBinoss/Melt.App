@@ -1,3 +1,5 @@
+import { createSceneAnimationPreviewDocument } from "../animations/scene-preview-document";
+import { isSceneMotionPreset } from "../../../services/motion/animations/presets";
 import {
   animationPreviewAssets,
   createAnimationPreviewDocument,
@@ -8,6 +10,7 @@ import {
   type EnginePort,
   type TransitionStyle,
   type MotionAnimationPreset,
+  type SceneMotionAnimationPreset,
 } from "@musart/core";
 import type { createRenderSession } from "@musart/render";
 import { createTransitionPreviewDocument } from "./preview-document";
@@ -15,7 +18,7 @@ import { createTransitionPreviewDocument } from "./preview-document";
 type Session = ReturnType<typeof createRenderSession>;
 export interface TransitionPreviewParameters {
   style: TransitionStyle;
-  preset?: MotionAnimationPreset;
+  preset?: MotionAnimationPreset | SceneMotionAnimationPreset;
   placement: "in" | "out";
   duration: number;
 }
@@ -88,7 +91,7 @@ export function createTransitionPreviewSession(
       if (closed) return null;
       const module = await (options.load ?? (() => import("@musart/render")))();
       if (closed) return null;
-      session = module.createRenderSession({ maxBytes: 32 * 1024 * 1024 });
+      session = module.createRenderSession({ maxBytes: 96 * 1024 * 1024 });
       return session;
     })());
   }
@@ -107,7 +110,9 @@ export function createTransitionPreviewSession(
       const source =
         program ??
         (description.preset
-          ? await createAnimationPreviewDocument(description.preset, description.duration)
+          ? isSceneMotionPreset(description.preset)
+            ? createSceneAnimationPreviewDocument(description.preset, description.duration)
+            : await createAnimationPreviewDocument(description.preset, description.duration)
           : createTransitionPreviewDocument(
               description.style,
               description.placement,

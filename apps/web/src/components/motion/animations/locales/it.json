@@ -1,5 +1,12 @@
 {
   "animatedBy": "Animato da {{name}}",
   "editKeyframes": "Modifica fotogrammi chiave",
-  "turns": "Giri"
+  "turns": "Giri",
+  "sceneTitle": {
+    "camera": "Animazioni della fotocamera",
+    "environment": "Animazioni dell’ambiente",
+    "light": "Animazioni della luce",
+    "compositionEffect": "Animazioni dell’effetto"
+  },
+  "previewFailed": "Impossibile visualizzare l’anteprima di questa animazione. Riprova."
 }

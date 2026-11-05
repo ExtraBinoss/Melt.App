@@ -535,7 +535,7 @@ export const Inspector = memo(
                     <p className="muted-description">{t("selectLayer")}</p>
                   </section>
                 )}
-                {(!layer || layer.spatial?.enabled) &&
+                {selected.length === 0 &&
                   (page.spatial || page.layers.some((item) => item.spatial?.enabled)) && (
                     <SpatialSceneProperties engine={engine} page={page} run={runCurrent} />
                   )}

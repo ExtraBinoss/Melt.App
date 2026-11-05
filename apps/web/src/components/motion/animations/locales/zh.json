@@ -1,5 +1,12 @@
 {
   "animatedBy": "继承 {{name}} 的动画",
   "editKeyframes": "编辑关键帧",
-  "turns": "圈数"
+  "turns": "圈数",
+  "sceneTitle": {
+    "camera": "相机动画",
+    "environment": "环境动画",
+    "light": "灯光动画",
+    "compositionEffect": "效果动画"
+  },
+  "previewFailed": "无法渲染此动画预览。请重试。"
 }
