@@ -80,14 +80,14 @@
   padding: 0 20px;
   border: 0;
   border-radius: 999px;
-  background: var(--action);
+  background-color: var(--action);
   color: var(--action-foreground);
   font-family: var(--font-brand-display);
   font-size: 15px;
   letter-spacing: 0.025em;
 }
 .site-header .site-try:hover {
-  background: color-mix(in srgb, var(--action) 90%, #000);
+  background-color: color-mix(in srgb, var(--action) 90%, #000);
 }
 .site-faq,
 .site-footer {

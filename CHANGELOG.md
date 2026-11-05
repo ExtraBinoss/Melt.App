@@ -98,6 +98,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
+- Give primary buttons a subtle shared brand gradient while retaining the selected accent, readable labels, focus rings and disabled states. Preserve the gradient in Studio, landing, site, export and timelapse primary-action styles.
+
 - Move model, SVG and pack scrollbar gutters to the popover's right border while retaining internal content padding. Keep shallow layer trees free of horizontal overflow and reserve horizontal scrolling for expanded hierarchies that actually exceed the viewport.
 - Replace Kenney's descriptive header and pagination with compact source/license information and a virtual continuous grid with shared scroll fades. Give Studio SVGs matching full-width tiles, virtual scrolling and mask fades. Convert stroked SVG icons into bounded editable filled outlines before native extrusion, preserving paint, transforms, caps, joins and holes with atomic undo and clearer localized budget errors.
 - Present the entire Studio window through the native GPU graph, including extended background paint, off-gate native sources and final composition effects, while preserving canonical project dimensions and export framing. Include layer gradients in source cache invalidation and move categorized background recipes into the existing advanced preset picker.

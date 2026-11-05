@@ -100,11 +100,11 @@
   accent-color: var(--primary);
 }
 .exportButton {
-  background: var(--action);
+  background-color: var(--action);
   color: var(--action-foreground);
 }
 .exportButton:hover {
-  background: color-mix(in srgb, var(--action) 90%, #000);
+  background-color: color-mix(in srgb, var(--action) 90%, #000);
 }
 @media (max-height: 650px) {
   .preview {

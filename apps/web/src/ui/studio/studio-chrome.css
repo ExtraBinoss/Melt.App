@@ -114,13 +114,14 @@
 }
 .studio-actions .inspector-export-button,
 .studio-actions .studio-export {
-  background: var(--primary);
+  background-color: var(--primary);
+  background-image: var(--brand-action-gradient);
   border-color: color-mix(in srgb, var(--primary) 80%, var(--foreground));
   color: var(--primary-foreground);
 }
 .studio-actions .inspector-export-button:hover,
 .studio-actions .studio-export:hover {
-  background: color-mix(in srgb, var(--primary) 88%, var(--foreground));
+  background-color: color-mix(in srgb, var(--primary) 88%, var(--foreground));
   color: var(--primary-foreground);
 }
 .studio-actions .inspector-export-button > svg,

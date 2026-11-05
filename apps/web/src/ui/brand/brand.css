@@ -1,5 +1,12 @@
 @import "./palette.css";
 @import "./radii.css";
+:root {
+  --brand-action-gradient: linear-gradient(
+    135deg,
+    transparent,
+    color-mix(in srgb, var(--brand-ink) 16%, transparent)
+  );
+}
 .melt-mascot {
   display: block;
   flex-shrink: 0;

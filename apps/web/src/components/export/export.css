@@ -179,11 +179,11 @@
   gap: 8px;
 }
 .export-submit {
-  background: var(--action);
+  background-color: var(--action);
   color: var(--action-foreground);
 }
 .export-submit:hover {
-  background: color-mix(in srgb, var(--action) 90%, #000);
+  background-color: color-mix(in srgb, var(--action) 90%, #000);
 }
 @media (prefers-reduced-motion: reduce) {
   .export-preview-zoom {
