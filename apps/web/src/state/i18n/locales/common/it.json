@@ -3,7 +3,7 @@
   "selectImageFirst": "Fai clic su un’immagine sbloccata per iniziare una selezione.",
   "canvas": "Tela della composizione",
   "toolHint": "Fai clic o disegna sulla tela",
-  "dropImages": "Trascina qui le immagini",
+  "dropImages": "Trascina qui immagini o elementi della libreria",
   "composition": "Composizione",
   "fontFamily": "Carattere",
   "close": "Chiudi",
@@ -20,5 +20,6 @@
   "modelLoading": "Caricamento del modello…",
   "modelHint": "È necessario un download iniziale. Le immagini rimangono sul tuo dispositivo.",
   "processing": "Elaborazione…",
-  "cancel": "Annulla"
+  "cancel": "Annulla",
+  "libraryDropPlaneUnavailable": "Orienta la fotocamera verso la scena per posizionare questo oggetto."
 }

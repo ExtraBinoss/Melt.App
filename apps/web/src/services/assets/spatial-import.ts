@@ -8,6 +8,8 @@ import {
   type SpatialSource,
 } from "@musart/core";
 import { readDataUrl } from "./imports";
+import type { Point } from "../../canvas/viewport/view";
+import { placeLibraryLayer } from "./library-placement";
 import { spatialLibraryLayer } from "./spatial-layer";
 import { brand } from "../../ui/brand/config";
 import { canvasNativeRenderer } from "../../canvas/render/plane-resources";
@@ -32,15 +34,14 @@ export function insertSpatialObject(
   engine: EnginePort,
   source: SpatialSource | "text",
   name: string,
-  presentation?: { fill?: string },
+  presentation?: { fill?: string; point?: Point },
 ) {
   const snapshot = engine.getSnapshot(),
     page = snapshot.project.pages.find((item) => item.id === snapshot.pageId)!;
   const size = Math.min(page.width, page.height) * 0.55;
   const layer = spatialLibraryLayer(source, size, name, crypto.randomUUID());
   if (presentation?.fill) layer.fill = presentation.fill;
-  layer.x = (page.width - layer.width) / 2;
-  layer.y = (page.height - layer.height) / 2;
+  placeLibraryLayer(page, layer, presentation?.point);
   engine.transaction([
     { type: "addLayers", layers: [layer] },
     ...(!page.spatial ? [{ type: "updatePage" as const, patch: { spatial: freshScene() } }] : []),
@@ -52,7 +53,7 @@ export async function importSpatialModel(
   engine: EnginePort,
   file: File,
   signal?: AbortSignal,
-  presentation?: { name: string; useModelMaterials: boolean },
+  presentation?: { name: string; useModelMaterials: boolean; point?: Point },
 ) {
   assertSize(file);
   const origin = engine.getSnapshot(),
@@ -98,6 +99,7 @@ export async function importSpatialModel(
       useModelMaterials: presentation?.useModelMaterials ?? true,
     },
   });
+  placeLibraryLayer(page, layer, presentation?.point);
   engine.transaction([
     { type: "addLayers", layers: [layer], assets: [asset] },
     ...(!page.spatial ? [{ type: "updatePage" as const, patch: { spatial: freshScene() } }] : []),

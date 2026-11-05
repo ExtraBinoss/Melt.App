@@ -12,6 +12,9 @@ import { SearchInput } from "./SearchInput";
 import { PaletteVector } from "./PaletteVector";
 import styles from "./Palette.module.css";
 import "./messages";
+import type { DragEvent } from "react";
+import { beginLibraryDrag } from "../../services/assets/library-drag";
+import { insertLibraryArtwork } from "../../services/assets/library-artwork";
 
 type Category = AssetKind | "imported";
 const EMPTY_ITEMS: readonly CatalogAsset[] = Object.freeze([]);
@@ -20,11 +23,15 @@ export function ShapePalette({
   onChoose,
   searchQuery,
   compact = false,
+  onDragItem,
+  onDropComplete,
 }: {
   engine: EnginePort;
   onChoose: (item: CatalogAsset) => void;
   searchQuery?: string;
   compact?: boolean;
+  onDragItem?: (event: DragEvent<HTMLButtonElement>, asset: CatalogAsset) => void;
+  onDropComplete?: () => void;
 }) {
   const { t } = useTranslation("assets");
   const [category, setCategory] = useState<Category>("shapes");
@@ -216,6 +223,17 @@ export function ShapePalette({
                       key={item.id}
                       title={name(item)}
                       aria-label={t("use", { name: name(item) })}
+                      draggable
+                      onDragStart={(event) => {
+                        const asset = { ...item, name: name(item) };
+                        if (onDragItem) onDragItem(event, asset);
+                        else
+                          beginLibraryDrag(event, engine, (target) => {
+                            target.assertCurrent();
+                            insertLibraryArtwork(engine, asset, target.point);
+                            onDropComplete?.();
+                          });
+                      }}
                       onClick={() => onChoose({ ...item, name: name(item) })}
                     >
                       <PaletteVector item={item} />

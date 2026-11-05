@@ -3,7 +3,7 @@
   "selectImageFirst": "Haz clic en una imagen desbloqueada para iniciar una selección.",
   "canvas": "Lienzo de composición",
   "toolHint": "Haz clic o dibuja en el lienzo",
-  "dropImages": "Suelta tus imágenes",
+  "dropImages": "Suelta imágenes o elementos de la biblioteca aquí",
   "composition": "Composición",
   "fontFamily": "Fuente",
   "close": "Cerrar",
@@ -20,5 +20,6 @@
   "modelLoading": "Cargando modelo…",
   "modelHint": "Se requiere una descarga inicial. Tus imágenes permanecen en tu dispositivo.",
   "processing": "Procesando…",
-  "cancel": "Cancelar"
+  "cancel": "Cancelar",
+  "libraryDropPlaneUnavailable": "Orienta la cámara hacia la escena para colocar este objeto."
 }

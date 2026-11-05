@@ -3,7 +3,7 @@
   "selectImageFirst": "Clique numa imagem desbloqueada para iniciar uma seleção.",
   "canvas": "Tela da composição",
   "toolHint": "Clica ou desenha na tela",
-  "dropImages": "Larga as tuas imagens",
+  "dropImages": "Larga aqui imagens ou elementos da biblioteca",
   "composition": "Composição",
   "fontFamily": "Tipo de letra",
   "close": "Fechar",
@@ -20,5 +20,6 @@
   "modelLoading": "A carregar o modelo…",
   "modelHint": "É necessária uma transferência inicial. As suas imagens permanecem no seu dispositivo.",
   "processing": "A processar…",
-  "cancel": "Cancelar"
+  "cancel": "Cancelar",
+  "libraryDropPlaneUnavailable": "Vira a câmara para a cena para colocar este objeto."
 }

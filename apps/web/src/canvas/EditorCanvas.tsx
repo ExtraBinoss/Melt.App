@@ -18,7 +18,7 @@ import { completeDrawing, resizeDrawing } from "./interaction/drawing";
 import { createTextDrawing, commitDrawing } from "./interaction/text-insertion";
 import { textInsertionModeAtom } from "../state/session/text-insertion";
 import { toolAtom } from "../state/session/editor";
-import { createCanvasTransfers } from "./interaction/transfers";
+import { useCanvasTransfers } from "./interaction/library-drop";
 import { CanvasContextMenu } from "./selection/CanvasContextMenu";
 import { readReleasePoint } from "./interaction/release";
 import { canvasNavigationKeys, canvasNavigationKeyDown } from "./interaction/keyboard-navigation";
@@ -447,23 +447,21 @@ export function EditorCanvas({
     if (!gesture.current || gesture.current.pointerId === event.pointerId) cancelGesture();
   }
   const gizmoProps = { engine, controller, viewSource: motion, onError };
-  const transfers = () =>
-    createCanvasTransfers({
-      engine,
-      readPage: () => controller.read().page,
-      readWorkspace: workspace.read,
-      readView: motion.read,
-      readViewport: () => viewport.current,
-      onActive: setDragOver,
-      onFiles: onDropFiles,
-    });
+  const transfers = useCanvasTransfers({
+    engine,
+    readPage: () => controller.read().page,
+    readWorkspace: workspace.read,
+    readView: motion.read,
+    readViewport: () => viewport.current,
+    onActive: setDragOver,
+    onFiles: onDropFiles,
+    onError,
+    onLibraryDrop: () => store.set(toolAtom, "pointer"),
+    allowOutsideActive: studio,
+  });
   const cursor = tool === "hand" || space ? "grab" : tool === "pointer" ? "default" : "crosshair";
   return (
-    <CanvasContextMenu
-      engine={engine}
-      resolveTarget={(point) => transfers().target(point)}
-      onError={onError}
-    >
+    <CanvasContextMenu engine={engine} resolveTarget={transfers.target} onError={onError}>
       <div
         className="editor-canvas"
         data-testid="editor-canvas"
@@ -496,9 +494,9 @@ export function EditorCanvas({
           cancelGesture();
           if (!pixelSelection && !pendingBox?.secondary) engine.select([]);
         }}
-        onDragOver={(event) => transfers().files.onDragOver(event)}
-        onDragLeave={(event) => transfers().files.onDragLeave(event)}
-        onDrop={(event) => transfers().files.onDrop(event)}
+        onDragOver={transfers.onDragOver}
+        onDragLeave={transfers.onDragLeave}
+        onDrop={transfers.onDrop}
       >
         <div className="canvas-stage">
           <InactiveArtboards

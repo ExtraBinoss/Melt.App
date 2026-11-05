@@ -10,12 +10,23 @@ export interface LibraryDropTarget {
   assertCurrent(): void;
 }
 type Insert = (target: LibraryDropTarget) => void | Promise<void>;
-let active: { token: string; engine: EnginePort; projectId: string; insert: Insert; dispose(): void } | null = null;
-let pending: AbortController | null = null;
+let active: {
+  token: string;
+  engine: EnginePort;
+  projectId: string;
+  insert: Insert;
+  dispose(): void;
+} | null = null;
+let pending: { engine: EnginePort; controller: AbortController } | null = null;
 
 /** A bounded, same-session transfer: no models, originals or executable data in DataTransfer. */
-export function beginLibraryDrag(event: Pick<DragEvent, "dataTransfer">, engine: EnginePort, insert: Insert) {
+export function beginLibraryDrag(
+  event: Pick<DragEvent, "dataTransfer">,
+  engine: EnginePort,
+  insert: Insert,
+) {
   active?.dispose();
+  pending?.controller.abort();
   const token = crypto.randomUUID();
   const end = () => {
     window.removeEventListener("dragend", end);
@@ -30,7 +41,12 @@ export function beginLibraryDrag(event: Pick<DragEvent, "dataTransfer">, engine:
 }
 
 export function acceptsLibraryDrag(data: Pick<DataTransfer, "types">, engine: EnginePort) {
-  return Boolean(active && active.engine === engine && active.projectId === engine.getSnapshot().project.id && Array.from(data.types).includes(LIBRARY_DRAG_TYPE));
+  return Boolean(
+    active &&
+    active.engine === engine &&
+    active.projectId === engine.getSnapshot().project.id &&
+    Array.from(data.types).includes(LIBRARY_DRAG_TYPE),
+  );
 }
 
 export function dropLibraryItem(
@@ -40,32 +56,53 @@ export function dropLibraryItem(
   onError: (error: unknown) => void,
 ) {
   const item = active;
-  if (!item || !acceptsLibraryDrag(data, engine) || data.getData(LIBRARY_DRAG_TYPE) !== item.token) return false;
+  if (!item || !acceptsLibraryDrag(data, engine) || data.getData(LIBRARY_DRAG_TYPE) !== item.token)
+    return false;
   item.dispose();
-  if (!engine.getSnapshot().project.pages.some(page => page.id === target.pageId)) return false;
-  pending?.abort();
+  if (!engine.getSnapshot().project.pages.some((page) => page.id === target.pageId)) return false;
+  pending?.controller.abort();
   const controller = new AbortController();
-  pending = controller;
+  pending = { engine, controller };
   engine.setPage(target.pageId);
   const origin = engine.getSnapshot();
   const stop = engine.subscribe(() => {
     const current = engine.getSnapshot();
-    if (current.project.id !== origin.project.id || current.pageId !== origin.pageId) controller.abort();
+    if (current.project.id !== origin.project.id || current.pageId !== origin.pageId)
+      controller.abort();
   });
   const assertCurrent = () => {
     controller.signal.throwIfAborted();
     const current = engine.getSnapshot();
-    if (current.project.id !== origin.project.id || current.pageId !== origin.pageId || current.revision !== origin.revision)
+    if (
+      current.project.id !== origin.project.id ||
+      current.pageId !== origin.pageId ||
+      current.revision !== origin.revision
+    )
       throw new DOMException("Composition changed during library drop", "AbortError");
   };
-  void Promise.resolve().then(() => {
-    assertCurrent();
-    return item.insert({ ...target, signal: controller.signal, assertCurrent });
-  }).catch(error => {
-    if (!controller.signal.aborted && !(error instanceof DOMException && error.name === "AbortError")) onError(error);
-  }).finally(() => {
-    stop();
-    if (pending === controller) pending = null;
-  });
+  void Promise.resolve()
+    .then(() => {
+      assertCurrent();
+      return item.insert({ ...target, signal: controller.signal, assertCurrent });
+    })
+    .catch((error) => {
+      if (
+        !controller.signal.aborted &&
+        !(error instanceof DOMException && error.name === "AbortError")
+      )
+        onError(error);
+    })
+    .finally(() => {
+      stop();
+      if (pending?.controller === controller) pending = null;
+    });
   return true;
+}
+
+export function cancelLibraryDrop(engine: EnginePort) {
+  if (active?.engine === engine) active.dispose();
+  if (pending?.engine === engine) {
+    pending.controller.abort();
+    pending = null;
+  }
 }

@@ -3,9 +3,16 @@ import type { CatalogAsset } from "@musart/assets";
 import { vectorFromAsset } from "../../assets/selection";
 import { brand } from "../../../ui/brand/config";
 import { filledVectorOutlines } from "./vector-outlines";
+import type { Point } from "../../../canvas/viewport/view";
+import { placeLibraryLayer } from "../../../services/assets/library-placement";
 
 /** SVGs enter the existing layer registry as ordinary editable geometry, in one transaction. */
-export function insertLibraryVector(engine: EnginePort, asset: CatalogAsset, extrude: boolean) {
+export function insertLibraryVector(
+  engine: EnginePort,
+  asset: CatalogAsset,
+  extrude: boolean,
+  point?: Point,
+) {
   const snapshot = engine.getSnapshot();
   const page = snapshot.project.pages.find((item) => item.id === snapshot.pageId)!;
   const [, , sourceWidth, sourceHeight] = asset.viewBox.split(/[\s,]+/u).map(Number);
@@ -25,6 +32,7 @@ export function insertLibraryVector(engine: EnginePort, asset: CatalogAsset, ext
     vector: extrude ? filledVectorOutlines(vector, brand.colors.primary) : vector,
     ...(extrude ? { spatial: { ...createSpatialLayer("extrude"), depth: 0.3, bevel: 0.04 } } : {}),
   });
+  placeLibraryLayer(page, layer, point);
   const scene = extrude && !page.spatial ? createSpatialScene() : undefined;
   if (scene) for (const light of scene.lights) light.id = crypto.randomUUID();
   engine.transaction([

@@ -1,5 +1,7 @@
 import { useState } from "react";
 import type { EnginePort } from "@musart/core";
+import type { CatalogAsset } from "@musart/assets";
+import { beginLibraryDrag, type LibraryDropTarget } from "../../../services/assets/library-drag";
 import { useTranslation } from "react-i18next";
 import { SpatialLibrary, type SpatialLibraryPanelContext } from "../SpatialLibrary";
 import { publishEditorNotice } from "../../notifications/source";
@@ -46,6 +48,17 @@ function VectorLibrary({
   const { t } = useTranslation("studioLibrary");
   const { t: common } = useTranslation();
   const [extrude, setExtrude] = useState(true);
+  async function add(asset: CatalogAsset, target?: LibraryDropTarget) {
+    await onTask(() => {
+      target?.assertCurrent();
+      const layer = insertLibraryVector(engine, asset, extrude, target?.point);
+      publishEditorNotice(engine, {
+        message: common("objectAdded", { ns: "notices", name: layer.name }),
+        error: false,
+      });
+      close();
+    });
+  }
   return (
     <div className="studio-vector-library">
       <label className="studio-vector-mode">
@@ -56,16 +69,10 @@ function VectorLibrary({
         engine={engine}
         searchQuery={query}
         compact
-        onChoose={(asset) => {
-          void onTask(() => {
-            const layer = insertLibraryVector(engine, asset, extrude);
-            publishEditorNotice(engine, {
-              message: common("objectAdded", { ns: "notices", name: layer.name }),
-              error: false,
-            });
-            close();
-          });
-        }}
+        onChoose={(asset) => void add(asset)}
+        onDragItem={(event, asset) =>
+          beginLibraryDrag(event, engine, (target) => add(asset, target))
+        }
       />
     </div>
   );

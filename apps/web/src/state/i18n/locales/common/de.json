@@ -3,7 +3,7 @@
   "selectImageFirst": "Klicken Sie auf ein entsperrtes Bild, um eine Auswahl zu beginnen.",
   "canvas": "Kompositionsfläche",
   "toolHint": "Klicke oder zeichne auf der Arbeitsfläche",
-  "dropImages": "Bilder hier ablegen",
+  "dropImages": "Bilder oder Bibliothekselemente hier ablegen",
   "composition": "Komposition",
   "fontFamily": "Schriftart",
   "close": "Schließen",
@@ -20,5 +20,6 @@
   "modelLoading": "Modell wird geladen…",
   "modelHint": "Ein erster Download ist erforderlich. Ihre Bilder bleiben auf Ihrem Gerät.",
   "processing": "Verarbeitung…",
-  "cancel": "Abbrechen"
+  "cancel": "Abbrechen",
+  "libraryDropPlaneUnavailable": "Richte die Kamera auf die Szene, um dieses Objekt zu platzieren."
 }

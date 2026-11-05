@@ -98,9 +98,11 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ### Changed
 
-- Complete the translated SVG-outline errors and workspace-switch loading labels across all supported locales.
+- Share Studio's complete object-library popover with Classic, including native primitives, curated GLB models, editable SVG extrusion and offline model packs. Add native library-to-canvas dragging in both workspaces, preserving pointer placement through pan, zoom, camera orbit and reframing. Insert through one undoable command/transaction, cancel stale asynchronous drops and retain existing file imports and deferred pack downloads.
 
 - Give primary buttons a subtle shared brand gradient while retaining the selected accent, readable labels, focus rings and disabled states. Preserve the gradient in Studio, landing, site, export and timelapse primary-action styles.
+
+- Complete the translated SVG-outline errors and workspace-switch loading labels across all supported locales.
 
 - Move model, SVG and pack scrollbar gutters to the popover's right border while retaining internal content padding. Keep shallow layer trees free of horizontal overflow and reserve horizontal scrolling for expanded hierarchies that actually exceed the viewport.
 - Replace Kenney's descriptive header and pagination with compact source/license information and a virtual continuous grid with shared scroll fades. Give Studio SVGs matching full-width tiles, virtual scrolling and mask fades. Convert stroked SVG icons into bounded editable filled outlines before native extrusion, preserving paint, transforms, caps, joins and holes with atomic undo and clearer localized budget errors.

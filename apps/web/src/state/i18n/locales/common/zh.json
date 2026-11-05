@@ -3,7 +3,7 @@
   "selectImageFirst": "单击未锁定的图像以开始选择。",
   "canvas": "合成画布",
   "toolHint": "在画布上点击或绘制",
-  "dropImages": "拖放你的图像",
+  "dropImages": "将图片或素材库项目拖放到此处",
   "composition": "合成",
   "fontFamily": "字体",
   "close": "关闭",
@@ -20,5 +20,6 @@
   "modelLoading": "正在加载模型…",
   "modelHint": "首次使用需要下载。图像会保留在你的设备上。",
   "processing": "正在处理…",
-  "cancel": "取消"
+  "cancel": "取消",
+  "libraryDropPlaneUnavailable": "请将相机转向场景以放置此对象。"
 }

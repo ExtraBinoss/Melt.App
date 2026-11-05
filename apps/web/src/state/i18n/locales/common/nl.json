@@ -3,7 +3,7 @@
   "selectImageFirst": "Klik op een ontgrendelde afbeelding om een selectie te starten.",
   "canvas": "Compositiecanvas",
   "toolHint": "Klik of teken op het canvas",
-  "dropImages": "Sleep je afbeeldingen hierheen",
+  "dropImages": "Sleep hier afbeeldingen of bibliotheekitems naartoe",
   "composition": "Compositie",
   "fontFamily": "Lettertype",
   "close": "Sluiten",
@@ -20,5 +20,6 @@
   "modelLoading": "Model laden…",
   "modelHint": "Een eerste download is nodig. Je afbeeldingen blijven op je apparaat.",
   "processing": "Verwerken…",
-  "cancel": "Annuleren"
+  "cancel": "Annuleren",
+  "libraryDropPlaneUnavailable": "Richt de camera op de scène om dit object te plaatsen."
 }

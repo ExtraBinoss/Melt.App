@@ -3,7 +3,7 @@
   "selectImageFirst": "Kliknij odblokowany obraz, aby rozpocząć zaznaczanie.",
   "canvas": "Płótno kompozycji",
   "toolHint": "Kliknij lub rysuj na płótnie",
-  "dropImages": "Upuść obrazy",
+  "dropImages": "Upuść tutaj obrazy lub elementy biblioteki",
   "composition": "Kompozycja",
   "fontFamily": "Krój pisma",
   "close": "Zamknij",
@@ -20,5 +20,6 @@
   "modelLoading": "Wczytywanie modelu…",
   "modelHint": "Wymagane jest pierwsze pobranie. Twoje obrazy pozostają na Twoim urządzeniu.",
   "processing": "Przetwarzanie…",
-  "cancel": "Anuluj"
+  "cancel": "Anuluj",
+  "libraryDropPlaneUnavailable": "Skieruj kamerę na scenę, aby umieścić ten obiekt."
 }

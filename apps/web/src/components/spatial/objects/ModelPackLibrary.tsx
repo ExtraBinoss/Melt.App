@@ -14,6 +14,7 @@ import { STUDIO_PACK } from "../../../services/assets/studio/integrity";
 import type { StudioManifest, StudioModel } from "../../../services/assets/studio/integrity";
 import { SpatialLibraryModels } from "../../../services/assets/spatial-library";
 import { importSpatialModel } from "../../../services/assets/spatial-import";
+import { beginLibraryDrag, type LibraryDropTarget } from "../../../services/assets/library-drag";
 import "./messages";
 import { ScrollShadow } from "../../shared/scroll/ScrollShadow";
 import { useVirtualList } from "../../shared/scroll/use-virtual-list";
@@ -97,19 +98,22 @@ export function ModelPackLibrary({
       if (alive.current) setBusy(false);
     }
   }
-  async function add(model: StudioModel) {
+  async function add(model: StudioModel, target?: LibraryDropTarget) {
     const controller = new AbortController(),
       origin = engine.getSnapshot();
+    const signal = target ? AbortSignal.any([controller.signal, target.signal]) : controller.signal;
     pending.current?.abort();
     pending.current = controller;
     setBusy(true);
     setError("");
     try {
       await preview.stop();
-      controller.signal.throwIfAborted();
-      const asset = await store.load(model, controller.signal);
-      const blob = await (await fetch(asset.dataUrl, { signal: controller.signal })).blob();
-      controller.signal.throwIfAborted();
+      signal.throwIfAborted();
+      target?.assertCurrent();
+      const asset = await store.load(model, signal);
+      const blob = await (await fetch(asset.dataUrl, { signal })).blob();
+      signal.throwIfAborted();
+      target?.assertCurrent();
       const current = engine.getSnapshot();
       if (
         current.project !== origin.project ||
@@ -118,7 +122,8 @@ export function ModelPackLibrary({
       )
         return;
       await onTask(async () => {
-        controller.signal.throwIfAborted();
+        signal.throwIfAborted();
+        target?.assertCurrent();
         const scope = engine.getSnapshot();
         if (
           scope.project !== origin.project ||
@@ -129,8 +134,8 @@ export function ModelPackLibrary({
         const layer = await importSpatialModel(
           engine,
           new File([blob], `${model.id}.glb`, { type: "model/gltf-binary" }),
-          controller.signal,
-          { name: model.name, useModelMaterials: true },
+          signal,
+          { name: model.name, useModelMaterials: true, point: target?.point },
         );
         publishEditorNotice(engine, {
           message: common("objectAdded", { ns: "notices", name: layer.name }),
@@ -139,7 +144,7 @@ export function ModelPackLibrary({
         close?.();
       });
     } catch {
-      if (alive.current && !controller.signal.aborted) setError(t("failed"));
+      if (alive.current && !signal.aborted) setError(t("failed"));
     } finally {
       if (pending.current === controller) pending.current = null;
       if (alive.current) {
@@ -255,6 +260,11 @@ export function ModelPackLibrary({
                         )
                       }
                       onBlur={() => preview.hide()}
+                      draggable={!busy}
+                      onDragStart={(event) => {
+                        void preview.stop();
+                        beginLibraryDrag(event, engine, (target) => add(model, target));
+                      }}
                       onClick={() => void add(model)}
                     >
                       <span className="spatial-object-visual" aria-hidden>

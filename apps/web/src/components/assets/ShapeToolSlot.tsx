@@ -83,6 +83,7 @@ export function ShapeToolSlot({
       <PopoverContent side="right" align="start" className="w-[340px] overflow-hidden p-0">
         <ShapePalette
           engine={engine}
+          onDropComplete={() => setOpen(false)}
           onChoose={(item) => {
             setShape(item);
             setTool("shape");

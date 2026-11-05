@@ -3,7 +3,7 @@
   "selectImageFirst": "ロックされていない画像をクリックして選択を開始してください。",
   "canvas": "コンポジションのキャンバス",
   "toolHint": "キャンバスをクリックするか描画してください",
-  "dropImages": "画像をドロップ",
+  "dropImages": "画像やライブラリのアイテムをここにドロップ",
   "composition": "コンポジション",
   "fontFamily": "フォント",
   "close": "閉じる",
@@ -20,5 +20,6 @@
   "modelLoading": "モデルを読み込み中…",
   "modelHint": "初回はダウンロードが必要です。画像はデバイス上に保持されます。",
   "processing": "処理中…",
-  "cancel": "キャンセル"
+  "cancel": "キャンセル",
+  "libraryDropPlaneUnavailable": "このオブジェクトを配置するには、カメラをシーンに向けてください。"
 }

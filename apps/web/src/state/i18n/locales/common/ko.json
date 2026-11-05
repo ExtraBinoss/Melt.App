@@ -3,7 +3,7 @@
   "selectImageFirst": "잠금 해제된 이미지를 클릭하여 선택을 시작하세요.",
   "canvas": "컴포지션 캔버스",
   "toolHint": "캔버스를 클릭하거나 그리세요",
-  "dropImages": "이미지를 놓으세요",
+  "dropImages": "이미지나 라이브러리 항목을 여기에 놓으세요",
   "composition": "컴포지션",
   "fontFamily": "글꼴",
   "close": "닫기",
@@ -20,5 +20,6 @@
   "modelLoading": "모델 불러오는 중…",
   "modelHint": "최초 다운로드가 필요합니다. 이미지는 기기에 보관됩니다.",
   "processing": "처리 중…",
-  "cancel": "취소"
+  "cancel": "취소",
+  "libraryDropPlaneUnavailable": "이 객체를 배치하려면 카메라가 장면을 향하도록 돌려 주세요."
 }

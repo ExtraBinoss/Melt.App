@@ -11,6 +11,7 @@ import { SegmentedTabs } from "../shared/segmented/SegmentedTabs";
 import { SearchInput } from "../assets/SearchInput";
 import { importSpatialModel, insertSpatialObject } from "../../services/assets/spatial-import";
 import { SpatialLibraryModels } from "../../services/assets/spatial-library";
+import { beginLibraryDrag, type LibraryDropTarget } from "../../services/assets/library-drag";
 import { publishEditorNotice } from "../notifications/source";
 import {
   SPATIAL_LIBRARY_MODELS,
@@ -67,17 +68,19 @@ export function SpatialLibrary({
     `${t(entry.nameKey)} ${entry.id}`.toLowerCase().includes(query.trim().toLowerCase()),
   );
   const native = tab === "shapes" || tab === "models";
-  async function add(entry: SpatialLibraryEntry | File) {
+  async function add(entry: SpatialLibraryEntry | File, target?: LibraryDropTarget) {
     if (busy) return;
     const controller = new AbortController();
     pending.current?.abort();
     pending.current = controller;
     const origin = engine.getSnapshot();
+    const signal = target ? AbortSignal.any([controller.signal, target.signal]) : controller.signal;
     setBusy(true);
     setError("");
     try {
       await preview.stop();
-      controller.signal.throwIfAborted();
+      signal.throwIfAborted();
+      target?.assertCurrent();
       const current = engine.getSnapshot();
       if (
         current.project !== origin.project ||
@@ -86,13 +89,17 @@ export function SpatialLibrary({
       )
         return;
       let layer;
-      if (entry instanceof File) layer = await importSpatialModel(engine, entry, controller.signal);
+      if (entry instanceof File) layer = await importSpatialModel(engine, entry, signal);
       else if (entry.kind === "shape")
-        layer = insertSpatialObject(engine, entry.source, t(entry.nameKey), { fill: "#b8bcc4" });
+        layer = insertSpatialObject(engine, entry.source, t(entry.nameKey), {
+          fill: "#b8bcc4",
+          point: target?.point,
+        });
       else {
-        const asset = await store.load(entry.model, controller.signal);
-        const blob = await (await fetch(asset.dataUrl, { signal: controller.signal })).blob();
-        controller.signal.throwIfAborted();
+        const asset = await store.load(entry.model, signal);
+        const blob = await (await fetch(asset.dataUrl, { signal })).blob();
+        signal.throwIfAborted();
+        target?.assertCurrent();
         const current = engine.getSnapshot();
         if (
           current.project !== origin.project ||
@@ -103,8 +110,8 @@ export function SpatialLibrary({
         layer = await importSpatialModel(
           engine,
           new File([blob], `${entry.id}.glb`, { type: "model/gltf-binary" }),
-          controller.signal,
-          { name: t(entry.nameKey), useModelMaterials: true },
+          signal,
+          { name: t(entry.nameKey), useModelMaterials: true, point: target?.point },
         );
       }
       publishEditorNotice(engine, {
@@ -113,10 +120,7 @@ export function SpatialLibrary({
       });
       setOpen(false);
     } catch (cause) {
-      if (
-        !controller.signal.aborted &&
-        !(cause instanceof DOMException && cause.name === "AbortError")
-      ) {
+      if (!signal.aborted && !(cause instanceof DOMException && cause.name === "AbortError")) {
         setError(t("errors.import"));
         setOpen(true);
       }
@@ -235,6 +239,11 @@ export function SpatialLibrary({
                       )
                     }
                     onBlur={() => preview.hide()}
+                    draggable={!busy}
+                    onDragStart={(event) => {
+                      void preview.stop();
+                      beginLibraryDrag(event, engine, (target) => add(entry, target));
+                    }}
                     onClick={() => void add(entry)}
                   >
                     <span className="spatial-object-visual" aria-hidden>
