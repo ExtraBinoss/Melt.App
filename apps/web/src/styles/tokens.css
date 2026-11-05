@@ -47,6 +47,7 @@
   --ring: var(--muted-foreground);
   --accent: #eeeeee;
   --destructive: #db4349;
+  --success: #15803d;
   --border: #e3e4e9;
   --input: #e4e5eb;
   --workspace: #eef0f2;
@@ -75,6 +76,7 @@
   --muted-foreground: #a0a0a0;
   --accent: #343434;
   --destructive: #ff6b72;
+  --success: #4ade80;
   --border: #3b3b3b;
   --input: #404040;
   --workspace: #181818;

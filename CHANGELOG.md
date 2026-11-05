@@ -4,6 +4,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ## [Unreleased]
 
+- Reuse the shared blinking face/thinking-dots cycle throughout background removal. Crossfade the mascot into a green completion check with a two-second accent, retain a readable success label, and respect reduced motion without delaying results or cancellation.
+
 - Bring the 2D rotation grip closer to the resize handles, reducing its screen-space offset from 36 px to 18 px while retaining its small circle and independent hit target.
 
 - Reuse the standard Melt text-and-throbber loading presentation during workspace switches, removing the custom pill, shadow, extra canvas orbit and duplicate loading feedback beneath it.

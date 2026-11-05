@@ -7,7 +7,7 @@ import type { ObjectSelectionPort } from "../../../services/selection/object/mod
 import type { LocalModelPort } from "../../../services/selection/model/contract";
 import type { TaskRunner } from "../../projects/ProjectDialog";
 import { Button } from "../../ui/button";
-import { Throbber } from "../../ui/throbber/Throbber";
+import { BackgroundStatus } from "./BackgroundStatus";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../../ui/tooltip";
 import "../../../services/selection/wand/messages";
 import "./messages";
@@ -100,24 +100,19 @@ export function ObjectSelectionOptions({
         )}
         <div className="background-target-status">
           <span className="background-target-name">{state.targetName}</span>
-          {state.busy ? (
-            <div className="background-phase">
-              <Throbber
-                delayMs={0}
-                size={20}
-                variant="shimmer"
-                state={loading || initializing ? "loading" : "preparing"}
-                label={label}
-              />
-              <span className="background-step" dir="ltr">
-                {videoPercent !== undefined
+          {(state.busy || (state.completed && !state.error)) && (
+            <BackgroundStatus
+              busy={state.busy}
+              completed={Boolean(state.completed && !state.error)}
+              label={label}
+              completedLabel={t("backgroundDone")}
+              step={
+                videoPercent !== undefined
                   ? `${number.format(videoPercent)} %`
-                  : `${number.format(stage)}/${number.format(3)}`}
-              </span>
-            </div>
-          ) : state.completed ? (
-            <small>{t("backgroundDone")}</small>
-          ) : null}
+                  : `${number.format(stage)}/${number.format(3)}`
+              }
+            />
+          )}
         </div>
       </div>
       <div className="background-action-buttons">

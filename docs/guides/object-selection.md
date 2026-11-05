@@ -21,6 +21,13 @@ unapplied hints. Refinement replaces the generated matte instead of intersecting
 it with itself, so previously hidden pixels can be recovered. An older clip is
 preserved on the existing generated mask source.
 
+During every pending stage the shared mascot alternates its naturally blinking
+face and native thinking dots, without restarting the cycle at each progress
+update. Successful removal crossfades into a green check with a two-second accent;
+the green completion label and check remain readable afterward. This decoration
+never delays publication or cancellation. Reduced motion uses a still face and
+an immediate check, and cancellation/errors do not display a success state.
+
 ## Thread and resource ownership
 
 When a card is mounted, an optional presentation lease waits for its thumbnail to
