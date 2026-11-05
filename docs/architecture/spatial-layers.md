@@ -30,6 +30,13 @@ the working RGB transfer before the existing composition graph. The same graph s
 selection previews, still exports and Motion encoding, including Three's WebGL
 fallback. No production GPU pixel readbacks are introduced.
 
+Selection contours borrow only the used native source viewport, independently of
+spare texture capacity. Screen derivatives keep the 1.25 CSS-pixel white stroke
+stable across zoom, preview density and transformed sources. The display adapter
+supplies the canvas CSS size once per draw; the contour quad includes the stroke
+margin and guards sampling beyond the used rectangle. No extra GPU target or
+pixel readback is required.
+
 Separate native objects share opaque depth and cast shadows onto one another.
 Classic paint, blending, post-effects and masks retain their document ordering.
 Fractional layer opacity does not write an opaque shared-depth holdout. A faded

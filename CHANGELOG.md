@@ -4,6 +4,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ## [Unreleased]
 
+- Align native 3D selection contours with the used source viewport instead of padded texture storage. Keep white selection strokes at a stable CSS-pixel width across zoom and preview density, including rotated sources, glyph counters and contour margins.
+
 - Restore document undo/redo after moving gradient stops, including inside nonmodal paint popovers. Make stop percentage suffixes horizontal scrub handles and open the selected stop's color picker on double-click in the gradient ramp.
 
 ### Added

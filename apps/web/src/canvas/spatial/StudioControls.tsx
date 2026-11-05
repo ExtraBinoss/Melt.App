@@ -130,6 +130,8 @@ export default function StudioControls({ engine, controller, target }: Props) {
     };
     const draw = () => {
       if (!ready()) return;
+      // Use the post-transform CSS size, independently of framebuffer density.
+      const contourSize = canvas.getBoundingClientRect();
       const current = source();
       if (!gesture.active)
         updateCompositionCamera(camera, current.frame.page, renderer.coordinateSystem);
@@ -195,7 +197,7 @@ export default function StudioControls({ engine, controller, target }: Props) {
           id === hoverId && pulse
             ? 0.65 + 0.3 * (0.5 + 0.5 * Math.cos((elapsed * Math.PI) / 350))
             : 0.9;
-        contour.render(renderer, resource, camera, opacity);
+        contour.render(renderer, resource, camera, opacity, contourSize);
       }
       if (pulsing) invalidate();
       if (layer) renderer.render(helper, camera);
