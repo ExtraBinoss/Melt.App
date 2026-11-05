@@ -53,9 +53,11 @@ function choiceLabel(value: string, definition: HistoryPropertyDefinition, t: TF
 function displayNumber(value: number, scale: number): number {
   // Decimal exponent shifting avoids turning 0.57 into 56.99999999999999%.
   const power = Math.log10(scale);
-  if (!Number.isInteger(power)) return value * scale;
   const [coefficient, exponent = "0"] = String(value).split("e");
-  return Number(`${coefficient}e${Number(exponent) + power}`);
+  const scaled = Number.isInteger(power)
+    ? Number(`${coefficient}e${Number(exponent) + power}`)
+    : value * scale;
+  return Number(scaled.toFixed(2));
 }
 function propertyValue(
   value: HistoryValue,

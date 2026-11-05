@@ -81,13 +81,13 @@ it("adds the real object/effect name and operation while preserving restored val
   ).toBe("Change Depth 12 · MELT · + 1 change");
 });
 
-it("names background, paints, typography, transforms, SVG flags and exact numeric restored values", () => {
+it("names background, paints, typography, transforms, SVG flags and compact numeric restored values", () => {
   const cases: [HistoryPropertyTarget, string | number | boolean, string][] = [
     [{ owner: composition, property: "background" }, "#123456", "Background #123456"],
     [{ owner: layer, property: "fill" }, "#8b5cf6", "Fill #8b5cf6"],
     [{ owner: layer, property: "stroke" }, "#ff0000", "Stroke #ff0000"],
     [{ owner: layer, property: "strokeWidth" }, 1.25, "Stroke width 1.25px"],
-    [{ owner: layer, property: "opacity" }, 0.12345, "Opacity 12.345%"],
+    [{ owner: layer, property: "opacity" }, 0.12345, "Opacity 12.35%"],
     [{ owner: layer, property: "text" }, "Actual text", "Text Actual text"],
     [{ owner: layer, property: "fontFamily" }, "Inter", "Font family Inter"],
     [{ owner: layer, property: "fontSize" }, 21.5, "Font size 21.5px"],
@@ -110,6 +110,37 @@ it("names background, paints, typography, transforms, SVG flags and exact numeri
   );
   expect(formatHistoryDescription(change, "undo", t)).toBe("Background #123456");
   expect(formatHistoryDescription(change, "redo", t)).toBe("Background #654321");
+});
+it("limits numeric undo and redo values to two decimals without changing retained precision", () => {
+  const before = 231.159848484,
+    after = -12.756789,
+    change = description({ owner: layer, property: "x" }, scalar(before), scalar(after));
+  for (const value of change.changes) {
+    if (value.kind !== "property") continue;
+    Object.freeze(value.before);
+    Object.freeze(value.after);
+    Object.freeze(value);
+  }
+  Object.freeze(change.changes);
+  Object.freeze(change);
+  expect(formatHistoryDescription(change, "undo", t)).toBe("Position X 231.16px");
+  expect(formatHistoryDescription(change, "redo", t)).toBe("Position X -12.76px");
+  expect(change).toEqual(
+    description({ owner: layer, property: "x" }, scalar(before), scalar(after)),
+  );
+  const cases: [HistoryPropertyTarget, number, string][] = [
+    [{ owner: layer, property: "x" }, 12.1, "Position X 12.1px"],
+    [{ owner: layer, property: "x" }, 12, "Position X 12px"],
+    [{ owner: layer, property: "x" }, -0.00001, "Position X 0px"],
+    [{ owner: layer, property: "opacity" }, 0.57159848484, "Opacity 57.16%"],
+    [{ owner: layer, property: "scaleX" }, 1.23456789, "Scale X 123.46%"],
+    [{ owner: layer, property: "rotation" }, 35.256789, "Rotation 35.26°"],
+    [{ owner: layer, property: "affine.0" }, 0.123456789, "Affine transform 1 0.12"],
+    [{ owner: layer, property: "spatial.material.roughness" }, 0.356789, "Roughness 0.36"],
+    [{ owner: audio, property: "fadeIn" }, 0.375, "Audio · Fade in 0.38s"],
+    [{ owner: motion, property: "duration" }, 1.256789, "Animation · Duration 1.26s"],
+  ];
+  for (const [target, value, expected] of cases) expect(format(target, value)).toBe(expected);
 });
 it("uses retained effect type and definition-owned parameter labels, units and choices", () => {
   const blur = {
@@ -157,7 +188,7 @@ it("names spatial pose/material, camera, light, environment, audio and Motion pr
       "Environment · Preset Sunset",
     ],
     [{ owner: audio, property: "volume" }, 0.25, "Audio · Volume 25%"],
-    [{ owner: audio, property: "fadeIn" }, 0.375, "Audio · Fade in 0.375s"],
+    [{ owner: audio, property: "fadeIn" }, 0.375, "Audio · Fade in 0.38s"],
     [{ owner: audio, property: "reverb.mix" }, 0.25, "Audio · Room mix 25%"],
     [{ owner: motion, property: "strength" }, 0.75, "Animation · Intensity 75%"],
     [{ owner: motion, property: "duration" }, 1.25, "Animation · Duration 1.25s"],
