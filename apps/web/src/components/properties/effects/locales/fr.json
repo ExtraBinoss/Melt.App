@@ -1,4 +1,6 @@
 {
+  "actions": "Actions",
+  "enabled": "Activé",
   "resetAll": "Réinitialiser tous les paramètres de l’effet",
   "playLive": "Animer",
   "pauseLive": "Pause",

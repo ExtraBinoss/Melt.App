@@ -77,13 +77,3 @@
   overflow-y: auto;
   overscroll-behavior: contain;
 }
-.studio-effect-actions {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 3px;
-  margin-top: 5px;
-}
-.studio-effect-actions > [data-slot="switch"] {
-  margin-inline-end: auto;
-}

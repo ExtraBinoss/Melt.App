@@ -226,5 +226,8 @@ export function effectPropertyLabel(effect: Effect, property: EffectDriverProper
         (property.target.kind === "effectSetting" ||
           property.target.kind === "compositionEffectSetting"),
   );
-  return parameter?.labelKey ?? property.target.property;
+  return (
+    parameter?.labelKey ??
+    (property.target.property === "enabled" ? "effectControls:enabled" : property.target.property)
+  );
 }

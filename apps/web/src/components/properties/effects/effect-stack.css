@@ -1,0 +1,41 @@
+.effect-stack {
+  display: grid;
+  gap: 8px;
+}
+.effect-stack .effect-stack-card {
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+.effect-stack-heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-inline: 12px 8px;
+}
+.effect-stack-heading > h3 {
+  flex: 1;
+  min-width: 0;
+}
+.effect-stack-heading [data-slot="accordion-trigger"] {
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  padding-block: 10px;
+  gap: 8px;
+  font-size: 14px;
+  line-height: 1.4;
+  text-decoration: none;
+}
+.effect-stack-heading strong {
+  overflow-wrap: anywhere;
+  font-weight: 500;
+}
+.effect-stack-heading > .icon-button {
+  width: 28px;
+  height: 28px;
+}
+.effect-stack .effect-stack-body {
+  padding: 0 12px 12px;
+}

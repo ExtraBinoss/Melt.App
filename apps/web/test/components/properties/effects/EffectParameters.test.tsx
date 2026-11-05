@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { expect, test, vi } from "vitest";
-import { act, fireEvent, screen } from "@testing-library/react";
+import { act, fireEvent, screen, within } from "@testing-library/react";
 import {
   createEffect,
   getEffectDefinition,
   GRADIENT_PRESETS,
   EFFECT_CATALOG,
+  EFFECT_DOMAIN_KEYS,
   isEffectParameterVisible,
   type EffectType,
   planMotionInitialization,
@@ -249,14 +250,24 @@ test.each(Object.keys(EFFECT_CATALOG) as EffectType[])(
     const d = setup(),
       effect = createEffect(type),
       definition = getEffectDefinition(type);
-    d.mount(<EffectParameters effect={effect} onChange={vi.fn()} />);
+    const { container } = d.mount(<EffectParameters effect={effect} onChange={vi.fn()} />);
+    if (definition.sdk?.placement)
+      fireEvent.click(
+        screen.getByRole("button", { name: i18n.t("effectDomain:title"), exact: true }),
+      );
     for (const parameter of definition.parameters.filter((parameter) =>
       isEffectParameterVisible(effect, parameter),
     )) {
       const label = i18n.t(parameter.labelKey);
       expect(label).not.toContain(":");
       expect(
-        screen.getByRole(
+        within(
+          container.querySelector<HTMLElement>(
+            EFFECT_DOMAIN_KEYS.includes(parameter.key)
+              ? ".effect-placement"
+              : ".effect-parameter-list",
+          )!,
+        ).getByRole(
           parameter.kind === "number" || parameter.kind === "text"
             ? "textbox"
             : parameter.kind === "boolean"

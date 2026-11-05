@@ -41,6 +41,19 @@ test("adds a clipped effect, previews numbers without document changes, commits 
       screen.getByText("Dither", { selector: "strong" }).closest(".effect-card") as HTMLElement,
     );
   }
+  expect(card().getByRole("button", { name: "Dither", exact: true })).toHaveAttribute(
+    "aria-expanded",
+    "false",
+  );
+  fireEvent.click(card().getByRole("button", { name: "Dither", exact: true }));
+  expect(card().getByRole("button", { name: "Dither", exact: true })).toHaveAttribute(
+    "aria-expanded",
+    "true",
+  );
+  expect(screen.getByRole("button", { name: "Flou", exact: true })).toHaveAttribute(
+    "aria-expanded",
+    "false",
+  );
   for (const [label, value] of [
     ["Intensité", "60"],
     ["Taille des cellules", "4"],
@@ -62,7 +75,8 @@ test("adds a clipped effect, previews numbers without document changes, commits 
   fireEvent.click(card().getByRole("switch", { name: "Activer l’effet" }));
   fireEvent.keyDown(card().getByLabelText("Intensité"), { key: "Escape" });
   expect(data.store.get(previewAtom)).toBeNull();
-  fireEvent.click(card().getByLabelText("Retirer l’effet"));
+  fireEvent.pointerDown(card().getByLabelText("Dither · Actions"), { button: 0, ctrlKey: false });
+  fireEvent.click(await screen.findByRole("menuitem", { name: "Retirer l’effet" }));
   expect(data.engine.getSnapshot().project.pages[0]!.layers[0]!.effects).toHaveLength(3);
 });
 test("offers an empty stack explanation", () => {
@@ -103,13 +117,24 @@ test("reorders the non-destructive effect stack as one undoable command", async 
       screen.getByText(name, { selector: "strong" }).closest(".effect-card") as HTMLElement,
     );
   }
-  expect(card("Dither").getByLabelText("Monter l’effet")).toBeDisabled();
-  expect(card("Contraste").getByLabelText("Descendre l’effet")).toBeDisabled();
-  fireEvent.click(card("Dither").getByLabelText("Descendre l’effet"));
+  async function action(name: string, label: string, disabled = false) {
+    fireEvent.pointerDown(card(name).getByLabelText(`${name} · Actions`), {
+      button: 0,
+      ctrlKey: false,
+    });
+    const item = await screen.findByRole("menuitem", { name: label });
+    if (disabled) {
+      expect(item).toHaveAttribute("data-disabled");
+      fireEvent.keyDown(item, { key: "Escape" });
+    } else fireEvent.click(item);
+  }
+  await action("Dither", "Monter l’effet", true);
+  await action("Contraste", "Descendre l’effet", true);
+  await action("Dither", "Descendre l’effet");
   expect(data.engine.getSnapshot().project.pages[0]!.layers[0]!.effects).toEqual([second, first]);
   act(() => data.engine.undo());
   expect(data.engine.getSnapshot().project.pages[0]!.layers[0]!.effects).toEqual([first, second]);
   expect(data.engine.getSnapshot().canUndo).toBe(false);
-  fireEvent.click(card("Contraste").getByLabelText("Monter l’effet"));
+  await action("Contraste", "Monter l’effet");
   expect(data.engine.getSnapshot().project.pages[0]!.layers[0]!.effects).toEqual([second, first]);
 });

@@ -4,6 +4,10 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ## [Unreleased]
 
+- Use one shared effect-stack accordion in Classic and Studio, opening one effect at a time with an independent enable switch. Move reorder and removal actions into a nonmodal overflow menu, open newly added effects immediately, and replace the native Position & area disclosure with the shared Radix accordion. Remove the duplicate effect editor from Studio's advanced inspector; its existing effect and layer entry points remain available.
+
+- Improve effect Motion readability with larger text and controls, roomier action tiles and full-width parameter selectors. Let long parameter labels wrap in their menus instead of collapsing to a few ellipsized letters, while keeping the panel within narrow viewports.
+
 - Separate the 2D rotation grip from resize handles by a constant screen-space offset. Keep its visual as a matching small circle with a larger invisible pointer target, preserve its size through zoom and transformed parents, and align rotation feedback with the actual grip.
 
 - Anchor complete raster-effect stacks and SDK influence areas to native text/vector front-face coordinates during Studio camera zoom. Reframe lit object images onto a stable authored pixel lattice on the GPU, run the existing shared effects pipeline once, and reproject its premultiplied result before masks and composition. The fix applies to every effect without shader-specific camera handling.

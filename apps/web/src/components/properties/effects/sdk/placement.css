@@ -3,10 +3,14 @@
   margin-top: 8px;
   padding-top: 8px;
 }
-.effect-placement > summary {
-  cursor: pointer;
-  font-size: 11px;
-  padding: 6px 0;
+.effect-placement [data-slot="accordion-trigger"] {
+  min-height: 38px;
+  padding: 8px 0;
+  font-size: 13px;
+  text-decoration: none;
+}
+.effect-placement .effect-placement-body {
+  padding-bottom: 0;
 }
 .effect-position-pad > button {
   position: relative;

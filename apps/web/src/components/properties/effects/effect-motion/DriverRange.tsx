@@ -42,6 +42,7 @@ export function DriverRangeFields({
         if (property.kind === "choice" || property.kind === "boolean")
           return (
             <SelectField
+              contentClassName="effect-motion-select"
               key={index}
               label={label}
               value={String(value[index])}

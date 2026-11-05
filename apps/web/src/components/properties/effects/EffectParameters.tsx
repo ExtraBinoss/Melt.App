@@ -1,3 +1,4 @@
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "../../ui/accordion";
 import { EffectPositionPad } from "./EffectPositionPad";
 import "./sdk/messages";
 import { LiquifyControls } from "./LiquifyControls";
@@ -250,29 +251,33 @@ export function EffectParameters({
         })}
       </div>
       {!parameterKeys && definition.sdk?.placement && (
-        <details className="effect-placement">
-          <summary>{t("effectDomain:title")}</summary>
-          <EffectPositionPad
-            effect={effect}
-            engine={engine}
-            layerId={ownLayerId}
-            disabled={disabled}
-            onChange={onChange}
-            onStart={onStart}
-            onCancel={onCancel}
-          />
-          <EffectParameters
-            effect={effect}
-            engine={engine}
-            layerId={ownLayerId}
-            disabled={disabled}
-            onChange={onChange}
-            onStart={onStart}
-            onCancel={onCancel}
-            parameterKeys={EFFECT_DOMAIN_KEYS}
-            hideActions
-          />
-        </details>
+        <Accordion type="single" collapsible className="effect-placement">
+          <AccordionItem value="placement">
+            <AccordionTrigger>{t("effectDomain:title")}</AccordionTrigger>
+            <AccordionContent className="effect-placement-body">
+              <EffectPositionPad
+                effect={effect}
+                engine={engine}
+                layerId={ownLayerId}
+                disabled={disabled}
+                onChange={onChange}
+                onStart={onStart}
+                onCancel={onCancel}
+              />
+              <EffectParameters
+                effect={effect}
+                engine={engine}
+                layerId={ownLayerId}
+                disabled={disabled}
+                onChange={onChange}
+                onStart={onStart}
+                onCancel={onCancel}
+                parameterKeys={EFFECT_DOMAIN_KEYS}
+                hideActions
+              />
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
       )}
     </div>
   );

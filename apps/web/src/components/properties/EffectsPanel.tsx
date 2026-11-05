@@ -1,4 +1,5 @@
-import { Plus, Trash2, ArrowUp, ArrowDown } from "lucide-react";
+import { useState } from "react";
+import { Plus } from "lucide-react";
 import {
   createEffect,
   getEffectDefinition,
@@ -10,9 +11,7 @@ import { useTranslation } from "react-i18next";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent } from "../ui/dropdown-menu";
 import { EffectMenu } from "../layers/EffectMenu";
 import { Button } from "../ui/button";
-import { Switch } from "../ui/switch";
-import { IconButton } from "../shared/IconButton";
-import { EffectParameters } from "./effects/EffectParameters";
+import { EffectStack } from "./effects/EffectStack";
 
 export function EffectsPanel({
   layer,
@@ -28,19 +27,15 @@ export function EffectsPanel({
   onCancel?: () => void;
 }) {
   const { t } = useTranslation();
+  const [opened, setOpened] = useState({ owner: layer.id, value: layer.effects.at(-1)?.id ?? "" });
+  if (opened.owner !== layer.id)
+    setOpened({ owner: layer.id, value: layer.effects.at(-1)?.id ?? "" });
   function update(effect: Effect, patch: Partial<Effect>, preview = false) {
     const effects = layer.effects.map((item) =>
       item.id === effect.id ? { ...item, ...patch } : item,
     );
     if (preview) onPreview({ effects });
     else onPatch({ effects });
-  }
-  function move(index: number, direction: -1 | 1) {
-    const effects = [...layer.effects];
-    const effect = effects[index]!;
-    effects.splice(index, 1);
-    effects.splice(index + direction, 0, effect);
-    onPatch({ effects });
   }
   return (
     <section className="inspector-section effects-section">
@@ -54,7 +49,11 @@ export function EffectsPanel({
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <EffectMenu
-              onAdd={(type) => onPatch({ effects: [...layer.effects, createEffect(type)] })}
+              onAdd={(type) => {
+                const effect = createEffect(type);
+                onPatch({ effects: [...layer.effects, effect] });
+                setOpened({ owner: layer.id, value: effect.id });
+              }}
             />
           </DropdownMenuContent>
         </DropdownMenu>
@@ -62,56 +61,16 @@ export function EffectsPanel({
       {!layer.effects.some((effect) => !getEffectDefinition(effect.type).retired) && (
         <p className="muted-description">{t("noEffects")}</p>
       )}
-      {layer.effects.map((effect, index) => {
-        const definition = getEffectDefinition(effect.type);
-        if (definition.retired) return null;
-        return (
-          <div
-            className={`effect-card ${!effect.enabled ? "effect-disabled" : ""}`}
-            key={effect.id}
-          >
-            <div className="effect-heading">
-              <span className="effect-badge">fx</span>
-              <strong>{t(definition.nameKey)}</strong>
-              <Switch
-                checked={effect.enabled}
-                aria-label={t(effect.enabled ? "disableEffect" : "enableEffect")}
-                onCheckedChange={(enabled) => update(effect, { enabled })}
-              />
-              <IconButton
-                label={t("moveEffectUp")}
-                disabled={index === 0}
-                onClick={() => move(index, -1)}
-              >
-                <ArrowUp size={12} />
-              </IconButton>
-              <IconButton
-                label={t("moveEffectDown")}
-                disabled={index === layer.effects.length - 1}
-                onClick={() => move(index, 1)}
-              >
-                <ArrowDown size={12} />
-              </IconButton>
-              <IconButton
-                label={t("removeEffect")}
-                onClick={() =>
-                  onPatch({ effects: layer.effects.filter((item) => item.id !== effect.id) })
-                }
-              >
-                <Trash2 size={13} />
-              </IconButton>
-            </div>
-            {effect.enabled && (
-              <EffectParameters
-                engine={engine}
-                effect={effect}
-                onChange={(patch, preview) => update(effect, patch, preview)}
-                onCancel={onCancel}
-              />
-            )}
-          </div>
-        );
-      })}
+      <EffectStack
+        effects={layer.effects}
+        engine={engine}
+        layerId={layer.id}
+        value={opened.value}
+        onValueChange={(value) => setOpened({ owner: layer.id, value })}
+        onUpdate={update}
+        onChange={(effects) => onPatch({ effects })}
+        onCancel={onCancel}
+      />
       {layer.effects.length > 0 && <p className="effect-footnote">{t("effectClipped")}</p>}
     </section>
   );

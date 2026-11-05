@@ -32,6 +32,7 @@ import { appendMotionInput } from "./effect-motion/input-recording";
 import { InputPad, type EffectPadInput } from "./effect-motion/InputPad";
 import { beginEffectInputSession } from "./effect-motion/input-session";
 import "./effect-motion/messages";
+import "./messages";
 import "./effect-motion/style.css";
 
 const INPUTS: MotionInputKind[] = [
@@ -407,6 +408,7 @@ export function EffectPlayback({
               {settingsOpen && (
                 <div id={settingsId} className="effect-motion-settings-fields">
                   <SelectField
+                    contentClassName="effect-motion-select"
                     label={t("effectMotion:property")}
                     value={motionPropertyKey(property)}
                     disabled={disabled || recording}
@@ -435,6 +437,7 @@ export function EffectPlayback({
                     onCommit={setPeriod}
                   />
                   <SelectField
+                    contentClassName="effect-motion-select"
                     label={t("effectMotion:input")}
                     value={input}
                     disabled={disabled || recording}
@@ -446,6 +449,7 @@ export function EffectPlayback({
                   />
                   {input === "pointerXY" && secondary && (
                     <SelectField
+                      contentClassName="effect-motion-select"
                       label={t("effectMotion:propertyY")}
                       value={motionPropertyKey(secondary)}
                       disabled={disabled || recording}
@@ -461,6 +465,7 @@ export function EffectPlayback({
                     />
                   )}
                   <SelectField
+                    contentClassName="effect-motion-select"
                     label={t("effectMotion:response")}
                     value={response}
                     disabled={disabled || recording}
@@ -472,6 +477,7 @@ export function EffectPlayback({
                   />
                   {input.endsWith("Click") && (
                     <SelectField
+                      contentClassName="effect-motion-select"
                       label={t("effectMotion:clickMode")}
                       value={clickMode}
                       disabled={disabled || recording}
@@ -484,6 +490,7 @@ export function EffectPlayback({
                   )}
                   {input === "pointerDrag" && (
                     <SelectField
+                      contentClassName="effect-motion-select"
                       label={t("effectMotion:release")}
                       value={returnOnRelease ? "return" : "hold"}
                       disabled={disabled || recording}

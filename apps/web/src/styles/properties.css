@@ -230,40 +230,6 @@
   border-radius: 7px;
   padding: 9px 11px 11px;
 }
-.effect-heading {
-  display: flex;
-  gap: 4px;
-  align-items: center;
-}
-.effect-heading strong {
-  flex: 1;
-  min-width: 0;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  font-size: 11px;
-  font-weight: 600;
-}
-.effect-badge {
-  width: 18px;
-  height: 18px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--field);
-  border-radius: 4px;
-  font-size: 10px;
-  font-style: italic;
-  color: var(--muted-foreground);
-}
-.effect-heading > [data-slot="switch"] {
-  margin-left: auto;
-}
-.effect-heading .icon-button {
-  width: 20px;
-  height: 22px;
-  color: var(--muted-foreground);
-}
 .effect-disabled {
   opacity: 0.65;
   padding-bottom: 9px;

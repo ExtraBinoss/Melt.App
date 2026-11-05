@@ -1,9 +1,8 @@
 import { useMemo, useState } from "react";
-import { ArrowDown, ArrowUp, Plus, SlidersHorizontal, Sparkles, Trash2 } from "lucide-react";
+import { Plus, SlidersHorizontal, Sparkles } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import {
   createEffect,
-  getEffectDefinition,
   type Composition,
   type Effect,
   type EnginePort,
@@ -17,18 +16,11 @@ import { LayerThumbnail } from "../../../components/layers/rows/LayerThumbnail";
 import { SelectionPreviewIdentity } from "../../../services/projects/thumbnails/selection-identity";
 import { useLayerPreview } from "../../../components/layers/controls/use-layer-preview";
 import { MotionFieldProvider } from "../../../components/properties/motion/context";
-import { EffectParameters } from "../../../components/properties/effects/EffectParameters";
+import { EffectStack } from "../../../components/properties/effects/EffectStack";
 import { Popover, PopoverContent, PopoverTrigger } from "../../../components/ui/popover";
 import { Button } from "../../../components/ui/button";
-import { Switch } from "../../../components/ui/switch";
 import { IconButton } from "../../../components/shared/IconButton";
 import { compositionHasDepth, type EffectCategory } from "../../../components/layers/catalog/model";
-import {
-  Accordion,
-  AccordionItem,
-  AccordionTrigger,
-  AccordionContent,
-} from "../../../components/ui/accordion";
 import { StudioEffectCatalog } from "./StudioEffectCatalog";
 import { useCompositionEffectMotionRequest } from "../../../components/motion/scene/effect-navigation";
 import { useCompositionEffects } from "../../../components/layers/controls/use-composition-effects";
@@ -154,10 +146,8 @@ function OwnedEditor({
 }) {
   const { t } = useTranslation();
   const [view, setView] = useState<"catalog" | "stack">(requestedEffectId ? "stack" : "catalog");
-  const [expanded, setExpanded] = useState<string[]>(
-    requestedEffectId
-      ? [requestedEffectId]
-      : (layer?.effects ?? page.effects ?? []).slice(-1).map((effect) => effect.id),
+  const [expanded, setExpanded] = useState(
+    requestedEffectId ?? (layer?.effects ?? page.effects ?? []).at(-1)?.id ?? "",
   );
   const local = useLayerPreview(engine, page, layer ? [layer.id] : [], run, true);
   const whole = useCompositionEffects(engine, page, run);
@@ -180,11 +170,6 @@ function OwnedEditor({
         effects.map((item) => (item.id === effect.id ? { ...item, ...patch } : item)),
         preview,
       );
-  }
-  function move(index: number, direction: -1 | 1) {
-    const next = [...effects];
-    next.splice(index + direction, 0, next.splice(index, 1)[0]!);
-    change(next);
   }
   return (
     <MotionFieldProvider editor={editor}>
@@ -235,64 +220,28 @@ function OwnedEditor({
           }}
           disabled={disabled || effects.length >= 64}
           onAdd={(type) => {
-            change([...effects, createEffect(type)]);
+            const effect = createEffect(type);
+            change([...effects, effect]);
+            setExpanded(effect.id);
             setView("stack");
           }}
         />
       ) : (
-        <Accordion
-          type="multiple"
-          value={expanded}
-          onValueChange={setExpanded}
-          className="studio-effects-stack"
-        >
+        <div className="studio-effects-stack">
           {!effects.length && <p className="muted-description">{t("noEffects")}</p>}
-          {effects.map((effect, index) => (
-            <AccordionItem key={effect.id} className="studio-effect-card" value={effect.id}>
-              <AccordionTrigger>{t(getEffectDefinition(effect.type).nameKey)}</AccordionTrigger>
-              <AccordionContent>
-                <div className="studio-effect-actions">
-                  <Switch
-                    checked={effect.enabled}
-                    disabled={disabled}
-                    aria-label={t(effect.enabled ? "disableEffect" : "enableEffect")}
-                    onCheckedChange={(enabled) => update(effect, { enabled })}
-                  />
-                  <IconButton
-                    label={t("moveEffectUp")}
-                    disabled={disabled || !index}
-                    onClick={() => move(index, -1)}
-                  >
-                    <ArrowUp size={13} />
-                  </IconButton>
-                  <IconButton
-                    label={t("moveEffectDown")}
-                    disabled={disabled || index === effects.length - 1}
-                    onClick={() => move(index, 1)}
-                  >
-                    <ArrowDown size={13} />
-                  </IconButton>
-                  <IconButton
-                    label={t("removeEffect")}
-                    disabled={disabled}
-                    onClick={() => change(effects.filter((item) => item.id !== effect.id))}
-                  >
-                    <Trash2 size={13} />
-                  </IconButton>
-                </div>
-                <EffectParameters
-                  engine={engine}
-                  layerId={layer?.id}
-                  effect={effect}
-                  disabled={disabled}
-                  onStart={editor.begin}
-                  onChange={(patch, preview) => update(effect, patch, preview)}
-                  onCancel={editor.cancel}
-                />
-              </AccordionContent>
-            </AccordionItem>
-          ))}
-        </Accordion>
+          <EffectStack
+            effects={effects}
+            engine={engine}
+            layerId={layer?.id}
+            disabled={disabled}
+            value={expanded}
+            onValueChange={setExpanded}
+            onUpdate={update}
+            onChange={change}
+            onStart={editor.begin}
+            onCancel={editor.cancel}
+          />
+        </div>
       )}
     </MotionFieldProvider>
   );

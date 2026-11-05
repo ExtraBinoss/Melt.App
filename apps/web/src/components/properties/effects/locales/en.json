@@ -1,4 +1,6 @@
 {
+  "actions": "Actions",
+  "enabled": "Enabled",
   "resetAll": "Reset all effect parameters",
   "playLive": "Play live",
   "pauseLive": "Pause live",
