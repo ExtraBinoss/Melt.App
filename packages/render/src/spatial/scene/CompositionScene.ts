@@ -35,6 +35,7 @@ import { SharedShadows } from "./SharedShadows";
 import { registerSampledLights } from "./SampledLights";
 import { projectedTransport, transportProjection, windowProjection } from "./projection";
 import { spatialEffectProjection } from "./effect-projection";
+import { projectedRaster } from "../../compositing/projected-raster";
 
 /** One world, camera and light rig per composition. Sources keep independent effect surfaces. */
 export class CompositionScene implements GpuResource {
@@ -124,6 +125,7 @@ export class CompositionScene implements GpuResource {
     scale: number,
     viewport?: Bounds,
     resizeTarget?: (layer: Layer, resource: SpatialResource, width: number, height: number) => void,
+    maxSourcePixels = Infinity,
   ) {
     this.settings = settings;
     this.scopes = new DepthScopes(
@@ -228,13 +230,12 @@ export class CompositionScene implements GpuResource {
       this.projection.set(layer.id, crop);
       const reference =
         layer.effects.some((e) => e.enabled) || layer.mask?.enabled || layer.clipping;
-      assertTextureSize(
-        Math.max(1, Math.ceil(bounds.width * (reference ? 1 : scale))),
-        Math.max(1, Math.ceil(bounds.height * (reference ? 1 : scale))),
+      const { width, height } = projectedRaster(
+        bounds,
+        reference ? 1 : scale,
         limit,
+        maxSourcePixels,
       );
-      const width = Math.max(1, Math.ceil(bounds.width * (reference ? 1 : scale))),
-        height = Math.max(1, Math.ceil(bounds.height * (reference ? 1 : scale)));
       if (resizeTarget) resizeTarget(layer, resource, width, height);
       else resource.target.setSize(width, height);
       (resource.camera as Camera).copy(this.camera, false);

@@ -36,8 +36,9 @@ export function drawLayerSource(layer: Layer, context: SourceContext): FrameText
   if (layer.kind === "group") return context.children();
   if (layer.spatial?.enabled) {
     const bounds = context.spatial!.bounds(layer.id);
-    const w = Math.max(1, Math.ceil((bounds?.width ?? layer.width) * scale)),
-      h = Math.max(1, Math.ceil((bounds?.height ?? layer.height) * scale));
+    const raster = context.spatial!.rasterSize(layer.id);
+    const w = raster?.width ?? Math.max(1, Math.ceil((bounds?.width ?? layer.width) * scale)),
+      h = raster?.height ?? Math.max(1, Math.ceil((bounds?.height ?? layer.height) * scale));
     const target = context.target("spatial", 0, w, h);
     context.spatial!.render(layer, target);
     return { texture: target.texture, width: w, height: h, premultiplied: true, bounds };

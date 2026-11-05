@@ -15,6 +15,7 @@ import type { GpuPasses } from "./passes";
 import type { LayerTargets } from "./targets";
 import { rasterExtent, type FrameTexture } from "./types";
 import { prepareProjectedEffects } from "./projected-effects";
+import { projectedRaster } from "./projected-raster";
 
 interface Context {
   target(role: string, width: number, height: number, mipmapped?: boolean): RenderTarget;
@@ -26,6 +27,9 @@ interface Context {
   image(id: string, ownerId?: string): FrameTexture["texture"];
   effectCache?: { entry: LayerTargets; signature: string };
   effectProjection?: readonly number[];
+  effectWindow?: Bounds;
+  maxTextureDimension?: number;
+  effectPixelBudget?: number;
 }
 const translate = (x: number, y: number): Matrix => [1, 0, 0, 1, x, y];
 
@@ -73,8 +77,18 @@ export function finishLayerSource(
       width: effectOriginal.width + outset.left + outset.right,
       height: effectOriginal.height + outset.top + outset.bottom,
     };
-    const width = rasterExtent(bounds.width, scale),
-      height = rasterExtent(bounds.height, scale);
+    const raster =
+      projected?.raster(bounds) ??
+      (context.maxTextureDimension
+        ? projectedRaster(
+            bounds,
+            scale,
+            context.maxTextureDimension,
+            context.effectPixelBudget ?? Infinity,
+          )
+        : undefined);
+    const width = raster?.width ?? rasterExtent(bounds.width, scale),
+      height = raster?.height ?? rasterExtent(bounds.height, scale);
     if (source.premultiplied || outset.left || outset.top || outset.right || outset.bottom) {
       const straight = context.target("straight", width, height);
       context.passes.copyTo(source, straight, source.premultiplied, false, {

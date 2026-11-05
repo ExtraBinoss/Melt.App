@@ -216,3 +216,22 @@ test("an expanded display gate retains off-artboard native triangles and matchin
     f.dispose();
   }
 });
+
+test("tiny layout scales retain a complete source window while bounding the native raster before allocation", async () => {
+  const f = fixture();
+  try {
+    const page = {
+      ...f.page,
+      layers: f.page.layers.map((layer, index) => (index ? layer : { ...layer, scaleX: 0.001 })),
+    };
+    await f.sync(page);
+    const bounds = f.stage.bounds(page.layers[0]!.id)!;
+    const raster = f.sources[0]!.resource.target;
+    expect(bounds.width).toBeGreaterThan(8192);
+    expect(raster.width).toBeLessThanOrEqual(8192);
+    expect(raster.height).toBeLessThanOrEqual(8192);
+    expect(bounds.width / raster.width).toBeGreaterThan(1);
+  } finally {
+    f.dispose();
+  }
+});

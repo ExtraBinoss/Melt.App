@@ -108,3 +108,78 @@ test("the authored lattice conservatively includes fractional margins and reject
     /horizon/,
   );
 });
+
+test.each([
+  [26979, 6497],
+  [8439, 2265],
+])(
+  "grazing %i×%i authored effects stay bounded and restore the requested output sampling",
+  (width, height) => {
+    const targets: RenderTarget[] = [];
+    const texture = new Texture();
+    const original = { x: 0, y: 0, width: 200, height: 100 };
+    const projection = new Matrix3().set(width / 200, 0, 0, 0, height / 100, 0, 0, 0, 1);
+    const projectTo = vi.fn();
+    const layer = createLayer("text", { width: 200, height: 100, effects: [createEffect("blur")] });
+    let logical: EffectDimensions | undefined;
+    try {
+      const output = finishLayerSource(
+        layer,
+        createPage({ layers: [layer] }),
+        1,
+        { texture, width: 200, height: 100, bounds: original, premultiplied: true },
+        {
+          effectProjection: projection.elements,
+          effectWindow: original,
+          maxTextureDimension: 8192,
+          effectPixelBudget: 1024 * 1024,
+          target(_role, w, h) {
+            expect(w).toBeLessThanOrEqual(8192);
+            expect(h).toBeLessThanOrEqual(8192);
+            expect(w * h).toBeLessThanOrEqual(1024 * 1024);
+            const target = new RenderTarget(w, h);
+            targets.push(target);
+            return target;
+          },
+          passes: { projectTo, copyTo: vi.fn() } as unknown as GpuPasses,
+          cache: { ensureCapacity: vi.fn(), synchronize: vi.fn() } as unknown as GpuResourceCache,
+          effects: {
+            projectedBytes: () => 0,
+            apply(
+              _texture: Texture,
+              _w: number,
+              _h: number,
+              _effects: unknown,
+              target: RenderTarget,
+              dimensions: EffectDimensions,
+            ) {
+              logical = dimensions;
+              return target.texture;
+            },
+          } as unknown as EffectResources,
+          mask: () => {
+            throw Error("Unexpected mask");
+          },
+          maskSource: () => {
+            throw Error("Unexpected mask");
+          },
+          image: () => {
+            throw Error("Unexpected image");
+          },
+        },
+      );
+      expect(logical!.width).toBeGreaterThanOrEqual(width);
+      expect(logical!.height).toBeGreaterThanOrEqual(height);
+      expect(logical!.content).toMatchObject({ width: 200, height: 100 });
+      expect(output.bounds).toEqual(original);
+      expect(output.width).toBe(200);
+      expect(output.height).toBe(100);
+      expect(projectTo).toHaveBeenCalledTimes(2);
+      expect(projectTo.mock.calls[0]![4]).toEqual(projection.clone().invert().elements);
+      expect(projectTo.mock.calls[1]![4]).toEqual(projection.elements);
+    } finally {
+      texture.dispose();
+      targets.forEach((target) => target.dispose());
+    }
+  },
+);

@@ -194,6 +194,8 @@ export class SpatialSources {
         );
         this.cache.synchronize(key);
       },
+      // Native half-float MSAA consumes 56 bytes/pixel; leave room for the shared scene and FX.
+      options.mediaMode === "exact" ? Infinity : Math.max(1, Math.floor(this.cache.maxBytes / 112)),
     );
     await this.reflections.prepare(
       page,
@@ -233,6 +235,10 @@ export class SpatialSources {
   }
   bounds(layerId: string) {
     return this.stage?.bounds(layerId);
+  }
+  rasterSize(layerId: string) {
+    const target = this.prepared.get(layerId)?.resource.target;
+    return target ? { width: target.viewport.z, height: target.viewport.w } : undefined;
   }
   effectProjection(layerId: string): readonly number[] | undefined {
     return this.stage?.effectProjection(layerId);

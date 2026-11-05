@@ -15,6 +15,7 @@ import { finishLayerSource, layerEffectCache } from "./finish-layer";
 import { hasEffectTreatment } from "../effects/shared/active";
 import { groupViewport, type GroupViewport } from "./group-viewport";
 import { rasterExtent, type FrameTexture } from "./types";
+import { projectedEffectWindow } from "./projected-window";
 
 interface Context {
   maxTextureDimension: number;
@@ -140,7 +141,13 @@ export function renderLayer(
       effects: context.effects,
       cache: context.cache,
       ...(layer.spatial?.enabled
-        ? { effectProjection: context.spatial?.effectProjection(layer.id) }
+        ? {
+            effectProjection: context.spatial?.effectProjection(layer.id),
+            effectWindow: projectedEffectWindow(page, layer, frame.viewport),
+            maxTextureDimension: context.maxTextureDimension,
+            // Bound retained treatment/copy/scratch surfaces alongside native MSAA and the scene.
+            effectPixelBudget: Math.max(1, Math.floor(context.cache.maxBytes / 96)),
+          }
         : {}),
       ...layerEffectCache(
         layer,

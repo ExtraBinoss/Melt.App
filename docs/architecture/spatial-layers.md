@@ -42,7 +42,14 @@ with one bucket of shrink hysteresis. The viewport and source crop remain exact;
 the output pass samples only that used rectangle, so effect dimensions, seeds
 and exported pixels do not depend on storage capacity. Cache admission precedes
 resize, and insufficient padding budget falls back to exact storage. Exact jobs
-always use tight storage. Camera-only samples retain depth/reflection material
+always use tight storage. Projected effect planes retain their authored coordinates
+when a grazing camera magnifies their logical transport. Their intermediate sampling
+lattice obeys the acquired device limit and a charged working-set budget; forward
+projection is clipped in homogeneous coordinates to the actual output window before
+allocation. Near a projection horizon this can reduce intermediate sampling density,
+without changing effect units, source anchors, or requested final export dimensions.
+Native source rasters use the same explicit rectangle mapping; exact jobs retain
+requested native density whenever it fits the device. Camera-only samples retain depth/reflection material
 graphs; appearance, geometry, pose, lighting and native shader changes invalidate
 their synchronization certificates.
 
