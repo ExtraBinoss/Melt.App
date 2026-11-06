@@ -1,5 +1,6 @@
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "../../ui/accordion";
 import { EffectPositionPad } from "./EffectPositionPad";
+import { EffectPositionPresentation } from "./sdk/EffectPositionPresentation";
 import "./sdk/messages";
 import { LiquifyControls } from "./LiquifyControls";
 import { EffectImageInputs } from "./inputs/EffectImageInputs";
@@ -285,26 +286,33 @@ export function EffectParameters({
           <AccordionItem value="placement">
             <AccordionTrigger>{t("effectDomain:title")}</AccordionTrigger>
             <AccordionContent className="effect-placement-body">
-              <EffectPositionPad
-                effect={effect}
-                engine={engine}
-                layerId={ownLayerId}
-                disabled={disabled}
-                onChange={onChange}
-                onStart={onStart}
-                onCancel={onCancel}
-              />
-              <EffectParameters
-                effect={effect}
-                engine={engine}
-                layerId={ownLayerId}
-                disabled={disabled}
-                onChange={onChange}
-                onStart={onStart}
-                onCancel={onCancel}
-                parameterKeys={EFFECT_DOMAIN_KEYS}
-                hideActions
-              />
+              <EffectPositionPresentation key={effect.id} effect={effect}>
+                {(publish) => (
+                  <>
+                    <EffectPositionPad
+                      effect={effect}
+                      engine={engine}
+                      layerId={ownLayerId}
+                      disabled={disabled}
+                      onChange={onChange}
+                      onStart={onStart}
+                      onCancel={onCancel}
+                      onPosition={publish}
+                    />
+                    <EffectParameters
+                      effect={effect}
+                      engine={engine}
+                      layerId={ownLayerId}
+                      disabled={disabled}
+                      onChange={onChange}
+                      onStart={onStart}
+                      onCancel={onCancel}
+                      parameterKeys={EFFECT_DOMAIN_KEYS}
+                      hideActions
+                    />
+                  </>
+                )}
+              </EffectPositionPresentation>
             </AccordionContent>
           </AccordionItem>
         </Accordion>

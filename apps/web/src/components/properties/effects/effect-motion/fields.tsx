@@ -1,3 +1,4 @@
+import { useContext } from "react";
 import type { ComponentProps, ReactNode } from "react";
 import type {
   EnginePort,
@@ -12,6 +13,8 @@ import { useMotionFieldEditor } from "../../motion/context";
 import { SceneMotionField } from "../../../spatial/SceneMotionField";
 import { SceneMotionValue } from "../../../spatial/SceneMotionValue";
 import { SceneNumberInput } from "../../../spatial/SceneNumberInput";
+import { NumberInput } from "../../../shared/NumberInput";
+import { EffectPositionContext } from "../sdk/EffectPositionPresentation";
 
 export type EffectFieldTarget = MotionPropertyTarget | SceneMotionPropertyTarget;
 interface FieldProps {
@@ -52,6 +55,21 @@ export function EffectMotionNumberInput({
   target,
   ...props
 }: Omit<ComponentProps<typeof MotionNumberInput>, "target"> & { target?: EffectFieldTarget }) {
+  const position = useContext(EffectPositionContext);
+  if (position && target && (target.property === "domainX" || target.property === "domainY"))
+    return (
+      <EffectMotionField
+        engine={props.engine}
+        target={target}
+        label={props.label}
+        disabled={props.disabled}
+      >
+        <NumberInput
+          {...props}
+          presentation={position.field(target.property, props.displayScale ?? 1)}
+        />
+      </EffectMotionField>
+    );
   return target && "compositionId" in target ? (
     <EffectMotionField
       engine={props.engine}
