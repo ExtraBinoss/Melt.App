@@ -4,6 +4,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ## [Unreleased]
 
+- Reduce Studio guide entrance rendering cost while preserving the staggered blur: separate viewport-bounded dimming bands from the blurred capture frame instead of filtering its `100vmax` shadow. Profile frozen production builds on Studio Starter at DPR 1/2; retain zero root React commits, approximately 26 ms median feedback, and document trace work, outliers and measurement limits in `docs/performance/studio-guides.md`.
+
 - Complete effect localization across all twelve supported languages: catalog/search names and descriptions, every SDK parameter and choice, gradients, transitions, source preparation, shared effect/alpha/blend controls, Motion recording/settings and canvas gizmo help. Load native locale bundles instead of falling back to English, and resolve animated choice endpoints through SDK labels while retaining portable values. Add strict per-locale resource, interpolation and runtime lookup regressions.
 
 - Soften held numeric scrub feedback to an 18% primary tint while preserving readable text, smooth fades and a steady appearance across snapping.

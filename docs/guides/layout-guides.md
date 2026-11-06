@@ -75,3 +75,9 @@ does not restart their opening animation. The canvas capture frame uses the same
 shared blur/fade keyframes; camera projection and guide geometry remain imperative.
 Reduced motion skips both entrances. These presentation animations do not create
 document commands, modify exported artwork or animate layout dimensions.
+
+The canvas dimmer uses four non-overlapping rectangles clamped to the viewport,
+separate from the capture-frame blur. This avoids including a `100vmax` shadow in
+the animated filter surface. View/camera updates keep the aperture aligned without
+React frame updates. See [the measured guide profile](../performance/studio-guides.md)
+for native production results and their limits.

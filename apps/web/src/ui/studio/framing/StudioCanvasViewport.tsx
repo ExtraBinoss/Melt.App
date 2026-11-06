@@ -6,6 +6,7 @@ import type { SpatialCanvasProps } from "../../../canvas/spatial/CanvasSpatialEd
 import { getStudioViewport } from "./viewport";
 import { DEFAULT_STUDIO_GUIDES, STUDIO_GUIDE_COLORS, studioSafeInsets } from "./guide-settings";
 import "../../../components/ui/blur-text-animation.css";
+import "../../../components/shared/motion/palette-panel.css";
 import "./backdrop.css";
 import "./framing.css";
 
@@ -19,6 +20,7 @@ export function StudioCanvasViewport({
   const active = useWorkspaceMode() === "studio";
   const capture = useProjectPreference("studioCapture");
   const window = useRef<HTMLDivElement>(null);
+  const matte = useRef<HTMLDivElement>(null);
   const label = useRef<HTMLSpanElement>(null);
   const safe = useRef<HTMLDivElement>(null);
   const center = useRef<HTMLDivElement>(null);
@@ -75,12 +77,26 @@ export function StudioCanvasViewport({
       const guides = frame.page.captureGuides ?? DEFAULT_STUDIO_GUIDES;
       const target =
         choice && !choice.full ? fitOutputRegion(region, choice.width, choice.height) : region;
-      const guide = window.current;
-      if (!guide) return;
+      const guide = window.current,
+        shade = matte.current;
+      if (!guide || !shade) return;
       guide.hidden = !choice?.visible;
+      shade.hidden = guide.hidden;
       if (guide.hidden) return;
-      guide.style.left = `${size.width / 2 + view.x + (target.x - frame.page.width / 2) * view.zoom}px`;
-      guide.style.top = `${size.height / 2 + view.y + (target.y - frame.page.height / 2) * view.zoom}px`;
+      const left = size.width / 2 + view.x + (target.x - frame.page.width / 2) * view.zoom;
+      const top = size.height / 2 + view.y + (target.y - frame.page.height / 2) * view.zoom;
+      const right = left + target.width * view.zoom,
+        bottom = top + target.height * view.zoom;
+      // Four non-overlapping bands need neither a giant shadow nor a rasterized clip mask.
+      shade.style.setProperty("--capture-left", `${Math.max(0, Math.min(size.width, left))}px`);
+      shade.style.setProperty("--capture-right", `${Math.max(0, Math.min(size.width, right))}px`);
+      shade.style.setProperty("--capture-top", `${Math.max(0, Math.min(size.height, top))}px`);
+      shade.style.setProperty(
+        "--capture-bottom",
+        `${Math.max(0, Math.min(size.height, bottom))}px`,
+      );
+      guide.style.left = `${left}px`;
+      guide.style.top = `${top}px`;
       guide.style.width = `${target.width * view.zoom}px`;
       guide.style.height = `${target.height * view.zoom}px`;
       guide.style.setProperty("--studio-guide-color", STUDIO_GUIDE_COLORS[guides.color]);
@@ -118,6 +134,17 @@ export function StudioCanvasViewport({
   return active ? (
     <>
       <div className="studio-capture-overlay" aria-hidden="true">
+        <div
+          ref={matte}
+          className="studio-capture-matte"
+          hidden={!capture?.visible}
+          data-studio-capture-matte
+        >
+          <i />
+          <i />
+          <i />
+          <i />
+        </div>
         <div
           ref={window}
           className="studio-capture-window"
