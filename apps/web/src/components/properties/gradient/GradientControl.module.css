@@ -201,7 +201,7 @@
   border-color: var(--ring);
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--ring) 15%, transparent);
 }
-.swatchButton {
+.swatchButton:global(.icon-button) {
   display: grid;
   place-items: center;
   flex-shrink: 0;
@@ -212,7 +212,17 @@
   border-radius: 4px;
   background: transparent;
 }
-.swatchButton:hover {
+.swatchButton:global(.icon-button):hover {
+  background: var(--accent);
+}
+.hexField > :global(.palette-shortcut.icon-button) {
+  width: 21px;
+  height: 25px;
+  padding: 3px;
+  border-radius: 4px;
+  background: transparent;
+}
+.hexField > :global(.palette-shortcut.icon-button):hover {
   background: var(--accent);
 }
 .swatchButton > span {

@@ -1,9 +1,12 @@
 import { useState, useSyncExternalStore } from "react";
+import { Check, Link, Plus, Trash2 } from "lucide-react";
 import { colorOwner, colorTargets } from "@musart/core";
 import type { ColorTarget, EnginePort } from "@musart/core";
 import { useTranslation } from "react-i18next";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
+import { Switch } from "../ui/switch";
+import { IconButton } from "../shared/IconButton";
 export function DocumentColors({
   engine,
   targets,
@@ -48,50 +51,32 @@ export function DocumentColors({
       setError(reason instanceof Error ? reason.message : t("failed"));
     }
   }
+  function create() {
+    const id = crypto.randomUUID();
+    engine.transaction([
+      { type: "setDocumentColors", colors: [{ id, name: name.trim(), value: edit }] },
+      { type: "linkDocumentColor", targets, colorId: id },
+    ]);
+  }
   return (
     <section className="palette-document" aria-label={t("document")}>
-      <strong>{t("document")}</strong>
-      <p className="muted-description">{t("globalHint")}</p>
-      {linked && (
-        <>
-          <p>
-            {t("linked", {
-              name: linked.name,
-              count: uses.filter((use) => use.colorId === linked.id).length,
-            })}
-          </p>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() =>
-              run(() => engine.execute({ type: "linkDocumentColor", targets, colorId: null }))
-            }
-          >
-            {t("detach")}
-          </Button>
-        </>
-      )}
-      <div className="palette-swatches">
+      <div className="palette-document-swatches">
         {project.colors?.map((color) => (
-          <div className="palette-document-color" key={color.id}>
-            <button
-              type="button"
-              className="palette-swatch"
-              style={{ background: color.value }}
-              title={`${color.name} · ${uses.filter((use) => use.colorId === color.id).length}`}
-              aria-label={color.name}
-              disabled={!targets.length}
-              onClick={() =>
-                run(() => engine.execute({ type: "linkDocumentColor", targets, colorId: color.id }))
-              }
-            />
-            <span>
-              {color.name} · {uses.filter((use) => use.colorId === color.id).length}
-            </span>
-          </div>
+          <Button
+            key={color.id}
+            variant="ghost"
+            className="palette-swatch"
+            style={{ background: color.value }}
+            title={`${color.name} · ${uses.filter((use) => use.colorId === color.id).length}`}
+            aria-label={color.name}
+            aria-pressed={color.id === linkedId}
+            disabled={!targets.length}
+            onClick={() =>
+              run(() => engine.execute({ type: "linkDocumentColor", targets, colorId: color.id }))
+            }
+          />
         ))}
       </div>
-      {!project.colors?.length && <p>{t("noColors")}</p>}
       <Input
         aria-label={t("globalName")}
         placeholder={t("globalName")}
@@ -104,52 +89,62 @@ export function DocumentColors({
         value={edit}
         onChange={(event) => setEdit(event.target.value)}
       />
-      <div className="palette-actions">
-        <Button
-          size="sm"
-          variant="outline"
+      <div className="palette-edit-actions">
+        <label className="palette-lock" title={t("link")}>
+          <Link size={14} aria-hidden="true" />
+          <Switch
+            size="sm"
+            aria-label={t("link")}
+            checked={!!linked}
+            disabled={!targets.length || (!linked && !name.trim())}
+            onCheckedChange={(next) =>
+              run(() =>
+                next
+                  ? create()
+                  : engine.execute({ type: "linkDocumentColor", targets, colorId: null }),
+              )
+            }
+          />
+        </label>
+        <IconButton
+          label={t("makeGlobal")}
           disabled={!name.trim() || !targets.length}
-          onClick={() =>
-            run(() => {
-              const id = crypto.randomUUID();
-              engine.transaction([
-                { type: "setDocumentColors", colors: [{ id, name: name.trim(), value: edit }] },
-                { type: "linkDocumentColor", targets, colorId: id },
-              ]);
-            })
-          }
+          onClick={() => run(create)}
         >
-          {t("makeGlobal")}
-        </Button>
+          <Plus size={15} />
+        </IconButton>
         {linked && (
           <>
-            <Button
-              size="sm"
-              variant="outline"
+            <IconButton
+              label={t("editGlobal")}
+              disabled={!name.trim()}
               onClick={() =>
                 run(() =>
                   engine.execute({
                     type: "setDocumentColors",
-                    colors: [{ ...linked, name: name.trim() || linked.name, value: edit }],
+                    colors: [{ ...linked, name: name.trim(), value: edit }],
                   }),
                 )
               }
             >
-              {t("editGlobal")}
-            </Button>
-            <Button
-              size="sm"
-              variant="ghost"
+              <Check size={15} />
+            </IconButton>
+            <IconButton
+              label={t("remove")}
               onClick={() =>
                 run(() => engine.execute({ type: "deleteDocumentColor", id: linked.id }))
               }
             >
-              {t("remove")}
-            </Button>
+              <Trash2 size={14} />
+            </IconButton>
           </>
         )}
       </div>
-      {error && <p role="alert">{error}</p>}
+      {error && (
+        <p role="alert" className="palette-error">
+          {error}
+        </p>
+      )}
     </section>
   );
 }

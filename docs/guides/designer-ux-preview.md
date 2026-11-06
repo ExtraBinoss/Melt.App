@@ -47,15 +47,21 @@ restores the previous binding and values together.
 
 ## Palettes
 
-A palette shortcut beside existing color-picker controls opens a nonmodal library.
+A palette shortcut beside existing color-picker controls opens a compact nonmodal
+picker. The default document palette is detected automatically; saved palettes
+share its selector. Add opens a separate editor with an empty suggested name,
+shared swatch picker and native pipette where supported. Secondary actions and
+explicit linked document colors are in the menu.
 Named palettes can be reused across projects; explicit document colors and links
 travel inside a project. Choosing a saved swatch locally and linking a property
 to a document color are distinct actions. A linked global edit updates all bound
 owners in one validated transaction, while detaching preserves local appearance.
 
 Dice variations preserve locked colors and use coherent perceptual color changes.
-Their preview is temporary; Apply commits one change and Cancel/unmount discards
-the draft. Saving a named variation is a separate library action. A stale editing
+Each generation has a local undo/redo step; buttons and Ctrl/Cmd+Z remain
+available inside the popover. Their preview is temporary; Apply commits one
+document change, while Cancel/unmount discards the draft. After Apply, document
+undo and redo remain available without dismissing the popover. Saving a named variation is a separate library action. A stale editing
 target and conflicting saved-library revisions produce real errors.
 
 ## Verification scope

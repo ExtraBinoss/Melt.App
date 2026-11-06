@@ -1,15 +1,19 @@
 import { useEffect, useRef, useState } from "react";
 import type { ColorTarget, PaletteSwatch, SavedPalette } from "@musart/core";
-import { validateSavedPalette, varyPalette } from "@musart/core";
+import { validateSavedPalette } from "@musart/core";
 import { useTranslation } from "react-i18next";
 import { PaletteLibrary } from "../../services/palettes/library";
 import type { PaletteRecord, PaletteSummary } from "../../services/palettes/library";
-import { Button } from "../ui/button";
-import { SelectField } from "../shared/SelectField";
+import { ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
+import { IconButton } from "../shared/IconButton";
+import { Throbber } from "../ui/throbber/Throbber";
+import { PalettePicker } from "./PalettePicker";
 import { usePaletteEngine } from "./PaletteProvider";
 import { DocumentColors } from "./DocumentColors";
 import { usePaletteVariation } from "./use-palette-variation";
 import { PaletteEditor } from "./PaletteEditor";
+import { useDocumentPalette } from "./use-document-palette";
+const DOCUMENT_PALETTE_ID = "document:detected";
 export function PaletteBrowser({
   value,
   targets,
@@ -27,6 +31,14 @@ export function PaletteBrowser({
 }) {
   const { t } = useTranslation("palettes"),
     engine = usePaletteEngine();
+  const detected = useDocumentPalette(engine, value);
+  const [viewingDocument, setViewingDocument] = useState(true);
+  const documentPalette: SavedPalette = {
+    id: DOCUMENT_PALETTE_ID,
+    name: t("documentDetected"),
+    colors: detected.colors,
+  };
+  const [mode, setMode] = useState<"pick" | "edit" | "document">("pick");
   const [items, setItems] = useState<PaletteSummary[]>([]),
     [selected, setSelected] = useState<PaletteRecord | null>(null),
     [draft, setDraft] = useState<SavedPalette | null>(null);
@@ -55,16 +67,18 @@ export function PaletteBrowser({
       .list()
       .then(
         (page) => {
-          if (token === lifetime.current.epoch) {
-            setItems(page.items);
-            setMore(page.more);
-          }
+          if (token !== life.epoch) return;
+          setItems(page.items);
+          setMore(page.more);
         },
         (reason: unknown) => {
           if (token === lifetime.current.epoch)
             setError(reason instanceof Error ? reason.message : t("failed"));
         },
       )
+      .catch((reason: unknown) => {
+        if (token === life.epoch) setError(reason instanceof Error ? reason.message : t("failed"));
+      })
       .finally(() => {
         if (token === lifetime.current.epoch) setBusy(false);
       });
@@ -96,11 +110,17 @@ export function PaletteBrowser({
     }
   }
   function load(id: string) {
+    if (id === DOCUMENT_PALETTE_ID) {
+      cancelVariation();
+      setViewingDocument(true);
+      return;
+    }
     void perform(async (library, current) => {
       const record = await library.get(id);
       if (current()) {
         setSelected(record);
         setDraft(record);
+        setViewingDocument(false);
       }
     });
   }
@@ -124,6 +144,8 @@ export function PaletteBrowser({
       if (current()) {
         setSelected(record);
         setDraft(record);
+        setViewingDocument(false);
+        setMode("pick");
       }
       await reload(library, current);
     });
@@ -132,25 +154,25 @@ export function PaletteBrowser({
     try {
       cancelVariation();
       beforeApply();
-      if (link && engine && targets.length)
+      if (link && engine && targets.length) {
+        const colorId = viewingDocument ? crypto.randomUUID() : color.id;
         engine.transaction([
           {
             type: "setDocumentColors",
-            colors: [{ id: color.id, name: color.name, value: color.value }],
+            colors: [{ id: colorId, name: color.name, value: color.value }],
           },
-          { type: "linkDocumentColor", targets, colorId: color.id },
+          { type: "linkDocumentColor", targets, colorId },
         ]);
-      else onUse(color.value);
+      } else onUse(color.value);
       setError("");
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : t("failed"));
     }
   }
-  function generate(colors: PaletteSwatch[]) {
+  function previewColors(colors: PaletteSwatch[]) {
     try {
-      const next = varyPalette(colors, Math.random());
-      variation.preview(next);
-      setPreview(next);
+      variation.preview(colors);
+      setPreview(colors);
       setError("");
     } catch (reason) {
       cancelVariation();
@@ -165,7 +187,7 @@ export function PaletteBrowser({
       setSelected(null);
       setDraft({
         id: crypto.randomUUID(),
-        name: t("variationName", { name: draft.name }),
+        name: draft.name ? t("variationName", { name: draft.name }) : "",
         colors: colors.map((color) => ({ ...color, id: crypto.randomUUID() })),
       });
       setError("");
@@ -190,73 +212,95 @@ export function PaletteBrowser({
       setError(reason instanceof Error ? reason.message : t("failed"));
     }
   }
+  function createPalette() {
+    cancelVariation();
+    setSelected(null);
+    setMode("edit");
+    setDraft({
+      id: crypto.randomUUID(),
+      name: "",
+      colors: (detected.colors.length
+        ? detected.colors
+        : [{ id: "current", name: "1", value }]
+      ).map((color, index) => ({ ...color, id: crypto.randomUUID(), name: `${index + 1}` })),
+    });
+  }
+  function closeEditor() {
+    cancelVariation();
+    setDraft(selected);
+    setViewingDocument(!selected);
+    setMode("pick");
+  }
   return (
-    <div className="palette-browser" aria-busy={busy}>
-      <strong>{t("library")}</strong>
-      <p className="muted-description">{t("hint")}</p>
-      <SelectField
-        label={t("library")}
-        value={selected?.id ?? ""}
-        disabled={busy || !items.length}
-        options={items.map((item) => ({ value: item.id, label: item.name }))}
-        onValueChange={load}
-      />
-      {!items.length && !busy && <p>{t("empty")}</p>}
-      <div className="palette-actions">
-        <Button
-          size="sm"
-          variant="outline"
-          disabled={busy}
-          onClick={() => {
-            cancelVariation();
-            setSelected(null);
-            setDraft({
-              id: crypto.randomUUID(),
-              name: t("company"),
-              colors: [{ id: crypto.randomUUID(), name: "1", value }],
-            });
+    <div className="palette-browser" aria-busy={busy} data-palette-mode={mode}>
+      {mode === "pick" && (
+        <PalettePicker
+          items={items}
+          selectedId={viewingDocument ? DOCUMENT_PALETTE_ID : selected?.id}
+          palette={viewingDocument ? documentPalette : draft}
+          detected={documentPalette}
+          personal={!viewingDocument && !!selected}
+          busy={busy}
+          canLink={Boolean(engine && targets.length)}
+          onLoad={load}
+          onNew={createPalette}
+          onUse={use}
+          onEdit={() => {
+            if (viewingDocument) createPalette();
+            else setMode("edit");
           }}
-        >
-          {t("new")}
-        </Button>
-        {selected && (
-          <>
-            <Button
-              size="sm"
-              variant="outline"
-              disabled={busy}
-              onClick={() => draft && save({ ...draft, name: `${draft.name} 2` }, true)}
-            >
-              {t("duplicate")}
-            </Button>
-            <Button
-              size="sm"
-              variant="ghost"
-              disabled={busy}
-              onClick={() => {
-                void perform(async (library, current) => {
-                  await library.delete(selected.id, selected.revision);
-                  if (current()) {
-                    setSelected(null);
-                    setDraft(null);
-                  }
-                  await reload(library, current);
-                });
-              }}
-            >
-              {t("remove")}
-            </Button>
-          </>
-        )}
-        <Button size="sm" variant="ghost" disabled={busy} onClick={() => importer.current?.click()}>
-          {t("import")}
-        </Button>
-        {draft && (
-          <Button size="sm" variant="ghost" disabled={busy} onClick={exportPalette}>
-            {t("export")}
-          </Button>
-        )}
-      </div>
+          onDuplicate={() => draft && save({ ...draft, name: `${draft.name} 2` }, true)}
+          onDelete={() => {
+            if (selected)
+              void perform(async (library, current) => {
+                await library.delete(selected.id, selected.revision);
+                if (current()) {
+                  setSelected(null);
+                  setDraft(null);
+                  setViewingDocument(true);
+                }
+                await reload(library, current);
+              });
+          }}
+          onImport={() => importer.current?.click()}
+          onExport={exportPalette}
+          onDocument={engine ? () => setMode("document") : undefined}
+        />
+      )}
+      {mode === "edit" && draft && (
+        <PaletteEditor
+          key={draft.id}
+          palette={draft}
+          value={value}
+          busy={busy}
+          onChange={setDraft}
+          onSave={save}
+          onClose={closeEditor}
+          preview={preview}
+          onPreview={previewColors}
+          onCancelPreview={cancelVariation}
+          onApplyVariation={applyVariation}
+        />
+      )}
+      {mode === "document" && engine && (
+        <>
+          <div className="palette-picker-heading">
+            <IconButton label={t("cancel")} onClick={() => setMode("pick")}>
+              <ArrowLeft size={16} />
+            </IconButton>
+            <span>{t("linkedColors")}</span>
+          </div>
+          <DocumentColors
+            engine={engine}
+            targets={targets}
+            value={value}
+            beforeApply={() => {
+              cancelVariation();
+              beforeApply();
+            }}
+          />
+        </>
+      )}
       <input
         ref={importer}
         type="file"
@@ -279,68 +323,47 @@ export function PaletteBrowser({
             if (current()) {
               setSelected(record);
               setDraft(record);
+              setMode("pick");
             }
             await reload(library, current);
           });
         }}
       />
-      <div className="palette-actions">
-        {cursors.length > 1 && (
-          <Button
-            size="sm"
-            variant="ghost"
-            disabled={busy}
-            onClick={() => {
-              const next = cursors.slice(0, -1);
-              setCursors(next);
-              void perform((library, current) => reload(library, current, next.at(-1)));
-            }}
-          >
-            {t("previous")}
-          </Button>
-        )}
-        {more && (
-          <Button
-            size="sm"
-            variant="ghost"
-            disabled={busy}
-            onClick={() => {
-              const after = items.at(-1)!.id;
-              setCursors([...cursors, after]);
-              void perform((library, current) => reload(library, current, after));
-            }}
-          >
-            {t("next")}
-          </Button>
-        )}
-      </div>
-      {draft && (
-        <PaletteEditor
-          key={draft.id}
-          palette={draft}
-          value={value}
-          busy={busy}
-          onChange={setDraft}
-          onSave={save}
-          onUse={use}
-          preview={preview}
-          onPreview={generate}
-          onCancelPreview={cancelVariation}
-          onApplyVariation={applyVariation}
-        />
+      {mode === "pick" && (cursors.length > 1 || more) && (
+        <div className="palette-pagination">
+          {cursors.length > 1 && (
+            <IconButton
+              label={t("previous")}
+              disabled={busy}
+              onClick={() => {
+                const next = cursors.slice(0, -1);
+                setCursors(next);
+                void perform((library, current) => reload(library, current, next.at(-1)));
+              }}
+            >
+              <ChevronLeft size={14} />
+            </IconButton>
+          )}
+          {more && (
+            <IconButton
+              label={t("next")}
+              disabled={busy}
+              onClick={() => {
+                const after = items.at(-1)!.id;
+                setCursors([...cursors, after]);
+                void perform((library, current) => reload(library, current, after));
+              }}
+            >
+              <ChevronRight size={14} />
+            </IconButton>
+          )}
+        </div>
       )}
-      {busy && <p role="status">{t("loading")}</p>}
-      {error && <p role="alert">{error}</p>}
-      {engine && (
-        <DocumentColors
-          engine={engine}
-          targets={targets}
-          value={value}
-          beforeApply={() => {
-            cancelVariation();
-            beforeApply();
-          }}
-        />
+      {busy && <Throbber label={t("loading")} size={18} variant="dots" />}
+      {(error || detected.error) && (
+        <p role="alert" className="palette-error">
+          {error || detected.error}
+        </p>
       )}
     </div>
   );

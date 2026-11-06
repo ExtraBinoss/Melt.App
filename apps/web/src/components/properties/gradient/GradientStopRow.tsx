@@ -93,14 +93,15 @@ export function GradientStopRow({
       <div className={styles.hexField}>
         <Popover open={colorOpen} onOpenChange={onColorOpenChange}>
           <PopoverTrigger asChild>
-            <button
+            <IconButton
               type="button"
               disabled={disabled}
               className={styles.swatchButton}
-              aria-label={t("stopColor", { number })}
+              label={t("stopColor", { number })}
+              tooltipSide="top"
             >
               <span data-gradient-swatch style={{ backgroundColor: stop.color }} />
-            </button>
+            </IconButton>
           </PopoverTrigger>
           <PopoverContent
             side="left"

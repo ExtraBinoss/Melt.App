@@ -89,6 +89,7 @@ export function StudioObjectPaint({
         </PopoverContent>
       </Popover>
       <PaletteShortcut
+        side="top"
         value={layer.fill}
         disabled={disabled}
         targets={[{ pageId: engine.getSnapshot().pageId, layerId: layer.id, property: "fill" }]}

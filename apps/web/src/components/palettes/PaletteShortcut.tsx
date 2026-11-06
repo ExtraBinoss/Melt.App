@@ -15,6 +15,7 @@ export function PaletteShortcut({
   beforeApply = () => {},
   onPreview,
   onCancel,
+  side = "left",
 }: {
   value: string;
   targets?: ColorTarget[];
@@ -23,6 +24,7 @@ export function PaletteShortcut({
   beforeApply?: () => void;
   onPreview?: (value: string) => void;
   onCancel?: () => void;
+  side?: "top" | "right" | "bottom" | "left";
 }) {
   const { t } = useTranslation("palettes"),
     [open, setOpen] = useState(false);
@@ -33,6 +35,7 @@ export function PaletteShortcut({
           type="button"
           className="palette-shortcut"
           label={t("shortcut")}
+          tooltipSide="top"
           disabled={disabled}
         >
           <Palette size={15} />
@@ -40,10 +43,11 @@ export function PaletteShortcut({
       </PopoverTrigger>
       <PopoverContent
         className="floating-panel saved-palette-popover"
-        side="left"
+        side={side}
         sideOffset={10}
         aria-label={t("shortcut")}
         data-palette-popover
+        data-canvas-control
         onPointerDown={(event) => event.stopPropagation()}
         onPointerUp={(event) => event.stopPropagation()}
         onKeyUp={(event) => event.stopPropagation()}
