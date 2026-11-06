@@ -120,6 +120,7 @@ export async function captureObjectTemporalTrail(forceWebGL: boolean) {
   const compositor = new GpuCompositor(renderer, { maxBytes: 96 * 1024 * 1024 }),
     presentation = new GpuPresentation(renderer),
     images: { name: string; scale: number; png: string }[] = [],
+    staticImages: { expanded: boolean; png: string }[] = [],
     glErrors: number[] = [],
     gpuErrors: string[] = [];
   const onGpuError = (event: GPUUncapturedErrorEvent) => gpuErrors.push(event.error.message);
@@ -180,6 +181,34 @@ export async function captureObjectTemporalTrail(forceWebGL: boolean) {
       if (error) glErrors.push(error);
       images.push({ name, scale, png: renderer.domElement.toDataURL("image/png") });
     }
+    // Static Auto text uses the same native pipeline, including the extent opt-out.
+    for (const expanded of [true, false]) {
+      const page = createPage({
+        id: "static-trail-text",
+        width: 192,
+        height: 128,
+        background: "#000000",
+        layers: [
+          createLayer("text", {
+            id: "static-text",
+            x: 8,
+            y: 8,
+            width: 24,
+            height: 32,
+            text: "I",
+            fontFamily: "Inter",
+            fontSize: 24,
+            fill: "#ff0000",
+            effects: [createEffect("trail", { settings: { expandBounds: expanded } })],
+          }),
+        ],
+      });
+      const frame = await compositor.render(page, {}, { forceWebGL });
+      presentation.render(frame);
+      if (backend.device) await backend.device.queue.onSubmittedWorkDone();
+      else backend.gl!.finish();
+      staticImages.push({ expanded, png: renderer.domElement.toDataURL("image/png") });
+    }
     activeStats = compositor.stats();
   } finally {
     backend.device?.removeEventListener("uncapturederror", onGpuError);
@@ -190,6 +219,7 @@ export async function captureObjectTemporalTrail(forceWebGL: boolean) {
   }
   return {
     images,
+    staticImages,
     expected,
     activeStats,
     released: compositor.stats(),

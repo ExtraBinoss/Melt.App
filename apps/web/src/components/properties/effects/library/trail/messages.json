@@ -11,9 +11,14 @@
       "angle": "Offset direction",
       "centerX": "Spread center X",
       "centerY": "Spread center Y",
-      "spread": "Scale change per echo"
+      "spread": "Scale change per echo",
+      "expandBounds": "Extend beyond object bounds"
     },
-    "choice": { "temporal": "Previous motion poses", "offset": "Current image offsets" }
+    "choice": {
+      "temporal": "Previous poses / video frames",
+      "offset": "Current image offsets",
+      "auto": "Auto · adapt to source"
+    }
   },
   "fr": {
     "name": "Traînée",
@@ -27,8 +32,13 @@
       "angle": "Direction du décalage",
       "centerX": "Centre de dilatation X",
       "centerY": "Centre de dilatation Y",
-      "spread": "Variation d’échelle par écho"
+      "spread": "Variation d’échelle par écho",
+      "expandBounds": "Étendre au-delà des limites de l’objet"
     },
-    "choice": { "temporal": "Poses précédentes du mouvement", "offset": "Décalages de l’image actuelle" }
+    "choice": {
+      "temporal": "Poses / images vidéo précédentes",
+      "offset": "Décalages de l’image actuelle",
+      "auto": "Auto · adapter à la source"
+    }
   }
 }

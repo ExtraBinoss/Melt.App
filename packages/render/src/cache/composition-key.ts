@@ -1,5 +1,6 @@
 import { backgroundLayer, type Composition, type Layer } from "@musart/core";
 import { isInstancedPrimitive, primitivePaintKey } from "../compositing/primitives/eligibility";
+import { resolveTrailMode } from "@musart/core";
 /** Root paint/placement dependencies. Editing-only page metadata does not invalidate pixels. */
 export function compositionPaintKey(
   page: Composition,
@@ -13,7 +14,7 @@ export function compositionPaintKey(
     page.height,
     page.background,
     page.backgroundGradient,
-    page.effects ?? [],
+    (page.effects ?? []).map((effect) => resolveTrailMode(effect, page)),
     (page.effects ?? []).flatMap((effect) =>
       Object.values(effect.inputs ?? {}).map((id) => effectInputKey?.(id) ?? id),
     ),

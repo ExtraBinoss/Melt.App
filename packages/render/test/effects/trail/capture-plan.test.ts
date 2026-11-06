@@ -24,7 +24,8 @@ it("schedules exact previous rational timestamps without manufacturing a negativ
 });
 
 it("collects owner and composition requests, excluding inherited hidden owners and bounding totals", () => {
-  const trail = () => createEffect("trail", { settings: { echoCount: 2, delay: 0.25 } });
+  const trail = () =>
+    createEffect("trail", { settings: { mode: "temporal", echoCount: 2, delay: 0.25 } });
   const group = createLayer("group", { id: "group", visible: false });
   const owner = createLayer("rectangle", { id: "owner", effects: [trail()] });
   const hidden = createLayer("rectangle", { parentId: group.id, effects: [trail()] });
@@ -43,7 +44,7 @@ it("collects owner and composition requests, excluding inherited hidden owners a
 
 it("truncates the requested upstream stack, preserves scene and masks, and excludes only temporal recursion", () => {
   const before = createEffect("brightness"),
-    temporal = createEffect("trail"),
+    temporal = createEffect("trail", { settings: { mode: "temporal" } }),
     offset = createEffect("trail", { settings: { mode: "offset" } }),
     after = createEffect("contrast");
   const parent = createLayer("group", { id: "parent", opacity: 0.4, x: 80, rotation: 25 });

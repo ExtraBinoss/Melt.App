@@ -57,7 +57,10 @@ export function historicalEffectBounds(
 ): Bounds | undefined {
   const inverse = effectToComposition(page, layer, projection).invert();
   const points = layer.effects.flatMap((effect) =>
-    (history?.get(effect.id) ?? []).flatMap((input) =>
+    (effect.type === "trail" && !resolveEffectSettings(effect).expandBounds
+      ? []
+      : (history?.get(effect.id) ?? [])
+    ).flatMap((input) =>
       input.available && input.ownerBounds ? finiteProjectedPoints(input.ownerBounds, inverse) : [],
     ),
   );

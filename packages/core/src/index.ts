@@ -439,6 +439,8 @@ export { compileAnimationChannel } from "./motion/animations/compile";
 
 export { motionProgramForFrame } from "./motion/evaluate";
 export { effectFields } from "./effects/shared/fields";
+export { trailMode, resolveTrailMode } from "./effects/trail/mode";
+export type { TrailMode } from "./effects/trail/mode";
 
 export { SpatialSnapIndex } from "./layout/snapping/spatial";
 export type {

@@ -62,6 +62,16 @@ test("historical moving owners expand the current local footprint and absent slo
       height: 30,
     });
     expect(historicalEffectBounds(page, layer, new Map())).toBeUndefined();
+    expect(
+      historicalEffectBounds(
+        page,
+        {
+          ...layer,
+          effects: [{ ...effect, settings: { expandBounds: false } }],
+        },
+        history,
+      ),
+    ).toBeUndefined();
   } finally {
     texture.dispose();
   }

@@ -17,6 +17,8 @@ import type { LayerTargets } from "./targets";
 import { rasterExtent, type FrameTexture } from "./types";
 import { prepareProjectedEffects } from "./projected-effects";
 import { projectedRaster } from "./projected-raster";
+import { resolveTrailMode } from "@musart/core";
+import { trailRenderBounds } from "../effects/trail/extent";
 
 interface Context {
   target(role: string, width: number, height: number, mipmapped?: boolean): RenderTarget;
@@ -58,7 +60,9 @@ export function finishLayerSource(
   let source = input;
   const original: Bounds = input.bounds ?? { x: 0, y: 0, width: layer.width, height: layer.height };
   let bounds: Bounds = original;
-  const effects = layer.effects.filter(hasEffectTreatment);
+  const effects = layer.effects
+    .filter(hasEffectTreatment)
+    .map((effect) => resolveTrailMode(effect, page, layer.id));
   const enabled = effects.length > 0;
   const retained = context.effectCache?.entry.effectSource;
   if (enabled && retained && retained.signature === context.effectCache?.signature) {
@@ -87,12 +91,21 @@ export function finishLayerSource(
         }
       : base;
     const outset = effectFootprint(effects);
-    bounds = {
-      x: effectOriginal.x - outset.left,
-      y: effectOriginal.y - outset.top,
-      width: effectOriginal.width + outset.left + outset.right,
-      height: effectOriginal.height + outset.top + outset.bottom,
-    };
+    bounds = trailRenderBounds(
+      effects,
+      {
+        x: effectOriginal.x - outset.left,
+        y: effectOriginal.y - outset.top,
+        width: effectOriginal.width + outset.left + outset.right,
+        height: effectOriginal.height + outset.top + outset.bottom,
+      },
+      layer,
+    );
+    const expanded =
+      bounds.x !== base.x ||
+      bounds.y !== base.y ||
+      bounds.width !== base.width ||
+      bounds.height !== base.height;
     const raster =
       projected?.raster(bounds) ??
       (context.maxTextureDimension
@@ -107,7 +120,7 @@ export function finishLayerSource(
       height = raster?.height ?? rasterExtent(bounds.height, scale);
     if (
       source.premultiplied ||
-      historical ||
+      expanded ||
       outset.left ||
       outset.top ||
       outset.right ||
@@ -159,11 +172,7 @@ export function finishLayerSource(
     if (bounds.x || bounds.y || bounds.width !== layer.width || bounds.height !== layer.height)
       source.bounds = bounds;
     if (projected) {
-      source = projected.restore(
-        source,
-        bounds,
-        Boolean(historical || outset.left || outset.top || outset.right || outset.bottom),
-      );
+      source = projected.restore(source, bounds, expanded);
       bounds = source.bounds!;
     }
     if (context.effectCache)

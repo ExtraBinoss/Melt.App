@@ -1,6 +1,7 @@
 import {
   createLayerGeometryIndex,
   resolveEffectSettings,
+  resolveTrailMode,
   transformPoint,
   type Bounds,
   type Composition,
@@ -18,8 +19,10 @@ export interface TrailCaptureRequest {
   readonly samples: readonly TrailSampleRequest[];
 }
 
-export function isTemporalTrail(effect: Effect): boolean {
-  return effect.type === "trail" && resolveEffectSettings(effect).mode === "temporal";
+export function isTemporalTrail(effect: Effect, page?: Composition, ownerId?: string): boolean {
+  if (effect.type !== "trail") return false;
+  const resolved = page ? resolveTrailMode(effect, page, ownerId) : effect;
+  return resolveEffectSettings(resolved).mode !== "offset";
 }
 
 /** The same schedule serves random access, reverse playback and export. */
@@ -29,8 +32,10 @@ export function trailCaptureRequests(page: Composition, time: MotionTime): Trail
   for (const owner of [page, ...page.layers]) {
     if (owner !== page && !geometry.isVisible(owner.id)) continue;
     for (const effect of owner.effects ?? []) {
-      if (!isTemporalTrail(effect) || !effect.enabled || effect.amount <= 0) continue;
-      const samples = getTrailSamples(effect, time);
+      const ownerId = owner === page ? undefined : owner.id;
+      if (!isTemporalTrail(effect, page, ownerId) || !effect.enabled || effect.amount <= 0)
+        continue;
+      const samples = getTrailSamples(resolveTrailMode(effect, page, ownerId), time);
       if (samples.length)
         requests.push({ effect, ...(owner === page ? {} : { ownerId: owner.id }), samples });
     }
@@ -44,18 +49,18 @@ export function trailCaptureRequests(page: Composition, time: MotionTime): Trail
  * Paint isolation is a compositor traversal option, never a visibility mutation here.
  */
 export function trailUpstreamPage(page: Composition, request: TrailCaptureRequest): Composition {
-  const truncate = (stack: readonly Effect[], owner: boolean): Effect[] => {
+  const truncate = (stack: readonly Effect[], owner: boolean, ownerId?: string): Effect[] => {
     const before = owner ? stack.findIndex((effect) => effect.id === request.effect.id) : -1;
     const upstream = owner ? (before < 0 ? [] : stack.slice(0, before)) : stack;
     // Static offset echoes are ordinary upstream treatments. Historical operators cannot recurse.
-    return upstream.filter((effect) => !isTemporalTrail(effect));
+    return upstream.filter((effect) => !isTemporalTrail(effect, page, ownerId));
   };
   return {
     ...page,
     effects: request.ownerId ? [] : truncate(page.effects ?? [], true),
     layers: page.layers.map((layer) => ({
       ...layer,
-      effects: truncate(layer.effects, layer.id === request.ownerId),
+      effects: truncate(layer.effects, layer.id === request.ownerId, layer.id),
     })),
   };
 }

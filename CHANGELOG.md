@@ -4,6 +4,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ## [Unreleased]
 
+- Default Trail to source-aware Auto mode: visible current-source echoes for stationary images/text and exact temporal samples for video or authored Motion. Adapt controls without baking derived settings; extend object echo bounds by default with an undoable opt-out, bounded raster sizes and source-aware cache invalidation.
+
 - Open projects directly in their saved Classic or Studio workspace, keeping the standard named Melt opening surface until the correct chrome and retained canvas are ready; recover from preference and renderer failures without trapping loading.
 - Use the supplied FX-plus and colorimetry SVG artwork at a readable 24 px size in Studio's effects toolbar.
 

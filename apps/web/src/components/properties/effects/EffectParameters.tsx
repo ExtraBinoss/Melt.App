@@ -15,6 +15,7 @@ import {
   getEffectParameter,
   isEffectParameterVisible,
   patchEffectParameter,
+  resolveTrailMode,
   GRADIENT_PRESETS,
   type Effect,
   type EffectParameter,
@@ -39,6 +40,7 @@ import { IconButton } from "../../shared/IconButton";
 import { freezeEffectPreviews } from "../../../state/session/effect-preview";
 import { useResetFeedback } from "../../shared/use-reset-feedback";
 import { useParameterWindow } from "./use-parameter-window";
+import { TrailOffsetInput } from "./library/trail/TrailOffsetInput";
 export function EffectParameters({
   effect,
   engine,
@@ -86,6 +88,13 @@ export function EffectParameters({
         : frame?.effects?.find((item) => item.id === effect.id)) ?? effect
     );
   }, [transport, ownLayerId, effect]);
+  const sourceResolved = useCallback(() => {
+    const snapshot = engine?.getSnapshot();
+    const page =
+      transport?.readFrame() ?? snapshot?.project.pages.find((page) => page.id === snapshot.pageId);
+    const current = displayed();
+    return page ? resolveTrailMode(current, page, ownLayerId) : current;
+  }, [engine, transport, displayed, ownLayerId]);
   const shape = useCallback(
     () =>
       definition.parameters
@@ -94,11 +103,11 @@ export function EffectParameters({
             (parameterKeys
               ? parameterKeys.includes(parameter.key)
               : !EFFECT_DOMAIN_KEYS.includes(parameter.key)) &&
-            isEffectParameterVisible(displayed(), parameter),
+            isEffectParameterVisible(sourceResolved(), parameter),
         )
         .map((parameter) => `${parameter.scope}:${parameter.key}`)
         .join("|"),
-    [definition, displayed, parameterKeys],
+    [definition, sourceResolved, parameterKeys],
   );
   useSyncExternalStore(transport?.subscribe ?? noSubscription, shape, shape);
   const owner = `${effect.id}:${effect.type}:${parameterKeys?.join("|") ?? "all"}`;
@@ -119,7 +128,7 @@ export function EffectParameters({
       (parameterKeys
         ? parameterKeys.includes(parameter.key)
         : !EFFECT_DOMAIN_KEYS.includes(parameter.key)) &&
-      isEffectParameterVisible(displayed(), parameter),
+      isEffectParameterVisible(sourceResolved(), parameter),
   );
   const window = useParameterWindow(list, owner, parameters.length, deferOffscreen);
   if (colorOwner !== owner) {
@@ -236,6 +245,7 @@ export function EffectParameters({
                 layerId={ownLayerId}
                 compositionId={ownerPage?.id}
                 effect={effect}
+                displayedEffect={sourceResolved()}
                 parameter={parameter}
                 defaults={defaults}
                 disabled={disabled}
@@ -286,6 +296,7 @@ export function EffectParameters({
 /** Retain mounted controls through window and focus updates; canonical edits still rebind every field. */
 const ParameterField = memo(function ParameterField({
   effect,
+  displayedEffect,
   engine,
   layerId,
   compositionId,
@@ -300,6 +311,7 @@ const ParameterField = memo(function ParameterField({
   onCancel,
 }: {
   effect: Effect;
+  displayedEffect: Effect;
   engine?: EnginePort;
   layerId?: string;
   compositionId?: string;
@@ -314,7 +326,7 @@ const ParameterField = memo(function ParameterField({
   onCancel?: () => void;
 }) {
   const label = t(parameter.labelKey);
-  const value = getEffectParameter(effect, parameter);
+  const value = getEffectParameter(parameter.key === "mode" ? effect : displayedEffect, parameter);
   const target: EffectFieldTarget | undefined = layerId
     ? parameter.scope === "settings"
       ? {
@@ -344,8 +356,21 @@ const ParameterField = memo(function ParameterField({
             property: parameter.key as EffectMotionProperty,
           }
       : undefined;
-  const change = (next: number | boolean | string, preview = false) =>
-    onChange(patchEffectParameter(effect, parameter, next), preview);
+  const trailOffset = effect.type === "trail" && ["offsetX", "offsetY"].includes(parameter.key);
+  const change = (next: number | boolean | string, preview = false) => {
+    // Persist the visible paired offset on first edit while retaining the Auto selector.
+    const current = trailOffset
+      ? {
+          ...effect,
+          settings: {
+            ...effect.settings,
+            offsetX: displayedEffect.settings?.offsetX ?? 0,
+            offsetY: displayedEffect.settings?.offsetY ?? 0,
+          },
+        }
+      : effect;
+    onChange(patchEffectParameter(current, parameter, next), preview);
+  };
   if (parameter.kind === "text")
     return (
       <MotionField engine={engine} target={target} label={label} disabled={disabled}>
@@ -455,26 +480,29 @@ const ParameterField = memo(function ParameterField({
         </MotionValueField>
       </MotionField>
     );
-  return (
-    <NumberInput
-      engine={engine}
-      target={target}
-      displayScale={parameter.displayScale}
-      decimalScale={parameter.integer ? 0 : undefined}
-      identity={effect}
-      label={label}
-      value={Number(value) * parameter.displayScale}
-      resetValue={() => Number(getEffectParameter(defaults, parameter)) * parameter.displayScale}
-      disabled={disabled}
-      min={parameter.min * parameter.displayScale}
-      max={parameter.max * parameter.displayScale}
-      step={parameter.step * parameter.displayScale}
-      unit={parameter.unit}
-      onStart={onStart}
-      onPreview={(next) => change(next / parameter.displayScale, true)}
-      onCancel={onCancel}
-      onCommit={(next) => change(next / parameter.displayScale)}
-    />
+  const numericProps = {
+    engine,
+    target,
+    displayScale: parameter.displayScale,
+    decimalScale: parameter.integer ? 0 : undefined,
+    identity: effect,
+    label,
+    value: Number(value) * parameter.displayScale,
+    resetValue: () => Number(getEffectParameter(defaults, parameter)) * parameter.displayScale,
+    disabled,
+    min: parameter.min * parameter.displayScale,
+    max: parameter.max * parameter.displayScale,
+    step: parameter.step * parameter.displayScale,
+    unit: parameter.unit,
+    onStart,
+    onPreview: (next: number) => change(next / parameter.displayScale, true),
+    onCancel,
+    onCommit: (next: number) => change(next / parameter.displayScale),
+  };
+  return trailOffset ? (
+    <TrailOffsetInput {...numericProps} effect={effect} parameter={parameter} layerId={layerId} />
+  ) : (
+    <NumberInput {...numericProps} />
   );
 });
 

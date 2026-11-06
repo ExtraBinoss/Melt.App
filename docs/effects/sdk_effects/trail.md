@@ -1,6 +1,19 @@
 # Deterministic Trail history
 
 Temporal Trail is available on individual layers, groups and the composition.
+New effects use **Auto**: stationary images/text receive current-source echoes,
+animated owners (including parents/group contents) use authored Motion history,
+and videos use historical decoded frames through the same Motion sampling path.
+Explicit choices remain available. At time zero an animated owner stays temporal
+with no prior samples. Auto spaces stationary echoes by 16 object pixels when
+neither offset was authored; explicit zeros and legacy source modes retain their
+values. Controls display the resolved offsets and hide the interval for static
+sources while preserving the Auto setting in the portable document.
+
+**Extend beyond object bounds** defaults on. Offset, scale and historical echoes
+may extend the GPU transport beyond a text/image box; disabling it restores the
+source gate. Selection geometry remains unchanged. Device dimensions and an
+admitted pixel budget reduce only sampling density for expanded transports.
 At a Motion sample it requests up to eight exact previous rational timestamps,
 using the same immutable Motion program as preview, replay and video export.
 Delay controls the timestamp spacing; samples before time zero are absent.

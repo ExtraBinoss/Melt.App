@@ -160,8 +160,12 @@ export function renderLayer(
         ? {
             effectProjection: context.spatial?.effectProjection(layer.id),
             effectWindow: projectedEffectWindow(page, layer, frame.viewport),
+          }
+        : {}),
+      ...(layer.spatial?.enabled || layer.effects.some((effect) => effect.type === "trail")
+        ? {
             maxTextureDimension: context.maxTextureDimension,
-            // Bound retained treatment/copy/scratch surfaces alongside native MSAA and the scene.
+            // Bound expanded Trail transports and retained copy/scratch surfaces together.
             effectPixelBudget: Math.max(1, Math.floor(context.cache.maxBytes / 96)),
           }
         : {}),

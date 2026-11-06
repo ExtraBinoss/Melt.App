@@ -6,6 +6,7 @@ import { hasEffectTreatment } from "../effects/shared/active";
 import type { EffectResources } from "./effect-resources";
 import type { GpuPasses } from "./passes";
 import type { FrameTexture } from "./types";
+import { resolveTrailMode } from "@musart/core";
 
 /** Prepare every authored stack through the same bounded operator, including future enabled keys. */
 export async function prepareEffectStacks(
@@ -44,7 +45,9 @@ export function finishCompositionEffects(
     target(role: string, width: number, height: number): RenderTarget;
   },
 ): FrameTexture {
-  const stack: Effect[] = (page.effects ?? []).filter(hasEffectTreatment);
+  const stack: Effect[] = (page.effects ?? [])
+    .filter(hasEffectTreatment)
+    .map((effect) => resolveTrailMode(effect, page));
   if (!stack.length) return input;
   const { width, height } = input;
   const straight = context.target("composition-straight", width, height);

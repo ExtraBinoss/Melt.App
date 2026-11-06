@@ -48,7 +48,7 @@ for (const forceWebGL of [false, true])
     }
     const inspector = await browser.newPage();
     try {
-      const pixels = await inspector.evaluate(async ({ images, expected }) => {
+      const pixels = await inspector.evaluate(async ({ images, staticImages, expected }) => {
         const decoded = [];
         for (const image of images) {
           const source = new Image();
@@ -82,7 +82,27 @@ for (const forceWebGL of [false, true])
           if (first.pixels[i] !== again.pixels[i]) replayDifferences++;
           if (first.pixels[i] !== different.pixels[i]) timeDifferences++;
         }
+        const staticOverflow = [];
+        for (const image of staticImages) {
+          const source = new Image();
+          source.src = image.png;
+          await source.decode();
+          const canvas = document.createElement("canvas");
+          canvas.width = source.width;
+          canvas.height = source.height;
+          const context = canvas.getContext("2d")!;
+          context.drawImage(source, 0, 0);
+          const pixels = context.getImageData(0, 0, canvas.width, canvas.height).data;
+          let red = 0;
+          for (let y = 0; y < 48; y++)
+            for (let x = 32; x < 112; x++) {
+              const offset = (y * canvas.width + x) * 4;
+              if (pixels[offset]! > 20 && pixels[offset + 1]! < 5 && pixels[offset + 2]! < 5) red++;
+            }
+          staticOverflow.push({ expanded: image.expanded, red });
+        }
         return {
+          staticOverflow,
           replayDifferences,
           timeDifferences,
           frames: decoded
@@ -124,6 +144,8 @@ for (const forceWebGL of [false, true])
           Buffer.from(image.png.split(",")[1]!, "base64"),
         );
       expect(pixels.replayDifferences).toBe(0);
+      expect(pixels.staticOverflow.find((sample) => sample.expanded)!.red).toBeGreaterThan(20);
+      expect(pixels.staticOverflow.find((sample) => !sample.expanded)!.red).toBe(0);
       expect(pixels.timeDifferences).toBeGreaterThan(40);
       for (const frame of pixels.frames) {
         expect(frame.width).toBe(frame.name === "A-zoom" ? 144 : 192);

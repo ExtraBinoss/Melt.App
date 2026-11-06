@@ -10,11 +10,12 @@ export const TRAIL_DEFINITION = defineEffect(
   {},
   [
     AMOUNT,
-    f.choice("mode", "temporal", ["temporal", "offset"]),
+    f.choice("mode", "auto", ["temporal", "offset", "auto"]),
+    f.boolean("expandBounds", true),
     { ...f.number("echoCount", 4, 1, TRAIL_MAX_ECHOES, 1), integer: true },
     {
       ...f.number("delay", 0.08, 0.001, 5, 0.001, "s"),
-      visibleWhen: { key: "mode", values: ["temporal"] },
+      visibleWhen: { key: "mode", values: ["auto", "temporal"] },
     },
     f.number("fade", 0.65, 0, 1),
     f.number("offsetX", 0, -512, 512, 0.5, "px"),
