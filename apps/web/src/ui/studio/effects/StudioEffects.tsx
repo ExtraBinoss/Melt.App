@@ -1,5 +1,5 @@
 import { useLayoutEffect, useMemo, useRef, useState } from "react";
-import { Plus, SlidersHorizontal, Sparkles } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import {
   createEffect,
@@ -23,6 +23,7 @@ import { IconButton } from "../../../components/shared/IconButton";
 import { ScrollShadow } from "../../../components/shared/scroll/ScrollShadow";
 import { ownerHasDepth, type EffectCategory } from "../../../components/layers/catalog/model";
 import { StudioEffectCatalog } from "./StudioEffectCatalog";
+import { StudioAddEffectIcon, StudioColorimetryIcon } from "./StudioEffectIcons";
 import { useCompositionEffectMotionRequest } from "../../../components/motion/scene/effect-navigation";
 import { useCompositionEffects } from "../../../components/layers/controls/use-composition-effects";
 import "./messages";
@@ -73,7 +74,7 @@ function EffectButton({
     setRequest({ token: request.token, effectId: request.effectId });
     setOpen(true);
   });
-  const Icon = category === "effect" ? Sparkles : SlidersHorizontal;
+  const Icon = category === "effect" ? StudioAddEffectIcon : StudioColorimetryIcon;
   const label = t(category === "effect" ? "addEffect" : "addGrade");
   return (
     <Popover modal={false} open={open} onOpenChange={setOpen}>
@@ -82,10 +83,10 @@ function EffectButton({
           ref={trigger}
           label={label}
           tooltipSide="bottom"
-          className="studio-surface"
+          className="studio-surface studio-effects-trigger"
           data-studio-effect-category={category}
         >
-          <Icon size={15} />
+          <Icon />
         </IconButton>
       </PopoverTrigger>
       <PopoverContent
@@ -134,7 +135,7 @@ function EffectEditor({
   const snapshot = useDocumentSnapshot(engine, true);
   const page = snapshot.project.pages.find((item) => item.id === snapshot.pageId)!;
   const layer = page.layers.find((item) => item.id === snapshot.selection[0]);
-  const identities = useMemo(() => new SelectionPreviewIdentity(), [engine]);
+  const identities = useMemo(() => new SelectionPreviewIdentity(), []);
   const previewKey = layer
     ? `${snapshot.project.id}:${page.id}:${identities.read(page, snapshot.project.assets, [layer.id])}`
     : "";

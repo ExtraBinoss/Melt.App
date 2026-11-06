@@ -94,8 +94,9 @@ export function beginProjectOpening(cancel?: () => void, projectName?: string): 
   }
   function check() {
     if (!installed || closed) return;
+    if (document.querySelector('.workspace-mode-root[data-workspace-initializing="true"]')) return;
     const canvas = document.querySelector<HTMLCanvasElement>(".editor-gpu-scene canvas");
-    if (canvas?.dataset.renderError) {
+    if (canvas?.dataset.renderError || document.querySelector(".gpu-error")) {
       finish(true);
       return;
     }
@@ -139,6 +140,7 @@ export function beginProjectOpening(cancel?: () => void, projectName?: string): 
       "data-rendered-revision",
       "data-canonical-presented-at",
       "data-render-error",
+      "data-workspace-initializing",
     ],
   });
   window.addEventListener("pagehide", hide);

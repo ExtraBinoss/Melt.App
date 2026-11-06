@@ -207,7 +207,10 @@ export function App({ engine, services, welcome = false, routing }: AppProps) {
             port={services.projectPreferences}
             onError={onPreferencesError}
           >
-            <WorkspaceModeBoundary engine={engine}>
+            <WorkspaceModeBoundary
+              engine={engine}
+              editorActive={!choosingProject || hasOpenedEditor}
+            >
               <main className="musart-app" ref={element}>
                 <ExportLeaveGuard />
                 <MotionImportConfirmation engine={engine} />

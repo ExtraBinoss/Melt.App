@@ -109,3 +109,24 @@ test("passes the selected name to its own opening and drops it when another proj
   expect(document.querySelector('[role="status"]')).toHaveTextContent("Opening Winter study");
   expect(document.body).not.toHaveTextContent("Summer study");
 });
+
+test("a presented canvas cannot dismiss opening before the saved workspace chrome is ready", async () => {
+  const workspace = document.createElement("div");
+  workspace.className = "workspace-mode-root";
+  workspace.dataset.workspaceInitializing = "true";
+  document.body.append(workspace);
+  try {
+    act(() => {
+      beginProjectOpening().installed();
+    });
+    const target = canvas();
+    target.dataset.presentationReady = "true";
+    await act(async () => {});
+    expect(motion.animate).toHaveBeenCalledTimes(1);
+    workspace.removeAttribute("data-workspace-initializing");
+    await act(async () => {});
+    expect(motion.animate).toHaveBeenCalledTimes(2);
+  } finally {
+    workspace.remove();
+  }
+});

@@ -25,6 +25,35 @@ function initialOverride(preferences: ProjectPreferencesController | null): Work
   return initialOverrides.get(preferences) ?? null;
 }
 
+/** Absence is meaningful until the project's first preference read settles. */
+export function readInitialWorkspaceMode(
+  preferences: ProjectPreferencesController | null,
+): WorkspaceMode | null {
+  return (
+    initialOverride(preferences) ??
+    preferences?.read("workspaceMode") ??
+    (preferences && !preferences.ready() ? null : "classic")
+  );
+}
+
+export function useInitialWorkspaceMode(): WorkspaceMode | null {
+  const preferences = useProjectPreferences();
+  const subscribe = useCallback(
+    (notify: () => void) => {
+      if (!preferences) return () => {};
+      const stopMode = preferences.subscribe("workspaceMode", notify);
+      const stopReady = preferences.subscribeReady(notify);
+      return () => {
+        stopMode();
+        stopReady();
+      };
+    },
+    [preferences],
+  );
+  const read = useCallback(() => readInitialWorkspaceMode(preferences), [preferences]);
+  return useSyncExternalStore(subscribe, read, read);
+}
+
 export function readRequestedWorkspaceMode(
   preferences: ProjectPreferencesController | null,
 ): WorkspaceMode {

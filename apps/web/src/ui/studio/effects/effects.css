@@ -1,3 +1,10 @@
+.studio-actions > button.studio-effects-trigger {
+  padding: 11px;
+}
+.studio-actions > button.studio-effects-trigger > svg {
+  width: 24px;
+  height: 24px;
+}
 .studio-effects-popover {
   width: min(360px, calc(100vw - 32px));
   padding: 12px;

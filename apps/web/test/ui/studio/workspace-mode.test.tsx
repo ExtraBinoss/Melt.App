@@ -3,6 +3,7 @@ import { act, fireEvent, render, screen } from "@testing-library/react";
 import { ProjectPreferencesProvider } from "../../../src/components/workspace/preferences/context";
 import {
   useWorkspaceMode,
+  useInitialWorkspaceMode,
   useRequestedWorkspaceMode,
   useSetWorkspaceMode,
   workspaceModeFromSearch,
@@ -153,4 +154,27 @@ test("saved mode restoration is isolated from replacement project preferences", 
     await Promise.resolve();
   });
   expect(port.update).toHaveBeenCalledExactlyOnceWith("new", { workspaceMode: "studio" });
+});
+
+test("initial mode remains unresolved until saved preferences arrive without writing defaults", async () => {
+  let resolve!: (values: ProjectLayoutPreferences) => void;
+  const read = new Promise<ProjectLayoutPreferences>((done) => {
+    resolve = done;
+  });
+  function Initial() {
+    return <output data-testid="initial">{useInitialWorkspaceMode() ?? "loading"}</output>;
+  }
+  const port = { read: () => read, update: vi.fn().mockResolvedValue(undefined) };
+  render(
+    <ProjectPreferencesProvider projectId="initial" port={port} onError={vi.fn()}>
+      <Initial />
+    </ProjectPreferencesProvider>,
+  );
+  expect(screen.getByTestId("initial")).toHaveTextContent("loading");
+  await act(async () => {
+    resolve({ workspaceMode: "studio" });
+    await read;
+  });
+  expect(screen.getByTestId("initial")).toHaveTextContent("studio");
+  expect(port.update).not.toHaveBeenCalled();
 });

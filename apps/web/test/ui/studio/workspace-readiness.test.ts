@@ -103,3 +103,25 @@ test("cancellation removes paint requests and late renderer completions cannot r
   expect(d.frames.size).toBe(0);
   d.publisher.release();
 });
+
+test("a real renderer failure reveals its error instead of keeping initial workspace loading forever", async () => {
+  const d = harness();
+  d.publisher.request(d.origin, true);
+  const wait = d.readiness.ready(new AbortController().signal);
+  d.root.querySelector("canvas")!.dataset.renderError = "GPU unavailable";
+  d.paint();
+  await wait;
+  expect(d.frames.size).toBe(0);
+  expect(getCanonicalPresentation(d.engine).ready(d.origin)).toBe(false);
+  d.publisher.release();
+});
+
+test("renderer initialization errors without a canvas release the real error fallback", async () => {
+  const d = harness();
+  d.root.innerHTML = '<div class="gpu-error" role="alert">GPU unavailable</div>';
+  const wait = d.readiness.ready(new AbortController().signal);
+  d.paint();
+  await wait;
+  expect(d.frames.size).toBe(0);
+  d.publisher.release();
+});

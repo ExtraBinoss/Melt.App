@@ -53,7 +53,7 @@ export function createWorkspaceReadiness(engine: EnginePort, surface: () => HTML
     for (const listener of listeners) listener();
   };
   return {
-    pending() {
+    pending: () => {
       const token = {};
       pending.add(token);
       changed();
@@ -98,9 +98,14 @@ export function createWorkspaceReadiness(engine: EnginePort, surface: () => HTML
             canvas.dataset.rendererReady === "true" &&
             canvas.dataset.presentationReady === "true";
           if (
-            !pending.size &&
-            (liveFrame ||
-              presentation.ready({ projectId: snapshot.project.id, revision: snapshot.revision }))
+            canvas?.dataset.renderError ||
+            root.querySelector(".gpu-error") ||
+            (!pending.size &&
+              (liveFrame ||
+                presentation.ready({
+                  projectId: snapshot.project.id,
+                  revision: snapshot.revision,
+                })))
           )
             finish();
         };
@@ -127,7 +132,7 @@ export function createWorkspaceReadiness(engine: EnginePort, surface: () => HTML
           subtree: true,
           childList: true,
           attributes: true,
-          attributeFilter: ["data-renderer-ready", "data-presentation-ready"],
+          attributeFilter: ["data-renderer-ready", "data-presentation-ready", "data-render-error"],
         });
         listeners.add(chromeChanged);
         signal.addEventListener("abort", finish, { once: true });

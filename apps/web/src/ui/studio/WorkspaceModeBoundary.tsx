@@ -1,4 +1,4 @@
-import { lazy, Suspense, useLayoutEffect, useMemo, useRef, useSyncExternalStore } from "react";
+import { lazy, Suspense, useLayoutEffect, useMemo, useSyncExternalStore } from "react";
 import { useReducedMotion } from "motion/react";
 import type { ReactNode } from "react";
 import type { EnginePort } from "@musart/core";
@@ -6,16 +6,17 @@ import type { EditorServices } from "../../state/contracts";
 import type { TaskRunner } from "../../components/projects/ProjectDialog";
 import { ExportActions } from "../../components/export/ExportActions";
 import { MagicSearch, type MagicSearchProps } from "../../components/search/MagicSearch";
+import { OpeningSurface } from "../../components/projects/opening/OpeningSurface";
+import { currentProjectOpening } from "../../components/projects/opening/controller";
 import { WorkspaceTheme } from "../brand/WorkspaceTheme";
 import { useProjectPreferences } from "../../components/workspace/preferences/context";
 import {
-  readRequestedWorkspaceMode,
+  readInitialWorkspaceMode,
   useWorkspaceMode,
-  useRequestedWorkspaceMode,
+  useInitialWorkspaceMode,
 } from "./workspace-mode";
 import { PresentedWorkspaceMode, WorkspaceChromeReadiness } from "./transition/context";
-import { WorkspaceTransition } from "./transition/controller";
-import { createWorkspaceChromeMotion, createWorkspaceReadiness } from "./transition/presentation";
+import { createWorkspaceSession } from "./transition/session";
 import {
   WorkspaceChromePending,
   WorkspaceTransitionSurface,
@@ -40,48 +41,49 @@ const ObjectLibrary = lazy(() =>
 export function WorkspaceModeBoundary({
   children,
   engine,
+  editorActive = true,
 }: {
   children: ReactNode;
   engine: EnginePort;
+  editorActive?: boolean;
 }) {
-  const requested = useRequestedWorkspaceMode();
+  const requested = useInitialWorkspaceMode();
   const preferences = useProjectPreferences();
-  const root = useRef<HTMLDivElement>(null);
   const reduced = useReducedMotion();
-  const reduceMotion = useRef(reduced);
+  const { transition, pending, attach, configure } = useMemo(
+    () => createWorkspaceSession(engine, readInitialWorkspaceMode(preferences)),
+    [engine, preferences],
+  );
   useLayoutEffect(() => {
-    reduceMotion.current = reduced;
-  }, [reduced]);
-  const readiness = useMemo(() => createWorkspaceReadiness(engine, () => root.current), [engine]);
-  const transition = useMemo(() => {
-    const motion = createWorkspaceChromeMotion(
-      () => root.current,
-      () => Boolean(reduceMotion.current),
-    );
-    // A replacement project starts directly in its own saved presentation.
-    return new WorkspaceTransition(readRequestedWorkspaceMode(preferences), {
-      ...motion,
-      ready: readiness.ready,
-    });
-  }, [preferences, readiness]);
+    configure(Boolean(reduced), editorActive);
+  }, [configure, reduced, editorActive]);
   const state = useSyncExternalStore(transition.subscribe, transition.read, transition.read);
   useLayoutEffect(() => {
-    transition.request(requested);
+    if (requested) transition.request(requested);
   }, [transition, requested]);
   useLayoutEffect(() => () => transition.dispose(), [transition]);
   return (
     <PresentedWorkspaceMode value={state.mode}>
-      <WorkspaceChromeReadiness value={readiness.pending}>
+      <WorkspaceChromeReadiness value={pending}>
         <WorkspaceTheme value={state.mode}>
           <div
-            ref={root}
+            ref={attach}
             className="workspace-mode-root"
             data-workspace-mode={state.mode}
             data-workspace-theme={state.mode}
             data-workspace-transition={state.phase}
+            data-workspace-initializing={state.initializing ? "true" : undefined}
           >
             {children}
-            <WorkspaceTransitionSurface state={state} />
+            {state.initializing ? (
+              !currentProjectOpening() && (
+                <div className="workspace-opening-surface project-opening-surface" role="status">
+                  <OpeningSurface projectName={engine.getSnapshot().project.name} />
+                </div>
+              )
+            ) : (
+              <WorkspaceTransitionSurface state={state} />
+            )}
           </div>
         </WorkspaceTheme>
       </WorkspaceChromeReadiness>

@@ -8,6 +8,10 @@ No conversion, flattening, new document version or implicit history entry occurs
 Older projects default to Classic. Both workspaces retain the normal import,
 portable-project, image/video export and headless command paths.
 
+Opening a project restores its saved workspace directly. The standard Melt opening
+surface remains while preferences, workspace controls and the canvas become ready,
+so a saved Studio project never appears in Classic first.
+
 The workspace selector spans its project-menu row. Switching crossfades the
 outgoing controls and presents a compact Melt loading surface while lazy chrome
 and the current GPU frame become ready. It keeps the existing canvas visible and

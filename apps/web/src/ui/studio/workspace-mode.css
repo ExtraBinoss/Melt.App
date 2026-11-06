@@ -56,3 +56,13 @@
     top: 124px;
   }
 }
+
+/* Keep the retained canvas measurable while the project's workspace is resolved. */
+.workspace-mode-root[data-workspace-initializing="true"] > .musart-app {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+.workspace-opening-surface {
+  background: var(--background);
+}

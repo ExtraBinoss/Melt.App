@@ -19,10 +19,11 @@ export function createProjectPreferencesController(
   let values: ProjectLayoutPreferences = {};
   const revisions = new Map<Field, number>();
   const listeners = new Set<Listener>();
+  const readinessListeners = new Set<() => void>();
   let pending: ProjectLayoutPreferences = {};
   let timer: ReturnType<typeof setTimeout> | undefined;
   let writing = Promise.resolve();
-  let loaded = false,
+  let loaded = !port,
     loading = false,
     generation = 0;
 
@@ -83,10 +84,28 @@ export function createProjectPreferencesController(
         if (generation === token) onError(error);
       })
       .finally(() => {
-        if (generation === token) loading = false;
+        if (generation !== token) return;
+        loading = false;
+        loaded = true;
+        for (const listener of readinessListeners) listener();
       });
   }
+  function release() {
+    if (listeners.size || readinessListeners.size) return;
+    generation++;
+    loading = false;
+    void flush();
+  }
   return {
+    ready: () => loaded,
+    subscribeReady(notifyListener: () => void) {
+      readinessListeners.add(notifyListener);
+      load();
+      return () => {
+        readinessListeners.delete(notifyListener);
+        release();
+      };
+    },
     read<K extends Field>(field: K): ProjectLayoutPreferences[K] {
       return values[field];
     },
@@ -100,11 +119,7 @@ export function createProjectPreferencesController(
       load();
       return () => {
         listeners.delete(listener);
-        if (!listeners.size) {
-          generation++;
-          loading = false;
-          void flush();
-        }
+        release();
       };
     },
   };

@@ -2,6 +2,7 @@ import type { WorkspaceMode } from "../../../services/projects/preferences/model
 
 export interface WorkspaceTransitionState {
   mode: WorkspaceMode;
+  initializing?: boolean;
   target: WorkspaceMode;
   phase: "idle" | "exiting" | "preparing" | "entering";
 }
@@ -20,8 +21,9 @@ export class WorkspaceTransition {
   constructor(
     mode: WorkspaceMode,
     private readonly ports: WorkspaceTransitionPorts,
+    initializing = false,
   ) {
-    this.state = { mode, target: mode, phase: "idle" };
+    this.state = { mode, target: mode, phase: "idle", ...(initializing ? { initializing } : {}) };
   }
   read = () => this.state;
   subscribe = (listener: () => void) => {
@@ -35,12 +37,22 @@ export class WorkspaceTransition {
     for (const listener of this.listeners) listener();
   }
   request(target: WorkspaceMode) {
-    if (this.state.target === target) return;
+    if (this.state.target === target && (!this.state.initializing || this.operation)) return;
     this.operation?.abort();
     const operation = new AbortController();
     this.operation = operation;
     this.publish({ target });
-    void this.run(target, operation.signal);
+    if (this.state.initializing) void this.initialize(target, operation.signal);
+    else void this.run(target, operation.signal);
+  }
+  private async initialize(target: WorkspaceMode, signal: AbortSignal) {
+    // Hydration is not a user switch: install the correct chrome directly under loading.
+    this.publish({ mode: target, phase: "preparing" });
+    await this.ports.ready(signal);
+    if (signal.aborted) return;
+    this.ports.restore();
+    this.publish({ phase: "idle", initializing: false });
+    this.operation = null;
   }
   private async run(target: WorkspaceMode, signal: AbortSignal) {
     if (this.state.mode !== target) {

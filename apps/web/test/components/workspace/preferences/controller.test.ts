@@ -106,3 +106,42 @@ test("storage failures retain the current session value and report the original 
   expect(error).toHaveBeenCalledWith(failure);
   stop();
 });
+
+test("readiness stays pending through hydration and settles on failure without swallowing the cause", async () => {
+  const reading = deferred<ProjectLayoutPreferences>();
+  const controller = createProjectPreferencesController(
+    "delayed",
+    {
+      read: () => reading.promise,
+      update: vi.fn().mockResolvedValue(undefined),
+    },
+    vi.fn(),
+  );
+  const ready = vi.fn();
+  const stopReady = controller.subscribeReady(ready);
+  const stopField = controller.subscribe("workspaceMode", vi.fn());
+  stopField(); // A readiness consumer keeps the same in-flight read alive.
+  expect(controller.ready()).toBe(false);
+  reading.resolve({ workspaceMode: "studio" });
+  await vi.waitFor(() => expect(controller.ready()).toBe(true));
+  expect(controller.read("workspaceMode")).toBe("studio");
+  expect(ready).toHaveBeenCalledOnce();
+  stopReady();
+
+  const cause = new Error("storage unavailable"),
+    error = vi.fn();
+  const failed = createProjectPreferencesController(
+    "failed",
+    {
+      read: () => Promise.reject(cause),
+      update: vi.fn(),
+    },
+    error,
+  );
+  const stopFailed = failed.subscribeReady(vi.fn());
+  await vi.waitFor(() => expect(failed.ready()).toBe(true));
+  expect(error).toHaveBeenCalledExactlyOnceWith(cause);
+  expect(failed.read("workspaceMode")).toBeUndefined();
+  stopFailed();
+  expect(createProjectPreferencesController("memory", undefined, error).ready()).toBe(true);
+});

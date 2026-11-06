@@ -36,6 +36,13 @@ of manifests, assets and journal bodies.
 The UI subscribes to individual fields; restoring preferences does not subscribe
 the application or canvas roots to pointer updates.
 
+Initial editor presentation waits for the shared preference read to settle before
+revealing a workspace. Saved Studio opens directly in Studio, without a transition
+from fallback Classic. The standard project-opening surface remains until the
+correct chrome and retained canvas are ready. An explicit workspace query override
+is available immediately. Missing preferences use Classic; failed reads report
+the cause and release loading into the usable session fallback.
+
 | Lifecycle         | Contract                                                                                                                                                                           |
 | ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Resize            | Continuous painting remains local. A completed pointer or keyboard resize stores the requested layout once; programmatic hydration and responsive constraint changes do not write. |

@@ -117,3 +117,27 @@ test("switching again during preparation cancels its readiness lifetime and only
   expect(transition.read()).toEqual({ mode: "classic", target: "classic", phase: "idle" });
   expect(ports.animate.mock.calls.filter(([direction]) => direction === "enter")).toHaveLength(1);
 });
+
+test.each(["classic", "studio"] as const)(
+  "initial %s restoration installs directly without animating from fallback Classic",
+  async (mode) => {
+    const ready = deferred();
+    const ports = { animate: vi.fn(), ready: vi.fn(() => ready.promise), restore: vi.fn() };
+    const transition = new WorkspaceTransition("classic", ports, true);
+    transition.request(mode);
+    expect(transition.read()).toMatchObject({
+      mode,
+      target: mode,
+      phase: "preparing",
+      initializing: true,
+    });
+    transition.request(mode);
+    expect(ports.ready).toHaveBeenCalledOnce();
+    expect(ports.animate).not.toHaveBeenCalled();
+    ready.resolve();
+    await Promise.resolve();
+    expect(transition.read()).toMatchObject({ mode, phase: "idle", initializing: false });
+    expect(ports.animate).not.toHaveBeenCalled();
+    transition.dispose();
+  },
+);

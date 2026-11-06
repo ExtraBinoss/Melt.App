@@ -4,6 +4,9 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ## [Unreleased]
 
+- Open projects directly in their saved Classic or Studio workspace, keeping the standard named Melt opening surface until the correct chrome and retained canvas are ready; recover from preference and renderer failures without trapping loading.
+- Use the supplied FX-plus and colorimetry SVG artwork at a readable 24 px size in Studio's effects toolbar.
+
 - Restore pointer-anchored, searchable Quick Add on blank canvas and artboards in Classic and Studio. Share its typewriter, transform-free blur/fade entrance and store-local Jotai command catalogue with Cmd+K; stop replaying entrances on search/category changes. Reuse the same panel engine for retained Studio property and scene settings, respecting focus and reduced motion.
 - Compact the font picker to 312 px with 64 px row pitch and six mounted rows at the top. Retain usable metadata, prepare it on cancellable pointer intent, remove text scaling and avoid the duplicate initial sample-row commit while preserving real FontFace readiness, preview cancellation and one-step undo.
 - Give camera, environment and light animation cards immediate neutral scene references and real GPU hover previews with first-frame feedback. Compress only thumbnail playback to 1.6 seconds with mirrored loops, preserve authored presets, and align scene animation headings without decorative icons.
