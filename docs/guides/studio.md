@@ -54,7 +54,8 @@ editable and are retained in the project.
   direction pad, distance and focal-angle controls edit the composition camera.
 - Slider drags remain relative outside their tracks. Shift uses increments of five
   or ten useful units according to speed (scaled to the parameter range); slow
-  movement refines ordinary input. Quiet color cues and solid ticks indicate snapping. Help uses
+  movement refines ordinary input. Scrub labels fade into the primary color for the entire held gesture, independently
+  of snap entry/exit; solid ticks indicate slider snapping. Help uses
   shared tooltips instead of browser titles.
 - Sliders preview imperatively, commit once on release and restore on cancellation,
   owner changes or unmount. Double-click a large slider to restore its domain default

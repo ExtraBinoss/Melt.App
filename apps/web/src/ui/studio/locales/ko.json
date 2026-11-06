@@ -14,5 +14,7 @@
   "scene": "장면",
   "environment": "환경",
   "intensity": "강도",
-  "rotation": "회전"
+  "rotation": "회전",
+  "sliderResetHint": "두 번 클릭하여 초기화",
+  "preciseHint": "5 / 10 단위 · 천천히 드래그하여 미세 조정"
 }

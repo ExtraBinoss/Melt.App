@@ -14,5 +14,7 @@
   "scene": "场景",
   "environment": "环境",
   "intensity": "强度",
-  "rotation": "旋转"
+  "rotation": "旋转",
+  "sliderResetHint": "双击重置",
+  "preciseHint": "以 5 / 10 为步长 · 缓慢拖动以微调"
 }

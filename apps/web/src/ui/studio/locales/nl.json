@@ -14,5 +14,7 @@
   "scene": "Scène",
   "environment": "Omgeving",
   "intensity": "Intensiteit",
-  "rotation": "Rotatie"
+  "rotation": "Rotatie",
+  "sliderResetHint": "Dubbelklik om te herstellen",
+  "preciseHint": "Stappen van 5 / 10 · Sleep langzaam voor meer precisie"
 }

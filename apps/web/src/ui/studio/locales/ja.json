@@ -14,5 +14,7 @@
   "scene": "シーン",
   "environment": "環境",
   "intensity": "強度",
-  "rotation": "回転"
+  "rotation": "回転",
+  "sliderResetHint": "ダブルクリックでリセット",
+  "preciseHint": "5 / 10刻み · ゆっくりドラッグして微調整"
 }

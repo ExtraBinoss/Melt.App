@@ -14,5 +14,7 @@
   "scene": "Cena",
   "environment": "Ambiente",
   "intensity": "Intensidade",
-  "rotation": "Rotação"
+  "rotation": "Rotação",
+  "sliderResetHint": "Clique duas vezes para repor",
+  "preciseHint": "Incrementos de 5 / 10 · Arraste devagar para maior precisão"
 }

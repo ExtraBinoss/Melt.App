@@ -159,12 +159,11 @@ export function StudioSlider(props: StudioSliderProps) {
       </div>
       <ControlHint
         content={
-          <>
-            <Kbd>⇧</Kbd>
-            <span>
-              {t("preciseHint")} · {t("sliderResetHint")}
-            </span>
-          </>
+          <span>
+            <Kbd>⇧</Kbd> {t("preciseHint")}
+            <br />
+            {t("sliderResetHint")}
+          </span>
         }
       >
         <div className="studio-slider-control">

@@ -4,6 +4,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ## [Unreleased]
 
+- Keep numeric scrub labels in the primary color throughout a held gesture, with smooth entry and release fades instead of snap-driven flashes. Put Studio slider reset help on its own tooltip line and translate both hints into all twelve supported languages.
+
 - Replace dotted scrub-label snap underlines with a subtle color cue and solid Studio slider ticks. Add double-click reset to large Studio sliders using each control’s real defaults, with one undoable edit, a replayable shimmer, reduced-motion feedback, and explicit retirement of pending clicks and animations.
 
 - Hide empty export Advanced accordions and keep Video export available for Static compositions. Offer a configurable still-video duration (two seconds by default), render the frozen base design without enabling retained Motion or audio, and reuse its preview frame. Preserve native encoder limits, selection/framing, progress, cancellation and stale-snapshot checks.

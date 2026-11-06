@@ -14,5 +14,7 @@
   "scene": "المشهد",
   "environment": "البيئة",
   "intensity": "الشدة",
-  "rotation": "الدوران"
+  "rotation": "الدوران",
+  "sliderResetHint": "انقر نقرًا مزدوجًا لإعادة الضبط",
+  "preciseHint": "خطوات 5 / 10 · اسحب ببطء لضبط أدق"
 }

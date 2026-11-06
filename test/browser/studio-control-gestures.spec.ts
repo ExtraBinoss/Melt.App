@@ -1,5 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import { resolve } from "node:path";
+import { readFile } from "node:fs/promises";
 
 async function mountControls(page: Page) {
   await page.route("**/controls-witness", (route) =>
@@ -112,20 +113,52 @@ test("scrubbing a Studio label has no dotted underline and keeps its field geome
   const scrub = page.getByRole("button", { name: "Adjust Intensity" });
   const field = page.locator(".number-field").filter({ has: scrub });
   const before = (await field.boundingBox())!;
+  const restingColor = await scrub.evaluate((node) => getComputedStyle(node).backgroundColor);
+  const primaryColor = await scrub.evaluate((node) => {
+    const probe = document.createElement("span");
+    probe.style.color = "var(--primary)";
+    node.append(probe);
+    const color = getComputedStyle(probe).color;
+    probe.remove();
+    return color;
+  });
   const box = (await scrub.boundingBox())!;
   await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
   await page.keyboard.down("Shift");
   await page.mouse.down();
+  await expect(field).toHaveAttribute("data-dragging", "true");
+  expect(await scrub.evaluate((node) => node.getAnimations().length)).toBeGreaterThan(0);
+  await expect(scrub).toHaveCSS("background-color", primaryColor);
   await page.mouse.move(box.x + box.width / 2 + 20, box.y + box.height / 2, { steps: 5 });
   await expect(field).toHaveAttribute("data-snapped", "");
   await expect(scrub).not.toHaveCSS("border-bottom-style", "dashed");
   await expect(scrub).not.toHaveCSS("border-bottom-style", "dotted");
+  await page.keyboard.up("Shift");
+  await page.mouse.move(box.x + box.width / 2 + 23, box.y + box.height / 2);
+  await expect(field).not.toHaveAttribute("data-snapped");
+  await expect(scrub).toHaveCSS("background-color", primaryColor);
+  expect(await scrub.evaluate((node) => node.getAnimations().length)).toBe(0);
+  await page.keyboard.down("Shift");
+  await page.mouse.move(box.x + box.width / 2 + 24, box.y + box.height / 2);
+  await expect(field).toHaveAttribute("data-snapped", "");
+  await expect(scrub).toHaveCSS("background-color", primaryColor);
+  expect(await scrub.evaluate((node) => node.getAnimations().length)).toBe(0);
   const after = (await field.boundingBox())!;
   expect(after.height).toBe(before.height);
   expect(after.y).toBe(before.y);
   await page.mouse.up();
   await page.keyboard.up("Shift");
   await expect(field).not.toHaveAttribute("data-snapped");
+  await expect(field).not.toHaveAttribute("data-dragging");
+  await page.mouse.move(0, 0);
+  expect(await scrub.evaluate((node) => node.getAnimations().length)).toBeGreaterThan(0);
+  await expect(scrub).toHaveCSS("background-color", restingColor);
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await scrub.hover();
+  await page.mouse.down();
+  await expect(scrub).toHaveCSS("background-color", primaryColor);
+  expect(await scrub.evaluate((node) => node.getAnimations().length)).toBe(0);
+  await page.mouse.up();
 });
 
 test("native double-click resets a large slider once, replays its shimmer and honors reduced motion", async ({
@@ -183,4 +216,26 @@ test("native double-click resets a large slider once, replays its shimmer and ho
   );
   await expect(feedback).not.toHaveAttribute("data-resetting");
   expect(await events()).toEqual([11, 10, 11, 10]);
+});
+
+test("Studio reset help has a separate line in every supported language", async ({ page }) => {
+  await mountControls(page);
+  await page.locator('[data-slot="slider-track"]').hover();
+  const hint = page.locator('[data-slot="tooltip-content"].control-hint');
+  await expect(hint).toBeVisible();
+  for (const locale of ["en", "fr", "de", "es", "it", "pt", "nl", "pl", "ja", "ko", "zh", "ar"]) {
+    const messages = JSON.parse(
+      await readFile(`apps/web/src/ui/studio/locales/${locale}.json`, "utf8"),
+    ) as { sliderResetHint: string; preciseHint: string };
+    await page.evaluate(
+      async ({ path, locale }) => {
+        const { i18n } = await import(/* @vite-ignore */ path);
+        await i18n.changeLanguage(locale);
+      },
+      { path: `/@fs${resolve("apps/web/src/state/i18n/index.ts")}`, locale },
+    );
+    await expect(hint).toContainText(messages.sliderResetHint);
+    await expect(hint).toContainText(messages.preciseHint);
+    await expect(hint.locator("br")).toHaveCount(1);
+  }
 });

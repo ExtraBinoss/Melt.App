@@ -14,5 +14,7 @@
   "scene": "Szene",
   "environment": "Umgebung",
   "intensity": "Intensität",
-  "rotation": "Drehung"
+  "rotation": "Drehung",
+  "sliderResetHint": "Zum Zurücksetzen doppelklicken",
+  "preciseHint": "Schritte 5 / 10 · Langsam ziehen: Präzision"
 }

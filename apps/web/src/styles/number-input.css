@@ -44,9 +44,11 @@
   cursor: ew-resize;
   touch-action: none;
   user-select: none;
+  transition:
+    background-color 220ms ease,
+    color 220ms ease;
 }
-.number-scrub:hover,
-.number-field[data-dragging] .number-scrub {
+.number-scrub:hover {
   color: var(--foreground);
   background: var(--accent);
 }
@@ -102,15 +104,17 @@
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .number-field {
-    transition: none;
+  .number-field,
+  .number-scrub {
+    transition: none !important;
   }
   .reset-feedback[data-resetting] {
     animation: none !important;
   }
 }
 
-.number-field[data-snapped] .number-scrub {
-  background: color-mix(in srgb, var(--primary) 12%, var(--accent));
-  color: var(--foreground);
+.number-field[data-dragging] .number-scrub {
+  background: var(--primary);
+  color: var(--primary-foreground);
+  transition-duration: 160ms;
 }

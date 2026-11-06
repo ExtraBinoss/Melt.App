@@ -208,6 +208,7 @@ function DesktopNumberInput({
       time: event.timeStamp,
       precise: initial,
     };
+    event.currentTarget.parentElement?.setAttribute("data-dragging", "true");
     event.currentTarget.setPointerCapture(event.pointerId);
   }
   function move(event: PointerEvent<HTMLButtonElement>) {
@@ -243,7 +244,6 @@ function DesktopNumberInput({
     const snapped = snapPoints?.find((point) => Math.abs(point - next) <= snapThreshold);
     next = bounded(snapped ?? next);
     active.next = next;
-    event.currentTarget.parentElement?.setAttribute("data-dragging", "true");
     preview(next);
   }
   function finish(event: PointerEvent<HTMLButtonElement>, cancel = false) {
