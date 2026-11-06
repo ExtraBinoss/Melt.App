@@ -78,3 +78,23 @@
     transition: none;
   }
 }
+
+.canvas-timeline-hover-label {
+  position: absolute;
+  top: -4px;
+  left: 0;
+  max-width: 240px;
+  padding: 2px 5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--canvas-handle-color, #ffffff);
+  background: var(--canvas-selection-accent, var(--media-image));
+  border-radius: 3px;
+  font-size: 11px;
+  line-height: 16px;
+  transform-origin: left bottom;
+}
+.canvas-timeline-hover[data-layer-kind="ellipse"] {
+  border-radius: 50%;
+}

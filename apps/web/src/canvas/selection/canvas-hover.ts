@@ -5,6 +5,7 @@ import { clientToPage } from "../viewport/view";
 import type { ViewSource } from "../viewport/motion";
 import { sourceGeometry } from "./frame-geometry";
 import { canvasHit } from "./hit";
+import { subscribePreparedPicking } from "./picking/prepared-content";
 
 interface Clock {
   request(callback: () => void): number;
@@ -46,7 +47,7 @@ export function installCanvasHover(
     // Read all layout before the hover lease synchronously paints its outline.
     const rect = node.getBoundingClientRect();
     const location = clientToPage(point, rect, view.read(), frame.page);
-    const picked = canvasHit(frame.page, location, true, sourceGeometry(controller), studio);
+    const picked = canvasHit(frame.page, location, false, sourceGeometry(controller), studio);
     const id = picked?.layer.id ?? null;
     if (id === layerId && hover.read()?.layerId === id) return;
     const previous = release;
@@ -128,11 +129,13 @@ export function installCanvasHover(
   node.addEventListener("pointercancel", leave, true);
   window.addEventListener("blur", leave);
   const stopScene = controller.subscribe(schedule),
-    stopView = view.subscribe(schedule);
+    stopView = view.subscribe(schedule),
+    stopPrepared = subscribePreparedPicking(controller, schedule);
   return () => {
     leave();
     stopScene();
     stopView();
+    stopPrepared();
     node.removeEventListener("pointermove", move);
     node.removeEventListener("pointerleave", leave);
     node.removeEventListener("pointerdown", down, true);

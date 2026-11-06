@@ -1,0 +1,6 @@
+{
+  "selectLayer": "Select layer",
+  "locked": "Locked",
+  "more": "{{count}} more — cycle with Ctrl/Cmd+Shift+click",
+  "hint": "Ctrl/Cmd+Shift+click cycles overlapping layers"
+}

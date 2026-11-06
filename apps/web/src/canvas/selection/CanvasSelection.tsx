@@ -110,6 +110,7 @@ function TimelineHoverOutline({
       previousPlayback: boolean | undefined,
       previousSelection: readonly string[] | null = null;
     let selected = new Set<string>();
+    const label = element.current?.querySelector<HTMLElement>(".canvas-timeline-hover-label");
     const handles =
       element.current?.querySelectorAll<HTMLElement>(".canvas-timeline-hover-handle") ?? [];
     const paint = (force = false) => {
@@ -160,6 +161,12 @@ function TimelineHoverOutline({
         return;
       }
       node.dataset.layerId = layer.id;
+      if (label) {
+        // The presentation observer also watches child lists. Writing identical text
+        // would schedule another forced paint and keep the UI thread in a loop.
+        if (label.textContent !== layer.name) label.textContent = layer.name;
+        label.style.transform = `translateY(-100%) scale(${1 / scale})`;
+      }
       node.dataset.layerKind = layer.kind;
       node.dataset.playback = String(Boolean(frame.playback));
       paintSelectionHandleInk(node, layer, frame.page);
@@ -201,6 +208,7 @@ function TimelineHoverOutline({
       aria-hidden="true"
       style={{ display: "none" }}
     >
+      <span className="canvas-timeline-hover-label" />
       {(["nw", "ne", "sw", "se"] as const).map((corner) => (
         <span key={corner} className={`canvas-timeline-hover-handle is-${corner}`} />
       ))}

@@ -67,7 +67,7 @@ import { CanvasSelection } from "./selection/CanvasSelection";
 import { useWorkspaceMode } from "../ui/studio/workspace-mode";
 import { useCanvasHover } from "./selection/use-canvas-hover";
 import { sourcePagePoint, sourceSelectionBounds } from "./selection/frame-geometry";
-import { canvasHit } from "./selection/hit";
+import { usePreparedPicking } from "./selection/picking/prepared-content";
 import * as pointerPick from "./interaction/pointer-pick";
 import { editablePresentedLayer, pickMotionPlayback } from "./selection/presented-pick";
 import { useMarquee } from "./selection/use-marquee";
@@ -102,6 +102,7 @@ export function EditorCanvas({
     () => new SceneController(engine, previewSource),
     [engine, previewSource],
   );
+  usePreparedPicking(controller);
   const page =
     snapshot.project.pages.find((item) => item.id === snapshot.pageId) ??
     snapshot.project.pages[0]!;
@@ -265,16 +266,7 @@ export function EditorCanvas({
     }
     attachmentSelection(engine).clear();
     if (targetBoard && targetBoard.id !== controller.read().page.id) {
-      engine.setPage(targetBoard.id);
-      const hit = canvasHit(
-        controller.read().page,
-        {
-          x: worldPoint.x - targetBoard.x,
-          y: worldPoint.y - targetBoard.y,
-        },
-        tool === "pointer",
-      )?.layer;
-      engine.select(hit ? [hit.id] : []);
+      pointerPick.selectCanvasArtboard(engine, controller, targetBoard, worldPoint, studio);
       return;
     }
     if (!targetBoard && tool !== "pointer") return;
@@ -300,6 +292,8 @@ export function EditorCanvas({
       gesture.current = { ...base, mode: "draw", shape };
       return;
     }
+    if (tool === "pointer" && pointerPick.isCanvasCycle(event))
+      return pointerPick.cycleCanvasPointer(engine, controller, point, studio);
     const currentPage = controller.read().page;
     const picked = pointerPick.pickCanvasPointer(engine, controller, point, tool, additive, studio),
       hit = picked?.layer;
@@ -463,7 +457,12 @@ export function EditorCanvas({
   });
   const cursor = tool === "hand" || space ? "grab" : tool === "pointer" ? "default" : "crosshair";
   return (
-    <CanvasContextMenu engine={engine} resolveTarget={transfers.target} onError={onError}>
+    <CanvasContextMenu
+      engine={engine}
+      resolveTarget={transfers.target}
+      resolveCandidates={transfers.targets}
+      onError={onError}
+    >
       <div
         className="editor-canvas"
         data-testid="editor-canvas"

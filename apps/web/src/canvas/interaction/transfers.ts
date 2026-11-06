@@ -2,7 +2,7 @@ import type { Composition, EnginePort } from "@musart/core";
 import type { DragEvent } from "react";
 import { acceptsLibraryDrag, dropLibraryItem } from "../../services/assets/library-drag";
 import { artboardAt, type ArtboardWorkspace } from "../artboards/layout";
-import { canvasHit } from "../selection/hit";
+import { canvasHit, canvasHits } from "../selection/hit";
 import { clientToPage, type Point, type View } from "../viewport/view";
 import { createCanvasFileDropHandlers } from "./file-drop";
 
@@ -59,6 +59,20 @@ export function createCanvasTransfers(options: CanvasTransfersOptions) {
     Boolean(event.dataTransfer && acceptsLibraryDrag(event.dataTransfer, options.engine));
   return {
     reset: () => onActive(false),
+    targets(this: void, point: Point): CanvasContextTarget[] {
+      const located = locate(point, undefined, options.allowOutsideActive);
+      if (!located) return [];
+      const presented = options.readPage();
+      const page =
+        presented.id === located.board.id
+          ? presented
+          : options.engine.getSnapshot().project.pages.find(({ id }) => id === located.board.id);
+      return page
+        ? canvasHits(page, located.position, true, undefined, !!options.allowOutsideActive).map(
+            ({ layer, locked }) => ({ compositionId: page.id, layerId: layer.id, locked }),
+          )
+        : [];
+    },
     target(this: void, point: Point): CanvasContextTarget | null {
       const located = locate(point);
       if (!located) return null;

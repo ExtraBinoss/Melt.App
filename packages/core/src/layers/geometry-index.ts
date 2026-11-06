@@ -21,6 +21,10 @@ interface HitOptions {
   includeLocked?: boolean;
   contentBounds?: (layer: Layer) => Readonly<Bounds> | null;
   spatialHit?: (layer: Layer) => boolean;
+  /** Optional prepared source-ink predicate in layer-local coordinates. */
+  localHit?: (layer: Layer, point: Point) => boolean;
+  /** Keep legacy group-frame picking unless an artwork picker opts out. */
+  groupFallback?: boolean;
 }
 
 /** One reusable index per immutable composition; mutable command drafts are never cached. */
@@ -305,22 +309,35 @@ export class LayerGeometryIndex {
       childLists ? (childLists.get(id) ?? empty) : this.children(id);
     return this.hitTestCandidates(point, options, childrenOf) ?? null;
   }
+  /** Explicit overlap queries visit each candidate once in hierarchical paint order. */
+  hitTestAll(point: Point, options: HitOptions = {}): Layer[] {
+    const hits: Layer[] = [];
+    this.hitTestCandidates(point, options, undefined, Infinity, hits);
+    return hits;
+  }
   private hitTestCandidates(
     point: Point,
     options: HitOptions,
     childrenOf: (id: string | null) => readonly Layer[] = (id) => this.children(id),
     budget = Infinity,
+    hits?: Layer[],
   ): Layer | null | undefined {
     let visited = 0;
     const roots = childrenOf(null);
-    const stack: { children: readonly Layer[]; at: number; point: Point; fallback?: Layer }[] = [
-      { children: roots, at: roots.length - 1, point },
-    ];
+    const stack: {
+      children: readonly Layer[];
+      at: number;
+      point: Point;
+      fallback?: Layer | undefined;
+    }[] = [{ children: roots, at: roots.length - 1, point }];
     while (stack.length) {
       const frame = stack[stack.length - 1]!;
       if (frame.at < 0) {
         stack.pop();
-        if (frame.fallback) return frame.fallback;
+        if (frame.fallback) {
+          if (!hits) return frame.fallback;
+          hits.push(frame.fallback);
+        }
         continue;
       }
       if (visited++ >= budget) return undefined;
@@ -335,7 +352,10 @@ export class LayerGeometryIndex {
       let local: Point;
       if (layer.spatial?.enabled) {
         if (layer.kind !== "group" && options.spatialHit) {
-          if (options.spatialHit(layer)) return layer;
+          if (options.spatialHit(layer)) {
+            if (!hits) return layer;
+            hits.push(layer);
+          }
           continue;
         }
         const bounds = this.worldBounds(layer.id);
@@ -346,9 +366,18 @@ export class LayerGeometryIndex {
           point.y > bounds.y + bounds.height
         )
           continue;
-        if (layer.kind !== "group") return layer;
+        if (layer.kind !== "group") {
+          if (!hits) return layer;
+          hits.push(layer);
+          continue;
+        }
         const children = childrenOf(layer.id);
-        stack.push({ children, at: children.length - 1, point: frame.point, fallback: layer });
+        stack.push({
+          children,
+          at: children.length - 1,
+          point: frame.point,
+          fallback: options.groupFallback === false ? undefined : layer,
+        });
         continue;
       }
       if (
@@ -395,9 +424,20 @@ export class LayerGeometryIndex {
           1
       )
         continue;
-      if (layer.kind !== "group") return layer;
+      if (layer.kind !== "group") {
+        if (!options.localHit || options.localHit(layer, local)) {
+          if (!hits) return layer;
+          hits.push(layer);
+        }
+        continue;
+      }
       const children = childrenOf(layer.id);
-      stack.push({ children, at: children.length - 1, point: local, fallback: layer });
+      stack.push({
+        children,
+        at: children.length - 1,
+        point: local,
+        fallback: options.groupFallback === false ? undefined : layer,
+      });
     }
     return null;
   }
