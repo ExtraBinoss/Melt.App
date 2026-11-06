@@ -182,6 +182,22 @@ the known project name, with a bounded cancellable metadata lookup for direct ro
 
 ## Verification scope
 
+Search palettes share `PalettePanel` and `PaletteReveal`. The shell fades over
+120 ms; row text reveals with 2 px blur over 160 ms and at most 64 ms of stagger.
+Neither shell nor glyphs scale or move. Radix placement and autofocus complete
+before the first visible frame. Cmd+K retains its modal focus ownership; Quick Add
+uses a nonmodal pointer-anchored popover. Advanced Studio and scene parameter
+surfaces use the same shell with a whole-surface blur, including Activity resume.
+Reduced motion presents the final state immediately.
+
+The opening phase is a local Jotai atom. The first query/category interaction
+retires it once, without per-frame state updates. Subsequent results mount without
+blur listeners or another entrance; tab changes therefore do not replay a dark
+loading sweep. Both searches reuse a store-local command catalogue, cached
+translations and availability projections. The placeholder typewriter writes only
+the native input placeholder. Actual compositor and input measurements, including
+their limits, are in [the palette report](../performance/palettes-scene-previews.md).
+
 The copied engine keeps its full upstream geometry witnesses. Run the exhaustive
 catalogue and fit-table checks explicitly when changing geometry or catalogue
 data, rather than for an unrelated UI adjustment:

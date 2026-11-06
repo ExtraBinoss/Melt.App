@@ -1,10 +1,10 @@
-import { useLayoutEffect, useRef, type ComponentProps } from "react";
-import { Dialog as DialogPrimitive, Slot } from "radix-ui";
-import { AnimatePresence, motion, useAnimationControls, useIsPresent } from "motion/react";
+import type { ComponentProps } from "react";
+import { Dialog as DialogPrimitive } from "radix-ui";
+import { AnimatePresence, motion } from "motion/react";
+import { PalettePanel } from "../shared/motion/PalettePanel";
 
-const Content = motion.create(DialogPrimitive.Content);
 const Overlay = motion.create(DialogPrimitive.Overlay);
-type ContentProps = ComponentProps<typeof Content>;
+type ContentProps = ComponentProps<typeof DialogPrimitive.Content>;
 interface Props extends ContentProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -21,35 +21,6 @@ export function SearchDialog({ open, onOpenChange, reduced, ...props }: Props) {
   );
 }
 function SearchDialogLayers({ reduced, children, ...props }: ContentProps & { reduced: boolean }) {
-  const present = useIsPresent();
-  const controls = useAnimationControls();
-  const content = useRef<HTMLDivElement>(null);
-  useLayoutEffect(() => {
-    if (present) return;
-    // Retire native focus before the inert exit; Radix restores the origin after presence ends.
-    const focused = document.activeElement;
-    if (focused instanceof HTMLElement && content.current?.contains(focused)) focused.blur();
-  }, [present]);
-  useLayoutEffect(() => {
-    if (!present || reduced) return;
-    // Start after mounting/focus/style work, so it cannot consume the visual entrance clock.
-    let active = true;
-    content.current?.setAttribute("data-search-reveal", "pending");
-    const frame = requestAnimationFrame(() => {
-      if (!active) return;
-      content.current?.setAttribute("data-search-reveal", "running");
-      void controls.start("visible");
-    });
-    return () => {
-      active = false;
-      cancelAnimationFrame(frame);
-    };
-  }, [present, reduced, controls]);
-  useLayoutEffect(() => () => controls.stop(), [controls]);
-  const transition = {
-    duration: reduced ? 0 : present ? 0.16 : 0.1,
-    ease: [0.2, 0.8, 0.2, 1] as [number, number, number, number],
-  };
   return (
     <DialogPrimitive.Portal forceMount>
       <Overlay
@@ -57,35 +28,25 @@ function SearchDialogLayers({ reduced, children, ...props }: ContentProps & { re
         data-slot="dialog-overlay"
         className="magic-search-overlay"
         initial={reduced ? false : { opacity: 0 }}
-        variants={{ visible: { opacity: 1 } }}
-        animate={reduced ? "visible" : controls}
+        animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        transition={transition}
-        style={{ pointerEvents: present ? "auto" : "none" }}
+        transition={{ duration: reduced ? 0 : 0.16 }}
       />
-      <Slot.Root ref={content}>
-        <Content
-          {...props}
-          onEscapeKeyDown={(event) => {
-            props.onEscapeKeyDown?.(event);
-            // Escape first belongs to the native IME candidate list, including legacy composition events.
-            if (event.isComposing || event.keyCode === 229) event.preventDefault();
-          }}
-          forceMount
-          data-slot="dialog-content"
-          data-magic-search
-          data-search-reveal={reduced ? "running" : "pending"}
-          inert={!present || undefined}
-          initial={reduced ? false : { opacity: 0, y: 8, scale: 0.985 }}
-          variants={{ visible: { opacity: 1, y: 0, scale: 1 } }}
-          animate={reduced ? "visible" : controls}
-          exit={{ opacity: 0, y: 4, scale: 0.99 }}
-          transition={transition}
-          style={{ ...props.style, pointerEvents: present ? "auto" : "none" }}
-        >
-          {children}
-        </Content>
-      </Slot.Root>
+
+      <DialogPrimitive.Content
+        {...props}
+        onEscapeKeyDown={(event) => {
+          props.onEscapeKeyDown?.(event);
+          // Escape first belongs to the native IME candidate list, including legacy composition events.
+          if (event.isComposing || event.keyCode === 229) event.preventDefault();
+        }}
+        forceMount
+        asChild
+        data-slot="dialog-content"
+        data-magic-search
+      >
+        <PalettePanel reduced={reduced}>{children}</PalettePanel>
+      </DialogPrimitive.Content>
     </DialogPrimitive.Portal>
   );
 }

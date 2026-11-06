@@ -34,6 +34,8 @@ export interface BlurRevealProps extends Omit<ComponentProps<"span">, "ref"> {
   blur?: number;
   scale?: number;
   reduced?: boolean;
+  /** Stable typography for palettes; other entrances may retain their small lift. */
+  motion?: "lift" | "still";
 }
 function bound(value: number | undefined, fallback: number, minimum: number, maximum: number) {
   return Number.isFinite(value) ? Math.min(maximum, Math.max(minimum, value!)) : fallback;
@@ -48,6 +50,7 @@ export function BlurReveal({
   blur = 3,
   scale = 1,
   reduced = false,
+  motion = "lift",
   className,
   style,
   ...props
@@ -63,48 +66,57 @@ export function BlurReveal({
       ),
       blur: bound(blur, 3, 0, 24),
       scale: bound(scale, 1, 0.5, 1.25),
+      motion,
     };
   });
-  const revealRef = useCallback((element: HTMLElement | null) => {
-    if (!element) return;
-    let previous = "",
-      active = false;
-    function release() {
-      if (!active) return;
-      // Do not overwrite a hint another owner installed during the entrance.
-      if (element!.style.willChange === "opacity, transform, filter") {
-        if (previous) element!.style.willChange = previous;
-        else element!.style.removeProperty("will-change");
+  const revealRef = useCallback(
+    (element: HTMLElement | null) => {
+      if (!element) return;
+      const hint = timing.motion === "still" ? "opacity, filter" : "opacity, transform, filter";
+      let previous = "",
+        active = false;
+      function release() {
+        if (!active) return;
+        // Do not overwrite a hint another owner installed during the entrance.
+        if (element!.style.willChange === hint) {
+          if (previous) element!.style.willChange = previous;
+          else element!.style.removeProperty("will-change");
+        }
+        active = false;
       }
-      active = false;
-    }
-    function animation(event: AnimationEvent) {
-      if (event.target !== element || event.animationName !== "musart-blur-reveal") return;
-      if (event.type === "animationstart") {
-        if (active || element!.hasAttribute("data-blur-complete")) return;
-        previous = element!.style.willChange;
-        element!.style.willChange = "opacity, transform, filter";
-        active = true;
-      } else {
+      function animation(event: AnimationEvent) {
+        if (
+          event.target !== element ||
+          !["musart-blur-reveal", "musart-blur-fade"].includes(event.animationName)
+        )
+          return;
+        if (event.type === "animationstart") {
+          if (active || element!.hasAttribute("data-blur-complete")) return;
+          previous = element!.style.willChange;
+          element!.style.willChange = hint;
+          active = true;
+        } else {
+          release();
+          element!.setAttribute("data-blur-complete", "");
+        }
+      }
+      if (
+        element.closest('[data-blur-reduced="true"],[data-reduced-motion="true"]') ||
+        window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
+      )
+        element.setAttribute("data-blur-complete", "");
+      element.addEventListener("animationstart", animation);
+      element.addEventListener("animationend", animation);
+      element.addEventListener("animationcancel", animation);
+      return () => {
+        element.removeEventListener("animationstart", animation);
+        element.removeEventListener("animationend", animation);
+        element.removeEventListener("animationcancel", animation);
         release();
-        element!.setAttribute("data-blur-complete", "");
-      }
-    }
-    if (
-      element.closest('[data-blur-reduced="true"],[data-reduced-motion="true"]') ||
-      window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
-    )
-      element.setAttribute("data-blur-complete", "");
-    element.addEventListener("animationstart", animation);
-    element.addEventListener("animationend", animation);
-    element.addEventListener("animationcancel", animation);
-    return () => {
-      element.removeEventListener("animationstart", animation);
-      element.removeEventListener("animationend", animation);
-      element.removeEventListener("animationcancel", animation);
-      release();
-    };
-  }, []);
+      };
+    },
+    [timing.motion],
+  );
   const Component = asChild ? Slot.Root : "span";
   return (
     <Component
@@ -113,6 +125,7 @@ export function BlurReveal({
       data-blur-reveal=""
       data-blur-order={timing.order}
       data-blur-reduced={reduced || undefined}
+      data-blur-motion={timing.motion}
       className={cn("blur-reveal", !asChild && "blur-reveal-inline", className)}
       style={
         {

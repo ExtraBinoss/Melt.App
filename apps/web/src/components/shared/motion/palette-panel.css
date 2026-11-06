@@ -1,0 +1,54 @@
+.palette-panel[data-search-reveal="pending"] .blur-reveal {
+  animation-play-state: paused;
+}
+/* Radix owns placement/presence; its default zoom must not compete with the palette engine. */
+.palette-panel[data-state] {
+  animation: none;
+}
+.palette-panel[data-search-reveal="pending"] {
+  opacity: 0;
+}
+.palette-panel[data-state][data-search-reveal="running"] {
+  animation: palette-panel-fade 120ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.palette-panel[data-state][data-search-reveal="running"][data-palette-blurred] {
+  animation-name: palette-panel-blur;
+}
+.palette-panel[data-state][data-reduced-motion],
+.palette-panel[data-state][data-search-reveal][inert] {
+  animation: none;
+}
+.palette-panel[data-reduced-motion] {
+  opacity: 1;
+}
+@keyframes palette-panel-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes palette-panel-blur {
+  from {
+    opacity: 0;
+    filter: blur(2px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .palette-panel[data-state][data-search-reveal] {
+    animation: none;
+    opacity: 1;
+  }
+}
+.palette-panel[data-palette-initial="false"] .blur-reveal {
+  animation: none;
+  opacity: var(--blur-reveal-opacity, 1);
+  filter: none;
+  transform: none;
+  will-change: auto;
+}

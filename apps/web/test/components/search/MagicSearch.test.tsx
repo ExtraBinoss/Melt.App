@@ -46,8 +46,14 @@ test("closed search rerenders only when command availability changes and actions
   const renders = surface.mock.calls.length;
   const shells = shellRender.mock.calls.length;
   const first = surface.mock.lastCall![0];
+  expect(first.commands.find((item) => item.id === "action:toolSegment")?.disabled).toBeTruthy();
   act(() => d.engine.select([d.image.id]));
-  expect(surface).toHaveBeenCalledTimes(renders);
+  // Background removal becomes available for an image: update only its command leaf.
+  expect(surface).toHaveBeenCalledTimes(renders + 1);
+  expect(
+    surface.mock.lastCall![0].commands.find((item) => item.id === "action:toolSegment")?.disabled,
+  ).toBeUndefined();
+  expect(shellRender).toHaveBeenCalledTimes(shells);
   act(() => {
     createCommandPort(d.engine).run("action:delete");
   });

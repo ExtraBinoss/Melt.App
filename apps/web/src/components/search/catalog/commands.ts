@@ -10,18 +10,26 @@ const EMPTY_SELECTION: string[] = [];
 Object.freeze(EMPTY_SELECTION);
 const gates = new Map(ACTIONS.map((action) => [`action:${action.action}`, action.gate]));
 type Gate = NonNullable<ActionDefinition["gate"]>;
+interface PreparedCommands {
+  base: SearchItem[];
+  enabled: SearchItem[];
+  states: Map<string, SearchItem[]>;
+}
 /** Labels and shortcuts change independently of selection; only availability changes on a click. */
 export class SearchCommands {
   private translate: SearchTranslate | null = null;
   private bindings: BindingSnapshot | null = null;
   private locale = "";
-  private motionHint = "";
   private base: SearchItem[] = [];
   private enabled: SearchItem[] = [];
   private selectionPage: Composition | null = null;
   private selection: readonly string[] | null = null;
   private selectionState: ReturnType<typeof layerSelection> | null = null;
-  private readonly states = new Map<string, SearchItem[]>();
+  private states = new Map<string, SearchItem[]>();
+  private readonly prepared = new WeakMap<
+    SearchTranslate,
+    WeakMap<BindingSnapshot, Map<string, PreparedCommands>>
+  >();
   read(
     snapshot: SessionSnapshot,
     t: SearchTranslate,
@@ -29,21 +37,33 @@ export class SearchCommands {
     locale: string,
   ): SearchItem[] {
     if (this.translate !== t || this.bindings !== bindings || this.locale !== locale) {
-      this.motionHint = t("motion:requiresMotion");
-      this.base = createSearchCommandItems(
-        { ...snapshot, selection: EMPTY_SELECTION, canUndo: false, canRedo: false },
-        t,
-        bindings,
-      ).map((item) =>
-        gates.get(item.id) === "motion" ? { ...item, disabled: this.motionHint } : item,
-      );
-      this.enabled = this.base.map((item) =>
-        item.disabled === undefined ? item : { ...item, disabled: undefined },
-      );
+      let byBindings = this.prepared.get(t);
+      if (!byBindings) this.prepared.set(t, (byBindings = new WeakMap()));
+      let byLocale = byBindings.get(bindings);
+      if (!byLocale) byBindings.set(bindings, (byLocale = new Map()));
+      let cached = byLocale.get(locale);
+      if (!cached) {
+        const motionHint = t("motion:requiresMotion");
+        const base = createSearchCommandItems(
+          { ...snapshot, selection: EMPTY_SELECTION, canUndo: false, canRedo: false },
+          t,
+          bindings,
+        ).map((item) =>
+          gates.get(item.id) === "motion" ? { ...item, disabled: motionHint } : item,
+        );
+        const enabled = base.map((item) =>
+          item.disabled === undefined ? item : { ...item, disabled: undefined },
+        );
+        cached = { base, enabled, states: new Map() };
+        byLocale.set(locale, cached);
+        if (byLocale.size > 2) byLocale.delete(byLocale.keys().next().value!);
+      }
+      this.base = cached.base;
+      this.enabled = cached.enabled;
+      this.states = cached.states;
       this.translate = t;
       this.bindings = bindings;
       this.locale = locale;
-      this.states.clear();
     }
     const page =
       snapshot.project.pages.find((page) => page.id === snapshot.pageId) ??

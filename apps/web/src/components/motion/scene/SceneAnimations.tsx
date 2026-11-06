@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ChevronRight, Plus, Sparkles } from "lucide-react";
+import { ChevronRight, Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import {
   extractSceneMotionAnimationPreset,
@@ -26,6 +26,7 @@ import { animationPresetName } from "../../spatial/presentation";
 import { SceneMotionPopover } from "./SceneMotionPopover";
 import "../animations/messages";
 import "../animations/animations.css";
+import "./scene-animations.css";
 
 /** Camera, environment and lights share the same authoritative action editor. */
 export function SceneAnimations({
@@ -81,11 +82,8 @@ export function SceneAnimations({
       aria-label={t(`sceneTitle.${owner.kind}`)}
       data-scene-animations={owner.kind}
     >
-      <div className="section-title">
-        <h3>
-          <Sparkles size={13} />
-          {t(`sceneTitle.${owner.kind}`)}
-        </h3>
+      <div className="scene-animations-heading">
+        <h3>{t(`sceneTitle.${owner.kind}`)}</h3>
         <SceneMotionPopover
           engine={engine}
           owner={owner}

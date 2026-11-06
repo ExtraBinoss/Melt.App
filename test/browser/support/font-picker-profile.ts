@@ -15,7 +15,13 @@ interface FontInputSample {
   superseded?: boolean;
 }
 interface FontProfile {
-  opens: { generated: number; dispatch: number; first?: FrameGeometry; second?: FrameGeometry }[];
+  opens: {
+    generated: number;
+    dispatch: number;
+    first?: FrameGeometry;
+    second?: FrameGeometry;
+    useful?: FrameGeometry;
+  }[];
   inputs: FontInputSample[];
   wheels: {
     generated: number;
@@ -33,6 +39,7 @@ interface FontProfile {
 interface FrameGeometry {
   at: number;
   present: boolean;
+  opacity?: number;
   top: number;
   rendered: number;
   firstRenderedPosition?: number;
@@ -75,6 +82,7 @@ export async function installFontPickerProfile(page: Page) {
           rows: [] as RowGeometry[],
         };
       const area = list.getBoundingClientRect();
+      const panel = list.closest('[data-slot="popover-content"]');
       const rows = [...list.querySelectorAll<HTMLElement>('[role="option"]')]
         .filter((row) => {
           const rect = row.getBoundingClientRect();
@@ -92,6 +100,7 @@ export async function installFontPickerProfile(page: Page) {
       return {
         at: performance.now(),
         present: true,
+        opacity: panel ? Number(getComputedStyle(panel).opacity) : 1,
         top: list.scrollTop,
         rendered: list.querySelectorAll('[role="option"]').length,
         firstRenderedPosition: Number(
@@ -149,10 +158,16 @@ export async function installFontPickerProfile(page: Page) {
         dispatch: performance.now(),
       };
       state.opens.push(sample);
+      const useful = () => {
+        const frame = geometry();
+        if (frame.rows.length && (frame.opacity ?? 0) > 0.1) sample.useful = frame;
+        else if (performance.now() - sample.dispatch < 1000) raf(useful);
+      };
       raf(() => {
         sample.first = geometry();
         raf(() => {
           sample.second = geometry();
+          useful();
         });
       });
     }

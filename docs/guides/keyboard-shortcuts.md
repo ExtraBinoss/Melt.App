@@ -67,23 +67,24 @@ The zoom controls also offer **100%**, **Fit** and **Recenter**. Browser- or OS-
 
 These gestures are separate from the editable command bindings.
 
-| Gesture or key                                 | Action                                                                                                          |
-| ---------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| Mouse wheel / two-finger trackpad scroll       | Pan vertically and horizontally.                                                                                |
-| `Shift` + vertical wheel                       | Pan horizontally.                                                                                               |
-| `Ctrl` + wheel / trackpad scroll               | Zoom around the pointer.                                                                                        |
-| Hold `Space` and drag                          | Temporarily pan the workspace.                                                                                  |
-| `Shift`-click or `Ctrl`-click artwork          | Add an item to the layer selection, or remove it if already selected.                                           |
-| Right-button drag                              | Select unlocked artwork intersecting the selection rectangle. A stationary right-click preserves the selection. |
-| Hold `Shift` while drawing a shape             | Draw a square or circle.                                                                                        |
-| Hold `Shift` while resizing / rotating         | Constrain proportions / rotate in 15° steps.                                                                    |
-| Hold `Alt` while moving / resizing             | Temporarily bypass snapping.                                                                                    |
-| Magic wand: click, then drag left/right        | Select a color region and adjust its tolerance.                                                                 |
-| Magic wand: `Shift`-click                      | Add to the pixel selection.                                                                                     |
-| Magic wand: `Alt`-click                        | Subtract from the pixel selection.                                                                              |
-| Active pixel selection: `Ctrl+D`               | Clear the pixel selection.                                                                                      |
-| Active pixel selection: `Delete` / `Backspace` | Hide the selected region through a mask, preserving the original image.                                         |
-| `Escape` during a canvas gesture               | Cancel the gesture and restore its starting state.                                                              |
+| Gesture or key                                    | Action                                                                                                                                                 |
+| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Mouse wheel / two-finger trackpad scroll          | Pan vertically and horizontally.                                                                                                                       |
+| `Shift` + vertical wheel                          | Pan horizontally.                                                                                                                                      |
+| `Ctrl` + wheel / trackpad scroll                  | Zoom around the pointer.                                                                                                                               |
+| Hold `Space` and drag                             | Temporarily pan the workspace.                                                                                                                         |
+| Double-click empty canvas or blank artboard paint | Open Quick Add at the pointer in Classic or Studio; search tools, effects, project actions and settings. Artwork keeps its normal double-click action. |
+| `Shift`-click or `Ctrl`-click artwork             | Add an item to the layer selection, or remove it if already selected.                                                                                  |
+| Right-button drag                                 | Select unlocked artwork intersecting the selection rectangle. A stationary right-click preserves the selection.                                        |
+| Hold `Shift` while drawing a shape                | Draw a square or circle.                                                                                                                               |
+| Hold `Shift` while resizing / rotating            | Constrain proportions / rotate in 15° steps.                                                                                                           |
+| Hold `Alt` while moving / resizing                | Temporarily bypass snapping.                                                                                                                           |
+| Magic wand: click, then drag left/right           | Select a color region and adjust its tolerance.                                                                                                        |
+| Magic wand: `Shift`-click                         | Add to the pixel selection.                                                                                                                            |
+| Magic wand: `Alt`-click                           | Subtract from the pixel selection.                                                                                                                     |
+| Active pixel selection: `Ctrl+D`                  | Clear the pixel selection.                                                                                                                             |
+| Active pixel selection: `Delete` / `Backspace`    | Hide the selected region through a mask, preserving the original image.                                                                                |
+| `Escape` during a canvas gesture                  | Cancel the gesture and restore its starting state.                                                                                                     |
 
 See [pixel selections](selection.md), [snapping](snapping.md) and [layers](layers.md) for details.
 

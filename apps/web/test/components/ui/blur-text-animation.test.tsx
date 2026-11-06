@@ -2,6 +2,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { Profiler } from "react";
 import { expect, test, vi } from "vitest";
 import { Popover, PopoverTrigger, PopoverContent } from "../../../src/components/ui/popover";
+import { PaletteReveal } from "../../../src/components/shared/motion/PaletteReveal";
 import BlurTextAnimation, {
   BlurReveal,
   Component,
@@ -12,6 +13,25 @@ function animation(element: Element, type: string) {
   Object.defineProperty(event, "animationName", { value: "musart-blur-reveal" });
   fireEvent(element, event);
 }
+test("palette headings, settings and rows share a stable blur/fade cadence without glyph transforms", () => {
+  const view = render(<PaletteReveal order={3}>Settings row</PaletteReveal>);
+  const row = screen.getByText("Settings row");
+  expect(row).toHaveAttribute("data-blur-motion", "still");
+  expect(row.style.getPropertyValue("--blur-reveal-delay")).toBe("22ms");
+  expect(row.style.getPropertyValue("--blur-reveal-duration")).toBe("160ms");
+  const event = (type: string) => {
+    const event = new Event(type, { bubbles: true });
+    Object.defineProperty(event, "animationName", { value: "musart-blur-fade" });
+    fireEvent(row, event);
+  };
+  event("animationstart");
+  expect(row.style.willChange).toBe("opacity, filter");
+  view.rerender(<PaletteReveal order={8}>Settings row</PaletteReveal>);
+  expect(row.style.getPropertyValue("--blur-reveal-delay")).toBe("22ms");
+  event("animationend");
+  expect(row.style.willChange).toBe("");
+  expect(row).toHaveAttribute("data-blur-complete");
+});
 test("keeps the supplied API aliases, exact whitespace and surrounding typography without demo content", () => {
   expect(Component).toBe(BlurTextAnimation);
   expect(Named).toBe(BlurTextAnimation);

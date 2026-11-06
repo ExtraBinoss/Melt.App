@@ -3,6 +3,8 @@ import { createLayer, createPage, createProject } from "@musart/core";
 import { mkdir, writeFile } from "node:fs/promises";
 import { installReadbackProbe } from "./support/readback-probe";
 
+test.use({ channel: "chromium", trace: "off" });
+
 async function surfaceCommits(page: Page) {
   return page.evaluate(() =>
     Object.fromEntries(
@@ -20,7 +22,12 @@ test("workspace plus and empty-world quick add use real shared actions, native f
 }) => {
   test.setTimeout(120000);
   await installReadbackProbe(page);
-  await page.goto("/?automation=1");
+  await page.addInitScript(() => {
+    localStorage.setItem("musart.language", "fr");
+    localStorage.setItem("musart.editor-tutorial.v1", "done");
+    localStorage.setItem("musart.onboarding.v1", JSON.stringify({ version: 1, completed: true }));
+  });
+  await page.goto("/editor?automation=1");
   await page.waitForFunction(() => Boolean(window.musart));
   await page.evaluate(
     (project) => window.musart!.load(project),
@@ -56,10 +63,17 @@ test("workspace plus and empty-world quick add use real shared actions, native f
   const addButton = page.getByTestId("canvas-add-artboard");
   await page.mouse.move(1590, 990);
   await expect(addButton).toHaveCSS("opacity", "0");
-  await artboard.hover();
-  await expect(addButton).toHaveCSS("opacity", "1");
+  const initialBoard = (await artboard.boundingBox())!;
+  await page.mouse.move(
+    initialBoard.x + initialBoard.width + 8,
+    initialBoard.y + initialBoard.height / 2,
+  );
+  await expect(addButton).toHaveCSS("opacity", "0.5");
   await page.mouse.move(1590, 990);
   await expect(addButton).toHaveCSS("opacity", "0");
+  await canvas.focus();
+  await expect(addButton).toHaveAttribute("data-visible", "true");
+  await page.keyboard.press("Tab");
   await addButton.focus();
   await expect(addButton).toHaveCSS("opacity", "1");
   await expect(page.getByRole("tooltip")).toHaveCount(0);
@@ -100,7 +114,7 @@ test("workspace plus and empty-world quick add use real shared actions, native f
     area = (await canvas.boundingBox())!;
   expect(popup.x).toBeCloseTo(area.x + 160, 0);
   expect(popup.y).toBeGreaterThanOrEqual(area.y + 120);
-  expect(popup.width).toBe(290);
+  expect(popup.width).toBe(350);
   await page.screenshot({ path: "artifacts/screenshots/canvas-quick-add.png" });
   await page.getByRole("option", { name: "Texte", exact: true }).click();
   await expect
@@ -131,7 +145,8 @@ test("workspace plus and empty-world quick add use real shared actions, native f
   await page.mouse.dblclick(board.x + 150, board.y + 150);
   await expect(page.getByRole("dialog", { name: "Ajout rapide", exact: true })).toBeHidden();
   await page.mouse.dblclick(board.x + 20, board.y + 20);
-  await expect(page.getByRole("dialog", { name: "Ajout rapide", exact: true })).toBeHidden();
+  await expect(page.getByRole("dialog", { name: "Ajout rapide", exact: true })).toBeVisible();
+  await page.keyboard.press("Escape");
   await open();
   const chooseImage = page.waitForEvent("filechooser");
   await page.getByRole("option", { name: "Importer des images", exact: true }).click();
@@ -158,7 +173,7 @@ test("workspace plus and empty-world quick add use real shared actions, native f
   await expect(page.getByRole("button", { name: "Icônes", exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: "Marques", exact: true })).toBeVisible();
   await page.keyboard.press("Escape");
-  await page.locator('.artboard-heading[data-active="true"]').hover();
+  await canvas.focus();
   await page.getByRole("button", { name: "Ajouter un plan de travail", exact: true }).click();
   await expect
     .poll(() => page.evaluate(() => window.musart!.snapshot().project.pages.length))

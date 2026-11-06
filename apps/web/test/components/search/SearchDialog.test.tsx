@@ -1,38 +1,9 @@
 import { act, fireEvent, screen, waitFor } from "@testing-library/react";
-import { afterEach, beforeEach, expect, test, vi } from "vitest";
+import { afterEach, expect, test, vi } from "vitest";
 import { SearchDialog } from "../../../src/components/search/SearchDialog";
 import { DialogTitle, DialogDescription } from "../../../src/components/ui/dialog";
 import { setup } from "../../support/ui";
 
-const entrance = vi.hoisted(() => ({ start: vi.fn(), stop: vi.fn() }));
-vi.mock("motion/react", async (original) => {
-  const actual = await original<typeof import("motion/react")>(),
-    { useMemo } = await import("react");
-  return {
-    ...actual,
-    useAnimationControls() {
-      const controls = actual.useAnimationControls();
-      return useMemo(
-        () => ({
-          ...controls,
-          start: (...args: Parameters<typeof controls.start>) => {
-            entrance.start(...args);
-            return controls.start(...args);
-          },
-          stop: () => {
-            entrance.stop();
-            controls.stop();
-          },
-        }),
-        [controls],
-      );
-    },
-  };
-});
-beforeEach(() => {
-  entrance.start.mockClear();
-  entrance.stop.mockClear();
-});
 afterEach(() => vi.unstubAllGlobals());
 function entranceClock() {
   let sequence = 0;
@@ -101,9 +72,8 @@ test("reduced motion skips visual entrance and Escape keeps the real Radix close
     </SearchDialog>,
   );
   const dialog = screen.getByRole("dialog");
-  expect(dialog).toHaveStyle({ opacity: "1" });
+  expect(dialog).toHaveAttribute("data-reduced-motion", "true");
   expect(dialog).toHaveAttribute("data-search-reveal", "running");
-  expect(entrance.start).not.toHaveBeenCalled();
   await act(async () => {
     await Promise.resolve();
   });
@@ -155,15 +125,15 @@ test("focus is immediate while the panel entrance starts only at the first avail
     </SearchDialog>,
   );
   expect(screen.getByRole("textbox", { name: "Query" })).toHaveFocus();
-  expect(screen.getByRole("dialog")).toHaveStyle({ opacity: "0" });
+  expect(screen.getByRole("dialog")).not.toHaveAttribute(
+    "style",
+    expect.stringContaining("transform"),
+  );
   expect(screen.getByRole("dialog")).toHaveAttribute("data-search-reveal", "pending");
-  expect(entrance.start).not.toHaveBeenCalled();
   expect(clock.pending.size).toBe(1);
   clock.flush();
   expect(screen.getByRole("dialog")).toHaveAttribute("data-search-reveal", "running");
-  expect(entrance.start).toHaveBeenCalledExactlyOnceWith("visible");
   view.unmount();
-  expect(entrance.stop).toHaveBeenCalledOnce();
   expect(clock.pending.size).toBe(0);
 });
 test("unmount before the first RAF cancels the entrance and rejects a retired callback", () => {
@@ -175,13 +145,13 @@ test("unmount before the first RAF cancels the entrance and rejects a retired ca
       <DialogDescription>Commands</DialogDescription>
     </SearchDialog>,
   );
+  const panel = screen.getByRole("dialog");
   const [id, callback] = [...clock.pending][0]!;
   view.unmount();
   expect(clock.cancel).toHaveBeenCalledWith(id);
   expect(clock.pending.size).toBe(0);
   act(() => callback(performance.now()));
-  expect(entrance.start).not.toHaveBeenCalled();
-  expect(entrance.stop).toHaveBeenCalledOnce();
+  expect(panel).toHaveAttribute("data-search-reveal", "pending");
 });
 test("closing before the entrance cancels its RAF without stopping the independent exit", () => {
   const clock = entranceClock(),
@@ -206,11 +176,12 @@ test("closing before the entrance cancels its RAF without stopping the independe
   expect(clock.cancel).toHaveBeenCalledWith(id);
   expect(clock.pending.size).toBe(0);
   act(() => callback(performance.now()));
-  expect(entrance.start).not.toHaveBeenCalled();
-  expect(entrance.stop).not.toHaveBeenCalled();
   expect(document.querySelector("[data-magic-search]")).toHaveAttribute("inert");
+  expect(document.querySelector("[data-magic-search]")).toHaveAttribute(
+    "data-search-reveal",
+    "pending",
+  );
   view.unmount();
-  expect(entrance.stop).toHaveBeenCalledOnce();
 });
 
 test.each([false, true])(

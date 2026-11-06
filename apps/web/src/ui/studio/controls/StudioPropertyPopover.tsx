@@ -1,6 +1,8 @@
 import { Activity, useEffect, useMemo, type ReactNode } from "react";
 import { atom, useAtom, useSetAtom } from "jotai";
+import { useReducedMotion } from "motion/react";
 import { Popover, PopoverContent, PopoverTrigger } from "../../../components/ui/popover";
+import { PalettePanel } from "../../../components/shared/motion/PalettePanel";
 import type { ComponentProps } from "react";
 
 type ContentProps = Omit<ComponentProps<typeof PopoverContent>, "children" | "forceMount">;
@@ -17,6 +19,7 @@ export function StudioPropertyPopover({
   openRequest?: object | null;
 }) {
   const atoms = useMemo(() => ({ open: atom(false), prepared: atom(false) }), []);
+  const reduced = Boolean(useReducedMotion());
   const [open, setOpen] = useAtom(atoms.open);
   const [prepared] = useAtom(atoms.prepared);
   const prepare = useSetAtom(atoms.prepared);
@@ -43,8 +46,10 @@ export function StudioPropertyPopover({
       </span>
       {prepared && (
         <Activity mode={open ? "visible" : "hidden"}>
-          <PopoverContent {...content} forceMount initialFocus="content">
-            {children}
+          <PopoverContent {...content} forceMount initialFocus="content" asChild>
+            <PalettePanel reduced={reduced} waitForPlacement blurred>
+              {children}
+            </PalettePanel>
           </PopoverContent>
         </Activity>
       )}

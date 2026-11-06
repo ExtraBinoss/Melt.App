@@ -4,6 +4,10 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ## [Unreleased]
 
+- Restore pointer-anchored, searchable Quick Add on blank canvas and artboards in Classic and Studio. Share its typewriter, transform-free blur/fade entrance and store-local Jotai command catalogue with Cmd+K; stop replaying entrances on search/category changes. Reuse the same panel engine for retained Studio property and scene settings, respecting focus and reduced motion.
+- Compact the font picker to 312 px with 64 px row pitch and six mounted rows at the top. Retain usable metadata, prepare it on cancellable pointer intent, remove text scaling and avoid the duplicate initial sample-row commit while preserving real FontFace readiness, preview cancellation and one-step undo.
+- Give camera, environment and light animation cards immediate neutral scene references and real GPU hover previews with first-frame feedback. Compress only thumbnail playback to 1.6 seconds with mirrored loops, preserve authored presets, and align scene animation headings without decorative icons.
+
 - Support native Depth of Field on individual 3D objects and groups, with mapped owner depth and GPU point focus that stays stable outside cropped viewports; expose supported owners in both workspace catalogs.
 - Support temporal Trail on individual layers and groups using exact historical Motion poses, isolated upstream paint, retained native scene context and bounded projective GPU captures.
 - Close Studio effect popovers on outside canvas clicks without interrupting native controls; place effects and grading beside Export and reuse shared ScrollShadow viewports for effects, grading, advanced properties and environments.

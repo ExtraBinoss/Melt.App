@@ -3,6 +3,7 @@ import { Check, LoaderCircle } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import type { FontOption } from "./catalog";
 import type { FontSampleCache, FontSampleState } from "./sample-cache";
+import { FONT_SAMPLE_LOADING } from "./sample-cache";
 import styles from "./FontPicker.module.css";
 import "./messages";
 
@@ -38,8 +39,8 @@ export const FontOptionRow = memo(function FontOptionRow({
   onChoose: (font: FontOption) => void;
 }) {
   const { t } = useTranslation("fonts");
-  const [storedSample, setSample] = useState<FontSampleState>({ status: "loading" });
-  const sample: FontSampleState = visible ? storedSample : { status: "loading" };
+  const [storedSample, setSample] = useState<FontSampleState>(FONT_SAMPLE_LOADING);
+  const sample: FontSampleState = visible ? storedSample : FONT_SAMPLE_LOADING;
   useLayoutEffect(
     () => (visible ? cache.acquire(font, installed, setSample) : undefined),
     [cache, font, installed, visible],

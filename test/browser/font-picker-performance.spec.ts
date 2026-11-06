@@ -6,6 +6,14 @@ import { installReadbackProbe } from "./support/readback-probe";
 import { fontSurfaceCounters, installFontPickerProfile } from "./support/font-picker-profile";
 import { profileClock } from "./support/selection-profile";
 
+test.use({
+  trace: "off",
+  screenshot: "off",
+  video: "off",
+  channel: "chromium",
+  headless: process.env.MUSART_PROFILE_HEADED !== "1",
+});
+
 async function twoFrames(page: Page) {
   await page.evaluate(
     () =>
@@ -55,7 +63,11 @@ test("font picker native production: cold/warm geometry, typing, scroll and real
     const entry = network.find((item) => item.id === event.requestId);
     if (entry) entry.bytes = event.encodedDataLength;
   });
-  await page.goto("/?automation=1");
+  await page.addInitScript(() => {
+    localStorage.setItem("musart.editor-tutorial.v1", "done");
+    localStorage.setItem("musart.onboarding.v1", JSON.stringify({ version: 1, completed: true }));
+  });
+  await page.goto("/editor?automation=1");
   await page.waitForFunction(() => Boolean(window.musart));
   await page.evaluate(
     (project) => {
@@ -122,7 +134,9 @@ test("font picker native production: cold/warm geometry, typing, scroll and real
     await page.waitForFunction(
       () =>
         Number(
-          document.querySelector('[role="listbox"] [role="option"]')?.getAttribute("aria-setsize"),
+          document
+            .querySelector('[role="listbox"][aria-label="Polices"] [role="option"]')
+            ?.getAttribute("aria-setsize"),
         ) > 1900,
     );
     expect(await visibleRows(page)).toBeGreaterThan(0);
@@ -145,6 +159,23 @@ test("font picker native production: cold/warm geometry, typing, scroll and real
   const list = page.getByRole("listbox", { name: "Polices", exact: true });
   const area = await list.boundingBox();
   if (!area) throw new Error("Font scroll viewport is unavailable.");
+  const footprint = await list.evaluate((node) => {
+    const bounds = node.closest('[data-slot="popover-content"]')!.getBoundingClientRect();
+    return {
+      width: bounds.width,
+      height: bounds.height,
+      rowHeight: node.querySelector('[role="option"]')!.getBoundingClientRect().height,
+      mountedRows: node.querySelectorAll('[role="option"]').length,
+    };
+  });
+  if (process.env.MUSART_FONT_COMPACT === "1") {
+    expect(footprint.width).toBe(312);
+    expect(footprint.rowHeight).toBe(62);
+    expect(footprint.mountedRows).toBeLessThanOrEqual(6);
+    await list
+      .locator('xpath=ancestor::*[@data-slot="popover-content"]')
+      .screenshot({ path: join(directory, "compact.png") });
+  }
   await page.mouse.move(area.x + area.width - 3, area.y + area.height / 2);
   const scrollBefore = await fontSurfaceCounters(page);
   for (let index = 0; index < 16; index++) await page.mouse.wheel(0, index < 8 ? 72 : -72);
@@ -175,6 +206,7 @@ test("font picker native production: cold/warm geometry, typing, scroll and real
   await writeFile(join(directory, "font-picker.cpuprofile"), JSON.stringify(profile));
   const result = {
     sourceSha: process.env.MUSART_FONT_SHA,
+    footprint,
     browser: browser.version(),
     viewport: page.viewportSize(),
     clock,

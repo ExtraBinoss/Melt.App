@@ -4,6 +4,15 @@ import { writeFile } from "node:fs/promises";
 import { inspectImage } from "./support/image-probe";
 import { installReadbackProbe } from "./support/readback-probe";
 
+test.use({ channel: "chromium", trace: "off" });
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem("musart.language", "fr");
+    localStorage.setItem("musart.editor-tutorial.v1", "done");
+    localStorage.setItem("musart.onboarding.v1", JSON.stringify({ version: 1, completed: true }));
+  });
+});
+
 async function presented(page: Page) {
   await page.waitForFunction(() => {
     const canvas = document.querySelector<HTMLCanvasElement>(".canvas-artboard canvas");
@@ -50,7 +59,7 @@ test("searchable font hover and keyboard previews change GPU text without editor
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
   await installReadbackProbe(page);
-  await page.goto("/?automation=1");
+  await page.goto("/editor?automation=1");
   await page.waitForFunction(() => Boolean(window.musart));
   await page.evaluate(
     (document) => {
@@ -81,7 +90,8 @@ test("searchable font hover and keyboard previews change GPU text without editor
       ],
     }),
   );
-  await page.getByRole("button", { name: "100 % · Recentrer", exact: true }).click();
+  await page.getByTestId("editor-canvas").focus();
+  await page.keyboard.press("Control+1");
   await presented(page);
   await page.evaluate(() => window.musart!.flushThumbnails());
   const probe = await page.context().newPage();
@@ -204,7 +214,7 @@ test("a real imported font stays available after saving and reopening the browse
 }) => {
   test.setTimeout(120000);
   await installReadbackProbe(page);
-  await page.goto("/?automation=1");
+  await page.goto("/editor?automation=1");
   await page.waitForFunction(() => Boolean(window.musart));
   await page.evaluate(
     (document) => {

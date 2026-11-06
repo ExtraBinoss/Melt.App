@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { LoaderCircle, Upload } from "lucide-react";
+import { useReducedMotion } from "motion/react";
 import { useTranslation } from "react-i18next";
 import { MAX_FONT_FILE_BYTES } from "@musart/assets";
 import type { EnginePort, Layer } from "@musart/core";
@@ -8,6 +9,7 @@ import type { PropertyActions } from "../TextProperties";
 import { Button } from "../../ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "../../ui/popover";
 import { ScrollShadow } from "../../shared/scroll/ScrollShadow";
+import { PalettePanel } from "../../shared/motion/PalettePanel";
 import { HorizontalScroll } from "../../shared/scroll/HorizontalScroll";
 import { DropdownChevron } from "../../shared/DropdownChevron";
 import { FontPickerSearch } from "./FontPickerSearch";
@@ -30,9 +32,9 @@ import { createMotionTransport } from "../../../services/motion/transport";
 import styles from "./FontPicker.module.css";
 import "./messages";
 
-const ROW_HEIGHT = 80,
+const ROW_HEIGHT = 64,
   VIEW_ROWS = 4,
-  OVERSCAN = 2;
+  OVERSCAN = 1;
 const declinedDiscovery = new WeakSet<FontLibraryPort>();
 const discoveries = new WeakMap<FontLibraryPort, Promise<readonly FontOption[]>>();
 
@@ -47,6 +49,7 @@ export function FontPicker({
   const { t } = useTranslation("fonts"),
     { t: common } = useTranslation();
   const library = useFontLibrary();
+  const reduced = Boolean(useReducedMotion());
   const samples = useMemo(() => new FontSampleCache(library), [library]);
   const canvas = useFontCanvasStatus(engine);
   const { request: requestCanvas, cancel: cancelCanvas } = canvas;
@@ -59,13 +62,13 @@ export function FontPicker({
     recent,
     setRecent,
     metadataReady,
-    setMetadataReady,
     error,
     setError,
   } = usePickerMetadata(library, open, layer.fontFamily);
   const [query, setQuery] = useState("");
   const [active, setActive] = useState(-1);
   const [windowRow, setWindowRow] = useState(0);
+  const catalogTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const scrollPosition = useRef(0),
     hoverTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined),
     pointerFont = useRef<string | null>(null),
@@ -134,6 +137,7 @@ export function FontPicker({
     alive.current = true;
     return () => {
       alive.current = false;
+      clearTimeout(catalogTimer.current);
       clearIntent();
       if (activePreview.current) cancelRef.current();
     };
@@ -154,6 +158,7 @@ export function FontPicker({
     setWindowRow(Math.floor(scrollPosition.current / ROW_HEIGHT));
   }
   function show(value: boolean) {
+    clearTimeout(catalogTimer.current);
     if (value && layer.locked) return;
     if (value && engine) createMotionTransport(engine).pause();
     request.current++;
@@ -164,7 +169,7 @@ export function FontPicker({
       samples.pause();
     } else {
       samples.resume();
-      setMetadataReady(false);
+      // Keep already usable metadata visible while the guarded background refresh runs.
       // Call directly in the trigger gesture, before an await can lose user activation.
       if (!library.supportsLocalFonts || declinedDiscovery.has(library)) setLocalUnavailable(true);
       else {
@@ -364,6 +369,14 @@ export function FontPicker({
           aria-controls={open ? listId : undefined}
           disabled={layer.locked}
           className={styles.trigger}
+          onPointerEnter={() => {
+            if (metadataReady || layer.locked) return;
+            clearTimeout(catalogTimer.current);
+            catalogTimer.current = setTimeout(() => {
+              void library.catalog().catch(() => undefined);
+            }, 120);
+          }}
+          onPointerLeave={() => clearTimeout(catalogTimer.current)}
         >
           <span>{currentLabel}</span>
           <FontRenderIndicator state={canvas.view} />
@@ -371,6 +384,7 @@ export function FontPicker({
         </Button>
       </PopoverTrigger>
       <PopoverContent
+        asChild
         side="left"
         align="start"
         className={`floating-panel ${styles.popover}`}
@@ -379,162 +393,164 @@ export function FontPicker({
           document.getElementById(`${id}-font-search`)?.focus({ preventScroll: true });
         }}
       >
-        <div className={styles.header}>
-          <strong>{t("title")}</strong>
-          <span>
-            {metadataReady ? (
-              fonts.length
-            ) : (
-              <LoaderCircle size={12} className="animate-spin" aria-label={t("loading")} />
-            )}
-          </span>
-          <Button
-            variant="ghost"
-            size="icon-xs"
+        <PalettePanel reduced={reduced} waitForPlacement>
+          <div className={styles.header}>
+            <strong>{t("title")}</strong>
+            <span>
+              {metadataReady ? (
+                fonts.length
+              ) : (
+                <LoaderCircle size={12} className="animate-spin" aria-label={t("loading")} />
+              )}
+            </span>
+            <Button
+              variant="ghost"
+              size="icon-xs"
+              aria-label={t("import")}
+              title={t("importHint")}
+              disabled={pending !== null || library === bundledFontLibrary || layer.locked}
+              onClick={() => fileInput.current?.click()}
+            >
+              <Upload size={14} />
+            </Button>
+          </div>
+          <input
+            ref={fileInput}
+            hidden
+            type="file"
+            accept=".ttf,.otf,font/ttf,font/otf"
             aria-label={t("import")}
-            title={t("importHint")}
-            disabled={pending !== null || library === bundledFontLibrary || layer.locked}
-            onClick={() => fileInput.current?.click()}
-          >
-            <Upload size={14} />
-          </Button>
-        </div>
-        <input
-          ref={fileInput}
-          hidden
-          type="file"
-          accept=".ttf,.otf,font/ttf,font/otf"
-          aria-label={t("import")}
-          onChange={(event) => {
-            importFile(event.currentTarget.files?.[0]);
-            event.currentTarget.value = "";
-          }}
-        />
-        <FontPickerSearch
-          id={`${id}-font-search`}
-          listId={listId}
-          activeId={
-            active >= 0 && filtered[active] ? `${id}-font-${filtered[active]!.id}` : undefined
-          }
-          hints={hints}
-          query={query}
-          onMove={move}
-          onQuery={(value) => {
-            request.current++;
-            clearIntent();
-            setPending(null);
-            resetPreview();
-            setQuery(value);
-            setActive(-1);
-            scrollTo(0);
-          }}
-          onChoose={() => {
-            const font = filtered[Math.max(0, active)];
-            if (font) choose(font);
-          }}
-        />
-        <FontCategoryTabs
-          value={category}
-          onChange={(item) => {
-            request.current++;
-            clearIntent();
-            setPending(null);
-            resetPreview();
-            setCategory(item);
-            setActive(-1);
-            scrollTo(0);
-          }}
-        />
-        {!query && recent.length > 0 && (
-          <div className={styles.recents}>
-            <span>{t("recent")}</span>
-            <HorizontalScroll label={t("recent")}>
-              {recent.map((item) => {
-                const font = fonts.find((font) => font.id === item);
-                return font ? (
-                  <button
-                    type="button"
-                    key={item}
-                    onPointerEnter={() => intent(font, -1)}
-                    onPointerLeave={clearIntent}
-                    onFocus={() => previewFont(font)}
-                    onClick={() => choose(font)}
-                  >
-                    {font.label ?? font.family}
-                  </button>
-                ) : null;
-              })}
-            </HorizontalScroll>
-          </div>
-        )}
-        <ScrollShadow className={styles.listShadow}>
-          <div
-            ref={attachList}
-            id={listId}
-            role="listbox"
-            aria-label={t("title")}
-            className={styles.list}
-            style={{ height: ROW_HEIGHT * VIEW_ROWS }}
-            onWheelCapture={suspendPointer}
-            onPointerDownCapture={(event) => {
-              if (event.pointerType === "touch" || event.target === event.currentTarget)
-                suspendPointer();
+            onChange={(event) => {
+              importFile(event.currentTarget.files?.[0]);
+              event.currentTarget.value = "";
             }}
-            onScroll={(event) => {
-              scrollPosition.current = event.currentTarget.scrollTop;
-              setWindowRow(Math.floor(event.currentTarget.scrollTop / ROW_HEIGHT));
+          />
+          <FontPickerSearch
+            id={`${id}-font-search`}
+            listId={listId}
+            activeId={
+              active >= 0 && filtered[active] ? `${id}-font-${filtered[active]!.id}` : undefined
+            }
+            hints={hints}
+            query={query}
+            onMove={move}
+            onQuery={(value) => {
+              request.current++;
+              clearIntent();
+              setPending(null);
+              resetPreview();
+              setQuery(value);
+              setActive(-1);
+              scrollTo(0);
             }}
-            onKeyDown={(event) => {
-              if (event.key === "ArrowDown" || event.key === "ArrowUp") {
-                event.preventDefault();
-                move(event.key === "ArrowDown" ? 1 : -1);
-                document.getElementById(`${id}-font-search`)?.focus({ preventScroll: true });
-              }
+            onChoose={() => {
+              const font = filtered[Math.max(0, active)];
+              if (font) choose(font);
             }}
-          >
-            <div className={styles.space} style={{ height: filtered.length * ROW_HEIGHT }}>
-              <div className={styles.rows} style={{ top: first * ROW_HEIGHT }}>
-                {visible.map((font, offset) => {
-                  const index = first + offset;
-                  return (
-                    <FontOptionRow
-                      key={font.id}
-                      font={font}
-                      index={index}
-                      id={`${id}-font-${font.id}`}
-                      selected={active >= 0 ? active === index : current?.id === font.id}
-                      applied={current?.id === font.id}
-                      active={active === index}
-                      count={filtered.length}
-                      installed={installedIds.has(font.id)}
-                      visible={index >= windowRow && index < windowRow + VIEW_ROWS + 1}
-                      cache={samples}
-                      onIntent={intent}
-                      onLeave={clearIntent}
-                      onFocusFont={focusRow}
-                      onChoose={chooseRow}
-                    />
-                  );
+          />
+          <FontCategoryTabs
+            value={category}
+            onChange={(item) => {
+              request.current++;
+              clearIntent();
+              setPending(null);
+              resetPreview();
+              setCategory(item);
+              setActive(-1);
+              scrollTo(0);
+            }}
+          />
+          {!query && recent.length > 0 && (
+            <div className={styles.recents}>
+              <span>{t("recent")}</span>
+              <HorizontalScroll label={t("recent")}>
+                {recent.map((item) => {
+                  const font = fonts.find((font) => font.id === item);
+                  return font ? (
+                    <button
+                      type="button"
+                      key={item}
+                      onPointerEnter={() => intent(font, -1)}
+                      onPointerLeave={clearIntent}
+                      onFocus={() => previewFont(font)}
+                      onClick={() => choose(font)}
+                    >
+                      {font.label ?? font.family}
+                    </button>
+                  ) : null;
                 })}
-              </div>
+              </HorizontalScroll>
             </div>
-            {!filtered.length && <p className={styles.empty}>{t("empty")}</p>}
-          </div>
-        </ScrollShadow>
-        {pending && (
-          <p className={styles.status} role="status">
-            <LoaderCircle size={13} className="animate-spin" />
-            {t("installing")}
-          </p>
-        )}
-        {error && (
-          <p className={styles.error} role="alert">
-            {error}
-          </p>
-        )}
-        {localUnavailable && library.supportsLocalFonts && (
-          <p className={styles.status}>{t("localUnavailable")}</p>
-        )}
+          )}
+          <ScrollShadow className={styles.listShadow}>
+            <div
+              ref={attachList}
+              id={listId}
+              role="listbox"
+              aria-label={t("title")}
+              className={styles.list}
+              style={{ height: ROW_HEIGHT * VIEW_ROWS }}
+              onWheelCapture={suspendPointer}
+              onPointerDownCapture={(event) => {
+                if (event.pointerType === "touch" || event.target === event.currentTarget)
+                  suspendPointer();
+              }}
+              onScroll={(event) => {
+                scrollPosition.current = event.currentTarget.scrollTop;
+                setWindowRow(Math.floor(event.currentTarget.scrollTop / ROW_HEIGHT));
+              }}
+              onKeyDown={(event) => {
+                if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+                  event.preventDefault();
+                  move(event.key === "ArrowDown" ? 1 : -1);
+                  document.getElementById(`${id}-font-search`)?.focus({ preventScroll: true });
+                }
+              }}
+            >
+              <div className={styles.space} style={{ height: filtered.length * ROW_HEIGHT }}>
+                <div className={styles.rows} style={{ top: first * ROW_HEIGHT }}>
+                  {visible.map((font, offset) => {
+                    const index = first + offset;
+                    return (
+                      <FontOptionRow
+                        key={font.id}
+                        font={font}
+                        index={index}
+                        id={`${id}-font-${font.id}`}
+                        selected={active >= 0 ? active === index : current?.id === font.id}
+                        applied={current?.id === font.id}
+                        active={active === index}
+                        count={filtered.length}
+                        installed={installedIds.has(font.id)}
+                        visible={index >= windowRow && index < windowRow + VIEW_ROWS + 1}
+                        cache={samples}
+                        onIntent={intent}
+                        onLeave={clearIntent}
+                        onFocusFont={focusRow}
+                        onChoose={chooseRow}
+                      />
+                    );
+                  })}
+                </div>
+              </div>
+              {!filtered.length && <p className={styles.empty}>{t("empty")}</p>}
+            </div>
+          </ScrollShadow>
+          {pending && (
+            <p className={styles.status} role="status">
+              <LoaderCircle size={13} className="animate-spin" />
+              {t("installing")}
+            </p>
+          )}
+          {error && (
+            <p className={styles.error} role="alert">
+              {error}
+            </p>
+          )}
+          {localUnavailable && library.supportsLocalFonts && (
+            <p className={styles.status}>{t("localUnavailable")}</p>
+          )}
+        </PalettePanel>
       </PopoverContent>
     </Popover>
   );

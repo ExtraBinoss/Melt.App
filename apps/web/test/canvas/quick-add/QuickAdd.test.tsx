@@ -4,7 +4,7 @@ import type { RenderOptions } from "@testing-library/react";
 import { createRef } from "react";
 import { act, fireEvent, render as renderBase, screen, waitFor } from "@testing-library/react";
 import { afterEach, expect, it, vi } from "vitest";
-import { createPage, createProject, EditorEngine } from "@musart/core";
+import { createLayer, createPage, createProject, EditorEngine } from "@musart/core";
 import { AddArtboardOverlay } from "../../../src/canvas/artboards/AddArtboardOverlay";
 import { ViewMotion } from "../../../src/canvas/viewport/motion";
 import { QuickAdd } from "../../../src/canvas/quick-add/QuickAdd";
@@ -73,10 +73,11 @@ function fixture() {
   };
   return { page, engine, controller, workspace, viewport, props, view, open, close, onError };
 }
-it("opens only in empty world space, inserts real text/primitives in the active artboard and commits one undo step", async () => {
+it("opens on empty artboard/world paint, inserts real text/primitives and commits one undo step", async () => {
   const d = fixture();
   fireEvent.doubleClick(d.viewport.current!, { clientX: 500, clientY: 400, button: 0 });
-  expect(screen.queryByRole("dialog")).toBeNull();
+  expect(screen.getByRole("dialog")).toBeInTheDocument();
+  await d.close();
   fireEvent.doubleClick(d.viewport.current!, { clientX: 80, clientY: 90, button: 2 });
   expect(screen.queryByRole("dialog")).toBeNull();
   fireEvent.doubleClick(screen.getByTestId("canvas-add-artboard"), {
@@ -107,6 +108,66 @@ it("opens only in empty world space, inserts real text/primitives in the active 
     expect(d.engine.getSnapshot().project.pages[0]!.layers).toHaveLength(0);
     expect(d.engine.getSnapshot().canUndo).toBe(false);
   }
+  d.view.unmount();
+  d.viewport.current?.remove();
+});
+it.each(["classic", "studio"])(
+  "keeps %s artwork and modified gestures out of quick add",
+  (workspace) => {
+    mode.value = workspace;
+    const d = fixture();
+    act(() =>
+      d.engine.execute({
+        type: "addLayers",
+        layers: [
+          createLayer("text", {
+            x: 80,
+            y: 60,
+            width: 40,
+            height: 40,
+            locked: true,
+          }),
+        ],
+      }),
+    );
+    fireEvent.doubleClick(d.viewport.current!, { clientX: 500, clientY: 400, button: 0 });
+    expect(screen.queryByRole("dialog")).toBeNull();
+    fireEvent.doubleClick(d.viewport.current!, {
+      clientX: 80,
+      clientY: 90,
+      button: 0,
+      shiftKey: true,
+    });
+    expect(screen.queryByRole("dialog")).toBeNull();
+    d.view.unmount();
+    d.viewport.current?.remove();
+  },
+);
+it("routes tools and enabled effects through the shared command owner, with unavailable effects disabled", () => {
+  const d = fixture(),
+    run = vi.fn(() => true),
+    stop = createCommandPort(d.engine).subscribe(run);
+  d.open();
+  fireEvent.change(screen.getByRole("combobox"), { target: { value: "hand" } });
+  fireEvent.click(screen.getByRole("option", { name: "search:commandLabels.toolHand" }));
+  expect(run).toHaveBeenLastCalledWith("action:toolHand");
+  d.open();
+  fireEvent.change(screen.getByRole("combobox"), { target: { value: "blur" } });
+  expect(screen.getByRole("option", { name: "search:effectLabels.blur" })).toHaveAttribute(
+    "aria-disabled",
+    "true",
+  );
+  fireEvent.wheel(d.viewport.current!);
+  act(() => {
+    const layer = createLayer("rectangle");
+    d.engine.execute({ type: "addLayers", layers: [layer] });
+    d.engine.select([layer.id]);
+  });
+  d.open();
+  fireEvent.change(screen.getByRole("combobox"), { target: { value: "blur" } });
+  fireEvent.click(screen.getByRole("option", { name: "search:effectLabels.blur" }));
+  expect(run).toHaveBeenLastCalledWith("effect:blur");
+  stop();
   d.view.unmount();
   d.viewport.current?.remove();
 });

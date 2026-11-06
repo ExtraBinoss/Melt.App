@@ -375,7 +375,7 @@ test("pending query capture leaves category and close keydown activation uncance
   expect(d.onClose).not.toHaveBeenCalled();
 });
 
-test("initial reveal uses one global top-to-bottom sequence and keeps retained rows on their original clock", () => {
+test("initial reveal uses one global sequence and filtered rows acquire no opening resources", () => {
   const d = fixture();
   const reveals = [...document.querySelectorAll<HTMLElement>("[data-blur-reveal]")];
   expect(reveals.map((reveal) => Number(reveal.dataset.blurOrder))).toEqual(
@@ -385,19 +385,17 @@ test("initial reveal uses one global top-to-bottom sequence and keeps retained r
     parseFloat(reveal.style.getPropertyValue("--blur-reveal-delay")),
   );
   expect(delays[0]).toBe(0);
-  expect(delays[1]).toBe(24);
-  expect(delays[2]).toBe(48);
-  expect(delays.at(-1)).toBeLessThanOrEqual(264);
+  expect(delays[1]).toBe(8);
+  expect(delays[2]).toBe(16);
+  expect(delays.at(-1)).toBeLessThanOrEqual(64);
   expect(delays.every((delay, index) => !index || delay >= delays[index - 1]!)).toBe(true);
   fireEvent.change(d.input, { target: { value: "flou" } });
   const row = screen.getAllByRole("option")[0]!;
-  expect(row).toHaveAttribute("data-blur-reveal");
-  const order = row.dataset.blurOrder,
-    delay = row.style.getPropertyValue("--blur-reveal-delay"),
-    icons = vi.mocked(getSearchIcon).mock.calls.length;
+  expect(row).not.toHaveAttribute("data-blur-reveal");
+  expect(row.style.getPropertyValue("--blur-reveal-delay")).toBe("");
+  const icons = vi.mocked(getSearchIcon).mock.calls.length;
   fireEvent.change(d.input, { target: { value: "flou " } });
   expect(screen.getAllByRole("option")[0]).toBe(row);
-  expect(row.dataset.blurOrder).toBe(order);
-  expect(row.style.getPropertyValue("--blur-reveal-delay")).toBe(delay);
+  expect(row).not.toHaveAttribute("data-blur-reveal");
   expect(getSearchIcon).toHaveBeenCalledTimes(icons);
 });

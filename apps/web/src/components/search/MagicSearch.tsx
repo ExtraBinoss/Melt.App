@@ -11,7 +11,7 @@ import {
   type ReactNode,
 } from "react";
 import "./keybindings/messages";
-import { useSetAtom } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import { useTranslation } from "react-i18next";
 import { Ellipsis } from "lucide-react";
 import { useReducedMotion } from "motion/react";
@@ -24,7 +24,7 @@ import type { TaskRunner } from "../projects/ProjectDialog";
 import { SearchDialog } from "./SearchDialog";
 import { IconButton } from "../shared/IconButton";
 import { SearchPalette } from "./SearchPalette";
-import { SearchCatalog } from "./catalog/cache";
+import { searchCatalogAtom } from "./catalog/session";
 import { browserSearchTiming } from "./open-timing";
 import type { SearchItem } from "./catalog/model";
 import { captureSearchItem, type PanelMode, type ProjectView, type SearchActions } from "./actions";
@@ -77,8 +77,8 @@ export function MagicSearch({
   const reducedMotion = useReducedMotion();
   const bindings = useKeybindings();
   const workspaceMode = useWorkspaceMode();
-  const catalog = useMemo(() => new SearchCatalog(), []),
-    timing = useMemo(() => browserSearchTiming(), []);
+  const catalog = useAtomValue(searchCatalogAtom(engine));
+  const timing = useMemo(() => browserSearchTiming(), []);
   const setTool = useSetAtom(toolAtom),
     setTheme = useSetAtom(themeAtom);
   const [open, setOpenState] = useState(false),

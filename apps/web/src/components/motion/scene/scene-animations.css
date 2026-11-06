@@ -1,0 +1,22 @@
+.scene-animations-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 28px;
+  margin-block: 8px;
+  padding-inline: 2px;
+}
+.scene-animations-heading h3 {
+  margin: 0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+.scene-animations-heading > button {
+  flex-shrink: 0;
+}

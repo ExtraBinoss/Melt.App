@@ -123,10 +123,14 @@ export function createTransitionPreviewSession(
       if (!target || closed || !visible || token !== generation) return;
       const duration = description.duration;
       const first = sceneFirstFrame;
+      const elapsed = Math.max(0, scheduler.now() - anchor);
+      const scene = description.preset && isSceneMotionPreset(description.preset);
       const milliseconds = active
         ? first
           ? 0
-          : Math.min(duration, Math.max(0, scheduler.now() - anchor) % (duration + 160))
+          : scene
+            ? duration - Math.abs(duration - (elapsed % (duration * 2)))
+            : Math.min(duration, elapsed % (duration + 160))
         : duration / 2;
       const plan = evaluateMotion(
         source,

@@ -1,4 +1,5 @@
 import { resolve } from "node:path";
+import { mkdir, writeFile } from "node:fs/promises";
 import { expect, test } from "@playwright/test";
 import {
   createEffect,
@@ -11,6 +12,7 @@ import {
   SCENE_MOTION_ANIMATION_PRESETS,
 } from "@musart/core";
 import { installReadbackProbe } from "./support/readback-probe";
+test.use({ channel: "chromium", trace: "off" });
 
 for (const workspace of ["classic", "studio"] as const)
   test(`camera orbit renders live before pause and its catalogue previews natively (${workspace})`, async ({
@@ -139,16 +141,35 @@ for (const workspace of ["classic", "studio"] as const)
         .toBeCloseTo(seconds, 5);
     }
     await page.evaluate(() => window.__sceneMotion!.catalogue());
-    for (const id of ["scene-camera-orbit", "scene-camera-push"]) {
+    const timings = [];
+    await mkdir("artifacts/scene-preset-preview", { recursive: true });
+    for (const id of [
+      "scene-camera-orbit",
+      "scene-camera-push",
+      "scene-environment-turn",
+      "scene-light-pulse",
+    ]) {
       const card = page.locator(`[data-preset-id="${id}"]`);
       await card.hover();
       const preview = card.locator(".animation-card-live canvas");
       await expect(preview).toBeVisible({ timeout: 15000 });
       await expect(preview).toHaveAttribute("data-backend", /webgpu|webgl/);
       const initialFrame = await preview.getAttribute("data-preview-frames");
+      const initial = await preview.screenshot();
       await expect.poll(() => preview.getAttribute("data-preview-frames")).not.toBe(initialFrame);
+      await expect
+        .poll(async () => Number(await preview.getAttribute("data-preview-time")))
+        .toBeGreaterThan(640);
+      const moved = await preview.screenshot();
+      expect(moved.equals(initial), `${id} must change actual rendered pixels`).toBe(false);
+      timings.push({ id, readyMs: Number(await preview.getAttribute("data-preview-ready-ms")) });
+      await writeFile(`artifacts/scene-preset-preview/${workspace}-${id}.png`, moved);
       await expect(page.getByRole("alert")).toHaveCount(0);
     }
+    await writeFile(
+      `artifacts/scene-preset-preview/${workspace}.json`,
+      JSON.stringify(timings, null, 2),
+    );
     const revision = await page.evaluate(() => window.__sceneMotion!.read().revision);
     expect(revision).toBe(before.revision);
     expect(await page.evaluate(() => window.__musartVideoReadbacks)).toMatchObject({

@@ -52,6 +52,17 @@ The catalogue contains 61 general recipes (31 property combinations and 30 nativ
 
 The picker uses one retained GPU preview session and a shared locally bundled alpine-lake photograph. Only hover/focus starts playback; idle tiles own no animation loop. The canvas moves between tiles, work is latest-only and acknowledged, and document visibility, intersection, reduced-motion preference and disposal stop scheduling. Photo data is bundled locally and never fetched from a remote image service during browsing.
 
+Camera, environment and light tiles show an immediate neutral cube/sphere SVG
+reference while idle. Hover/focus replaces it with the real native scene preview:
+gray objects at different depths, a light background and reflective materials
+make orbit, push and environment rotation readable. A small loading ring remains
+until an actual rendered frame acknowledges readiness; failures stay explicit.
+Scene thumbnails compress their preview interval to at most 1,600 ms and reverse
+continuously at each end. Applying a preset retains its original authored duration
+and sparse channels. Only one 24 fps hover renderer is retained, with the existing
+96 MiB budget; no idle rendering or production pixel readbacks are added. Scene
+animation headings share compact local spacing without a decorative icon.
+
 Personal presets live in a separate global `musart-motion-presets` IndexedDB database, independent of projects and their deletion. Every record has a UUID, revision and updated-order index. Cursor reads are bounded. Writes compare the current revision in a read/write transaction; deletion leaves a tombstone so delayed saves cannot resurrect a deleted preset. Errors are reported only as failures, and success is shown after transaction completion. Core extraction converts ordinary authored timelines to normalized, self-contained recipes without source project/layer IDs.
 
 ## Share Your Work reference

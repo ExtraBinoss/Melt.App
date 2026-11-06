@@ -23,7 +23,7 @@ export const FONT_SAMPLE_LIMITS = {
   fileBytes: 4 * 1024 * 1024,
   concurrency: 2,
 } as const;
-const LOADING: FontSampleState = Object.freeze({ status: "loading" });
+export const FONT_SAMPLE_LOADING: FontSampleState = Object.freeze({ status: "loading" });
 const ERROR: FontSampleState = Object.freeze({ status: "error" });
 let familySequence = 0;
 const cssString = (value: string) =>
@@ -71,7 +71,7 @@ export class FontSampleCache {
       entry = {
         font,
         installed,
-        state: LOADING,
+        state: FONT_SAMPLE_LOADING,
         listeners: new Set(),
         controller: new AbortController(),
         bytes: 0,

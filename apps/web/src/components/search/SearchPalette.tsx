@@ -15,7 +15,8 @@ import { useEngineValue } from "../../state/session/editor";
 import { ScrollShadow } from "../shared/scroll/ScrollShadow";
 import { HorizontalScroll } from "../shared/scroll/HorizontalScroll";
 import { Button } from "../ui/button";
-import { BlurReveal } from "../ui/blur-text-animation";
+import { PaletteReveal } from "../shared/motion/PaletteReveal";
+import { usePaletteInteraction } from "../shared/motion/PalettePanel";
 import { DialogHeader, DialogTitle, DialogDescription } from "../ui/dialog";
 import { Command, CommandInput, CommandList, CommandGroup, CommandItem } from "../ui/command";
 import { Kbd, KbdGroup } from "../ui/kbd";
@@ -34,7 +35,6 @@ import "./messages";
 
 // cmdk still scores newly registered items when shouldFilter=false. Ranking already belongs to our index.
 const alreadyRanked = () => 1;
-const SEARCH_REVEAL = { durationMs: 220, blur: 3 } as const;
 function keepButtonActivation(event: KeyboardEvent<HTMLButtonElement>) {
   // Let the browser activate this button; cmdk must not reinterpret its key as a result choice.
   if (event.key === "Enter" || event.key === " ") event.stopPropagation();
@@ -89,6 +89,7 @@ const PaletteContent = memo(function PaletteContent({
 }) {
   const [query, setQuery] = useState(""),
     [category, setCategory] = useState<SearchFilter>("all");
+  const interact = usePaletteInteraction();
   const criteria = useMemo(() => ({ query, category }), [query, category]);
   const deferred = useDeferredValue(criteria);
   const pending = !sameCriteria(criteria, deferred);
@@ -108,19 +109,24 @@ const PaletteContent = memo(function PaletteContent({
     displayed.current = deferred;
     context.current = { items, results, onChoose };
   }, [deferred, items, results, onChoose]);
-  const changeQuery = useCallback((value: string) => {
-    // Native input/Enter may arrive before a background result render commits.
-    latest.current = { ...latest.current, query: value };
-    setQuery(value);
-  }, []);
+  const changeQuery = useCallback(
+    (value: string) => {
+      interact();
+      // Native input/Enter may arrive before a background result render commits.
+      latest.current = { ...latest.current, query: value };
+      setQuery(value);
+    },
+    [interact],
+  );
   const changeCategory = useCallback(
     (value: SearchFilter) => {
+      interact();
       latest.current = { ...latest.current, category: value };
       setCategory(value);
       const input = inputRef.current;
       if (input && document.activeElement !== input) input.focus({ preventScroll: true });
     },
-    [inputRef],
+    [inputRef, interact],
   );
   const select = useCallback((id: string) => {
     if (!sameCriteria(latest.current, displayed.current)) return;
@@ -180,7 +186,7 @@ const PaletteContent = memo(function PaletteContent({
         className="magic-search-command"
         label={t("search:title")}
       >
-        <BlurReveal {...SEARCH_REVEAL} asChild order={0} delayMs={0}>
+        <PaletteReveal asChild order={0}>
           <div className="magic-search-input-row">
             <CommandInput
               ref={inputRef}
@@ -198,7 +204,7 @@ const PaletteContent = memo(function PaletteContent({
               <Kbd>Esc</Kbd>
             </Button>
           </div>
-        </BlurReveal>
+        </PaletteReveal>
         <CategoryTabs category={category} available={available} onChange={changeCategory} t={t} />
         <span className="sr-only" role="status" aria-live="polite" aria-busy={pending}>
           {t("search:resultCount", { count: results.total })}
@@ -248,37 +254,23 @@ const ResultGroups = memo(function ResultGroups({
   }, [items]);
   if (!items.length)
     return (
-      <BlurReveal {...SEARCH_REVEAL} asChild order={2} delayMs={48}>
+      <PaletteReveal asChild order={2}>
         <div cmdk-empty="" role="presentation" className="py-6 text-center text-sm">
           {t("search:empty")}
         </div>
-      </BlurReveal>
+      </PaletteReveal>
     );
   let order = 2;
-  // Give visible rows a readable sweep; offscreen results never extend the opening beyond 484 ms.
-  const delay = (rank: number) => 48 + Math.min(rank - 2, 12) * 18;
   return [...groups].map(([value, group]) => {
     const headingOrder = order++;
     return (
       <CommandGroup
         key={value}
-        heading={
-          <BlurReveal {...SEARCH_REVEAL} order={headingOrder} delayMs={delay(headingOrder)}>
-            {t(`search:${value}`)}
-          </BlurReveal>
-        }
+        heading={<PaletteReveal order={headingOrder}>{t(`search:${value}`)}</PaletteReveal>}
       >
         {group.map((item) => {
           const rowOrder = order++;
-          return (
-            <ResultRow
-              key={item.id}
-              item={item}
-              onChoose={onChoose}
-              order={rowOrder}
-              delayMs={delay(rowOrder)}
-            />
-          );
+          return <ResultRow key={item.id} item={item} onChoose={onChoose} order={rowOrder} />;
         })}
       </CommandGroup>
     );
@@ -296,7 +288,7 @@ const CategoryTabs = memo(function CategoryTabs({
   t: SearchTranslate;
 }) {
   return (
-    <BlurReveal {...SEARCH_REVEAL} asChild order={1} delayMs={24}>
+    <PaletteReveal asChild order={1}>
       <div className="magic-search-categories">
         <HorizontalScroll label={t("search:categories")} edgeControls="shadows">
           {(
@@ -315,7 +307,7 @@ const CategoryTabs = memo(function CategoryTabs({
           ))}
         </HorizontalScroll>
       </div>
-    </BlurReveal>
+    </PaletteReveal>
   );
 });
 const ResultRow = memo(
@@ -323,16 +315,14 @@ const ResultRow = memo(
     item,
     onChoose,
     order,
-    delayMs,
   }: {
     item: SearchItem;
     onChoose: Props["onChoose"];
     order: number;
-    delayMs: number;
   }) {
     const Icon = getSearchIcon(item);
     return (
-      <BlurReveal {...SEARCH_REVEAL} asChild order={order} delayMs={delayMs}>
+      <PaletteReveal asChild order={order}>
         <CommandItem
           value={item.id}
           disabled={Boolean(item.disabled)}
@@ -356,7 +346,7 @@ const ResultRow = memo(
             )}
           </span>
         </CommandItem>
-      </BlurReveal>
+      </PaletteReveal>
     );
     // Entrance positions are captured at mount; changing their rank must not rebuild retained rows.
   },

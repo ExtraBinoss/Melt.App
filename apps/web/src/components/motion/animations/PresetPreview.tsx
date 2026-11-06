@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { useReducedMotion } from "motion/react";
 import type { EnginePort, MotionAnimationPreset, SceneMotionAnimationPreset } from "@musart/core";
 import { createTransitionPreviewSession } from "../transitions/preview-session";
+import { isSceneMotionPreset } from "../../../services/motion/animations/presets";
 
 /** A single retained GPU session moves its canvas between hovered cards. Idle tiles own no loop. */
 export function PresetPreview({
@@ -21,6 +22,7 @@ export function PresetPreview({
   const source = useRef<ReturnType<typeof createTransitionPreviewSession> | null>(null);
   const reduced = useReducedMotion();
   const acknowledged = useRef(false);
+  const began = useRef(0);
   const ready = useRef(onReady);
   useEffect(() => {
     ready.current = onReady;
@@ -33,10 +35,15 @@ export function PresetPreview({
         if (canvas.parentElement !== host) host.replaceChildren(canvas);
         if (!acknowledged.current) {
           acknowledged.current = true;
+          host.dataset.previewState = "ready";
+          canvas.dataset.previewReadyMs = String(performance.now() - began.current);
           ready.current?.();
         }
       },
-      onError,
+      onError() {
+        if (destination.current) destination.current.dataset.previewState = "error";
+        onError();
+      },
     });
     source.current = session;
     return () => {
@@ -55,7 +62,14 @@ export function PresetPreview({
       session?.visible(false);
       return;
     }
-    session.update({ style: "fade", preset, placement: "in", duration: preset.duration });
+    began.current = performance.now();
+    mount.setAttribute("data-preview-state", "loading");
+    session.update({
+      style: "fade",
+      preset,
+      placement: "in",
+      duration: isSceneMotionPreset(preset) ? Math.min(preset.duration, 1600) : preset.duration,
+    });
     let intersecting = true;
     const visibility = () => {
       session.visible(!document.hidden && intersecting);
@@ -74,6 +88,7 @@ export function PresetPreview({
       session.play(false);
       session.visible(false);
       mount.replaceChildren();
+      mount.removeAttribute("data-preview-state");
     };
   }, [preset, mount, reduced]);
   return null;

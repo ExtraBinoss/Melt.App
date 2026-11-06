@@ -219,3 +219,20 @@ it("retains the native scene action sampler and renderer through successive live
   expect(d.dispose).toHaveBeenCalledOnce();
   expect(d.onError).not.toHaveBeenCalled();
 });
+it("mirrors a scene push smoothly without a jump at the thumbnail loop boundary", async () => {
+  const d = fixture(),
+    preset = SCENE_MOTION_ANIMATION_PRESETS.find((preset) => preset.id === "scene-camera-push")!;
+  d.source.update({ ...fade, preset, duration: 1600 });
+  d.source.play(true);
+  await d.step(0);
+  await d.step(1600);
+  const end = d.render.mock.calls.at(-1)![0].spatial!.camera.distance;
+  await d.step(1700);
+  const returning = d.render.mock.calls.at(-1)![0].spatial!.camera.distance;
+  expect(returning).toBeGreaterThan(end);
+  expect(returning - end).toBeLessThan(0.05);
+  await d.step(3200);
+  expect(d.render.mock.calls.at(-1)![0].spatial!.camera.distance).toBeGreaterThan(returning);
+  expect(preset.duration).toBe(2000);
+  await d.source.dispose();
+});

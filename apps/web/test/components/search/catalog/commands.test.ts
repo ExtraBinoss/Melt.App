@@ -4,6 +4,20 @@ import { SearchCommands } from "../../../../src/components/search/catalog/comman
 import { createSearchCommandItems } from "../../../../src/components/search/catalog/items";
 import { bindingSnapshot } from "../../../../src/state/keybindings/preferences";
 
+test("switching between persistent palette translators reuses each bounded prepared index", () => {
+  const engine = new EditorEngine(createProject()),
+    cache = new SearchCommands(),
+    bindings = bindingSnapshot();
+  const first = vi.fn((key: string) => `first:${key}`),
+    second = vi.fn((key: string) => `second:${key}`);
+  const original = cache.read(engine.getSnapshot(), first, bindings, "en");
+  const calls = first.mock.calls.length;
+  const alternate = cache.read(engine.getSnapshot(), second, bindings, "en");
+  expect(cache.read(engine.getSnapshot(), first, bindings, "en")).toBe(original);
+  expect(first).toHaveBeenCalledTimes(calls);
+  expect(cache.read(engine.getSnapshot(), second, bindings, "en")).toBe(alternate);
+});
+
 test("selection only changes cached availability, without translating static command metadata again", () => {
   const group = createLayer("group", { id: "group" }),
     shape = createLayer("rectangle", { id: "shape" }),

@@ -2,7 +2,8 @@ import { animationPresetName } from "../../spatial/presentation";
 import { MaterialSwatch } from "../../spatial/MaterialPicker";
 import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import { Camera, Sun, Lightbulb, Sparkles, Trash2 } from "lucide-react";
+import { Sparkles, Trash2 } from "lucide-react";
+import { ScenePreviewPoster } from "./ScenePreviewPoster";
 import type { EnginePort } from "@musart/core";
 import {
   isSceneMotionPreset,
@@ -164,12 +165,10 @@ export function PresetGrid({
                     >
                       <span className="animation-card-image">
                         {isSceneMotionPreset(preset) ? (
-                          preset.channels[0]?.target.kind === "camera" ? (
-                            <Camera size={32} />
-                          ) : preset.channels[0]?.target.kind === "environment" ? (
-                            <Sun size={32} />
-                          ) : preset.channels[0]?.target.kind === "light" ? (
-                            <Lightbulb size={32} />
+                          ["camera", "environment", "light"].includes(
+                            preset.channels[0]!.target.kind,
+                          ) ? (
+                            <ScenePreviewPoster />
                           ) : (
                             <Sparkles size={32} />
                           )

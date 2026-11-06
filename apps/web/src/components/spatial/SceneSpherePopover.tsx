@@ -1,5 +1,7 @@
 import { useId } from "react";
 import type { ReactNode } from "react";
+import { useReducedMotion } from "motion/react";
+import { PalettePanel } from "../shared/motion/PalettePanel";
 import { Button } from "../ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
@@ -29,6 +31,7 @@ export function SceneSpherePopover({
   onOpenChange?: (open: boolean) => void;
 }) {
   const id = useId();
+  const reduced = Boolean(useReducedMotion());
   const previews = useCatalogPreviewBoundary();
   return (
     <section
@@ -83,8 +86,11 @@ export function SceneSpherePopover({
             aria-label={title}
             initialFocus="content"
             data-canvas-control
+            asChild
           >
-            {children}
+            <PalettePanel reduced={reduced} waitForPlacement blurred>
+              {children}
+            </PalettePanel>
           </PopoverContent>
         </Popover>
       </CatalogPreviewBoundary>

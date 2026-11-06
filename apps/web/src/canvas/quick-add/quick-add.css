@@ -34,20 +34,30 @@
   pointer-events: none;
 }
 .quick-add-popover {
-  width: 290px;
+  width: min(350px, calc(100vw - 24px));
   padding: 0;
   overflow: hidden;
+  contain: layout style paint;
+  border-radius: 12px;
+  backdrop-filter: none;
+}
+.quick-add-popover [data-slot="command-item"][data-disabled="true"] {
+  --blur-reveal-opacity: 0.48;
+  opacity: 0.48;
 }
 .quick-add-categories {
   display: flex;
   margin: 8px;
-  width: calc(100% - 16px);
+  width: max-content;
+}
+.quick-add-category-scroll {
+  width: 100%;
 }
 .quick-add-categories button {
   font-size: 10px;
   padding-inline: 8px;
   height: 26px;
-  flex: 1;
+  flex: none;
   min-width: 0;
   display: block;
   overflow: hidden;
@@ -58,7 +68,21 @@
   font-size: 12px;
 }
 .quick-add-popover [data-slot="command-list"] {
-  max-height: 300px;
+  max-height: min(340px, 50dvh);
+}
+.quick-add-item-label {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+  gap: 2px;
+}
+.quick-add-item-label small {
+  font-size: 10px;
+  color: var(--muted-foreground);
+}
+.quick-add-popover [data-slot="kbd-group"] {
+  margin-inline-start: auto;
+  flex-shrink: 0;
 }
 .quick-add-popover [data-slot="command-item"] {
   font-size: 12px;

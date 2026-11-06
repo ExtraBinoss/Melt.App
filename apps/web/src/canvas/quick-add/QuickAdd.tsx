@@ -1,22 +1,14 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type RefObject } from "react";
-import { useSetAtom } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
+import { useReducedMotion } from "motion/react";
 import { useTranslation } from "react-i18next";
-import type { EnginePort } from "@musart/core";
-import { Button } from "../../components/ui/button";
-import { ButtonGroup } from "../../components/ui/button-group";
+import { backgroundLayer, type EnginePort } from "@musart/core";
 import { Popover, PopoverAnchor, PopoverContent } from "../../components/ui/popover";
-import {
-  Command,
-  CommandInput,
-  CommandList,
-  CommandEmpty,
-  CommandGroup,
-  CommandItem,
-} from "../../components/ui/command";
-import { searchItems } from "../../components/search/catalog/search";
-import type { SearchFilter, SearchItem } from "../../components/search/catalog/model";
-import { getSearchIcon } from "../../components/search/icons";
+import type { SearchItem } from "../../components/search/catalog/model";
+import { searchCatalogAtom } from "../../components/search/catalog/session";
+import { PalettePanel } from "../../components/shared/motion/PalettePanel";
 import { createCommandPort } from "../../state/keybindings/command-port";
+import { isCommandId } from "../../state/keybindings/registry";
 import { createLibraryActions } from "../../components/assets/library-actions";
 import { toolAtom } from "../../state/session/editor";
 import {
@@ -32,15 +24,13 @@ import { sourceGeometry } from "../selection/frame-geometry";
 import { canvasHit } from "../selection/hit";
 import { useWorkspaceMode } from "../../ui/studio/workspace-mode";
 import type { SceneController } from "../session/scene-controller";
-import { createQuickAddItems } from "./catalog";
+import { QuickAddMenu } from "./QuickAddMenu";
 import { createQuickLayer, isQuickLayerAction } from "./layers";
 import "./messages";
 import "./quick-add.css";
 
 interface InsertSession {
   origin: GestureOrigin;
-  x: number;
-  y: number;
 }
 export function QuickAdd({
   engine,
@@ -60,12 +50,24 @@ export function QuickAdd({
   const { t } = useTranslation(),
     setTool = useSetAtom(toolAtom);
   const studio = useWorkspaceMode() === "studio";
+  const reduced = Boolean(useReducedMotion());
+  const catalog = useAtomValue(searchCatalogAtom(engine));
+  const content = useRef<HTMLDivElement>(null);
+  const position = useRef({ x: 0, y: 0 });
+  // Radix retains this virtual anchor while closed. Update its coordinates before
+  // mounting content so its first positioning pass cannot use the previous (0, 0).
+  const anchor = useMemo(
+    () => ({
+      current: {
+        getBoundingClientRect: () => new DOMRect(position.current.x, position.current.y, 0, 0),
+      },
+    }),
+    [],
+  );
   const commands = useMemo(() => createCommandPort(engine), [engine]);
   const handoff = useRef(false);
   const showing = useRef(false);
-  const [session, setSession] = useState<InsertSession | null>(null),
-    [query, setQuery] = useState(""),
-    [category, setCategory] = useState<SearchFilter>("all");
+  const [session, setSession] = useState<InsertSession | null>(null);
   useLayoutEffect(() => {
     showing.current = Boolean(session);
   }, [session]);
@@ -75,6 +77,10 @@ export function QuickAdd({
     const open = (event: MouseEvent) => {
       if (
         event.button !== 0 ||
+        event.altKey ||
+        event.ctrlKey ||
+        event.metaKey ||
+        event.shiftKey ||
         controller.read().playback ||
         (event.target instanceof Element && event.target.closest("[data-canvas-control]"))
       )
@@ -88,27 +94,24 @@ export function QuickAdd({
         viewSource.read(),
         layout,
       );
-      const board = layout.boards.find((item) => item.id === controller.read().page.id);
-      if (
-        studio
-          ? board &&
-            canvasHit(
-              controller.read().page,
-              { x: point.x - board.x, y: point.y - board.y },
-              true,
-              sourceGeometry(controller),
-              true,
-            )
-          : artboardAt(layout, point)
-      )
-        return;
+      const frame = controller.read(),
+        board = layout.boards.find((item) => item.id === frame.page.id),
+        underPointer = artboardAt(layout, point);
+      if (underPointer && underPointer.id !== frame.page.id) return;
+      if (board && (studio || underPointer)) {
+        const hit = canvasHit(
+          frame.page,
+          { x: point.x - board.x, y: point.y - board.y },
+          true,
+          sourceGeometry(controller),
+          studio,
+        );
+        if (hit && hit.layer.id !== backgroundLayer(frame.page)?.id) return;
+      }
       event.preventDefault();
-      setQuery("");
-      setCategory("all");
+      position.current = { x: event.clientX, y: event.clientY };
       setSession({
         origin: captureGestureOrigin(engine),
-        x: event.clientX,
-        y: event.clientY,
       });
     };
     const close = () => setSession(null);
@@ -130,35 +133,20 @@ export function QuickAdd({
       stopScene();
     };
   }, [engine, viewport, workspace, viewSource, controller, studio]);
-  const anchor = useMemo(
-    () => ({
-      current: {
-        getBoundingClientRect: () => new DOMRect(session?.x ?? 0, session?.y ?? 0, 0, 0),
-      },
-    }),
-    [session],
-  );
-  const items = useMemo(
-    () => (session ? createQuickAddItems(engine.getSnapshot(), t) : []),
-    [session, engine, t],
-  );
-  const results = useMemo(
-    () => (session ? searchItems(items, query, category).items : []),
-    [session, items, query, category],
-  );
   function run(item: SearchItem) {
+    if (item.disabled) return;
     if (
       !session ||
       !isGestureOriginCurrent(engine, session.origin) ||
       controller.read().playback ||
-      item.target.kind !== "action"
+      !isCommandId(item.id)
     ) {
       setSession(null);
       return;
     }
-    const action = item.target.action;
+    const action = item.target.kind === "action" ? item.target.action : undefined;
     try {
-      if (isQuickLayerAction(action)) {
+      if (action && isQuickLayerAction(action)) {
         const snapshot = engine.getSnapshot(),
           page = snapshot.project.pages.find((page) => page.id === snapshot.pageId)!;
         const layer = createQuickLayer(action, page, t("newText"));
@@ -166,7 +154,7 @@ export function QuickAdd({
         engine.select([layer.id]);
         setTool("pointer");
       } else {
-        if (!commands.run(`action:${action}`)) throw new Error(t("quickAdd:unavailable"));
+        if (!commands.run(item.id)) throw new Error(t("quickAdd:unavailable"));
         if (action === "toolShape") {
           handoff.current = true;
           if (!createLibraryActions(engine).open()) {
@@ -190,6 +178,8 @@ export function QuickAdd({
       >
         <PopoverAnchor virtualRef={anchor} />
         <PopoverContent
+          asChild
+          ref={content}
           align="start"
           sideOffset={4}
           collisionPadding={12}
@@ -199,49 +189,18 @@ export function QuickAdd({
           onCloseAutoFocus={(event) => {
             event.preventDefault();
             if (showing.current) return;
-            if (!handoff.current) viewport.current?.focus();
+            const focused = document.activeElement;
+            if (
+              !handoff.current &&
+              (focused === document.body || content.current?.contains(focused))
+            )
+              viewport.current?.focus({ preventScroll: true });
             handoff.current = false;
           }}
         >
-          <Command label={t("quickAdd:title")} shouldFilter={false} loop>
-            <CommandInput
-              aria-label={t("quickAdd:title")}
-              placeholder={t("quickAdd:search")}
-              value={query}
-              onValueChange={setQuery}
-            />
-            <ButtonGroup className="quick-add-categories" aria-label={t("search:categories")}>
-              {(["all", "tools", "files", "project"] as const).map((value) => (
-                <Button
-                  key={value}
-                  size="sm"
-                  variant={category === value ? "secondary" : "ghost"}
-                  aria-pressed={category === value}
-                  onClick={() => setCategory(value)}
-                >
-                  {t(`search:${value}`)}
-                </Button>
-              ))}
-            </ButtonGroup>
-            <CommandList>
-              <CommandEmpty>{t("quickAdd:empty")}</CommandEmpty>
-              {[...new Set(results.map((item) => item.category))].map((value) => (
-                <CommandGroup key={value} heading={t(`search:${value}`)}>
-                  {results
-                    .filter((item) => item.category === value)
-                    .map((item) => {
-                      const Icon = getSearchIcon(item);
-                      return (
-                        <CommandItem key={item.id} value={item.id} onSelect={() => run(item)}>
-                          <Icon size={15} />
-                          <span>{item.label}</span>
-                        </CommandItem>
-                      );
-                    })}
-                </CommandGroup>
-              ))}
-            </CommandList>
-          </Command>
+          <PalettePanel reduced={reduced} waitForPlacement>
+            <QuickAddMenu engine={engine} catalog={catalog} translate={t} onChoose={run} />
+          </PalettePanel>
         </PopoverContent>
       </Popover>
     </>

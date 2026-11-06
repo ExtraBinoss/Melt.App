@@ -18,6 +18,7 @@ export function createSceneAnimationPreviewDocument(
   const spatial = createSpatialScene();
   spatial.reflections = { mode: "environment", quality: "draft" };
   spatial.camera = { ...spatial.camera, yaw: 0, pitch: 15 };
+  spatial.environment = { preset: "studio", assetId: null, intensity: 0.7, rotation: 0 };
   spatial.lights = [{ ...spatial.lights[0]!, id: "preview-light" }];
   const engine = new EditorEngine(
     createProject({
@@ -27,7 +28,7 @@ export function createSceneAnimationPreviewDocument(
           id: "preview",
           width: 192,
           height: 144,
-          background: "#20232b",
+          background: "#e8eaee",
           spatial,
           layers: [
             createLayer("rectangle", {
@@ -36,11 +37,17 @@ export function createSceneAnimationPreviewDocument(
               y: 30,
               width: 72,
               height: 84,
-              fill: "#a9a0ff",
+              fill: "#a6aab2",
               spatial: {
                 ...createSpatialLayer("box"),
                 rotationY: -20,
+                x: -0.4,
                 z: 0.25,
+                material: {
+                  ...createSpatialLayer("box").material,
+                  metalness: 0.45,
+                  roughness: 0.28,
+                },
               },
             }),
             createLayer("ellipse", {
@@ -49,8 +56,18 @@ export function createSceneAnimationPreviewDocument(
               y: 55,
               width: 44,
               height: 44,
-              fill: "#f8c67d",
-              spatial: { ...createSpatialLayer("sphere"), z: -0.45 },
+              fill: "#d0d3d9",
+              spatial: {
+                ...createSpatialLayer("sphere"),
+                x: 0.5,
+                y: -0.1,
+                z: -0.45,
+                material: {
+                  ...createSpatialLayer("sphere").material,
+                  metalness: 0.75,
+                  roughness: 0.2,
+                },
+              },
             }),
           ],
         }),

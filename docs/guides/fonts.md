@@ -2,6 +2,11 @@
 
 The font picker combines twenty bundled outline families, a snapshot of **1,950 Google Fonts families**, imported user fonts and locally installed faces exposed by the browser. Search and category filters operate on metadata; the list is virtualized. Opening the picker does not download the entire Google Fonts library.
 
+The compact popover is 312 px wide, bounded by the viewport, with a 256 px list and
+64 px row pitch. At the top, only six rows mount, including overscan. Its shared
+palette entrance fades without scaling text. A cancellable 120 ms pointer intent
+may prepare metadata only; opening does not reset an already usable catalogue.
+
 A short pointer hover or immediate keyboard focus previews the selected text through the imperative scene port. Scrolling cancels pointer intent and does not automatically preview whichever row moves under the pointer. Closing the picker restores the original face. Opening pauses Motion playback at its current pose without changing history; font requests use the evaluated weight. A choice produces one validated document edit and one undo entry. The renderer keeps five idle font faces in an LRU cache. Active preparation leases prevent eviction while a face is being used; old faces release owned font metadata and reusable shaping buffers explicitly.
 
 ## Picker samples and readiness
@@ -28,6 +33,8 @@ Renderer feedback stays in the trigger's small loading/error indicator. There is
 no additional “font is ready” paragraph in the popover.
 
 The native baseline, functional pixel checks and measurement limits are recorded in [Typography performance](../performance/fonts.md).
+The subsequent compact-picker and shared-palette measurements are recorded in
+[Palette and scene-preview verification](../performance/palettes-scene-previews.md).
 
 ## Sources and downloads
 

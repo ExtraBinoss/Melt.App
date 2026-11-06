@@ -1,5 +1,6 @@
 import { act, render, screen } from "@testing-library/react";
 import { expect, test, vi } from "vitest";
+import { Profiler } from "react";
 import { FONT_CATALOG } from "@musart/assets";
 import { FontOptionRow } from "../../../../src/components/properties/fonts/FontOptionRow";
 import {
@@ -7,6 +8,35 @@ import {
   type FontSampleState,
 } from "../../../../src/components/properties/fonts/sample-cache";
 import { bundledFontLibrary } from "../../../../src/components/properties/fonts/library-context";
+
+test("acquiring a loading sample does not add a synchronous React commit to the opening", () => {
+  const cache = new FontSampleCache(bundledFontLibrary),
+    commits = vi.fn();
+  const view = render(
+    <Profiler id="font-row" onRender={commits}>
+      <FontOptionRow
+        font={FONT_CATALOG[0]!}
+        index={0}
+        id="font-lease"
+        selected={false}
+        applied={false}
+        active={false}
+        count={20}
+        installed
+        visible
+        cache={cache}
+        onIntent={vi.fn()}
+        onLeave={vi.fn()}
+        onFocusFont={vi.fn()}
+        onChoose={vi.fn()}
+      />
+    </Profiler>,
+  );
+  expect(commits).toHaveBeenCalledOnce();
+  expect(screen.getByRole("option")).toHaveAttribute("aria-busy", "true");
+  view.unmount();
+  cache.dispose();
+});
 
 test("shows a real loading state before a decoded family, and releases the visible sample", () => {
   const cache = new FontSampleCache(bundledFontLibrary),

@@ -14,7 +14,8 @@ afterEach(() => localStorage.removeItem("musart.fonts.recent"));
 
 function mount(locked = false, library?: FontLibraryPort, withEngine = false) {
   localStorage.removeItem("musart.fonts.recent");
-  const data = setup();
+  // Font transaction/ownership checks are immediate; native Chrome tests cover the animated entrance.
+  const data = setup({ reducedMotion: true });
   if (locked) {
     data.engine.execute({ type: "updateLayers", ids: [data.text.id], patch: { locked } });
     data.engine.load(data.engine.getSnapshot().project);
@@ -129,7 +130,7 @@ test("filters full virtual catalogs by category and installed state without load
   const data = mount(false, library);
   open();
   await screen.findByText(String(2000 + FONT_CATALOG.length));
-  expect(screen.getAllByRole("option")).toHaveLength(8);
+  expect(screen.getAllByRole("option")).toHaveLength(6);
   fireEvent.click(screen.getByRole("button", { name: "Serif" }));
   expect(
     screen
@@ -342,7 +343,7 @@ test("filters localized categories, handles empty search and cancels an unmounte
 test("scrolls the window without mounting the whole library and reuses explicit recent choices", async () => {
   const data = mount();
   open();
-  fireEvent.scroll(screen.getByRole("listbox"), { target: { scrollTop: 1280 } });
+  fireEvent.scroll(screen.getByRole("listbox"), { target: { scrollTop: 1024 } });
   expect(screen.queryByRole("option", { name: "Inter" })).toBeNull();
   fireEvent.click(screen.getByRole("option", { name: "Pacifico" }));
   open();
