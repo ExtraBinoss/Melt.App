@@ -1,4 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import type { ColorTarget } from "@musart/core";
+import { PaletteShortcut } from "../palettes/PaletteShortcut";
 import { Pipette } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Input } from "../ui/input";
@@ -17,7 +19,11 @@ export function ColorControl({
   alpha = true,
   identity,
   invalidation,
+  paletteTargets,
+  showPaletteShortcut = true,
 }: {
+  paletteTargets?: ColorTarget[];
+  showPaletteShortcut?: boolean;
   disabled?: boolean;
   alpha?: boolean;
   identity?: string;
@@ -239,12 +245,14 @@ export function ColorControl({
         if (gesture.current || blockedGesture.current) cancel();
       }}
       onKeyDown={(event) => {
+        if ((event.target as HTMLElement).closest("[data-palette-popover]")) return;
         if (event.key === "Escape") {
           event.stopPropagation();
           cancel(gesture.current);
         }
       }}
       onKeyUp={(event) => {
+        if ((event.target as HTMLElement).closest("[data-palette-popover]")) return;
         if (event.key.startsWith("Arrow") || event.key === "Enter") commit();
       }}
       onBlur={(event) => {
@@ -282,6 +290,20 @@ export function ColorControl({
             }
           }}
         />
+        {showPaletteShortcut && (
+          <PaletteShortcut
+            value={value}
+            targets={paletteTargets}
+            disabled={disabled}
+            beforeApply={() => cancel()}
+            onUse={(color) => {
+              setOverride({ base: value, hex: color });
+              commit(color);
+            }}
+            onPreview={(color) => callbacks.current.onPreview(alpha ? color : color.slice(0, 7))}
+            onCancel={() => callbacks.current.onCancel()}
+          />
+        )}
         {available && (
           <IconButton
             type="button"

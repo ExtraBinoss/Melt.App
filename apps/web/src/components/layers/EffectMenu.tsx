@@ -24,6 +24,7 @@ import {
 import { useOverlayEntrance } from "../shared/overlays/use-overlay-entrance";
 import { useHoverDismiss } from "../shared/overlays/use-hover-dismiss";
 import type { EffectCatalogOwner, EffectCategory } from "./catalog/model";
+import type { TreatmentContext } from "../properties/effects/presets/TreatmentsLibrary";
 import { RetainedCatalogs } from "./catalog/RetainedCatalogs";
 
 /** One native submenu owns both catalogs, so changing category retains its surface and focus scope. */
@@ -32,11 +33,13 @@ export function EffectMenu({
   libraryRequest = 0,
   guidedQuery = null,
   owner,
+  treatments,
 }: {
   onAdd: (type: EffectType) => void;
   libraryRequest?: number;
   guidedQuery?: string | null;
   owner?: EffectCatalogOwner;
+  treatments?: TreatmentContext;
 }) {
   const { t, i18n } = useTranslation();
   const [category, setCategory] = useState<EffectCategory>("effect");
@@ -201,6 +204,7 @@ export function EffectMenu({
             onAdd={onAdd}
             initialQuery={guidedQuery ?? ""}
             owner={owner}
+            treatments={treatments}
           />
         </DropdownMenuSubContent>
       </DropdownMenuPortal>

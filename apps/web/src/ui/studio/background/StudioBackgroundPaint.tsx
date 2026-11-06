@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { Circle, CircleDashed, Settings2 } from "lucide-react";
-import type { EnginePort, FillGradient } from "@musart/core";
+import type { ColorTarget, EnginePort, FillGradient } from "@musart/core";
 import { IconButton } from "../../../components/shared/IconButton";
 import { Popover, PopoverContent, PopoverTrigger } from "../../../components/ui/popover";
 import { EffectColor } from "../../../components/properties/effects/EffectColor";
@@ -29,6 +29,7 @@ export function StudioBackgroundPaint({
   commit,
   cancel,
   advanced,
+  paletteTargets,
 }: StudioPaint & {
   engine: EnginePort;
   identity: unknown;
@@ -38,6 +39,7 @@ export function StudioBackgroundPaint({
   commit: (paint: StudioPaint) => void;
   cancel: () => void;
   advanced: ReactNode;
+  paletteTargets?: ColorTarget[];
 }) {
   const { t } = useTranslation("studioBackground");
   const { t: g } = useTranslation("gradient");
@@ -113,6 +115,7 @@ export function StudioBackgroundPaint({
       {mode === "solid" && (
         <EffectColor
           invalidation={invalidation}
+          paletteTargets={paletteTargets}
           label={t("title")}
           identity={`${ownerId}:color`}
           value={color}

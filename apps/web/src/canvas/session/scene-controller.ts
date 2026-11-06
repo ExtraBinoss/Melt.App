@@ -272,7 +272,9 @@ export class SceneController {
     this.cachedGesture = this.gestureRevision;
     this.cached = {
       page: this.draft ? { ...next, layers: [...next.layers, this.draft] } : next,
-      assets: snapshot.project.assets,
+      assets: preview?.assets
+        ? { ...snapshot.project.assets, ...preview.assets }
+        : snapshot.project.assets,
       ...(motionPlan ? { motionFrame: motionPlan } : {}),
       ...(motionPlaying ? { playback: true } : {}),
       presentation: {

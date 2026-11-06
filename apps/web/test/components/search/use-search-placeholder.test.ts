@@ -1,6 +1,9 @@
 import { renderHook, act } from "@testing-library/react";
 import { afterEach, expect, test, vi } from "vitest";
-import { useSearchPlaceholder } from "../../../src/components/search/use-search-placeholder";
+import {
+  useSearchPlaceholder,
+  useTypewriterPlaceholder,
+} from "../../../src/components/search/use-search-placeholder";
 import type { SearchItem } from "../../../src/components/search/catalog/model";
 const items: SearchItem[] = ["Contraste", "Flou gaussien"].map((label, index) => ({
   id: `effect:${index ? "blur" : "contrast"}`,
@@ -85,4 +88,52 @@ test("query-owner renders reuse hint selection without rescanning the catalog or
   expect(d.input.placeholder).toBe(placeholder);
   expect(vi.getTimerCount()).toBe(1);
   d.unmount();
+});
+
+test("shared name hints pause on focus, typed values, disabled state and dispose all listeners", () => {
+  vi.useFakeTimers();
+  Object.defineProperty(document, "hidden", { configurable: true, get: () => false });
+  const input = document.createElement("input"),
+    ref = { current: input },
+    renders = vi.fn();
+  document.body.append(input);
+  const view = renderHook(
+    ({ enabled }) => {
+      renders();
+      useTypewriterPlaceholder(ref, ["Studio identity", "Summer campaign"], false, {
+        suffix: "",
+        pauseOnFocus: true,
+        enabled,
+      });
+    },
+    { initialProps: { enabled: true } },
+  );
+  act(() => {
+    vi.advanceTimersByTime(325);
+  });
+  expect(input.placeholder).toBe("Studi");
+  expect(renders).toHaveBeenCalledTimes(1);
+  input.focus();
+  expect(input.placeholder).toBe("Studio identity");
+  expect(vi.getTimerCount()).toBe(0);
+  input.value = "Custom identity";
+  input.dispatchEvent(new Event("input"));
+  input.blur();
+  expect(vi.getTimerCount()).toBe(0);
+  input.value = "";
+  input.dispatchEvent(new Event("input"));
+  expect(vi.getTimerCount()).toBe(1);
+  view.rerender({ enabled: false });
+  expect(input.placeholder).toBe("Studio identity");
+  expect(vi.getTimerCount()).toBe(0);
+  view.rerender({ enabled: true });
+  expect(vi.getTimerCount()).toBe(1);
+  view.unmount();
+  expect(vi.getTimerCount()).toBe(0);
+  input.focus();
+  input.blur();
+  input.dispatchEvent(new Event("input"));
+  document.dispatchEvent(new Event("visibilitychange"));
+  expect(vi.getTimerCount()).toBe(0);
+  input.remove();
 });

@@ -222,3 +222,29 @@ test("replacement cancels an actual effect draft, rejects its late command and s
   fireEvent.click(screen.getByRole("button", { name: "Other FX" }));
   expect(screen.getAllByRole("dialog")).toHaveLength(1);
 });
+
+test("retires both parameter and preset-preview leases once when the same popover closes", () => {
+  const view = renderHook(() => usePopoverOwner("effect"), { wrapper: scope() });
+  const parameter = vi.fn(),
+    preview = vi.fn();
+  let releaseParameter!: () => void, releasePreview!: () => void;
+  act(() => {
+    view.result.current.onOpenChange(true);
+  });
+  act(() => {
+    releaseParameter = view.result.current.registerDeactivate(parameter);
+    releasePreview = view.result.current.registerDeactivate(preview);
+  });
+  act(() => {
+    view.result.current.onOpenChange(false);
+  });
+  expect(parameter).toHaveBeenCalledTimes(1);
+  expect(preview).toHaveBeenCalledTimes(1);
+  act(() => {
+    releaseParameter();
+    releasePreview();
+  });
+  expect(parameter).toHaveBeenCalledTimes(1);
+  expect(preview).toHaveBeenCalledTimes(1);
+  view.unmount();
+});

@@ -30,17 +30,20 @@ interface MenuScope {
   target: CanvasContextTarget | null;
   compositionId: string;
   selection: string[];
+  candidates: CanvasContextTarget[];
   trackId?: string;
 }
 /** Right-click releases open the menu; a right-button marquee remains a real canvas gesture. */
 export function CanvasContextMenu({
   engine,
   resolveTarget,
+  resolveCandidates,
   onError,
   children,
 }: {
   engine: EnginePort;
   resolveTarget: (point: Point) => CanvasContextTarget | null;
+  resolveCandidates?: (point: Point) => CanvasContextTarget[];
   onError?: (message: string) => void;
   children: ReactNode;
 }) {
@@ -82,7 +85,8 @@ export function CanvasContextMenu({
     (point: Point, scope: Pick<SessionSnapshot, "project" | "revision"> = engine.getSnapshot()) => {
       const current = engine.getSnapshot();
       if (current.project !== scope.project || current.revision !== scope.revision) return;
-      const target = resolveTarget(point);
+      const candidates = resolveCandidates?.(point) ?? [];
+      const target = candidates[0] ?? resolveTarget(point);
       const transport = createMotionTransport(engine);
       transport.pause();
       const compositionId = target?.compositionId ?? current.pageId;
@@ -106,12 +110,13 @@ export function CanvasContextMenu({
         revision: current.revision,
         point,
         target,
+        candidates,
         compositionId,
         selection: [...engine.getSnapshot().selection],
         trackId,
       });
     },
-    [engine, resolveTarget],
+    [engine, resolveTarget, resolveCandidates],
   );
   useEffect(() => registerCanvasMenu(engine, open), [engine, open]);
   return (
@@ -231,6 +236,7 @@ export function CanvasContextMenu({
               engine={engine}
               page={menu.project.pages.find((page) => page.id === menu.compositionId)!}
               selection={menu.selection}
+              candidates={menu.candidates}
               layerId={menu.target?.layerId}
               current={() => isCurrent(menu)}
               onError={onError}

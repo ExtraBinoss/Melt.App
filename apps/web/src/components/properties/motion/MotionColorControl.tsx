@@ -52,6 +52,18 @@ export function MotionColorControl({
             {...callbacks}
             identity={identity}
             invalidation={scope.invalidation}
+            paletteTargets={
+              props.paletteTargets ??
+              (engine && target?.kind === "layer" && ["fill", "stroke"].includes(target.property)
+                ? [
+                    {
+                      pageId: engine.getSnapshot().pageId,
+                      layerId: target.layerId,
+                      property: target.property,
+                    },
+                  ]
+                : undefined)
+            }
             value={String(value)}
           />
         )}

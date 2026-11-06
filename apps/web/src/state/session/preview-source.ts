@@ -1,11 +1,12 @@
 import type { createStore } from "jotai";
-import type { Layer, Composition } from "@musart/core";
+import type { Asset, Layer, Composition } from "@musart/core";
 import { previewAtom } from "./editor";
 
-export type PreviewValue =
+export type PreviewValue = (
   | { target: "layer"; layerId: string; patch: Partial<Layer> }
   | { target: "layers"; layerIds: string[]; patch: Partial<Layer> }
-  | { target: "page"; patch: Partial<Composition> };
+  | { target: "page"; patch: Partial<Composition> }
+) & { assets?: Readonly<Record<string, Asset>> };
 export interface PreviewSource {
   read: () => PreviewValue | null;
   subscribe: (listener: () => void) => () => void;

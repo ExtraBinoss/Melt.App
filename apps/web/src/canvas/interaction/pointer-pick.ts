@@ -1,7 +1,7 @@
 import type { EnginePort } from "@musart/core";
 import type { SceneController } from "../session/scene-controller";
 import { sourceGeometry } from "../selection/frame-geometry";
-import { canvasHit, canvasSelectionHit } from "../selection/hit";
+import { canvasHit, canvasHits, canvasSelectionHit } from "../selection/hit";
 import type { Point } from "../viewport/view";
 import type { Tool } from "./gestures";
 
@@ -25,20 +25,13 @@ export function pickCanvasPointer(
   additive: boolean,
   studio = false,
 ): ReturnType<typeof canvasSelectionHit> {
-  if (studio)
-    return canvasHit(
-      controller.read().page,
-      point,
-      tool === "pointer",
-      sourceGeometry(controller),
-      true,
-    );
   return canvasSelectionHit(
     controller.read().page,
     point,
     tool === "pointer" && !additive ? engine.getSnapshot().selection : [],
     sourceGeometry(controller),
-    tool === "pointer",
+    false,
+    studio,
   );
 }
 
@@ -50,4 +43,49 @@ export function canvasPointerPans(button: number, tool: Tool, space: boolean, st
 export function captureCanvasPointer(viewport: HTMLElement | null, pointerId: number) {
   viewport?.focus({ preventScroll: true });
   viewport?.setPointerCapture(pointerId);
+}
+
+/** Mod+Shift cycles the explicit overlap stack; Mod alone remains additive and Alt stays free. */
+export function cycleCanvasPointer(
+  engine: EnginePort,
+  controller: SceneController,
+  point: Point,
+  studio = false,
+) {
+  const hits = canvasHits(controller.read().page, point, false, sourceGeometry(controller), studio);
+  const selection = engine.getSnapshot().selection;
+  const current = hits.findIndex((hit) => selection.includes(hit.layer.id));
+  const candidate = hits.length ? hits[(current + 1) % hits.length] : null;
+  engine.select(candidate ? [candidate.layer.id] : []);
+}
+
+/** Switching artboards uses the same unlocked artwork predicate as active-page picks. */
+export function selectCanvasArtboard(
+  engine: EnginePort,
+  controller: SceneController,
+  board: { id: string; x: number; y: number },
+  worldPoint: Point,
+  studio = false,
+) {
+  engine.setPage(board.id);
+  const hit = canvasHit(
+    controller.read().page,
+    {
+      x: worldPoint.x - board.x,
+      y: worldPoint.y - board.y,
+    },
+    false,
+    sourceGeometry(controller),
+    studio,
+  );
+  engine.select(hit ? [hit.layer.id] : []);
+}
+export function isCanvasCycle(event: {
+  button: number;
+  shiftKey: boolean;
+  ctrlKey: boolean;
+  metaKey: boolean;
+  altKey: boolean;
+}) {
+  return event.button === 0 && event.shiftKey && (event.ctrlKey || event.metaKey) && !event.altKey;
 }

@@ -149,7 +149,7 @@ test("the icon resets every parameter and effect composition together, preservin
   });
   const view = d.mount(<EffectParameters effect={effect} onChange={change} onCancel={cancel} />);
   const reset = screen.getByRole("button", {
-    name: "Réinitialiser tous les paramètres de l’effet",
+    name: "Valeurs d’origine",
   });
   expect(reset.textContent).toBe("");
   fireEvent.click(reset);
@@ -172,6 +172,20 @@ test("the icon resets every parameter and effect composition together, preservin
   view.rerender(<EffectParameters effect={effect} onChange={change} disabled />);
   fireEvent.click(reset);
   expect(change).not.toHaveBeenCalled();
+});
+test("factory reset detaches saved preset and color links even when numeric values already match defaults", () => {
+  const d = setup(),
+    change = vi.fn();
+  const effect = createEffect("gradient", {
+    preset: { id: "saved", name: "Paper" },
+    colorLinks: { color0: "token" },
+  });
+  d.mount(<EffectParameters effect={effect} onChange={change} />);
+  fireEvent.click(screen.getByRole("button", { name: "Valeurs d’origine" }));
+  expect(change).toHaveBeenCalledExactlyOnceWith(
+    expect.objectContaining({ preset: undefined, colorLinks: undefined }),
+    false,
+  );
 });
 test("effect colors share one active picker and cancel the preceding color draft", async () => {
   const user = userEvent.setup();

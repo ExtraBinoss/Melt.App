@@ -2,7 +2,7 @@ import { validateEffectMotion } from "./motion/validation";
 import { validateLiquifyDabs } from "./liquify/strokes";
 import { validateEffectInputs } from "./inputs";
 import type { Effect } from "../document/model";
-import { assertNumber, assertRecord } from "../document/guards";
+import { assertNumber, assertRecord, assertText } from "../document/guards";
 import { ensure } from "../errors";
 import { BLEND_CATALOG } from "../layers/blending/catalog";
 import { EFFECT_COMPOSITE_MODES } from "./compositing";
@@ -16,6 +16,21 @@ import { validateShapeMorph } from "./morph/validation";
 export function validateEffectExtensions(value: Record<string, unknown>): void {
   validateEffectInputs(value as unknown as Effect);
   validateEffectMotion(value as unknown as Effect, value.motion);
+  if (value.preset !== undefined) {
+    assertRecord(value.preset);
+    assertText(value.preset.id, 256);
+    assertText(value.preset.name, 120);
+    ensure(
+      value.preset.name.trim() === value.preset.name,
+      "INVALID_DOCUMENT",
+      "Invalid preset reference name",
+    );
+    ensure(
+      Object.keys(value.preset).every((key) => key === "id" || key === "name"),
+      "INVALID_DOCUMENT",
+      "Unknown preset reference field",
+    );
+  }
   if (value.liquify !== undefined) {
     ensure(value.type === "liquify", "INVALID_DOCUMENT", "Brush data belongs to Liquify");
     validateLiquifyDabs(value.liquify);

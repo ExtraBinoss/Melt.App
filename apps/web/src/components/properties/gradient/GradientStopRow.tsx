@@ -6,6 +6,7 @@ import { IconButton } from "../../shared/IconButton";
 import { NumberInput } from "../../shared/NumberInput";
 import { Input } from "../../ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "../../ui/popover";
+import { PaletteShortcut } from "../../palettes/PaletteShortcut";
 import { ColorControl } from "../ColorControl";
 import { stopBounds, stopColorFields, withHexColor, withOpacity } from "./paint";
 import styles from "./GradientControl.module.css";
@@ -92,14 +93,15 @@ export function GradientStopRow({
       <div className={styles.hexField}>
         <Popover open={colorOpen} onOpenChange={onColorOpenChange}>
           <PopoverTrigger asChild>
-            <button
+            <IconButton
               type="button"
               disabled={disabled}
               className={styles.swatchButton}
-              aria-label={t("stopColor", { number })}
+              label={t("stopColor", { number })}
+              tooltipSide="top"
             >
               <span data-gradient-swatch style={{ backgroundColor: stop.color }} />
-            </button>
+            </IconButton>
           </PopoverTrigger>
           <PopoverContent
             side="left"
@@ -108,23 +110,35 @@ export function GradientStopRow({
             aria-label={t("stopColor", { number })}
           >
             <ColorControl
+              showPaletteShortcut={false}
               identity={`${ownerId}:${index}`}
               value={stop.color}
               disabled={disabled}
               invalidation={invalidation}
-              onPreview={(color) => onPreview({ color })}
+              onPreview={(color) => onPreview?.({ color })}
               onCommit={(color) => onCommit({ color })}
               onCancel={onCancel}
             />
           </PopoverContent>
         </Popover>
+        <PaletteShortcut
+          value={stop.color}
+          disabled={disabled}
+          beforeApply={() => {
+            onColorOpenChange?.(false);
+            onCancel();
+          }}
+          onUse={(color) => onCommit({ color })}
+          onPreview={(color) => onPreview?.({ color })}
+          onCancel={onCancel}
+        />
         <StopHexInput
           color={stop.color}
           identity={identity}
           label={t("stopHex", { number })}
           disabled={disabled}
           invalidation={invalidation}
-          onPreview={(color) => onPreview({ color })}
+          onPreview={(color) => onPreview?.({ color })}
           onCommit={(color) => onCommit({ color })}
           onCancel={onCancel}
         />

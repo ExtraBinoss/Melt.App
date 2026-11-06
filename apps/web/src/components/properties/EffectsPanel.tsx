@@ -58,6 +58,11 @@ export function EffectsPanel({
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <EffectMenu
+              treatments={
+                engine && ownerPage
+                  ? { engine, target: { pageId: ownerPage.id, layerIds: [layer.id] } }
+                  : undefined
+              }
               owner={{
                 scope: "layer",
                 depthAvailable: Boolean(ownerPage && ownerHasDepth(ownerPage, layer.id)),

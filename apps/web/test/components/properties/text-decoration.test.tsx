@@ -103,9 +103,7 @@ test("hard-shadow reset retains zero blur and its durable effect identity", () =
       cancel={vi.fn()}
     />,
   );
-  fireEvent.click(
-    screen.getByRole("button", { name: "Réinitialiser tous les paramètres de l’effet" }),
-  );
+  fireEvent.click(screen.getByRole("button", { name: "Valeurs d’origine" }));
   expect(patch).toHaveBeenCalledOnce();
   expect(patch.mock.calls[0]![0].effects[0]).toMatchObject({
     id: shadow.id,
@@ -251,9 +249,7 @@ test("live shadow toggles retain the parameter tree while canonical changes canc
     }),
   );
   expect(renders.parameters).toHaveBeenCalledTimes(beforeUnrelatedEffect);
-  fireEvent.click(
-    screen.getByRole("button", { name: "Réinitialiser tous les paramètres de l’effet" }),
-  );
+  fireEvent.click(screen.getByRole("button", { name: "Valeurs d’origine" }));
   const effects = d.engine
     .getSnapshot()
     .project.pages[0]!.layers.find((item) => item.id === d.text.id)!.effects;

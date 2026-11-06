@@ -31,6 +31,7 @@ export class PaintPreviewLineage {
     selection: readonly string[];
     scope: string;
     token: object;
+    assets: PreviewValue["assets"];
   } | null = null;
 
   clear(): void {
@@ -74,11 +75,12 @@ export class PaintPreviewLineage {
       previous?.project === project &&
       previous.source === source &&
       previous.selection === selection &&
-      previous.scope === scope
+      previous.scope === scope &&
+      previous.assets === preview.assets
     )
       return previous.token;
     const token = {};
-    this.current = { project, source, selection, scope, token };
+    this.current = { project, source, selection, scope, token, assets: preview.assets };
     return token;
   }
 }

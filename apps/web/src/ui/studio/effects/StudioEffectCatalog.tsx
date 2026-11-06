@@ -12,6 +12,10 @@ import { Input } from "../../../components/ui/input";
 import { Button } from "../../../components/ui/button";
 import { ScrollShadow } from "../../../components/shared/scroll/ScrollShadow";
 import "../../../components/layers/catalog/messages";
+import {
+  TreatmentsLibrary,
+  type TreatmentContext,
+} from "../../../components/properties/effects/presets/TreatmentsLibrary";
 import "../../../components/properties/effects/library-messages";
 
 /** Use the established searchable catalog and effect taxonomy in a quiet popover surface. */
@@ -20,48 +24,70 @@ export function StudioEffectCatalog({
   owner = { scope: "layer" },
   disabled,
   onAdd,
+  treatments,
 }: {
   category: EffectCategory;
+  treatments?: TreatmentContext;
   owner?: EffectCatalogOwner;
   disabled: boolean;
   onAdd: (type: EffectType) => void;
 }) {
   const { t, i18n } = useTranslation();
+  const [personal, setPersonal] = useState(false);
   const [query, setQuery] = useState("");
   const entries = useMemo(
-    () => effectCatalogEntries(category, t, i18n.resolvedLanguage ?? i18n.language, owner),
+    () =>
+      effectCatalogEntries(category, t, i18n.resolvedLanguage ?? i18n.language, {
+        scope: owner.scope,
+        depthAvailable: owner.depthAvailable,
+      }),
     [category, t, i18n.resolvedLanguage, i18n.language, owner.scope, owner.depthAvailable],
   );
   const visible = filterEffectCatalog(entries, query, "all");
   return (
     <div className="studio-effect-catalog">
-      <Input
-        aria-label={t(
-          category === "effect" ? "effectCatalog:search" : "effectCatalog:searchAdjustment",
-        )}
-        placeholder={t(
-          category === "effect" ? "effectCatalog:search" : "effectCatalog:searchAdjustment",
-        )}
-        value={query}
-        onChange={(event) => setQuery(event.currentTarget.value)}
-      />
-      <ScrollShadow className="studio-effects-scroll">
-        <div className="studio-effect-options">
-          {visible.map((entry) => (
-            <Button
-              key={entry.type}
-              variant="ghost"
-              size="sm"
-              disabled={disabled}
-              onClick={() => onAdd(entry.type)}
-            >
-              <EffectThumbnail type={entry.type} />
-              <span>{entry.label}</span>
-            </Button>
-          ))}
-          {!visible.length && <p className="muted-description">{t("effectCatalog:empty")}</p>}
-        </div>
-      </ScrollShadow>
+      {treatments && category === "effect" && (
+        <Button
+          size="sm"
+          variant={personal ? "secondary" : "ghost"}
+          onClick={() => setPersonal(!personal)}
+        >
+          {t("effectPresets:treatments")}
+        </Button>
+      )}
+      {personal && treatments ? (
+        <TreatmentsLibrary {...treatments} />
+      ) : (
+        <>
+          <Input
+            aria-label={t(
+              category === "effect" ? "effectCatalog:search" : "effectCatalog:searchAdjustment",
+            )}
+            placeholder={t(
+              category === "effect" ? "effectCatalog:search" : "effectCatalog:searchAdjustment",
+            )}
+            value={query}
+            onChange={(event) => setQuery(event.currentTarget.value)}
+          />
+          <ScrollShadow className="studio-effects-scroll">
+            <div className="studio-effect-options">
+              {visible.map((entry) => (
+                <Button
+                  key={entry.type}
+                  variant="ghost"
+                  size="sm"
+                  disabled={disabled}
+                  onClick={() => onAdd(entry.type)}
+                >
+                  <EffectThumbnail type={entry.type} />
+                  <span>{entry.label}</span>
+                </Button>
+              ))}
+              {!visible.length && <p className="muted-description">{t("effectCatalog:empty")}</p>}
+            </div>
+          </ScrollShadow>
+        </>
+      )}
     </div>
   );
 }

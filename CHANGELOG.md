@@ -4,6 +4,28 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ## [Unreleased]
 
+- Synchronize effect position-pad X/Y fields in real time through imperative Jotai subscriptions without React commits during dragging; retain one undoable position commit and cancellation restoration for layer and composition effects.
+- Keep preset names stable during IndexedDB reads and switches; replace treatment-library loading text with the shared delayed brand throbber and suppress the initial empty-list flash.
+
+- Remove the separate linked-color panel and menu action; palette swatches continue to manage document links automatically.
+
+- Keep palette actions visible and automatically link colors when choosing swatches; reuse document color identities for repeated detected colors and retain an optional local-only copy action.
+
+- Streamline effect preset headers with one save action, in-selector modification status, icon-only naming forms and a divider above compositing controls. Preview local IndexedDB presets on hover without document/history writes, including their transient image inputs.
+- List saved palettes under an All filter in a 180-pixel scroll area, with detected document colors below a divider and lazy visible-row payload reads.
+- Preview palette generations on the addressed paint even without global links; apply solid colors over gradients and original model/vector colors with one undo, preserving explicit document links.
+- Preserve the effect catalog shell when switching to personal treatments so the submenu stays under the pointer.
+
+- Simplify the palette popover to named swatches and an add action; move secondary controls into menus and reuse shared switches, color pickers, native eyedropper sampling and inline hex validation.
+- Detect document colors from authored paints and bounded original-image sampling; add animated naming suggestions and per-generation undo/redo inside the popover, retaining document history after Apply.
+- Keep palette tooltips above their controls, add concise contextual help and prevent gradient color-row hover controls from overlapping.
+
+- Keep Studio's object color and palette buttons aligned in one compact row without increasing the contextual toolbar height.
+
+- Add designer selection through source transparency and empty vector areas, an explicit behind-selection gesture and a contextual layer picker while retaining stable drag targets.
+- Add personal effect presets and ordered treatments with named saving, restoration distinct from factory defaults, independent applied copies and undoable application.
+- Add named palette libraries, explicit document color links and a shortcut beside color pickers, with locked-swatch variations, preview/cancel and undoable global edits.
+
 - Reduce Studio guide entrance rendering cost while preserving the staggered blur: separate viewport-bounded dimming bands from the blurred capture frame instead of filtering its `100vmax` shadow. Profile frozen production builds on Studio Starter at DPR 1/2; retain zero root React commits, approximately 26 ms median feedback, and document trace work, outliers and measurement limits in `docs/performance/studio-guides.md`.
 
 - Complete effect localization across all twelve supported languages: catalog/search names and descriptions, every SDK parameter and choice, gradients, transitions, source preparation, shared effect/alpha/blend controls, Motion recording/settings and canvas gizmo help. Load native locale bundles instead of falling back to English, and resolve animated choice endpoints through SDK labels while retaining portable values. Add strict per-locale resource, interpolation and runtime lookup regressions.

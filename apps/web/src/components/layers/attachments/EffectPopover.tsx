@@ -1,5 +1,5 @@
 import { memo, useCallback, useLayoutEffect, type ReactNode } from "react";
-import { Eye, EyeOff, Trash2, Sun } from "lucide-react";
+import { Eye, EyeOff, Sun } from "lucide-react";
 import {
   getEffectDefinition,
   BLEND_MODES,
@@ -286,153 +286,155 @@ const EffectDetails = memo(function EffectDetails({
                       )}
                     </MotionValueField>
                   </MotionField>
-                  <IconButton
-                    disabled={disabled}
-                    label={t("removeEffect")}
-                    onClick={() => runCurrent(capturePresentationDelete(engine))}
-                  >
-                    <Trash2 size={13} />
-                  </IconButton>
                 </div>
               </div>
-              <div className="effect-compositing">
-                <div className="effect-parameter-row">
-                  <MotionNumberInput
-                    engine={engine}
-                    target={{
-                      kind: "effect",
-                      layerId: layer.id,
-                      effectId: effect.id,
-                      property: "opacity",
-                    }}
-                    displayScale={100}
-                    identity={effect}
-                    resetValue={100}
-                    label={t("opacity")}
-                    scrubLabel={
-                      <>
-                        <Sun size={14} aria-hidden="true" />
-                        <span>{t("opacity")}</span>
-                      </>
-                    }
-                    value={(effect.opacity ?? 1) * 100}
-                    min={0}
-                    max={100}
-                    unit="%"
-                    disabled={disabled}
-                    onStart={begin}
-                    onPreview={(value) => update(effect, { opacity: value / 100 }, true)}
-                    onCommit={(value) => update(effect, { opacity: value / 100 })}
-                    onCancel={cancel}
-                  />
-                </div>
-                <MotionField
-                  className="effect-property-row"
-                  engine={engine}
-                  target={{
-                    kind: "effect",
-                    layerId: layer.id,
-                    effectId: effect.id,
-                    property: "blendMode",
-                  }}
-                  label={t("blendMode")}
-                  disabled={disabled}
-                >
-                  <MotionValueField
-                    engine={engine}
-                    target={{
-                      kind: "effect",
-                      layerId: layer.id,
-                      effectId: effect.id,
-                      property: "blendMode",
-                    }}
-                    fallback={effect.blendMode ?? "normal"}
-                  >
-                    {(value) => (
-                      <label className="effect-select-field">
-                        <span>{t("blendMode")}</span>
-                        <SelectField
-                          identity={effect}
-                          label={t("blendMode")}
-                          value={String(value)}
-                          disabled={disabled}
-                          options={BLEND_MODES.map((mode) => ({
-                            value: mode,
-                            label: t(getBlendDefinition(mode).nameKey),
-                          }))}
-                          onPreview={(mode) =>
-                            update(effect, { blendMode: mode as Effect["blendMode"] }, true)
-                          }
-                          onPreviewCancel={cancel}
-                          onValueChange={(mode) =>
-                            update(effect, { blendMode: mode as Effect["blendMode"] })
-                          }
-                        />
-                      </label>
-                    )}
-                  </MotionValueField>
-                </MotionField>
-              </div>
-              <MotionField
-                className="effect-property-row"
-                engine={engine}
-                target={{
-                  kind: "effect",
-                  layerId: layer.id,
-                  effectId: effect.id,
-                  property: "composite",
-                }}
-                label={t("effectControls:composite")}
-                disabled={disabled}
-              >
-                <MotionValueField
-                  engine={engine}
-                  target={{
-                    kind: "effect",
-                    layerId: layer.id,
-                    effectId: effect.id,
-                    property: "composite",
-                  }}
-                  fallback={effect.composite ?? "default"}
-                >
-                  {(value) => (
-                    <label className="effect-select-field">
-                      <span>{t("effectControls:composite")}</span>
-                      <SelectField
-                        identity={effect}
-                        label={t("effectControls:composite")}
-                        value={String(value)}
-                        disabled={disabled}
-                        options={[
-                          { value: "default", label: t("effectControls:replacement") },
-                          ...EFFECT_COMPOSITE_MODES.map((value) => ({
-                            value,
-                            label: t(`effectControls:operation.${value}`),
-                          })),
-                        ]}
-                        onPreview={(mode) =>
-                          update(
-                            effect,
-                            {
-                              composite:
-                                mode === "default" ? undefined : (mode as Effect["composite"]),
-                            },
-                            true,
-                          )
-                        }
-                        onPreviewCancel={cancel}
-                        onValueChange={(mode) =>
-                          update(effect, {
-                            composite:
-                              mode === "default" ? undefined : (mode as Effect["composite"]),
-                          })
-                        }
-                      />
-                    </label>
-                  )}
-                </MotionValueField>
-              </MotionField>
               <EffectParameters
+                registerDeactivate={registerDeactivate}
+                stackEffects={layer.effects}
+                compositing={
+                  <>
+                    <div className="effect-compositing">
+                      <div className="effect-parameter-row">
+                        <MotionNumberInput
+                          engine={engine}
+                          target={{
+                            kind: "effect",
+                            layerId: layer.id,
+                            effectId: effect.id,
+                            property: "opacity",
+                          }}
+                          displayScale={100}
+                          identity={effect}
+                          resetValue={100}
+                          label={t("opacity")}
+                          scrubLabel={
+                            <>
+                              <Sun size={14} aria-hidden="true" />
+                              <span>{t("opacity")}</span>
+                            </>
+                          }
+                          value={(effect.opacity ?? 1) * 100}
+                          min={0}
+                          max={100}
+                          unit="%"
+                          disabled={disabled}
+                          onStart={begin}
+                          onPreview={(value) => update(effect, { opacity: value / 100 }, true)}
+                          onCommit={(value) => update(effect, { opacity: value / 100 })}
+                          onCancel={cancel}
+                        />
+                      </div>
+                      <MotionField
+                        className="effect-property-row"
+                        engine={engine}
+                        target={{
+                          kind: "effect",
+                          layerId: layer.id,
+                          effectId: effect.id,
+                          property: "blendMode",
+                        }}
+                        label={t("blendMode")}
+                        disabled={disabled}
+                      >
+                        <MotionValueField
+                          engine={engine}
+                          target={{
+                            kind: "effect",
+                            layerId: layer.id,
+                            effectId: effect.id,
+                            property: "blendMode",
+                          }}
+                          fallback={effect.blendMode ?? "normal"}
+                        >
+                          {(value) => (
+                            <label className="effect-select-field">
+                              <span>{t("blendMode")}</span>
+                              <SelectField
+                                identity={effect}
+                                label={t("blendMode")}
+                                value={String(value)}
+                                disabled={disabled}
+                                options={BLEND_MODES.map((mode) => ({
+                                  value: mode,
+                                  label: t(getBlendDefinition(mode).nameKey),
+                                }))}
+                                onPreview={(mode) =>
+                                  update(effect, { blendMode: mode as Effect["blendMode"] }, true)
+                                }
+                                onPreviewCancel={cancel}
+                                onValueChange={(mode) =>
+                                  update(effect, { blendMode: mode as Effect["blendMode"] })
+                                }
+                              />
+                            </label>
+                          )}
+                        </MotionValueField>
+                      </MotionField>
+                    </div>
+                    <MotionField
+                      className="effect-property-row"
+                      engine={engine}
+                      target={{
+                        kind: "effect",
+                        layerId: layer.id,
+                        effectId: effect.id,
+                        property: "composite",
+                      }}
+                      label={t("effectControls:composite")}
+                      disabled={disabled}
+                    >
+                      <MotionValueField
+                        engine={engine}
+                        target={{
+                          kind: "effect",
+                          layerId: layer.id,
+                          effectId: effect.id,
+                          property: "composite",
+                        }}
+                        fallback={effect.composite ?? "default"}
+                      >
+                        {(value) => (
+                          <label className="effect-select-field">
+                            <span>{t("effectControls:composite")}</span>
+                            <SelectField
+                              identity={effect}
+                              label={t("effectControls:composite")}
+                              value={String(value)}
+                              disabled={disabled}
+                              options={[
+                                { value: "default", label: t("effectControls:replacement") },
+                                ...EFFECT_COMPOSITE_MODES.map((value) => ({
+                                  value,
+                                  label: t(`effectControls:operation.${value}`),
+                                })),
+                              ]}
+                              onPreview={(mode) =>
+                                update(
+                                  effect,
+                                  {
+                                    composite:
+                                      mode === "default"
+                                        ? undefined
+                                        : (mode as Effect["composite"]),
+                                  },
+                                  true,
+                                )
+                              }
+                              onPreviewCancel={cancel}
+                              onValueChange={(mode) =>
+                                update(effect, {
+                                  composite:
+                                    mode === "default" ? undefined : (mode as Effect["composite"]),
+                                })
+                              }
+                            />
+                          </label>
+                        )}
+                      </MotionValueField>
+                    </MotionField>
+                  </>
+                }
+                onDelete={() => runCurrent(capturePresentationDelete(engine))}
                 deferOffscreen={Boolean(effectId)}
                 engine={engine}
                 layerId={layer.id}

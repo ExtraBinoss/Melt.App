@@ -102,6 +102,7 @@ export const LayerFooter = memo(
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <EffectMenu
+                treatments={{ engine, target: { pageId: page.id, layerIds: selection } }}
                 onAdd={actions.effect}
                 owner={{ scope: "layer", depthAvailable: selectionHasDepth(page, selection) }}
                 libraryRequest={libraryRequest}

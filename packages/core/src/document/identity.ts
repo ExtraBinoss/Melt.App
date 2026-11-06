@@ -17,6 +17,7 @@ export function createId(prefix = "node"): string {
 /** Collect only durable schema identities, including scene channels and spatial lights. */
 export function collectProjectIds(project: Project): Set<string> {
   const ids = new Set<string>([project.id]);
+  for (const color of project.colors ?? []) ids.add(color.id);
   for (const asset of Object.values(project.assets)) ids.add(asset.id);
   for (const page of project.pages) {
     ids.add(page.id);

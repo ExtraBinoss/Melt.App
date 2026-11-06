@@ -16,6 +16,7 @@ export function RetainedCatalogs(props: ComponentProps<typeof EffectCatalog>) {
         onAdd={props.onAdd}
         initialQuery={props.initialQuery}
         owner={props.owner}
+        treatments={props.treatments}
       />
     </Activity>
   ));

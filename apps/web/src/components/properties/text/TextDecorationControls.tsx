@@ -140,6 +140,11 @@ export function TextDecorationControls({
         >
           {(stroke) => (
             <EffectColor
+              paletteTargets={
+                engine
+                  ? [{ pageId: engine.getSnapshot().pageId, layerId: layer.id, property: "stroke" }]
+                  : undefined
+              }
               label={t("outlineColor")}
               identity={layer.id}
               value={String(stroke)}

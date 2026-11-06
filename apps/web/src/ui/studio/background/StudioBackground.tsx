@@ -79,6 +79,7 @@ function BackgroundEditor({ engine, onTask }: { engine: EnginePort; onTask: Task
           <StudioBackgroundPaint
             engine={engine}
             identity={page}
+            paletteTargets={[{ pageId: page.id, property: "background" }]}
             ownerId={`${snapshot.project.id}:${page.id}:${snapshot.revision}`}
             color={page.background}
             gradient={page.backgroundGradient}
@@ -151,6 +152,9 @@ function LayerBackground({
         <StudioBackgroundPaint
           engine={engine}
           identity={layer}
+          paletteTargets={[
+            { pageId: engine.getSnapshot().pageId, layerId: layer.id, property: "fill" },
+          ]}
           ownerId={`${engine.getSnapshot().project.id}:${layer.id}:${engine.getSnapshot().revision}`}
           color={layer.fill}
           gradient={layer.fillGradient}

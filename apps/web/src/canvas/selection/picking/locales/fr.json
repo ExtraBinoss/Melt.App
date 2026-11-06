@@ -1,0 +1,6 @@
+{
+  "selectLayer": "Sélectionner un calque",
+  "locked": "Verrouillé",
+  "more": "{{count}} de plus — parcourir avec Ctrl/Cmd+Maj+clic",
+  "hint": "Ctrl/Cmd+Maj+clic parcourt les calques superposés"
+}

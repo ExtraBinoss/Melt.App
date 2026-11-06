@@ -1,5 +1,6 @@
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "../../ui/accordion";
 import { EffectPositionPad } from "./EffectPositionPad";
+import { EffectPositionPresentation } from "./sdk/EffectPositionPresentation";
 import "./sdk/messages";
 import { LiquifyControls } from "./LiquifyControls";
 import { EffectImageInputs } from "./inputs/EffectImageInputs";
@@ -7,8 +8,16 @@ import "./gradient-messages";
 import "./messages";
 import "./library-messages";
 import "./parameter-layout.css";
-import { memo, useCallback, useMemo, useRef, useState, useSyncExternalStore } from "react";
-import { RotateCcw } from "lucide-react";
+import {
+  memo,
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  useSyncExternalStore,
+  type ReactNode,
+} from "react";
+import { EffectPresets } from "./presets/EffectPresets";
 import {
   EFFECT_DOMAIN_KEYS,
   getEffectDefinition,
@@ -36,7 +45,6 @@ import { Switch } from "../../ui/switch";
 import { EffectPlayback } from "./EffectPlayback";
 import { EffectColor } from "./EffectColor";
 import { EffectText } from "./EffectText";
-import { IconButton } from "../../shared/IconButton";
 import { freezeEffectPreviews } from "../../../state/session/effect-preview";
 import { useResetFeedback } from "../../shared/use-reset-feedback";
 import { useParameterWindow } from "./use-parameter-window";
@@ -53,6 +61,10 @@ export function EffectParameters({
   parameterKeys,
   resetDefaults,
   hideActions = false,
+  onDelete,
+  compositing,
+  stackEffects,
+  registerDeactivate,
 }: {
   effect: Effect;
   engine?: EnginePort;
@@ -67,6 +79,11 @@ export function EffectParameters({
   /** Specialized surfaces can retain structural settings such as a hard shadow's zero blur. */
   resetDefaults?: Partial<Pick<Effect, "amount" | "settings">>;
   hideActions?: boolean;
+  onDelete?: () => void;
+  /** Owner-specific controls follow the shared preset header. */
+  compositing?: ReactNode;
+  stackEffects?: readonly Effect[];
+  registerDeactivate?: (cancel: () => void) => () => void;
 }) {
   const { t } = useTranslation();
   const definition = getEffectDefinition(effect.type);
@@ -154,56 +171,60 @@ export function EffectParameters({
       className="effect-controls reset-feedback"
       data-effect-parameter-count={parameters.length}
     >
+      {!hideActions && (
+        <EffectPresets
+          engine={engine}
+          stackEffects={stackEffects}
+          registerDeactivate={registerDeactivate}
+          layerId={ownLayerId}
+          effect={effect}
+          disabled={disabled}
+          onChange={onChange}
+          onCancel={onCancel}
+          onDelete={onDelete}
+          onReset={() => {
+            if (engine) freezeEffectPreviews(engine, false);
+            onCancel?.();
+            setOpenColorKey(null);
+            setResetVersion((version) => version + 1);
+            const changed =
+              definition.parameters.some(
+                (parameter) =>
+                  getEffectParameter(displayed(), parameter) !==
+                  getEffectParameter(defaults, parameter),
+              ) ||
+              Object.keys(displayed().inputs ?? {}).length > 0 ||
+              (displayed().opacity ?? 1) !== 1 ||
+              (displayed().blendMode ?? "normal") !== "normal" ||
+              displayed().composite !== undefined ||
+              displayed().preset !== undefined ||
+              displayed().colorLinks !== undefined;
+            if (changed)
+              onChange(
+                {
+                  ...definition.defaults,
+                  amount: defaults.amount,
+                  inputs: undefined,
+                  preset: undefined,
+                  colorLinks: undefined,
+                  enabled: displayed().enabled,
+                  settings: defaults.settings ? { ...defaults.settings } : undefined,
+                  time: defaults.time,
+                  opacity: 1,
+                  blendMode: "normal",
+                  composite: undefined,
+                },
+                false,
+              );
+            if (!matchMedia("(prefers-reduced-motion: reduce)").matches) feedback();
+          }}
+        />
+      )}
+      {compositing}
       {effect.type === "liquify" && (
         <LiquifyControls engine={engine} layerId={ownLayerId} effect={effect} onChange={onChange} />
       )}
       <EffectImageInputs engine={engine} layerId={ownLayerId} effect={effect} disabled={disabled} />
-      {!hideActions && (
-        <div className="effect-controls-actions">
-          <IconButton
-            label={t("effectControls:resetAll")}
-            disabled={disabled}
-            data-effect-reset=""
-            onPointerDown={(event) => {
-              if (event.button === 0) event.preventDefault();
-            }}
-            onClick={() => {
-              if (engine) freezeEffectPreviews(engine, false);
-              onCancel?.();
-              setOpenColorKey(null);
-              setResetVersion((version) => version + 1);
-              const changed =
-                definition.parameters.some(
-                  (parameter) =>
-                    getEffectParameter(displayed(), parameter) !==
-                    getEffectParameter(defaults, parameter),
-                ) ||
-                Object.keys(displayed().inputs ?? {}).length > 0 ||
-                (displayed().opacity ?? 1) !== 1 ||
-                (displayed().blendMode ?? "normal") !== "normal" ||
-                displayed().composite !== undefined;
-              if (changed)
-                onChange(
-                  {
-                    ...definition.defaults,
-                    amount: defaults.amount,
-                    inputs: undefined,
-                    enabled: displayed().enabled,
-                    settings: defaults.settings ? { ...defaults.settings } : undefined,
-                    time: defaults.time,
-                    opacity: 1,
-                    blendMode: "normal",
-                    composite: undefined,
-                  },
-                  false,
-                );
-              if (!matchMedia("(prefers-reduced-motion: reduce)").matches) feedback();
-            }}
-          >
-            <RotateCcw size={14} aria-hidden="true" />
-          </IconButton>
-        </div>
-      )}
       {!hideActions && engine && !definition.retired && definition.source !== "geometry" && (
         <EffectPlayback
           engine={engine}
@@ -265,26 +286,33 @@ export function EffectParameters({
           <AccordionItem value="placement">
             <AccordionTrigger>{t("effectDomain:title")}</AccordionTrigger>
             <AccordionContent className="effect-placement-body">
-              <EffectPositionPad
-                effect={effect}
-                engine={engine}
-                layerId={ownLayerId}
-                disabled={disabled}
-                onChange={onChange}
-                onStart={onStart}
-                onCancel={onCancel}
-              />
-              <EffectParameters
-                effect={effect}
-                engine={engine}
-                layerId={ownLayerId}
-                disabled={disabled}
-                onChange={onChange}
-                onStart={onStart}
-                onCancel={onCancel}
-                parameterKeys={EFFECT_DOMAIN_KEYS}
-                hideActions
-              />
+              <EffectPositionPresentation key={effect.id} effect={effect}>
+                {(publish) => (
+                  <>
+                    <EffectPositionPad
+                      effect={effect}
+                      engine={engine}
+                      layerId={ownLayerId}
+                      disabled={disabled}
+                      onChange={onChange}
+                      onStart={onStart}
+                      onCancel={onCancel}
+                      onPosition={publish}
+                    />
+                    <EffectParameters
+                      effect={effect}
+                      engine={engine}
+                      layerId={ownLayerId}
+                      disabled={disabled}
+                      onChange={onChange}
+                      onStart={onStart}
+                      onCancel={onCancel}
+                      parameterKeys={EFFECT_DOMAIN_KEYS}
+                      hideActions
+                    />
+                  </>
+                )}
+              </EffectPositionPresentation>
             </AccordionContent>
           </AccordionItem>
         </Accordion>
@@ -459,6 +487,18 @@ const ParameterField = memo(function ParameterField({
         <MotionValueField engine={engine} target={target} fallback={value}>
           {(live) => (
             <EffectColor
+              paletteTargets={
+                parameter.scope === "settings" && compositionId
+                  ? [
+                      {
+                        pageId: compositionId,
+                        ...(layerId ? { layerId } : {}),
+                        effectId: effect.id,
+                        property: parameter.key,
+                      },
+                    ]
+                  : undefined
+              }
               invalidation={engine ? motionTimeChanges(engine) : undefined}
               identity={`${effect.id}:${effect.type}:${parameter.key}`}
               label={label}

@@ -1,3 +1,5 @@
+import { CanvasLayerCandidates } from "./picking/CanvasLayerCandidates";
+import type { CanvasContextTarget } from "../interaction/transfers";
 import { Sparkles, ClipboardPaste, MousePointer2, Trash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import type { Composition, EnginePort } from "@musart/core";
@@ -13,6 +15,7 @@ export function CanvasMenuItems({
   engine,
   page,
   selection,
+  candidates = [],
   layerId,
   current,
   motion,
@@ -21,6 +24,7 @@ export function CanvasMenuItems({
   engine: EnginePort;
   page: Composition;
   selection: string[];
+  candidates?: CanvasContextTarget[];
   layerId?: string;
   current: () => boolean;
   motion: () => void;
@@ -66,6 +70,12 @@ export function CanvasMenuItems({
   const actions = layerActions(engine, page, run);
   return (
     <>
+      <CanvasLayerCandidates
+        engine={engine}
+        page={page}
+        candidates={candidates}
+        current={current}
+      />
       <DropdownMenuItem
         data-tutorial="add-transition"
         disabled={!state.editable || selection.length !== 1}

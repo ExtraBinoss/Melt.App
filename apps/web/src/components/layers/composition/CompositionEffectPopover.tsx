@@ -1,5 +1,5 @@
 import { useLayoutEffect, type ReactNode } from "react";
-import { ArrowDown, ArrowUp, Eye, EyeOff, Trash2 } from "lucide-react";
+import { ArrowDown, ArrowUp, Eye, EyeOff } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { getEffectDefinition, type Composition, type Effect, type EnginePort } from "@musart/core";
 import { Popover, PopoverTrigger, PopoverContent } from "../../ui/popover";
@@ -154,17 +154,14 @@ function CompositionEffectDetails({
             >
               <ArrowDown size={13} />
             </IconButton>
-            <IconButton
-              label={t("removeEffect")}
-              onClick={() => {
-                if (isCurrent()) edit.change(effects.filter((item) => item.id !== effectId));
-              }}
-            >
-              <Trash2 size={13} />
-            </IconButton>
           </div>
         </div>
         <EffectParameters
+          registerDeactivate={registerDeactivate}
+          stackEffects={effects}
+          onDelete={() => {
+            if (isCurrent()) edit.change(effects.filter((item) => item.id !== effectId));
+          }}
           engine={engine}
           effect={effect}
           onStart={edit.begin}

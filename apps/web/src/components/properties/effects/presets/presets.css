@@ -1,0 +1,80 @@
+.effect-presets {
+  display: grid;
+  gap: 4px;
+  margin-block: 0 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+  min-width: 0;
+}
+.effect-preset-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+.effect-preset-bar > :first-child {
+  flex: 1;
+  min-width: 0;
+}
+
+.effect-preset-selected {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+}
+.effect-preset-selected > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.effect-preset-selected > svg {
+  flex-shrink: 0;
+}
+.treatment-save {
+  display: contents;
+}
+.treatment-name-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  grid-column: 1 / -1;
+  width: 100%;
+  padding-block: 6px;
+}
+.effect-preset-bar .treatment-name-form {
+  order: 1;
+  flex-basis: 100%;
+}
+.treatment-name-form input {
+  flex: 1 1 80px;
+  min-width: 0;
+}
+.treatment-name-form small,
+.treatment-name-form p {
+  flex-basis: 100%;
+}
+.effect-presets p[role="alert"],
+.treatments-library p[role="alert"] {
+  color: var(--destructive);
+  font-size: 12px;
+}
+.treatments-library {
+  display: grid;
+  gap: 6px;
+  padding: 8px;
+  max-height: 360px;
+  overflow: auto;
+}
+.treatment-row {
+  display: grid;
+  gap: 4px;
+  padding-block: 6px;
+  border-bottom: 1px solid var(--border);
+}
+.treatment-row-actions {
+  display: flex;
+  gap: 4px;
+}

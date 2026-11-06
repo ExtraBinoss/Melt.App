@@ -71,6 +71,7 @@ export function BackgroundPaintControls({
           label={t("fill")}
           identity={`page:${page.id}`}
           value={background}
+          paletteTargets={[{ pageId: page.id, property: "background" }]}
           onPreview={(background) => preview({ background })}
           onCommit={(background) => patch({ background })}
           onCancel={cancel}

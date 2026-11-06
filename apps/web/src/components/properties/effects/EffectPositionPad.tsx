@@ -1,5 +1,5 @@
 import { createMotionTransport } from "../../../services/motion/transport";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef } from "react";
 import {
   getEffectDefinition,
   getEffectParameter,
@@ -19,6 +19,7 @@ export function EffectPositionPad({
   onChange,
   onStart,
   onCancel,
+  onPosition,
 }: {
   effect: Effect;
   engine?: EnginePort;
@@ -27,6 +28,7 @@ export function EffectPositionPad({
   onChange: (patch: Partial<Effect>, preview?: boolean) => void;
   onStart?: () => void;
   onCancel?: () => void;
+  onPosition?: (x: number, y: number) => void;
 }) {
   const { t } = useTranslation("effectDomain");
   const dot = useRef<HTMLSpanElement>(null);
@@ -39,7 +41,9 @@ export function EffectPositionPad({
     snapshot?: SessionSnapshot;
   } | null>(null);
   const cancel = useRef(onCancel);
-  cancel.current = onCancel;
+  useLayoutEffect(() => {
+    cancel.current = onCancel;
+  }, [onCancel]);
   const fields = getEffectDefinition(effect.type).parameters;
   const x = Number(
     getEffectParameter(
@@ -65,12 +69,16 @@ export function EffectPositionPad({
   const patch = (x: number, y: number) => ({
     settings: { ...effect.settings, domainX: x, domainY: y },
   });
-  const paint = useCallback((x: number, y: number) => {
-    if (dot.current) {
-      dot.current.style.left = `${x * 100}%`;
-      dot.current.style.top = `${y * 100}%`;
-    }
-  }, []);
+  const paint = useCallback(
+    (x: number, y: number) => {
+      if (dot.current) {
+        dot.current.style.left = `${x * 100}%`;
+        dot.current.style.top = `${y * 100}%`;
+      }
+      onPosition?.(x, y);
+    },
+    [onPosition],
+  );
   useEffect(() => {
     if (!engine) return;
     const transport = createMotionTransport(engine);

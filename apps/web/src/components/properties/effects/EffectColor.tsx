@@ -1,5 +1,7 @@
 import { useCallback, useLayoutEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import type { ColorTarget } from "@musart/core";
+import { PaletteShortcut } from "../../palettes/PaletteShortcut";
 import { Button } from "../../ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "../../ui/popover";
 import { useResetFeedback } from "../../shared/use-reset-feedback";
@@ -20,7 +22,9 @@ export function EffectColor({
   onCommit,
   onCancel,
   invalidation,
+  paletteTargets,
 }: {
+  paletteTargets?: ColorTarget[];
   label: string;
   value: string;
   disabled: boolean;
@@ -129,6 +133,7 @@ export function EffectColor({
           }}
         >
           <ColorControl
+            showPaletteShortcut={false}
             invalidation={invalidation}
             value={value}
             identity={identity}
@@ -140,6 +145,24 @@ export function EffectColor({
           />
         </PopoverContent>
       </Popover>
+      <PaletteShortcut
+        value={value}
+        targets={paletteTargets}
+        disabled={disabled}
+        beforeApply={() => {
+          changeOpen(false);
+          latest.current.onCancel?.();
+        }}
+        onUse={(color) => {
+          latest.current.onStart?.();
+          latest.current.onCommit(color);
+        }}
+        onPreview={(color) => {
+          latest.current.onStart?.();
+          latest.current.onPreview(color);
+        }}
+        onCancel={() => latest.current.onCancel?.()}
+      />
     </div>
   );
 }

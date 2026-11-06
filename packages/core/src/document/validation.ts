@@ -1,3 +1,4 @@
+import { validateColorLinks, validateProjectColors } from "../palettes/validation";
 import { validateEffectInputs } from "../effects/inputs";
 import type { Effect } from "./model";
 import { validateSpatialSource, validateSpatialScene } from "../spatial/validation";
@@ -51,6 +52,7 @@ export function validateEffect(value: unknown, ids: Set<string>): void {
   );
   assertNumber(value.levels, 2, 256);
   assertNumber(value.seed, 0, 2147483647);
+  validateColorLinks(value.colorLinks);
   validateEffectExtensions(value);
 }
 
@@ -99,6 +101,7 @@ export function validateLayer(
   assertBoolean(value.visible);
   assertBoolean(value.locked);
   if (value.background !== undefined) assertBoolean(value.background);
+  validateColorLinks(value.colorLinks, ["fill", "stroke"]);
   assertColor(value.fill);
   if (value.fillGradient !== undefined) validateFillGradient(value.fillGradient);
   assertColor(value.stroke);
@@ -217,6 +220,7 @@ export function validatePageMetadata(page: Record<string, unknown>): void {
   assertText(page.name);
   assertNumber(page.width, 1, 16384);
   assertNumber(page.height, 1, 16384);
+  validateColorLinks(page.colorLinks, ["background"]);
   assertColor(page.background);
   if (page.backgroundGradient !== undefined) validateFillGradient(page.backgroundGradient);
   validatePageLayout(page);
@@ -278,5 +282,6 @@ export function validateProject(value: unknown): asserts value is Project {
       if (guide.color !== undefined) assertColor(guide.color);
     }
   }
+  validateProjectColors(value as unknown as Project, ids);
   if (value.replay !== undefined) validateReplaySpec(value.replay);
 }

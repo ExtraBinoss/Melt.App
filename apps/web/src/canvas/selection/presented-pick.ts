@@ -35,7 +35,7 @@ export function pickMotionPlayback(
     point.y > page.height
   )
     return;
-  const hit = canvasHit(page, point, true, frameGeometry(frame))?.layer;
+  const hit = canvasHit(page, point, false, frameGeometry(frame))?.layer;
   const canonical = snapshot.project.pages.find((item) => item.id === snapshot.pageId)!;
   if (hit && !createLayerGeometryIndex(canonical).byId.has(hit.id)) return;
   const additive = event.shiftKey || event.ctrlKey || event.metaKey;
