@@ -1,0 +1,63 @@
+.effect-presets {
+  display: grid;
+  gap: 4px;
+  margin-block: 6px 10px;
+  min-width: 0;
+}
+.effect-preset-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+.effect-preset-bar > :first-child {
+  flex: 1;
+  min-width: 0;
+}
+.treatment-save {
+  display: contents;
+}
+.treatment-name-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  grid-column: 1 / -1;
+  width: 100%;
+  padding-block: 6px;
+}
+.treatment-name-form input {
+  flex: 1 1 120px;
+  min-width: 0;
+}
+.treatment-name-form small,
+.treatment-name-form p {
+  flex-basis: 100%;
+}
+.effect-presets p[role="alert"],
+.treatments-library p[role="alert"] {
+  color: var(--destructive);
+  font-size: 12px;
+}
+.treatments-library {
+  display: grid;
+  gap: 6px;
+  padding: 8px;
+  max-height: 360px;
+  overflow: auto;
+}
+.treatment-row {
+  display: grid;
+  gap: 4px;
+  padding-block: 6px;
+  border-bottom: 1px solid var(--border);
+}
+.treatment-row-actions {
+  display: flex;
+  gap: 4px;
+}
+.effect-stack-library-save {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 5px;
+}

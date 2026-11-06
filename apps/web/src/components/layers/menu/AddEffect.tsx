@@ -70,6 +70,7 @@ function EffectOptions({
   const actions = layerActions(engine, page, run);
   return (
     <EffectCatalog
+      treatments={{ engine, target: { pageId: page.id, layerIds: selection } }}
       key={category}
       category={category}
       onAdd={actions.effect}

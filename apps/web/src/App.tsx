@@ -1,3 +1,4 @@
+import { PaletteProvider } from "./components/palettes/PaletteProvider";
 import { Tutorial, REPLAY_TUTORIAL } from "./components/onboarding/tutorial/Tutorial";
 import { useProjectTitle } from "./components/workspace/use-project-title";
 import { dashboardHref, isPlainPrimaryClick, dialogLinkKeyDown } from "./ui/navigation/activation";
@@ -198,7 +199,7 @@ export function App({ engine, services, welcome = false, routing }: AppProps) {
     [motionTransport, store, dialogs],
   );
   useShortcuts(engine, services, onTask, !choosingProject);
-  return (
+  const content = (
     <FontLibraryProvider library={services.fonts ?? bundledFontLibrary}>
       <MobileControlsContext value={mobile}>
         <TooltipProvider delayDuration={350}>
@@ -455,6 +456,7 @@ export function App({ engine, services, welcome = false, routing }: AppProps) {
       </MobileControlsContext>
     </FontLibraryProvider>
   );
+  return <PaletteProvider engine={engine}>{content}</PaletteProvider>;
 }
 
 /** Canonical origin follows edits only while the dashboard is mounted. */

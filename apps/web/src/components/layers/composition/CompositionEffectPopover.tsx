@@ -1,9 +1,10 @@
 import { useLayoutEffect, type ReactNode } from "react";
-import { ArrowDown, ArrowUp, Eye, EyeOff, Trash2 } from "lucide-react";
+import { ArrowDown, ArrowUp, Eye, EyeOff } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { getEffectDefinition, type Composition, type Effect, type EnginePort } from "@musart/core";
 import { Popover, PopoverTrigger, PopoverContent } from "../../ui/popover";
 import { IconButton } from "../../shared/IconButton";
+import { SaveTreatment } from "../../properties/effects/presets/SaveTreatment";
 import { EffectParameters } from "../../properties/effects/EffectParameters";
 import { MotionFieldProvider } from "../../properties/motion/context";
 import { useCompositionEffects } from "../controls/use-composition-effects";
@@ -154,17 +155,15 @@ function CompositionEffectDetails({
             >
               <ArrowDown size={13} />
             </IconButton>
-            <IconButton
-              label={t("removeEffect")}
-              onClick={() => {
-                if (isCurrent()) edit.change(effects.filter((item) => item.id !== effectId));
-              }}
-            >
-              <Trash2 size={13} />
-            </IconButton>
           </div>
         </div>
+        <div className="effect-stack-library-save">
+          <SaveTreatment engine={engine} effects={effects} kind="stack" />
+        </div>
         <EffectParameters
+          onDelete={() => {
+            if (isCurrent()) edit.change(effects.filter((item) => item.id !== effectId));
+          }}
           engine={engine}
           effect={effect}
           onStart={edit.begin}

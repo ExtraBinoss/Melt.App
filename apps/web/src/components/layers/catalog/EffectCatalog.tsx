@@ -17,6 +17,11 @@ import "./messages";
 import "../../properties/effects/library-messages";
 import "../../motion/transitions/messages";
 import "./catalog.css";
+import { Button } from "../../ui/button";
+import {
+  TreatmentsLibrary,
+  type TreatmentContext,
+} from "../../properties/effects/presets/TreatmentsLibrary";
 
 /** Shared mounted-only menu leaf. Browsing never mutates the document or previews effects. */
 export const EffectCatalog = memo(function EffectCatalog({
@@ -24,18 +29,25 @@ export const EffectCatalog = memo(function EffectCatalog({
   onAdd,
   initialQuery = "",
   owner = { scope: "layer" },
+  treatments,
 }: {
   category: EffectCategory;
+  treatments?: TreatmentContext;
   initialQuery?: string;
   owner?: EffectCatalogOwner;
   onAdd(this: void, type: EffectType): void;
 }) {
   const { t, i18n } = useTranslation();
+  const [personal, setPersonal] = useState(false);
   const [query, setQuery] = useState(initialQuery);
   const [family, setFamily] = useState<EffectFamily | "all">("all");
   const list = useRef<CatalogRowsHandle>(null);
   const entries = useMemo(
-    () => effectCatalogEntries(category, t, i18n.resolvedLanguage ?? i18n.language, owner),
+    () =>
+      effectCatalogEntries(category, t, i18n.resolvedLanguage ?? i18n.language, {
+        scope: owner.scope,
+        depthAvailable: owner.depthAvailable,
+      }),
     [category, t, i18n.resolvedLanguage, i18n.language, owner.scope, owner.depthAvailable],
   );
   const families = EFFECT_FAMILIES.filter((family) =>
@@ -64,37 +76,54 @@ export const EffectCatalog = memo(function EffectCatalog({
   }
   return (
     <div className="effect-catalog" data-effect-category={category}>
-      <div className="effect-catalog-filters">
-        <SearchInput
-          aria-label={t(
-            category === "effect" ? "effectCatalog:search" : "effectCatalog:searchAdjustment",
-          )}
-          hints={hints}
-          value={query}
-          onChange={(event) => setQuery(event.currentTarget.value)}
-          onKeyDown={filterKeys}
-        />
-        <SelectField
-          prewarm={false}
-          label={t("effectCatalog:familyLabel")}
-          value={family}
-          options={[
-            { value: "all", label: t("effectCatalog:all") },
-            ...families.map((value) => ({ value, label: t(`effectCatalog:family.${value}`) })),
-          ]}
-          onValueChange={(value) => setFamily(value as EffectFamily | "all")}
-        />
-      </div>
-      <ScrollShadow className="effect-catalog-scroll" surface="var(--popover)">
-        <CatalogRows
-          key={JSON.stringify([category, query, family])}
-          ref={list}
-          entries={visible}
-          families={families}
-          onAdd={onAdd}
-          empty={t(category === "effect" ? "effectCatalog:empty" : "effectCatalog:emptyAdjustment")}
-        />
-      </ScrollShadow>
+      {treatments && category === "effect" && (
+        <Button
+          size="sm"
+          variant={personal ? "secondary" : "ghost"}
+          onClick={() => setPersonal(!personal)}
+        >
+          {t("effectPresets:treatments")}
+        </Button>
+      )}
+      {personal && treatments ? (
+        <TreatmentsLibrary {...treatments} />
+      ) : (
+        <>
+          <div className="effect-catalog-filters">
+            <SearchInput
+              aria-label={t(
+                category === "effect" ? "effectCatalog:search" : "effectCatalog:searchAdjustment",
+              )}
+              hints={hints}
+              value={query}
+              onChange={(event) => setQuery(event.currentTarget.value)}
+              onKeyDown={filterKeys}
+            />
+            <SelectField
+              prewarm={false}
+              label={t("effectCatalog:familyLabel")}
+              value={family}
+              options={[
+                { value: "all", label: t("effectCatalog:all") },
+                ...families.map((value) => ({ value, label: t(`effectCatalog:family.${value}`) })),
+              ]}
+              onValueChange={(value) => setFamily(value as EffectFamily | "all")}
+            />
+          </div>
+          <ScrollShadow className="effect-catalog-scroll" surface="var(--popover)">
+            <CatalogRows
+              key={JSON.stringify([category, query, family])}
+              ref={list}
+              entries={visible}
+              families={families}
+              onAdd={onAdd}
+              empty={t(
+                category === "effect" ? "effectCatalog:empty" : "effectCatalog:emptyAdjustment",
+              )}
+            />
+          </ScrollShadow>
+        </>
+      )}
     </div>
   );
 });

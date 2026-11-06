@@ -15,3 +15,35 @@ Every effect parameter uses the same label, value and keyframe columns. Numeric 
 Presentation families live in the web catalog and cover every registered effect through a typed mapping. They do not change portable documents or the core effect taxonomy. Controls still subscribe at their existing leaf/imperative boundaries; this layout adds no animation-frame subscriptions or App/Inspector updates.
 
 Focused mirrors cover catalog membership, localized sorting/search, filtering, real Radix selection, stale action guards and parameter row structure. Native catalog checks verify real searching/selection. Native geometry checks verify the actual label/value/diamond columns; a DOM test alone does not prove pixel alignment.
+
+Each applied effect has a **Preset** selector and an inline **Save as preset**
+action. Saving captures the current literal settings, application area and
+compositing values under a user-supplied name. **Modified** compares the applied
+values with the saved treatment. **Restore saved preset** reapplies that saved
+copy; the separate **Factory defaults** button restores the effect definition's
+defaults and removes the preset reference. The actions menu also updates,
+renames or deletes the saved entry. Updating the library never changes other
+applied copies. A missing entry is explicitly shown as unavailable while the
+document keeps its applied values.
+
+**Save effect stack** captures the owner's complete ordered stack, including
+disabled effects. **My treatments** is available in Classic and Studio's Add
+effect catalogs for layer and composition owners. **Append** adds independent
+copies after the existing stack; **Replace stack** replaces it. Applying to
+multiple editable layers is one transaction and one undo entry. Incompatible
+native-depth requirements and locked or stale targets are real errors.
+
+The personal library is local to this browser and shared across projects. List
+pages return at most 100 small metadata records, scanning at most 200 including
+deletion markers; image originals are read only for explicit actions. Payloads
+are limited to 64 effects, 128 embedded images and 24 MB of serialized content.
+Metadata and originals are written atomically. Revision checks reject concurrent
+overwrites and durable deletion markers prevent delayed saves from resurrecting
+deleted entries. Reload the library after a conflict.
+
+Reusable treatments preserve ordinary parameters, macro settings and image
+inputs with newly allocated asset identities on application. They contain no
+project palette-token IDs: captured colors stay literal, and restoring a preset
+detaches its previous effect color links. Source-owned Liquify paint, Morph
+geometry and generated Depth Anything maps are excluded. Existing projects and
+applied copies remain usable after library entries are renamed or deleted.

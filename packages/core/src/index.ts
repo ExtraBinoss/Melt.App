@@ -450,3 +450,16 @@ export type {
   SnapProjector,
   SpatialSnapCue,
 } from "./layout/snapping/spatial";
+
+export type { DocumentColor, PaletteSwatch, SavedPalette, ColorTarget } from "./palettes/model";
+export { validateSavedPalette } from "./palettes/validation";
+export { colorTargets, colorOwner, readTargetColor, writeTargetColor } from "./palettes/targets";
+export type { EffectTreatment } from "./effects/presets";
+export {
+  captureEffectTreatment,
+  reusableEffect,
+  validateEffectTreatment,
+  instantiateEffectTreatment,
+  effectMatchesTreatment,
+} from "./effects/presets";
+export { varyPalette } from "./palettes/variation";

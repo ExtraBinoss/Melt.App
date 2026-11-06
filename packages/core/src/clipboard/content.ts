@@ -39,6 +39,7 @@ export function copyContent(
     : selectionComposition(source, selected, [
         snapshot.project.id,
         ...Object.keys(snapshot.project.assets),
+        ...(snapshot.project.colors ?? []).map((color) => color.id),
       ]);
   const page =
     options.composition || !selectedPage.motion
@@ -65,6 +66,7 @@ export function copyContent(
   const document = createProject({
     id: snapshot.project.id,
     name: snapshot.project.name,
+    ...(snapshot.project.colors ? { colors: snapshot.project.colors } : {}),
     pages: [page],
     assets,
   });

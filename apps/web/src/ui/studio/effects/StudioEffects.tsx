@@ -245,6 +245,11 @@ function OwnedEditor({
       {view === "catalog" ? (
         <StudioEffectCatalog
           category={category}
+          treatments={{
+            engine,
+            target: { pageId: page.id, ...(layer ? { layerIds: [layer.id] } : {}) },
+            disabled,
+          }}
           owner={{
             scope: layer ? "layer" : "composition",
             depthAvailable: ownerHasDepth(page, layer?.id),

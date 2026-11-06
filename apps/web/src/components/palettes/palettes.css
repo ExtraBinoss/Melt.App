@@ -1,0 +1,95 @@
+.saved-palette-popover {
+  width: min(390px, calc(100vw - 24px));
+  max-height: min(720px, calc(100dvh - 40px));
+  overflow: auto;
+  contain: layout style;
+  overscroll-behavior: contain;
+}
+.palette-browser,
+.palette-editor,
+.palette-document {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.palette-browser .muted-description {
+  font-size: 11px;
+  line-height: 1.5;
+  margin: 0;
+}
+.palette-actions {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+.palette-actions button {
+  font-size: 11px;
+}
+.palette-swatches {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+.palette-swatch {
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  flex-shrink: 0;
+  box-shadow: inset 0 0 0 1px #ffffff20;
+}
+.palette-swatch:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+.palette-editor-swatches {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.palette-editor-swatch {
+  display: grid;
+  grid-template-columns: 30px minmax(50px, 1fr) 88px 25px 25px;
+  gap: 5px;
+  align-items: center;
+}
+.palette-editor-swatch input {
+  min-width: 0;
+  height: 30px;
+  font-size: 11px;
+  padding: 4px;
+}
+.palette-link-option {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11px;
+}
+.palette-document {
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+  margin-top: 5px;
+}
+.palette-document p {
+  font-size: 11px;
+  margin: 0;
+}
+.palette-shortcut {
+  flex-shrink: 0;
+}
+.effect-color-field > .palette-shortcut {
+  margin-left: 4px;
+}
+.palette-stroke-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.palette-document-color {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+}

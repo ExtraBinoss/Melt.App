@@ -9,6 +9,15 @@ import * as audio from "./audio";
 
 /** Exhaustive domain dispatch: implementations stay beside the relevant property collectors. */
 export const HISTORY_HANDLERS: HistoryHandlers = {
+  setDocumentColors: (context) => {
+    context.history.action("geometry", { kind: "project", projectId: context.project.id });
+  },
+  deleteDocumentColor: (context) => {
+    context.history.action("delete", { kind: "project", projectId: context.project.id });
+  },
+  linkDocumentColor: (context) => {
+    context.history.action("geometry", { kind: "project", projectId: context.project.id });
+  },
   applyBackgroundPreset: (context) => {
     context.history.action("geometry", { kind: "composition", compositionId: context.page.id });
   },

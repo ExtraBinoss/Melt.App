@@ -4,9 +4,14 @@ import type { Point } from "../layers/geometry";
 import type { ClipboardContent } from "./model";
 import type { MotionPropertyTarget } from "../motion/properties/model";
 import { cloneValue } from "../document/immutable";
+import type { DocumentColor } from "../palettes/model";
 
 function reservedIds(project: Project): Set<string> {
-  const result = new Set([project.id, ...Object.keys(project.assets)]);
+  const result = new Set([
+    project.id,
+    ...Object.keys(project.assets),
+    ...(project.colors ?? []).map((color) => color.id),
+  ]);
   for (const page of project.pages) {
     result.add(page.id);
     for (const effect of page.effects ?? []) result.add(effect.id);
@@ -57,6 +62,36 @@ export function pasteContent(
     throw new Error("Clipboard identity allocator is exhausted.");
   }
   const page = cloneValue(content.document.pages[0]!);
+  // Document color references are dependencies: remap identities across projects,
+  // never infer a link from equal literal values or overwrite destination globals.
+  const globals: DocumentColor[] = [],
+    imported = new Map<string, string>();
+  const sourceColors = new Map(content.document.colors?.map((color) => [color.id, color]));
+  const destinationColors = new Map(destination.colors?.map((color) => [color.id, color]));
+  const remap = (owner: { colorLinks?: Record<string, string> }) => {
+    if (!owner.colorLinks) return;
+    owner.colorLinks = Object.fromEntries(
+      Object.entries(owner.colorLinks).map(([key, sourceId]) => {
+        const source = sourceColors.get(sourceId)!;
+        const current = destinationColors.get(sourceId);
+        if (content.sourceProjectId === destination.id && current?.value === source.value)
+          return [key, sourceId];
+        let id = imported.get(sourceId);
+        if (!id) {
+          id = allocate();
+          imported.set(sourceId, id);
+          globals.push({ ...source, id });
+        }
+        return [key, id];
+      }),
+    );
+  };
+  remap(page);
+  for (const effect of page.effects ?? []) remap(effect);
+  for (const layer of page.layers) {
+    remap(layer);
+    for (const effect of layer.effects) remap(effect);
+  }
   const ids = new Map<string, string>();
   const assets: Asset[] = [];
   for (const [id, asset] of Object.entries(content.document.assets)) {
@@ -246,6 +281,7 @@ export function pasteContent(
   return content.kind === "composition"
     ? {
         commands: [
+          ...(globals.length ? [{ type: "setDocumentColors" as const, colors: globals }] : []),
           ...(assets.length ? [{ type: "addAssets" as const, assets }] : []),
           { type: "addPage", page: cloned },
         ],
@@ -254,6 +290,7 @@ export function pasteContent(
       }
     : {
         commands: [
+          ...(globals.length ? [{ type: "setDocumentColors" as const, colors: globals }] : []),
           {
             type: "addLayers",
             layers: cloned.layers.map((layer) =>

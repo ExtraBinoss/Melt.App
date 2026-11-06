@@ -1,3 +1,4 @@
+import { detachChangedColorLinks, detachEditedEffects } from "../palettes/targets";
 import { pruneSceneMotionProperties } from "../motion/scene/structure";
 import { arrangeArtboards } from "./workspace";
 import { ensure } from "../errors";
@@ -35,7 +36,12 @@ export const updatePage: CommandHandler<"updatePage"> = ({ project, page, pageId
   const target =
     command.targetId === undefined ? page : project.pages.find((p) => p.id === command.targetId);
   ensure(target, "NOT_FOUND", "NOT_FOUND");
+  detachChangedColorLinks(target, command.patch);
+  const effects = command.patch.effects
+    ? detachEditedEffects(target.effects ?? [], command.patch.effects)
+    : undefined;
   Object.assign(target, command.patch);
+  if (effects) target.effects = effects;
   if (Object.hasOwn(command.patch, "spatial") || Object.hasOwn(command.patch, "effects"))
     pruneSceneMotionProperties(target);
   return { pageId };

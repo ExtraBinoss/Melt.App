@@ -1,3 +1,4 @@
+import { detachChangedColorLinks, detachEditedEffects } from "../palettes/targets";
 import type { Composition, Layer } from "../document/model";
 import { ensure } from "../errors";
 import { createLayerGeometryIndex } from "./geometry-index";
@@ -49,7 +50,10 @@ export function applyLayerPatches(
       Object.entries(patch).some(([key, value]) => !Object.is(layer[key as keyof Layer], value))
     )
       layer.background = true;
+    detachChangedColorLinks(layer, patch);
+    const effects = patch.effects ? detachEditedEffects(layer.effects, patch.effects) : undefined;
     Object.assign(layer, patch);
+    if (effects) layer.effects = effects;
   }
   if (patches.some(({ patch }) => patch.mask === null)) releaseUnusedMaskSources(page);
 }

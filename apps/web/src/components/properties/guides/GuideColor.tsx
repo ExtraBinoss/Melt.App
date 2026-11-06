@@ -2,6 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from
 import { useTranslation } from "react-i18next";
 import { Popover, PopoverContent, PopoverTrigger } from "../../ui/popover";
 import { Button } from "../../ui/button";
+import { PaletteShortcut } from "../../palettes/PaletteShortcut";
 import { ColorControl } from "../ColorControl";
 import "./guide-color.css";
 import "./messages";
@@ -33,35 +34,49 @@ export function GuideColor({
     if (disabled) cancel.current();
   }, [disabled]);
   return (
-    <Popover
-      open={openedFor === identity && !disabled}
-      onOpenChange={(open) => {
-        setOpenedFor(open ? identity : null);
-        if (!open) onCancel();
-      }}
-    >
-      <PopoverTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon"
-          disabled={disabled}
-          className="guide-color-trigger"
-          aria-label={t("color")}
-        >
-          <span style={{ "--guide-swatch": value } as CSSProperties} />
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="guide-color-popover" align="end" aria-label={t("color")}>
-        <ColorControl
-          identity={identity}
-          value={value}
-          alpha={false}
-          disabled={disabled}
-          onPreview={onPreview}
-          onCommit={onCommit}
-          onCancel={onCancel}
-        />
-      </PopoverContent>
-    </Popover>
+    <>
+      <Popover
+        open={openedFor === identity && !disabled}
+        onOpenChange={(open) => {
+          setOpenedFor(open ? identity : null);
+          if (!open) onCancel();
+        }}
+      >
+        <PopoverTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            disabled={disabled}
+            className="guide-color-trigger"
+            aria-label={t("color")}
+          >
+            <span style={{ "--guide-swatch": value } as CSSProperties} />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="guide-color-popover" align="end" aria-label={t("color")}>
+          <ColorControl
+            showPaletteShortcut={false}
+            identity={identity}
+            value={value}
+            alpha={false}
+            disabled={disabled}
+            onPreview={onPreview}
+            onCommit={onCommit}
+            onCancel={onCancel}
+          />
+        </PopoverContent>
+      </Popover>
+      <PaletteShortcut
+        value={value}
+        disabled={disabled}
+        beforeApply={() => {
+          setOpenedFor(null);
+          onCancel();
+        }}
+        onUse={onCommit}
+        onPreview={onPreview}
+        onCancel={onCancel}
+      />
+    </>
   );
 }

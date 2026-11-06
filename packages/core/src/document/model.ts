@@ -1,3 +1,4 @@
+import type { DocumentColor, PaletteCommand } from "../palettes/model";
 import type { SpatialLayer, SpatialScene } from "../spatial/model";
 import type { BlendMode } from "../layers/blending/catalog";
 import type { VectorDefinition } from "../vector/model";
@@ -89,6 +90,9 @@ export type EffectType =
 /** Effect-owned scalar settings are validated against that effect's definition. */
 export type EffectSettings = Partial<Record<string, number | boolean | string>>;
 export interface Effect {
+  colorLinks?: Record<string, string>;
+  /** Personal-library reference; applied parameter values remain independent and portable. */
+  preset?: { id: string; name: string };
   /** Named immutable image or prepared video assets owned by the portable project. */
   inputs?: Readonly<Record<string, string>>;
   shapeMorph?: ShapeMorph;
@@ -118,6 +122,7 @@ export interface LayerMask {
   inverted: boolean;
 }
 export interface Layer {
+  colorLinks?: Record<string, string>;
   /** Root rectangle paint continues across the composition; false opts out of legacy inference. */
   background?: boolean;
   spatial?: SpatialLayer;
@@ -171,6 +176,7 @@ export interface Guide {
   color?: string;
 }
 export interface Composition {
+  colorLinks?: Record<string, string>;
   /** Applied to the complete blended artboard before output color conversion. Missing means empty. */
   effects?: Effect[];
   spatial?: SpatialScene;
@@ -193,6 +199,7 @@ export interface Composition {
   canvasPosition?: { x: number; y: number };
 }
 export interface Project {
+  colors?: DocumentColor[];
   version: typeof FORMAT_VERSION;
   id: string;
   name: string;
@@ -211,6 +218,7 @@ export interface SessionSnapshot {
   canRedo: boolean;
 }
 export type Command =
+  | PaletteCommand
   | ApplyBackgroundPresetCommand
   | ApplyMotionTransitionCommand
   | MotionCommand

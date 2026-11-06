@@ -151,6 +151,7 @@ function MaterialSolidColor({
         {(color) => (
           <EffectColor
             {...callbacks}
+            paletteTargets={[{ pageId: engine.getSnapshot().pageId, layerId, property: "fill" }]}
             key={identity}
             label={label}
             value={String(color)}

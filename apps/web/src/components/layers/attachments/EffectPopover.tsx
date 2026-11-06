@@ -1,5 +1,5 @@
 import { memo, useCallback, useLayoutEffect, type ReactNode } from "react";
-import { Eye, EyeOff, Trash2, Sun } from "lucide-react";
+import { Eye, EyeOff, Sun } from "lucide-react";
 import {
   getEffectDefinition,
   BLEND_MODES,
@@ -16,6 +16,7 @@ import { Popover, PopoverAnchor, PopoverTrigger, PopoverContent } from "../../ui
 import { IconButton } from "../../shared/IconButton";
 import { ScrollShadow } from "../../shared/scroll/ScrollShadow";
 import { SelectField } from "../../shared/SelectField";
+import { SaveTreatment } from "../../properties/effects/presets/SaveTreatment";
 import { EffectParameters } from "../../properties/effects/EffectParameters";
 import {
   attachmentSelection,
@@ -222,6 +223,9 @@ const EffectDetails = memo(function EffectDetails({
     <MotionFieldProvider editor={editor}>
       <div className="layer-effect-details">
         <LockedLayerNotice engine={engine} page={page} layers={[layer]} run={runCurrent} />
+        <div className="effect-stack-library-save">
+          <SaveTreatment engine={engine} effects={layer.effects} kind="stack" disabled={disabled} />
+        </div>
         {layer.effects
           .filter(
             (effect) =>
@@ -286,13 +290,6 @@ const EffectDetails = memo(function EffectDetails({
                       )}
                     </MotionValueField>
                   </MotionField>
-                  <IconButton
-                    disabled={disabled}
-                    label={t("removeEffect")}
-                    onClick={() => runCurrent(capturePresentationDelete(engine))}
-                  >
-                    <Trash2 size={13} />
-                  </IconButton>
                 </div>
               </div>
               <div className="effect-compositing">
@@ -433,6 +430,7 @@ const EffectDetails = memo(function EffectDetails({
                 </MotionValueField>
               </MotionField>
               <EffectParameters
+                onDelete={() => runCurrent(capturePresentationDelete(engine))}
                 deferOffscreen={Boolean(effectId)}
                 engine={engine}
                 layerId={layer.id}
