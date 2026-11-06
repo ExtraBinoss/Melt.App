@@ -112,10 +112,19 @@ self-overlapping variable glyphs and SVGs without filling their counters.
 
 ## Authoring and Motion
 
-G/R/S select translation, rotation and scale while 3D editing is active; Shift
-snaps. OrbitControls change the composition camera. Normal handles return in 2D
-editing mode. SVG point editing temporarily presents its flat source, without a
+G/R/S select translation, rotation and scale while 3D editing is active. Holding
+Shift snaps translation to 0.1 world units, rotation to 15-degree increments and
+scale to 0.1 increments. Modifier input follows the window and native pointer
+state so it also works when Shift is held before the canvas gains focus; release,
+blur and control disposal clear it. Precision snapping takes precedence over
+nearby geometry attraction. OrbitControls change the composition camera. Normal
+handles return in 2D editing mode. SVG point editing temporarily presents its flat source, without a
 document edit or a change to canonical exports.
+
+Native gizmo drafts also publish an engine-scoped, owner-checked field presentation.
+Property number inputs subscribe imperatively to that sampled page, updating the
+visible values without React owner commits. Cancellation, undo and scope changes
+restore canonical values; release clears the transient page and its subscriptions.
 
 High-frequency gestures use retained scene drafts or an owned page preview.
 Release publishes one validated transaction, including Auto-key routing through

@@ -1,4 +1,4 @@
-import { Matrix4, Vector3, Vector4, type Camera, type Object3D } from "three/webgpu";
+import { MathUtils, Matrix4, Vector3, Vector4, type Camera, type Object3D } from "three/webgpu";
 import type { TransformControls } from "three/addons/controls/TransformControls.js";
 import type { createStore } from "jotai/vanilla";
 import {
@@ -62,7 +62,8 @@ export function installSpatialSnapping(o: Options) {
     raw: Vector3;
     plane?: SnapVector;
   } | null = null;
-  let alt = false;
+  let alt = false,
+    shift = false;
   const matrix = new Matrix4(),
     clip = new Vector4();
   const project = (point: SnapVector) => {
@@ -130,7 +131,7 @@ export function installSpatialSnapping(o: Options) {
       allowed,
       project,
       prefs.threshold,
-      prefs.enabled && !alt,
+      prefs.enabled && !alt && !shift,
       held.plane,
     );
     world.add(new Vector3(...result.correction)).applyMatrix4(held.inverse);
@@ -145,13 +146,25 @@ export function installSpatialSnapping(o: Options) {
     }
   };
   const modifiers = (event: KeyboardEvent | PointerEvent) => {
-    if (alt !== event.altKey) {
-      alt = event.altKey;
-      refresh();
+    const changed = alt !== event.altKey || shift !== event.shiftKey;
+    alt = event.altKey;
+    if (shift !== event.shiftKey) {
+      shift = event.shiftKey;
+      transform.setTranslationSnap(shift ? 0.1 : null);
+      transform.setRotationSnap(shift ? MathUtils.degToRad(15) : null);
+      transform.setScaleSnap(shift ? 0.1 : null);
     }
+    if (changed) refresh();
   };
   const key = (event: KeyboardEvent) => {
-    if (event.key === "Alt") modifiers(event);
+    if (event.key === "Alt" || event.key === "Shift") modifiers(event);
+  };
+  const blur = () => {
+    alt = false;
+    shift = false;
+    transform.setTranslationSnap(null);
+    transform.setRotationSnap(null);
+    transform.setScaleSnap(null);
   };
   const stopPreferences = snappingPreferences.subscribe(refresh);
   const stopFeedback = store.sub(feedback, paint);
@@ -166,6 +179,7 @@ export function installSpatialSnapping(o: Options) {
     paint();
   });
   resize.observe(canvas);
+  window.addEventListener("blur", blur);
   window.addEventListener("keydown", key, true);
   window.addEventListener("keyup", key, true);
   canvas.addEventListener("pointerdown", modifiers, true);
@@ -205,6 +219,8 @@ export function installSpatialSnapping(o: Options) {
       stopEngine();
       stopScene();
       resize.disconnect();
+      window.removeEventListener("blur", blur);
+      blur();
       window.removeEventListener("keydown", key, true);
       window.removeEventListener("keyup", key, true);
       canvas.removeEventListener("pointerdown", modifiers, true);

@@ -1,3 +1,5 @@
+import { createSpatialLayer } from "@musart/core";
+import { spatialGesturePreview } from "../../../../src/state/session/spatial-preview";
 import { expect, test, vi } from "vitest";
 import { createNumberPresentation } from "../../../../src/components/properties/motion/number-presentation";
 import { setup } from "../../../support/ui";
@@ -71,4 +73,58 @@ test("ruler admission shares one metadata observer and never exempts undo or red
   d.engine.undo();
   expect(first).toHaveBeenCalledTimes(2);
   expect(second).toHaveBeenCalledTimes(2);
+});
+
+test("native 3D drafts update numbers without owner renders and restore on cancel or stale scope", () => {
+  const d = setup();
+  d.engine.select([d.rectangle.id]);
+  d.engine.execute({
+    type: "updateLayers",
+    ids: [d.rectangle.id],
+    patch: { spatial: createSpatialLayer("box") },
+  });
+  const origin = d.engine.getSnapshot();
+  const page = origin.project.pages.find((page) => page.id === origin.pageId)!;
+  const source = createNumberPresentation(
+    d.engine,
+    [{ kind: "layer", layerId: d.rectangle.id, property: "spatial.x" }],
+    1,
+    () => 0,
+  );
+  const values: (number | null)[] = [];
+  const owner = vi.fn();
+  const stop = source.subscribe(() => values.push(source.read()));
+  const stopOwner = source.subscribeOwner(owner);
+  const drafts = spatialGesturePreview(d.engine),
+    gesture = {};
+  const draft = {
+    ...page,
+    layers: page.layers.map((layer) =>
+      layer.id === d.rectangle.id ? { ...layer, spatial: { ...layer.spatial!, x: 0.7 } } : layer,
+    ),
+  };
+  try {
+    drafts.publish(gesture, origin, draft);
+    expect(source.read()).toBe(0.7);
+    expect(values).toEqual([0.7]);
+    expect(owner).not.toHaveBeenCalled();
+    expect(d.engine.getSnapshot().project).toBe(origin.project);
+    drafts.clear({});
+    expect(source.read()).toBe(0.7);
+    drafts.clear(gesture);
+    expect(source.read()).toBe(0);
+    expect(values).toEqual([0.7, 0]);
+    drafts.publish(gesture, origin, draft);
+    d.engine.select([]);
+    expect(source.read()).toBe(0);
+    stop();
+    stopOwner();
+    const count = values.length;
+    drafts.clear(gesture);
+    expect(values).toHaveLength(count);
+  } finally {
+    stop();
+    stopOwner();
+    drafts.clear(gesture);
+  }
 });

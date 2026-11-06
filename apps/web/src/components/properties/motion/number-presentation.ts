@@ -6,6 +6,7 @@ import {
   type CommandCommitInfo,
 } from "@musart/core";
 import { createMotionTransport } from "../../../services/motion/transport";
+import { spatialGesturePreview } from "../../../state/session/spatial-preview";
 import { rulerChange } from "../../../services/motion/ruler-change";
 
 /** A committed scalar outside React refs can also be read safely by a render-time store projection. */
@@ -60,13 +61,16 @@ export function createNumberPresentation(
   rangeSensitive = false,
 ) {
   const transport = createMotionTransport(engine);
+  const spatial = spatialGesturePreview(engine);
   const listeners = new Set<() => void>();
   const owners = new Set<() => void>();
   let stop: (() => void) | undefined;
   const read = () => {
     const snapshot = engine.getSnapshot();
     const page =
-      transport.readFrame() ?? snapshot.project.pages.find((item) => item.id === snapshot.pageId)!;
+      spatial.read() ??
+      transport.readFrame() ??
+      snapshot.project.pages.find((item) => item.id === snapshot.pageId)!;
     const values = addresses.map((address) => resolveMotionProperty(page, address)?.value);
     return typeof values[0] !== "number"
       ? fallback()
@@ -96,7 +100,7 @@ export function createNumberPresentation(
       value = read(),
       owner = readOwner();
     const stopHistory = summarized(engine) ? observeHistory(engine, emitFields) : () => {};
-    const stopTransport = transport.subscribe(() => {
+    const update = () => {
       const nextSnapshot = engine.getSnapshot(),
         next = transport.read(),
         nextValue = read();
@@ -118,8 +122,11 @@ export function createNumberPresentation(
       owner = nextOwner;
       if (changed) emitFields();
       if (ownerChanged) for (const listener of owners) listener();
-    });
+    };
+    const stopTransport = transport.subscribe(update);
+    const stopSpatial = spatial.subscribe(update);
     stop = () => {
+      stopSpatial();
       stopTransport();
       stopHistory();
     };

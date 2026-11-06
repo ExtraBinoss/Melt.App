@@ -2,15 +2,7 @@ import { installSpatialSnapping } from "./snapping/controls";
 import { useEffect, useMemo, useRef } from "react";
 import { useStore } from "jotai";
 import { useFrame, useThree } from "@react-three/fiber";
-import {
-  Group,
-  MathUtils,
-  Scene,
-  Vector2,
-  Vector3,
-  type Camera,
-  type WebGPURenderer,
-} from "three/webgpu";
+import { Group, Scene, Vector2, Vector3, type Camera, type WebGPURenderer } from "three/webgpu";
 import { TransformControls } from "three/addons/controls/TransformControls.js";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import {
@@ -273,18 +265,6 @@ export default function SpatialControls({ engine, controller, target }: Props) {
               : null,
           );
       }
-      if (event.key === "Shift") {
-        transform.setTranslationSnap(0.1);
-        transform.setRotationSnap(MathUtils.degToRad(15));
-        transform.setScaleSnap(0.1);
-      }
-    };
-    const keyUp = (event: KeyboardEvent) => {
-      if (event.key === "Shift") {
-        transform.setTranslationSnap(null);
-        transform.setRotationSnap(null);
-        transform.setScaleSnap(null);
-      }
     };
     canvas.setAttribute("tabindex", "0");
     canvas.setAttribute("data-keybinding-capture", "");
@@ -297,7 +277,6 @@ export default function SpatialControls({ engine, controller, target }: Props) {
     canvas.addEventListener("wheel", block);
     canvas.addEventListener("contextmenu", context);
     viewport?.addEventListener("keydown", key, true);
-    viewport?.addEventListener("keyup", keyUp, true);
     window.addEventListener("blur", cancel);
     const stop = controller.subscribe(() => {
         gesture.invalidate();
@@ -326,7 +305,6 @@ export default function SpatialControls({ engine, controller, target }: Props) {
       canvas.removeEventListener("wheel", block);
       canvas.removeEventListener("contextmenu", context);
       viewport?.removeEventListener("keydown", key, true);
-      viewport?.removeEventListener("keyup", keyUp, true);
       window.removeEventListener("blur", cancel);
       for (const id of pointers) if (canvas.hasPointerCapture(id)) canvas.releasePointerCapture(id);
       pointers.clear();

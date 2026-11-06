@@ -2,7 +2,7 @@ import { installSpatialSnapping } from "./snapping/controls";
 import { useEffect, useMemo, useRef } from "react";
 import { useStore } from "jotai";
 import { useFrame, useThree } from "@react-three/fiber";
-import { Group, MathUtils, Scene, Vector3, type WebGPURenderer } from "three/webgpu";
+import { Group, Scene, Vector3, type WebGPURenderer } from "three/webgpu";
 import { TransformControls } from "three/addons/controls/TransformControls.js";
 import { StudioOrbit } from "./StudioOrbit";
 import {
@@ -391,18 +391,6 @@ export default function StudioControls({ engine, controller, target }: Props) {
         event.stopPropagation();
         cancel();
       }
-      if (event.key === "Shift") {
-        transform.setTranslationSnap(0.1);
-        transform.setRotationSnap(MathUtils.degToRad(15));
-        transform.setScaleSnap(0.1);
-      }
-    };
-    const keyUp = (event: KeyboardEvent) => {
-      if (event.key === "Shift") {
-        transform.setTranslationSnap(null);
-        transform.setRotationSnap(null);
-        transform.setScaleSnap(null);
-      }
     };
     const interruptKey = (event: KeyboardEvent) => {
       if (!orbit.coasting) return;
@@ -447,7 +435,6 @@ export default function StudioControls({ engine, controller, target }: Props) {
     surface.addEventListener("pointerup", release);
     surface.addEventListener("pointercancel", cancel, true);
     viewport?.addEventListener("keydown", key, true);
-    viewport?.addEventListener("keyup", keyUp, true);
     window.addEventListener("blur", cancel);
     const stop = controller.subscribe(() => {
       gesture.invalidate();
@@ -485,7 +472,6 @@ export default function StudioControls({ engine, controller, target }: Props) {
       surface.removeEventListener("pointerup", release);
       surface.removeEventListener("pointercancel", cancel, true);
       viewport?.removeEventListener("keydown", key, true);
-      viewport?.removeEventListener("keyup", keyUp, true);
       window.removeEventListener("blur", cancel);
       snapping.dispose();
       transform.dispose();

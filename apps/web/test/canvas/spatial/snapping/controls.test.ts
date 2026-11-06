@@ -172,3 +172,45 @@ test("the perspective center handle retains the camera quaternion plane even off
     snappingPreferences.update(prefs);
   }
 });
+
+test("Shift precision survives outside focus and pointer entry, overrides attraction and releases cleanly", () => {
+  const f = fixture(),
+    prefs = snappingPreferences.read();
+  snappingPreferences.update({ enabled: true, threshold: 6 });
+  const input = document.createElement("input");
+  document.body.append(input);
+  try {
+    f.gesture.begin("moving", "translate");
+    f.adapter.begin("moving");
+    f.proxy.position.x = 0.01;
+    f.adapter.change();
+    expect(f.feedback()).toHaveLength(1);
+    input.focus();
+    input.dispatchEvent(
+      new KeyboardEvent("keydown", { key: "Shift", shiftKey: true, bubbles: true }),
+    );
+    expect(f.transform.translationSnap).toBe(0.1);
+    expect(f.transform.rotationSnap).toBeCloseTo(Math.PI / 12);
+    expect(f.transform.scaleSnap).toBe(0.1);
+    expect(f.feedback()).toHaveLength(0);
+    expect(f.proxy.position.x).toBeCloseTo(0.01);
+    input.dispatchEvent(new KeyboardEvent("keyup", { key: "Shift", bubbles: true }));
+    expect(f.transform.translationSnap).toBeNull();
+    expect(f.transform.rotationSnap).toBeNull();
+    expect(f.transform.scaleSnap).toBeNull();
+    expect(f.feedback()).toHaveLength(1);
+    // A Shift key held before these controls mounted is recovered from native pointer input.
+    f.canvas.dispatchEvent(new PointerEvent("pointermove", { shiftKey: true }));
+    expect(f.transform.rotationSnap).toBeCloseTo(Math.PI / 12);
+    window.dispatchEvent(new Event("blur"));
+    expect(f.transform.translationSnap).toBeNull();
+    expect(f.transform.rotationSnap).toBeNull();
+    expect(f.transform.scaleSnap).toBeNull();
+    f.dispose();
+    window.dispatchEvent(new KeyboardEvent("keydown", { key: "Shift", shiftKey: true }));
+    expect(f.transform.rotationSnap).toBeNull();
+  } finally {
+    input.remove();
+    snappingPreferences.update(prefs);
+  }
+});

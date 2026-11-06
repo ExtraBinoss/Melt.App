@@ -9,6 +9,7 @@ import {
 import { MathUtils, type Object3D } from "three/webgpu";
 import type { createStore } from "jotai/vanilla";
 type Store = ReturnType<typeof createStore>;
+import { spatialGesturePreview } from "../../state/session/spatial-preview";
 import { previewAtom } from "../../state/session/editor";
 import {
   captureMotionEdit,
@@ -117,6 +118,11 @@ export class SpatialGesture {
       null,
       this,
     );
+    spatialGesturePreview(this.engine).publish(
+      this,
+      held.origin.snapshot,
+      this.controller.read().page,
+    );
   }
   beginOrbit() {
     this.cancel();
@@ -173,5 +179,6 @@ export class SpatialGesture {
     if (orbit?.preview && this.store.get(previewAtom) === orbit.preview)
       this.store.set(previewAtom, null);
     this.controller.clearGesture(this);
+    spatialGesturePreview(this.engine).clear(this);
   }
 }

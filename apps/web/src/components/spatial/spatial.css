@@ -1,4 +1,5 @@
 .spatial-properties {
+  container: spatial-fields / inline-size;
   display: grid;
   gap: 12px;
 }
@@ -168,4 +169,75 @@
   color: var(--destructive);
   font-size: 11px;
   margin: 6px 0 0;
+}
+
+/* Keep identical value columns and baselines, independent of translated label length. */
+.spatial-transform-row {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+.spatial-transform-heading {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted-foreground);
+  font-size: 11px;
+  line-height: 18px;
+}
+.spatial-axis-grid .number-field {
+  display: grid;
+  grid-template-columns: 26px minmax(0, 1fr) 16px;
+}
+.spatial-axis-grid .number-field input {
+  width: 100%;
+}
+.spatial-axis-grid .number-scrub {
+  width: 26px;
+  min-width: 26px;
+  max-width: 26px;
+  padding: 0;
+}
+.spatial-axis-grid .number-unit {
+  min-width: 16px;
+  padding-inline: 2px;
+}
+.spatial-axis-label {
+  font-variant-numeric: tabular-nums;
+}
+.spatial-advanced-grid .number-field {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: 32px 30px;
+  height: 64px;
+}
+.spatial-advanced-grid .number-scrub {
+  width: 100%;
+  max-width: none;
+  min-width: 0;
+  padding: 3px 8px;
+  border-right: 0;
+  border-bottom: 1px solid var(--border);
+  line-height: 13px;
+  white-space: normal;
+}
+.spatial-advanced-grid .number-field input {
+  width: 100%;
+}
+.spatial-parameter-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+}
+.spatial-parameter-label > svg {
+  display: none;
+}
+@container spatial-fields (max-width: 270px) {
+  .spatial-advanced-grid .spatial-parameter-label > svg {
+    display: block;
+  }
+  .spatial-advanced-grid .spatial-parameter-label > span {
+    display: none;
+  }
 }

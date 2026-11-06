@@ -178,6 +178,7 @@ export function CanvasSpatialEditing({
                 <IconButton
                   key={tool}
                   label={t(tool)}
+                  tooltipSide="top"
                   shortcut={shortcut}
                   active={editing?.tool === tool}
                   onClick={() => {
@@ -193,6 +194,7 @@ export function CanvasSpatialEditing({
             {!active && layer.kind === "vector" && (
               <IconButton
                 label={t("vectorEditor:edit")}
+                tooltipSide="top"
                 onClick={() => {
                   setEditing(null);
                   setVector(vectorEditingTarget(engine, layer.id));

@@ -1,5 +1,21 @@
 import { useTranslation } from "react-i18next";
-import { Box } from "lucide-react";
+import {
+  Blend,
+  Box,
+  CircleDashed,
+  Diamond,
+  Flame,
+  Layers,
+  Move3D,
+  Rainbow,
+  Rotate3D,
+  Scaling,
+  Settings2,
+  Spline,
+  Sun,
+  Waves,
+  type LucideIcon,
+} from "lucide-react";
 import {
   createSpatialLayer,
   type EnginePort,
@@ -15,6 +31,46 @@ import { MotionNumberInput } from "../properties/motion/MotionNumberInput";
 import { MaterialControl } from "./MaterialControl";
 import { useWorkspaceMode } from "../../ui/studio/workspace-mode";
 import "./messages";
+const transformRows = [
+  { label: "position", icon: Move3D, fields: ["x", "y", "z"], min: -1000, max: 1000, step: 0.1 },
+  {
+    label: "rotation",
+    icon: Rotate3D,
+    fields: ["rotationX", "rotationY", "rotationZ"],
+    min: -360000,
+    max: 360000,
+    step: 1,
+  },
+  {
+    label: "scale",
+    icon: Scaling,
+    fields: ["scaleX", "scaleY", "scaleZ"],
+    min: 0.001,
+    max: 100,
+    step: 0.01,
+  },
+] as const;
+const parameterIcons: Readonly<Record<string, LucideIcon>> = {
+  transmission: Blend,
+  ior: Diamond,
+  clearcoat: Layers,
+  clearcoatRoughness: Waves,
+  sheen: Sun,
+  iridescence: Rainbow,
+  emissiveIntensity: Flame,
+  opacity: CircleDashed,
+  bevelSegments: Spline,
+  curveSegments: Spline,
+};
+function parameterLabel(key: string, label: string) {
+  const Icon = parameterIcons[key] ?? Settings2;
+  return (
+    <span className="spatial-parameter-label" title={label}>
+      <Icon size={14} aria-hidden="true" />
+      <span>{label}</span>
+    </span>
+  );
+}
 interface Props {
   engine: EnginePort;
   run: (task: () => void) => void;
@@ -89,6 +145,13 @@ export function SpatialLayerProperties({ engine, layer, patch, preview, cancel, 
         target={{ kind: "layer", layerId: layer.id, property: `spatial.${key}` }}
         identity={layer}
         label={label}
+        scrubLabel={
+          key.length === 1 || /^(rotation|scale)[XYZ]$/.test(key) ? (
+            <span className="spatial-axis-label">{axis}</span>
+          ) : (
+            parameterLabel(key, label)
+          )
+        }
         value={settings[key]}
         min={min}
         max={max}
@@ -118,6 +181,7 @@ export function SpatialLayerProperties({ engine, layer, patch, preview, cancel, 
         }}
         identity={layer}
         label={t(key)}
+        scrubLabel={parameterLabel(key, t(key))}
         value={settings.material[key]}
         min={min}
         max={max}
@@ -196,21 +260,17 @@ export function SpatialLayerProperties({ engine, layer, patch, preview, cancel, 
               <AccordionTrigger>{t("transform")}</AccordionTrigger>
               <AccordionContent>
                 <div className="spatial-accordion-body">
-                  <div className="spatial-axis-grid">
-                    {field("x", -1000, 1000)}
-                    {field("y", -1000, 1000)}
-                    {field("z", -1000, 1000)}
-                  </div>
-                  <div className="spatial-axis-grid">
-                    {field("rotationX", -360000, 360000, 1)}
-                    {field("rotationY", -360000, 360000, 1)}
-                    {field("rotationZ", -360000, 360000, 1)}
-                  </div>
-                  <div className="spatial-axis-grid">
-                    {field("scaleX", 0.001, 100, 0.01)}
-                    {field("scaleY", 0.001, 100, 0.01)}
-                    {field("scaleZ", 0.001, 100, 0.01)}
-                  </div>
+                  {transformRows.map(({ label, icon: Icon, fields, min, max, step }) => (
+                    <div key={label} className="spatial-transform-row" data-transform-kind={label}>
+                      <div className="spatial-transform-heading" title={t(label)}>
+                        <Icon size={13} aria-hidden="true" />
+                        <span>{t(label)}</span>
+                      </div>
+                      <div className="spatial-axis-grid">
+                        {fields.map((key) => field(key, min, max, step))}
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </AccordionContent>
             </AccordionItem>
@@ -219,7 +279,7 @@ export function SpatialLayerProperties({ engine, layer, patch, preview, cancel, 
                 <AccordionTrigger>{t("advanced")}</AccordionTrigger>
                 <AccordionContent>
                   <div className="spatial-accordion-body">
-                    <div className="fields-grid">
+                    <div className="fields-grid spatial-advanced-grid">
                       {showMaterial && (
                         <>
                           {materialField("transmission")}
