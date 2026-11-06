@@ -253,7 +253,8 @@ export function FieldMenu({
               className={cn("select-scroll-content p-0", contentClassName)}
               style={{
                 width: "var(--radix-popover-trigger-width)",
-                minWidth: "var(--radix-popover-trigger-width)",
+                minWidth:
+                  "min(calc(100dvw - 20px), max(var(--radix-popover-trigger-width), var(--select-menu-min-width, 0px)))",
                 maxWidth: "calc(100dvw - 20px)",
               }}
             >

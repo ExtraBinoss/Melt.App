@@ -263,6 +263,10 @@ export const Inspector = memo(
                       label={t("colorMode")}
                       value={page.colorSpace ?? "srgb"}
                       className="color-mode-select"
+                      contentClassName="color-mode-menu"
+                      selectedLabel={
+                        page.colorSpace === "cmyk" ? t("exportPanel:cmykShort") : undefined
+                      }
                       options={[
                         { value: "srgb", label: "sRGB" },
                         { value: "display-p3", label: "Display P3" },

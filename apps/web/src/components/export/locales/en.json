@@ -10,6 +10,7 @@
   "print": "Print",
   "close": "Close",
   "colors": "Color output",
+  "cmykShort": "CMYK",
   "cmyk": "CMYK · standard coated paper",
   "cmykHint": "CGATS21 CRPC6 ICC profile. White paper; transparent areas are flattened. Confirm the profile with your printer.",
   "srgbHint": "sRGB for screens and the web.",

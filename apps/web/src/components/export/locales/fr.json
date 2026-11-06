@@ -10,6 +10,7 @@
   "print": "Impression",
   "close": "Fermer",
   "colors": "Couleurs de sortie",
+  "cmykShort": "CMJN",
   "cmyk": "CMJN · papier couché standard",
   "cmykHint": "Profil ICC CGATS21 CRPC6. Papier blanc ; les zones transparentes sont aplaties. Vérifiez le profil avec votre imprimeur.",
   "srgbHint": "sRGB pour les écrans et le web.",

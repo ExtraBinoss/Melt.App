@@ -4,6 +4,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ## [Unreleased]
 
+- Keep the inspector color-space selector readable: reserve space for its selected label and give its local menu enough width for sRGB, Display P3 and CMYK labels while retaining viewport bounds, keyboard focus and nonmodal behavior.
+
 - Document the paid cloud product direction, provider-neutral persistence, storage-funded project allowances, shared authenticated MCP/headless access, creative resources, collaboration transports and history/cost optimization in docs/paid_plan/.
 
 - Make Shift precision snapping reliable in Classic and Studio 3D controls, including when held before canvas focus or released elsewhere. Preserve 15-degree rotation and 0.1 translation/scale steps without geometry attraction overriding them, reset modifiers on blur/disposal, and place the floating 2D/3D toolbar’s tooltips vertically. Keep property numbers synchronized imperatively during native gestures, restoring them on cancel/undo, and align responsive Transform/Advanced fields with compact axes and icons for narrow panels.
