@@ -1,4 +1,4 @@
-import type { Composition, MotionFrameRate, OutputFraming } from "@musart/core";
+import type { Composition, MotionFrameRate, MotionTime, OutputFraming } from "@musart/core";
 import type { ManagedImageOptions } from "@musart/render";
 import type { ExportOptions } from "../../state/contracts";
 
@@ -32,6 +32,7 @@ export type CompositionExportOptions = {
       selection?: readonly string[];
       container: "auto" | "mp4" | "webm";
       frameRate?: MotionFrameRate;
+      staticDuration?: MotionTime;
       videoBitrate?: number;
       audioBitrate?: number;
       audio?: boolean;

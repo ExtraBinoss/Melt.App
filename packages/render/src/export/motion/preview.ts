@@ -11,6 +11,7 @@ import {
   type Project,
 } from "@musart/core";
 import { createRenderSession } from "../standalone";
+import { compositionVideoTiming } from "./timing";
 import { MotionExportError } from "./errors";
 import type { MotionPreviewOptions, MotionPreviewState } from "./preview-model";
 import { BufferedPlaybackClock, PLAYBACK_FRAME_CREDIT_MS } from "../../playback";
@@ -19,11 +20,7 @@ import { BufferedPlaybackClock, PLAYBACK_FRAME_CREDIT_MS } from "../../playback"
 export function createMotionPreview(project: Project, options: MotionPreviewOptions) {
   const assets = structuredClone(project.assets);
   const program = compileMotion({ ...project, assets }, { compositionId: options.compositionId });
-  if (program.mode !== "motion" || !program.duration)
-    throw new MotionExportError(
-      "missingMotion",
-      "Motion preview requires an authored Motion composition.",
-    );
+  const timing = compositionVideoTiming(program, options);
   const selection = selectionFrameScope(
     program.composition,
     options.selection,
@@ -39,12 +36,8 @@ export function createMotionPreview(project: Project, options: MotionPreviewOpti
     request: (callback: () => void) => requestAnimationFrame(callback),
     cancel: (handle: number) => cancelAnimationFrame(handle),
   };
-  const duration = motionTimeToSeconds(program.duration);
-  const frameRate = Math.min(
-    30,
-    program.composition.motion!.frameRate.numerator /
-      program.composition.motion!.frameRate.denominator,
-  );
+  const duration = motionTimeToSeconds(timing.duration);
+  const frameRate = Math.min(30, timing.frameRate.numerator / timing.frameRate.denominator);
   const session = createRenderSession({
     mediaResolver: options.mediaResolver,
     fontResolver: options.fontResolver,
@@ -63,12 +56,13 @@ export function createMotionPreview(project: Project, options: MotionPreviewOpti
   let state: MotionPreviewState = {
     playing: true,
     time: { value: 0, rate: 1 },
-    duration: program.duration,
+    duration: timing.duration,
     busy: false,
     error: null,
   };
   let frame: number | null = null,
     pending: Promise<void> | null = null;
+  let staticPresented = false;
   let generation = 0,
     dirty = true,
     closed = false;
@@ -105,7 +99,12 @@ export function createMotionPreview(project: Project, options: MotionPreviewOpti
       schedule();
       return;
     }
-    const plan = evaluateMotion(program, time);
+    if (program.mode === "static" && staticPresented && !dirty) {
+      publish({ time });
+      schedule();
+      return;
+    }
+    const plan = evaluateMotion(program, program.mode === "static" ? { value: 0, rate: 1 } : time);
     const releaseFrame = clock.hold(bootstrapRelease ? 0 : PLAYBACK_FRAME_CREDIT_MS);
     dirty = false;
     publish({ busy: true });
@@ -113,7 +112,10 @@ export function createMotionPreview(project: Project, options: MotionPreviewOpti
       selection.frame(applyMotionFrame(program, plan)),
       assets,
       (canvas) => {
-        if (!closed && owner === generation) options.onFrame(canvas, session.stats()?.backend);
+        if (!closed && owner === generation) {
+          staticPresented = true;
+          options.onFrame(canvas, session.stats()?.backend);
+        }
       },
       {
         scale: previewScale,

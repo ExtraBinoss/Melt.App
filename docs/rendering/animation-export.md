@@ -24,3 +24,14 @@ copyable preview and export errors and console diagnostics. Production pixel
 readback probes remained zero. Captures are in `artifacts/timelapse-recovery/`.
 
 Primary references: [media sources](https://mediabunny.dev/guide/media-sources), [writing files](https://mediabunny.dev/guide/writing-media-files), [samples and packets](https://mediabunny.dev/guide/packets-and-samples).
+
+## Still-video output
+
+`exportMotionVideo` and `createMotionPreview` also accept Static compositions.
+`staticDuration` is an optional exact rational duration, defaulting to two seconds;
+`frameRate` defaults to 30 fps for export. Authored Motion ignores `staticDuration`.
+Static output evaluates its frozen program once at time zero and reuses that page
+and frame plan for every native encoder submission. Retained Motion tracks remain
+inactive and no audio mixer is opened. The preview renders once and advances only
+its player clock until an explicit seek invalidates the presentation. Existing
+frame/output/GPU budgets, cancellation, framing and cleanup still apply.

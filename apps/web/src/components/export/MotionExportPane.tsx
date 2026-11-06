@@ -10,6 +10,7 @@ import { ExportLayout, ExportAdvanced } from "./ExportLayout";
 import { useStartExport } from "./use-start-export";
 import type { ExportPaneProps } from "./workspace-model";
 import { SelectField } from "../shared/SelectField";
+import { NumberInput } from "../shared/NumberInput";
 import { Label } from "../ui/label";
 import { Switch } from "../ui/switch";
 
@@ -24,6 +25,7 @@ export function MotionExportPane(props: ExportPaneProps) {
     );
   const [scale, setScale] = useState(1),
     [container, setContainer] = useState<"auto" | "mp4" | "webm">("auto");
+  const [staticSeconds, setStaticSeconds] = useState(2);
   const [fps, setFps] = useState("composition"),
     [bitrate, setBitrate] = useState(8_000_000),
     [audio, setAudio] = useState(true);
@@ -42,15 +44,22 @@ export function MotionExportPane(props: ExportPaneProps) {
     width: Math.max(1, Math.round((props.framing?.width ?? scope.width) * scale)),
     height: Math.max(1, Math.round((props.framing?.height ?? scope.height) * scale)),
   };
-  const motion = page.motion!;
+  const animated = page.motion?.mode === "motion";
+  const motion = animated ? page.motion! : null;
+  const baseRate = motion?.frameRate ?? { numerator: 30, denominator: 1 };
+  const staticDuration = useMemo(
+    () => ({ value: Math.round(staticSeconds * 1000), rate: 1000 }),
+    [staticSeconds],
+  );
   const rate =
     fps === "composition"
-      ? motion.frameRate
+      ? baseRate
       : { numerator: Number(fps.split("/")[0]), denominator: Number(fps.split("/")[1] ?? 1) };
-  const duration = motion.duration.value / motion.duration.rate;
+  const duration = motion ? motion.duration.value / motion.duration.rate : staticSeconds;
   const hasAudio = Boolean(
-    (!selection.length && motion.audioTracks?.length) ||
-    scope.layers.some((layer) => layer.kind === "video"),
+    animated &&
+    ((!selection.length && motion?.audioTracks?.length) ||
+      scope.layers.some((layer) => layer.kind === "video")),
   );
   const sizeKey = exportSizeKey(origin.project, [
     "motion",
@@ -64,6 +73,7 @@ export function MotionExportPane(props: ExportPaneProps) {
     rate.denominator,
     bitrate,
     audio,
+    animated ? null : staticDuration,
   ]);
   const start = useStartExport(props, "motion", sizeKey);
   return (
@@ -77,6 +87,7 @@ export function MotionExportPane(props: ExportPaneProps) {
           <MotionExportPreview
             project={origin.project}
             page={page}
+            staticDuration={animated ? undefined : staticDuration}
             services={services}
             selection={selection}
             centerSelection={props.centerSelection}
@@ -111,9 +122,10 @@ export function MotionExportPane(props: ExportPaneProps) {
               framing: props.framing,
               container,
               frameRate: rate,
+              staticDuration: animated ? undefined : staticDuration,
               videoBitrate: bitrate,
               audioBitrate: 192_000,
-              audio,
+              audio: animated && audio,
               selection,
               signal,
               onProgress: progress,
@@ -160,6 +172,21 @@ export function MotionExportPane(props: ExportPaneProps) {
           onValueChange={(value) => setScale(Number(value))}
         />
       </div>
+      {!animated && (
+        <>
+          <NumberInput
+            label={t("staticDuration")}
+            value={staticSeconds}
+            min={0.1}
+            max={3600}
+            step={0.1}
+            unit="s"
+            disabled={busy}
+            onCommit={setStaticSeconds}
+          />
+          <p className="muted-description">{t("staticVideoHint")}</p>
+        </>
+      )}
       {hasAudio && (
         <label className="switch-row">
           <span>{t("includeAudio")}</span>
@@ -182,9 +209,11 @@ export function MotionExportPane(props: ExportPaneProps) {
             options={[
               {
                 value: "composition",
-                label: t("authoredRate", {
-                  rate: motion.frameRate.numerator / motion.frameRate.denominator,
-                }),
+                label: animated
+                  ? t("authoredRate", {
+                      rate: baseRate.numerator / baseRate.denominator,
+                    })
+                  : "30 fps",
               },
               ...["24", "25", "30", "60", "24000/1001", "30000/1001", "60000/1001"].map(
                 (value) => ({ value, label: `${value} fps` }),

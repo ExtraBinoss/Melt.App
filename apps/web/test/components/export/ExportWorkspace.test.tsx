@@ -205,3 +205,34 @@ test("format presets control delivered image dimensions without editing the docu
   await waitFor(() => expect(getExportJobs(d.engine).pending).toBe(false));
   expect(d.engine.getSnapshot()).toBe(before);
 });
+
+test("single-page PNG hides empty Advanced and Static keeps a usable video export without editing Motion", async () => {
+  const d = setup(),
+    before = d.engine.getSnapshot();
+  d.services.exportComposition = vi.fn(async () => ({
+    mode: "motion" as const,
+    filename: "still.webm",
+    mimeType: "video/webm",
+    bytes: 10,
+    width: 64,
+    height: 64,
+  }));
+  d.mount(<ExportWorkspace engine={d.engine} services={d.services} onClose={vi.fn()} />);
+  expect(screen.queryByRole("button", { name: "Avancé" })).toBeNull();
+  fireEvent.click(screen.getByRole("radio", { name: "Vidéo", exact: true }));
+  expect(screen.getByRole("textbox", { name: "Durée de la vidéo" })).toHaveValue("2");
+  expect(screen.getByRole("button", { name: "Avancé" })).toBeVisible();
+  fireEvent.click(screen.getByRole("button", { name: "Exporter la vidéo" }));
+  await waitFor(() =>
+    expect(d.services.exportComposition).toHaveBeenCalledWith(
+      expect.objectContaining({
+        mode: "motion",
+        staticDuration: { value: 2000, rate: 1000 },
+        audio: false,
+      }),
+      expect.objectContaining({ page: d.page, revision: before.revision }),
+    ),
+  );
+  await waitFor(() => expect(getExportJobs(d.engine).pending).toBe(false));
+  expect(d.engine.getSnapshot()).toBe(before);
+});

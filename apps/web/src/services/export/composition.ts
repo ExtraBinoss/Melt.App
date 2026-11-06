@@ -46,8 +46,7 @@ export function createCompositionExporter(
       project.id !== scope.projectId ||
       options.compositionId !== scope.compositionId ||
       snapshot.revision !== scope.revision ||
-      page !== scope.page ||
-      (options.mode === "motion" && page.motion?.mode !== "motion")
+      page !== scope.page
     )
       throw new ExportScopeError();
     let replaced = false;
@@ -79,6 +78,7 @@ export function createCompositionExporter(
           framing: options.framing,
           container: options.container,
           frameRate: options.frameRate,
+          staticDuration: options.staticDuration,
           videoBitrate: options.videoBitrate,
           audioBitrate: options.audioBitrate,
           audio: options.audio === false ? false : {},

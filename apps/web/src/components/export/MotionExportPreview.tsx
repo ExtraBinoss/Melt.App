@@ -5,6 +5,7 @@ import {
   type Composition,
   type Project,
   type OutputFraming,
+  type MotionTime,
 } from "@musart/core";
 import { PreviewPreparation } from "./PreviewPreparation";
 import { PreviewAudio } from "../../services/motion/audio/preview";
@@ -23,6 +24,7 @@ export function MotionExportPreview({
   selection,
   centerSelection = false,
   framing,
+  staticDuration,
 }: {
   project: Project;
   page: Composition;
@@ -31,6 +33,7 @@ export function MotionExportPreview({
   selection?: readonly string[];
   centerSelection?: boolean;
   framing?: OutputFraming;
+  staticDuration?: MotionTime;
   onReady?: (preview: ReturnType<typeof createMotionPreview> | null) => void;
 }) {
   const { t } = useTranslation("exportPanel");
@@ -41,8 +44,8 @@ export function MotionExportPreview({
   const retiring = useRef<Promise<void>>(Promise.resolve());
   const pauseRequested = useRef(paused);
   const owner = useMemo(
-    () => ({ project, page, selection, centerSelection, framing }),
-    [project, page, selection, centerSelection, framing],
+    () => ({ project, page, selection, centerSelection, framing, staticDuration }),
+    [project, page, selection, centerSelection, framing, staticDuration],
   );
   const [playing, setPlaying] = useState(true);
   const [presentation, setPresentation] = useState<{
@@ -68,6 +71,7 @@ export function MotionExportPreview({
         if (!active) return;
         preview = createMotionPreview(project, {
           compositionId: page.id,
+          staticDuration,
           selection,
           centerSelection,
           framing,
@@ -86,7 +90,7 @@ export function MotionExportPreview({
         });
         source.current = preview;
         let monitored = project;
-        if (selection?.length) {
+        if (selection?.length && page.motion?.mode === "motion") {
           const selected = selectionComposition(page, selection);
           const ids = new Set(selected.layers.map((layer) => layer.id));
           monitored = {
@@ -105,8 +109,9 @@ export function MotionExportPreview({
         }
         const monitoredPage = monitored.pages.find((item) => item.id === page.id)!;
         if (
-          monitoredPage.layers.some((layer) => layer.kind === "video") ||
-          monitoredPage.motion?.audioTracks?.length
+          monitoredPage.motion?.mode === "motion" &&
+          (monitoredPage.layers.some((layer) => layer.kind === "video") ||
+            monitoredPage.motion?.audioTracks?.length)
         ) {
           audio = new PreviewAudio({
             source: () => ({ project: monitored, pageId: page.id }),
@@ -178,13 +183,17 @@ export function MotionExportPreview({
     selection,
     centerSelection,
     framing,
+    staticDuration,
     owner,
   ]);
   useEffect(() => {
     pauseRequested.current = paused;
     if (paused) source.current?.pause();
   }, [paused]);
-  const duration = page.motion!.duration.value / page.motion!.duration.rate;
+  const duration =
+    page.motion?.mode === "motion"
+      ? page.motion.duration.value / page.motion.duration.rate
+      : (staticDuration?.value ?? 2) / (staticDuration?.rate ?? 1);
   return (
     <div className="motion-export-preview">
       <div

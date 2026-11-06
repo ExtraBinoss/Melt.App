@@ -2,7 +2,14 @@
 
 Image, Motion and Timelapse use the same responsive dialog: useful settings in
 the scrolling left column, a preview/player in the right column and a fixed
-footer. Extra encoder controls are collapsed under **Advanced**. PDF controls
+footer. Extra encoder controls are collapsed under **Advanced**; that accordion
+is omitted when the selected image format and scope have no extra controls.
+**Video** stays available in Static mode: its duration is configurable from 0.1
+to 3600 seconds, defaulting to two seconds at 30 fps. It holds the base design
+(including static source-frame choices) without activating retained Motion keys,
+effect behaviors or audio. The editor document and undo history remain unchanged.
+The still preview reuses its rendered frame as its player clock advances. Authored
+Motion output retains its original timeline duration, animation and audio mix. PDF controls
 are collapsed under **Print**. The ordinary export path is two clicks: open,
 then export. Switching output type uses one direct segmented choice, so that
 path also takes three clicks. The editor has one full Export button; Timelapse

@@ -6,10 +6,11 @@ import {
   openMotionAudioSource,
 } from "../../../src/export/motion/index";
 
-it("exposes a headless API that rejects a static composition before acquiring native media resources", async () => {
+it("rejects invalid static video duration before acquiring native media resources", async () => {
   await expect(
     exportMotionVideo(createProject({ pages: [createPage({ id: "static" })] }), {
       compositionId: "static",
+      staticDuration: { value: 0, rate: 1 },
     }),
   ).rejects.toBeInstanceOf(MotionExportError);
   expect(typeof openMotionAudioSource).toBe("function");

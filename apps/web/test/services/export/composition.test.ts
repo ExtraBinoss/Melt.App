@@ -238,3 +238,19 @@ test("output framing reaches the existing image renderer without changing the ca
   expect(result).toMatchObject({ width: 32, height: 64 });
   expect(d.engine.getSnapshot()).toBe(before);
 });
+
+test("a static artboard can export a still video without enabling Motion or changing history", async () => {
+  const d = fixture(),
+    before = d.engine.getSnapshot();
+  const staticDuration = { value: 1, rate: 2 };
+  await d.run(
+    { mode: "motion", compositionId: "b", scale: 1, container: "webm", staticDuration },
+    d.scope(),
+  );
+  expect(d.video).toHaveBeenCalledWith(
+    before.project,
+    expect.objectContaining({ compositionId: "b", staticDuration }),
+  );
+  expect(d.engine.getSnapshot()).toBe(before);
+  expect(d.download).toHaveBeenCalledOnce();
+});

@@ -4,6 +4,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ## [Unreleased]
 
+- Hide empty export Advanced accordions and keep Video export available for Static compositions. Offer a configurable still-video duration (two seconds by default), render the frozen base design without enabling retained Motion or audio, and reuse its preview frame. Preserve native encoder limits, selection/framing, progress, cancellation and stale-snapshot checks.
+
 - Reuse the Cmd+K palette entrance for Studio capture-guide controls: reveal the popover and newly enabled settings with transform-free blur/fade, fade canvas guides through the shared opacity animation, and respect reduced motion without changing guide geometry, undo or export behavior.
 
 - Keep the inspector color-space selector readable: reserve space for its selected label and give its local menu enough width for sRGB, Display P3 and CMYK labels while retaining viewport bounds, keyboard focus and nonmodal behavior.

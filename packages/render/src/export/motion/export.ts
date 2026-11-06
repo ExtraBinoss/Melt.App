@@ -12,10 +12,9 @@ import { assertRenderSize } from "../../compositing/types";
 import { createRenderSession } from "../standalone";
 import { createMotionAudioMixer } from "./audio/mixer";
 import { assertMotionAlphaMode, chooseMotionEncoding } from "./encoding";
-import { MotionExportError } from "./errors";
 import type { MotionVideoExportOptions, MotionVideoExportResult } from "./model";
 import { createMotionOutputTarget } from "./target";
-import { motionExportFrame, motionExportTiming } from "./timing";
+import { compositionVideoTiming, motionExportFrame } from "./timing";
 import { motionEncodedFrame, motionEncodedTiming } from "./container-time";
 import { createEncodedSizeTracker } from "../encoded-size";
 
@@ -28,27 +27,21 @@ export async function exportMotionVideo(
   assertMotionAlphaMode(options.alpha ?? "discard");
   const assets = structuredClone(project.assets);
   const program = compileMotion({ ...project, assets }, { compositionId: options.compositionId });
-  if (program.mode !== "motion" || !program.duration || !program.composition.motion)
-    throw new MotionExportError(
-      "missingMotion",
-      "Motion video export requires an initialized Motion composition.",
-    );
-  const timing = motionExportTiming(
-    program.duration,
-    options.frameRate ?? program.composition.motion.frameRate,
-    options.maxFrames,
-  );
+  const timing = compositionVideoTiming(program, options);
   const selection = selectionFrameScope(
     program.composition,
     options.selection,
     options.centerSelection,
   );
+  const staticPlan =
+    program.mode === "static" ? evaluateMotion(program, { value: 0, rate: 1 }) : null;
+  const staticFrame = staticPlan ? selection.frame(applyMotionFrame(program, staticPlan)) : null;
   const scale = options.scale ?? 1;
   const outputFrame = resolveOutputFraming(selection.page, options.framing, scale);
   assertRenderSize(selection.page, outputFrame.scale);
   const { width, height } = outputFrame;
   const mixer =
-    options.audio === false
+    options.audio === false || program.mode === "static"
       ? {
           hasAudio: false,
           sampleRate: 48000,
@@ -155,9 +148,9 @@ export async function exportMotionVideo(
       ) {
         const frame = motionExportFrame(timing, index);
         const encoded = motionEncodedFrame(timing, index, encodedTiming.resolution);
-        const plan = evaluateMotion(program, frame.time);
+        const plan = staticPlan ?? evaluateMotion(program, frame.time);
         await session.withCanvasFrame(
-          selection.frame(applyMotionFrame(program, plan)),
+          staticFrame ?? selection.frame(applyMotionFrame(program, plan)),
           assets,
           async (canvas) => {
             options.signal?.throwIfAborted();

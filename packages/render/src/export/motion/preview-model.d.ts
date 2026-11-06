@@ -10,6 +10,7 @@ export interface MotionPreviewState {
 }
 export interface MotionPreviewOptions extends Pick<
   MotionVideoExportOptions,
+  | "staticDuration"
   | "framing"
   | "centerSelection"
   | "selection"

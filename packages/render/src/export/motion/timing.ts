@@ -6,8 +6,10 @@ import {
   normalizeMotionTime,
   subtractMotionTime,
   type MotionFrameRate,
+  type MotionProgram,
   type MotionTime,
 } from "@musart/core";
+import type { MotionVideoExportOptions } from "./model";
 import { MotionExportError } from "./errors";
 
 export function motionExportTiming(
@@ -59,4 +61,23 @@ export function motionAudioSampleCount(duration: MotionTime, sampleRate: number)
   if (count < 0n || count > BigInt(Number.MAX_SAFE_INTEGER))
     throw new MotionExportError("invalidOptions", "Audio sample count is outside its exact range.");
   return Number(count);
+}
+
+/** Static videos sample the base design; their output clock does not enable authored Motion. */
+export function compositionVideoTiming(
+  program: MotionProgram,
+  options: Pick<MotionVideoExportOptions, "staticDuration" | "frameRate" | "maxFrames"> = {},
+) {
+  if (program.mode === "motion" && (!program.duration || !program.composition.motion))
+    throw new MotionExportError("missingMotion", "Motion video needs an initialized timeline.");
+  return motionExportTiming(
+    program.mode === "motion"
+      ? program.duration!
+      : (options.staticDuration ?? { value: 2, rate: 1 }),
+    options.frameRate ??
+      (program.mode === "motion"
+        ? program.composition.motion!.frameRate
+        : { numerator: 30, denominator: 1 }),
+    options.maxFrames,
+  );
 }

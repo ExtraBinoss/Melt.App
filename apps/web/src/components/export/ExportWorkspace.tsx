@@ -108,7 +108,8 @@ export const ExportWorkspace = memo(function ExportWorkspace({
             setAllPages(false);
             const next = origin.project.pages.find((item) => item.id === id)!;
             setFrameChoice({ preset: "full", full: true, width: next.width, height: next.height });
-            if (kind !== "timelapse") setKind(next.motion?.mode === "motion" ? "motion" : "image");
+            // Keep a chosen video output on static artboards, while preserving Motion defaults.
+            if (kind === "image" && next.motion?.mode === "motion") setKind("motion");
           }}
         />
       </div>
@@ -122,7 +123,7 @@ export const ExportWorkspace = memo(function ExportWorkspace({
           disabled={busy}
           items={[
             { value: "image", label: t("image") },
-            ...(page.motion?.mode === "motion" ? [{ value: "motion", label: t("motion") }] : []),
+            { value: "motion", label: t(page.motion?.mode === "motion" ? "motion" : "video") },
             { value: "timelapse", label: t("timelapse") },
           ]}
           onValueChange={(value) => {

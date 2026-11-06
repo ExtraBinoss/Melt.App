@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { Children, useState, type ReactNode } from "react";
 import type { EnginePort } from "@musart/core";
 import { useTranslation } from "react-i18next";
 import { Download } from "lucide-react";
@@ -19,6 +19,7 @@ export function ExportAdvanced({
   print?: boolean;
 }) {
   const { t } = useTranslation("exportPanel");
+  if (Children.toArray(children).length === 0) return null;
   return (
     <Accordion type="single" collapsible>
       <AccordionItem value="options">

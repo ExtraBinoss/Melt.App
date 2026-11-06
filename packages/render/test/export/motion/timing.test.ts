@@ -1,5 +1,8 @@
+import { compileMotion, createPage, createProject } from "@musart/core";
+import { motionProject } from "./fixtures";
 import { expect, it } from "vitest";
 import {
+  compositionVideoTiming,
   motionAudioSampleCount,
   motionExportFrame,
   motionExportTiming,
@@ -37,4 +40,29 @@ it("rejects invalid work bounds, frame indices and audio timebases", () => {
   const timing = motionExportTiming({ value: 1, rate: 1 }, { numerator: 2, denominator: 1 });
   for (const index of [-1, 2, 0.5]) expect(() => motionExportFrame(timing, index)).toThrow();
   expect(() => motionAudioSampleCount({ value: 1, rate: 1 }, 100)).toThrow();
+});
+
+it("keeps static video timing separate from authored timeline duration and frame bounds", () => {
+  const project = createProject({ pages: [createPage({ id: "still" })] });
+  const program = compileMotion(project, { compositionId: "still" });
+  expect(compositionVideoTiming(program)).toEqual({
+    duration: { value: 2, rate: 1 },
+    frameRate: { numerator: 30, denominator: 1 },
+    count: 60,
+  });
+  expect(
+    compositionVideoTiming(program, {
+      staticDuration: { value: 1, rate: 2 },
+      frameRate: { numerator: 24, denominator: 1 },
+    }).count,
+  ).toBe(12);
+  expect(() => compositionVideoTiming(program, { staticDuration: { value: 0, rate: 1 } })).toThrow(
+    /positive/,
+  );
+  expect(() => compositionVideoTiming(program, { maxFrames: 1 })).toThrow(/budget/);
+  const animated = compileMotion(motionProject(), { compositionId: "composition" });
+  expect(
+    compositionVideoTiming(animated, { staticDuration: { value: 90, rate: 1 } }).duration,
+  ).toEqual(animated.duration);
+  expect(project.pages[0]!.motion).toBeUndefined();
 });

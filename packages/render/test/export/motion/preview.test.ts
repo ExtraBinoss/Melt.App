@@ -118,13 +118,14 @@ it("backpressure bounds work and seek/pause reject a superseded canvas before re
   await preview.dispose();
   expect(state.dispose).toHaveBeenCalledOnce();
 });
-it("rejects invalid/static requests without allocating GPU resources and cleans a failed render", async () => {
+it("rejects invalid requests without allocating GPU resources and cleans a failed render", async () => {
   expect(() =>
     createMotionPreview(createProject({ pages: [createPage({ id: "static" })] }), {
       compositionId: "static",
+      staticDuration: { value: 0, rate: 1 },
       onFrame: vi.fn(),
     }),
-  ).toThrow(/Motion/);
+  ).toThrow(/positive/);
   expect(() =>
     createMotionPreview(motionProject(), {
       compositionId: "composition",
@@ -268,4 +269,28 @@ it("keeps a fixed framing contract across preview playback samples", async () =>
   for (const call of state.render.mock.calls)
     expect(call[3]).toMatchObject({ framing, scale: 384 / 1920 });
   await preview.dispose();
+});
+
+it("previews a static design once while its output clock advances without enabling retained Motion", async () => {
+  const scheduler = clock(),
+    project = structuredClone(motionProject());
+  project.pages[0]!.motion!.mode = "static";
+  const before = JSON.stringify(project);
+  const preview = createMotionPreview(project, {
+    compositionId: "composition",
+    staticDuration: { value: 3, rate: 2 },
+    scheduler,
+    onFrame: vi.fn(),
+  });
+  await scheduler.step(0);
+  await scheduler.step(400);
+  await scheduler.step(800);
+  expect(preview.read().duration).toEqual({ value: 3, rate: 2 });
+  expect(preview.read().time.value / preview.read().time.rate).toBeGreaterThan(0);
+  expect(state.render).toHaveBeenCalledTimes(1);
+  expect(state.render.mock.calls[0]![0].layers[0]!.x).toBe(0);
+  expect(state.render.mock.calls[0]![3].motionFrame.time).toEqual({ value: 0, rate: 1 });
+  expect(JSON.stringify(project)).toBe(before);
+  await preview.dispose();
+  expect(scheduler.callbacks.size).toBe(0);
 });

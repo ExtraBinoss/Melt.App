@@ -10,6 +10,8 @@ export interface MotionVideoExportOptions {
   centerSelection?: boolean;
   beforeFrame?: () => Promise<void>;
   frameRate?: MotionFrameRate;
+  /** Fixed-design video duration; ignored for authored Motion. Defaults to two seconds. */
+  staticDuration?: MotionTime;
   scale?: number;
   framing?: OutputFraming;
   container?: "auto" | "mp4" | "webm";
