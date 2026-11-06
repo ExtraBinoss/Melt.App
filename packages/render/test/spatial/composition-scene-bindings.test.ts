@@ -235,3 +235,36 @@ test("tiny layout scales retain a complete source window while bounding the nati
     f.dispose();
   }
 });
+
+test("reflected layer transports preserve native raster winding and reset on canonical sync", async () => {
+  const f = fixture();
+  try {
+    const page = {
+      ...f.page,
+      layers: f.page.layers.map((layer, index) =>
+        index === 0
+          ? { ...layer, affine: [-1, 0, 0, 1] as [number, number, number, number] }
+          : layer,
+      ),
+    };
+    await f.sync(page);
+    expect(f.stage.mirrored("a")).toBe(true);
+    expect(f.stage.mirrored("b")).toBe(false);
+    const canonical = f.stage.camera.projectionMatrix.clone();
+    const determinants: number[] = [];
+    f.render.mockImplementation((_scene, camera) => {
+      determinants.push(camera.projectionMatrix.determinant());
+    });
+    f.stage.render(page.layers[0]!);
+    // Depth and cropped color retain the canonical raster handedness.
+    expect(determinants.length).toBeGreaterThan(0);
+    expect(determinants.every((value) => value * canonical.determinant() > 0)).toBe(true);
+    expect(f.stage.camera.projectionMatrix.equals(canonical)).toBe(true);
+    await f.sync();
+    expect(f.stage.mirrored("a")).toBe(false);
+    f.stage.releaseSources();
+    expect(f.stage.mirrored("a")).toBe(false);
+  } finally {
+    f.dispose();
+  }
+});

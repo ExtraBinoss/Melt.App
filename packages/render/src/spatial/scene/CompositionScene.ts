@@ -58,6 +58,7 @@ export class CompositionScene implements GpuResource {
   private readonly transports = new Map<string, Bounds>();
   private readonly effectProjections = new Map<string, readonly number[]>();
   private readonly projection = new Map<string, Matrix4>();
+  private readonly mirroredSources = new Set<string>();
   private readonly depthProjection = new Matrix4();
   private settings: SpatialScene;
   private compiledDepth = "";
@@ -154,6 +155,7 @@ export class CompositionScene implements GpuResource {
     this.transports.clear();
     this.effectProjections.clear();
     this.projection.clear();
+    this.mirroredSources.clear();
     const fake = createLayer("group", {
       id: "__spatial_scene_rig",
       width: page.width,
@@ -231,9 +233,12 @@ export class CompositionScene implements GpuResource {
         geometry,
       );
       if (effectProjection) this.effectProjections.set(layer.id, effectProjection);
-      const crop = transportProjection(page, layer, bounds, geometry)
-        .invert()
-        .multiply(this.camera.projectionMatrix);
+      const transport = transportProjection(page, layer, bounds, geometry);
+      if (transport.determinant() < 0) this.mirroredSources.add(layer.id);
+      const crop = transport.invert().multiply(this.camera.projectionMatrix);
+      // Keep the native raster right-handed. Output restores the source-local
+      // reflection after lighting, so culling and front-facing normals stay canonical.
+      if (this.mirroredSources.has(layer.id)) crop.premultiply(new Matrix4().makeScale(-1, 1, 1));
       this.projection.set(layer.id, crop);
       const reference =
         layer.effects.some((e) => e.enabled) || layer.mask?.enabled || layer.clipping;
@@ -279,6 +284,9 @@ export class CompositionScene implements GpuResource {
         `${this.scene.uuid}:${this.identities.intern(signatures.source(layer.id)! + windowStamp)}`,
       );
     this.stamp = `${this.scene.uuid}:${this.identities.intern(signatures.composite + windowStamp)}`;
+  }
+  mirrored(id: string) {
+    return this.mirroredSources.has(id);
   }
   sourceStamp(id: string) {
     return this.sourceStamps.get(id);
@@ -380,6 +388,7 @@ export class CompositionScene implements GpuResource {
     this.transports.clear();
     this.effectProjections.clear();
     this.projection.clear();
+    this.mirroredSources.clear();
     this.identities.clear();
     this.stamp = "";
     this.scopes = null;

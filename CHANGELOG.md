@@ -4,6 +4,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ## [Unreleased]
 
+- Fix native 3D objects disappearing under camera/object rotation in reflected layer frames in Classic and Studio. Preserve native raster winding through reflected source crops and restore their orientation in the GPU output pass, retaining correct lighting, depth, shadows and the WebGL fallback.
+
 - Replace the 947 MB SAM 3 refinement predictor with pinned SAM 2.1 Tiny FP16 weights (78 MB) after real WebGPU comparison with EdgeTAM. Preserve GPU image embeddings, verified downloads and legacy cache removal; use the correct 1024-square/ImageNet preprocessing. Expose the shared refinement card in Studio and verify automatic point/rectangle inference and secondary-click exclusion without canvas pan or context menus.
 
 - Default Trail to source-aware Auto mode: visible current-source echoes for stationary images/text and exact temporal samples for video or authored Motion. Adapt controls without baking derived settings; extend object echo bounds by default with an undoable opt-out, bounded raster sizes and source-aware cache invalidation.

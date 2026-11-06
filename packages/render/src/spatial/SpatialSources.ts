@@ -276,7 +276,7 @@ export class SpatialSources {
     if (!prepared || prepared.resource.closed) throw Error("3D source is not prepared");
     if (!this.stage) throw Error("Composition 3D scene is not prepared");
     this.stage.render(layer);
-    this.output.render(prepared.resource.target, target);
+    this.output.render(prepared.resource.target, target, this.stage.mirrored(layer.id));
     this.passes += 2;
   }
   private check(canContinue: () => boolean) {
