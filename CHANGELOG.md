@@ -4,6 +4,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ## [Unreleased]
 
+- Remove the separate linked-color panel and menu action; palette swatches continue to manage document links automatically.
+
 - Keep palette actions visible and automatically link colors when choosing swatches; reuse document color identities for repeated detected colors and retain an optional local-only copy action.
 
 - Streamline effect preset headers with one save action, in-selector modification status, icon-only naming forms and a divider above compositing controls. Preview local IndexedDB presets on hover without document/history writes, including their transient image inputs.

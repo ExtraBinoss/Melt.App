@@ -7,8 +7,7 @@
   overscroll-behavior: contain;
 }
 .palette-browser,
-.palette-editor,
-.palette-document {
+.palette-editor {
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -62,8 +61,7 @@
   outline: 2px solid var(--ring);
   outline-offset: 2px;
 }
-.palette-editor input,
-.palette-document input {
+.palette-editor input {
   min-width: 0;
   height: 32px;
   font-size: 12px;
@@ -97,14 +95,6 @@
   display: flex;
   align-items: center;
   gap: 6px;
-}
-.palette-document-swatches {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-.palette-document-swatches .palette-swatch {
-  width: 34px;
 }
 .palette-info {
   flex-shrink: 0;

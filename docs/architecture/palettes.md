@@ -30,13 +30,13 @@ independently of the saved-palette filter. The outer popover remains bounded. De
 sampling, never compositor readbacks (see the detection service README for the
 source-footprint approximation and resource bounds). Empty palette names use
 imperative, reduced-motion-aware example placeholders, not prefilled company names.
-The add action opens the editor; secondary library and explicit linked-color
-management live in a menu. Color swatches open the shared native color control;
+The add action opens the editor; secondary library actions live in a menu.
+There is no separate manual linked-color panel. Color swatches open the shared native color control;
 invalid hex drafts show inline errors and block Save, Dice and Apply.
 It supplies named palette creation, explicit update, duplicate, import/export,
 local-only copies and automatic document links when choosing a swatch. Editing a saved library entry never
-silently modifies projects. Document globals show usage counts and explicit
-commands to update all uses or detach the current target.
+silently modifies projects. Swatch selection manages document links automatically;
+the optional local-only context action copies the literal paint.
 
 Dice rotates hue consistently in OKLab while preserving neutral anchors,
 perceptual lightness, alpha and locked values exactly. Its draft previews use the

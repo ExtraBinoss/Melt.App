@@ -4,12 +4,11 @@ import { validateSavedPalette } from "@musart/core";
 import { useTranslation } from "react-i18next";
 import { PaletteLibrary } from "../../services/palettes/library";
 import type { PaletteRecord, PaletteSummary } from "../../services/palettes/library";
-import { ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { IconButton } from "../shared/IconButton";
 import { Throbber } from "../ui/throbber/Throbber";
 import { PalettePicker } from "./PalettePicker";
 import { usePaletteEngine } from "./PaletteProvider";
-import { DocumentColors } from "./DocumentColors";
 import { paletteApplication } from "../../services/palettes/application";
 import { usePaletteVariation } from "./use-palette-variation";
 import { PaletteEditor } from "./PaletteEditor";
@@ -40,7 +39,7 @@ export function PaletteBrowser({
     name: t("documentDetected"),
     colors: detected.colors,
   };
-  const [mode, setMode] = useState<"pick" | "edit" | "document">("pick");
+  const [mode, setMode] = useState<"pick" | "edit">("pick");
   const [items, setItems] = useState<PaletteSummary[]>([]),
     [selected, setSelected] = useState<PaletteRecord | null>(null),
     [draft, setDraft] = useState<SavedPalette | null>(null);
@@ -274,7 +273,6 @@ export function PaletteBrowser({
           }}
           onImport={() => importer.current?.click()}
           onExport={exportPalette}
-          onDocument={engine ? () => setMode("document") : undefined}
         />
       )}
       {mode === "edit" && draft && (
@@ -291,25 +289,6 @@ export function PaletteBrowser({
           onCancelPreview={cancelVariation}
           onApplyVariation={applyVariation}
         />
-      )}
-      {mode === "document" && engine && (
-        <>
-          <div className="palette-picker-heading">
-            <IconButton label={t("cancel")} onClick={() => setMode("pick")}>
-              <ArrowLeft size={16} />
-            </IconButton>
-            <span>{t("document")}</span>
-          </div>
-          <DocumentColors
-            engine={engine}
-            targets={targets}
-            value={value}
-            beforeApply={() => {
-              cancelVariation();
-              beforeApply();
-            }}
-          />
-        </>
       )}
       <input
         ref={importer}

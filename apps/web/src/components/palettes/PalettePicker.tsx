@@ -32,7 +32,6 @@ export function PalettePicker({
   onDelete,
   onImport,
   onExport,
-  onDocument,
 }: {
   items: PaletteSummary[];
   filterId: string;
@@ -50,7 +49,6 @@ export function PalettePicker({
   onDelete: () => void;
   onImport: () => void;
   onExport: () => void;
-  onDocument?: () => void;
 }) {
   const { t } = useTranslation("palettes");
   const available =
@@ -107,12 +105,6 @@ export function PalettePicker({
             <DropdownMenuItem disabled={!selected} onSelect={onExport}>
               {t("export")}
             </DropdownMenuItem>
-            {onDocument && (
-              <>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onSelect={onDocument}>{t("document")}</DropdownMenuItem>
-              </>
-            )}
             <DropdownMenuSeparator />
             <DropdownMenuItem disabled={!selected} variant="destructive" onSelect={onDelete}>
               {t("remove")}

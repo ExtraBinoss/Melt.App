@@ -275,6 +275,13 @@ test("Studio color and palette triggers stay on one row and open a compact nativ
   expect(bounds.y + bounds.height).toBeLessThan(group.y);
   await expect(popover.getByRole("textbox")).toHaveCount(0);
   await page.screenshot({ path: "artifacts/designer-ux/studio-palette-controls.png" });
+  await popover.getByRole("button", { name: "Palette actions", exact: true }).click();
+  await expect(page.getByRole("menuitem")).toHaveCount(5);
+  await expect(page.getByRole("menuitem", { name: /Document colors|Linked colors/ })).toHaveCount(
+    0,
+  );
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("menu")).toBeHidden();
   await page.keyboard.press("Escape");
   await expect(popover).toBeHidden();
   await expect(shortcut).toBeFocused();

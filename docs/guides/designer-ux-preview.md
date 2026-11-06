@@ -53,12 +53,12 @@ A palette shortcut beside existing color-picker controls opens a compact nonmoda
 picker. **All** shows saved palette rows in a list capped at 180 pixels before
 scrolling; the selector can filter a saved palette. Automatically detected document
 colors remain below a divider. Add opens a separate editor with an empty suggested name,
-shared swatch picker and native pipette where supported. Secondary actions and
-document color editing is in the always-visible actions menu. Selecting a swatch
+shared swatch picker and native pipette where supported. Secondary library
+actions stay in the always-visible menu; there is no manual linked-color panel. Selecting a swatch
 automatically links it; reusing a detected color shares the same document ink.
 Named palettes can be reused across projects; explicit document colors and links
-travel inside a project. Choosing a saved swatch locally and linking a property
-to a document color are distinct actions. A linked global edit updates all bound
+travel inside a project. The optional local-only context action copies a literal
+color. A linked global edit updates all bound
 owners in one validated transaction, while detaching preserves local appearance.
 
 Dice variations preserve locked colors and use coherent perceptual color changes.
