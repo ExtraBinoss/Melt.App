@@ -39,6 +39,8 @@ export const EffectCatalog = memo(function EffectCatalog({
 }) {
   const { t, i18n } = useTranslation();
   const [personal, setPersonal] = useState(false);
+  const surface = useRef<HTMLDivElement>(null);
+  const [personalHeight, setPersonalHeight] = useState<number>();
   const [query, setQuery] = useState(initialQuery);
   const [family, setFamily] = useState<EffectFamily | "all">("all");
   const list = useRef<CatalogRowsHandle>(null);
@@ -75,12 +77,21 @@ export const EffectCatalog = memo(function EffectCatalog({
     }
   }
   return (
-    <div className="effect-catalog" data-effect-category={category}>
+    <div
+      ref={surface}
+      className="effect-catalog"
+      data-effect-category={category}
+      style={personal ? { height: personalHeight } : undefined}
+    >
       {treatments && category === "effect" && (
         <Button
           size="sm"
           variant={personal ? "secondary" : "ghost"}
-          onClick={() => setPersonal(!personal)}
+          onClick={() => {
+            // Keep the submenu under the pointer while its contents switch.
+            if (!personal) setPersonalHeight(surface.current?.offsetHeight);
+            setPersonal(!personal);
+          }}
         >
           {t("effectPresets:treatments")}
         </Button>

@@ -13,7 +13,6 @@ import { IconButton } from "../../shared/IconButton";
 import { Switch } from "../../ui/switch";
 import { EffectParameters } from "./EffectParameters";
 import "./effect-stack.css";
-import { SaveTreatment } from "./presets/SaveTreatment";
 
 /** The same compact, keyboard-accessible effect stack in either workspace. */
 export function EffectStack({
@@ -47,9 +46,6 @@ export function EffectStack({
   }
   return (
     <>
-      <div className="effect-stack-library-save">
-        <SaveTreatment engine={engine} effects={effects} kind="stack" disabled={disabled} />
-      </div>
       <Accordion
         type="single"
         collapsible
@@ -120,6 +116,7 @@ export function EffectStack({
               </div>
               <AccordionContent className="effect-stack-body">
                 <EffectParameters
+                  stackEffects={effects}
                   engine={engine}
                   layerId={layerId}
                   effect={effect}

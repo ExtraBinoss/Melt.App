@@ -24,6 +24,7 @@ export function SelectField({
   onValueChange,
   onPreview,
   onPreviewCancel,
+  previewCurrent = false,
   id,
   disabled,
   className,
@@ -42,6 +43,8 @@ export function SelectField({
   onValueChange: (value: string) => void;
   onPreview?: (value: string) => void;
   onPreviewCancel?: () => void;
+  /** Modified saved values can preview their own selected record on menu focus. */
+  previewCurrent?: boolean;
   id?: string;
   disabled?: boolean;
   className?: string;
@@ -225,7 +228,7 @@ export function SelectField({
             openingOwner.current = owner.token;
             if (richOptions.length) setMounted(true);
             session.current.open = true;
-            session.current.last = value;
+            session.current.last = previewCurrent ? null : value;
             session.current.cancel = onPreviewCancel;
           } else if (session.current.open) {
             session.current.open = false;

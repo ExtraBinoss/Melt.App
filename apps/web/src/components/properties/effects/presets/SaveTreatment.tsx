@@ -2,10 +2,9 @@ import { useState, useEffect, useRef } from "react";
 import { Plus } from "lucide-react";
 import { captureEffectTreatment, type Effect, type EnginePort } from "@musart/core";
 import { useTranslation } from "react-i18next";
-import { Button } from "../../../ui/button";
-import { Input } from "../../../ui/input";
 import { IconButton } from "../../../shared/IconButton";
 import { EffectPresetStore, type SavedTreatment } from "../../../../services/effect-presets/store";
+import { TreatmentNameForm } from "./TreatmentNameForm";
 import "./messages";
 import "./presets.css";
 export function SaveTreatment({
@@ -14,28 +13,43 @@ export function SaveTreatment({
   kind,
   disabled,
   onSaved,
+  open: controlledOpen,
+  onOpenChange,
+  hideTrigger = false,
+  onStart,
 }: {
   engine?: EnginePort;
   effects: readonly Effect[];
   kind: "effect" | "stack";
   disabled?: boolean;
   onSaved?: (saved: SavedTreatment) => void;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  hideTrigger?: boolean;
+  onStart?: () => void;
 }) {
   const { t } = useTranslation("effectPresets");
-  const [open, setOpen] = useState(false),
+  const [localOpen, setLocalOpen] = useState(false),
     [name, setName] = useState(""),
     [error, setError] = useState(""),
     [busy, setBusy] = useState(false);
+  const open = controlledOpen ?? localOpen;
+  const setOpen = onOpenChange ?? setLocalOpen;
   // Form owns the asynchronous store so disposal also aborts accepted but uncommitted writes.
   return (
     <div className="treatment-save">
-      <IconButton
-        label={t(kind === "stack" ? "saveStack" : "save")}
-        disabled={disabled || busy || !engine || !effects.length}
-        onClick={() => setOpen(!open)}
-      >
-        <Plus size={14} />
-      </IconButton>
+      {!hideTrigger && !open && (
+        <IconButton
+          label={t(kind === "stack" ? "saveStack" : "save")}
+          disabled={disabled || busy || !engine || !effects.length}
+          onClick={() => {
+            onStart?.();
+            setOpen(true);
+          }}
+        >
+          <Plus size={14} />
+        </IconButton>
+      )}
       {open && (
         <SaveForm
           key={kind}
@@ -97,9 +111,13 @@ function SaveForm({
     };
   }, []);
   return (
-    <form
-      className="treatment-name-form"
-      onKeyDown={(event) => event.stopPropagation()}
+    <TreatmentNameForm
+      label={t(kind === "stack" ? "stackName" : "name")}
+      name={name}
+      onName={onName}
+      busy={busy}
+      error={error}
+      onCancel={onClose}
       onSubmit={(event) => {
         event.preventDefault();
         if (saving.current) return;
@@ -131,23 +149,6 @@ function SaveForm({
           }
         })();
       }}
-    >
-      <Input
-        autoFocus
-        maxLength={120}
-        aria-label={t(kind === "stack" ? "stackName" : "name")}
-        value={name}
-        onChange={(event) => onName(event.target.value)}
-        disabled={busy}
-      />
-      <Button size="sm" type="submit" disabled={busy || !name.trim()}>
-        {t("confirm")}
-      </Button>
-      <Button size="sm" type="button" variant="ghost" disabled={busy} onClick={onClose}>
-        {t("cancel")}
-      </Button>
-      <small>{t("omitted")}</small>
-      {error && <p role="alert">{error}</p>}
-    </form>
+    />
   );
 }

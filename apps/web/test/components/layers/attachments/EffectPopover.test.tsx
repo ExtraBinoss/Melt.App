@@ -91,9 +91,7 @@ test("locked FX show an actionable notice and preserve the effect while unlockin
   });
   fireEvent.click(screen.getByRole("button", { name: "FX" }));
   expect(screen.getByRole("status")).toHaveTextContent("Ce calque est verrouillé");
-  expect(
-    screen.getAllByRole("button", { name: "Réinitialiser tous les paramètres de l’effet" })[0],
-  ).toBeDisabled();
+  expect(screen.getAllByRole("button", { name: "Valeurs d’origine" })[0]).toBeDisabled();
   const before = d.engine.getSnapshot();
   fireEvent.click(screen.getByRole("button", { name: "Déverrouiller" }));
   expect(screen.queryByRole("status")).not.toBeInTheDocument();
@@ -131,9 +129,7 @@ test("reset all is one undoable edit of its effect including blend, opacity and 
   });
   const before = d.engine.getSnapshot();
   fireEvent.click(screen.getByRole("button", { name: "FX" }));
-  fireEvent.click(
-    screen.getAllByRole("button", { name: "Réinitialiser tous les paramètres de l’effet" })[0]!,
-  );
+  fireEvent.click(screen.getAllByRole("button", { name: "Valeurs d’origine" })[0]!);
   const after = d.engine.getSnapshot();
   expect(after.revision).toBe(before.revision + 1);
   expect(after.project.pages[0]!.layers[0]!.effects[0]).toMatchObject({
@@ -154,6 +150,13 @@ test("FX avatars expose actual blend/opacity and parameters; previews cancel or 
   const d = fixture();
   fireEvent.click(screen.getByRole("button", { name: "FX" }));
   const amount = screen.getAllByLabelText("Intensité")[0]!;
+  for (const section of document.querySelectorAll(".layer-effect-details section")) {
+    const controls = section.querySelector(".effect-controls")!;
+    expect(controls.firstElementChild).toHaveAttribute("data-effect-presets");
+    expect(controls.children[1]).toHaveClass("effect-compositing");
+    expect(controls.querySelectorAll("svg.lucide-plus")).toHaveLength(1);
+  }
+  expect(screen.queryByRole("button", { name: "Enregistrer la pile d’effets" })).toBeNull();
   const scrubs = screen.getAllByRole("button", { name: "Ajuster Opacité" });
   expect(scrubs).toHaveLength(2);
   for (const scrub of scrubs) {
@@ -211,7 +214,12 @@ test("effect popovers toggle, delete and blend the selected effect without touch
   fireEvent.click(screen.getByLabelText("Désactiver l’effet"));
   expect(d.engine.getSnapshot().project.pages[0]!.layers[0]!.effects[0]!.enabled).toBe(false);
   fireEvent.click(screen.getByLabelText("Activer l’effet"));
-  fireEvent.click(screen.getByLabelText("Retirer l’effet"));
+  fireEvent.pointerDown(screen.getByRole("button", { name: "Actions du préréglage" }), {
+    button: 0,
+    ctrlKey: false,
+    pointerType: "mouse",
+  });
+  fireEvent.click(await screen.findByRole("menuitem", { name: "Retirer l’effet" }));
   expect(d.engine.getSnapshot().project.pages[0]!.layers[0]!.effects).toHaveLength(0);
 });
 test("closing clears held drafts and a replaced project rejects late parameter commits", () => {

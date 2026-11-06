@@ -34,8 +34,10 @@ available for overlap that cannot be inferred from the original pixels.
 
 ## Presets and treatments
 
-Each effect exposes a preset selector, named saving, modified status and saved
-preset restoration. Factory defaults are a separate operation. A saved preset is
+Each effect exposes one preset header above its controls: a selector with inline
+modified status, one save plus, compact Check/X naming and a divider. Saved options
+preview on hover without writing the document, and closing restores its current
+values. Named saving and saved-preset restoration use the local IndexedDB library. Factory defaults are a separate operation. A saved preset is
 an independent personal-library item; applied values remain portable/editable.
 A missing library record never silently substitutes factory values.
 
@@ -48,8 +50,9 @@ restores the previous binding and values together.
 ## Palettes
 
 A palette shortcut beside existing color-picker controls opens a compact nonmodal
-picker. The default document palette is detected automatically; saved palettes
-share its selector. Add opens a separate editor with an empty suggested name,
+picker. **All** shows saved palette rows in a list capped at 180 pixels before
+scrolling; the selector can filter a saved palette. Automatically detected document
+colors remain below a divider. Add opens a separate editor with an empty suggested name,
 shared swatch picker and native pipette where supported. Secondary actions and
 explicit linked document colors are in the menu.
 Named palettes can be reused across projects; explicit document colors and links

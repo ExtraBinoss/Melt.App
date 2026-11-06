@@ -29,7 +29,7 @@ export function usePopoverOwner(owner: string) {
   const opening = slot?.opening;
   const current = useRef<Binding | null>(binding);
   const sequence = useRef(0);
-  const deactivate = useRef<{ binding: Binding; cancel: () => void } | null>(null);
+  const deactivate = useRef(new Set<{ binding: Binding; cancel: () => void }>());
   useLayoutEffect(() => {
     current.current = binding;
     return () => {
@@ -52,12 +52,9 @@ export function usePopoverOwner(owner: string) {
           cancel();
         },
       };
-      deactivate.current = entry;
+      deactivate.current.add(entry);
       return () => {
-        if (deactivate.current === entry) {
-          deactivate.current = null;
-          entry.cancel();
-        }
+        if (deactivate.current.delete(entry)) entry.cancel();
       };
     },
     [binding],
@@ -72,7 +69,9 @@ export function usePopoverOwner(owner: string) {
         live: open,
         opened: open,
         cancel: () => {
-          if (deactivate.current?.binding === binding) deactivate.current.cancel();
+          // Snapshot this owner's handlers before cancellations can register new ones.
+          const handlers = [...deactivate.current].filter((entry) => entry.binding === binding);
+          for (const entry of handlers) entry.cancel();
         },
       };
       store.set(attachmentPopover, { opening: next, open });

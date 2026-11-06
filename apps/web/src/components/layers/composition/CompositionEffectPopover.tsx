@@ -4,7 +4,6 @@ import { useTranslation } from "react-i18next";
 import { getEffectDefinition, type Composition, type Effect, type EnginePort } from "@musart/core";
 import { Popover, PopoverTrigger, PopoverContent } from "../../ui/popover";
 import { IconButton } from "../../shared/IconButton";
-import { SaveTreatment } from "../../properties/effects/presets/SaveTreatment";
 import { EffectParameters } from "../../properties/effects/EffectParameters";
 import { MotionFieldProvider } from "../../properties/motion/context";
 import { useCompositionEffects } from "../controls/use-composition-effects";
@@ -157,10 +156,9 @@ function CompositionEffectDetails({
             </IconButton>
           </div>
         </div>
-        <div className="effect-stack-library-save">
-          <SaveTreatment engine={engine} effects={effects} kind="stack" />
-        </div>
         <EffectParameters
+          registerDeactivate={registerDeactivate}
+          stackEffects={effects}
           onDelete={() => {
             if (isCurrent()) edit.change(effects.filter((item) => item.id !== effectId));
           }}

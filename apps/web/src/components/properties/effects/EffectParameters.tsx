@@ -7,7 +7,15 @@ import "./gradient-messages";
 import "./messages";
 import "./library-messages";
 import "./parameter-layout.css";
-import { memo, useCallback, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import {
+  memo,
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  useSyncExternalStore,
+  type ReactNode,
+} from "react";
 import { EffectPresets } from "./presets/EffectPresets";
 import {
   EFFECT_DOMAIN_KEYS,
@@ -53,6 +61,9 @@ export function EffectParameters({
   resetDefaults,
   hideActions = false,
   onDelete,
+  compositing,
+  stackEffects,
+  registerDeactivate,
 }: {
   effect: Effect;
   engine?: EnginePort;
@@ -68,6 +79,10 @@ export function EffectParameters({
   resetDefaults?: Partial<Pick<Effect, "amount" | "settings">>;
   hideActions?: boolean;
   onDelete?: () => void;
+  /** Owner-specific controls follow the shared preset header. */
+  compositing?: ReactNode;
+  stackEffects?: readonly Effect[];
+  registerDeactivate?: (cancel: () => void) => () => void;
 }) {
   const { t } = useTranslation();
   const definition = getEffectDefinition(effect.type);
@@ -155,13 +170,11 @@ export function EffectParameters({
       className="effect-controls reset-feedback"
       data-effect-parameter-count={parameters.length}
     >
-      {effect.type === "liquify" && (
-        <LiquifyControls engine={engine} layerId={ownLayerId} effect={effect} onChange={onChange} />
-      )}
-      <EffectImageInputs engine={engine} layerId={ownLayerId} effect={effect} disabled={disabled} />
       {!hideActions && (
         <EffectPresets
           engine={engine}
+          stackEffects={stackEffects}
+          registerDeactivate={registerDeactivate}
           layerId={ownLayerId}
           effect={effect}
           disabled={disabled}
@@ -206,6 +219,11 @@ export function EffectParameters({
           }}
         />
       )}
+      {compositing}
+      {effect.type === "liquify" && (
+        <LiquifyControls engine={engine} layerId={ownLayerId} effect={effect} onChange={onChange} />
+      )}
+      <EffectImageInputs engine={engine} layerId={ownLayerId} effect={effect} disabled={disabled} />
       {!hideActions && engine && !definition.retired && definition.source !== "geometry" && (
         <EffectPlayback
           engine={engine}
