@@ -110,6 +110,8 @@ test("Studio visual tools stay compact, use shared previews and edit the canonic
   expect(sizes).toEqual([
     [48, 48],
     [48, 48],
+    [48, 48],
+    [48, 48],
   ]);
   await page.screenshot({ path: "artifacts/studio/studio-dark-overview.png" });
   expect(await page.evaluate(() => window.__musartVideoReadbacks)).toMatchObject({

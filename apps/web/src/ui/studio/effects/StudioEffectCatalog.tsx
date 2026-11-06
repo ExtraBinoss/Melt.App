@@ -10,6 +10,7 @@ import {
 import { EffectThumbnail } from "../../../components/layers/catalog/EffectThumbnail";
 import { Input } from "../../../components/ui/input";
 import { Button } from "../../../components/ui/button";
+import { ScrollShadow } from "../../../components/shared/scroll/ScrollShadow";
 import "../../../components/layers/catalog/messages";
 import "../../../components/properties/effects/library-messages";
 
@@ -44,21 +45,23 @@ export function StudioEffectCatalog({
         value={query}
         onChange={(event) => setQuery(event.currentTarget.value)}
       />
-      <div className="studio-effect-options">
-        {visible.map((entry) => (
-          <Button
-            key={entry.type}
-            variant="ghost"
-            size="sm"
-            disabled={disabled}
-            onClick={() => onAdd(entry.type)}
-          >
-            <EffectThumbnail type={entry.type} />
-            <span>{entry.label}</span>
-          </Button>
-        ))}
-        {!visible.length && <p className="muted-description">{t("effectCatalog:empty")}</p>}
-      </div>
+      <ScrollShadow className="studio-effects-scroll">
+        <div className="studio-effect-options">
+          {visible.map((entry) => (
+            <Button
+              key={entry.type}
+              variant="ghost"
+              size="sm"
+              disabled={disabled}
+              onClick={() => onAdd(entry.type)}
+            >
+              <EffectThumbnail type={entry.type} />
+              <span>{entry.label}</span>
+            </Button>
+          ))}
+          {!visible.length && <p className="muted-description">{t("effectCatalog:empty")}</p>}
+        </div>
+      </ScrollShadow>
     </div>
   );
 }

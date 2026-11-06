@@ -1,5 +1,6 @@
 import { SceneReflections } from "./reflections/SceneReflections";
 import { CompositionScene } from "./scene/CompositionScene";
+import type { DepthFocusPoint } from "./scene/EffectDepthInputs";
 import type { RenderOptions } from "../compositing/types";
 import {
   createLayerGeometryIndex,
@@ -7,6 +8,7 @@ import {
   isSceneAsset,
   type Asset,
   type Composition,
+  type Bounds,
   type Layer,
   type SpatialScene,
 } from "@musart/core";
@@ -173,6 +175,7 @@ export class SpatialSources {
         Math.ceil((options.viewport?.width ?? page.width) * density),
         Math.ceil((options.viewport?.height ?? page.height) * density),
         sources.length,
+        page,
       ),
     );
     stage.sync(
@@ -244,10 +247,23 @@ export class SpatialSources {
     return this.stage?.effectProjection(layerId);
   }
   /** Borrowed camera depth for the current root viewport; owned and released by the scene cache. */
-  compositionDepth() {
+  compositionDepth(focus?: DepthFocusPoint) {
     if (!this.stage || this.closed) return null;
     const before = this.stage.depthPasses,
-      depth = this.stage.compositionDepth();
+      depth = this.stage.compositionDepth(focus);
+    this.passes += this.stage.depthPasses - before;
+    return depth;
+  }
+  /** Borrowed owner depth; admission and disposal belong to the composition scene cache. */
+  layerDepth(
+    layerId: string,
+    transport: Bounds,
+    focus?: DepthFocusPoint,
+    projection?: readonly number[],
+  ) {
+    if (!this.stage || this.closed) return null;
+    const before = this.stage.depthPasses;
+    const depth = this.stage.layerDepth(layerId, transport, focus, projection);
     this.passes += this.stage.depthPasses - before;
     return depth;
   }

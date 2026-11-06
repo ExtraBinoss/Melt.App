@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Plus, SlidersHorizontal, Sparkles } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import {
@@ -20,7 +20,8 @@ import { EffectStack } from "../../../components/properties/effects/EffectStack"
 import { Popover, PopoverContent, PopoverTrigger } from "../../../components/ui/popover";
 import { Button } from "../../../components/ui/button";
 import { IconButton } from "../../../components/shared/IconButton";
-import { compositionHasDepth, type EffectCategory } from "../../../components/layers/catalog/model";
+import { ScrollShadow } from "../../../components/shared/scroll/ScrollShadow";
+import { ownerHasDepth, type EffectCategory } from "../../../components/layers/catalog/model";
 import { StudioEffectCatalog } from "./StudioEffectCatalog";
 import { useCompositionEffectMotionRequest } from "../../../components/motion/scene/effect-navigation";
 import { useCompositionEffects } from "../../../components/layers/controls/use-composition-effects";
@@ -52,6 +53,16 @@ function EffectButton({
 }) {
   const { t } = useTranslation("studioEffects");
   const [open, setOpen] = useState(false);
+  const content = useRef<HTMLDivElement>(null);
+  const trigger = useRef<HTMLButtonElement>(null);
+  const restoreFocus = useRef(false);
+  useLayoutEffect(() => {
+    // Radix can reuse content during its exit animation, without another mount autofocus.
+    if (open) {
+      restoreFocus.current = false;
+      content.current?.focus({ preventScroll: true });
+    }
+  }, [open]);
   const [request, setRequest] = useState<{ token: number; effectId: string } | null>(null);
   useCompositionEffectMotionRequest(engine, (request) => {
     if (request.category !== category) {
@@ -67,14 +78,33 @@ function EffectButton({
   return (
     <Popover modal={false} open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <IconButton label={label} tooltipSide="bottom" data-studio-effect-category={category}>
+        <IconButton
+          ref={trigger}
+          label={label}
+          tooltipSide="bottom"
+          className="studio-surface"
+          data-studio-effect-category={category}
+        >
           <Icon size={15} />
         </IconButton>
       </PopoverTrigger>
       <PopoverContent
+        ref={content}
+        onEscapeKeyDown={() => {
+          restoreFocus.current = true;
+        }}
+        onCloseAutoFocus={(event) => {
+          // A rapid reopen can retain Radix's prior outside-interaction flag.
+          // Restore keyboard focus for Escape without stealing an outside canvas click.
+          if (restoreFocus.current) {
+            event.preventDefault();
+            restoreFocus.current = false;
+            trigger.current?.focus({ preventScroll: true });
+          }
+        }}
         className="studio-effects-popover"
         side="bottom"
-        align="center"
+        align="end"
         collisionPadding={12}
         initialFocus="content"
         aria-label={label}
@@ -216,7 +246,7 @@ function OwnedEditor({
           category={category}
           owner={{
             scope: layer ? "layer" : "composition",
-            depthAvailable: !layer && compositionHasDepth(page),
+            depthAvailable: ownerHasDepth(page, layer?.id),
           }}
           disabled={disabled || effects.length >= 64}
           onAdd={(type) => {
@@ -227,21 +257,23 @@ function OwnedEditor({
           }}
         />
       ) : (
-        <div className="studio-effects-stack">
-          {!effects.length && <p className="muted-description">{t("noEffects")}</p>}
-          <EffectStack
-            effects={effects}
-            engine={engine}
-            layerId={layer?.id}
-            disabled={disabled}
-            value={expanded}
-            onValueChange={setExpanded}
-            onUpdate={update}
-            onChange={change}
-            onStart={editor.begin}
-            onCancel={editor.cancel}
-          />
-        </div>
+        <ScrollShadow className="studio-effects-scroll">
+          <div className="studio-effects-stack">
+            {!effects.length && <p className="muted-description">{t("noEffects")}</p>}
+            <EffectStack
+              effects={effects}
+              engine={engine}
+              layerId={layer?.id}
+              disabled={disabled}
+              value={expanded}
+              onValueChange={setExpanded}
+              onUpdate={update}
+              onChange={change}
+              onStart={editor.begin}
+              onCancel={editor.cancel}
+            />
+          </div>
+        </ScrollShadow>
       )}
     </MotionFieldProvider>
   );

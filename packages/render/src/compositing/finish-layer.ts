@@ -1,3 +1,4 @@
+import type { EffectAuxiliaryInputs } from "../effects/shared/context";
 import { hasEffectTreatment } from "../effects/shared/active";
 import {
   multiplyMatrices,
@@ -25,6 +26,8 @@ interface Context {
   mask(id: string): Layer;
   maskSource(layer: Layer): FrameTexture;
   image(id: string, ownerId?: string): FrameTexture["texture"];
+  auxiliary?(bounds: Bounds): EffectAuxiliaryInputs;
+  historyBounds?: Bounds;
   effectCache?: { entry: LayerTargets; signature: string };
   effectProjection?: readonly number[];
   effectWindow?: Bounds;
@@ -69,7 +72,20 @@ export function finishLayerSource(
       ? prepareProjectedEffects(source, original, layer, scale, context.effectProjection, context)
       : null;
     if (projected) source = projected.source;
-    const effectOriginal = projected?.bounds ?? original;
+    const base = projected?.bounds ?? original;
+    const historical = context.historyBounds;
+    const effectOriginal = historical
+      ? {
+          x: Math.min(base.x, historical.x),
+          y: Math.min(base.y, historical.y),
+          width:
+            Math.max(base.x + base.width, historical.x + historical.width) -
+            Math.min(base.x, historical.x),
+          height:
+            Math.max(base.y + base.height, historical.y + historical.height) -
+            Math.min(base.y, historical.y),
+        }
+      : base;
     const outset = effectFootprint(effects);
     bounds = {
       x: effectOriginal.x - outset.left,
@@ -89,13 +105,20 @@ export function finishLayerSource(
         : undefined);
     const width = raster?.width ?? rasterExtent(bounds.width, scale),
       height = raster?.height ?? rasterExtent(bounds.height, scale);
-    if (source.premultiplied || outset.left || outset.top || outset.right || outset.bottom) {
+    if (
+      source.premultiplied ||
+      historical ||
+      outset.left ||
+      outset.top ||
+      outset.right ||
+      outset.bottom
+    ) {
       const straight = context.target("straight", width, height);
       context.passes.copyTo(source, straight, source.premultiplied, false, {
-        x: (bounds.x - effectOriginal.x) / effectOriginal.width,
-        y: 1 - (bounds.y - effectOriginal.y + bounds.height) / effectOriginal.height,
-        width: bounds.width / effectOriginal.width,
-        height: bounds.height / effectOriginal.height,
+        x: (bounds.x - base.x) / base.width,
+        y: 1 - (bounds.y - base.y + bounds.height) / base.height,
+        width: bounds.width / base.width,
+        height: bounds.height / base.height,
       });
       source = { texture: straight.texture, width, height, premultiplied: false };
     }
@@ -106,18 +129,26 @@ export function finishLayerSource(
     );
     try {
       source = {
-        texture: context.effects.apply(source.texture, width, height, effects, output, {
-          width: bounds.width,
-          height: bounds.height,
-          // Transport bounds may be a viewport crop or expansion. Effect fields
-          // and their area controls remain anchored to the authored layer frame.
-          content: {
-            x: -bounds.x,
-            y: -bounds.y,
-            width: layer.width,
-            height: layer.height,
+        texture: context.effects.apply(
+          source.texture,
+          width,
+          height,
+          effects,
+          output,
+          {
+            width: bounds.width,
+            height: bounds.height,
+            // Transport bounds may be a viewport crop or expansion. Effect fields
+            // and their area controls remain anchored to the authored layer frame.
+            content: {
+              x: -bounds.x || 0,
+              y: -bounds.y || 0,
+              width: layer.width,
+              height: layer.height,
+            },
           },
-        }),
+          context.auxiliary?.(bounds),
+        ),
         width,
         height,
         premultiplied: false,
@@ -131,7 +162,7 @@ export function finishLayerSource(
       source = projected.restore(
         source,
         bounds,
-        Boolean(outset.left || outset.top || outset.right || outset.bottom),
+        Boolean(historical || outset.left || outset.top || outset.right || outset.bottom),
       );
       bounds = source.bounds!;
     }

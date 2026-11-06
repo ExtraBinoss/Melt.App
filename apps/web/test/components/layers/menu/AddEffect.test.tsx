@@ -36,7 +36,12 @@ test.each(["effect", "adjustment"] as const)(
         });
         const search = screen.getByRole("searchbox");
         const definitions = Object.values(EFFECT_CATALOG).filter(
-          (effect) => effect.category === category && !effect.source && !effect.retired,
+          (effect) =>
+            effect.category === category &&
+            !effect.source &&
+            !effect.retired &&
+            effect.requirements?.scope !== "composition" &&
+            !effect.requirements?.depth,
         );
         for (const effect of definitions) {
           const label = i18n.t(effect.nameKey);

@@ -1,11 +1,13 @@
 import {
   createEffect,
+  getEffectDefinition,
   type Composition,
   type EnginePort,
   type EffectType,
   type Command,
 } from "@musart/core";
 import { layerSelection } from "./selection";
+import { selectionHasDepth } from "../catalog/model";
 import { capturePresentationDelete } from "../../../state/selection/attachments";
 import { resolveLayerPage } from "../tree/activation";
 /** Menu operations always re-read the active selection and reject a stale page before execution. */
@@ -57,6 +59,12 @@ export function layerActions(
     mask: () => execute((ids) => [{ type: "createMaskFromSelection", ids }]),
     effect: (type: EffectType) =>
       execute((ids, current) => {
+        const requirements = getEffectDefinition(type).requirements;
+        if (
+          requirements?.scope === "composition" ||
+          (requirements?.depth && !selectionHasDepth(current, ids))
+        )
+          return [];
         const selected = new Set(ids);
         return [
           {

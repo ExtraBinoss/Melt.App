@@ -4,6 +4,9 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ## [Unreleased]
 
+- Support native Depth of Field on individual 3D objects and groups, with mapped owner depth and GPU point focus that stays stable outside cropped viewports; expose supported owners in both workspace catalogs.
+- Support temporal Trail on individual layers and groups using exact historical Motion poses, isolated upstream paint, retained native scene context and bounded projective GPU captures.
+- Close Studio effect popovers on outside canvas clicks without interrupting native controls; place effects and grading beside Export and reuse shared ScrollShadow viewports for effects, grading, advanced properties and environments.
 - Keep document Undo/Redo available after numeric label scrubbing and inside nonmodal parameter popovers; preserve native text editing and modal keyboard ownership, with one commit per completed drag.
 - Restore known project layout preferences across Classic/Studio switches when another client added version 1 fields; preserve extra fields atomically while retaining strict validation of edits and known values.
 - Prevent native renderer focus outlines from framing the Studio canvas when holding Shift, while keeping keyboard focus and control focus indicators.

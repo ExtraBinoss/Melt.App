@@ -2,7 +2,6 @@ import {
   applyMotionFrame,
   evaluateMotion,
   motionProgramForFrame,
-  resolveEffectSettings,
   type Asset,
   type Composition,
 } from "@musart/core";
@@ -11,7 +10,13 @@ import type { GpuCompositor } from "../../compositing/GpuCompositor";
 import type { FrameTexture, RenderOptions } from "../../compositing/types";
 import type { EffectHistoryInput } from "../shared/context";
 import { GpuPasses } from "../../compositing/passes";
-import { getTrailSamples } from "./samples";
+import { gpuTextureLimit } from "../../cache/texture-limits";
+import {
+  trailCaptureRaster,
+  trailCaptureRequests,
+  trailHistoricalBounds,
+  trailUpstreamPage,
+} from "./capture-plan";
 
 /** Bounded, explicitly admitted snapshots of authored poses. No framebuffer history or readbacks. */
 export class TemporalEffectSources {
@@ -20,6 +25,7 @@ export class TemporalEffectSources {
   private snapshots: RenderTarget[] = [];
   private closed = false;
   readonly childBudget: number;
+  readonly snapshotBudget: number;
   constructor(
     private readonly renderer: WebGPURenderer,
     budget: number,
@@ -27,6 +33,7 @@ export class TemporalEffectSources {
     private readonly reserve: (bytes: number) => void,
   ) {
     this.childBudget = Math.min(64 * 1024 * 1024, Math.floor(budget / 4));
+    this.snapshotBudget = this.childBudget;
   }
 
   async prepare(
@@ -35,31 +42,32 @@ export class TemporalEffectSources {
     options: RenderOptions,
   ): Promise<ReadonlyMap<string, readonly EffectHistoryInput[]>> {
     const result = new Map<string, readonly EffectHistoryInput[]>();
-    const trails = (page.effects ?? []).filter(
-      (e) =>
-        e.type === "trail" &&
-        e.enabled &&
-        e.amount > 0 &&
-        resolveEffectSettings(e).mode === "temporal",
-    );
-    if (options.history === "disabled" || !trails.length) {
+    const plan = options.motionFrame;
+    const program = plan && motionProgramForFrame(plan);
+    // Static poses have no authored past; discard retained snapshots from an earlier sample.
+    if (options.history === "disabled" || !plan || !program || program.mode !== "motion") {
       this.releaseSnapshots();
       return result;
     }
-    const plan = options.motionFrame;
-    const program = plan && motionProgramForFrame(plan);
-    // A static pose has no authored past. Do not fabricate history from the current image.
-    if (!plan || !program || program.mode !== "motion") return result;
-    const requests = trails.map((effect) => ({
-      effect,
-      samples: getTrailSamples(effect, plan.time),
-    }));
+    const requests = trailCaptureRequests(page, plan.time);
     const count = requests.reduce((n, request) => n + request.samples.length, 0);
-    if (count > 32) throw new Error("Temporal effects exceed the shared 32-snapshot budget.");
-    if (!count) return result;
-    const region = options.viewport ?? page;
-    const width = Math.max(1, Math.ceil(region.width * (options.scale ?? 1)));
-    const height = Math.max(1, Math.ceil(region.height * (options.scale ?? 1)));
+    if (!count) {
+      this.releaseSnapshots();
+      return result;
+    }
+    const captureBounds = options.viewport ?? {
+      x: 0,
+      y: 0,
+      width: page.width,
+      height: page.height,
+    };
+    const { width, height, scale } = trailCaptureRaster(
+      captureBounds,
+      options.scale ?? 1,
+      count,
+      gpuTextureLimit(this.renderer),
+      this.snapshotBudget,
+    );
     const previousBytes = this.snapshots.reduce(
       (bytes, target) => bytes + target.width * target.height * 8,
       0,
@@ -82,24 +90,19 @@ export class TemporalEffectSources {
         this.assertActive(options);
         const previous = evaluateMotion(program, sample.time);
         const authored = applyMotionFrame(program, previous);
-        const before =
-          authored.effects?.findIndex((effect) => effect.id === request.effect.id) ?? -1;
-        const upstream: Composition = {
-          ...authored,
-          effects: (before < 0 ? [] : authored.effects!.slice(0, before)).filter(
-            (effect) => effect.type !== "trail",
-          ),
-          layers: authored.layers.map((layer) =>
-            layer.effects.some((e) => e.type === "trail")
-              ? { ...layer, effects: layer.effects.filter((e) => e.type !== "trail") }
-              : layer,
-          ),
-        };
+        const upstream: Composition = trailUpstreamPage(authored, request);
+        const ownerBounds = request.ownerId
+          ? trailHistoricalBounds(upstream, request.ownerId, captureBounds)
+          : undefined;
         const frame: FrameTexture = await this.compositor.render(upstream, assets, {
           ...options,
           immutableFrame: undefined,
           history: "disabled",
           effectCapture: true,
+          effectCaptureOwnerId: request.ownerId,
+          scale,
+          effectSourceScale: Math.min(options.effectSourceScale ?? 1, scale),
+          imageSourceScale: Math.min(options.imageSourceScale ?? scale, scale),
           framing: undefined,
           motionFrame: previous,
           canRender: () =>
@@ -118,7 +121,13 @@ export class TemporalEffectSources {
           this.snapshots[index] = target;
         } else target.setSize(width, height);
         this.passes.copyTo(frame, target, frame.premultiplied);
-        inputs[sample.slot] = { texture: target.texture, available: true, flipY: true };
+        inputs[sample.slot] = {
+          texture: target.texture,
+          available: true,
+          flipY: true,
+          captureBounds,
+          ...(ownerBounds ? { ownerBounds } : {}),
+        };
         index++;
       }
       result.set(request.effect.id, inputs);

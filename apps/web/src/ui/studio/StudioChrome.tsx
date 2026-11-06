@@ -1,5 +1,5 @@
 import { memo, useCallback, type ReactNode } from "react";
-import { Crosshair, Download, ImagePlus, SlidersHorizontal } from "lucide-react";
+import { Crosshair, Download, ImagePlus, PanelRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import type { EnginePort } from "@musart/core";
 import type { EditorServices } from "../../state/contracts";
@@ -65,10 +65,6 @@ export const StudioChrome = memo(function StudioChrome({
           </IconButton>
         </div>
         <span className="studio-toolbar-divider" aria-hidden />
-        <div className="studio-tool-group">
-          <StudioEffects engine={engine} services={services} run={run} />
-        </div>
-        <span className="studio-toolbar-divider" aria-hidden />
         <div className="studio-tool-group studio-view-shortcuts">
           <IconButton
             label={common("recenterView")}
@@ -82,11 +78,12 @@ export const StudioChrome = memo(function StudioChrome({
         </div>
       </nav>
       <div className="studio-actions" data-canvas-control>
+        <StudioEffects engine={engine} services={services} run={run} />
         <StudioPropertyPopover
           openRequest={advancedRequest}
           trigger={
             <IconButton label={t("advanced")} tooltipSide="bottom" className="studio-surface">
-              <SlidersHorizontal size={17} />
+              <PanelRight size={17} />
             </IconButton>
           }
           side="bottom"

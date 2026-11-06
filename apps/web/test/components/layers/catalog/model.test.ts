@@ -18,7 +18,14 @@ test("every registered effect has exactly one presentation family and retains it
     const entries = effectCatalogEntries(category, i18n.getFixedT("fr"), "fr");
     expect(entries.map((entry) => entry.type).sort()).toEqual(
       Object.values(EFFECT_CATALOG)
-        .filter((item) => item.category === category && !item.source && !item.retired)
+        .filter(
+          (item) =>
+            item.category === category &&
+            !item.source &&
+            !item.retired &&
+            item.requirements?.scope !== "composition" &&
+            !item.requirements?.depth,
+        )
         .map((item) => item.type)
         .sort(),
     );
@@ -68,7 +75,10 @@ test("descriptions and bilingual synonyms discover adjustments while retaining c
 test("search matches localized names, durable IDs and families, with accent-insensitive AND terms", () => {
   const entries = effectCatalogEntries("effect", i18n.getFixedT("fr"), "fr");
   expect(normalizeEffectSearch("  ÉCRANS  ")).toBe("ecrans");
-  expect(filterEffectCatalog(entries, "FlOu", "all").map((entry) => entry.type)).toEqual(["blur"]);
+  expect(filterEffectCatalog(entries, "FlOu", "all").map((entry) => entry.type)).toEqual([
+    "feather",
+    "blur",
+  ]);
   expect(filterEffectCatalog(entries, "ombre", "all").map((entry) => entry.type)).toEqual([
     "circle",
     "shadow",

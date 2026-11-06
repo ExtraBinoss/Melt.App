@@ -4,6 +4,7 @@ import {
   createEffect,
   getEffectDefinition,
   type Effect,
+  type Composition,
   type Layer,
   type EnginePort,
 } from "@musart/core";
@@ -12,21 +13,29 @@ import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent } from "../ui/dr
 import { EffectMenu } from "../layers/EffectMenu";
 import { Button } from "../ui/button";
 import { EffectStack } from "./effects/EffectStack";
+import { ownerHasDepth } from "../layers/catalog/model";
 
 export function EffectsPanel({
   layer,
+  page,
   engine,
   onPatch,
   onPreview,
   onCancel,
 }: {
   layer: Layer;
+  page?: Composition;
   engine?: EnginePort;
   onPatch(this: void, patch: Partial<Layer>): void;
   onPreview(this: void, patch: Partial<Layer>): void;
   onCancel?: () => void;
 }) {
   const { t } = useTranslation();
+  const ownerPage =
+    page ??
+    engine
+      ?.getSnapshot()
+      .project.pages.find((item) => item.layers.some((item) => item.id === layer.id));
   const [opened, setOpened] = useState({ owner: layer.id, value: layer.effects.at(-1)?.id ?? "" });
   if (opened.owner !== layer.id)
     setOpened({ owner: layer.id, value: layer.effects.at(-1)?.id ?? "" });
@@ -49,6 +58,10 @@ export function EffectsPanel({
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <EffectMenu
+              owner={{
+                scope: "layer",
+                depthAvailable: Boolean(ownerPage && ownerHasDepth(ownerPage, layer.id)),
+              }}
               onAdd={(type) => {
                 const effect = createEffect(type);
                 onPatch({ effects: [...layer.effects, effect] });

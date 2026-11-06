@@ -5,6 +5,17 @@ import { canvasHit, canvasSelectionHit } from "../selection/hit";
 import type { Point } from "../viewport/view";
 import type { Tool } from "./gestures";
 
+const handledPointers = new WeakSet<Event>();
+
+/** Native camera/object controls own the gesture while document overlays still see input. */
+export function markCanvasPointerHandled(event: Event) {
+  handledPointers.add(event);
+}
+
+export function canvasPointerAdmitted(event: { nativeEvent: Event; button: number }) {
+  return !handledPointers.has(event.nativeEvent) && event.button >= 0 && event.button <= 2;
+}
+
 /** Modified clicks use paint order; an ordinary pointer drag retains its selected target. */
 export function pickCanvasPointer(
   engine: EnginePort,

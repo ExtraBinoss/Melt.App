@@ -78,6 +78,10 @@
   overflow-y: auto;
   overscroll-behavior: contain;
 }
+.studio-sphere-properties-shadow {
+  min-width: 0;
+  border-radius: var(--radius-lg);
+}
 .studio-sphere-properties .studio-panel-title {
   color: var(--muted-foreground);
   margin-bottom: 9px;

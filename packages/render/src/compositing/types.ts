@@ -17,6 +17,8 @@ export interface RenderOptions {
   history?: "disabled";
   /** Internal upstream snapshots retain working-space pixels before presentation proofing. */
   effectCapture?: boolean;
+  /** Isolate an owner’s paint while retaining the complete native scene for depth and shading. */
+  effectCaptureOwnerId?: string;
   /** Explicit adapter ownership: all nested render data stays immutable for this
    * frame's lifetime. Must reference the exact page passed to render().
    */

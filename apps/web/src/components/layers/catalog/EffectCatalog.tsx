@@ -11,6 +11,7 @@ import {
   filterEffectCatalog,
   type EffectCategory,
   type EffectFamily,
+  type EffectCatalogOwner,
 } from "./model";
 import "./messages";
 import "../../properties/effects/library-messages";
@@ -22,9 +23,11 @@ export const EffectCatalog = memo(function EffectCatalog({
   category,
   onAdd,
   initialQuery = "",
+  owner = { scope: "layer" },
 }: {
   category: EffectCategory;
   initialQuery?: string;
+  owner?: EffectCatalogOwner;
   onAdd(this: void, type: EffectType): void;
 }) {
   const { t, i18n } = useTranslation();
@@ -32,8 +35,8 @@ export const EffectCatalog = memo(function EffectCatalog({
   const [family, setFamily] = useState<EffectFamily | "all">("all");
   const list = useRef<CatalogRowsHandle>(null);
   const entries = useMemo(
-    () => effectCatalogEntries(category, t, i18n.resolvedLanguage ?? i18n.language),
-    [category, t, i18n.resolvedLanguage, i18n.language],
+    () => effectCatalogEntries(category, t, i18n.resolvedLanguage ?? i18n.language, owner),
+    [category, t, i18n.resolvedLanguage, i18n.language, owner.scope, owner.depthAvailable],
   );
   const families = EFFECT_FAMILIES.filter((family) =>
     entries.some((entry) => entry.family === family),

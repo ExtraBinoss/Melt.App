@@ -11,6 +11,7 @@ import {
 } from "@musart/core";
 import {
   DataTexture,
+  Matrix3,
   DepthTexture,
   RGBAFormat,
   UnsignedByteType,
@@ -58,7 +59,11 @@ interface EffectPass {
   readonly controls: EffectUniforms;
   readonly images: Map<
     string,
-    { texture: TextureNode<"vec4">; enabled: UniformNode<"float", number> }
+    {
+      texture: TextureNode<"vec4">;
+      enabled: UniformNode<"float", number>;
+      flipY: UniformNode<"float", number>;
+    }
   >;
   readonly depth: EffectDepthBinding | null;
   readonly history: Map<number, EffectHistoryBinding & { readonly fallback: DataTexture }>;
@@ -132,7 +137,21 @@ export class GpuEffects {
     const advanced =
       stage.final &&
       Boolean(effect.composite || (effect.blendMode && effect.blendMode !== "normal"));
-    const passKey = effectPassKey(effect, stage);
+    const depthInput = getEffectDefinition(effect.type).requirements?.depth
+      ? (auxiliary.depthForEffect?.(effect) ?? auxiliary.depth)
+      : undefined;
+    if (
+      getEffectDefinition(effect.type).requirements?.depth &&
+      (!depthInput ||
+        !(depthInput.texture instanceof DepthTexture) ||
+        !Number.isFinite(depthInput.near) ||
+        !Number.isFinite(depthInput.far) ||
+        depthInput.near <= 0 ||
+        depthInput.far <= depthInput.near)
+    )
+      throw Error("Native depth is unavailable for this effect owner");
+    // Point focus needs an independent sampler; manual passes may alias unused focus depth.
+    const passKey = effectPassKey(effect, stage) + (depthInput?.focusTexture ? ":focus" : "");
     const uniformEffect = stage.key === "copy" ? COPY_EFFECT : effect;
     let pass = this.passes.get(passKey);
     if (!pass) {
@@ -145,13 +164,24 @@ export class GpuEffects {
       let depth: EffectDepthBinding | null = null;
       const node = stage.builder({
         bindDepthInput: () => {
-          if (!auxiliary.depth) throw Error("Native composition depth is unavailable");
+          if (
+            !depthInput ||
+            !(depthInput.texture instanceof DepthTexture) ||
+            !Number.isFinite(depthInput.near) ||
+            !Number.isFinite(depthInput.far) ||
+            depthInput.near <= 0 ||
+            depthInput.far <= depthInput.near
+          )
+            throw Error("Native depth is unavailable for this effect owner");
           return (depth ??= {
-            texture: texture(auxiliary.depth.texture),
+            texture: texture(depthInput.texture),
             available: uniform(1),
-            near: uniform(auxiliary.depth.near),
-            far: uniform(auxiliary.depth.far),
-            perspective: uniform(auxiliary.depth.perspective ? 1 : 0),
+            near: uniform(depthInput.near),
+            far: uniform(depthInput.far),
+            perspective: uniform(depthInput.perspective ? 1 : 0),
+            uvTransform: uniform(new Matrix3()),
+            focusTexture: texture(depthInput.focusTexture ?? depthInput.texture),
+            focusPresent: uniform(depthInput.focusTexture ? 1 : 0),
           });
         },
         bindHistoryInput: (slot) => {
@@ -167,6 +197,7 @@ export class GpuEffects {
               texture: texture(input?.texture ?? fallback),
               available: uniform(0),
               flipY: uniform(0),
+              uvTransform: uniform(new Matrix3()),
               fallback,
             };
             history.set(slot, binding);
@@ -176,7 +207,11 @@ export class GpuEffects {
         bindImageInput: (key) => {
           let binding = images.get(key);
           if (!binding) {
-            binding = { texture: texture(this.neutralImage()), enabled: uniform(0) };
+            binding = {
+              texture: texture(this.neutralImage()),
+              enabled: uniform(0),
+              flipY: uniform(0),
+            };
             images.set(key, binding);
           }
           return binding;
@@ -219,21 +254,27 @@ export class GpuEffects {
         throw Error("Effect image resolver is unavailable");
       binding.texture.value =
         assetId && bindImages ? this.imageInput!(assetId) : this.neutralImage();
+      binding.flipY.value = binding.texture.value.isRenderTargetTexture ? 1 : 0;
       binding.enabled.value = assetId ? 1 : 0;
     }
-    if (pass.depth) {
-      if (!auxiliary.depth) throw Error("Native composition depth is unavailable");
-      pass.depth.texture.value = auxiliary.depth.texture;
+    if (pass.depth && depthInput) {
+      pass.depth.texture.value = depthInput.texture;
       pass.depth.available.value = 1;
-      pass.depth.near.value = auxiliary.depth.near;
-      pass.depth.far.value = auxiliary.depth.far;
-      pass.depth.perspective.value = auxiliary.depth.perspective ? 1 : 0;
+      pass.depth.near.value = depthInput.near;
+      pass.depth.far.value = depthInput.far;
+      pass.depth.perspective.value = depthInput.perspective ? 1 : 0;
+      pass.depth.uvTransform.value.fromArray(
+        depthInput.uvTransform ?? [1, 0, 0, 0, -1, 0, 0, 1, 1],
+      );
+      pass.depth.focusTexture.value = depthInput.focusTexture ?? depthInput.texture;
+      pass.depth.focusPresent.value = depthInput.focusTexture ? 1 : 0;
     }
     for (const [slot, binding] of pass.history) {
       const input = auxiliary.history?.get(effect.id)?.[slot];
       binding.texture.value = input?.texture ?? binding.fallback;
       binding.available.value = input?.available ? 1 : 0;
       binding.flipY.value = input?.flipY ? 1 : 0;
+      binding.uvTransform.value.fromArray(input?.uvTransform ?? [1, 0, 0, 0, 1, 0, 0, 0, 1]);
     }
     pass.source.value = input;
     pass.backdrop.value = original;
@@ -383,18 +424,8 @@ export class GpuEffects {
       const requirements = getEffectDefinition(effect.type).requirements;
       if (requirements?.scope === "composition" && auxiliary.scope !== "composition")
         throw Error(`${effect.type} is available only on the composition`);
-      if (requirements?.depth) {
-        const depth = auxiliary.depth;
-        if (
-          !depth ||
-          !(depth.texture instanceof DepthTexture) ||
-          !Number.isFinite(depth.near) ||
-          !Number.isFinite(depth.far) ||
-          depth.near <= 0 ||
-          depth.far <= depth.near
-        )
-          throw Error("Depth of field is unavailable without native composition depth");
-      }
+      if (requirements?.depth && !auxiliary.depth && !auxiliary.depthForEffect)
+        throw Error("Depth of field is unavailable without native owner depth");
     }
     if (source === output.texture)
       throw new Error("La source et la cible GPU doivent être distinctes.");

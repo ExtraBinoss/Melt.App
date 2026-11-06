@@ -1,5 +1,5 @@
 import type { Node } from "three/webgpu";
-import { clamp, cos, float, max, mix, pow, sin, step, uv, vec2, vec3, vec4 } from "three/tsl";
+import { abs, clamp, cos, float, max, mix, pow, sin, step, uv, vec2, vec3, vec4 } from "three/tsl";
 import { sampleEffect, type EffectNodeContext } from "../shared/context";
 import { mixEffectCoverage } from "../shared/compositing/node";
 
@@ -33,18 +33,34 @@ export function trailNode(context: EffectNodeContext) {
       inside = step(0, coord.x).mul(step(coord.x, 1)).mul(step(0, coord.y)).mul(step(coord.y, 1)),
       staticSample = sampleEffect(source, controls, clamp(coord, 0, 1)),
       binding = context.bindHistoryInput?.(slot),
+      projected = binding?.uvTransform.mul(vec3(coord, 1)),
+      historicalCoord = projected
+        ? projected.xy.div(projected.z.equal(0).select(1, projected.z))
+        : coord,
+      historicalInside = step(0, historicalCoord.x)
+        .mul(step(historicalCoord.x, 1))
+        .mul(step(0, historicalCoord.y))
+        .mul(step(historicalCoord.y, 1))
+        .mul(projected ? abs(projected.z).greaterThan(0.000001).select(1, 0) : 1),
       history = binding
         ? binding.texture.sample(
             vec2(
-              clamp(coord.x, 0, 1),
-              mix(clamp(coord.y, 0, 1), clamp(coord.y, 0, 1).oneMinus(), binding.flipY),
+              clamp(historicalCoord.x, 0, 1),
+              mix(
+                clamp(historicalCoord.y, 0, 1),
+                clamp(historicalCoord.y, 0, 1).oneMinus(),
+                binding.flipY,
+              ),
             ),
           )
         : staticSample,
       available = binding?.available ?? float(0),
       sampleAlpha = temporal.select(history.a.mul(available), staticSample.a),
       sampleColor = temporal.select(history.rgb, staticSample.rgb),
-      weight = float(slot).lessThan(u.echoCount!).select(pow(u.fade!, age), 0).mul(inside),
+      weight = float(slot)
+        .lessThan(u.echoCount!)
+        .select(pow(u.fade!, age), 0)
+        .mul(temporal.select(historicalInside, inside)),
       coverage = sampleAlpha.mul(weight);
     temporalColor = temporalColor.add(history.rgb.mul(history.a).mul(weight).mul(available));
     temporalAlpha = temporalAlpha.add(history.a.mul(weight).mul(available));

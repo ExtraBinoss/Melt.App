@@ -1,8 +1,7 @@
 # SDK implementation checkpoint
 
 The earlier handoff describes drafts before this implementation. The current
-working tree now connects the SDK, Motion authoring and effect registries. It has
-not been committed; unrelated earlier changes are preserved.
+working tree now connects the SDK, Motion authoring and effect registries. The initial implementation is committed; unrelated local changes are preserved.
 
 | Domain | Implemented |
 | --- | --- |
@@ -12,8 +11,8 @@ not been committed; unrelated earlier changes are preserved.
 | Motion | Timed drivers and sparse recorded input, analytic springs, displacement drag/release, click impulse/toggle, ordinary editable blocks, composition effect targets and shared evaluation. |
 | Interaction | Recording-only canvas ownership with owner-coordinate mapping, controls excluded, mouse/touch/keyboard and lifecycle cancellation. |
 | New source treatments | Risograph, Oil Painter, Chromatic Aberration, LEGO-style Blocks and Wind registered with controls, localization, search and native builders. |
-| DOF | Real borrowed native depth, manual camera-distance focus, quality controls and composition-only availability. |
-| Trail | Exact prior authored poses rendered upstream through Motion, recursive history disabled, working-space snapshots admitted against a bounded GPU budget. Composition-only. |
+| DOF | Real borrowed native depth for composition and native objects/groups, manual or GPU point focus, exact owner/window mapping and bounded quality controls. |
+| Trail | Exact prior authored poses for composition, objects and groups through Motion; isolated upstream paint, retained native context, projective mapping, historical bounds and bounded GPU snapshots. |
 
 All 53 active effect thumbnails now use a photographed source selected through
 `EffectDefinition.sdk.preview`. Four generated originals are bundled under
@@ -22,8 +21,9 @@ All 53 active effect thumbnails now use a photographed source selected through
 atlas with zero production GPU, WebGL, Canvas2D and VideoFrame readbacks.
 Studio displays large photo cards; Classic retains its virtual list with larger
 static thumbnails. No source photograph or effect renderer is loaded for browsing.
-DOF point focus and layer-local temporal capture remain unsupported. Native depth
-retains the existing opaque prepass limitations for transparent and faded groups.
+Object depth and temporal captures are implemented in the follow-up described in
+[DOF](depth-of-field.md) and [Trail](trail.md). Native depth retains the existing
+opaque-material eligibility; post-composite masks affect color after native depth.
 
 Validation is deliberately limited during implementation. The initial dock units
 passed ten cases, with one timeout under the 25% CPU quota. Browser dock attempts
@@ -50,3 +50,25 @@ editor smoke stopped at cold startup before executing functional assertions; it
 must not be presented as a full app pass. Native card geometry was inspected and
 verified at 121.5px photo height with readable labels. Captures and witnesses are
 under ignored `artifacts/studio/motion-simple-*` and `photo-catalog-*`.
+
+
+## Native object follow-up validation
+
+The object-depth/point-focus and temporal-owner implementation passed focused
+core, renderer, compositor and catalog regressions. Direct native pixel witnesses
+passed on both Three WebGPU and WebGL backends: local DOF preserves an untouched
+neighbour, point focus restores the native sharp source, offscreen full-gate focus
+matches cropped output, and exact repeats match. Object Trail preserves prior
+owner/parent poses, masks and neighbour isolation across random-access replay and
+preview density, with zero production readbacks and released GPU allocations.
+
+The Studio native witness verifies first-click outside dismissal, quick reopen
+and Escape focus, nested menu ownership, shared scroll shadows (including no fade
+when content fits), no body style locks, and the compact right-side action layout
+at narrow width. Renderer strict source typing, focused lint and repository rules
+are checked separately from CI's full build/coverage/release gate. Evidence is
+retained under ignored `artifacts/studio/object-*` and
+`studio-effect-dismissal-final.log`. Checks run serially with CPUQuota=50%, bounded
+memory, one worker and no swap; these are correctness witnesses, not latency or
+120 Hz display benchmarks. Unrelated in-progress media/effect changes are excluded
+from the reviewed source snapshot.

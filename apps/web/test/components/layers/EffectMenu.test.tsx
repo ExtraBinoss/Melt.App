@@ -59,7 +59,14 @@ test.each(["effect", "adjustment"] as const)(
         const search = await screen.findByRole("searchbox");
         const entries = readCatalog(search.closest('[role="menu"]') as HTMLElement, language);
         const expected = Object.values(EFFECT_CATALOG)
-          .filter((e) => e.category === category && !e.source && !e.retired)
+          .filter(
+            (e) =>
+              e.category === category &&
+              !e.source &&
+              !e.retired &&
+              !e.requirements?.depth &&
+              e.requirements?.scope !== "composition",
+          )
           .map((e) => e.type);
         expect(new Set(entries.keys())).toEqual(new Set(expected));
       }

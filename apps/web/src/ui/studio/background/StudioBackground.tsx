@@ -172,6 +172,7 @@ function LayerBackground({
           }
         />
         <EffectsPanel
+          page={page}
           engine={engine}
           layer={layer}
           onPatch={edit.commit}

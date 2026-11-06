@@ -11,7 +11,12 @@ export function RetainedCatalogs(props: ComponentProps<typeof EffectCatalog>) {
       key={`${category}:${props.initialQuery ?? ""}`}
       mode={category === props.category ? "visible" : "hidden"}
     >
-      <EffectCatalog category={category} onAdd={props.onAdd} initialQuery={props.initialQuery} />
+      <EffectCatalog
+        category={category}
+        onAdd={props.onAdd}
+        initialQuery={props.initialQuery}
+        owner={props.owner}
+      />
     </Activity>
   ));
 }

@@ -215,7 +215,7 @@ export function EditorCanvas({
     if (layer) beginHandle(event, layer, handle);
   }
   function pointerDown(event: ReactPointerEvent<HTMLDivElement>) {
-    if (event.button < 0 || event.button > 2) return;
+    if (!pointerPick.canvasPointerAdmitted(event)) return;
     if (gesture.current && gesture.current.pointerId !== event.pointerId) return;
     if ((event.target as HTMLElement).closest("[data-canvas-control]")) return;
     const frame = controller.read();

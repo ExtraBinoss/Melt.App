@@ -12,6 +12,7 @@ import type { LayerTargets } from "./targets";
 import type { RenderFrame } from "./render-frame";
 import { drawLayerSource, isSrgbLayerSource } from "./layer-source";
 import { finishLayerSource, layerEffectCache } from "./finish-layer";
+import { historicalEffectBounds, layerEffectInputs } from "./effect-inputs";
 import { hasEffectTreatment } from "../effects/shared/active";
 import { groupViewport, type GroupViewport } from "./group-viewport";
 import { rasterExtent, type FrameTexture } from "./types";
@@ -140,6 +141,21 @@ export function renderLayer(
       passes: context.passes,
       effects: context.effects,
       cache: context.cache,
+      historyBounds: historicalEffectBounds(
+        page,
+        layer,
+        frame.history,
+        context.spatial?.effectProjection(layer.id),
+      ),
+      auxiliary: (bounds) =>
+        layerEffectInputs(
+          page,
+          layer,
+          bounds,
+          context.spatial,
+          frame.history,
+          context.spatial?.effectProjection(layer.id),
+        ),
       ...(layer.spatial?.enabled
         ? {
             effectProjection: context.spatial?.effectProjection(layer.id),
@@ -156,7 +172,8 @@ export function renderLayer(
       ),
       image: (id, ownerId) =>
         ownerId ? context.sources.maskImage(id, ownerId) : context.sources.image(id),
-      maskSource: (maskLayer) => context.layer(maskLayer, frame),
+      maskSource: (maskLayer) =>
+        context.layer(maskLayer, frame.capture ? { ...frame, capture: undefined } : frame),
       mask: (id) => {
         const maskLayer = geometry.byId.get(id);
         if (!maskLayer) throw new Error(`Calque masque introuvable : ${id}`);

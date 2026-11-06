@@ -23,7 +23,7 @@ import {
 } from "../ui/dropdown-menu";
 import { useOverlayEntrance } from "../shared/overlays/use-overlay-entrance";
 import { useHoverDismiss } from "../shared/overlays/use-hover-dismiss";
-import type { EffectCategory } from "./catalog/model";
+import type { EffectCatalogOwner, EffectCategory } from "./catalog/model";
 import { RetainedCatalogs } from "./catalog/RetainedCatalogs";
 
 /** One native submenu owns both catalogs, so changing category retains its surface and focus scope. */
@@ -31,10 +31,12 @@ export function EffectMenu({
   onAdd,
   libraryRequest = 0,
   guidedQuery = null,
+  owner,
 }: {
   onAdd: (type: EffectType) => void;
   libraryRequest?: number;
   guidedQuery?: string | null;
+  owner?: EffectCatalogOwner;
 }) {
   const { t, i18n } = useTranslation();
   const [category, setCategory] = useState<EffectCategory>("effect");
@@ -194,7 +196,12 @@ export function EffectMenu({
           onPointerLeave={guidedQuery === null ? hover.leave : undefined}
           onKeyDownCapture={keyboard}
         >
-          <RetainedCatalogs category={category} onAdd={onAdd} initialQuery={guidedQuery ?? ""} />
+          <RetainedCatalogs
+            category={category}
+            onAdd={onAdd}
+            initialQuery={guidedQuery ?? ""}
+            owner={owner}
+          />
         </DropdownMenuSubContent>
       </DropdownMenuPortal>
     </DropdownMenuSub>

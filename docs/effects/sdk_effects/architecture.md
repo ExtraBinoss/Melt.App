@@ -106,11 +106,20 @@ handles are supplied when an effect has no native gizmo. The shared controls
 include an imperative XY pad plus generated scalar controls.
 
 Native depth/history inputs are borrowed from their renderer owners. Missing
-native depth is a real failure, not a simulated focus effect. DOF initially exposes
-manual focus distance and is composition-only. Temporal Trail is also
-composition-only: it evaluates the same immutable Motion program at exact previous
-times, truncates the upstream stack, disables recursive temporal requests, and
-copies GPU outputs into a bounded snapshot pool. Snapshot storage and a capped
-child compositor are admitted against the parent GPU budget before allocation.
-There is no dependence on previously viewed frames. Layer-local temporal capture
-and offscreen point focus are not implemented by these capabilities.
+native depth is a real failure, not a simulated focus effect. DOF supports the
+composition and native objects/groups. Its isolated owner depth maps through the
+actual transport, parent layout and camera homography. Point focus renders one
+GPU depth pixel at the full authored owner position, independently of the displayed
+viewport; a maximum of 64 tiny focus targets and one local depth target are admitted
+against the same spatial cache budget. Ordinary flat layers have no native depth.
+
+Temporal Trail supports composition, layers and groups. It evaluates the same
+immutable Motion program at exact previous times, truncates the requesting owner's
+upstream stack, disables recursive temporal requests, and captures isolated owner
+paint while retaining the complete native scene for depth, lighting and reflections.
+Ancestor paint treatments are applied by the present graph, not duplicated in each
+echo. Projective UV mapping and conservative historical bounds preserve previous
+object/parent/camera poses outside the current silhouette. Snapshot density and a
+capped child compositor are admitted against the parent GPU budget; there is no
+dependence on previously viewed frames. See [DOF](depth-of-field.md) and
+[Trail](trail.md) for material eligibility, masks and sampling limits.

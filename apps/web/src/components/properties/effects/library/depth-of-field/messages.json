@@ -2,6 +2,9 @@
   "en": {
     "name": "Depth of Field",
     "parameter": {
+      "focusMode": "Focus mode",
+      "focusX": "Focus point X",
+      "focusY": "Focus point Y",
       "focusDistance": "Focus distance",
       "focusRange": "Focal range",
       "aperture": "Aperture",
@@ -12,6 +15,8 @@
       "quality": "Sampling quality"
     },
     "choice": {
+      "distance": "Camera distance",
+      "point": "Native depth at point",
       "low": "Low (8 samples)",
       "medium": "Medium (16 samples)",
       "high": "High (24 samples)"
@@ -20,6 +25,9 @@
   "fr": {
     "name": "Profondeur de champ",
     "parameter": {
+      "focusMode": "Mode de mise au point",
+      "focusX": "Point de mise au point X",
+      "focusY": "Point de mise au point Y",
       "focusDistance": "Distance de mise au point",
       "focusRange": "Plage de netteté",
       "aperture": "Ouverture",
@@ -30,6 +38,8 @@
       "quality": "Qualité d’échantillonnage"
     },
     "choice": {
+      "distance": "Distance caméra",
+      "point": "Profondeur native au point",
       "low": "Faible (8 échantillons)",
       "medium": "Moyenne (16 échantillons)",
       "high": "Élevée (24 échantillons)"

@@ -27,7 +27,7 @@ export const TRAIL_DEFINITION = defineEffect(
   "effect",
   "expand",
   {
-    requirements: { history: true, scope: "composition" },
+    requirements: { history: true },
     sdk: { direction: "angle", preferredTargets: ["fade", "offsetX", "spread"] },
   },
 );

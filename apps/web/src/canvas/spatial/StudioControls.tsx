@@ -29,6 +29,7 @@ import { wheelZoomFactor } from "../viewport/view";
 import { registerCameraNavigation } from "../viewport/camera-navigation";
 import { getStudioViewport } from "../../ui/studio/framing/viewport";
 import { applyStudioCameraWindow } from "./display-camera";
+import { markCanvasPointerHandled } from "../interaction/pointer-pick";
 
 interface Props {
   engine: EnginePort;
@@ -347,8 +348,9 @@ export default function StudioControls({ engine, controller, target }: Props) {
       };
       viewport?.focus({ preventScroll: true });
     };
-    const block = (event: Event) => {
-      if (admitted) event.stopPropagation();
+    const claim = (event: Event) => {
+      // Suppress the competing React canvas gesture without hiding outside input from Radix.
+      if (admitted) markCanvasPointerHandled(event);
     };
     const release = (event: PointerEvent) => {
       if (!pointer || pointer.id !== event.pointerId) return;
@@ -441,7 +443,7 @@ export default function StudioControls({ engine, controller, target }: Props) {
     document.addEventListener("visibilitychange", visibility);
     canvas.setAttribute("tabindex", "0");
     surface.addEventListener("pointerdown", gate, true);
-    surface.addEventListener("pointerdown", block);
+    surface.addEventListener("pointerdown", claim);
     surface.addEventListener("pointerup", release);
     surface.addEventListener("pointercancel", cancel, true);
     viewport?.addEventListener("keydown", key, true);
@@ -479,7 +481,7 @@ export default function StudioControls({ engine, controller, target }: Props) {
       delete canvas.dataset.spatialCenter;
       delete canvas.dataset.spatialProjection;
       surface.removeEventListener("pointerdown", gate, true);
-      surface.removeEventListener("pointerdown", block);
+      surface.removeEventListener("pointerdown", claim);
       surface.removeEventListener("pointerup", release);
       surface.removeEventListener("pointercancel", cancel, true);
       viewport?.removeEventListener("keydown", key, true);

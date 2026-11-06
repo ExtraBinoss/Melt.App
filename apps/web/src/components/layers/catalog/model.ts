@@ -20,13 +20,28 @@ export interface EffectCatalogOwner {
   readonly scope: "layer" | "composition";
   readonly depthAvailable?: boolean;
 }
-/** UI admission follows actual native source availability; rendering verifies the borrowed depth port. */
-export function compositionHasDepth(page: Composition): boolean {
+/** UI admission follows prepared native mesh ownership; rendering verifies the borrowed depth port. */
+export function ownerHasDepth(page: Composition, layerId?: string): boolean {
   const geometry = createLayerGeometryIndex(page);
-  return page.layers.some(
-    (layer) =>
-      layer.spatial?.enabled && layer.spatial.source !== "group" && geometry.isVisible(layer.id),
-  );
+  if (layerId && !geometry.byId.has(layerId)) return false;
+  return page.layers.some((layer) => {
+    if (
+      !layer.spatial?.enabled ||
+      layer.spatial.source === "group" ||
+      !geometry.isVisible(layer.id)
+    )
+      return false;
+    if (layer.id === layerId) return true;
+    if (geometry.isMaskSource(layer.id)) return false;
+    return !layerId || geometry.ancestors(layer.id).some((parent) => parent.id === layerId);
+  });
+}
+export function compositionHasDepth(page: Composition): boolean {
+  return ownerHasDepth(page);
+}
+/** Bulk actions add the effect to every selected row, including selected descendants. */
+export function selectionHasDepth(page: Composition, selection: readonly string[]): boolean {
+  return selection.length > 0 && selection.every((id) => ownerHasDepth(page, id));
 }
 export const EFFECT_FAMILIES: readonly EffectFamily[] = [
   "tone",

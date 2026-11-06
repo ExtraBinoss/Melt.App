@@ -9,6 +9,7 @@ import { layerActions } from "./actions";
 import { useRenderMetrics } from "../../../state/session/render-metrics";
 import "../../properties/effects/library-messages";
 import { EffectCatalog } from "../catalog/EffectCatalog";
+import { selectionHasDepth } from "../catalog/model";
 export const AddEffect = memo(function AddEffect({
   engine,
   page,
@@ -40,7 +41,13 @@ export const AddEffect = memo(function AddEffect({
         </IconButton>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="effect-catalog-menu">
-        <EffectOptions engine={engine} page={page} run={run} category={category} />
+        <EffectOptions
+          engine={engine}
+          page={page}
+          selection={selection}
+          run={run}
+          category={category}
+        />
       </DropdownMenuContent>
     </DropdownMenu>
   );
@@ -50,14 +57,23 @@ export const AddEffect = memo(function AddEffect({
 function EffectOptions({
   engine,
   page,
+  selection,
   run,
   category,
 }: {
   engine: EnginePort;
   page: Composition;
+  selection: string[];
   run: (task: () => void) => void;
   category: "effect" | "adjustment";
 }) {
   const actions = layerActions(engine, page, run);
-  return <EffectCatalog key={category} category={category} onAdd={actions.effect} />;
+  return (
+    <EffectCatalog
+      key={category}
+      category={category}
+      onAdd={actions.effect}
+      owner={{ scope: "layer", depthAvailable: selectionHasDepth(page, selection) }}
+    />
+  );
 }

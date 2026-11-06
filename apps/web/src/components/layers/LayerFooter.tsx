@@ -18,6 +18,7 @@ import {
 import { layerActions } from "./menu/actions";
 import { layerSelection } from "./menu/selection";
 import { sameSelectionAvailability } from "./menu/availability";
+import { selectionHasDepth } from "./catalog/model";
 
 export const LayerFooter = memo(
   function LayerFooter({
@@ -102,6 +103,7 @@ export const LayerFooter = memo(
             <DropdownMenuContent align="end">
               <EffectMenu
                 onAdd={actions.effect}
+                owner={{ scope: "layer", depthAvailable: selectionHasDepth(page, selection) }}
                 libraryRequest={libraryRequest}
                 guidedQuery={guidedQuery}
               />
@@ -133,5 +135,8 @@ export const LayerFooter = memo(
     );
   },
   (before, after) =>
-    before.attachment === after.attachment && sameSelectionAvailability(before, after),
+    before.attachment === after.attachment &&
+    sameSelectionAvailability(before, after) &&
+    selectionHasDepth(before.page, before.selection) ===
+      selectionHasDepth(after.page, after.selection),
 );

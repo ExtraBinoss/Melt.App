@@ -30,6 +30,9 @@ import { updateCompositionCamera } from "../camera";
 import { SpatialResource, type SpatialNativeLight } from "../SpatialResource";
 import type { ReflectionSource } from "../reflections/model";
 import { DepthBindings } from "./DepthBindings";
+import { EffectDepthInputs, type DepthFocusPoint } from "./EffectDepthInputs";
+import { renderEffectDepth } from "./render-effect-depth";
+import { effectDepthUv } from "./effect-depth-mapping";
 import { DepthScopes } from "./DepthScopes";
 import { SharedShadows } from "./SharedShadows";
 import { registerSampledLights } from "./SampledLights";
@@ -45,6 +48,7 @@ export class CompositionScene implements GpuResource {
     depthTexture: new DepthTexture(1, 1, FloatType),
   });
   private readonly depth: DepthBindings;
+  private readonly effectDepth = new EffectDepthInputs();
   private readonly shadows = new SharedShadows();
   private readonly identities = new SourceIdentities(512, 2 * 1024 * 1024);
   private readonly anchors = new Map<string, Group>();
@@ -93,11 +97,12 @@ export class CompositionScene implements GpuResource {
       this.signatureBytes +
       this.owner.bytes +
       this.depthTarget.width * this.depthTarget.height * 8 +
-      this.depth.bytes
+      this.depth.bytes +
+      this.effectDepth.bytes
     );
   }
   get targets() {
-    return this.owner.targets + 1;
+    return this.owner.targets + 1 + this.effectDepth.targets;
   }
   private get signatureBytes() {
     return (
@@ -108,13 +113,14 @@ export class CompositionScene implements GpuResource {
       2
     );
   }
-  projectedBytes(width: number, height: number, count: number) {
+  projectedBytes(width: number, height: number, count: number, page?: Composition) {
     return (
       this.identities.stats().bytes +
       this.signatureBytes +
       this.owner.bytes +
       width * height * 8 +
-      count * 8192
+      count * 8192 +
+      this.effectDepth.projectedBytes(width, height, page)
     );
   }
   sync(
@@ -200,6 +206,7 @@ export class CompositionScene implements GpuResource {
     if (this.depthTarget.width !== depthWidth || this.depthTarget.height !== depthHeight)
       this.depthReady = false;
     this.depthTarget.setSize(depthWidth, depthHeight);
+    this.effectDepth.sync(page, depthWidth, depthHeight, this.sources.keys(), viewport);
     this.depthProjection
       .copy(windowProjection(page, viewport))
       .multiply(this.camera.projectionMatrix);
@@ -285,20 +292,86 @@ export class CompositionScene implements GpuResource {
   effectProjection(id: string): readonly number[] | undefined {
     return this.effectProjections.get(id);
   }
-  /** Borrowed full composition viewport depth, never a source-local or faded-group scope. */
-  compositionDepth() {
+  /** Borrowed native camera-window depth; point focus has its own full-gate one-pixel draw. */
+  compositionDepth(focus?: DepthFocusPoint) {
     if (this.closed || !this.sources.size || !this.scopes) return null;
     this.renderDepth("");
+    return this.depthInput(this.depthTarget, effectDepthUv({ width: 1, height: 1 }), focus);
+  }
+  /** Isolate the owner's actual native meshes, including descendants of a native group.
+   * Upstream colour already contains scene occlusion; neighbour depth must not replace
+   * this object's distance when its local filter gathers its surviving colour pixels.
+   */
+  layerDepth(
+    id: string,
+    transport: Bounds,
+    focus?: DepthFocusPoint,
+    projection?: readonly number[],
+  ) {
+    if (this.closed || !this.scopes) return null;
+    const target = this.effectDepth.localTarget(id);
+    if (!target) return null;
+    this.renderDepth(this.scopes.scope(id));
+    this.drawEffectDepth(target, this.depthProjection, id);
+    return this.depthInput(
+      target,
+      this.effectDepth.uv(id, transport, projection),
+      focus,
+      id,
+      projection,
+    );
+  }
+  private depthInput(
+    target: RenderTarget,
+    uvTransform: readonly number[],
+    focus?: DepthFocusPoint,
+    id?: string,
+    projection?: readonly number[],
+  ) {
+    let focusTexture: Texture | undefined;
+    if (focus) {
+      const sample = this.effectDepth.focusTarget(
+        focus,
+        this.camera.projectionMatrix,
+        id,
+        projection,
+      );
+      this.drawEffectDepth(sample.target, sample.projection, id);
+      focusTexture = sample.target.depthTexture!;
+    }
     return {
-      texture: this.depthTarget.depthTexture!,
+      texture: target.depthTexture!,
       near: this.camera.near,
       far: this.camera.far,
       perspective: this.settings.camera.projection === "perspective",
+      uvTransform,
+      focusTexture,
     };
+  }
+  private drawEffectDepth(target: RenderTarget, projection: Matrix4, id?: string) {
+    const owned = id ? this.effectDepth.ownerSources(id) : undefined;
+    renderEffectDepth(
+      this.renderer,
+      this.scene,
+      this.camera,
+      target,
+      projection,
+      this.depth,
+      this.meshSources,
+      this.anchors,
+      this.sources,
+      (source) =>
+        (!owned || owned.has(source)) &&
+        this.visibleSources.has(source) &&
+        (source === id || !this.maskSources.has(source)),
+      (source) => (owned ? owned.has(source) : this.scopes!.writes(source, "")),
+    );
+    this.depthPasses++;
   }
   /** An inactive cached rig must not retain borrowed source geometry or texture pixels. */
   releaseSources() {
     this.depth.restore();
+    this.effectDepth.clear();
     for (const anchor of this.anchors.values()) anchor.clear();
     this.sources.clear();
     this.meshSources.clear();

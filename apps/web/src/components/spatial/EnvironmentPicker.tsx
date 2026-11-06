@@ -38,31 +38,33 @@ export function EnvironmentPicker({
     count: SPATIAL_ENVIRONMENT_PRESETS.filter((item) => item.category === id).length,
   }));
   const catalog = (
-    <ScrollShadow className="studio-catalog-scroll">
-      <CatalogGroups kind="environment" groups={groups}>
-        {(category) =>
-          SPATIAL_ENVIRONMENT_PRESETS.map((preset, index) =>
-            preset.category === category ? (
-              <button
-                type="button"
-                key={preset.id}
-                data-catalog-preset={preset.id}
-                disabled={disabled}
-                aria-label={environmentName(preset.id)}
-                aria-pressed={!assetName && value === preset.id}
-                onPointerEnter={() => session.preview(preset.id)}
-                onFocus={() => session.preview(preset.id)}
-                onClick={(event) => {
-                  if (event.button === 0) session.choose(preset.id);
-                }}
-              >
-                <CatalogSwatch kind="environments" index={index} />
-                <span>{environmentName(preset.id)}</span>
-              </button>
-            ) : null,
-          )
-        }
-      </CatalogGroups>
+    <ScrollShadow>
+      <div className="studio-catalog-scroll">
+        <CatalogGroups kind="environment" groups={groups}>
+          {(category) =>
+            SPATIAL_ENVIRONMENT_PRESETS.map((preset, index) =>
+              preset.category === category ? (
+                <button
+                  type="button"
+                  key={preset.id}
+                  data-catalog-preset={preset.id}
+                  disabled={disabled}
+                  aria-label={environmentName(preset.id)}
+                  aria-pressed={!assetName && value === preset.id}
+                  onPointerEnter={() => session.preview(preset.id)}
+                  onFocus={() => session.preview(preset.id)}
+                  onClick={(event) => {
+                    if (event.button === 0) session.choose(preset.id);
+                  }}
+                >
+                  <CatalogSwatch kind="environments" index={index} />
+                  <span>{environmentName(preset.id)}</span>
+                </button>
+              ) : null,
+            )
+          }
+        </CatalogGroups>
+      </div>
     </ScrollShadow>
   );
   if (embedded) return <div className="studio-catalog-embedded">{catalog}</div>;

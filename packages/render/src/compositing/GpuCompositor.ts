@@ -1,3 +1,6 @@
+import { renderChildren } from "./children-renderer";
+import { CapturePaint } from "./capture-paint";
+import { compositionDepthInputs } from "./effect-inputs";
 import { TemporalEffectSources } from "../effects/trail/TemporalEffectSources";
 import { compositionViewport, viewportBackground } from "./composition-viewport";
 import { finishCompositionEffects, prepareEffectStacks } from "./composition-effects";
@@ -10,7 +13,6 @@ import { renderLayer } from "./layer-renderer";
 import type { SpatialSources } from "../spatial/SpatialSources";
 import {
   createLayerGeometryIndex,
-  getEffectDefinition,
   isPublishedComposition,
   isPublishedAssets,
   type Asset,
@@ -33,18 +35,11 @@ import { TextureSources } from "../surface/TextureSources";
 import { TextSources } from "../surface/text/source";
 import type { FontResolver } from "../surface/text/fonts";
 import { PrimitiveBatch } from "./primitives/batch";
-import { isInstancedPrimitive } from "./primitives/eligibility";
 import { NormalBatch } from "./normal-batch";
 import { GpuPasses } from "./passes";
 import { LayerTargets } from "./targets";
 import type { GroupViewport } from "./group-viewport";
-import {
-  assertRenderSize,
-  rasterExtent,
-  type FrameTexture,
-  type GpuStats,
-  type RenderOptions,
-} from "./types";
+import { assertRenderSize, type FrameTexture, type GpuStats, type RenderOptions } from "./types";
 /** Retained GPU graph. Only font/image preparation awaits; all GPU submissions are synchronous. */
 export class GpuCompositor {
   private readonly maxTextureDimension: number;
@@ -121,7 +116,9 @@ export class GpuCompositor {
       !input ||
       !sameCompositionInput(input.page.deref(), page) ||
       input.assets.deref() !== assets ||
-      (page.effects?.some((effect) => effect.type === "trail" && effect.enabled) &&
+      ([page, ...page.layers].some((owner) =>
+        owner.effects?.some((effect) => effect.type === "trail" && effect.enabled),
+      ) &&
         input.motionFrame !== motionFrame) ||
       (input.motionFrame !== motionFrame &&
         Boolean(input.motionFrame?.mediaRequests.length || motionFrame?.mediaRequests.length)) ||
@@ -152,7 +149,9 @@ export class GpuCompositor {
       this.cache.beginFrame(this.retainedRoot);
       if (
         options.history !== "disabled" &&
-        page.effects?.some((effect) => effect.type === "trail" && effect.enabled)
+        [page, ...page.layers].some((owner) =>
+          owner.effects?.some((effect) => effect.type === "trail" && effect.enabled),
+        )
       ) {
         this.temporal ??= new TemporalEffectSources(
           this.renderer,
@@ -180,6 +179,10 @@ export class GpuCompositor {
         this.cache.set("shared-primitives", this.primitives);
       }
       const geometry = createLayerGeometryIndex(page);
+      const capture = options.effectCaptureOwnerId
+        ? new CapturePaint(geometry, options.effectCaptureOwnerId)
+        : undefined;
+      const paintedPage = capture?.preparationPage(page, geometry) ?? page;
       this.normal.retain(geometry.byId);
       const preparationKey = "pipeline-preparation";
       const preparationTarget = this.target(
@@ -208,19 +211,25 @@ export class GpuCompositor {
         await proof.prepare(preparationTarget, canPrepare);
       }
       await this.passes.prepare(preparationTarget, canPrepare);
-      await prepareEffectStacks(page, this.effects, this.cache, preparationTarget, canPrepare);
+      await prepareEffectStacks(
+        paintedPage,
+        this.effects,
+        this.cache,
+        preparationTarget,
+        canPrepare,
+      );
       await this.normal.prepare(
-        page.layers,
+        paintedPage.layers,
         preparationTarget,
         canPrepare,
         viewportBackground(page, options.viewport),
       );
       this.sample("pipeline", pipelineStarted, options.profileVideo);
       const sourceStarted = options.profileVideo ? performance.now() : 0;
-      await this.sources.prepare(page, assets, options);
+      await this.sources.prepare(paintedPage, assets, options);
       this.sample("sources", sourceStarted, options.profileVideo);
       const textStarted = options.profileVideo ? performance.now() : 0;
-      await this.texts.prepare(page, {
+      await this.texts.prepare(paintedPage, {
         target: preparationTarget,
         canContinue: canPrepare,
         profile: options.profileVideo,
@@ -254,22 +263,40 @@ export class GpuCompositor {
         options,
         keyOptions,
       );
+      const historyStamp = history?.size
+        ? `:history:${options.motionFrame?.time.value}/${options.motionFrame?.time.rate}`
+        : "";
+      const affected = new Set<string>();
+      for (const layer of page.layers)
+        if (layer.effects.some((effect) => history?.has(effect.id))) {
+          let current: Layer | undefined = layer;
+          while (current) {
+            affected.add(current.id);
+            current = current.parentId ? geometry.byId.get(current.parentId) : undefined;
+          }
+        }
+      const stampedKey = (key: (layer: Layer) => string) => (layer: Layer) =>
+        key(layer) +
+        (affected.has(layer.id) ? historyStamp : "") +
+        (capture ? `:capture:${capture.ownerId}` : "");
       const frame: RenderFrame = {
         page,
         viewport: options.viewport,
-        backgroundId: viewportBackground(page, options.viewport),
+        backgroundId: capture ? undefined : viewportBackground(page, options.viewport),
+        history,
+        capture,
         scale,
         referenceScale,
         vectorAntialias: !!options.vectorAntialias,
-        keyFor,
-        referenceKeyFor,
+        keyFor: stampedKey(keyFor),
+        referenceKeyFor: stampedKey(referenceKeyFor),
         geometry,
       };
-      const rootKey = `page:${page.id}:${scale}${options.colorOutput === "source" ? ":source" : ""}${frame.vectorAntialias ? ":vector-aa" : ""}${density}${options.effectCapture ? ":capture" : ""}${window ? `:viewport:${window.key}` : ""}`;
+      const rootKey = `page:${page.id}:${scale}${options.colorOutput === "source" ? ":source" : ""}${frame.vectorAntialias ? ":vector-aa" : ""}${density}${options.effectCapture ? `:capture:${options.effectCaptureOwnerId ?? "composition"}` : ""}${window ? `:viewport:${window.key}` : ""}`;
       const entry = this.entry(rootKey);
       const roots = geometry.children(null);
       const signature =
-        compositionPaintKey(page, roots, keyFor, (id) => assetIdentity(assets[id])) +
+        compositionPaintKey(page, roots, frame.keyFor, (id) => assetIdentity(assets[id])) +
         (history?.size
           ? `:history:${options.motionFrame?.time.value}/${options.motionFrame?.time.rate}`
           : "");
@@ -287,7 +314,7 @@ export class GpuCompositor {
         null,
         page.width,
         page.height,
-        page.background,
+        capture ? "transparent" : page.background,
         entry,
         rootKey,
         frame,
@@ -298,11 +325,7 @@ export class GpuCompositor {
         effects: this.effects,
         cache: this.cache,
         history,
-        depth: page.effects?.some(
-          (effect) => effect.enabled && getEffectDefinition(effect.type).requirements?.depth,
-        )
-          ? (this.spatial?.compositionDepth() ?? undefined)
-          : undefined,
+        ...compositionDepthInputs(this.spatial),
         target: (role, width, height) => this.target(entry, rootKey, role, width, height),
       });
       const target = this.target(
@@ -412,89 +435,16 @@ export class GpuCompositor {
     frame: RenderFrame,
     window?: GroupViewport | null,
   ): FrameTexture {
-    const { scale, geometry } = frame;
-    const viewport = window?.bounds ?? { x: 0, y: 0, width, height };
-    const pixelWidth = window?.pixelWidth ?? rasterExtent(width, scale);
-    const pixelHeight = window?.pixelHeight ?? rasterExtent(height, scale);
-    let target = this.target(entry, key, "children-a", pixelWidth, pixelHeight);
-    this.passes!.clear(
-      target,
-      parentId === null && frame.backgroundId ? "transparent" : background,
-      parentId === null && !frame.backgroundId ? frame.page.backgroundGradient : undefined,
-      parentId === null && window ? { width, height, region: viewport } : undefined,
-    );
-    const layers = window?.empty ? [] : geometry.children(parentId);
-    let batch: { layer: Layer; source: FrameTexture }[] = [],
-      primitiveRun: Layer[] = [];
-    const flush = () => {
-      this.normal!.draw(batch, viewport.width, viewport.height, target, viewport);
-      batch = [];
-    };
-    const flushPrimitives = () => {
-      if (!primitiveRun.length) return;
-      this.cache.ensureCapacity(
-        "shared-primitives",
-        this.primitives!.projectedBytes(primitiveRun.length),
-      );
-      try {
-        this.primitives!.draw(
-          primitiveRun,
-          viewport.width,
-          viewport.height,
-          scale,
-          target,
-          viewport,
-        );
-      } finally {
-        this.cache.synchronize("shared-primitives");
-      }
-      primitiveRun = [];
-    };
-    for (const layer of layers) {
-      if (!layer.visible || layer.opacity <= 0 || layer.maskSource || layer.spatialContext)
-        continue;
-      if (isInstancedPrimitive(layer) && layer.id !== frame.backgroundId) {
-        flush();
-        primitiveRun.push(layer);
-        continue;
-      }
-      flushPrimitives();
-      const source = this.layer(layer, frame, viewport);
-      if (layer.blendMode === "normal") {
-        batch.push({ layer, source });
-        continue;
-      }
-      flush();
-      const next = this.target(
-        entry,
-        key,
-        target === entry.target("children-a", pixelWidth, pixelHeight)
-          ? "children-b"
-          : "children-a",
-        pixelWidth,
-        pixelHeight,
-      );
-      this.passes!.blendTo(
-        target.texture,
-        source,
-        layer,
-        viewport.width,
-        viewport.height,
-        next,
-        viewport,
-      );
-      target = next;
-    }
-    flushPrimitives();
-    flush();
-    return {
-      texture: target.texture,
-      width: pixelWidth,
-      height: pixelHeight,
-      premultiplied: true,
-      ...(window ? { bounds: window.bounds } : {}),
-    };
+    return renderChildren(parentId, width, height, background, entry, key, frame, window, {
+      cache: this.cache,
+      passes: this.passes!,
+      normal: this.normal!,
+      primitives: this.primitives!,
+      target: (...args) => this.target(...args),
+      layer: (...args) => this.layer(...args),
+    });
   }
+
   stats(): GpuStats {
     const cache = this.cache.stats();
     const effects = this.effects?.stats();

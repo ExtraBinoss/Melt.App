@@ -1,4 +1,5 @@
-import type { Node, Texture, TextureNode, UniformNode } from "three/webgpu";
+import type { Node, Texture, TextureNode, UniformNode, Matrix3 } from "three/webgpu";
+import type { Bounds, Effect } from "@musart/core";
 import type { EffectUniforms } from "./uniforms";
 import type { GlyphAtlasBinding } from "../ascii/binding";
 
@@ -7,15 +8,25 @@ export interface EffectHistoryInput {
   readonly texture: Texture;
   readonly available: boolean;
   readonly flipY: boolean;
+  /** Historical color is captured in composition coordinates, not the current object pose. */
+  readonly captureBounds?: Bounds;
+  readonly ownerBounds?: Bounds;
+  /** Current effect UV to historical canonical bottom-up UV. */
+  readonly uvTransform?: readonly number[];
+}
+export interface EffectDepthInput {
+  readonly texture: Texture;
+  readonly near: number;
+  readonly far: number;
+  readonly perspective: boolean;
+  /** Effect UV (bottom up) to the exact native depth viewport UV (top down). */
+  readonly uvTransform?: readonly number[];
+  readonly focusTexture?: Texture;
 }
 export interface EffectAuxiliaryInputs {
   readonly scope?: "layer" | "composition";
-  readonly depth?: {
-    readonly texture: Texture;
-    readonly near: number;
-    readonly far: number;
-    readonly perspective: boolean;
-  };
+  readonly depth?: EffectDepthInput;
+  readonly depthForEffect?: (effect: Effect) => EffectDepthInput | undefined;
   readonly history?: ReadonlyMap<string, readonly EffectHistoryInput[]>;
 }
 export interface EffectDepthBinding {
@@ -24,11 +35,15 @@ export interface EffectDepthBinding {
   readonly near: UniformNode<"float", number>;
   readonly far: UniformNode<"float", number>;
   readonly perspective: UniformNode<"float", number>;
+  readonly uvTransform: UniformNode<"mat3", Matrix3>;
+  readonly focusTexture: TextureNode<"vec4">;
+  readonly focusPresent: UniformNode<"float", number>;
 }
 export interface EffectHistoryBinding {
   readonly texture: TextureNode<"vec4">;
   readonly available: UniformNode<"float", number>;
   readonly flipY: UniformNode<"float", number>;
+  readonly uvTransform: UniformNode<"mat3", Matrix3>;
 }
 
 /** GPU-only inputs. Source pixels and intermediate results never cross this boundary. */
@@ -37,6 +52,7 @@ export interface EffectNodeContext {
   readonly bindImageInput?: (key: string) => {
     readonly texture: TextureNode<"vec4">;
     readonly enabled: UniformNode<"float", number>;
+    readonly flipY?: UniformNode<"float", number>;
   };
   readonly bindDepthInput?: () => EffectDepthBinding;
   readonly bindHistoryInput?: (slot: number) => EffectHistoryBinding;

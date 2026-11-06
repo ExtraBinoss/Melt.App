@@ -281,8 +281,11 @@
   --inspector-gutter: 16px;
   width: min(354px, calc(100vw - 24px));
   padding: 0;
+  height: min(75dvh, var(--radix-popover-content-available-height));
   max-height: 75dvh;
-  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
   overscroll-behavior: contain;
   border: 1px solid color-mix(in srgb, var(--border) 76%, transparent);
   border-radius: var(--radius-lg);
@@ -290,12 +293,24 @@
   box-shadow: none;
   backdrop-filter: blur(18px);
 }
+.studio-advanced-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+.studio-advanced-body > .inspector-scroll {
+  height: auto;
+  min-height: 0;
+  flex: 1;
+}
 .studio-advanced-popover .studio-popover-title {
   margin: 0;
   padding: 18px var(--inspector-gutter) 0;
   font-size: 12px;
   line-height: 1.4;
   font-weight: 500;
+  flex-shrink: 0;
 }
 .studio-advanced-popover .inspector {
   width: 100%;
@@ -348,6 +363,20 @@
 @media (max-width: 760px) {
   .workspace-mode-root[data-workspace-mode="studio"] {
     --studio-gap: 12px;
+  }
+  .studio-actions {
+    gap: 4px;
+  }
+  .studio-actions > button,
+  .studio-actions .inspector-export-button {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    min-height: 40px;
+    padding: 10px;
+  }
+  .workspace-mode-root[data-workspace-mode="studio"] .project-pill-title {
+    max-width: clamp(30px, calc(100vw - 290px), 90px);
   }
   .studio-quick-add {
     top: calc(var(--studio-top) + 58px);

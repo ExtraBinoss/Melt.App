@@ -12,6 +12,7 @@ import {
   smoothstep,
   uv,
   vec2,
+  vec3,
   vec4,
 } from "three/tsl";
 import { sampleEffect, type EffectNodeContext } from "../shared/context";
@@ -30,22 +31,36 @@ export function cameraDepthDistance(
 
 /** Native-depth gather: 25 color taps, 25 depth taps, no estimated or synthetic depth. */
 export function depthOfFieldNode({ source, controls, bindDepthInput }: EffectNodeContext) {
-  if (!bindDepthInput) throw Error("Depth of field requires the native composition depth port");
+  if (!bindDepthInput) throw Error("Depth of field requires the native camera depth port");
   const binding = bindDepthInput(),
     u = controls.parameters,
     position = uv(),
     original = sampleEffect(source, controls, position);
   const result = Fn(() => {
-    // Native root depth stores the exact current composition viewport with its top at UV0.
-    const distance = (coord: Node<"vec2">) =>
+    // Source UVs can be expanded, cropped, transformed or reprojected into an
+    // authored native face. Borrowed depth always belongs to its actual camera gate.
+    const distance = (coord: Node<"vec2">) => {
+        const mapped = binding.uvTransform.mul(vec3(coord, 1)),
+          depthUv = mapped.xy.div(mapped.z),
+          inside = depthUv.x
+            .greaterThanEqual(0)
+            .and(depthUv.x.lessThanEqual(1))
+            .and(depthUv.y.greaterThanEqual(0))
+            .and(depthUv.y.lessThanEqual(1)),
+          raw = inside.select(binding.texture.sample(clamp(depthUv, 0, 1)).r, float(1));
+        return cameraDepthDistance(raw, binding.near, binding.far, binding.perspective);
+      },
+      centerDepth = distance(position).toVar(),
+      focus = mix(
+        u.focusDistance!,
         cameraDepthDistance(
-          binding.texture.sample(vec2(coord.x, coord.y.oneMinus())).r,
+          binding.focusTexture.sample(vec2(0.5)).r,
           binding.near,
           binding.far,
           binding.perspective,
         ),
-      centerDepth = distance(position).toVar(),
-      focus = u.focusDistance!,
+        u.focusMode!.mul(binding.focusPresent),
+      ),
       difference = max(centerDepth.sub(focus).abs().sub(u.focusRange!), 0),
       radius = clamp(
         difference.div(max(centerDepth, 0.000001)).mul(float(4).div(u.aperture!)),

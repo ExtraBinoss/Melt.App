@@ -4,6 +4,7 @@ import { createLayer, createPage, createProject, EditorEngine } from "@musart/co
 import { EditorCanvas } from "../../src/canvas/EditorCanvas";
 import { TooltipProvider } from "../../src/components/ui/tooltip";
 import { canvasPoint as point, pointerDrag } from "../support/canvas-pointer";
+import { markCanvasPointerHandled } from "../../src/canvas/interaction/pointer-pick";
 
 const scene = vi.hoisted(() => vi.fn());
 vi.mock("../../src/canvas/render/EditorScene", () => ({
@@ -42,6 +43,31 @@ async function fixture(tool: "pointer" | "rectangle" = "pointer") {
     box: document.querySelector<HTMLElement>(".canvas-marquee")!,
   };
 }
+
+test("native camera-owned pointers reach document overlays without starting a second editor gesture", async () => {
+  const { engine, canvas } = await fixture();
+  const initial = engine.getSnapshot();
+  const outside = vi.fn();
+  const surface = screen.getByTestId("selection-scene");
+  surface.addEventListener("pointerdown", markCanvasPointerHandled);
+  document.addEventListener("pointerdown", outside);
+  try {
+    fireEvent.pointerDown(surface, point(40, 40));
+    expect(outside).toHaveBeenCalledOnce();
+    expect(outside.mock.calls[0]![0].target).toBe(surface);
+    fireEvent.pointerMove(canvas, point(80, 90));
+    fireEvent.pointerUp(canvas, point(80, 90));
+    expect(engine.getSnapshot()).toBe(initial);
+    // A later ordinary pointer remains eligible for classic editor selection.
+    pointerDrag(canvas, point(40, 40), point(40, 40));
+    expect(engine.getSnapshot().selection).toEqual(["one"]);
+    expect(engine.getSnapshot().project).toBe(initial.project);
+    expect(engine.getSnapshot().canUndo).toBe(false);
+  } finally {
+    surface.removeEventListener("pointerdown", markCanvasPointerHandled);
+    document.removeEventListener("pointerdown", outside);
+  }
+});
 
 test("right drag can begin on artwork, paints imperatively, selects crossing bounds once and leaves history untouched", async () => {
   const { engine, canvas, box } = await fixture(),

@@ -17,6 +17,7 @@ import { SceneSpherePopover } from "./SceneSpherePopover";
 import { StudioDirectionPad } from "../../ui/studio/controls/StudioDirectionPad";
 import type { DirectionValue } from "../../ui/studio/controls/StudioDirectionPad";
 import { StudioSlider } from "../../ui/studio/controls/StudioSlider";
+import { ScrollShadow } from "../shared/scroll/ScrollShadow";
 import "./messages";
 import "../../ui/studio/messages";
 import "../../ui/studio/catalog/messages";
@@ -103,96 +104,102 @@ export const EnvironmentControl = memo(function EnvironmentControl({
             onChoose={(preset) => environmentPreset(preset, true)}
           />
         </section>
-        <section role="group" className="studio-sphere-properties" aria-label={t("scene")}>
-          <div className="studio-panel-title">{catalogText("direction")}</div>
-          <StudioDirectionPad
-            label={catalogText("direction")}
-            value={{ x: camera.yaw, y: camera.pitch }}
-            minX={-180}
-            maxX={180}
-            minY={-89}
-            maxY={89}
-            identity={identity}
-            invalidation={motionTimeChanges(engine)}
-            onStart={edit.begin}
-            onPreview={(value) => direction(value, false)}
-            onCommit={(value) => direction(value, true)}
-            onCancel={edit.cancel}
-          />
-          {(["distance", "fov"] as const).map((key) => (
-            <StudioSlider
-              key={key}
+        <ScrollShadow className="studio-sphere-properties-shadow" fade="mask">
+          <section role="group" className="studio-sphere-properties" aria-label={t("scene")}>
+            <div className="studio-panel-title">{catalogText("direction")}</div>
+            <StudioDirectionPad
+              label={catalogText("direction")}
+              value={{ x: camera.yaw, y: camera.pitch }}
+              minX={-180}
+              maxX={180}
+              minY={-89}
+              maxY={89}
               identity={identity}
               invalidation={motionTimeChanges(engine)}
-              label={spatialText(key)}
-              value={camera[key]}
-              min={key === "distance" ? 0.2 : 5}
-              max={key === "distance" ? 100 : 120}
-              step={key === "distance" ? 0.1 : 1}
-              unit={key === "fov" ? "°" : undefined}
-              disabled={key === "fov" && camera.projection !== "perspective"}
               onStart={edit.begin}
-              onPreview={(value) => {
-                if (current())
-                  edit.preview(
-                    { ...settings, camera: { ...camera, [key]: value } },
-                    { kind: "camera", compositionId: page.id, property: key },
-                  );
-              }}
-              onCommit={(value) => {
-                if (current())
-                  edit.commit(
-                    { ...settings, camera: { ...camera, [key]: value } },
-                    { kind: "camera", compositionId: page.id, property: key },
-                  );
-              }}
+              onPreview={(value) => direction(value, false)}
+              onCommit={(value) => direction(value, true)}
               onCancel={edit.cancel}
             />
-          ))}
-          <SceneAnimations
-            engine={engine}
-            page={page}
-            owner={{ kind: "camera", compositionId: page.id }}
-          />
-          <div className="studio-scene-section-title">{catalogText("highlights")}</div>
-          {(["intensity", "rotation"] as const).map((key) => {
-            const target = { kind: "environment" as const, compositionId: page.id, property: key };
-            return (
+            {(["distance", "fov"] as const).map((key) => (
               <StudioSlider
                 key={key}
                 identity={identity}
                 invalidation={motionTimeChanges(engine)}
-                label={t(key)}
-                value={environment[key]}
-                min={key === "rotation" ? -180 : 0}
-                max={key === "rotation" ? 180 : 10}
-                step={key === "rotation" ? 1 : 0.1}
-                unit={key === "rotation" ? "°" : undefined}
+                label={spatialText(key)}
+                value={camera[key]}
+                min={key === "distance" ? 0.2 : 5}
+                max={key === "distance" ? 100 : 120}
+                step={key === "distance" ? 0.1 : 1}
+                unit={key === "fov" ? "°" : undefined}
+                disabled={key === "fov" && camera.projection !== "perspective"}
                 onStart={edit.begin}
                 onPreview={(value) => {
                   if (current())
                     edit.preview(
-                      { ...settings, environment: { ...environment, [key]: value } },
-                      target,
+                      { ...settings, camera: { ...camera, [key]: value } },
+                      { kind: "camera", compositionId: page.id, property: key },
                     );
                 }}
                 onCommit={(value) => {
                   if (current())
                     edit.commit(
-                      { ...settings, environment: { ...environment, [key]: value } },
-                      target,
+                      { ...settings, camera: { ...camera, [key]: value } },
+                      { kind: "camera", compositionId: page.id, property: key },
                     );
                 }}
                 onCancel={edit.cancel}
               />
-            );
-          })}
-          <SceneAnimations
-            engine={engine}
-            page={page}
-            owner={{ kind: "environment", compositionId: page.id }}
-          />
-        </section>
+            ))}
+            <SceneAnimations
+              engine={engine}
+              page={page}
+              owner={{ kind: "camera", compositionId: page.id }}
+            />
+            <div className="studio-scene-section-title">{catalogText("highlights")}</div>
+            {(["intensity", "rotation"] as const).map((key) => {
+              const target = {
+                kind: "environment" as const,
+                compositionId: page.id,
+                property: key,
+              };
+              return (
+                <StudioSlider
+                  key={key}
+                  identity={identity}
+                  invalidation={motionTimeChanges(engine)}
+                  label={t(key)}
+                  value={environment[key]}
+                  min={key === "rotation" ? -180 : 0}
+                  max={key === "rotation" ? 180 : 10}
+                  step={key === "rotation" ? 1 : 0.1}
+                  unit={key === "rotation" ? "°" : undefined}
+                  onStart={edit.begin}
+                  onPreview={(value) => {
+                    if (current())
+                      edit.preview(
+                        { ...settings, environment: { ...environment, [key]: value } },
+                        target,
+                      );
+                  }}
+                  onCommit={(value) => {
+                    if (current())
+                      edit.commit(
+                        { ...settings, environment: { ...environment, [key]: value } },
+                        target,
+                      );
+                  }}
+                  onCancel={edit.cancel}
+                />
+              );
+            })}
+            <SceneAnimations
+              engine={engine}
+              page={page}
+              owner={{ kind: "environment", compositionId: page.id }}
+            />
+          </section>
+        </ScrollShadow>
       </div>
     </SceneSpherePopover>
   );

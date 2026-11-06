@@ -1,12 +1,17 @@
 .studio-effects-popover {
   width: min(360px, calc(100vw - 32px));
   padding: 12px;
+  display: flex;
+  flex-direction: column;
+  max-height: min(720px, var(--radix-popover-content-available-height));
+  overflow: hidden;
 }
 .studio-effects-owner {
   display: flex;
   align-items: center;
   gap: 8px;
   margin-bottom: 10px;
+  flex-shrink: 0;
 }
 .studio-effects-owner strong {
   min-width: 0;
@@ -24,10 +29,21 @@
   align-items: center;
   gap: 4px;
   margin-bottom: 10px;
+  flex-shrink: 0;
 }
 .studio-effect-catalog {
-  display: grid;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
   gap: 8px;
+}
+.studio-effect-catalog > input {
+  flex-shrink: 0;
+}
+.studio-effects-scroll {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 }
 .studio-effect-options {
   display: grid;
@@ -38,6 +54,7 @@
   max-height: min(460px, 58dvh);
   overflow-y: auto;
   overscroll-behavior: contain;
+  min-height: 0;
 }
 .studio-effect-options button {
   display: block;
@@ -76,4 +93,5 @@
   max-height: min(520px, 65vh);
   overflow-y: auto;
   overscroll-behavior: contain;
+  min-height: 0;
 }

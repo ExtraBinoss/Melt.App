@@ -39,6 +39,7 @@ export function finishCompositionEffects(
     effects: EffectResources;
     cache: GpuResourceCache;
     depth?: EffectAuxiliaryInputs["depth"];
+    depthForEffect?: EffectAuxiliaryInputs["depthForEffect"];
     history?: EffectAuxiliaryInputs["history"];
     target(role: string, width: number, height: number): RenderTarget;
   },
@@ -69,7 +70,12 @@ export function finishCompositionEffects(
           ? { content: { x: -viewport.x, y: -viewport.y, width: page.width, height: page.height } }
           : {}),
       },
-      { scope: "composition", depth: context.depth, history: context.history },
+      {
+        scope: "composition",
+        depth: context.depth,
+        depthForEffect: context.depthForEffect,
+        history: context.history,
+      },
     );
   } finally {
     context.cache.synchronize("shared-effects");
