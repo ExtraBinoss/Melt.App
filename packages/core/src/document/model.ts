@@ -1,3 +1,4 @@
+import type { EffectMotion } from "../effects/motion/model";
 import type { SpatialLayer, SpatialScene } from "../spatial/model";
 import type { BlendMode } from "../layers/blending/catalog";
 import type { VectorDefinition } from "../vector/model";
@@ -89,6 +90,8 @@ export type EffectType =
 /** Effect-owned scalar settings are validated against that effect's definition. */
 export type EffectSettings = Partial<Record<string, number | boolean | string>>;
 export interface Effect {
+  /** Portable direct behaviors; recording transfers these channels to the timeline. */
+  motion?: EffectMotion;
   /** Named immutable image or prepared video assets owned by the portable project. */
   inputs?: Readonly<Record<string, string>>;
   shapeMorph?: ShapeMorph;

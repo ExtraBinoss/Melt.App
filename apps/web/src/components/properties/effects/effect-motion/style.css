@@ -2,20 +2,20 @@
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: 14px;
+  gap: 9px;
   font-size: 14px;
   line-height: 1.4;
 }
 .effect-motion[data-slot="popover-content"] {
-  width: min(344px, calc(100vw - 24px));
+  width: min(300px, calc(100vw - 24px));
   max-height: min(680px, var(--radix-popover-content-available-height));
   overflow: auto;
   overscroll-behavior: contain;
-  padding: 14px;
+  padding: 10px;
 }
 .effect-motion-choice-group {
   display: grid;
-  gap: 7px;
+  gap: 5px;
 }
 .effect-motion-heading {
   font-size: 13px;
@@ -28,13 +28,14 @@
   gap: 5px;
 }
 .effect-motion .effect-motion-choice {
+  position: relative;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 7px;
+  gap: 5px;
   width: 100%;
-  min-height: 76px;
-  padding: 10px 6px;
+  min-height: 52px;
+  padding: 6px 4px;
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   background: transparent;
@@ -56,7 +57,7 @@
 .effect-motion-settings > button {
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: 5px;
   cursor: pointer;
   width: max-content;
   font-size: 13px;
@@ -93,7 +94,7 @@
 .effect-motion-recording-heading {
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: 5px;
   font-size: 13px;
 }
 .effect-motion-record-dot {
@@ -112,7 +113,7 @@
 .effect-motion-input-pad {
   display: grid;
   place-items: center;
-  min-height: 76px;
+  min-height: 52px;
   padding: 12px;
   border: 1px dashed var(--border);
   border-radius: var(--radius-md);
@@ -164,4 +165,16 @@
 .effect-motion-select .select-label-text {
   white-space: normal;
   overflow-wrap: anywhere;
+}
+
+.effect-motion-checked {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  color: var(--primary);
+}
+.effect-motion-settings-help {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }

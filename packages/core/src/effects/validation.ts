@@ -1,3 +1,4 @@
+import { validateEffectMotion } from "./motion/validation";
 import { validateLiquifyDabs } from "./liquify/strokes";
 import { validateEffectInputs } from "./inputs";
 import type { Effect } from "../document/model";
@@ -14,6 +15,7 @@ import { validateShapeMorph } from "./morph/validation";
 /** Optional fields keep old documents valid; every supplied setting remains strictly validated. */
 export function validateEffectExtensions(value: Record<string, unknown>): void {
   validateEffectInputs(value as unknown as Effect);
+  validateEffectMotion(value as unknown as Effect, value.motion);
   if (value.liquify !== undefined) {
     ensure(value.type === "liquify", "INVALID_DOCUMENT", "Brush data belongs to Liquify");
     validateLiquifyDabs(value.liquify);

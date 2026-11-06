@@ -1,5 +1,6 @@
 import { memo, type MouseEvent, type RefObject } from "react";
-import { Eye, EyeOff, Trash2, ScanLine } from "lucide-react";
+import { effectAnimationChildren } from "../tree/effect-animations";
+import { Activity, Eye, EyeOff, Trash2, ScanLine } from "lucide-react";
 import {
   getEffectDefinition,
   createLayerGeometryIndex,
@@ -200,6 +201,9 @@ export const LayerAttachments = memo(function LayerAttachments({
         >
           <span className="effect-avatar">fx</span>
           {t(getEffectDefinition(effect.type).nameKey)}
+          {effectAnimationChildren(page, effect, layer).length > 0 && (
+            <Activity size={11} aria-label={t("effectMotion:title")} />
+          )}
         </Button>
       </EffectPopover>
       <div className="attachment-actions">

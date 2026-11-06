@@ -186,3 +186,45 @@ strength into the two values once. Bloom Windows authors these presets through
 `addMotionAnimation` for its parent and counter rotations, with ten turns over
 its twelve-second composition. Direct custom channels remain available for manual
 authoring; generated intervals never become a second persisted timeline.
+
+## Direct effect behaviors
+
+Optional `Effect.motion` owns at most one automatic and one interactive action.
+Each action carries a localized display name and ordinary typed animation channels
+whose slot zero resolves exclusively to that effect. Core validates their schemas,
+owner, drivers and point limits; interactive bindings contain no recorded events.
+They serialize with the effect and survive duplication without foreign owner IDs.
+
+Automatic bindings enable Motion without opening the timeline or creating action
+blocks. They use the shared compiler before authored timeline actions, in preview
+and export. Newly authored Loop curves close with sparse eased control points;
+complete cycles fit the composition duration so its playback boundary also closes.
+Boolean and choice properties retain their intentional discrete transitions.
+
+The compact Motion popover derives checked choices from canonical effect data.
+Settings remain collapsed until requested; Apply changes active bindings in one
+validated transaction. Test temporarily arms normalized canvas/pad input. Escape,
+outside dismissal, document changes, blur and unmount retire the input session and
+restore the canonical effect, while retaining the selected binding. Normal canvas
+editing resumes after testing. Unrecorded interactive input is presentation state
+and does not affect offline export. Input history is capped at 512 meaningful
+native events; reaching the cap stops the test/take with an explicit error.
+When automatic and interactive channels share a numeric property, the gesture adds
+an offset around its neutral input to the automatic pose. The same explicit Add
+channels are retained in recorded blocks. Preview uses core evaluateAnimations,
+including its registered clamping. Samplers compile only when input changes; RAF previews reuse them and never append
+keys or dispatch document edits. The existing imperative property-preview source
+owns presentation and background GPU admission.
+
+Record is explicit. An automatic binding transfers immediately; an interactive
+binding collects a bounded semantic take and transfers on Save. Both bindings can
+become separate ordinary blocks in the same atomic transaction, retaining the
+original effect and clearing the direct choices only after validation succeeds.
+Undo restores the direct bindings and removes the blocks together. Cancel and
+failed saves retain the bindings. There is no second authoritative keyframe list.
+
+Layers projects these references as children of the owning effect, with a small
+motion indicator on its row. Selecting a direct child opens its existing Motion
+settings; selecting a recorded child selects its timeline block and opens shared
+AnimationDetails. A per-engine Jotai request atom isolates navigation to the target
+effect; input frames do not write presentation atoms or rerender panel roots.

@@ -1,5 +1,6 @@
 import {
   Activity,
+  Check,
   Hand,
   MousePointerClick,
   Move,
@@ -30,15 +31,17 @@ const interactive = [
 export function MotionChoices({
   disabled,
   recording,
-  input,
+  activeAutomatic,
+  activeInteractive,
   onAutomatic,
   onInput,
 }: {
   disabled: boolean;
   recording: boolean;
-  input: MotionInputKind;
-  onAutomatic(kind: "loop" | "pingPong" | "pulse"): void;
-  onInput(kind: MotionInputKind): void;
+  activeAutomatic?: string;
+  activeInteractive?: string;
+  onAutomatic(this: void, kind: "loop" | "pingPong" | "pulse"): void;
+  onInput(this: void, kind: MotionInputKind): void;
 }) {
   const { t } = useTranslation("effectMotion");
   return (
@@ -54,10 +57,14 @@ export function MotionChoices({
                   variant="ghost"
                   className="effect-motion-choice"
                   disabled={disabled || recording}
+                  aria-pressed={activeAutomatic === kind}
                   onClick={() => onAutomatic(kind)}
                 >
-                  <Icon size={21} strokeWidth={1.6} aria-hidden />
+                  <Icon size={17} strokeWidth={1.6} aria-hidden />
                   <span>{t(kind)}</span>
+                  {activeAutomatic === kind && (
+                    <Check className="effect-motion-checked" size={10} aria-hidden />
+                  )}
                 </Button>
               </TooltipTrigger>
               <TooltipContent side="top">{t(`${kind}Hint`)}</TooltipContent>
@@ -76,11 +83,18 @@ export function MotionChoices({
                   variant="ghost"
                   className="effect-motion-choice"
                   disabled={disabled || recording}
-                  aria-pressed={recording && input === kind}
+                  aria-pressed={
+                    activeInteractive === kind ||
+                    (kind === "primaryClick" && activeInteractive === "secondaryClick")
+                  }
                   onClick={() => onInput(kind)}
                 >
-                  <Icon size={21} strokeWidth={1.6} aria-hidden />
+                  <Icon size={17} strokeWidth={1.6} aria-hidden />
                   <span>{t(`quick.${kind}`)}</span>
+                  {(activeInteractive === kind ||
+                    (kind === "primaryClick" && activeInteractive === "secondaryClick")) && (
+                    <Check className="effect-motion-checked" size={10} aria-hidden />
+                  )}
                 </Button>
               </TooltipTrigger>
               <TooltipContent side="top">{t(`${kind}Hint`)}</TooltipContent>

@@ -1,7 +1,17 @@
 import type { Composition, Layer, Project } from "@musart/core";
+import { effectAnimationChildren, type EffectAnimationChild } from "./effect-animations";
 import { projectLayerTree, type LayerTreeEntry } from "./projection";
 
 export type ProjectTreeEntry =
+  | {
+      kind: "effect-animation";
+      key: string;
+      page: Composition;
+      effectId: string;
+      layer?: Layer;
+      depth: number;
+      child: EffectAnimationChild;
+    }
   | { kind: "artboard"; key: string; page: Composition; expanded: boolean }
   | { kind: "empty"; key: string; page: Composition }
   | { kind: "composition-effects"; key: string; page: Composition; expanded: boolean }
@@ -31,13 +41,23 @@ export function projectLayerWorkspace(
         expanded,
       });
       if (expanded)
-        for (const effect of page.effects)
+        for (const effect of page.effects) {
           entries.push({
             kind: "composition-effect",
             key: `composition-effect:${page.id.length}:${page.id}:${effect.id}`,
             page,
             effectId: effect.id,
           });
+          for (const child of effectAnimationChildren(page, effect))
+            entries.push({
+              kind: "effect-animation",
+              key: `${page.id}:fx:${effect.id}:animation:${child.id}`,
+              page,
+              effectId: effect.id,
+              child,
+              depth: 3,
+            });
+        }
     }
     if (!page.layers.length) entries.push({ kind: "empty", key: `empty:${page.id}`, page });
     const drag = preview?.pageId === page.id ? preview : undefined;
@@ -52,6 +72,19 @@ export function projectLayerWorkspace(
           ? `${entry.layer.id.length}:${entry.layer.id}:${entry.effectId}`
           : entry.layer.id;
       entries.push({ ...entry, key: `${entry.kind}:${identity}`, depth: entry.depth + 1, page });
+      if (entry.kind === "effect") {
+        const effect = entry.layer.effects.find((effect) => effect.id === entry.effectId)!;
+        for (const child of effectAnimationChildren(page, effect, entry.layer))
+          entries.push({
+            kind: "effect-animation",
+            key: `${page.id}:layer:${entry.layer.id}:fx:${effect.id}:animation:${child.id}`,
+            page,
+            layer: entry.layer,
+            effectId: effect.id,
+            child,
+            depth: entry.depth + 2,
+          });
+      }
     }
   }
   return entries;

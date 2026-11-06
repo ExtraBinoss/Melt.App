@@ -1,3 +1,5 @@
+export { relativeEffectMotionAction, compileEffectMotionPreview } from "./effects/motion/preview";
+export type { EffectMotion, EffectMotionAction } from "./effects/motion/model";
 export { projectNameCandidate } from "./document/naming";
 export { projectContentTags } from "./document/contents";
 export type { ProjectContentTag } from "./document/contents";

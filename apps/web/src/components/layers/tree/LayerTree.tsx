@@ -1,3 +1,4 @@
+import { EffectAnimationRow } from "../rows/EffectAnimationRow";
 import { CompositionEffectsRow, CompositionEffectRow } from "../composition/CompositionEffectsRow";
 import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useReducedMotion } from "motion/react";
@@ -267,6 +268,14 @@ export const LayerTree = memo(function LayerTree({
                     top={at * LAYER_ROW_HEIGHT}
                     run={run}
                     onDragReject={drag.clearTarget}
+                  />
+                ) : entry.kind === "effect-animation" ? (
+                  <EffectAnimationRow
+                    key={`${project.id}:${entry.key}`}
+                    engine={engine}
+                    entry={entry}
+                    top={at * LAYER_ROW_HEIGHT}
+                    run={run}
                   />
                 ) : entry.kind === "layer" ? (
                   <LayerRow

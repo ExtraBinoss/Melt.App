@@ -1,3 +1,4 @@
+import { compileLayerEffectMotion } from "../effects/motion/compile";
 import { compileAnimations } from "./animations/compile";
 import { getEffectDefinition } from "../effects/catalog";
 import { isVideoAsset } from "../assets/identity";
@@ -107,8 +108,13 @@ export function compileMotionLayers(
             }
           : {}),
         properties,
-        ...(mode === "motion" && track?.animations?.length
-          ? { animations: compileAnimations(page, track) }
+        ...(mode === "motion"
+          ? {
+              animations: [
+                ...compileLayerEffectMotion(page, layer.id),
+                ...(track ? compileAnimations(page, track) : []),
+              ],
+            }
           : {}),
       };
       if (mode === "static") return [{ ...common, start: zero, end: duration }];

@@ -81,3 +81,44 @@ test("composition effects are virtual tree attachments with real IDs above artwo
   ).toEqual(["artboard", "composition-effects", "layer"]);
   expect(page.layers).toHaveLength(1);
 });
+
+test("nests direct and recorded action references immediately under their effect", () => {
+  const effect = createEffect("ripple", {
+    id: "fx",
+    motion: {
+      automatic: {
+        name: "Loop",
+        channels: [
+          {
+            target: { kind: "effect", slot: 0, property: "amount" },
+            operation: "replace",
+            points: [
+              { at: 0, value: 0 },
+              { at: 1, value: 1 },
+            ],
+            driver: { kind: "loop", period: { value: 2, rate: 1 } },
+          },
+        ],
+      },
+    },
+  });
+  const layer = createLayer("rectangle", { id: "shape", effects: [effect] });
+  const page = createPage({ id: "page", layers: [layer] });
+  const entries = projectLayerWorkspace(
+    createProject({ pages: [page] }),
+    new Set(),
+    new Set(),
+    new Set([layer.id]),
+  );
+  expect(entries.map((entry) => entry.kind)).toEqual([
+    "artboard",
+    "layer",
+    "effect",
+    "effect-animation",
+  ]);
+  expect(entries.at(-1)).toMatchObject({
+    depth: 3,
+    effectId: "fx",
+    child: { action: "automatic", name: "Loop" },
+  });
+});

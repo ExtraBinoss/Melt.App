@@ -1,4 +1,6 @@
 import type { DragEvent } from "react";
+import { effectAnimationChildren } from "../tree/effect-animations";
+import { Activity } from "lucide-react";
 import { ChevronRight, Eye, EyeOff, Sparkles, Trash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { getEffectDefinition, type Composition, type EnginePort } from "@musart/core";
@@ -154,6 +156,9 @@ export function CompositionEffectRow({
         <Button variant="ghost" className="attachment-name" data-attachment-tooltip={label}>
           <span className="effect-avatar">fx</span>
           {label}
+          {effectAnimationChildren(page, effect).length > 0 && (
+            <Activity size={11} aria-label={t("effectMotion:title")} />
+          )}
         </Button>
       </CompositionEffectPopover>
       <div className="attachment-actions">

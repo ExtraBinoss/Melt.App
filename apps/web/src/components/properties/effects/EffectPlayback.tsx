@@ -1,48 +1,33 @@
-import { useEffect, useId, useRef, useState } from "react";
+import { useInputPreview } from "./effect-motion/use-input-preview";
+import { useEffect, useId, useRef, useState, useMemo } from "react";
+import { AnimationDetails } from "../../motion/animations/AnimationDetails";
+import { effectMotionNavigation, useEffectMotionRequest } from "./effect-motion/navigation";
 import { animationPresentation } from "../../motion/animations/presentation";
-import { DriverRangeFields, type DriverRange } from "./effect-motion/DriverRange";
-import { Activity, Check, SlidersHorizontal, Square, X } from "lucide-react";
+import { type DriverRange } from "./effect-motion/DriverRange";
+import { Activity, Check, Circle, Play, SlidersHorizontal, Square, X } from "lucide-react";
 import { useSetAtom } from "jotai";
 import { timelineOpenAtom } from "../../../state/motion/timeline-state";
 import { createMotionTransport } from "../../../services/motion/transport";
 import { MotionChoices } from "./effect-motion/MotionChoices";
 import { Popover, PopoverTrigger, PopoverContent } from "../../ui/popover";
-import { NumberInput } from "../../shared/NumberInput";
-import type {
-  Effect,
-  EnginePort,
-  MotionDriver,
-  MotionInputEvent,
-  MotionInputKind,
-} from "@musart/core";
+import { MotionSettings } from "./effect-motion/MotionSettings";
+import type { Effect, EnginePort, MotionInputKind } from "@musart/core";
 import { useTranslation } from "react-i18next";
 import { Button } from "../../ui/button";
-import { SelectField } from "../../shared/SelectField";
-import { startEffectPreview } from "../../../state/session/effect-preview";
+
 import {
   addEffectDriver,
+  setEffectMotion,
+  smoothAutomaticChannel,
   effectDriverChannel,
+  interactiveEffectChannels,
   effectMotionProperties,
-  effectPropertyLabel,
   motionPropertyKey,
-  previewEffectDriver,
-  type EffectDriverProperty,
 } from "./effect-motion/authoring";
-import { appendMotionInput } from "./effect-motion/input-recording";
-import { InputPad, type EffectPadInput } from "./effect-motion/InputPad";
-import { beginEffectInputSession } from "./effect-motion/input-session";
+import { InputPad } from "./effect-motion/InputPad";
 import "./effect-motion/messages";
 import "./messages";
 import "./effect-motion/style.css";
-
-const INPUTS: MotionInputKind[] = [
-  "pointerX",
-  "pointerY",
-  "pointerXY",
-  "pointerDrag",
-  "primaryClick",
-  "secondaryClick",
-];
 
 /** Controls create ordinary editable action blocks; a recording is one undo transaction. */
 export function EffectPlayback({
@@ -63,19 +48,66 @@ export function EffectPlayback({
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [settingsAction, setSettingsAction] = useState<"automatic" | "interactive">(
+    effect.motion?.interactive ? "interactive" : "automatic",
+  );
   const settingsId = useId();
   const showTimeline = useSetAtom(timelineOpenAtom);
-  const [period, setPeriod] = useState(2);
-  const [response, setResponse] = useState("smooth");
-  const [clickMode, setClickMode] = useState("impulse");
-  const [returnOnRelease, setReturnOnRelease] = useState(true);
-  const [propertyKey, setPropertyKey] = useState("");
-  const [range, setRange] = useState<{ key: string; value: DriverRange } | null>(null);
+  const properties = useMemo(() => effectMotionProperties(engine, effect), [engine, effect]);
+  const initialAction = effect.motion?.interactive ?? effect.motion?.automatic;
+  const initialChannel = initialAction?.channels[0];
+  const initialDriver = initialChannel?.driver;
+  const initialProperty = properties.find(
+    (property) =>
+      property.target.property === initialChannel?.target.property &&
+      property.target.kind.endsWith("Setting") ===
+        (initialChannel?.target.kind === "effectSetting"),
+  );
+  const [period, setPeriod] = useState(() => {
+    const driver = effect.motion?.automatic?.channels[0]?.driver;
+    return driver && "period" in driver ? driver.period.value / driver.period.rate : 2;
+  });
+  const [response, setResponse] = useState(
+    initialDriver && "response" in initialDriver && initialDriver.response
+      ? initialDriver.response.damping < 1
+        ? "rebound"
+        : "smooth"
+      : initialDriver && !("period" in initialDriver)
+        ? "direct"
+        : "smooth",
+  );
+  const [clickMode, setClickMode] = useState<string>(
+    initialDriver && "clickMode" in initialDriver
+      ? (initialDriver.clickMode ?? "impulse")
+      : "impulse",
+  );
+  const [returnOnRelease, setReturnOnRelease] = useState(
+    initialDriver && "returnOnRelease" in initialDriver
+      ? (initialDriver.returnOnRelease ?? true)
+      : true,
+  );
+  const [propertyKey, setPropertyKey] = useState(
+    initialProperty ? motionPropertyKey(initialProperty) : "",
+  );
+  const [range, setRange] = useState<{ key: string; value: DriverRange } | null>(
+    initialProperty && initialChannel
+      ? {
+          key: motionPropertyKey(initialProperty),
+          value: [
+            initialChannel.points[0]!.value,
+            initialChannel.points[
+              initialChannel.driver?.kind === "loop" ? 1 : initialChannel.points.length - 1
+            ]!.value,
+          ],
+        }
+      : null,
+  );
   const [secondaryKey, setSecondaryKey] = useState("");
-  const [input, setInput] = useState<MotionInputKind>("pointerX");
-  const [recording, setRecording] = useState(false);
+  const [input, setInput] = useState<MotionInputKind>(
+    initialDriver && !("period" in initialDriver) ? initialDriver.kind : "pointerX",
+  );
+  const [editing, setEditing] = useState<string | null>(null);
   const [status, setStatus] = useState<"saved" | "failed" | "full" | "">("");
-  const output = useRef<HTMLOutputElement>(null);
   const root = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
   const [propertyOwner, setPropertyOwner] = useState(effect.id);
@@ -87,12 +119,6 @@ export function EffectPlayback({
     setOpen(false);
     setSettingsOpen(false);
   }
-  const latest = useRef({ onChange, onStart, onCancel });
-  latest.current = { onChange, onStart, onCancel };
-  const finish = useRef<((commit?: boolean) => void) | null>(null);
-  const retireInput = useRef<(() => void) | null>(null);
-  const take = useRef<{ started: number; events: MotionInputEvent[] } | null>(null);
-  const properties = effectMotionProperties(engine, effect);
   const property =
     properties.find((property) => motionPropertyKey(property) === propertyKey) ?? properties[0];
   const defaultChannel = property
@@ -104,8 +130,24 @@ export function EffectPlayback({
       : [defaultChannel?.points[0]?.value ?? 0, defaultChannel?.points.at(-1)?.value ?? 1];
   const secondary =
     properties.find((item) => motionPropertyKey(item) === secondaryKey && item !== property) ??
-    properties.find((item) => item !== property && /Y$/.test(item.target.property)) ??
+    properties.find((item) => item !== property && item.target.property.endsWith("Y")) ??
     properties.find((item) => item !== property);
+  const { record, emit, finish, output, recording, testing } = useInputPreview({
+    engine,
+    effect,
+    secondary,
+    input,
+    response,
+    clickMode,
+    returnOnRelease,
+    outputRange,
+    setInput,
+    setStatus,
+    showTimeline,
+    onChange,
+    onStart,
+    onCancel,
+  });
   const snapshot = engine.getSnapshot();
   const page = snapshot.project.pages.find((page) => page.id === snapshot.pageId);
 
@@ -156,170 +198,116 @@ export function EffectPlayback({
       window.removeEventListener("keydown", key, true);
       window.removeEventListener("blur", cancel);
       document.removeEventListener("visibilitychange", hide);
-      finish.current?.(false);
+      cancel();
     };
-  }, [engine, effect.id]);
+  }, [engine, effect.id, finish]);
 
   function add(kind: "loop" | "pingPong" | "pulse") {
     if (!property) return;
+    setSettingsAction("automatic");
     finish.current?.(false);
     try {
-      addEffectDriver(
-        engine,
-        effect,
-        effectDriverChannel(
-          property,
-          { kind, period: { value: Math.round(period * 1000), rate: 1000 } },
-          outputRange,
-        ),
-        t(`effectMotion:${kind}`),
-        period * 1000,
-      );
-      showTimeline(true);
-      createMotionTransport(engine).play();
-      setStatus("saved");
+      const current = effect.motion ?? {};
+      const automatic =
+        current.automatic?.channels[0]?.driver?.kind === kind
+          ? undefined
+          : {
+              name: t(`effectMotion:${kind}`),
+              channels: [
+                smoothAutomaticChannel(
+                  effectDriverChannel(
+                    property,
+                    { kind, period: { value: Math.round(period * 1000), rate: 1000 } },
+                    outputRange,
+                  ),
+                ),
+              ],
+            };
+      setEffectMotion(engine, effect.id, { ...current, automatic });
+      if (automatic) createMotionTransport(engine).play();
+      setStatus("");
     } catch {
       setStatus("failed");
     }
   }
 
-  function record(selected: EffectDriverProperty, selectedInput: MotionInputKind = input) {
-    createMotionTransport(engine).pause();
-    setInput(selectedInput);
-    setStatus("");
-    const events: MotionInputEvent[] = [];
-    take.current = { started: performance.now(), events };
-    const driver: MotionDriver = {
-      kind: selectedInput,
-      initial: selectedInput.endsWith("Click") ? 0 : 0.5,
-      events,
-      ...(response === "direct"
-        ? {}
-        : { response: { frequency: 16, damping: response === "rebound" ? 0.35 : 1 } }),
-      ...(selectedInput === "pointerDrag" ? { returnOnRelease } : {}),
-      ...(selectedInput.endsWith("Click")
-        ? { clickMode: clickMode === "toggle" ? "toggle" : "impulse" }
-        : {}),
-    };
-    const neutral =
-      selectedInput === "pointerDrag" &&
-      typeof selected.value === "number" &&
-      typeof outputRange[0] === "number" &&
-      typeof outputRange[1] === "number" &&
-      outputRange[0] !== outputRange[1]
-        ? Math.max(
-            0,
-            Math.min(1, (selected.value - outputRange[0]) / (outputRange[1] - outputRange[0])),
-          )
-        : driver.initial;
-    const channel = effectDriverChannel(
-      selected,
-      { ...driver, initial: neutral, ...(selectedInput === "pointerXY" ? { axis: "x" } : {}) },
-      outputRange,
-    );
-    const secondChannel =
-      selectedInput === "pointerXY" && secondary
-        ? effectDriverChannel(secondary, { ...driver, axis: "y" })
-        : null;
-    const channels = secondChannel ? [channel, secondChannel] : [channel];
-    try {
-      previewEffectDriver(selected, channel, 0);
-      if (secondChannel && secondary) previewEffectDriver(secondary, secondChannel, 0);
-    } catch {
-      setStatus("failed");
+  const selectedAnimation =
+    page?.motion?.tracks
+      .flatMap((track) => track.animations ?? [])
+      .find((animation) => animation.id === editing) ??
+    page?.motion?.sceneAnimations?.find((animation) => animation.id === editing);
+  useEffectMotionRequest(engine, effect.id, (request) => {
+    if (request.pageId !== page?.id) return;
+    if (
+      request.layersOnly &&
+      !trigger.current?.closest("[data-attachment-body], .composition-effect-popover")
+    )
+      return;
+    if (trigger.current?.closest('[data-slot="popover-content"][data-state="closed"]')) return;
+    if (request.action) loadAction(request.action);
+    setOpen(true);
+    setEditing(request.animationId ?? null);
+    setSettingsOpen(Boolean(request.action));
+    effectMotionNavigation(engine).clear();
+  });
+
+  function loadAction(actionKey: "automatic" | "interactive") {
+    setSettingsAction(actionKey);
+    const action = effect.motion?.[actionKey];
+    const channel = action?.channels[0],
+      driver = channel?.driver;
+    if (channel && driver) {
+      const property = properties.find(
+        (property) =>
+          property.target.property === channel.target.property &&
+          property.target.kind.endsWith("Setting") === (channel.target.kind === "effectSetting"),
+      );
+      if (property) {
+        setPropertyKey(motionPropertyKey(property));
+        setRange({
+          key: motionPropertyKey(property),
+          value: [
+            channel.points[0]!.value,
+            channel.points[driver.kind === "loop" ? 1 : channel.points.length - 1]!.value,
+          ],
+        });
+      }
+      if ("period" in driver) setPeriod(driver.period.value / driver.period.rate);
+      else {
+        setInput(driver.kind);
+        setResponse(
+          !driver.response ? "direct" : driver.response.damping < 1 ? "rebound" : "smooth",
+        );
+        setReturnOnRelease(driver.returnOnRelease ?? true);
+        setClickMode(driver.clickMode ?? "impulse");
+      }
+    }
+  }
+
+  function chooseInput(kind: MotionInputKind) {
+    if (!property) return;
+    setSettingsAction("interactive");
+    finish.current?.(false);
+    const previous = effect.motion?.interactive?.channels[0]?.driver?.kind;
+    if (previous === kind) {
+      const { interactive: _interactive, ...remaining } = effect.motion ?? {};
+      setEffectMotion(engine, effect.id, remaining);
       return;
     }
-    setRecording(true);
-    finish.current = startEffectPreview(engine, {
-      time: 0,
-      sampleOnFinish: true,
-      clock: {
-        now: () => performance.now(),
-        request: (callback) => requestAnimationFrame(callback),
-        cancel: (handle) => cancelAnimationFrame(handle),
-      },
-      begin: () => latest.current.onStart?.(),
-      preview: (seconds) => {
-        if (output.current)
-          output.current.value = t("effectMotion:live", { time: seconds.toFixed(2) });
-        const first = previewEffectDriver(selected, channel, seconds * 1000);
-        const second =
-          secondChannel && secondary
-            ? previewEffectDriver(secondary, secondChannel, seconds * 1000)
-            : {};
-        const patch = {
-          ...first,
-          ...second,
-          ...(first.settings || second.settings
-            ? { settings: { ...first.settings, ...second.settings } }
-            : {}),
-        };
-        latest.current.onChange(
-          patch.settings
-            ? { ...patch, settings: { ...effect.settings, ...patch.settings } }
-            : patch,
-          true,
-        );
-      },
-      commit: (seconds) => {
-        latest.current.onCancel?.();
-        if (!events.length) return;
-        try {
-          addEffectDriver(
-            engine,
-            effect,
-            channels,
-            t("effectMotion:recorded", { driver: t(`effectMotion:${selectedInput}`) }),
-            // Keep release/impulse settling inside the authored block, even on an immediate Save.
-            seconds * 1000 +
-              (response === "direct" ? 0 : response === "rebound" ? 1500 : 1000) +
-              (selectedInput.endsWith("Click") && clickMode === "impulse" ? 150 : 0),
-          );
-          showTimeline(true);
-          createMotionTransport(engine).play();
-          setStatus("saved");
-        } catch {
-          setStatus("failed");
-        }
-      },
-      cancel: () => latest.current.onCancel?.(),
-      stopped: () => {
-        retireInput.current?.();
-        retireInput.current = null;
-        finish.current = null;
-        take.current = null;
-        setRecording(false);
-      },
-    });
-    retireInput.current = beginEffectInputSession(engine, {
-      owner: page
-        ? {
-            compositionId: page.id,
-            ...(page.layers.find((layer) => layer.effects.some((item) => item.id === effect.id))
-              ? {
-                  layerId: page.layers.find((layer) =>
-                    layer.effects.some((item) => item.id === effect.id),
-                  )!.id,
-                }
-              : {}),
-          }
-        : undefined,
-      kind: selectedInput,
-      emit,
-      cancel: () => finish.current?.(false),
-    });
-  }
-
-  function emit(event: EffectPadInput) {
-    const current = take.current;
-    if (!current) return;
-    const at = {
-      value: Math.max(0, Math.round((performance.now() - current.started) * 1000)),
-      rate: 1000000,
-    };
-    if (!appendMotionInput(current.events, { ...event, at })) {
-      finish.current?.(false);
-      setStatus("full");
+    const channels = interactiveEffectChannels(
+      property,
+      kind,
+      { response, clickMode, returnOnRelease, range: outputRange },
+      secondary,
+    );
+    try {
+      setEffectMotion(engine, effect.id, {
+        ...effect.motion,
+        interactive: { name: t(`effectMotion:${kind}`), channels },
+      });
+      record(property, kind);
+    } catch {
+      setStatus("failed");
     }
   }
 
@@ -350,46 +338,121 @@ export function EffectPlayback({
         data-keybinding-capture
         onInteractOutside={(event) => {
           if (
-            recording &&
+            (recording || testing) &&
             event.target instanceof Element &&
             event.target.closest("[data-effect-input-surface]")
           )
             event.preventDefault();
         }}
       >
-        {property ? (
+        {selectedAnimation ? (
+          <>
+            <Button size="sm" variant="ghost" onClick={() => setEditing(null)}>
+              {t("effectMotion:title")}
+            </Button>
+
+            <fieldset disabled={disabled}>
+              <legend>{selectedAnimation.preset.name}</legend>
+              <AnimationDetails
+                engine={engine}
+                animation={selectedAnimation}
+                run={(action) => {
+                  try {
+                    action();
+                  } catch {
+                    setStatus("failed");
+                  }
+                }}
+              />
+            </fieldset>
+          </>
+        ) : property ? (
           <>
             <MotionChoices
               disabled={disabled}
               recording={recording}
-              input={input}
+              activeAutomatic={effect.motion?.automatic?.channels[0]?.driver?.kind}
+              activeInteractive={effect.motion?.interactive?.channels[0]?.driver?.kind}
               onAutomatic={add}
-              onInput={(kind) =>
-                record(
-                  property,
-                  kind === "primaryClick" && input === "secondaryClick" ? "secondaryClick" : kind,
-                )
-              }
+              onInput={chooseInput}
             />
-            {recording && (
+            {!recording && (
+              <div className="effect-motion-record-actions">
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  disabled={disabled || !effect.motion?.interactive}
+                  onClick={() =>
+                    testing
+                      ? finish.current?.(false)
+                      : property &&
+                        record(
+                          property,
+                          effect.motion?.interactive?.channels[0]?.driver?.kind as MotionInputKind,
+                        )
+                  }
+                >
+                  <Play size={12} />
+                  {t(testing ? "effectMotion:stopTest" : "effectMotion:test")}
+                </Button>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  aria-label={t("effectMotion:record")}
+                  disabled={disabled || (!effect.motion?.automatic && !effect.motion?.interactive)}
+                  onClick={() => {
+                    if (effect.motion?.interactive && property)
+                      record(
+                        property,
+                        effect.motion.interactive.channels[0]!.driver!.kind as MotionInputKind,
+                        true,
+                      );
+                    else if (effect.motion?.automatic) {
+                      try {
+                        finish.current?.(false);
+                        addEffectDriver(
+                          engine,
+                          effect,
+                          effect.motion.automatic.channels,
+                          effect.motion.automatic.name,
+                          period * 1000,
+                          true,
+                        );
+                        showTimeline(true);
+                        createMotionTransport(engine).play();
+                        setStatus("saved");
+                      } catch {
+                        setStatus("failed");
+                      }
+                    }
+                  }}
+                >
+                  <Circle size={12} />
+                  {t("effectMotion:recordAction")}
+                </Button>
+              </div>
+            )}
+            {(recording || testing) && (
               <div className="effect-motion-recording">
                 <div className="effect-motion-recording-heading">
-                  <span className="effect-motion-record-dot" />
+                  {recording && <span className="effect-motion-record-dot" />}
                   <output ref={output} aria-live="off">
-                    {t("effectMotion:recording")}
+                    {t(recording ? "effectMotion:recording" : "effectMotion:testing")}
                   </output>
                 </div>
                 <InputPad kind={input} emit={emit} cancel={() => finish.current?.(false)} />
-                <div className="effect-motion-record-actions">
-                  <Button size="sm" onClick={() => finish.current?.()}>
-                    <Square size={13} aria-hidden />
-                    {t("effectMotion:done")}
-                  </Button>
-                  <Button size="sm" variant="ghost" onClick={() => finish.current?.(false)}>
-                    <X size={14} aria-hidden />
-                    {t("effectMotion:cancel")}
-                  </Button>
-                </div>
+                {recording && (
+                  <div className="effect-motion-record-actions">
+                    <Button size="sm" onClick={() => finish.current?.()}>
+                      <Square size={13} aria-hidden />
+                      {t("effectMotion:done")}
+                    </Button>
+                    <Button size="sm" variant="ghost" onClick={() => finish.current?.(false)}>
+                      <X size={14} aria-hidden />
+                      {t("effectMotion:cancel")}
+                    </Button>
+                  </div>
+                )}
               </div>
             )}
             <div className="effect-motion-settings">
@@ -407,112 +470,99 @@ export function EffectPlayback({
               </Button>
               {settingsOpen && (
                 <div id={settingsId} className="effect-motion-settings-fields">
-                  <SelectField
-                    contentClassName="effect-motion-select"
-                    label={t("effectMotion:property")}
-                    value={motionPropertyKey(property)}
-                    disabled={disabled || recording}
-                    options={properties.map((item) => ({
-                      value: motionPropertyKey(item),
-                      label: t(effectPropertyLabel(effect, item), {
-                        defaultValue: item.target.property,
-                      }),
-                    }))}
-                    onValueChange={setPropertyKey}
-                  />
-                  <DriverRangeFields
+                  {effect.motion?.automatic && effect.motion.interactive && (
+                    <div className="effect-motion-record-actions">
+                      {(["automatic", "interactive"] as const).map((action) => (
+                        <Button
+                          key={action}
+                          size="sm"
+                          variant="ghost"
+                          aria-pressed={settingsAction === action}
+                          onClick={() => loadAction(action)}
+                        >
+                          {t(`effectMotion:${action}`)}
+                        </Button>
+                      ))}
+                    </div>
+                  )}
+                  <MotionSettings
+                    effect={effect}
                     property={property}
-                    value={outputRange}
+                    properties={properties}
+                    secondary={secondary}
+                    outputRange={outputRange}
+                    period={period}
+                    input={input}
+                    response={response}
+                    clickMode={clickMode}
+                    returnOnRelease={returnOnRelease}
                     disabled={disabled || recording}
-                    onChange={(value) => setRange({ key: motionPropertyKey(property), value })}
+                    setPropertyKey={setPropertyKey}
+                    setRange={setRange}
+                    setPeriod={setPeriod}
+                    setInput={setInput}
+                    setSecondaryKey={setSecondaryKey}
+                    setResponse={setResponse}
+                    setClickMode={setClickMode}
+                    setReturnOnRelease={setReturnOnRelease}
                   />
-                  <NumberInput
-                    label={t("effectMotion:period")}
-                    value={period}
-                    min={0.1}
-                    max={3600}
-                    step={0.1}
-                    unit="s"
-                    disabled={disabled || recording}
-                    onCommit={setPeriod}
-                  />
-                  <SelectField
-                    contentClassName="effect-motion-select"
-                    label={t("effectMotion:input")}
-                    value={input}
-                    disabled={disabled || recording}
-                    options={INPUTS.map((kind) => ({
-                      value: kind,
-                      label: t(`effectMotion:${kind}`),
-                    }))}
-                    onValueChange={(value) => setInput(value as MotionInputKind)}
-                  />
-                  {input === "pointerXY" && secondary && (
-                    <SelectField
-                      contentClassName="effect-motion-select"
-                      label={t("effectMotion:propertyY")}
-                      value={motionPropertyKey(secondary)}
+                  {(effect.motion?.automatic || effect.motion?.interactive) && (
+                    <Button
+                      size="sm"
                       disabled={disabled || recording}
-                      options={properties
-                        .filter((item) => item !== property)
-                        .map((item) => ({
-                          value: motionPropertyKey(item),
-                          label: t(effectPropertyLabel(effect, item), {
-                            defaultValue: item.target.property,
-                          }),
-                        }))}
-                      onValueChange={setSecondaryKey}
-                    />
-                  )}
-                  <SelectField
-                    contentClassName="effect-motion-select"
-                    label={t("effectMotion:response")}
-                    value={response}
-                    disabled={disabled || recording}
-                    options={["direct", "smooth", "rebound"].map((value) => ({
-                      value,
-                      label: t(`effectMotion:${value}`),
-                    }))}
-                    onValueChange={setResponse}
-                  />
-                  {input.endsWith("Click") && (
-                    <SelectField
-                      contentClassName="effect-motion-select"
-                      label={t("effectMotion:clickMode")}
-                      value={clickMode}
-                      disabled={disabled || recording}
-                      options={["impulse", "toggle"].map((value) => ({
-                        value,
-                        label: t(`effectMotion:${value}`),
-                      }))}
-                      onValueChange={setClickMode}
-                    />
-                  )}
-                  {input === "pointerDrag" && (
-                    <SelectField
-                      contentClassName="effect-motion-select"
-                      label={t("effectMotion:release")}
-                      value={returnOnRelease ? "return" : "hold"}
-                      disabled={disabled || recording}
-                      options={["return", "hold"].map((value) => ({
-                        value,
-                        label: t(`effectMotion:${value}`),
-                      }))}
-                      onValueChange={(value) => setReturnOnRelease(value === "return")}
-                    />
+                      onClick={() => {
+                        finish.current?.(false);
+                        const motion = structuredClone(effect.motion!);
+                        if (motion.automatic && settingsAction === "automatic") {
+                          const driver = motion.automatic.channels[0]!.driver!;
+                          if ("period" in driver)
+                            motion.automatic.channels = [
+                              smoothAutomaticChannel(
+                                effectDriverChannel(
+                                  property,
+                                  {
+                                    ...driver,
+                                    period: { value: Math.round(period * 1000), rate: 1000 },
+                                  },
+                                  outputRange,
+                                ),
+                              ),
+                            ];
+                        }
+                        if (motion.interactive && settingsAction === "interactive") {
+                          motion.interactive = {
+                            name: t(`effectMotion:${input}`),
+                            channels: interactiveEffectChannels(
+                              property,
+                              input,
+                              { response, clickMode, returnOnRelease, range: outputRange },
+                              secondary,
+                            ),
+                          };
+                        }
+                        try {
+                          setEffectMotion(engine, effect.id, motion);
+                          setStatus("");
+                        } catch {
+                          setStatus("failed");
+                        }
+                      }}
+                    >
+                      {t("effectMotion:apply")}
+                    </Button>
                   )}
                 </div>
               )}
             </div>
-            {status && (
-              <p role={status === "failed" || status === "full" ? "alert" : "status"}>
-                {status === "saved" && <Check size={13} aria-hidden />}
-                {t(`effectMotion:${status}`)}
-              </p>
-            )}
           </>
         ) : (
           <p>{t("effectMotion:unavailable")}</p>
+        )}
+        {status && (
+          <p role={status === "failed" || status === "full" ? "alert" : "status"}>
+            {status === "saved" && <Check size={13} aria-hidden />}
+            {t(`effectMotion:${status}`)}
+          </p>
         )}
       </PopoverContent>
     </Popover>

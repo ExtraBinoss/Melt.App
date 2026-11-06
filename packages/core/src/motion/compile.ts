@@ -1,3 +1,4 @@
+import { compileCompositionEffectMotion } from "../effects/motion/compile";
 import { compileSceneAnimations } from "./scene/animations/compile";
 import type { SceneMotionPropertyTarget } from "./scene/model";
 import { compileSceneMotion } from "./scene/compile";
@@ -128,7 +129,10 @@ export function compileMotion(
     layers,
     audio,
     sceneProperties: mode === "motion" ? compileSceneMotion(page) : [],
-    sceneAnimations: mode === "motion" ? compileSceneAnimations(page) : [],
+    sceneAnimations:
+      mode === "motion"
+        ? [...compileCompositionEffectMotion(page), ...compileSceneAnimations(page)]
+        : [],
   });
   if (trusted) {
     let retained = programs.get(project);
