@@ -4,6 +4,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ## [Unreleased]
 
+- Document the paid cloud product direction, provider-neutral persistence, storage-funded project allowances, shared authenticated MCP/headless access, creative resources, collaboration transports and history/cost optimization in docs/paid_plan/.
+
 - Keep extruded 3D text/vector layers visible with Chromatic Aberration and other effects near edge-on rotations. Detect when the native raster crosses the authored face’s inverse projection horizon and evaluate effects, depth and history in native raster coordinates, avoiding effectively infinite intermediate surfaces and lost coverage in Classic, Studio and exports.
 
 - Keep effect Motion compact with persistent checked automatic/interactive behaviors, contextual help and an explicit temporary test. Evaluate closed, eased automatic loops through the shared Motion compiler, fit complete cycles to the composition, compose numeric live gestures with automatic motion, and cache interactive samplers between native input events. Recording transfers the selected behaviors into ordinary editable timeline actions and clears the direct choices in one undoable transaction; cancellation and failed saves preserve them. Show direct and recorded animation children under layer/composition effects in Layers, with direct navigation to their real controls.
