@@ -1,0 +1,19 @@
+{
+  "name": "Okręgi",
+  "parameter": {
+    "spacing": "Odstęp komórek",
+    "rotation": "Kąt rastra",
+    "dotSize": "Rozmiar punktów",
+    "softness": "Miękkość krawędzi",
+    "gamma": "Gamma tonalna",
+    "polarity": "Polaryzacja punktów",
+    "foreground": "Kolor tuszu",
+    "background": "Kolor papieru",
+    "foregroundOpacity": "Krycie tuszu",
+    "backgroundOpacity": "Krycie papieru"
+  },
+  "polarity": {
+    "shadows": "Punkty w cieniach",
+    "highlights": "Punkty w światłach"
+  }
+}

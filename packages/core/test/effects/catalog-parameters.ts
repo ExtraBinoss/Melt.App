@@ -1,9 +1,11 @@
+import { SDK_CATALOG_PARAMETERS } from "./sdk-catalog-parameters";
 import { SURFACE_PARAMETERS } from "./surface/parameters";
 import { TERMINAL_PARAMETERS } from "./terminal/parameters";
 import { BLUR_PARAMETER_KEYS } from "./blur/parameters";
 import { GRADIENT_DEFINITION } from "../../src/effects/gradient/definition";
 import type { EffectType } from "../../src/document/model";
 export const CATALOG_PARAMETERS: Record<EffectType, string[]> = {
+  ...SDK_CATALOG_PARAMETERS,
   "depth-anything": ["amount", "strength", "angle", "focus", "zoom", "view"],
   feather: ["amount", "centerX", "centerY", "radius", "softness"],
   terminal: TERMINAL_PARAMETERS,

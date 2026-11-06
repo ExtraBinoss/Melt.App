@@ -1,0 +1,22 @@
+{
+  "name": "تموج حي",
+  "parameter": {
+    "centerX": "المركز X",
+    "centerY": "المركز Y",
+    "innerRadius": "نصف القطر المحمي",
+    "radius": "المدى",
+    "feather": "تنعيم الحواف",
+    "falloff": "التلاشي مع المسافة",
+    "amplitude": "الإزاحة",
+    "wavelength": "الطول الموجي",
+    "speed": "سرعة الموجة",
+    "phase": "الطور",
+    "direction": "الاتجاه",
+    "dispersion": "تشتت الألوان",
+    "time": "الزمن"
+  },
+  "direction": {
+    "outward": "نحو الخارج",
+    "inward": "نحو الداخل"
+  }
+}

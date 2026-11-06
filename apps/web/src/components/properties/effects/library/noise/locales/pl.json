@@ -1,0 +1,37 @@
+{
+  "name": "Szum",
+  "parameter": {
+    "algorithm": "Algorytm",
+    "scale": "Rozmiar komórek",
+    "octaves": "Oktawy",
+    "lacunarity": "Przyrost częstotliwości",
+    "persistence": "Siła detali",
+    "jitter": "Nieregularność komórek",
+    "offsetX": "Przesunięcie X",
+    "offsetY": "Przesunięcie Y",
+    "offsetZ": "Przekrój 3D",
+    "speed": "Szybkość ewolucji",
+    "contrast": "Kontrast",
+    "brightness": "Jasność",
+    "gamma": "Gamma",
+    "invert": "Odwróć",
+    "mode": "Zastosuj szum",
+    "lowColor": "Kolor niskich wartości",
+    "highColor": "Kolor wysokich wartości",
+    "time": "Czas"
+  },
+  "algorithm": {
+    "perlin": "Perlin 3D",
+    "value": "Szum wartości 3D",
+    "cell": "Komórki 3D",
+    "worley": "Worley 3D",
+    "fbm": "Fraktalny ruch Browna",
+    "ridged": "Fraktal grzbietowy",
+    "turbulence": "Turbulencja"
+  },
+  "mode": {
+    "replace": "Zastąp kolor",
+    "add": "Dodaj zróżnicowanie",
+    "multiply": "Pomnóż"
+  }
+}

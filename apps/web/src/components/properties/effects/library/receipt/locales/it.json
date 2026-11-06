@@ -1,0 +1,50 @@
+{
+  "name": "Scontrino",
+  "fit": {
+    "contain": "Mantieni le proporzioni",
+    "stretch": "Riempi l’area di stampa"
+  },
+  "mode": {
+    "ordered": "Punti ordinati",
+    "stochastic": "Punti casuali",
+    "threshold": "Soglia"
+  },
+  "edge": {
+    "straight": "Taglio dritto",
+    "torn": "Bordo strappato",
+    "perforated": "Bordo perforato"
+  },
+  "parameter": {
+    "scale": "Passo dei punti di stampa",
+    "mode": "Retino termico",
+    "exposure": "Esposizione",
+    "gamma": "Gamma",
+    "contrast": "Contrasto di stampa",
+    "invert": "Inverti stampa",
+    "inkColor": "Colore di stampa",
+    "paperColor": "Colore della carta",
+    "inkOpacity": "Densità di stampa",
+    "dotSpread": "Espansione dei punti",
+    "dotSoftness": "Morbidezza dei punti",
+    "wear": "Punti mancanti",
+    "feedBanding": "Bande di avanzamento",
+    "feedPitch": "Spaziatura delle bande di avanzamento",
+    "streaks": "Striature della testina",
+    "streakWidth": "Larghezza delle striature",
+    "marginX": "Margine orizzontale di stampa",
+    "marginY": "Margine verticale di stampa",
+    "fit": "Adattamento dell’immagine",
+    "paperTexture": "Texture della carta",
+    "fiberSize": "Dimensione delle fibre",
+    "edge": "Taglio della carta",
+    "edgeHeight": "Profondità del bordo",
+    "edgePitch": "Spaziatura del bordo",
+    "edgeJitter": "Irregolarità del bordo",
+    "edgeSoftness": "Morbidezza del bordo",
+    "edgeShade": "Ombreggiatura del bordo",
+    "foldStrength": "Ombreggiatura della piega",
+    "foldPosition": "Posizione della piega",
+    "foldWidth": "Larghezza della piega",
+    "cutout": "Bordi della carta trasparenti"
+  }
+}

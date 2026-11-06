@@ -1,0 +1,21 @@
+{
+  "name": "분홍 형광체",
+  "parameter": {
+    "scale": "주사선 간격",
+    "exposure": "노출",
+    "gamma": "색조 감마",
+    "contrast": "대비",
+    "glow": "발광 강도",
+    "glowRadius": "발광 범위",
+    "glowThreshold": "발광 임계값",
+    "scanlines": "주사선 강도",
+    "beamWidth": "광선 너비",
+    "grain": "입자",
+    "flicker": "깜박임",
+    "speed": "변화 속도",
+    "background": "어두운 영역 색상",
+    "phosphor": "형광체 색상",
+    "highlight": "밝은 영역 색상",
+    "time": "시간"
+  }
+}

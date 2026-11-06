@@ -1,0 +1,19 @@
+{
+  "name": "Kreise",
+  "parameter": {
+    "spacing": "Zellenabstand",
+    "rotation": "Rasterwinkel",
+    "dotSize": "Punktgröße",
+    "softness": "Kantenweichheit",
+    "gamma": "Tonwertgamma",
+    "polarity": "Punktpolarität",
+    "foreground": "Druckfarbe",
+    "background": "Papierfarbe",
+    "foregroundOpacity": "Druckfarbendeckkraft",
+    "backgroundOpacity": "Papierdeckkraft"
+  },
+  "polarity": {
+    "shadows": "Punkte in Schatten",
+    "highlights": "Punkte in Spitzlichtern"
+  }
+}

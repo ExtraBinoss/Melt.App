@@ -1,0 +1,16 @@
+{
+  "name": "Acuarela",
+  "parameter": {
+    "washScale": "Escala de la aguada",
+    "simplification": "Simplificación de regiones",
+    "edgePreservation": "Preservación de bordes",
+    "diffusion": "Difusión del pigmento",
+    "pigment": "Densidad del pigmento",
+    "edgeDarkening": "Acumulación en los bordes",
+    "granulation": "Granulación del pigmento",
+    "paperGrain": "Grano del papel",
+    "paperScale": "Escala de la textura del papel",
+    "paperOpacity": "Aguada del papel",
+    "paperColor": "Color del papel"
+  }
+}

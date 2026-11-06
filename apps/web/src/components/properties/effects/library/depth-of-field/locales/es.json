@@ -1,0 +1,23 @@
+{
+  "name": "Profundidad de campo",
+  "parameter": {
+    "focusMode": "Modo de enfoque",
+    "focusX": "Punto de enfoque X",
+    "focusY": "Punto de enfoque Y",
+    "focusDistance": "Distancia de enfoque",
+    "focusRange": "Rango focal",
+    "aperture": "Apertura",
+    "maxBlur": "Desenfoque máximo",
+    "blades": "Palas del diafragma",
+    "angle": "Orientación del diafragma",
+    "edgeProtection": "Protección de bordes de profundidad",
+    "quality": "Calidad del muestreo"
+  },
+  "choice": {
+    "distance": "Distancia de la cámara",
+    "point": "Profundidad nativa en el punto",
+    "low": "Baja (8 muestras)",
+    "medium": "Media (16 muestras)",
+    "high": "Alta (24 muestras)"
+  }
+}

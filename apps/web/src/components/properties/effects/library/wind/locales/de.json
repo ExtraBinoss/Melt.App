@@ -1,0 +1,16 @@
+{
+  "name": "Wind",
+  "parameter": {
+    "centerX": "Feldzentrum X",
+    "centerY": "Feldzentrum Y",
+    "angle": "Windrichtung",
+    "length": "Streifenlänge",
+    "bandSize": "Bandbreite",
+    "variation": "Bandvariation",
+    "gust": "Böenstärke",
+    "speed": "Böengeschwindigkeit",
+    "phase": "Phase",
+    "sourceMix": "Originaldetails",
+    "time": "Zeit"
+  }
+}

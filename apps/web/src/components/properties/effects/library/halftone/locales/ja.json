@@ -1,0 +1,25 @@
+{
+  "name": "ハーフトーン",
+  "parameter": {
+    "pattern": "パターン",
+    "rotation": "グリッドの回転",
+    "dotSize": "円のサイズ",
+    "softness": "端の柔らかさ",
+    "gamma": "階調のガンマ",
+    "offsetX": "グリッドのオフセット X",
+    "offsetY": "グリッドのオフセット Y",
+    "ink": "ドットの色",
+    "paper": "背景色",
+    "backgroundOpacity": "背景の不透明度",
+    "sourceColor": "元の色を使用",
+    "cyanAngle": "シアンの網角度",
+    "magentaAngle": "マゼンタの網角度",
+    "yellowAngle": "イエローの網角度"
+  },
+  "choice": {
+    "legacy": "クラシック印刷",
+    "circle-grid": "円形ドットグリッド",
+    "round-mosaic": "丸いカラーモザイク",
+    "color-screen": "色チャンネルの網点"
+  }
+}

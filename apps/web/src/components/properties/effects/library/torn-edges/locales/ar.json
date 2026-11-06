@@ -1,0 +1,28 @@
+{
+  "name": "حواف ممزقة",
+  "parameter": {
+    "technique": "التقنية",
+    "balance": "توازن الدرجات اللونية",
+    "contrast": "التباين",
+    "roughness": "خشونة التمزق",
+    "textureScale": "حجم النسيج",
+    "detail": "ألياف دقيقة",
+    "smoothing": "تنعيم المصدر",
+    "tearWidth": "عمق التمزق",
+    "edgeWidth": "عرض حافة الورق",
+    "feather": "تنعيم الحواف",
+    "ink": "لون الحبر",
+    "paper": "لون الورق",
+    "edgeColor": "لون الحافة الممزقة",
+    "backgroundOpacity": "عتامة الورق",
+    "sourceColor": "اللون الأصلي",
+    "tearTop": "تمزيق الأعلى",
+    "tearBottom": "تمزيق الأسفل",
+    "tearLeft": "تمزيق اليسار",
+    "tearRight": "تمزيق اليمين"
+  },
+  "choice": {
+    "graphic": "رسم ممزق",
+    "paper": "هيئة ورق ممزق"
+  }
+}

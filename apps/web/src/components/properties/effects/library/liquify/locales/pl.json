@@ -1,0 +1,22 @@
+{
+  "name": "Skraplanie",
+  "parameter": {
+    "brushMode": "Tryb pędzla",
+    "brushRadius": "Promień pędzla",
+    "brushStrength": "Siła pędzla",
+    "brushHardness": "Twardość pędzla",
+    "stylusPressure": "Używaj nacisku pióra"
+  },
+  "choice": {
+    "push": "Przesuń",
+    "pinch": "Ściśnij",
+    "bloat": "Rozszerz",
+    "twirl-cw": "Wir zgodnie z ruchem wskazówek zegara",
+    "twirl-ccw": "Wir przeciwnie do ruchu wskazówek zegara",
+    "restore": "Odtwórz"
+  },
+  "brushHint": "Rysuj na warstwie okrągłym pędzlem. Escape anuluje bieżące pociągnięcie; Cofnij przywraca poprzednie odkształcenie. Poza pociągnięciem Escape kończy malowanie.",
+  "clear": "Wyzeruj odkształcenie",
+  "capacity": "Ten efekt Skraplanie osiągnął limit pędzla. Cofnij lub wyzeruj odkształcenie albo dodaj kolejny efekt Skraplanie.",
+  "spatialHint": "Maluj na warstwie 2D lub spłaszczonej kompozycji."
+}

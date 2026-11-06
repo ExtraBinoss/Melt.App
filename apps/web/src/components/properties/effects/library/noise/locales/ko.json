@@ -1,0 +1,37 @@
+{
+  "name": "노이즈",
+  "parameter": {
+    "algorithm": "알고리즘",
+    "scale": "셀 크기",
+    "octaves": "옥타브 수",
+    "lacunarity": "주파수 증가율",
+    "persistence": "세부 강도",
+    "jitter": "셀 불규칙성",
+    "offsetX": "X 오프셋",
+    "offsetY": "Y 오프셋",
+    "offsetZ": "3D 단면",
+    "speed": "변화 속도",
+    "contrast": "대비",
+    "brightness": "밝기",
+    "gamma": "감마",
+    "invert": "반전",
+    "mode": "노이즈 적용",
+    "lowColor": "낮은 값의 색상",
+    "highColor": "높은 값의 색상",
+    "time": "시간"
+  },
+  "algorithm": {
+    "perlin": "3D 펄린",
+    "value": "3D 값 노이즈",
+    "cell": "3D 셀",
+    "worley": "3D 월리",
+    "fbm": "프랙탈 브라운 운동",
+    "ridged": "능선 프랙탈",
+    "turbulence": "난류"
+  },
+  "mode": {
+    "replace": "색상 대체",
+    "add": "변화 추가",
+    "multiply": "곱하기"
+  }
+}

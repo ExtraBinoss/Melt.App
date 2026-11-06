@@ -1,0 +1,21 @@
+{
+  "name": "Scia",
+  "parameter": {
+    "mode": "Sorgente degli echi",
+    "echoCount": "Numero di echi",
+    "delay": "Tempo tra gli echi",
+    "fade": "Decadimento dell’opacità degli echi",
+    "offsetX": "Scostamento X per eco",
+    "offsetY": "Scostamento Y per eco",
+    "angle": "Direzione dello scostamento",
+    "centerX": "Centro di espansione X",
+    "centerY": "Centro di espansione Y",
+    "spread": "Variazione di scala per eco",
+    "expandBounds": "Estendi oltre i limiti dell’oggetto"
+  },
+  "choice": {
+    "temporal": "Pose / fotogrammi video precedenti",
+    "offset": "Scostamenti dell’immagine attuale",
+    "auto": "Automatico · adatta alla sorgente"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "name": "Głębia ostrości",
+  "parameter": {
+    "focusMode": "Tryb ustawiania ostrości",
+    "focusX": "Punkt ostrości X",
+    "focusY": "Punkt ostrości Y",
+    "focusDistance": "Odległość ostrzenia",
+    "focusRange": "Zakres ostrości",
+    "aperture": "Przysłona",
+    "maxBlur": "Maksymalne rozmycie",
+    "blades": "Listki przysłony",
+    "angle": "Kierunek przysłony",
+    "edgeProtection": "Ochrona krawędzi głębi",
+    "quality": "Jakość próbkowania"
+  },
+  "choice": {
+    "distance": "Odległość od kamery",
+    "point": "Natywna głębia w punkcie",
+    "low": "Niska (8 próbek)",
+    "medium": "Średnia (16 próbek)",
+    "high": "Wysoka (24 próbki)"
+  }
+}

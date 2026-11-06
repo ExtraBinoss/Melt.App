@@ -1,0 +1,27 @@
+{
+  "name": "Grelha de formas",
+  "parameter": {
+    "shape": "Escala de formas",
+    "cellSize": "Tamanho da célula",
+    "fill": "Preenchimento das formas",
+    "stroke": "Espessura do contorno",
+    "rotation": "Rotação da grelha",
+    "contrast": "Contraste tonal",
+    "colorMode": "Modo de cor",
+    "shadowColor": "Cor das sombras",
+    "midtoneColor": "Cor dos meios-tons",
+    "highlightColor": "Cor dos realces",
+    "backgroundColor": "Cor de fundo",
+    "backgroundOpacity": "Opacidade do fundo"
+  },
+  "choice": {
+    "adaptive": "Escala tonal adaptativa",
+    "dots": "Pontos",
+    "rings": "Anéis",
+    "diamonds": "Losangos",
+    "squares": "Quadrados",
+    "crosses": "Cruzes",
+    "source": "Cores originais",
+    "palette": "Paleta de três cores"
+  }
+}

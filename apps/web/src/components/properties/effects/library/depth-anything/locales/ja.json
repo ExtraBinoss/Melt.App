@@ -1,0 +1,28 @@
+{
+  "name": "Depth Anything V3",
+  "map": "深度マップ",
+  "prepare": "深度を準備…",
+  "regenerate": "深度を再生成…",
+  "hint": "Depth Anything V3 Small · 105 MBを初回のみダウンロードします。ダウンロード後、深度を自動生成します。準備はWebGPUを使って端末内で実行され、フレーム間で処理を譲り、操作中は一時停止します。再生時は保存済みの深度を使用するため、AI処理は行いません。",
+  "generate": "深度を生成",
+  "cancel": "キャンセル",
+  "processing": "深度を準備中",
+  "unsupported": "ロックされていない2D画像または動画を選択してください。コンポジションのエフェクトでは深度を推定できません。",
+  "parameter": {
+    "strength": "立体感",
+    "angle": "方向",
+    "focus": "固定深度面",
+    "zoom": "縁のズーム",
+    "view": "表示"
+  },
+  "choice": {
+    "parallax": "視差",
+    "depth": "深度マップ"
+  },
+  "download": "モデルをダウンロード",
+  "downloading": "モデルをダウンロード中",
+  "completed": "深度の準備完了",
+  "close": "閉じる",
+  "info": "深度の準備について",
+  "preview": "動画プレビューを準備中"
+}

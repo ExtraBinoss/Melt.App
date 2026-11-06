@@ -1,0 +1,50 @@
+{
+  "name": "영수증",
+  "fit": {
+    "contain": "가로세로 비율 유지",
+    "stretch": "인쇄 영역 채우기"
+  },
+  "mode": {
+    "ordered": "규칙적인 점",
+    "stochastic": "무작위 점",
+    "threshold": "임계값"
+  },
+  "edge": {
+    "straight": "직선 절단",
+    "torn": "찢어진 가장자리",
+    "perforated": "천공 가장자리"
+  },
+  "parameter": {
+    "scale": "인쇄 점 간격",
+    "mode": "감열 하프톤",
+    "exposure": "노출",
+    "gamma": "감마",
+    "contrast": "인쇄 대비",
+    "invert": "인쇄 반전",
+    "inkColor": "인쇄 색상",
+    "paperColor": "종이 색상",
+    "inkOpacity": "인쇄 농도",
+    "dotSpread": "점 퍼짐",
+    "dotSoftness": "점 부드러움",
+    "wear": "누락된 점",
+    "feedBanding": "급지 줄무늬",
+    "feedPitch": "급지 줄무늬 간격",
+    "streaks": "헤드 줄 자국",
+    "streakWidth": "줄 자국 너비",
+    "marginX": "가로 인쇄 여백",
+    "marginY": "세로 인쇄 여백",
+    "fit": "이미지 맞춤",
+    "paperTexture": "종이 질감",
+    "fiberSize": "섬유 크기",
+    "edge": "종이 절단",
+    "edgeHeight": "가장자리 깊이",
+    "edgePitch": "가장자리 간격",
+    "edgeJitter": "가장자리 불규칙성",
+    "edgeSoftness": "가장자리 부드러움",
+    "edgeShade": "가장자리 음영",
+    "foldStrength": "접힌 자국 음영",
+    "foldPosition": "접힌 자국 위치",
+    "foldWidth": "접힌 자국 너비",
+    "cutout": "종이 가장자리 투명하게"
+  }
+}

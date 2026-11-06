@@ -1,12 +1,12 @@
 {
-  "center": "Effectcentrum",
+  "center": "Effectmiddelpunt",
   "radius": "Effectstraal",
   "innerRadius": "Beschermde straal",
-  "feather": "Overgangsrand",
-  "hint": "Sleep het centrum of de straal · Escape om te annuleren",
-  "centerHelp": "Sleep om het centrum van het effect te verplaatsen.",
+  "feather": "Zachte grens",
+  "hint": "Sleep het middelpunt of de straal · Escape om te annuleren",
+  "centerHelp": "Sleep om het middelpunt van het effect te verplaatsen.",
   "radiusHelp": "Sleep om het bereik van het effect aan te passen.",
   "innerRadiusHelp": "Sleep om de grootte van het beschermde gebied aan te passen.",
-  "featherHelp": "Sleep om de overgang tussen het scherpe en onscherpe gebied aan te passen.",
+  "featherHelp": "Sleep om de overgang tussen scherpe en onscherpe gebieden aan te passen.",
   "keyboardHelp": "Pijltoetsen: 1 px · Shift: 10 px · Escape: annuleren."
 }

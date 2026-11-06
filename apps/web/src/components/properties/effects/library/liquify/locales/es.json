@@ -1,0 +1,22 @@
+{
+  "name": "Licuar",
+  "parameter": {
+    "brushMode": "Modo del pincel",
+    "brushRadius": "Radio del pincel",
+    "brushStrength": "Intensidad del pincel",
+    "brushHardness": "Dureza del pincel",
+    "stylusPressure": "Usar presión del lápiz"
+  },
+  "choice": {
+    "push": "Empujar",
+    "pinch": "Contraer",
+    "bloat": "Inflar",
+    "twirl-cw": "Girar en sentido horario",
+    "twirl-ccw": "Girar en sentido antihorario",
+    "restore": "Reconstruir"
+  },
+  "brushHint": "Dibuja en la capa con el pincel redondo. Escape cancela el trazo actual; Deshacer restaura la deformación anterior. Fuera de un trazo, Escape sale del modo de pintura.",
+  "clear": "Restablecer deformación",
+  "capacity": "Este efecto Licuar ha alcanzado su capacidad de pincel. Deshaz o restablece la deformación, o añade otro efecto Licuar.",
+  "spatialHint": "Pinta sobre una capa 2D o una composición acoplada."
+}

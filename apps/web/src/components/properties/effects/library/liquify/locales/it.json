@@ -1,0 +1,22 @@
+{
+  "name": "Fluidifica",
+  "parameter": {
+    "brushMode": "Modalità pennello",
+    "brushRadius": "Raggio del pennello",
+    "brushStrength": "Intensità del pennello",
+    "brushHardness": "Durezza del pennello",
+    "stylusPressure": "Usa pressione della penna"
+  },
+  "choice": {
+    "push": "Spingi",
+    "pinch": "Contrai",
+    "bloat": "Gonfia",
+    "twirl-cw": "Ruota in senso orario",
+    "twirl-ccw": "Ruota in senso antiorario",
+    "restore": "Ricostruisci"
+  },
+  "brushHint": "Disegna sul livello con il pennello rotondo. Esc annulla il tratto in corso; Annulla ripristina la deformazione precedente. Al di fuori di un tratto, Esc esce dalla pittura.",
+  "clear": "Reimposta deformazione",
+  "capacity": "Questo effetto Fluidifica ha raggiunto la capacità del pennello. Annulla o reimposta la deformazione oppure aggiungi un altro effetto Fluidifica.",
+  "spatialHint": "Dipingi su un livello 2D o una composizione unita."
+}

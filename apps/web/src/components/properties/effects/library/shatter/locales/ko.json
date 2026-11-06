@@ -1,0 +1,33 @@
+{
+  "name": "산산조각",
+  "pattern": {
+    "impact": "충격으로 깨진 유리",
+    "cellular": "셀 형태의 깨진 유리"
+  },
+  "parameter": {
+    "scale": "조각 크기",
+    "pattern": "균열 패턴",
+    "centerX": "충격 X",
+    "centerY": "충격 Y",
+    "radius": "충격 반경",
+    "innerRadius": "보호할 중심",
+    "falloff": "가장자리 감쇠",
+    "jitter": "균열 불규칙성",
+    "spokes": "방사형 균열",
+    "displacement": "조각 이동",
+    "rotation": "조각 회전",
+    "ior": "굴절률",
+    "thickness": "유리 두께",
+    "dispersion": "색 분산",
+    "tilt": "조각 기울기",
+    "roughness": "유리 거칠기",
+    "crackWidth": "균열 너비",
+    "cracks": "균열 불투명도",
+    "highlights": "유리 하이라이트",
+    "tintStrength": "색조 강도",
+    "tintColor": "유리 색조",
+    "crackColor": "균열 색상",
+    "highlightColor": "하이라이트 색상",
+    "cutout": "균열 투명화"
+  }
+}

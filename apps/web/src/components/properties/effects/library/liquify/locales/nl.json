@@ -1,0 +1,22 @@
+{
+  "name": "Uitvloeien",
+  "parameter": {
+    "brushMode": "Penseelmodus",
+    "brushRadius": "Penseelstraal",
+    "brushStrength": "Penseelsterkte",
+    "brushHardness": "Penseelhardheid",
+    "stylusPressure": "Pendruk gebruiken"
+  },
+  "choice": {
+    "push": "Duwen",
+    "pinch": "Samentrekken",
+    "bloat": "Opblazen",
+    "twirl-cw": "Met de klok mee draaien",
+    "twirl-ccw": "Tegen de klok in draaien",
+    "restore": "Reconstrueren"
+  },
+  "brushHint": "Teken op de laag met het ronde penseel. Escape annuleert de huidige streek; Ongedaan maken herstelt de vorige vervorming. Buiten een streek sluit Escape het schilderen af.",
+  "clear": "Vervorming opnieuw instellen",
+  "capacity": "Dit Uitvloeien-effect heeft zijn penseelcapaciteit bereikt. Maak de vervorming ongedaan, stel deze opnieuw in of voeg een nieuw Uitvloeien-effect toe.",
+  "spatialHint": "Schilder op een 2D-laag of een samengevoegde compositie."
+}

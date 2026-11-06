@@ -1,0 +1,17 @@
+{
+  "name": "ブロック",
+  "parameter": {
+    "scale": "突起の間隔",
+    "centerX": "グリッド中心 X",
+    "centerY": "グリッド中心 Y",
+    "angle": "ブロックの向き",
+    "stagger": "行をずらす",
+    "gap": "ブロックの隙間",
+    "relief": "プラスチックの隆起",
+    "lightAngle": "光の方向",
+    "variation": "ブロックの色のばらつき",
+    "studRadius": "突起の半径",
+    "studHeight": "突起の高さ",
+    "paletteLevels": "色の階調数（0 = 元画像）"
+  }
+}

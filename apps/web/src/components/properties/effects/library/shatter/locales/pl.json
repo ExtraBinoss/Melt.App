@@ -1,0 +1,33 @@
+{
+  "name": "Rozbicie",
+  "pattern": {
+    "impact": "Szkło po uderzeniu",
+    "cellular": "Szkło komórkowe"
+  },
+  "parameter": {
+    "scale": "Rozmiar fragmentów",
+    "pattern": "Wzór pęknięć",
+    "centerX": "Uderzenie X",
+    "centerY": "Uderzenie Y",
+    "radius": "Promień uderzenia",
+    "innerRadius": "Chroniony środek",
+    "falloff": "Zanikanie na krawędzi",
+    "jitter": "Nieregularność pęknięć",
+    "spokes": "Pęknięcia promieniste",
+    "displacement": "Przesunięcie fragmentów",
+    "rotation": "Obrót fragmentów",
+    "ior": "Współczynnik załamania",
+    "thickness": "Grubość szkła",
+    "dispersion": "Rozszczepienie kolorów",
+    "tilt": "Nachylenie fragmentów",
+    "roughness": "Chropowatość szkła",
+    "crackWidth": "Szerokość pęknięć",
+    "cracks": "Krycie pęknięć",
+    "highlights": "Odblaski szkła",
+    "tintStrength": "Siła zabarwienia",
+    "tintColor": "Zabarwienie szkła",
+    "crackColor": "Kolor pęknięć",
+    "highlightColor": "Kolor odblasków",
+    "cutout": "Przezroczyste pęknięcia"
+  }
+}

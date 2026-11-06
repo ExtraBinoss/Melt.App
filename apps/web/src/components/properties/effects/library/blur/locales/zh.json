@@ -1,0 +1,35 @@
+{
+  "name": "模糊",
+  "parameter": {
+    "technique": "方法",
+    "angle": "方向角度",
+    "centerX": "中心 X",
+    "centerY": "中心 Y",
+    "spinAngle": "旋转角度",
+    "zoomStrength": "缩放强度",
+    "apertureBlades": "光圈叶片数",
+    "apertureRotation": "光圈旋转",
+    "rangeSigma": "颜色容差",
+    "protect": "保护中心",
+    "protectedRadius": "保护半径",
+    "feather": "保护边缘羽化",
+    "gradientShape": "渐变形状",
+    "gradientStart": "渐变起点",
+    "gradientEnd": "渐变终点",
+    "gradientPower": "变化曲线",
+    "gradientInvert": "反转变化"
+  },
+  "choice": {
+    "gaussian": "高斯",
+    "box": "均值",
+    "directional": "定向",
+    "spin": "旋转",
+    "zoom": "缩放",
+    "lens": "镜头（散景）",
+    "bilateral": "双边",
+    "progressive": "渐进",
+    "linear": "线性",
+    "radial": "径向",
+    "band": "清晰带"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "name": "Chromatische aberratie",
+  "parameter": {
+    "mode": "Scheidingsmodus",
+    "centerX": "Midden X",
+    "centerY": "Midden Y",
+    "angle": "Scheidingsrichting",
+    "separation": "Kanaalscheiding",
+    "radius": "Afzwakkingsstraal",
+    "falloff": "Afstandsafzwakking"
+  },
+  "choice": {
+    "radial": "Radiaal",
+    "directional": "Gericht"
+  }
+}

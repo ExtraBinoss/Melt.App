@@ -1,0 +1,21 @@
+{
+  "name": "ピンクの蛍光体",
+  "parameter": {
+    "scale": "走査線の間隔",
+    "exposure": "露光",
+    "gamma": "階調ガンマ",
+    "contrast": "コントラスト",
+    "glow": "発光の強さ",
+    "glowRadius": "発光の広がり",
+    "glowThreshold": "発光のしきい値",
+    "scanlines": "走査線の強さ",
+    "beamWidth": "光束の幅",
+    "grain": "粒子",
+    "flicker": "ちらつき",
+    "speed": "変化の速度",
+    "background": "シャドウの色",
+    "phosphor": "蛍光体の色",
+    "highlight": "ハイライトの色",
+    "time": "時間"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "name": "リピーター",
+  "parameter": {
+    "layout": "配置",
+    "count": "元画像を含むコピー数",
+    "columns": "グリッドの列数",
+    "spacingX": "横方向の間隔",
+    "spacingY": "縦方向の間隔",
+    "radius": "リングの半径",
+    "angle": "配置角度",
+    "scaleStep": "コピーごとの拡大率の変化",
+    "rotationStep": "コピーごとの回転",
+    "copyOpacity": "コピーごとの不透明度の倍率"
+  },
+  "choice": {
+    "linear": "直線",
+    "grid": "グリッド",
+    "radial": "放射状"
+  }
+}

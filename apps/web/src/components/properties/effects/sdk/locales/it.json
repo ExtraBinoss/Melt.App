@@ -1,0 +1,12 @@
+{
+  "title": "Posizione e area",
+  "position": "Posizione",
+  "positionHelp": "Trascina per posizionare. Le frecce spostano; Maiusc aumenta il passo.",
+  "domainEnabled": "Area locale",
+  "domainX": "Posizione X",
+  "domainY": "Posizione Y",
+  "domainAngle": "Direzione dell’area",
+  "domainRadius": "Raggio",
+  "domainAspect": "Proporzioni",
+  "domainFeather": "Sfumatura"
+}

@@ -1,0 +1,28 @@
+{
+  "name": "Depth Anything V3",
+  "map": "Tiefenkarte",
+  "prepare": "Tiefe vorbereiten…",
+  "regenerate": "Tiefe neu berechnen…",
+  "hint": "Depth Anything V3 Small · 105 MB werden einmalig heruntergeladen. Danach wird die Tiefe automatisch erzeugt. Die Vorbereitung läuft lokal über WebGPU, gibt zwischen den Bildern Rechenzeit frei und pausiert während der Bedienung. Bei der Wiedergabe wird die gespeicherte Tiefe ohne KI gerendert.",
+  "generate": "Tiefe erzeugen",
+  "cancel": "Abbrechen",
+  "processing": "Tiefe wird vorbereitet",
+  "unsupported": "Wähle ein entsperrtes 2D-Bild oder -Video. Kompositionseffekte können keine Tiefe schätzen.",
+  "parameter": {
+    "strength": "Relief",
+    "angle": "Richtung",
+    "focus": "Feste Tiefenebene",
+    "zoom": "Randzoom",
+    "view": "Anzeige"
+  },
+  "choice": {
+    "parallax": "Parallaxe",
+    "depth": "Tiefenkarte"
+  },
+  "download": "Modell herunterladen",
+  "downloading": "Modell wird heruntergeladen",
+  "completed": "Tiefe bereit",
+  "close": "Schließen",
+  "info": "Über die Tiefenvorbereitung",
+  "preview": "Videovorschau wird vorbereitet"
+}

@@ -1,0 +1,22 @@
+{
+  "name": "Increspatura animata",
+  "parameter": {
+    "centerX": "Centro X",
+    "centerY": "Centro Y",
+    "innerRadius": "Raggio protetto",
+    "radius": "Portata",
+    "feather": "Sfumatura del bordo",
+    "falloff": "Attenuazione con la distanza",
+    "amplitude": "Spostamento",
+    "wavelength": "Lunghezza d'onda",
+    "speed": "Velocità dell'onda",
+    "phase": "Fase",
+    "direction": "Direzione",
+    "dispersion": "Dispersione cromatica",
+    "time": "Tempo"
+  },
+  "direction": {
+    "outward": "Verso l'esterno",
+    "inward": "Verso l'interno"
+  }
+}

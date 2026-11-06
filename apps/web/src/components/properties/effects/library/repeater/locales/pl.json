@@ -1,0 +1,20 @@
+{
+  "name": "Powielacz",
+  "parameter": {
+    "layout": "Układ",
+    "count": "Kopie wraz z oryginałem",
+    "columns": "Kolumny siatki",
+    "spacingX": "Odstęp poziomy",
+    "spacingY": "Odstęp pionowy",
+    "radius": "Promień pierścienia",
+    "angle": "Kąt układu",
+    "scaleStep": "Zmiana skali na kopię",
+    "rotationStep": "Obrót na kopię",
+    "copyOpacity": "Mnożnik krycia na kopię"
+  },
+  "choice": {
+    "linear": "Liniowy",
+    "grid": "Siatka",
+    "radial": "Promienisty"
+  }
+}

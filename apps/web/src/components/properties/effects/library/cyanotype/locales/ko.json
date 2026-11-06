@@ -1,0 +1,23 @@
+{
+  "name": "시아노타이프",
+  "parameter": {
+    "exposure": "인화 노출",
+    "contrast": "대비",
+    "gamma": "중간톤",
+    "density": "파랑 농도",
+    "blackPoint": "검정점",
+    "whitePoint": "흰색점",
+    "invert": "네거티브 이미지",
+    "inkColor": "파란 잉크",
+    "paperColor": "종이 색상",
+    "wash": "색 빠짐",
+    "unevenness": "불균일한 코팅",
+    "textureScale": "코팅 무늬 크기",
+    "paperGrain": "종이 입자",
+    "grainScale": "입자 크기",
+    "fibers": "종이 섬유",
+    "fiberScale": "섬유 크기",
+    "edgeFade": "바랜 가장자리",
+    "edgeWidth": "가장자리 너비"
+  }
+}

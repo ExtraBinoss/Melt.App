@@ -1,0 +1,16 @@
+{
+  "name": "色差",
+  "parameter": {
+    "mode": "分离模式",
+    "centerX": "中心 X",
+    "centerY": "中心 Y",
+    "angle": "分离方向",
+    "separation": "通道分离",
+    "radius": "衰减半径",
+    "falloff": "距离衰减"
+  },
+  "choice": {
+    "radial": "径向",
+    "directional": "定向"
+  }
+}

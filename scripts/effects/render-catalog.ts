@@ -50,7 +50,9 @@ try {
       const cellWidth = 240,
         cellHeight = 180,
         columns = 8;
-      const entries = Object.values(core.EFFECT_CATALOG).filter((entry) => !entry.retired);
+      const entries = Object.values(core.EFFECT_CATALOG).filter(
+        (entry) => !entry.retired && !entry.source,
+      );
       const assets: Record<string, Core.Asset> = {};
       const decodedOriginals = [];
       // One bounded decode of each immutable original, shared by all authored scenes.
@@ -90,7 +92,8 @@ try {
       for (const entry of entries) {
         try {
           const scene = sources.createEffectCatalogScene(entry.type);
-          core.validateProject(core.createProject({ pages: [scene.composition], assets }));
+          const validateProject: typeof Core.validateProject = core.validateProject;
+          validateProject(core.createProject({ pages: [scene.composition], assets }));
           scenes.push(scene);
         } catch (error) {
           failures.push({ type: entry.type, reason: String(error) });

@@ -1,3 +1,5 @@
+import { glowStages } from "./glow/pipeline";
+import { neonMeltStages } from "./neon-melt/pipeline";
 import { pixelSortStages } from "./pixel-sort/pipeline";
 import { EDGE_DETECT_STAGES } from "./edge-detect/pipeline";
 import { getEffectDefinition, type Effect } from "@musart/core";
@@ -13,6 +15,8 @@ export type { EffectStage } from "./shared/stages";
 export function effectStages(effect: Effect): readonly EffectStage[] {
   const definition = getEffectDefinition(effect.type);
   if (definition.retired || definition.source === "geometry") return [];
+  if (effect.type === "glow") return glowStages(effect);
+  if (effect.type === "neon-melt") return neonMeltStages(effect);
   if (effect.type === "pixel-sort") return pixelSortStages(effect);
   if (effect.type === "edge-detect") return EDGE_DETECT_STAGES;
   if (effect.type === "gradient") return gradientStages(effect);

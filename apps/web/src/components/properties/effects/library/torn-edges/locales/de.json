@@ -1,0 +1,28 @@
+{
+  "name": "Gerissene Kanten",
+  "parameter": {
+    "technique": "Technik",
+    "balance": "Tonwertbalance",
+    "contrast": "Kontrast",
+    "roughness": "Rissrauheit",
+    "textureScale": "Texturgröße",
+    "detail": "Feine Fasern",
+    "smoothing": "Quellglättung",
+    "tearWidth": "Risstiefe",
+    "edgeWidth": "Breite der Papierkante",
+    "feather": "Kantenweichheit",
+    "ink": "Tintenfarbe",
+    "paper": "Papierfarbe",
+    "edgeColor": "Farbe der Risskante",
+    "backgroundOpacity": "Papierdeckkraft",
+    "sourceColor": "Originalfarbe",
+    "tearTop": "Oben reißen",
+    "tearBottom": "Unten reißen",
+    "tearLeft": "Links reißen",
+    "tearRight": "Rechts reißen"
+  },
+  "choice": {
+    "graphic": "Gerissene Grafik",
+    "paper": "Silhouette aus gerissenem Papier"
+  }
+}

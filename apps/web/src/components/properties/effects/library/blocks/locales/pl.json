@@ -1,0 +1,17 @@
+{
+  "name": "Klocki",
+  "parameter": {
+    "scale": "Odstęp wypustek",
+    "centerX": "Środek siatki X",
+    "centerY": "Środek siatki Y",
+    "angle": "Kierunek klocków",
+    "stagger": "Przesunięcie rzędów",
+    "gap": "Odstęp między klockami",
+    "relief": "Wypukła faktura plastiku",
+    "lightAngle": "Kierunek światła",
+    "variation": "Zróżnicowanie koloru klocków",
+    "studRadius": "Promień wypustek",
+    "studHeight": "Wysokość wypustek",
+    "paletteLevels": "Poziomy koloru (0 = źródło)"
+  }
+}

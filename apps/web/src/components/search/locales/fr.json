@@ -174,7 +174,15 @@
     "chromatic-aberration": "Séparer les canaux rouge et bleu radialement ou dans une direction réglable.",
     "wind": "Étirer les détails en traînées directionnelles avec des bandes déterministes et des rafales animées.",
     "depth-of-field": "Régler la netteté de la composition avec la profondeur native, la distance de mise au point et l’ouverture. Nécessite une scène 3D.",
-    "trail": "Mélanger les poses précédentes de la composition en échos temporels, ou répéter l’image actuelle avec des décalages."
+    "trail": "Mélanger les poses précédentes de la composition en échos temporels, ou répéter l’image actuelle avec des décalages.",
+    "glow": "Diffuser les hautes lumières en un halo doux et colorable sur fond transparent.",
+    "neon-melt": "Recolorer le contenu avec une palette néon, des déformations liquides et des halos lumineux.",
+    "repeater": "Répéter le contenu source éditable en ligne, en grille ou en cercle.",
+    "wave-distortion": "Déformer le contenu avec des ondes directionnelles sinusoïdales, triangulaires, carrées ou en dents de scie.",
+    "shape-grid": "Reconstruire les tons de l’image avec une trame de formes géométriques et des palettes éditables.",
+    "watercolor": "Simplifier les détails en lavis de pigments avec du grain de papier et des contours assombris.",
+    "depth-anything": "Générer localement une carte de profondeur relative depuis une image ou vidéo 2D et ajouter une parallaxe facultative.",
+    "time-warp-scan": "Ancienne déformation temporelle par balayage pour les projets enregistrés."
   },
   "commandLabels": {
     "togglePlayback": "Lire / mettre en pause Motion",
@@ -286,7 +294,16 @@
     "chromatic-aberration": "Aberration chromatique",
     "wind": "Vent",
     "depth-of-field": "Profondeur de champ",
-    "trail": "Traînée"
+    "trail": "Traînée",
+    "glow": "Lueur",
+    "neon-melt": "Néon liquide",
+    "repeater": "Répétiteur",
+    "wave-distortion": "Distorsion par ondes",
+    "shape-grid": "Grille de formes",
+    "watercolor": "Aquarelle",
+    "time-warp-scan": "Balayage temporel",
+    "feather": "Contour progressif",
+    "depth-anything": "Depth Anything V3"
   },
   "resultCount_many": "{{count}} résultats",
   "language": "Langue"

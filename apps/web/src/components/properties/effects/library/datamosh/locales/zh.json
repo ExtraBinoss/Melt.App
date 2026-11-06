@@ -1,0 +1,16 @@
+{
+  "name": "数据错乱 · 块状拖影",
+  "parameter": {
+    "blockSize": "宏块大小",
+    "density": "受影响的块",
+    "displacement": "块位移",
+    "direction": "位移方向",
+    "angleVariation": "方向变化",
+    "coherence": "行连贯性",
+    "smear": "空间拖影",
+    "chromaShift": "颜色渗出",
+    "levels": "颜色级数",
+    "rate": "图案变化速率",
+    "time": "图案时间"
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "name": "CRT",
+  "mask": {
+    "aperture": "荫栅",
+    "shadow": "荫罩",
+    "slot": "槽状荫罩"
+  },
+  "parameter": {
+    "scale": "荧光体节距",
+    "mask": "荧光体遮罩",
+    "maskStrength": "遮罩强度",
+    "maskGap": "荧光体间隙",
+    "scanlineStrength": "扫描线强度",
+    "scanlinePitch": "扫描线间距",
+    "scanlineWidth": "电子束宽度",
+    "scanlinePhase": "扫描线相位",
+    "curvatureX": "水平曲率",
+    "curvatureY": "垂直曲率",
+    "zoom": "屏幕缩放",
+    "convergence": "色彩会聚误差",
+    "glow": "荧光体辉光",
+    "glowRadius": "辉光半径",
+    "brightness": "亮度",
+    "contrast": "对比度",
+    "saturation": "饱和度",
+    "tintColor": "屏幕色调",
+    "vignette": "暗角",
+    "roundness": "屏幕圆角",
+    "borderSoftness": "屏幕边缘柔和度",
+    "bezelColor": "边框颜色",
+    "noise": "信号噪声",
+    "jitter": "行抖动",
+    "flicker": "闪烁强度",
+    "flickerRate": "闪烁频率",
+    "rollingBar": "滚动条纹强度",
+    "rollingSpeed": "滚动条纹速度",
+    "cutout": "屏幕边缘透明",
+    "time": "时间"
+  }
+}

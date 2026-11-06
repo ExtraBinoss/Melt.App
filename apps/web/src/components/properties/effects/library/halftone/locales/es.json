@@ -1,0 +1,25 @@
+{
+  "name": "Semitono",
+  "parameter": {
+    "pattern": "Patrón",
+    "rotation": "Rotación de la cuadrícula",
+    "dotSize": "Tamaño de los círculos",
+    "softness": "Suavidad de los bordes",
+    "gamma": "Gamma de tonos",
+    "offsetX": "Desplazamiento de cuadrícula X",
+    "offsetY": "Desplazamiento de cuadrícula Y",
+    "ink": "Color de los puntos",
+    "paper": "Color de fondo",
+    "backgroundOpacity": "Opacidad del fondo",
+    "sourceColor": "Usar colores de origen",
+    "cyanAngle": "Ángulo de trama cian",
+    "magentaAngle": "Ángulo de trama magenta",
+    "yellowAngle": "Ángulo de trama amarilla"
+  },
+  "choice": {
+    "legacy": "Impresión clásica",
+    "circle-grid": "Cuadrícula de puntos circulares",
+    "round-mosaic": "Mosaico de color circular",
+    "color-screen": "Tramas de canales de color"
+  }
+}

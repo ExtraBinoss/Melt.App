@@ -1,0 +1,37 @@
+{
+  "name": "Ruis",
+  "parameter": {
+    "algorithm": "Algoritme",
+    "scale": "Celgrootte",
+    "octaves": "Octaven",
+    "lacunarity": "Frequentietoename",
+    "persistence": "Detailsterkte",
+    "jitter": "Celonregelmatigheid",
+    "offsetX": "Verschuiving X",
+    "offsetY": "Verschuiving Y",
+    "offsetZ": "3D-doorsnede",
+    "speed": "Evolutiesnelheid",
+    "contrast": "Contrast",
+    "brightness": "Helderheid",
+    "gamma": "Gamma",
+    "invert": "Omkeren",
+    "mode": "Ruis toepassen",
+    "lowColor": "Kleur voor lage waarden",
+    "highColor": "Kleur voor hoge waarden",
+    "time": "Tijd"
+  },
+  "algorithm": {
+    "perlin": "3D-Perlinruis",
+    "value": "3D-waarderuis",
+    "cell": "3D-celruis",
+    "worley": "3D-Worleyruis",
+    "fbm": "Fractale brownse beweging",
+    "ridged": "Ribbenfractal",
+    "turbulence": "Turbulentie"
+  },
+  "mode": {
+    "replace": "Kleur vervangen",
+    "add": "Variatie toevoegen",
+    "multiply": "Vermenigvuldigen"
+  }
+}

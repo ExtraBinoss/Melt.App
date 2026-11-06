@@ -1,0 +1,27 @@
+{
+  "name": "Vormenraster",
+  "parameter": {
+    "shape": "Vormenreeks",
+    "cellSize": "Celgrootte",
+    "fill": "Vormvulling",
+    "stroke": "Lijndikte",
+    "rotation": "Rasterrotatie",
+    "contrast": "Tooncontrast",
+    "colorMode": "Kleurmodus",
+    "shadowColor": "Schaduwkleur",
+    "midtoneColor": "Middentoonkleur",
+    "highlightColor": "Hooglichtkleur",
+    "backgroundColor": "Achtergrondkleur",
+    "backgroundOpacity": "Achtergronddekking"
+  },
+  "choice": {
+    "adaptive": "Adaptieve toonreeks",
+    "dots": "Stippen",
+    "rings": "Ringen",
+    "diamonds": "Ruiten",
+    "squares": "Vierkanten",
+    "crosses": "Kruisen",
+    "source": "Oorspronkelijke kleuren",
+    "palette": "Palet met drie kleuren"
+  }
+}

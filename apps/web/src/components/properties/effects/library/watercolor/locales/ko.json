@@ -1,0 +1,16 @@
+{
+  "name": "수채화",
+  "parameter": {
+    "washScale": "담채 크기",
+    "simplification": "영역 단순화",
+    "edgePreservation": "가장자리 보존",
+    "diffusion": "안료 확산",
+    "pigment": "안료 밀도",
+    "edgeDarkening": "가장자리 안료 고임",
+    "granulation": "안료 입자감",
+    "paperGrain": "종이 결",
+    "paperScale": "종이 질감 크기",
+    "paperOpacity": "종이 담채",
+    "paperColor": "종이 색상"
+  }
+}

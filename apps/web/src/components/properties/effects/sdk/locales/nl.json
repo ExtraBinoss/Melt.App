@@ -1,0 +1,12 @@
+{
+  "title": "Positie en gebied",
+  "position": "Positie",
+  "positionHelp": "Sleep om te plaatsen. Pijltoetsen verplaatsen; Shift vergroot de stap.",
+  "domainEnabled": "Lokaal gebied",
+  "domainX": "Positie X",
+  "domainY": "Positie Y",
+  "domainAngle": "Richting van gebied",
+  "domainRadius": "Straal",
+  "domainAspect": "Verhouding",
+  "domainFeather": "Zachte rand"
+}

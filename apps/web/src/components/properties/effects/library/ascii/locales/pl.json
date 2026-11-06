@@ -1,0 +1,28 @@
+{
+  "name": "ASCII",
+  "charactersHint": "Ułóż znaki od jasnych do gęstych. Spacje też się liczą. Użyj 1–64 znaków; powtórzenia zwiększają wagę danego tonu.",
+  "parameter": {
+    "scale": "Rozmiar znaków",
+    "characters": "Znaki",
+    "brightness": "Jasność",
+    "contrast": "Kontrast",
+    "gamma": "Szczegóły cieni",
+    "palette": "Tryb kolorów",
+    "foreground": "Tusz / odcień",
+    "background": "Tło",
+    "shades": "Poziomy tonalne",
+    "invert": "Odwróć gęstość",
+    "cellAspect": "Szerokość komórki",
+    "glyphScale": "Rozmiar glifu",
+    "weight": "Grubość tuszu",
+    "color": "Kolory źródła",
+    "gradientEnd": "Kolor końcowy",
+    "gradientAngle": "Kąt gradientu"
+  },
+  "palette": {
+    "image": "Tony obrazu",
+    "tonal": "Cieniowany tusz",
+    "solid": "Jednolity tusz",
+    "gradient": "Tusz gradientowy"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "name": "Nachziehspur",
+  "parameter": {
+    "mode": "Echoquelle",
+    "echoCount": "Anzahl der Echos",
+    "delay": "Zeit zwischen Echos",
+    "fade": "Abnahme der Echodeckkraft",
+    "offsetX": "Versatz X pro Echo",
+    "offsetY": "Versatz Y pro Echo",
+    "angle": "Versatzrichtung",
+    "centerX": "Skalierungsmittelpunkt X",
+    "centerY": "Skalierungsmittelpunkt Y",
+    "spread": "Skalierungsänderung pro Echo",
+    "expandBounds": "Über Objektgrenzen hinaus erweitern"
+  },
+  "choice": {
+    "temporal": "Vorherige Posen / Videobilder",
+    "offset": "Versetzte Kopien des aktuellen Bildes",
+    "auto": "Automatisch · an Quelle anpassen"
+  }
+}

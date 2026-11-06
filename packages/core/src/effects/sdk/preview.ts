@@ -37,6 +37,12 @@ const preview = (
 /** Deliberate art direction for built-ins; an effect author's own declaration takes priority. */
 export const BUILTIN_EFFECT_PREVIEWS: Readonly<Record<EffectType, EffectPreviewDefinition>> =
   Object.freeze({
+    glow: preview("neon-city"),
+    "neon-melt": preview("neon-city"),
+    repeater: preview("studio-still-life"),
+    "wave-distortion": preview("alpine-lake"),
+    "shape-grid": preview("editorial-portrait"),
+    watercolor: preview("alpine-lake"),
     "depth-anything": preview("editorial-portrait"),
     "depth-of-field": preview(
       "studio-still-life",

@@ -1,0 +1,28 @@
+{
+  "name": "Depth Anything V3",
+  "map": "깊이 맵",
+  "prepare": "깊이 준비…",
+  "regenerate": "깊이 다시 생성…",
+  "hint": "Depth Anything V3 Small · 105 MB를 한 번만 다운로드합니다. 다운로드 후 깊이가 자동으로 생성됩니다. 준비 작업은 WebGPU를 통해 기기에서 실행되며, 프레임 사이에 실행을 양보하고 조작 중에는 일시 중지됩니다. 재생 시에는 저장된 깊이를 AI 없이 렌더링합니다.",
+  "generate": "깊이 생성",
+  "cancel": "취소",
+  "processing": "깊이 준비 중",
+  "unsupported": "잠금 해제된 2D 이미지나 동영상을 선택하세요. 컴포지션 효과는 깊이를 추정할 수 없습니다.",
+  "parameter": {
+    "strength": "입체감",
+    "angle": "방향",
+    "focus": "고정 깊이 평면",
+    "zoom": "가장자리 확대",
+    "view": "표시"
+  },
+  "choice": {
+    "parallax": "시차",
+    "depth": "깊이 맵"
+  },
+  "download": "모델 다운로드",
+  "downloading": "모델 다운로드 중",
+  "completed": "깊이 준비 완료",
+  "close": "닫기",
+  "info": "깊이 준비 정보",
+  "preview": "동영상 미리보기 준비 중"
+}

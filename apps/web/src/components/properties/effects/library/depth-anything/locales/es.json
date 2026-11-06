@@ -1,0 +1,28 @@
+{
+  "name": "Depth Anything V3",
+  "map": "Mapa de profundidad",
+  "prepare": "Preparar profundidad…",
+  "regenerate": "Regenerar profundidad…",
+  "hint": "Depth Anything V3 Small · Se descargan 105 MB una sola vez. La profundidad se genera automáticamente tras la descarga. La preparación se ejecuta localmente con WebGPU, libera recursos entre fotogramas y se pausa mientras interactúas. La profundidad guardada se renderiza sin IA durante la reproducción.",
+  "generate": "Generar profundidad",
+  "cancel": "Cancelar",
+  "processing": "Preparando profundidad",
+  "unsupported": "Selecciona una imagen o un vídeo 2D desbloqueado. Los efectos de composición no pueden estimar la profundidad.",
+  "parameter": {
+    "strength": "Relieve",
+    "angle": "Dirección",
+    "focus": "Plano de profundidad fijo",
+    "zoom": "Zoom de bordes",
+    "view": "Visualización"
+  },
+  "choice": {
+    "parallax": "Paralaje",
+    "depth": "Mapa de profundidad"
+  },
+  "download": "Descargar modelo",
+  "downloading": "Descargando modelo",
+  "completed": "Profundidad lista",
+  "close": "Cerrar",
+  "info": "Acerca de la preparación de profundidad",
+  "preview": "Preparando la vista previa del vídeo"
+}

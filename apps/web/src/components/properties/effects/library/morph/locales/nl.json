@@ -1,0 +1,11 @@
+{
+  "name": "Vervorming",
+  "progress": "Voortgang",
+  "stagger": "Letterverspringing",
+  "inflate": "Opblazen",
+  "stretch": "Uitrekken",
+  "order": "Lettervolgorde",
+  "forward": "Van eerste naar laatste",
+  "reverse": "Van laatste naar eerste",
+  "center": "Vanuit het midden"
+}

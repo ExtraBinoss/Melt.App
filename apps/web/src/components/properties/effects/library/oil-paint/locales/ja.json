@@ -1,0 +1,13 @@
+{
+  "name": "油絵",
+  "parameter": {
+    "brushScale": "ブラシのサイズ",
+    "elongation": "ブラシの伸長",
+    "directionality": "放射状のブラシ方向",
+    "edgePreservation": "輪郭の保持",
+    "detail": "元のディテール",
+    "centerX": "ブラシの中心 X",
+    "centerY": "ブラシの中心 Y",
+    "angle": "ブラシの角度"
+  }
+}

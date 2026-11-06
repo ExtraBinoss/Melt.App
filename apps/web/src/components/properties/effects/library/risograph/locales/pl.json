@@ -1,0 +1,23 @@
+{
+  "name": "Rizografia",
+  "parameter": {
+    "palette": "Paleta farb drukarskich",
+    "inkA": "Pierwsza farba",
+    "inkB": "Druga farba",
+    "inkC": "Trzecia farba",
+    "paperColor": "Kolor papieru",
+    "dotSize": "Rozmiar punktów druku",
+    "contrast": "Kontrast separacji",
+    "inkDensity": "Gęstość farby",
+    "misregistration": "Niedopasowanie pasowania farb",
+    "grain": "Ziarnistość farby",
+    "paperTexture": "Faktura papieru",
+    "centerX": "Początek druku X",
+    "centerY": "Początek druku Y",
+    "angle": "Kierunek druku"
+  },
+  "choice": {
+    "duotone": "Dwie farby",
+    "tritone": "Trzy farby"
+  }
+}

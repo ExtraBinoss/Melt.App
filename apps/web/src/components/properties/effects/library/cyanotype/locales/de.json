@@ -1,0 +1,23 @@
+{
+  "name": "Cyanotypie",
+  "parameter": {
+    "exposure": "Belichtung des Abzugs",
+    "contrast": "Kontrast",
+    "gamma": "Mitteltöne",
+    "density": "Blaudichte",
+    "blackPoint": "Schwarzpunkt",
+    "whitePoint": "Weißpunkt",
+    "invert": "Negativbild",
+    "inkColor": "Blaue Tinte",
+    "paperColor": "Papierfarbe",
+    "wash": "Auswaschung",
+    "unevenness": "Ungleichmäßige Beschichtung",
+    "textureScale": "Beschichtungsgröße",
+    "paperGrain": "Papierkörnung",
+    "grainScale": "Korngröße",
+    "fibers": "Papierfasern",
+    "fiberScale": "Fasergröße",
+    "edgeFade": "Verblasste Ränder",
+    "edgeWidth": "Randbreite"
+  }
+}

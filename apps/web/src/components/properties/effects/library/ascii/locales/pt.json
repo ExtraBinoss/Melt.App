@@ -1,0 +1,28 @@
+{
+  "name": "ASCII",
+  "charactersHint": "Ordene os caracteres do mais claro ao mais denso. Os espaços contam. Use 1 a 64 caracteres; as repetições dão mais peso a um tom.",
+  "parameter": {
+    "scale": "Tamanho dos caracteres",
+    "characters": "Caracteres",
+    "brightness": "Brilho",
+    "contrast": "Contraste",
+    "gamma": "Detalhe das sombras",
+    "palette": "Modo de cor",
+    "foreground": "Tinta / tonalidade",
+    "background": "Fundo",
+    "shades": "Níveis tonais",
+    "invert": "Inverter densidade",
+    "cellAspect": "Largura da célula",
+    "glyphScale": "Tamanho do glifo",
+    "weight": "Espessura da tinta",
+    "color": "Cores de origem",
+    "gradientEnd": "Cor final",
+    "gradientAngle": "Ângulo do gradiente"
+  },
+  "palette": {
+    "image": "Tons da imagem",
+    "tonal": "Tinta sombreada",
+    "solid": "Tinta sólida",
+    "gradient": "Tinta em gradiente"
+  }
+}

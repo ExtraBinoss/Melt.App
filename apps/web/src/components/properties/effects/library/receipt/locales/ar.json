@@ -1,0 +1,50 @@
+{
+  "name": "إيصال",
+  "fit": {
+    "contain": "الحفاظ على نسبة الأبعاد",
+    "stretch": "ملء مساحة الطباعة"
+  },
+  "mode": {
+    "ordered": "نقاط منتظمة",
+    "stochastic": "نقاط عشوائية",
+    "threshold": "عتبة"
+  },
+  "edge": {
+    "straight": "قص مستقيم",
+    "torn": "حافة ممزقة",
+    "perforated": "حافة مثقبة"
+  },
+  "parameter": {
+    "scale": "تباعد نقاط الطباعة",
+    "mode": "تنقيط حراري",
+    "exposure": "التعريض",
+    "gamma": "غاما",
+    "contrast": "تباين الطباعة",
+    "invert": "عكس الطباعة",
+    "inkColor": "لون الطباعة",
+    "paperColor": "لون الورق",
+    "inkOpacity": "كثافة الطباعة",
+    "dotSpread": "انتشار النقاط",
+    "dotSoftness": "نعومة النقاط",
+    "wear": "نقاط مفقودة",
+    "feedBanding": "شرائط تغذية الورق",
+    "feedPitch": "تباعد شرائط التغذية",
+    "streaks": "خطوط رأس الطباعة",
+    "streakWidth": "عرض الخطوط",
+    "marginX": "هامش الطباعة الأفقي",
+    "marginY": "هامش الطباعة العمودي",
+    "fit": "ملاءمة الصورة",
+    "paperTexture": "نسيج الورق",
+    "fiberSize": "حجم الألياف",
+    "edge": "قص الورق",
+    "edgeHeight": "عمق الحافة",
+    "edgePitch": "تباعد الحواف",
+    "edgeJitter": "عدم انتظام الحافة",
+    "edgeSoftness": "نعومة الحافة",
+    "edgeShade": "تظليل الحافة",
+    "foldStrength": "تظليل الطية",
+    "foldPosition": "موضع الطية",
+    "foldWidth": "عرض الطية",
+    "cutout": "حواف ورق شفافة"
+  }
+}

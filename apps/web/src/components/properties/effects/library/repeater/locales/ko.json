@@ -1,0 +1,20 @@
+{
+  "name": "반복기",
+  "parameter": {
+    "layout": "배치",
+    "count": "원본을 포함한 복사본 수",
+    "columns": "격자 열 수",
+    "spacingX": "가로 간격",
+    "spacingY": "세로 간격",
+    "radius": "고리 반경",
+    "angle": "배치 각도",
+    "scaleStep": "복사본마다 크기 변화",
+    "rotationStep": "복사본마다 회전",
+    "copyOpacity": "복사본마다 불투명도 배율"
+  },
+  "choice": {
+    "linear": "선형",
+    "grid": "격자",
+    "radial": "방사형"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "name": "Sombra projetada",
+  "parameter": {
+    "offsetX": "Deslocamento horizontal",
+    "offsetY": "Deslocamento vertical",
+    "radius": "Raio de desfoque",
+    "shadowColor": "Cor da sombra"
+  }
+}

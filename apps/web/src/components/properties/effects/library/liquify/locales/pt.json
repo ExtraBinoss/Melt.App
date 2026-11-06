@@ -1,0 +1,22 @@
+{
+  "name": "Dissolver",
+  "parameter": {
+    "brushMode": "Modo do pincel",
+    "brushRadius": "Raio do pincel",
+    "brushStrength": "Intensidade do pincel",
+    "brushHardness": "Dureza do pincel",
+    "stylusPressure": "Usar pressão da caneta"
+  },
+  "choice": {
+    "push": "Empurrar",
+    "pinch": "Contrair",
+    "bloat": "Inflar",
+    "twirl-cw": "Rodar no sentido horário",
+    "twirl-ccw": "Rodar no sentido anti-horário",
+    "restore": "Reconstruir"
+  },
+  "brushHint": "Desenhe na camada com o pincel redondo. Escape cancela o traço atual; Anular restaura a deformação anterior. Fora de um traço, Escape sai do modo de pintura.",
+  "clear": "Repor deformação",
+  "capacity": "Este efeito Dissolver atingiu a capacidade do pincel. Anule ou reponha a deformação, ou adicione outro efeito Dissolver.",
+  "spatialHint": "Pinte numa camada 2D ou numa composição achatada."
+}

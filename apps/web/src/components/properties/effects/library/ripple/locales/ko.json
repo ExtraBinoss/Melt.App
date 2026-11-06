@@ -1,0 +1,22 @@
+{
+  "name": "움직이는 물결",
+  "parameter": {
+    "centerX": "중심 X",
+    "centerY": "중심 Y",
+    "innerRadius": "보호할 반경",
+    "radius": "도달 범위",
+    "feather": "가장자리 페더",
+    "falloff": "거리에 따른 감쇠",
+    "amplitude": "변위",
+    "wavelength": "파장",
+    "speed": "파동 속도",
+    "phase": "위상",
+    "direction": "방향",
+    "dispersion": "색 분산",
+    "time": "시간"
+  },
+  "direction": {
+    "outward": "바깥쪽",
+    "inward": "안쪽"
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "name": "ぼかし",
+  "parameter": {
+    "technique": "方式",
+    "angle": "方向角度",
+    "centerX": "中心 X",
+    "centerY": "中心 Y",
+    "spinAngle": "回転角度",
+    "zoomStrength": "ズームの強さ",
+    "apertureBlades": "絞り羽根の数",
+    "apertureRotation": "絞りの回転",
+    "rangeSigma": "色の許容値",
+    "protect": "中心を保護",
+    "protectedRadius": "保護する半径",
+    "feather": "保護境界のぼかし",
+    "gradientShape": "グラデーションの形状",
+    "gradientStart": "グラデーションの開始",
+    "gradientEnd": "グラデーションの終了",
+    "gradientPower": "進行カーブ",
+    "gradientInvert": "進行を反転"
+  },
+  "choice": {
+    "gaussian": "ガウス",
+    "box": "平均",
+    "directional": "方向",
+    "spin": "回転",
+    "zoom": "ズーム",
+    "lens": "レンズ（ボケ）",
+    "bilateral": "バイラテラル",
+    "progressive": "段階的",
+    "linear": "線形",
+    "radial": "放射状",
+    "band": "鮮明な帯"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "name": "リソグラフ",
+  "parameter": {
+    "palette": "インクパレット",
+    "inkA": "1色目のインク",
+    "inkB": "2色目のインク",
+    "inkC": "3色目のインク",
+    "paperColor": "紙の色",
+    "dotSize": "印刷ドットのサイズ",
+    "contrast": "色分解のコントラスト",
+    "inkDensity": "インク濃度",
+    "misregistration": "インクの版ずれ",
+    "grain": "インクの粒子",
+    "paperTexture": "紙の質感",
+    "centerX": "印刷原点 X",
+    "centerY": "印刷原点 Y",
+    "angle": "印刷方向"
+  },
+  "choice": {
+    "duotone": "2色刷り",
+    "tritone": "3色刷り"
+  }
+}

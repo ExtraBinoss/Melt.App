@@ -1,0 +1,23 @@
+{
+  "name": "液体ネオン",
+  "parameter": {
+    "threshold": "ハイライトのしきい値",
+    "knee": "ソフトしきい値",
+    "intensity": "グローの強さ",
+    "radius": "光輪の半径",
+    "tint": "グローの色合い",
+    "glowOnly": "グローのみ",
+    "palette": "ネオンパレット",
+    "paletteShift": "パレットのオフセット",
+    "contrast": "再マッピングのコントラスト",
+    "distortion": "液体の変位",
+    "liquidScale": "液体の波長",
+    "direction": "流れの方向",
+    "phase": "液体の位相"
+  },
+  "choice": {
+    "acid": "アシッド",
+    "spectral": "スペクトル",
+    "ultraviolet": "紫外線"
+  }
+}

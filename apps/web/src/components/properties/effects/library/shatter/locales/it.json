@@ -1,0 +1,33 @@
+{
+  "name": "Frantumazione",
+  "pattern": {
+    "impact": "Vetro colpito",
+    "cellular": "Vetro cellulare"
+  },
+  "parameter": {
+    "scale": "Dimensione delle faccette",
+    "pattern": "Schema di frattura",
+    "centerX": "Impatto X",
+    "centerY": "Impatto Y",
+    "radius": "Raggio dell'impatto",
+    "innerRadius": "Centro protetto",
+    "falloff": "Attenuazione del bordo",
+    "jitter": "Irregolarità delle fratture",
+    "spokes": "Crepe radiali",
+    "displacement": "Spostamento delle faccette",
+    "rotation": "Rotazione delle faccette",
+    "ior": "Indice di rifrazione",
+    "thickness": "Spessore del vetro",
+    "dispersion": "Dispersione cromatica",
+    "tilt": "Inclinazione delle faccette",
+    "roughness": "Rugosità del vetro",
+    "crackWidth": "Larghezza delle crepe",
+    "cracks": "Opacità delle crepe",
+    "highlights": "Riflessi del vetro",
+    "tintStrength": "Intensità della tinta",
+    "tintColor": "Tinta del vetro",
+    "crackColor": "Colore delle crepe",
+    "highlightColor": "Colore dei riflessi",
+    "cutout": "Crepe trasparenti"
+  }
+}

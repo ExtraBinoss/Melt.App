@@ -1,0 +1,22 @@
+{
+  "name": "Levende golven",
+  "parameter": {
+    "centerX": "Midden X",
+    "centerY": "Midden Y",
+    "innerRadius": "Beschermde straal",
+    "radius": "Bereik",
+    "feather": "Randvervaging",
+    "falloff": "Afstandsafzwakking",
+    "amplitude": "Verplaatsing",
+    "wavelength": "Golflengte",
+    "speed": "Golfsnelheid",
+    "phase": "Fase",
+    "direction": "Richting",
+    "dispersion": "Kleurspreiding",
+    "time": "Tijd"
+  },
+  "direction": {
+    "outward": "Naar buiten",
+    "inward": "Naar binnen"
+  }
+}

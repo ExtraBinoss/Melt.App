@@ -1,0 +1,33 @@
+{
+  "name": "Zersplittern",
+  "pattern": {
+    "impact": "Einschlagglas",
+    "cellular": "Zellglas"
+  },
+  "parameter": {
+    "scale": "Facettengröße",
+    "pattern": "Bruchmuster",
+    "centerX": "Einschlag X",
+    "centerY": "Einschlag Y",
+    "radius": "Einschlagradius",
+    "innerRadius": "Geschütztes Zentrum",
+    "falloff": "Randabschwächung",
+    "jitter": "Unregelmäßigkeit der Brüche",
+    "spokes": "Radiale Risse",
+    "displacement": "Facettenverschiebung",
+    "rotation": "Facettendrehung",
+    "ior": "Brechungsindex",
+    "thickness": "Glasdicke",
+    "dispersion": "Farbdispersion",
+    "tilt": "Facettenneigung",
+    "roughness": "Glasrauheit",
+    "crackWidth": "Rissbreite",
+    "cracks": "Rissdeckkraft",
+    "highlights": "Glasreflexe",
+    "tintStrength": "Tönungsstärke",
+    "tintColor": "Glastönung",
+    "crackColor": "Rissfarbe",
+    "highlightColor": "Reflexfarbe",
+    "cutout": "Transparente Risse"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "name": "Halftoon",
+  "parameter": {
+    "pattern": "Patroon",
+    "rotation": "Rasterrotatie",
+    "dotSize": "Cirkelgrootte",
+    "softness": "Randzachtheid",
+    "gamma": "Toongamma",
+    "offsetX": "Rasterverschuiving X",
+    "offsetY": "Rasterverschuiving Y",
+    "ink": "Puntkleur",
+    "paper": "Achtergrondkleur",
+    "backgroundOpacity": "Achtergronddekking",
+    "sourceColor": "Bronkleuren gebruiken",
+    "cyanAngle": "Rasterhoek cyaan",
+    "magentaAngle": "Rasterhoek magenta",
+    "yellowAngle": "Rasterhoek geel"
+  },
+  "choice": {
+    "legacy": "Klassieke druk",
+    "circle-grid": "Raster van ronde punten",
+    "round-mosaic": "Rond kleurenmozaïek",
+    "color-screen": "Kleurkanaalrasters"
+  }
+}

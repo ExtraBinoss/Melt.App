@@ -1,0 +1,16 @@
+{
+  "name": "Datamosh · Arrasto de blocos",
+  "parameter": {
+    "blockSize": "Tamanho dos macroblocos",
+    "density": "Blocos afetados",
+    "displacement": "Deslocamento dos blocos",
+    "direction": "Direção do deslocamento",
+    "angleVariation": "Variação da direção",
+    "coherence": "Coerência das linhas",
+    "smear": "Arrasto espacial",
+    "chromaShift": "Vazamento de cor",
+    "levels": "Níveis de cor",
+    "rate": "Frequência do padrão",
+    "time": "Tempo do padrão"
+  }
+}

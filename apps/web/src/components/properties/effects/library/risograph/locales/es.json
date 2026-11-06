@@ -1,0 +1,23 @@
+{
+  "name": "Risografía",
+  "parameter": {
+    "palette": "Paleta de tintas",
+    "inkA": "Primera tinta",
+    "inkB": "Segunda tinta",
+    "inkC": "Tercera tinta",
+    "paperColor": "Color del papel",
+    "dotSize": "Tamaño del punto de impresión",
+    "contrast": "Contraste de separación",
+    "inkDensity": "Densidad de tinta",
+    "misregistration": "Desregistro de tintas",
+    "grain": "Grano de la tinta",
+    "paperTexture": "Textura del papel",
+    "centerX": "Origen de impresión X",
+    "centerY": "Origen de impresión Y",
+    "angle": "Dirección de impresión"
+  },
+  "choice": {
+    "duotone": "Dos tintas",
+    "tritone": "Tres tintas"
+  }
+}

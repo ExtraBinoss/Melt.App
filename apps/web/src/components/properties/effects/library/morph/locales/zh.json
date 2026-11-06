@@ -1,0 +1,11 @@
+{
+  "name": "形态变换",
+  "progress": "进度",
+  "stagger": "字母错开",
+  "inflate": "膨胀",
+  "stretch": "拉伸",
+  "order": "字母顺序",
+  "forward": "从首到尾",
+  "reverse": "从尾到首",
+  "center": "从中心开始"
+}

@@ -1,0 +1,50 @@
+{
+  "name": "Recibo",
+  "fit": {
+    "contain": "Manter proporções",
+    "stretch": "Preencher a área de impressão"
+  },
+  "mode": {
+    "ordered": "Pontos ordenados",
+    "stochastic": "Pontos aleatórios",
+    "threshold": "Limiar"
+  },
+  "edge": {
+    "straight": "Corte reto",
+    "torn": "Borda rasgada",
+    "perforated": "Borda perfurada"
+  },
+  "parameter": {
+    "scale": "Passo dos pontos de impressão",
+    "mode": "Meio-tom térmico",
+    "exposure": "Exposição",
+    "gamma": "Gama",
+    "contrast": "Contraste de impressão",
+    "invert": "Inverter impressão",
+    "inkColor": "Cor de impressão",
+    "paperColor": "Cor do papel",
+    "inkOpacity": "Densidade de impressão",
+    "dotSpread": "Expansão dos pontos",
+    "dotSoftness": "Suavidade dos pontos",
+    "wear": "Pontos em falta",
+    "feedBanding": "Bandas de avanço",
+    "feedPitch": "Espaçamento das bandas de avanço",
+    "streaks": "Estrias da cabeça de impressão",
+    "streakWidth": "Largura das estrias",
+    "marginX": "Margem horizontal de impressão",
+    "marginY": "Margem vertical de impressão",
+    "fit": "Ajuste da imagem",
+    "paperTexture": "Textura do papel",
+    "fiberSize": "Tamanho das fibras",
+    "edge": "Corte do papel",
+    "edgeHeight": "Profundidade da borda",
+    "edgePitch": "Espaçamento da borda",
+    "edgeJitter": "Irregularidade da borda",
+    "edgeSoftness": "Suavidade da borda",
+    "edgeShade": "Sombreado da borda",
+    "foldStrength": "Sombreado da dobra",
+    "foldPosition": "Posição da dobra",
+    "foldWidth": "Largura da dobra",
+    "cutout": "Bordas do papel transparentes"
+  }
+}

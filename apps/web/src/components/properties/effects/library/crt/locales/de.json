@@ -1,0 +1,40 @@
+{
+  "name": "CRT",
+  "mask": {
+    "aperture": "Schlitzgitter",
+    "shadow": "Lochmaske",
+    "slot": "Schlitzmaske"
+  },
+  "parameter": {
+    "scale": "Leuchtstoffabstand",
+    "mask": "Leuchtstoffmaske",
+    "maskStrength": "Maskenstärke",
+    "maskGap": "Leuchtstofflücke",
+    "scanlineStrength": "Scanlinienintensität",
+    "scanlinePitch": "Scanlinienabstand",
+    "scanlineWidth": "Strahlbreite",
+    "scanlinePhase": "Scanlinienphase",
+    "curvatureX": "Horizontale Krümmung",
+    "curvatureY": "Vertikale Krümmung",
+    "zoom": "Bildschirmzoom",
+    "convergence": "Farbfehlkonvergenz",
+    "glow": "Leuchtstoffglühen",
+    "glowRadius": "Leuchtradius",
+    "brightness": "Helligkeit",
+    "contrast": "Kontrast",
+    "saturation": "Sättigung",
+    "tintColor": "Bildschirmtönung",
+    "vignette": "Vignettierung",
+    "roundness": "Bildschirmecken",
+    "borderSoftness": "Weichheit des Bildschirmrands",
+    "bezelColor": "Rahmenfarbe",
+    "noise": "Signalrauschen",
+    "jitter": "Zeilenzittern",
+    "flicker": "Flimmerstärke",
+    "flickerRate": "Flimmerfrequenz",
+    "rollingBar": "Stärke des Laufbalkens",
+    "rollingSpeed": "Geschwindigkeit des Laufbalkens",
+    "cutout": "Transparente Bildschirmränder",
+    "time": "Zeit"
+  }
+}

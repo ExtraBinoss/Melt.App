@@ -1,0 +1,21 @@
+{
+  "name": "Rasto",
+  "parameter": {
+    "mode": "Origem dos ecos",
+    "echoCount": "Número de ecos",
+    "delay": "Tempo entre ecos",
+    "fade": "Decaimento da opacidade dos ecos",
+    "offsetX": "Deslocamento X por eco",
+    "offsetY": "Deslocamento Y por eco",
+    "angle": "Direção do deslocamento",
+    "centerX": "Centro de expansão X",
+    "centerY": "Centro de expansão Y",
+    "spread": "Variação de escala por eco",
+    "expandBounds": "Estender para além dos limites do objeto"
+  },
+  "choice": {
+    "temporal": "Poses / fotogramas de vídeo anteriores",
+    "offset": "Deslocamentos da imagem atual",
+    "auto": "Automático · adaptar à origem"
+  }
+}

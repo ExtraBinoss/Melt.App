@@ -1,0 +1,21 @@
+{
+  "name": "물결 왜곡",
+  "parameter": {
+    "waveform": "파형",
+    "amplitude": "진폭",
+    "frequency": "짧은 변당 주기 수",
+    "angle": "전파 각도",
+    "phase": "위상",
+    "edge": "원본 가장자리"
+  },
+  "choice": {
+    "sine": "사인파",
+    "triangle": "삼각파",
+    "square": "사각파",
+    "sawtooth": "톱니파",
+    "transparent": "투명",
+    "mirror": "반사",
+    "repeat": "반복",
+    "clamp": "가장자리 늘이기"
+  }
+}

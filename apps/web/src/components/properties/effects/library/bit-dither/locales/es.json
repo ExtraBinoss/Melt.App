@@ -1,0 +1,23 @@
+{
+  "name": "Tramado de un bit",
+  "parameter": {
+    "method": "Método",
+    "scale": "Tamaño de celda",
+    "threshold": "Umbral",
+    "strength": "Intensidad del tramado",
+    "contrast": "Contraste",
+    "gamma": "Gamma tonal",
+    "invert": "Invertir",
+    "foreground": "Color de tinta",
+    "background": "Color del papel",
+    "sourceColor": "Colores de origen"
+  },
+  "method": {
+    "threshold": "Umbral fijo",
+    "bayer2": "Bayer 2×2",
+    "bayer4": "Bayer 4×4",
+    "bayer8": "Bayer 8×8",
+    "interleaved": "Ruido de gradiente entrelazado",
+    "multilevel": "Bayer multinivel"
+  }
+}

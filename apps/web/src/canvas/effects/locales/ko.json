@@ -1,12 +1,12 @@
 {
   "center": "효과 중심",
   "radius": "효과 반경",
-  "innerRadius": "보호 영역 반경",
+  "innerRadius": "보호 반경",
   "feather": "페더 경계",
   "hint": "중심 또는 반경을 드래그 · Escape로 취소",
-  "centerHelp": "드래그하여 효과의 중심을 이동합니다.",
-  "radiusHelp": "드래그하여 효과의 범위를 조절합니다.",
-  "innerRadiusHelp": "드래그하여 보호 영역의 크기를 조절합니다.",
-  "featherHelp": "드래그하여 선명한 영역과 흐린 영역 사이의 전환을 조절합니다.",
+  "centerHelp": "드래그하여 효과 중심을 이동합니다.",
+  "radiusHelp": "드래그하여 효과가 적용되는 범위를 조정합니다.",
+  "innerRadiusHelp": "드래그하여 보호 영역의 크기를 변경합니다.",
+  "featherHelp": "드래그하여 선명한 영역과 흐린 영역 사이의 전환을 조정합니다.",
   "keyboardHelp": "방향키: 1 px · Shift: 10 px · Escape: 취소."
 }

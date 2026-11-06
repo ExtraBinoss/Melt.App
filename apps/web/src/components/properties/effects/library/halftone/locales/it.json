@@ -1,0 +1,25 @@
+{
+  "name": "Retino mezzetinte",
+  "parameter": {
+    "pattern": "Motivo",
+    "rotation": "Rotazione della griglia",
+    "dotSize": "Dimensione dei cerchi",
+    "softness": "Morbidezza dei bordi",
+    "gamma": "Gamma dei toni",
+    "offsetX": "Spostamento griglia X",
+    "offsetY": "Spostamento griglia Y",
+    "ink": "Colore dei punti",
+    "paper": "Colore di sfondo",
+    "backgroundOpacity": "Opacità dello sfondo",
+    "sourceColor": "Usa i colori originali",
+    "cyanAngle": "Angolo del retino ciano",
+    "magentaAngle": "Angolo del retino magenta",
+    "yellowAngle": "Angolo del retino giallo"
+  },
+  "choice": {
+    "legacy": "Stampa classica",
+    "circle-grid": "Griglia di punti circolari",
+    "round-mosaic": "Mosaico di colori circolare",
+    "color-screen": "Retini dei canali colore"
+  }
+}

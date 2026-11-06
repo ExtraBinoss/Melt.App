@@ -1,0 +1,28 @@
+{
+  "name": "Poszarpane krawędzie",
+  "parameter": {
+    "technique": "Technika",
+    "balance": "Równowaga tonalna",
+    "contrast": "Kontrast",
+    "roughness": "Chropowatość rozdarcia",
+    "textureScale": "Rozmiar tekstury",
+    "detail": "Drobne włókna",
+    "smoothing": "Wygładzanie źródła",
+    "tearWidth": "Głębokość rozdarcia",
+    "edgeWidth": "Szerokość krawędzi papieru",
+    "feather": "Zmiękczenie krawędzi",
+    "ink": "Kolor tuszu",
+    "paper": "Kolor papieru",
+    "edgeColor": "Kolor rozdartej krawędzi",
+    "backgroundOpacity": "Krycie papieru",
+    "sourceColor": "Oryginalny kolor",
+    "tearTop": "Rozedrzyj górę",
+    "tearBottom": "Rozedrzyj dół",
+    "tearLeft": "Rozedrzyj lewą stronę",
+    "tearRight": "Rozedrzyj prawą stronę"
+  },
+  "choice": {
+    "graphic": "Poszarpana grafika",
+    "paper": "Sylwetka z rozdartego papieru"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "name": "被写界深度",
+  "parameter": {
+    "focusMode": "フォーカスモード",
+    "focusX": "フォーカスポイント X",
+    "focusY": "フォーカスポイント Y",
+    "focusDistance": "フォーカス距離",
+    "focusRange": "ピントの合う範囲",
+    "aperture": "絞り",
+    "maxBlur": "最大ぼかし",
+    "blades": "絞り羽根",
+    "angle": "絞りの向き",
+    "edgeProtection": "深度境界の保護",
+    "quality": "サンプリング品質"
+  },
+  "choice": {
+    "distance": "カメラからの距離",
+    "point": "指定点のネイティブ深度",
+    "low": "低（8サンプル）",
+    "medium": "中（16サンプル）",
+    "high": "高（24サンプル）"
+  }
+}

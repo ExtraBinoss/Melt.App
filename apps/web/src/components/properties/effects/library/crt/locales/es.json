@@ -1,0 +1,40 @@
+{
+  "name": "CRT",
+  "mask": {
+    "aperture": "Rejilla de apertura",
+    "shadow": "Máscara de sombra",
+    "slot": "Máscara de ranuras"
+  },
+  "parameter": {
+    "scale": "Paso del fósforo",
+    "mask": "Máscara de fósforo",
+    "maskStrength": "Intensidad de la máscara",
+    "maskGap": "Separación del fósforo",
+    "scanlineStrength": "Intensidad de las líneas de barrido",
+    "scanlinePitch": "Espaciado de las líneas de barrido",
+    "scanlineWidth": "Anchura del haz",
+    "scanlinePhase": "Fase de las líneas de barrido",
+    "curvatureX": "Curvatura horizontal",
+    "curvatureY": "Curvatura vertical",
+    "zoom": "Zoom de pantalla",
+    "convergence": "Desconvergencia de color",
+    "glow": "Resplandor del fósforo",
+    "glowRadius": "Radio del resplandor",
+    "brightness": "Brillo",
+    "contrast": "Contraste",
+    "saturation": "Saturación",
+    "tintColor": "Tinte de pantalla",
+    "vignette": "Viñeteado",
+    "roundness": "Esquinas de la pantalla",
+    "borderSoftness": "Suavidad del borde de pantalla",
+    "bezelColor": "Color del marco",
+    "noise": "Ruido de la señal",
+    "jitter": "Inestabilidad de las líneas",
+    "flicker": "Intensidad del parpadeo",
+    "flickerRate": "Frecuencia del parpadeo",
+    "rollingBar": "Intensidad de la banda móvil",
+    "rollingSpeed": "Velocidad de la banda móvil",
+    "cutout": "Bordes de pantalla transparentes",
+    "time": "Tiempo"
+  }
+}

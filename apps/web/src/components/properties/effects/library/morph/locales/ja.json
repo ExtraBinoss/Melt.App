@@ -1,0 +1,11 @@
+{
+  "name": "モーフィング",
+  "progress": "進行度",
+  "stagger": "文字の時間差",
+  "inflate": "膨張",
+  "stretch": "伸長",
+  "order": "文字の順序",
+  "forward": "最初から最後へ",
+  "reverse": "最後から最初へ",
+  "center": "中央から"
+}

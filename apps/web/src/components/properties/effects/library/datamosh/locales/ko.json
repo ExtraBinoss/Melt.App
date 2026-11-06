@@ -1,0 +1,16 @@
+{
+  "name": "데이터모시 · 블록 번짐",
+  "parameter": {
+    "blockSize": "매크로블록 크기",
+    "density": "영향받는 블록",
+    "displacement": "블록 변위",
+    "direction": "변위 방향",
+    "angleVariation": "방향 변화",
+    "coherence": "행 일관성",
+    "smear": "공간 번짐",
+    "chromaShift": "색상 번짐",
+    "levels": "색상 단계",
+    "rate": "패턴 변화율",
+    "time": "패턴 시간"
+  }
+}

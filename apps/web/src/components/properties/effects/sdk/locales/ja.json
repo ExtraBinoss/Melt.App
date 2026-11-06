@@ -1,0 +1,12 @@
+{
+  "title": "位置と範囲",
+  "position": "位置",
+  "positionHelp": "ドラッグして配置します。矢印キーで移動し、Shift で移動幅が大きくなります。",
+  "domainEnabled": "局所範囲",
+  "domainX": "位置 X",
+  "domainY": "位置 Y",
+  "domainAngle": "範囲の方向",
+  "domainRadius": "半径",
+  "domainAspect": "縦横比",
+  "domainFeather": "ぼかし"
+}

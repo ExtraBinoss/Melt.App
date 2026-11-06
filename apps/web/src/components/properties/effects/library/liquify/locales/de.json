@@ -1,0 +1,22 @@
+{
+  "name": "Verflüssigen",
+  "parameter": {
+    "brushMode": "Pinselmodus",
+    "brushRadius": "Pinselradius",
+    "brushStrength": "Pinselstärke",
+    "brushHardness": "Pinselhärte",
+    "stylusPressure": "Stiftdruck verwenden"
+  },
+  "choice": {
+    "push": "Verschieben",
+    "pinch": "Zusammenziehen",
+    "bloat": "Aufblähen",
+    "twirl-cw": "Im Uhrzeigersinn verwirbeln",
+    "twirl-ccw": "Gegen den Uhrzeigersinn verwirbeln",
+    "restore": "Rekonstruieren"
+  },
+  "brushHint": "Male mit dem runden Pinsel auf der Ebene. Escape bricht den aktuellen Strich ab; Rückgängig stellt die vorherige Verformung wieder her. Außerhalb eines Strichs beendet Escape das Malen.",
+  "clear": "Verformung zurücksetzen",
+  "capacity": "Die Pinselkapazität dieses Verflüssigen-Effekts ist erreicht. Mache die Verformung rückgängig, setze sie zurück oder füge einen weiteren Verflüssigen-Effekt hinzu.",
+  "spatialHint": "Male auf einer 2D-Ebene oder einer reduzierten Komposition."
+}

@@ -1,0 +1,16 @@
+{
+  "name": "Akwarela",
+  "parameter": {
+    "washScale": "Skala lawowania",
+    "simplification": "Uproszczenie obszarów",
+    "edgePreservation": "Zachowanie krawędzi",
+    "diffusion": "Dyfuzja pigmentu",
+    "pigment": "Gęstość pigmentu",
+    "edgeDarkening": "Nagromadzenie na krawędziach",
+    "granulation": "Granulacja pigmentu",
+    "paperGrain": "Ziarnistość papieru",
+    "paperScale": "Skala tekstury papieru",
+    "paperOpacity": "Lawowanie papieru",
+    "paperColor": "Kolor papieru"
+  }
+}

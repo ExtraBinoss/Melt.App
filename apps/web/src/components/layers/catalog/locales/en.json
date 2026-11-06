@@ -21,7 +21,7 @@
     "brightness": "Lighten or darken the image by adjusting its overall brightness.",
     "contrast": "Increase or reduce the difference between bright and dark tones.",
     "grayscale": "Mix the image into monochrome black and white.",
-    "blur": "Soften the image using Gaussian, box, directional, spin, zoom, lens bokeh or bilateral filtering, with an optional protected sharp region.",
+    "blur": "Soften the image using Gaussian, box, directional, spin, zoom, lens bokeh or bilateral filtering, with an optional protected sharp region. Progressive mode varies the blur radius along a linear, radial or band gradient.",
     "saturation": "Adjust the overall intensity of image colors.",
     "hue": "Rotate colors around the hue wheel.",
     "exposure": "Adjust light intensity in photographic exposure stops.",
@@ -58,7 +58,15 @@
     "chromatic-aberration": "Separate red and blue channels radially or along an adjustable direction.",
     "wind": "Stretch source detail into directional streaks with seeded bands and animated gusts.",
     "depth-of-field": "Focus the composition using native camera depth, manual focus distance and aperture blur. Requires a 3D scene.",
-    "trail": "Blend previous authored composition poses into temporal echoes, or repeat the current image with offsets."
+    "trail": "Blend previous authored composition poses into temporal echoes, or repeat the current image with offsets.",
+    "glow": "Scatter highlights into a soft, tintable halo over transparent content.",
+    "neon-melt": "Recolor content with a neon palette, liquid distortion and luminous halos.",
+    "repeater": "Repeat editable source content in a line, grid or radial arrangement.",
+    "wave-distortion": "Bend content with directional sine, triangle, square or sawtooth waves.",
+    "shape-grid": "Reconstruct image tones with a grid of geometric shapes and editable palettes.",
+    "watercolor": "Simplify image detail into pigment washes with paper grain and darkened edges.",
+    "depth-anything": "Generate a relative depth map locally from a 2D image or video and optionally add parallax.",
+    "feather": "Soft elliptical alpha falloff with editable center, radius and softness."
   },
   "family": {
     "tone": "Light & tone",

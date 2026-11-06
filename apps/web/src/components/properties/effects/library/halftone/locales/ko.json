@@ -1,0 +1,25 @@
+{
+  "name": "하프톤",
+  "parameter": {
+    "pattern": "패턴",
+    "rotation": "격자 회전",
+    "dotSize": "원 크기",
+    "softness": "가장자리 부드러움",
+    "gamma": "톤 감마",
+    "offsetX": "격자 오프셋 X",
+    "offsetY": "격자 오프셋 Y",
+    "ink": "점 색상",
+    "paper": "배경 색상",
+    "backgroundOpacity": "배경 불투명도",
+    "sourceColor": "원본 색상 사용",
+    "cyanAngle": "청록 망점 각도",
+    "magentaAngle": "자홍 망점 각도",
+    "yellowAngle": "노랑 망점 각도"
+  },
+  "choice": {
+    "legacy": "클래식 인쇄",
+    "circle-grid": "원형 점 격자",
+    "round-mosaic": "원형 색상 모자이크",
+    "color-screen": "색상 채널 망점"
+  }
+}

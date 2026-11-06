@@ -1,0 +1,27 @@
+{
+  "name": "도형 격자",
+  "parameter": {
+    "shape": "도형 단계",
+    "cellSize": "셀 크기",
+    "fill": "도형 채우기",
+    "stroke": "윤곽선 두께",
+    "rotation": "격자 회전",
+    "contrast": "명암 대비",
+    "colorMode": "색상 모드",
+    "shadowColor": "어두운 영역 색상",
+    "midtoneColor": "중간톤 색상",
+    "highlightColor": "밝은 영역 색상",
+    "backgroundColor": "배경색",
+    "backgroundOpacity": "배경 불투명도"
+  },
+  "choice": {
+    "adaptive": "적응형 명암 단계",
+    "dots": "점",
+    "rings": "고리",
+    "diamonds": "마름모",
+    "squares": "정사각형",
+    "crosses": "십자",
+    "source": "원본 색상",
+    "palette": "3색 팔레트"
+  }
+}

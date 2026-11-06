@@ -1,0 +1,22 @@
+{
+  "name": "液化",
+  "parameter": {
+    "brushMode": "画笔模式",
+    "brushRadius": "画笔半径",
+    "brushStrength": "画笔强度",
+    "brushHardness": "画笔硬度",
+    "stylusPressure": "使用笔压"
+  },
+  "choice": {
+    "push": "推移",
+    "pinch": "收缩",
+    "bloat": "膨胀",
+    "twirl-cw": "顺时针旋转",
+    "twirl-ccw": "逆时针旋转",
+    "restore": "重建"
+  },
+  "brushHint": "使用圆形画笔在图层上绘制。Escape 键取消当前笔画；撤销会恢复上一次变形。未绘制笔画时，按 Escape 键退出绘制。",
+  "clear": "重置变形",
+  "capacity": "此液化效果已达到画笔容量上限。请撤销或重置变形，或添加另一个液化效果。",
+  "spatialHint": "请在 2D 图层或已拼合的合成上绘制。"
+}

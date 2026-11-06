@@ -1,0 +1,20 @@
+{
+  "name": "Repetidor",
+  "parameter": {
+    "layout": "Disposição",
+    "count": "Cópias incluindo o original",
+    "columns": "Colunas da grelha",
+    "spacingX": "Espaçamento horizontal",
+    "spacingY": "Espaçamento vertical",
+    "radius": "Raio do anel",
+    "angle": "Ângulo da disposição",
+    "scaleStep": "Variação de escala por cópia",
+    "rotationStep": "Rotação por cópia",
+    "copyOpacity": "Multiplicador de opacidade por cópia"
+  },
+  "choice": {
+    "linear": "Linear",
+    "grid": "Grelha",
+    "radial": "Radial"
+  }
+}

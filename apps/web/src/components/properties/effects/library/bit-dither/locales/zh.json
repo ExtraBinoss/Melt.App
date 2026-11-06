@@ -1,0 +1,23 @@
+{
+  "name": "单比特抖动",
+  "parameter": {
+    "method": "方法",
+    "scale": "单元格大小",
+    "threshold": "阈值",
+    "strength": "抖动强度",
+    "contrast": "对比度",
+    "gamma": "色调伽马",
+    "invert": "反转",
+    "foreground": "墨水颜色",
+    "background": "纸张颜色",
+    "sourceColor": "源图颜色"
+  },
+  "method": {
+    "threshold": "固定阈值",
+    "bayer2": "Bayer 2×2",
+    "bayer4": "Bayer 4×4",
+    "bayer8": "Bayer 8×8",
+    "interleaved": "交错梯度噪声",
+    "multilevel": "多级 Bayer"
+  }
+}

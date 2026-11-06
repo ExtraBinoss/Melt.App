@@ -1,0 +1,28 @@
+{
+  "name": "破れた縁",
+  "parameter": {
+    "technique": "手法",
+    "balance": "階調バランス",
+    "contrast": "コントラスト",
+    "roughness": "破れの粗さ",
+    "textureScale": "テクスチャの大きさ",
+    "detail": "細かな繊維",
+    "smoothing": "元画像の平滑化",
+    "tearWidth": "破れの深さ",
+    "edgeWidth": "紙の縁の幅",
+    "feather": "縁のぼかし",
+    "ink": "インクの色",
+    "paper": "紙の色",
+    "edgeColor": "破れた縁の色",
+    "backgroundOpacity": "紙の不透明度",
+    "sourceColor": "元の色",
+    "tearTop": "上端を破る",
+    "tearBottom": "下端を破る",
+    "tearLeft": "左端を破る",
+    "tearRight": "右端を破る"
+  },
+  "choice": {
+    "graphic": "破れたグラフィック",
+    "paper": "破れた紙のシルエット"
+  }
+}

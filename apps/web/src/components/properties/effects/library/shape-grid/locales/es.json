@@ -1,0 +1,27 @@
+{
+  "name": "Cuadrícula de formas",
+  "parameter": {
+    "shape": "Escala de formas",
+    "cellSize": "Tamaño de celda",
+    "fill": "Relleno de las formas",
+    "stroke": "Grosor del contorno",
+    "rotation": "Rotación de la cuadrícula",
+    "contrast": "Contraste tonal",
+    "colorMode": "Modo de color",
+    "shadowColor": "Color de sombras",
+    "midtoneColor": "Color de tonos medios",
+    "highlightColor": "Color de luces altas",
+    "backgroundColor": "Color de fondo",
+    "backgroundOpacity": "Opacidad del fondo"
+  },
+  "choice": {
+    "adaptive": "Escala tonal adaptativa",
+    "dots": "Puntos",
+    "rings": "Anillos",
+    "diamonds": "Rombos",
+    "squares": "Cuadrados",
+    "crosses": "Cruces",
+    "source": "Colores originales",
+    "palette": "Paleta de tres colores"
+  }
+}

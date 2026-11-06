@@ -1,0 +1,35 @@
+{
+  "name": "Weichzeichnen",
+  "parameter": {
+    "technique": "Verfahren",
+    "angle": "Richtungswinkel",
+    "centerX": "Mitte X",
+    "centerY": "Mitte Y",
+    "spinAngle": "Drehwinkel",
+    "zoomStrength": "Zoomstärke",
+    "apertureBlades": "Blendenlamellen",
+    "apertureRotation": "Blendendrehung",
+    "rangeSigma": "Farbtoleranz",
+    "protect": "Mitte schützen",
+    "protectedRadius": "Geschützter Radius",
+    "feather": "Weiche Schutzkante",
+    "gradientShape": "Verlaufsform",
+    "gradientStart": "Verlaufsanfang",
+    "gradientEnd": "Verlaufsende",
+    "gradientPower": "Verlaufskurve",
+    "gradientInvert": "Verlauf umkehren"
+  },
+  "choice": {
+    "gaussian": "Gauß",
+    "box": "Mittelwert",
+    "directional": "Gerichtet",
+    "spin": "Drehung",
+    "zoom": "Zoom",
+    "lens": "Objektiv (Bokeh)",
+    "bilateral": "Bilateral",
+    "progressive": "Progressiv",
+    "linear": "Linear",
+    "radial": "Radial",
+    "band": "Scharfer Streifen"
+  }
+}

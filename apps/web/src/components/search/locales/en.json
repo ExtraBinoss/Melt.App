@@ -174,7 +174,15 @@
     "chromatic-aberration": "Separate red and blue channels radially or along an adjustable direction.",
     "wind": "Stretch source detail into directional streaks with seeded bands and animated gusts.",
     "depth-of-field": "Focus the composition using native camera depth, manual focus distance and aperture blur. Requires a 3D scene.",
-    "trail": "Blend previous authored composition poses into temporal echoes, or repeat the current image with offsets."
+    "trail": "Blend previous authored composition poses into temporal echoes, or repeat the current image with offsets.",
+    "glow": "Scatter highlights into a soft, tintable halo over transparent content.",
+    "neon-melt": "Recolor content with a neon palette, liquid distortion and luminous halos.",
+    "repeater": "Repeat editable source content in a line, grid or radial arrangement.",
+    "wave-distortion": "Bend content with directional sine, triangle, square or sawtooth waves.",
+    "shape-grid": "Reconstruct image tones with a grid of geometric shapes and editable palettes.",
+    "watercolor": "Simplify image detail into pigment washes with paper grain and darkened edges.",
+    "depth-anything": "Generate a relative depth map locally from a 2D image or video and optionally add parallax.",
+    "time-warp-scan": "Legacy scanline time distortion for saved projects."
   },
   "commandLabels": {
     "togglePlayback": "Play / pause Motion",
@@ -286,7 +294,16 @@
     "chromatic-aberration": "Chromatic Aberration",
     "wind": "Wind",
     "depth-of-field": "Depth of Field",
-    "trail": "Trail"
+    "trail": "Trail",
+    "glow": "Glow",
+    "neon-melt": "Neon Melt",
+    "repeater": "Repeater",
+    "wave-distortion": "Wave Distortion",
+    "shape-grid": "Shape Grid",
+    "watercolor": "Watercolor",
+    "time-warp-scan": "Time warp scan",
+    "feather": "Feather",
+    "depth-anything": "Depth Anything V3"
   },
   "language": "Language"
 }

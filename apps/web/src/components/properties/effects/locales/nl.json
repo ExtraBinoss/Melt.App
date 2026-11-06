@@ -1,0 +1,27 @@
+{
+  "actions": "Acties",
+  "enabled": "Ingeschakeld",
+  "resetAll": "Alle effectparameters herstellen",
+  "playLive": "Livevoorbeeld afspelen",
+  "pauseLive": "Livevoorbeeld pauzeren",
+  "liveTime": "Weergegeven fase",
+  "seed": "Willekeurige beginwaarde",
+  "falloff": "Afname",
+  "composite": "Alfacompositie",
+  "replacement": "Vervangen door effect (standaard)",
+  "operation": {
+    "source-over": "Bron boven doel",
+    "destination-over": "Doel boven bron",
+    "source-in": "Bron binnen doel",
+    "destination-in": "Doel binnen bron",
+    "source-out": "Bron buiten doel",
+    "destination-out": "Doel buiten bron",
+    "source-atop": "Bron op doelgebied",
+    "destination-atop": "Doel op brongebied",
+    "xor": "Overlap uitsluiten",
+    "copy": "Alleen bron",
+    "destination": "Alleen doel",
+    "clear": "Wissen",
+    "lighter": "Bron en doel optellen"
+  }
+}

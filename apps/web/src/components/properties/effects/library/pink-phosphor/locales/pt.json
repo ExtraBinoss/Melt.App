@@ -1,0 +1,21 @@
+{
+  "name": "Fósforo rosa",
+  "parameter": {
+    "scale": "Espaçamento das linhas de varrimento",
+    "exposure": "Exposição",
+    "gamma": "Gama tonal",
+    "contrast": "Contraste",
+    "glow": "Intensidade do brilho",
+    "glowRadius": "Alcance do brilho",
+    "glowThreshold": "Limiar do brilho",
+    "scanlines": "Intensidade das linhas de varrimento",
+    "beamWidth": "Largura do feixe",
+    "grain": "Grão",
+    "flicker": "Cintilação",
+    "speed": "Velocidade de evolução",
+    "background": "Cor das sombras",
+    "phosphor": "Cor do fósforo",
+    "highlight": "Cor dos realces",
+    "time": "Tempo"
+  }
+}

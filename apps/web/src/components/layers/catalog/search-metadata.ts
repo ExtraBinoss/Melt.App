@@ -4,6 +4,13 @@ import type { EffectType } from "@musart/core";
  * Descriptions live in the catalog locales; selectable techniques are indexed from their definitions.
  */
 export const EFFECT_SEARCH_ALIASES = {
+  glow: "glow bloom light halo lueur lumière",
+  "neon-melt": "acid glow neon melt liquid psychedelic néon liquide",
+  repeater: "cloner clone repeater repeat grid radial répétition copies grille",
+  "wave-distortion": "waves wave distortion sine zigzag ondulation vague",
+  "shape-grid": "shape grid geometric shapes symbols trame géométrique grille formes",
+  watercolor: "watercolor watercolour aquarelle pigments wash lavis",
+
   "depth-anything": "depth anything v3 da3 ai parallax relief profondeur parallaxe image video",
   "depth-of-field":
     "depth of field dof focus aperture camera native depth profondeur champ mise point ouverture caméra",
@@ -18,7 +25,7 @@ export const EFFECT_SEARCH_ALIASES = {
     "liquify fluidite fluidité brush pinceau warp push pinch bloat twirl déformation peinture",
   "torn-edges": "torn edges paper tear ripped déchiré papier photoshop fibres graphic",
   terminal: "typewriter typing cursor caret terminal console machine écrire frappe curseur",
-  "ink-bleed": "ink bleed bleeding watercolor watercolour encre bavure aquarelle papier",
+  "ink-bleed": "ink bleed bleeding encre bavure papier",
   "pixel-sort": "pixel sorting pixels tri traînées glitch",
   "edge-detect": "edge detection outline contour sobel scharr laplacian détection contours",
   "window-trails": "window trails desktop echoes cascade fenêtres traînées échos",
@@ -32,7 +39,7 @@ export const EFFECT_SEARCH_ALIASES = {
   brightness: "brightness luminance luminosité éclaircir assombrir",
   contrast: "contrast dynamic range contraste dynamique",
   grayscale: "grayscale greyscale monochrome black white noir blanc désaturation",
-  blur: "blur flou gaussian gaussien box boîte boite directional directionnel spin rotation radial zoom lens aperture objectif bokeh bilateral bilatéral edge preserving netteté zone protégée",
+  blur: "progressive gradient blur flou progressif dégradé gaussian gaussien box boîte boite directional directionnel spin rotation radial zoom lens aperture objectif bokeh bilateral bilatéral edge preserving netteté zone protégée",
   saturation: "saturation chroma intensity intensité couleurs",
   hue: "hue shift color wheel teinte rotation chromatique",
   exposure: "exposure stops EV exposition diaphragmes",

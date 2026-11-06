@@ -1,0 +1,12 @@
+{
+  "title": "위치 및 영역",
+  "position": "위치",
+  "positionHelp": "드래그하여 배치합니다. 화살표 키로 이동하고 Shift를 누르면 더 크게 이동합니다.",
+  "domainEnabled": "국소 영역",
+  "domainX": "X 위치",
+  "domainY": "Y 위치",
+  "domainAngle": "영역 방향",
+  "domainRadius": "반경",
+  "domainAspect": "종횡비",
+  "domainFeather": "부드럽게"
+}

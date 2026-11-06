@@ -1,0 +1,19 @@
+{
+  "name": "Cirkels",
+  "parameter": {
+    "spacing": "Celafstand",
+    "rotation": "Rasterhoek",
+    "dotSize": "Puntgrootte",
+    "softness": "Randzachtheid",
+    "gamma": "Toongamma",
+    "polarity": "Puntpolariteit",
+    "foreground": "Inktkleur",
+    "background": "Papierkleur",
+    "foregroundOpacity": "Inktdekking",
+    "backgroundOpacity": "Papierdekking"
+  },
+  "polarity": {
+    "shadows": "Punten in schaduwen",
+    "highlights": "Punten in hooglichten"
+  }
+}

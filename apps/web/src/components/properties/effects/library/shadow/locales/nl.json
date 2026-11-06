@@ -1,0 +1,9 @@
+{
+  "name": "Slagschaduw",
+  "parameter": {
+    "offsetX": "Horizontale verschuiving",
+    "offsetY": "Verticale verschuiving",
+    "radius": "Vervagingsstraal",
+    "shadowColor": "Schaduwkleur"
+  }
+}

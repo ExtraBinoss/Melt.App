@@ -1,0 +1,16 @@
+{
+  "name": "Aberración cromática",
+  "parameter": {
+    "mode": "Modo de separación",
+    "centerX": "Centro X",
+    "centerY": "Centro Y",
+    "angle": "Dirección de separación",
+    "separation": "Separación de canales",
+    "radius": "Radio de atenuación",
+    "falloff": "Atenuación por distancia"
+  },
+  "choice": {
+    "radial": "Radial",
+    "directional": "Direccional"
+  }
+}

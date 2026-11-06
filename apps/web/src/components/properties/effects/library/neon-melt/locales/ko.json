@@ -1,0 +1,23 @@
+{
+  "name": "액체 네온",
+  "parameter": {
+    "threshold": "밝은 영역 임계값",
+    "knee": "부드러운 임계값",
+    "intensity": "광채 강도",
+    "radius": "빛무리 반경",
+    "tint": "광채 색조",
+    "glowOnly": "광채만 표시",
+    "palette": "네온 팔레트",
+    "paletteShift": "팔레트 오프셋",
+    "contrast": "재매핑 대비",
+    "distortion": "액체 변위",
+    "liquidScale": "액체 파장",
+    "direction": "흐름 방향",
+    "phase": "액체 위상"
+  },
+  "choice": {
+    "acid": "애시드",
+    "spectral": "스펙트럼",
+    "ultraviolet": "자외선"
+  }
+}

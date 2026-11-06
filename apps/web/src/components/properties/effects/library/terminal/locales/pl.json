@@ -1,0 +1,18 @@
+{
+  "name": "Terminal",
+  "parameter": {
+    "progress": "Postęp pisania",
+    "columns": "Kolumny",
+    "rows": "Wiersze",
+    "cursor": "Kursor",
+    "cursorColor": "Kolor kursora",
+    "blinkRate": "Częstotliwość migania",
+    "time": "Czas"
+  },
+  "choice": {
+    "none": "Brak",
+    "block": "Blok",
+    "underline": "Podkreślenie",
+    "line": "Podświetlenie wiersza"
+  }
+}

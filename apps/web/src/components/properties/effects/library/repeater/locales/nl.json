@@ -1,0 +1,20 @@
+{
+  "name": "Herhaler",
+  "parameter": {
+    "layout": "Indeling",
+    "count": "Kopieën inclusief origineel",
+    "columns": "Rasterkolommen",
+    "spacingX": "Horizontale afstand",
+    "spacingY": "Verticale afstand",
+    "radius": "Ringstraal",
+    "angle": "Indelingshoek",
+    "scaleStep": "Schaalverandering per kopie",
+    "rotationStep": "Rotatie per kopie",
+    "copyOpacity": "Dekkingsfactor per kopie"
+  },
+  "choice": {
+    "linear": "Lineair",
+    "grid": "Raster",
+    "radial": "Radiaal"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "name": "油画",
+  "parameter": {
+    "brushScale": "画笔大小",
+    "elongation": "画笔伸长",
+    "directionality": "径向笔触方向",
+    "edgePreservation": "边缘保留",
+    "detail": "原始细节",
+    "centerX": "画笔中心 X",
+    "centerY": "画笔中心 Y",
+    "angle": "画笔角度"
+  }
+}

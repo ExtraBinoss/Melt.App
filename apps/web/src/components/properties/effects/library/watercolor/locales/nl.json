@@ -1,0 +1,16 @@
+{
+  "name": "Aquarel",
+  "parameter": {
+    "washScale": "Grootte van de wassing",
+    "simplification": "Gebieden vereenvoudigen",
+    "edgePreservation": "Randen behouden",
+    "diffusion": "Pigmentverspreiding",
+    "pigment": "Pigmentdichtheid",
+    "edgeDarkening": "Ophoping aan randen",
+    "granulation": "Pigmentkorreling",
+    "paperGrain": "Papierkorrel",
+    "paperScale": "Grootte van de papiertextuur",
+    "paperOpacity": "Papierwassing",
+    "paperColor": "Papierkleur"
+  }
+}

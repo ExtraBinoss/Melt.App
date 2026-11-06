@@ -1,0 +1,13 @@
+{
+  "name": "Malarstwo olejne",
+  "parameter": {
+    "brushScale": "Rozmiar pędzla",
+    "elongation": "Wydłużenie pędzla",
+    "directionality": "Promienisty kierunek pędzla",
+    "edgePreservation": "Zachowanie krawędzi",
+    "detail": "Oryginalne szczegóły",
+    "centerX": "Środek pędzla X",
+    "centerY": "Środek pędzla Y",
+    "angle": "Kąt pędzla"
+  }
+}

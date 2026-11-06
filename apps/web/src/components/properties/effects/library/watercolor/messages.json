@@ -1,0 +1,34 @@
+{
+  "en": {
+    "name": "Watercolor",
+    "parameter": {
+      "washScale": "Wash scale",
+      "simplification": "Region simplification",
+      "edgePreservation": "Edge preservation",
+      "diffusion": "Pigment diffusion",
+      "pigment": "Pigment density",
+      "edgeDarkening": "Edge pooling",
+      "granulation": "Pigment granulation",
+      "paperGrain": "Paper grain",
+      "paperScale": "Paper texture scale",
+      "paperOpacity": "Paper wash",
+      "paperColor": "Paper color"
+    }
+  },
+  "fr": {
+    "name": "Aquarelle",
+    "parameter": {
+      "washScale": "Échelle du lavis",
+      "simplification": "Simplification des régions",
+      "edgePreservation": "Préservation des contours",
+      "diffusion": "Diffusion des pigments",
+      "pigment": "Densité des pigments",
+      "edgeDarkening": "Accumulation aux contours",
+      "granulation": "Granulation des pigments",
+      "paperGrain": "Grain du papier",
+      "paperScale": "Échelle du grain",
+      "paperOpacity": "Lavis du papier",
+      "paperColor": "Couleur du papier"
+    }
+  }
+}

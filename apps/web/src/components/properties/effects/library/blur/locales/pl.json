@@ -1,0 +1,35 @@
+{
+  "name": "Rozmycie",
+  "parameter": {
+    "technique": "Technika",
+    "angle": "Kąt kierunku",
+    "centerX": "Środek X",
+    "centerY": "Środek Y",
+    "spinAngle": "Kąt obrotu",
+    "zoomStrength": "Siła przybliżenia",
+    "apertureBlades": "Listki przysłony",
+    "apertureRotation": "Obrót przysłony",
+    "rangeSigma": "Tolerancja koloru",
+    "protect": "Chroń środek",
+    "protectedRadius": "Chroniony promień",
+    "feather": "Zmiękczenie ochrony",
+    "gradientShape": "Kształt gradientu",
+    "gradientStart": "Początek gradientu",
+    "gradientEnd": "Koniec gradientu",
+    "gradientPower": "Krzywa progresji",
+    "gradientInvert": "Odwróć progresję"
+  },
+  "choice": {
+    "gaussian": "Gaussa",
+    "box": "Uśredniające",
+    "directional": "Kierunkowe",
+    "spin": "Obrotowe",
+    "zoom": "Przybliżenie",
+    "lens": "Obiektyw (bokeh)",
+    "bilateral": "Bilateralne",
+    "progressive": "Progresywne",
+    "linear": "Liniowy",
+    "radial": "Promienisty",
+    "band": "Ostry pas"
+  }
+}

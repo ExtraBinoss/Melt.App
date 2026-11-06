@@ -1,0 +1,17 @@
+{
+  "name": "Mattoncini",
+  "parameter": {
+    "scale": "Spaziatura dei bottoncini",
+    "centerX": "Centro X della griglia",
+    "centerY": "Centro Y della griglia",
+    "angle": "Direzione dei mattoncini",
+    "stagger": "Sfalsa le righe",
+    "gap": "Spazio tra i mattoncini",
+    "relief": "Rilievo della plastica",
+    "lightAngle": "Direzione della luce",
+    "variation": "Variazione del colore dei mattoncini",
+    "studRadius": "Raggio dei bottoncini",
+    "studHeight": "Altezza dei bottoncini",
+    "paletteLevels": "Livelli di colore (0 = sorgente)"
+  }
+}

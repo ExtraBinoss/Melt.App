@@ -73,7 +73,7 @@ export function trailHistoricalBounds(
 ): Bounds {
   const geometry = createLayerGeometryIndex(page),
     owner = geometry.get(ownerId),
-    outset = effectFootprint(owner.effects);
+    outset = effectFootprint(owner.effects, owner);
   if (!outset.left && !outset.top && !outset.right && !outset.bottom)
     return geometry.worldBounds(ownerId);
   // Prepared native meshes can project beyond their authored plane. The captured gate

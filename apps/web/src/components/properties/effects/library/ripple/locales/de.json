@@ -1,0 +1,22 @@
+{
+  "name": "Lebendige Wellen",
+  "parameter": {
+    "centerX": "Zentrum X",
+    "centerY": "Zentrum Y",
+    "innerRadius": "Geschützter Radius",
+    "radius": "Reichweite",
+    "feather": "Weicher Rand",
+    "falloff": "Entfernungsabschwächung",
+    "amplitude": "Verschiebung",
+    "wavelength": "Wellenlänge",
+    "speed": "Wellengeschwindigkeit",
+    "phase": "Phase",
+    "direction": "Richtung",
+    "dispersion": "Farbdispersion",
+    "time": "Zeit"
+  },
+  "direction": {
+    "outward": "Nach außen",
+    "inward": "Nach innen"
+  }
+}

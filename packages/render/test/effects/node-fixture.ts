@@ -70,6 +70,10 @@ export function graphNodes(node: Node): Set<Node> {
 /** The last component must be the original per-pixel alpha, not a block sample. */
 export function expectSourceAlpha(node: Node, input: Texture): void {
   const output = node instanceof VarNode ? node.node : node;
+  if (output instanceof TextureNode) {
+    expect(output.value).toBe(input);
+    return;
+  }
   expect(output).toBeInstanceOf(JoinNode);
   if (!(output instanceof JoinNode)) throw new Error("RGBA output expected");
   const alpha = output.nodes[1];

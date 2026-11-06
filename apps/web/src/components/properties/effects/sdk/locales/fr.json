@@ -1,0 +1,12 @@
+{
+  "title": "Position et zone",
+  "position": "Position",
+  "positionHelp": "Glisser pour positionner. Les flèches déplacent ; Maj amplifie le déplacement.",
+  "domainEnabled": "Zone locale",
+  "domainX": "Position X",
+  "domainY": "Position Y",
+  "domainAngle": "Direction de la zone",
+  "domainRadius": "Rayon",
+  "domainAspect": "Proportions",
+  "domainFeather": "Contour progressif"
+}

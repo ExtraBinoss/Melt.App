@@ -1,0 +1,22 @@
+{
+  "name": "Flitslicht",
+  "parameter": {
+    "centerX": "Middelpunt X",
+    "centerY": "Middelpunt Y",
+    "radius": "Lichtradius",
+    "softness": "Randzachtheid",
+    "falloff": "Lichtafname",
+    "aspect": "Bundelverhouding",
+    "rotation": "Bundelrotatie",
+    "intensity": "Lichtintensiteit",
+    "ambient": "Omgevingslicht",
+    "exposure": "Flitsbelichting",
+    "highlightCompression": "Hooglichtcompressie",
+    "saturation": "Verzadiging",
+    "glow": "Lichtnevel",
+    "grain": "Filmkorrel",
+    "grainSize": "Korrelgrootte",
+    "lightColor": "Lichtkleur",
+    "invert": "Verlichting omkeren"
+  }
+}

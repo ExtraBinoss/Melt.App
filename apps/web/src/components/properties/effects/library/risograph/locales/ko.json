@@ -1,0 +1,23 @@
+{
+  "name": "리소그래프",
+  "parameter": {
+    "palette": "잉크 팔레트",
+    "inkA": "첫 번째 잉크",
+    "inkB": "두 번째 잉크",
+    "inkC": "세 번째 잉크",
+    "paperColor": "종이 색상",
+    "dotSize": "인쇄 점 크기",
+    "contrast": "색 분리 대비",
+    "inkDensity": "잉크 농도",
+    "misregistration": "잉크 맞춤 어긋남",
+    "grain": "잉크 입자",
+    "paperTexture": "종이 질감",
+    "centerX": "인쇄 원점 X",
+    "centerY": "인쇄 원점 Y",
+    "angle": "인쇄 방향"
+  },
+  "choice": {
+    "duotone": "잉크 2색",
+    "tritone": "잉크 3색"
+  }
+}

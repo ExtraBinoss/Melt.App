@@ -1,0 +1,23 @@
+{
+  "name": "孔版印刷",
+  "parameter": {
+    "palette": "油墨调色板",
+    "inkA": "第一种油墨",
+    "inkB": "第二种油墨",
+    "inkC": "第三种油墨",
+    "paperColor": "纸张颜色",
+    "dotSize": "印刷网点大小",
+    "contrast": "分色对比度",
+    "inkDensity": "油墨密度",
+    "misregistration": "油墨套印偏移",
+    "grain": "油墨颗粒",
+    "paperTexture": "纸张纹理",
+    "centerX": "印刷原点 X",
+    "centerY": "印刷原点 Y",
+    "angle": "印刷方向"
+  },
+  "choice": {
+    "duotone": "双色油墨",
+    "tritone": "三色油墨"
+  }
+}

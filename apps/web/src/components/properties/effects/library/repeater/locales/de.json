@@ -1,0 +1,20 @@
+{
+  "name": "Wiederholer",
+  "parameter": {
+    "layout": "Anordnung",
+    "count": "Kopien einschließlich Original",
+    "columns": "Rasterspalten",
+    "spacingX": "Horizontaler Abstand",
+    "spacingY": "Vertikaler Abstand",
+    "radius": "Ringradius",
+    "angle": "Anordnungswinkel",
+    "scaleStep": "Skalierungsänderung pro Kopie",
+    "rotationStep": "Drehung pro Kopie",
+    "copyOpacity": "Deckkraftmultiplikator pro Kopie"
+  },
+  "choice": {
+    "linear": "Linear",
+    "grid": "Raster",
+    "radial": "Radial"
+  }
+}

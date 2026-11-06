@@ -1,0 +1,28 @@
+{
+  "name": "Bordi strappati",
+  "parameter": {
+    "technique": "Tecnica",
+    "balance": "Bilanciamento dei toni",
+    "contrast": "Contrasto",
+    "roughness": "Rugosità dello strappo",
+    "textureScale": "Dimensione della trama",
+    "detail": "Fibre sottili",
+    "smoothing": "Levigatura della sorgente",
+    "tearWidth": "Profondità dello strappo",
+    "edgeWidth": "Larghezza del bordo della carta",
+    "feather": "Sfumatura dei bordi",
+    "ink": "Colore inchiostro",
+    "paper": "Colore carta",
+    "edgeColor": "Colore del bordo strappato",
+    "backgroundOpacity": "Opacità della carta",
+    "sourceColor": "Colore originale",
+    "tearTop": "Strappa in alto",
+    "tearBottom": "Strappa in basso",
+    "tearLeft": "Strappa a sinistra",
+    "tearRight": "Strappa a destra"
+  },
+  "choice": {
+    "graphic": "Grafica strappata",
+    "paper": "Sagoma di carta strappata"
+  }
+}

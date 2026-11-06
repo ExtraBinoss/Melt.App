@@ -1,0 +1,21 @@
+{
+  "name": "Fosforo rosa",
+  "parameter": {
+    "scale": "Passo delle linee di scansione",
+    "exposure": "Esposizione",
+    "gamma": "Gamma tonale",
+    "contrast": "Contrasto",
+    "glow": "Intensità del bagliore",
+    "glowRadius": "Estensione del bagliore",
+    "glowThreshold": "Soglia del bagliore",
+    "scanlines": "Intensità delle linee di scansione",
+    "beamWidth": "Larghezza del fascio",
+    "grain": "Grana",
+    "flicker": "Sfarfallio",
+    "speed": "Velocità di evoluzione",
+    "background": "Colore delle ombre",
+    "phosphor": "Colore del fosforo",
+    "highlight": "Colore delle alte luci",
+    "time": "Tempo"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "name": "Vloeibaar neon",
+  "parameter": {
+    "threshold": "Drempel voor hooglichten",
+    "knee": "Zachte drempel",
+    "intensity": "Gloedsterkte",
+    "radius": "Straal van de lichtkrans",
+    "tint": "Gloedtint",
+    "glowOnly": "Alleen gloed",
+    "palette": "Neonpalet",
+    "paletteShift": "Paletverschuiving",
+    "contrast": "Contrast van kleurtoewijzing",
+    "distortion": "Vloeibare verplaatsing",
+    "liquidScale": "Golflengte van de vloeistof",
+    "direction": "Stroomrichting",
+    "phase": "Fase van de vloeistof"
+  },
+  "choice": {
+    "acid": "Zuurkleuren",
+    "spectral": "Spectraal",
+    "ultraviolet": "Ultraviolet"
+  }
+}

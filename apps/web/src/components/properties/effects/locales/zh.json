@@ -1,0 +1,27 @@
+{
+  "actions": "操作",
+  "enabled": "已启用",
+  "resetAll": "重置所有效果参数",
+  "playLive": "实时播放",
+  "pauseLive": "暂停实时播放",
+  "liveTime": "当前显示相位",
+  "seed": "随机种子",
+  "falloff": "衰减",
+  "composite": "Alpha 合成",
+  "replacement": "以效果替换（默认）",
+  "operation": {
+    "source-over": "源置于目标之上",
+    "destination-over": "目标置于源之上",
+    "source-in": "保留源与目标的相交区域",
+    "destination-in": "保留目标与源的相交区域",
+    "source-out": "保留源在目标之外的区域",
+    "destination-out": "保留目标在源之外的区域",
+    "source-atop": "在目标范围内叠加源",
+    "destination-atop": "在源范围内叠加目标",
+    "xor": "排除重叠区域",
+    "copy": "仅源",
+    "destination": "仅目标",
+    "clear": "清除",
+    "lighter": "源与目标相加"
+  }
+}

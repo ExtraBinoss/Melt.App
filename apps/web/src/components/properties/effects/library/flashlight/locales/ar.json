@@ -1,0 +1,22 @@
+{
+  "name": "وميض ضوئي",
+  "parameter": {
+    "centerX": "المركز X",
+    "centerY": "المركز Y",
+    "radius": "نصف قطر الضوء",
+    "softness": "نعومة الحافة",
+    "falloff": "تلاشي الضوء",
+    "aspect": "نسبة أبعاد الشعاع",
+    "rotation": "دوران الشعاع",
+    "intensity": "شدة الضوء",
+    "ambient": "الإضاءة المحيطة",
+    "exposure": "تعريض الوميض",
+    "highlightCompression": "ضغط المناطق الساطعة",
+    "saturation": "التشبع",
+    "glow": "ضباب ضوئي",
+    "grain": "حبيبات الفيلم",
+    "grainSize": "حجم الحبيبات",
+    "lightColor": "لون الضوء",
+    "invert": "عكس الإضاءة"
+  }
+}

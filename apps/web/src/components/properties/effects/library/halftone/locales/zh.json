@@ -1,0 +1,25 @@
+{
+  "name": "半色调",
+  "parameter": {
+    "pattern": "图案",
+    "rotation": "网格旋转",
+    "dotSize": "圆点大小",
+    "softness": "边缘柔和度",
+    "gamma": "色调伽马",
+    "offsetX": "网格偏移 X",
+    "offsetY": "网格偏移 Y",
+    "ink": "网点颜色",
+    "paper": "背景颜色",
+    "backgroundOpacity": "背景不透明度",
+    "sourceColor": "使用原始颜色",
+    "cyanAngle": "青色网角",
+    "magentaAngle": "品红网角",
+    "yellowAngle": "黄色网角"
+  },
+  "choice": {
+    "legacy": "经典印刷",
+    "circle-grid": "圆点网格",
+    "round-mosaic": "圆形彩色马赛克",
+    "color-screen": "颜色通道网屏"
+  }
+}

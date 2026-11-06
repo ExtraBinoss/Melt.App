@@ -1,0 +1,11 @@
+{
+  "name": "Gloed",
+  "parameter": {
+    "threshold": "Drempel voor hooglichten",
+    "knee": "Zachte drempel",
+    "intensity": "Gloedsterkte",
+    "radius": "Straal van de lichtkrans",
+    "tint": "Gloedtint",
+    "glowOnly": "Alleen gloed"
+  }
+}

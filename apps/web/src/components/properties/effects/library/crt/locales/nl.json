@@ -1,0 +1,40 @@
+{
+  "name": "CRT",
+  "mask": {
+    "aperture": "Apertuurrooster",
+    "shadow": "Schaduwmasker",
+    "slot": "Sleufmasker"
+  },
+  "parameter": {
+    "scale": "Fosforsteek",
+    "mask": "Fosformasker",
+    "maskStrength": "Maskersterkte",
+    "maskGap": "Fosfortussenruimte",
+    "scanlineStrength": "Scanlijnsterkte",
+    "scanlinePitch": "Scanlijnafstand",
+    "scanlineWidth": "Straalbreedte",
+    "scanlinePhase": "Scanlijnfase",
+    "curvatureX": "Horizontale kromming",
+    "curvatureY": "Verticale kromming",
+    "zoom": "Schermzoom",
+    "convergence": "Kleurmisconvergentie",
+    "glow": "Fosforgloed",
+    "glowRadius": "Gloedstraal",
+    "brightness": "Helderheid",
+    "contrast": "Contrast",
+    "saturation": "Verzadiging",
+    "tintColor": "Schermtint",
+    "vignette": "Vignettering",
+    "roundness": "Schermhoeken",
+    "borderSoftness": "Zachtheid van de schermrand",
+    "bezelColor": "Randkleur",
+    "noise": "Signaalruis",
+    "jitter": "Lijntrilling",
+    "flicker": "Flikkersterkte",
+    "flickerRate": "Flikkerfrequentie",
+    "rollingBar": "Sterkte van de lopende balk",
+    "rollingSpeed": "Snelheid van de lopende balk",
+    "cutout": "Transparante schermranden",
+    "time": "Tijd"
+  }
+}

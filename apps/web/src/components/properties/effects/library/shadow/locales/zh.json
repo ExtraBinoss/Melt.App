@@ -1,0 +1,9 @@
+{
+  "name": "投影",
+  "parameter": {
+    "offsetX": "水平偏移",
+    "offsetY": "垂直偏移",
+    "radius": "模糊半径",
+    "shadowColor": "阴影颜色"
+  }
+}

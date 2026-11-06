@@ -1,0 +1,13 @@
+{
+  "name": "Olieverfschildering",
+  "parameter": {
+    "brushScale": "Penseelgrootte",
+    "elongation": "Penseelverlenging",
+    "directionality": "Radiale penseelrichting",
+    "edgePreservation": "Randbehoud",
+    "detail": "Oorspronkelijk detail",
+    "centerX": "Penseelmidden X",
+    "centerY": "Penseelmidden Y",
+    "angle": "Penseelhoek"
+  }
+}

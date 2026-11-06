@@ -1,0 +1,16 @@
+{
+  "name": "风",
+  "parameter": {
+    "centerX": "场中心 X",
+    "centerY": "场中心 Y",
+    "angle": "风向",
+    "length": "拖影长度",
+    "bandSize": "条带宽度",
+    "variation": "条带变化",
+    "gust": "阵风强度",
+    "speed": "阵风速度",
+    "phase": "相位",
+    "sourceMix": "原始细节",
+    "time": "时间"
+  }
+}

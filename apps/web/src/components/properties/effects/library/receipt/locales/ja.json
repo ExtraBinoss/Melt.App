@@ -1,0 +1,50 @@
+{
+  "name": "レシート",
+  "fit": {
+    "contain": "縦横比を保持",
+    "stretch": "印刷領域を埋める"
+  },
+  "mode": {
+    "ordered": "規則的なドット",
+    "stochastic": "ランダムなドット",
+    "threshold": "しきい値"
+  },
+  "edge": {
+    "straight": "直線の切り口",
+    "torn": "破れた端",
+    "perforated": "ミシン目の端"
+  },
+  "parameter": {
+    "scale": "印刷ドットのピッチ",
+    "mode": "感熱ハーフトーン",
+    "exposure": "露出",
+    "gamma": "ガンマ",
+    "contrast": "印刷コントラスト",
+    "invert": "印刷を反転",
+    "inkColor": "印刷色",
+    "paperColor": "紙の色",
+    "inkOpacity": "印刷濃度",
+    "dotSpread": "ドットの広がり",
+    "dotSoftness": "ドットの柔らかさ",
+    "wear": "ドットの欠け",
+    "feedBanding": "紙送りの縞",
+    "feedPitch": "紙送りの縞の間隔",
+    "streaks": "ヘッドの筋",
+    "streakWidth": "筋の幅",
+    "marginX": "印刷の左右余白",
+    "marginY": "印刷の上下余白",
+    "fit": "画像の合わせ方",
+    "paperTexture": "紙のテクスチャ",
+    "fiberSize": "繊維の大きさ",
+    "edge": "紙の切り口",
+    "edgeHeight": "端の深さ",
+    "edgePitch": "端の間隔",
+    "edgeJitter": "端の不規則さ",
+    "edgeSoftness": "端の柔らかさ",
+    "edgeShade": "端の陰影",
+    "foldStrength": "折り目の陰影",
+    "foldPosition": "折り目の位置",
+    "foldWidth": "折り目の幅",
+    "cutout": "紙の端を透明に"
+  }
+}

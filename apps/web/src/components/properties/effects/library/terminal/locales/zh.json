@@ -1,0 +1,18 @@
+{
+  "name": "终端",
+  "parameter": {
+    "progress": "输入进度",
+    "columns": "列数",
+    "rows": "行数",
+    "cursor": "光标",
+    "cursorColor": "光标颜色",
+    "blinkRate": "闪烁频率",
+    "time": "时间"
+  },
+  "choice": {
+    "none": "无",
+    "block": "方块",
+    "underline": "下划线",
+    "line": "行高亮"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "name": "Resplandor",
+  "parameter": {
+    "threshold": "Umbral de luces altas",
+    "knee": "Umbral suave",
+    "intensity": "Intensidad del resplandor",
+    "radius": "Radio del halo",
+    "tint": "Tinte del resplandor",
+    "glowOnly": "Solo resplandor"
+  }
+}

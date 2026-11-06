@@ -1,0 +1,22 @@
+{
+  "name": "Blitzlicht",
+  "parameter": {
+    "centerX": "Mittelpunkt X",
+    "centerY": "Mittelpunkt Y",
+    "radius": "Lichtradius",
+    "softness": "Kantenweichheit",
+    "falloff": "Lichtabfall",
+    "aspect": "Strahlseitenverhältnis",
+    "rotation": "Strahldrehung",
+    "intensity": "Lichtintensität",
+    "ambient": "Umgebungslicht",
+    "exposure": "Blitzbelichtung",
+    "highlightCompression": "Lichterkompression",
+    "saturation": "Sättigung",
+    "glow": "Lichtdunst",
+    "grain": "Filmkorn",
+    "grainSize": "Korngröße",
+    "lightColor": "Lichtfarbe",
+    "invert": "Beleuchtung umkehren"
+  }
+}

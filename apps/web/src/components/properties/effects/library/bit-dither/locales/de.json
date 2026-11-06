@@ -1,0 +1,23 @@
+{
+  "name": "Ein-Bit-Dithering",
+  "parameter": {
+    "method": "Methode",
+    "scale": "Zellgröße",
+    "threshold": "Schwellenwert",
+    "strength": "Ditherstärke",
+    "contrast": "Kontrast",
+    "gamma": "Tonwert-Gamma",
+    "invert": "Umkehren",
+    "foreground": "Tintenfarbe",
+    "background": "Papierfarbe",
+    "sourceColor": "Quellfarben"
+  },
+  "method": {
+    "threshold": "Fester Schwellenwert",
+    "bayer2": "Bayer 2×2",
+    "bayer4": "Bayer 4×4",
+    "bayer8": "Bayer 8×8",
+    "interleaved": "Verschachteltes Verlaufsrauschen",
+    "multilevel": "Mehrstufiges Bayer-Dithering"
+  }
+}

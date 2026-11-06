@@ -1,0 +1,18 @@
+{
+  "name": "터미널",
+  "parameter": {
+    "progress": "입력 진행도",
+    "columns": "열 수",
+    "rows": "행 수",
+    "cursor": "커서",
+    "cursorColor": "커서 색상",
+    "blinkRate": "깜박임 속도",
+    "time": "시간"
+  },
+  "choice": {
+    "none": "없음",
+    "block": "블록",
+    "underline": "밑줄",
+    "line": "행 강조"
+  }
+}

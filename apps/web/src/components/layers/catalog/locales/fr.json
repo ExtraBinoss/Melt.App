@@ -21,7 +21,7 @@
     "brightness": "Éclaircir ou assombrir l'image en ajustant sa luminosité globale.",
     "contrast": "Augmenter ou réduire l'écart entre les tons clairs et foncés.",
     "grayscale": "Convertir progressivement l'image en monochrome noir et blanc.",
-    "blur": "Adoucir l'image par filtrage gaussien, boîte, directionnel, rotation, zoom, bokeh d'objectif ou bilatéral, avec une zone nette protégée facultative.",
+    "blur": "Adoucir l'image par filtrage gaussien, boîte, directionnel, rotation, zoom, bokeh d'objectif ou bilatéral, avec une zone nette protégée facultative. Le mode progressif fait varier le rayon du flou selon un dégradé linéaire, radial ou en bande.",
     "saturation": "Ajuster l'intensité globale des couleurs de l'image.",
     "hue": "Faire tourner les couleurs sur le cercle des teintes.",
     "exposure": "Ajuster l'intensité lumineuse en diaphragmes d'exposition photographique.",
@@ -58,7 +58,15 @@
     "chromatic-aberration": "Séparer les canaux rouge et bleu radialement ou dans une direction réglable.",
     "wind": "Étirer les détails en traînées directionnelles avec des bandes déterministes et des rafales animées.",
     "depth-of-field": "Régler la netteté de la composition avec la profondeur native, la distance de mise au point et l’ouverture. Nécessite une scène 3D.",
-    "trail": "Mélanger les poses précédentes de la composition en échos temporels, ou répéter l’image actuelle avec des décalages."
+    "trail": "Mélanger les poses précédentes de la composition en échos temporels, ou répéter l’image actuelle avec des décalages.",
+    "glow": "Diffuser les hautes lumières en un halo doux et colorable sur fond transparent.",
+    "neon-melt": "Recolorer le contenu avec une palette néon, des déformations liquides et des halos lumineux.",
+    "repeater": "Répéter le contenu source éditable en ligne, en grille ou en cercle.",
+    "wave-distortion": "Déformer le contenu avec des ondes directionnelles sinusoïdales, triangulaires, carrées ou en dents de scie.",
+    "shape-grid": "Reconstruire les tons de l’image avec une trame de formes géométriques et des palettes éditables.",
+    "watercolor": "Simplifier les détails en lavis de pigments avec du grain de papier et des contours assombris.",
+    "depth-anything": "Générer localement une carte de profondeur relative depuis une image ou vidéo 2D et ajouter une parallaxe facultative.",
+    "feather": "Atténuation elliptique de la transparence avec centre, rayon et douceur modifiables."
   },
   "family": {
     "tone": "Lumière et tonalité",

@@ -1,0 +1,21 @@
+{
+  "name": "波浪扭曲",
+  "parameter": {
+    "waveform": "波形",
+    "amplitude": "振幅",
+    "frequency": "短边周期数",
+    "angle": "传播角度",
+    "phase": "相位",
+    "edge": "源图边缘"
+  },
+  "choice": {
+    "sine": "正弦波",
+    "triangle": "三角波",
+    "square": "方波",
+    "sawtooth": "锯齿波",
+    "transparent": "透明",
+    "mirror": "镜像",
+    "repeat": "重复",
+    "clamp": "延展边缘"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "name": "風",
+  "parameter": {
+    "centerX": "フィールド中心 X",
+    "centerY": "フィールド中心 Y",
+    "angle": "風向き",
+    "length": "筋の長さ",
+    "bandSize": "帯の幅",
+    "variation": "帯の変化",
+    "gust": "突風の強さ",
+    "speed": "突風の速度",
+    "phase": "位相",
+    "sourceMix": "元のディテール",
+    "time": "時間"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "name": "Cień zewnętrzny",
+  "parameter": {
+    "offsetX": "Przesunięcie poziome",
+    "offsetY": "Przesunięcie pionowe",
+    "radius": "Promień rozmycia",
+    "shadowColor": "Kolor cienia"
+  }
+}

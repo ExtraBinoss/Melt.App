@@ -1,0 +1,27 @@
+{
+  "name": "形状网格",
+  "parameter": {
+    "shape": "形状阶梯",
+    "cellSize": "单元格大小",
+    "fill": "形状填充",
+    "stroke": "描边宽度",
+    "rotation": "网格旋转",
+    "contrast": "色调对比度",
+    "colorMode": "颜色模式",
+    "shadowColor": "阴影颜色",
+    "midtoneColor": "中间调颜色",
+    "highlightColor": "高光颜色",
+    "backgroundColor": "背景颜色",
+    "backgroundOpacity": "背景不透明度"
+  },
+  "choice": {
+    "adaptive": "自适应色调阶梯",
+    "dots": "圆点",
+    "rings": "圆环",
+    "diamonds": "菱形",
+    "squares": "正方形",
+    "crosses": "十字",
+    "source": "原始颜色",
+    "palette": "三色调色板"
+  }
+}

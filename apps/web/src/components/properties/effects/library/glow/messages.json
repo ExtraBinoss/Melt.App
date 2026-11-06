@@ -1,0 +1,24 @@
+{
+  "en": {
+    "name": "Glow",
+    "parameter": {
+      "threshold": "Highlight threshold",
+      "knee": "Soft threshold",
+      "intensity": "Glow intensity",
+      "radius": "Halo radius",
+      "tint": "Glow tint",
+      "glowOnly": "Glow only"
+    }
+  },
+  "fr": {
+    "name": "Lueur",
+    "parameter": {
+      "threshold": "Seuil des hautes lumières",
+      "knee": "Transition du seuil",
+      "intensity": "Intensité de la lueur",
+      "radius": "Rayon du halo",
+      "tint": "Teinte de la lueur",
+      "glowOnly": "Lueur seule"
+    }
+  }
+}

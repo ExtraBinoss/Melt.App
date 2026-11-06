@@ -1,0 +1,21 @@
+{
+  "name": "残像",
+  "parameter": {
+    "mode": "残像のソース",
+    "echoCount": "残像数",
+    "delay": "残像の時間間隔",
+    "fade": "残像の不透明度の減衰",
+    "offsetX": "残像ごとのXオフセット",
+    "offsetY": "残像ごとのYオフセット",
+    "angle": "オフセットの方向",
+    "centerX": "拡縮の中心X",
+    "centerY": "拡縮の中心Y",
+    "spread": "残像ごとのスケール変化",
+    "expandBounds": "オブジェクトの境界を超えて拡張"
+  },
+  "choice": {
+    "temporal": "以前のポーズ／動画フレーム",
+    "offset": "現在の画像をずらす",
+    "auto": "自動 · ソースに合わせる"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "name": "Repetidor",
+  "parameter": {
+    "layout": "Disposición",
+    "count": "Copias incluido el original",
+    "columns": "Columnas de la cuadrícula",
+    "spacingX": "Espaciado horizontal",
+    "spacingY": "Espaciado vertical",
+    "radius": "Radio del anillo",
+    "angle": "Ángulo de disposición",
+    "scaleStep": "Cambio de escala por copia",
+    "rotationStep": "Rotación por copia",
+    "copyOpacity": "Multiplicador de opacidad por copia"
+  },
+  "choice": {
+    "linear": "Lineal",
+    "grid": "Cuadrícula",
+    "radial": "Radial"
+  }
+}

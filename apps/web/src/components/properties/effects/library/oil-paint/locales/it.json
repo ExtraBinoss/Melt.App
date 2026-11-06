@@ -1,0 +1,13 @@
+{
+  "name": "Pittura a olio",
+  "parameter": {
+    "brushScale": "Dimensione del pennello",
+    "elongation": "Allungamento del pennello",
+    "directionality": "Direzione radiale del pennello",
+    "edgePreservation": "Conservazione dei bordi",
+    "detail": "Dettaglio originale",
+    "centerX": "Centro del pennello X",
+    "centerY": "Centro del pennello Y",
+    "angle": "Angolo del pennello"
+  }
+}

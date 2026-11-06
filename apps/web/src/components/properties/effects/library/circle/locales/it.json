@@ -1,0 +1,19 @@
+{
+  "name": "Cerchi",
+  "parameter": {
+    "spacing": "Spaziatura delle celle",
+    "rotation": "Angolo del retino",
+    "dotSize": "Dimensione dei punti",
+    "softness": "Morbidezza dei bordi",
+    "gamma": "Gamma tonale",
+    "polarity": "Polarità dei punti",
+    "foreground": "Colore dell’inchiostro",
+    "background": "Colore della carta",
+    "foregroundOpacity": "Opacità dell’inchiostro",
+    "backgroundOpacity": "Opacità della carta"
+  },
+  "polarity": {
+    "shadows": "Punti nelle ombre",
+    "highlights": "Punti nelle alte luci"
+  }
+}

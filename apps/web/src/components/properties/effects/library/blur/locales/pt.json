@@ -1,0 +1,35 @@
+{
+  "name": "Desfoque",
+  "parameter": {
+    "technique": "Técnica",
+    "angle": "Ângulo da direção",
+    "centerX": "Centro X",
+    "centerY": "Centro Y",
+    "spinAngle": "Ângulo de rotação",
+    "zoomStrength": "Intensidade do zoom",
+    "apertureBlades": "Lâminas do diafragma",
+    "apertureRotation": "Rotação do diafragma",
+    "rangeSigma": "Tolerância de cor",
+    "protect": "Proteger o centro",
+    "protectedRadius": "Raio protegido",
+    "feather": "Suavização da proteção",
+    "gradientShape": "Forma do gradiente",
+    "gradientStart": "Início do gradiente",
+    "gradientEnd": "Fim do gradiente",
+    "gradientPower": "Curva de progressão",
+    "gradientInvert": "Inverter progressão"
+  },
+  "choice": {
+    "gaussian": "Gaussiano",
+    "box": "Média",
+    "directional": "Direcional",
+    "spin": "Rotação",
+    "zoom": "Zoom",
+    "lens": "Lente (bokeh)",
+    "bilateral": "Bilateral",
+    "progressive": "Progressivo",
+    "linear": "Linear",
+    "radial": "Radial",
+    "band": "Faixa nítida"
+  }
+}

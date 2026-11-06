@@ -1,0 +1,17 @@
+{
+  "name": "积木",
+  "parameter": {
+    "scale": "凸点间距",
+    "centerX": "网格中心 X",
+    "centerY": "网格中心 Y",
+    "angle": "积木方向",
+    "stagger": "行交错",
+    "gap": "积木间隙",
+    "relief": "塑料凸起浮雕",
+    "lightAngle": "光照方向",
+    "variation": "积木颜色变化",
+    "studRadius": "凸点半径",
+    "studHeight": "凸点高度",
+    "paletteLevels": "颜色级数（0 = 源图）"
+  }
+}

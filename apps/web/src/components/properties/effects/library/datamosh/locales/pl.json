@@ -1,0 +1,16 @@
+{
+  "name": "Datamosh · Rozmazane bloki",
+  "parameter": {
+    "blockSize": "Rozmiar makrobloków",
+    "density": "Objęte bloki",
+    "displacement": "Przesunięcie bloków",
+    "direction": "Kierunek przesunięcia",
+    "angleVariation": "Zmienność kierunku",
+    "coherence": "Spójność wierszy",
+    "smear": "Rozmazywanie przestrzenne",
+    "chromaShift": "Rozlewanie kolorów",
+    "levels": "Poziomy kolorów",
+    "rate": "Częstotliwość wzoru",
+    "time": "Czas wzoru"
+  }
+}

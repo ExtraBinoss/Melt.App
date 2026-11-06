@@ -1,0 +1,34 @@
+{
+  "en": {
+    "name": "Repeater",
+    "parameter": {
+      "layout": "Layout",
+      "count": "Copies including original",
+      "columns": "Grid columns",
+      "spacingX": "Horizontal spacing",
+      "spacingY": "Vertical spacing",
+      "radius": "Ring radius",
+      "angle": "Layout angle",
+      "scaleStep": "Scale change per copy",
+      "rotationStep": "Rotation per copy",
+      "copyOpacity": "Opacity multiplier per copy"
+    },
+    "choice": { "linear": "Linear", "grid": "Grid", "radial": "Radial" }
+  },
+  "fr": {
+    "name": "Répétiteur",
+    "parameter": {
+      "layout": "Disposition",
+      "count": "Copies avec l’original",
+      "columns": "Colonnes de la grille",
+      "spacingX": "Espacement horizontal",
+      "spacingY": "Espacement vertical",
+      "radius": "Rayon du cercle",
+      "angle": "Angle de disposition",
+      "scaleStep": "Variation d’échelle par copie",
+      "rotationStep": "Rotation par copie",
+      "copyOpacity": "Multiplicateur d’opacité par copie"
+    },
+    "choice": { "linear": "Linéaire", "grid": "Grille", "radial": "Radiale" }
+  }
+}

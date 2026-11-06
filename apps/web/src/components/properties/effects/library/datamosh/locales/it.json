@@ -1,0 +1,16 @@
+{
+  "name": "Datamosh · Scie di blocchi",
+  "parameter": {
+    "blockSize": "Dimensione dei macroblocchi",
+    "density": "Blocchi interessati",
+    "displacement": "Spostamento dei blocchi",
+    "direction": "Direzione dello spostamento",
+    "angleVariation": "Variazione della direzione",
+    "coherence": "Coerenza delle righe",
+    "smear": "Scia spaziale",
+    "chromaShift": "Sbavatura del colore",
+    "levels": "Livelli di colore",
+    "rate": "Frequenza del motivo",
+    "time": "Tempo del motivo"
+  }
+}

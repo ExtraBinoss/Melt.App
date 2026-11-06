@@ -1,0 +1,21 @@
+{
+  "name": "Naspoor",
+  "parameter": {
+    "mode": "Echobron",
+    "echoCount": "Aantal echo’s",
+    "delay": "Tijd tussen echo’s",
+    "fade": "Afname van echodekking",
+    "offsetX": "Verschuiving X per echo",
+    "offsetY": "Verschuiving Y per echo",
+    "angle": "Verschuivingsrichting",
+    "centerX": "Spreidingsmiddelpunt X",
+    "centerY": "Spreidingsmiddelpunt Y",
+    "spread": "Schaalverandering per echo",
+    "expandBounds": "Buiten de objectgrenzen uitbreiden"
+  },
+  "choice": {
+    "temporal": "Eerdere poses / videoframes",
+    "offset": "Verschuivingen van het huidige beeld",
+    "auto": "Automatisch · aanpassen aan bron"
+  }
+}

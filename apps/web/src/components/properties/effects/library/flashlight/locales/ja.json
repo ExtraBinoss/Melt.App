@@ -1,0 +1,22 @@
+{
+  "name": "閃光",
+  "parameter": {
+    "centerX": "中心X",
+    "centerY": "中心Y",
+    "radius": "光の半径",
+    "softness": "縁の柔らかさ",
+    "falloff": "光の減衰",
+    "aspect": "光束の縦横比",
+    "rotation": "光束の回転",
+    "intensity": "光の強度",
+    "ambient": "環境光",
+    "exposure": "フラッシュ露光",
+    "highlightCompression": "ハイライトの圧縮",
+    "saturation": "彩度",
+    "glow": "光のかすみ",
+    "grain": "フィルム粒子",
+    "grainSize": "粒子の大きさ",
+    "lightColor": "光の色",
+    "invert": "照明を反転"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "name": "色収差",
+  "parameter": {
+    "mode": "分離モード",
+    "centerX": "中心 X",
+    "centerY": "中心 Y",
+    "angle": "分離方向",
+    "separation": "チャンネルの分離",
+    "radius": "減衰の半径",
+    "falloff": "距離による減衰"
+  },
+  "choice": {
+    "radial": "放射状",
+    "directional": "方向指定"
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "name": "CRT",
+  "mask": {
+    "aperture": "شبكة الفتحات",
+    "shadow": "قناع الظل",
+    "slot": "قناع الشقوق"
+  },
+  "parameter": {
+    "scale": "تباعد عناصر الفوسفور",
+    "mask": "قناع الفوسفور",
+    "maskStrength": "شدة القناع",
+    "maskGap": "فجوة الفوسفور",
+    "scanlineStrength": "شدة خطوط المسح",
+    "scanlinePitch": "تباعد خطوط المسح",
+    "scanlineWidth": "عرض الحزمة",
+    "scanlinePhase": "طور خطوط المسح",
+    "curvatureX": "الانحناء الأفقي",
+    "curvatureY": "الانحناء العمودي",
+    "zoom": "تكبير الشاشة",
+    "convergence": "سوء تقارب الألوان",
+    "glow": "توهج الفوسفور",
+    "glowRadius": "نصف قطر التوهج",
+    "brightness": "السطوع",
+    "contrast": "التباين",
+    "saturation": "التشبع",
+    "tintColor": "صبغة الشاشة",
+    "vignette": "تظليل الحواف",
+    "roundness": "زوايا الشاشة",
+    "borderSoftness": "نعومة حافة الشاشة",
+    "bezelColor": "لون الإطار",
+    "noise": "تشويش الإشارة",
+    "jitter": "اهتزاز الخطوط",
+    "flicker": "شدة الوميض",
+    "flickerRate": "تردد الوميض",
+    "rollingBar": "شدة الشريط المتحرك",
+    "rollingSpeed": "سرعة الشريط المتحرك",
+    "cutout": "حواف شاشة شفافة",
+    "time": "الزمن"
+  }
+}

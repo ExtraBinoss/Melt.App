@@ -1,0 +1,11 @@
+{
+  "name": "Verformung",
+  "progress": "Fortschritt",
+  "stagger": "Buchstabenversatz",
+  "inflate": "Aufblähen",
+  "stretch": "Dehnung",
+  "order": "Buchstabenreihenfolge",
+  "forward": "Vom ersten zum letzten",
+  "reverse": "Vom letzten zum ersten",
+  "center": "Von der Mitte aus"
+}

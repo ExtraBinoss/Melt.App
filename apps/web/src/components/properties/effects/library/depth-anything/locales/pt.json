@@ -1,0 +1,28 @@
+{
+  "name": "Depth Anything V3",
+  "map": "Mapa de profundidade",
+  "prepare": "Preparar profundidade…",
+  "regenerate": "Regenerar profundidade…",
+  "hint": "Depth Anything V3 Small · 105 MB transferidos uma única vez. A profundidade é gerada automaticamente após a transferência. A preparação é executada localmente com WebGPU, liberta recursos entre fotogramas e faz uma pausa durante as interações. Na reprodução, a profundidade guardada é renderizada sem IA.",
+  "generate": "Gerar profundidade",
+  "cancel": "Cancelar",
+  "processing": "A preparar profundidade",
+  "unsupported": "Selecione uma imagem ou um vídeo 2D desbloqueado. Os efeitos de composição não podem estimar a profundidade.",
+  "parameter": {
+    "strength": "Relevo",
+    "angle": "Direção",
+    "focus": "Plano de profundidade fixo",
+    "zoom": "Zoom das bordas",
+    "view": "Visualização"
+  },
+  "choice": {
+    "parallax": "Paralaxe",
+    "depth": "Mapa de profundidade"
+  },
+  "download": "Transferir modelo",
+  "downloading": "A transferir modelo",
+  "completed": "Profundidade pronta",
+  "close": "Fechar",
+  "info": "Sobre a preparação da profundidade",
+  "preview": "A preparar a pré-visualização do vídeo"
+}

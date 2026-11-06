@@ -1,0 +1,22 @@
+{
+  "name": "Ondulação animada",
+  "parameter": {
+    "centerX": "Centro X",
+    "centerY": "Centro Y",
+    "innerRadius": "Raio protegido",
+    "radius": "Alcance",
+    "feather": "Suavização da borda",
+    "falloff": "Atenuação com a distância",
+    "amplitude": "Deslocamento",
+    "wavelength": "Comprimento de onda",
+    "speed": "Velocidade da onda",
+    "phase": "Fase",
+    "direction": "Direção",
+    "dispersion": "Dispersão de cores",
+    "time": "Tempo"
+  },
+  "direction": {
+    "outward": "Para fora",
+    "inward": "Para dentro"
+  }
+}

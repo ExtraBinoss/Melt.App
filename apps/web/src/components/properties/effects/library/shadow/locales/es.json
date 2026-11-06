@@ -1,0 +1,9 @@
+{
+  "name": "Sombra paralela",
+  "parameter": {
+    "offsetX": "Desplazamiento horizontal",
+    "offsetY": "Desplazamiento vertical",
+    "radius": "Radio de desenfoque",
+    "shadowColor": "Color de la sombra"
+  }
+}

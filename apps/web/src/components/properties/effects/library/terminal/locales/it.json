@@ -1,0 +1,18 @@
+{
+  "name": "Terminale",
+  "parameter": {
+    "progress": "Avanzamento della digitazione",
+    "columns": "Colonne",
+    "rows": "Righe",
+    "cursor": "Cursore",
+    "cursorColor": "Colore del cursore",
+    "blinkRate": "Frequenza di lampeggiamento",
+    "time": "Tempo"
+  },
+  "choice": {
+    "none": "Nessuno",
+    "block": "Blocco",
+    "underline": "Sottolineatura",
+    "line": "Evidenziazione della riga"
+  }
+}

@@ -1,3 +1,4 @@
+import { EFFECT_DOMAIN_KEYS } from "../../src/effects/sdk/domain";
 import { CATALOG_PARAMETERS } from "./catalog-parameters";
 import { describe, expect, it } from "vitest";
 import { EFFECT_CATALOG, getEffectDefinition } from "../../src/effects/catalog";
@@ -6,6 +7,22 @@ import { createEffect, createLayer } from "../../src/document/factories";
 describe("portable effect definitions", () => {
   it("describes every supported effect once, with the existing deterministic defaults", () => {
     expect(Object.keys(EFFECT_CATALOG)).toEqual([
+      "glow",
+      "neon-melt",
+      "repeater",
+      "wave-distortion",
+      "shape-grid",
+      "watercolor",
+      "depth-anything",
+      "depth-of-field",
+      "trail",
+      "risograph",
+      "oil-paint",
+      "blocks",
+      "chromatic-aberration",
+      "wind",
+      "feather",
+
       "terminal",
       "torn-edges",
       "liquify",
@@ -71,12 +88,18 @@ describe("portable effect definitions", () => {
   });
   it("provides typed controls in document units and meaningful display metadata", () => {
     for (const definition of Object.values(EFFECT_CATALOG)) {
-      expect(definition.parameters.map((parameter) => parameter.key)).toEqual(
-        CATALOG_PARAMETERS[definition.type],
-      );
+      expect(definition.parameters.map((parameter) => parameter.key)).toEqual([
+        ...CATALOG_PARAMETERS[definition.type],
+        ...(!definition.retired && definition.source !== "geometry" ? EFFECT_DOMAIN_KEYS : []),
+      ]);
       expect(getEffectDefinition(definition.type)).toBe(definition);
       expect(definition.coverage).toBe(
         [
+          "glow",
+          "neon-melt",
+          "repeater",
+          "wave-distortion",
+          "trail",
           "terminal",
           "liquify",
           "ink-bleed",
@@ -89,6 +112,9 @@ describe("portable effect definitions", () => {
         ].includes(definition.type)
           ? "expand"
           : [
+                "shape-grid",
+                "blocks",
+                "feather",
                 "torn-edges",
                 "halftone",
                 "edge-detect",
@@ -104,6 +130,21 @@ describe("portable effect definitions", () => {
       );
       expect(definition.category).toBe(
         [
+          "glow",
+          "neon-melt",
+          "repeater",
+          "wave-distortion",
+          "shape-grid",
+          "watercolor",
+          "depth-anything",
+          "depth-of-field",
+          "trail",
+          "risograph",
+          "oil-paint",
+          "blocks",
+          "chromatic-aberration",
+          "wind",
+          "feather",
           "liquify",
           "torn-edges",
           "terminal",

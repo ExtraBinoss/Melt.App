@@ -1,0 +1,12 @@
+{
+  "title": "الموضع والمنطقة",
+  "position": "الموضع",
+  "positionHelp": "اسحب لتحديد الموضع. تحرّك بمفاتيح الأسهم، واضغط Shift لزيادة مسافة الحركة.",
+  "domainEnabled": "المنطقة المحلية",
+  "domainX": "الموضع X",
+  "domainY": "الموضع Y",
+  "domainAngle": "اتجاه المنطقة",
+  "domainRadius": "نصف القطر",
+  "domainAspect": "نسبة الأبعاد",
+  "domainFeather": "التنعيم"
+}

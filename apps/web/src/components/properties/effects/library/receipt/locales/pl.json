@@ -1,0 +1,50 @@
+{
+  "name": "Paragon",
+  "fit": {
+    "contain": "Zachowaj proporcje",
+    "stretch": "Wypełnij obszar wydruku"
+  },
+  "mode": {
+    "ordered": "Uporządkowane punkty",
+    "stochastic": "Losowe punkty",
+    "threshold": "Próg"
+  },
+  "edge": {
+    "straight": "Proste cięcie",
+    "torn": "Postrzępiona krawędź",
+    "perforated": "Perforowana krawędź"
+  },
+  "parameter": {
+    "scale": "Rozstaw punktów druku",
+    "mode": "Raster termiczny",
+    "exposure": "Ekspozycja",
+    "gamma": "Gamma",
+    "contrast": "Kontrast wydruku",
+    "invert": "Odwróć wydruk",
+    "inkColor": "Kolor druku",
+    "paperColor": "Kolor papieru",
+    "inkOpacity": "Gęstość druku",
+    "dotSpread": "Rozlewanie punktów",
+    "dotSoftness": "Miękkość punktów",
+    "wear": "Brakujące punkty",
+    "feedBanding": "Pasy przesuwu papieru",
+    "feedPitch": "Odstęp pasów przesuwu",
+    "streaks": "Smugi głowicy",
+    "streakWidth": "Szerokość smug",
+    "marginX": "Poziomy margines wydruku",
+    "marginY": "Pionowy margines wydruku",
+    "fit": "Dopasowanie obrazu",
+    "paperTexture": "Tekstura papieru",
+    "fiberSize": "Rozmiar włókien",
+    "edge": "Cięcie papieru",
+    "edgeHeight": "Głębokość krawędzi",
+    "edgePitch": "Rozstaw krawędzi",
+    "edgeJitter": "Nieregularność krawędzi",
+    "edgeSoftness": "Miękkość krawędzi",
+    "edgeShade": "Cieniowanie krawędzi",
+    "foldStrength": "Cieniowanie zagięcia",
+    "foldPosition": "Pozycja zagięcia",
+    "foldWidth": "Szerokość zagięcia",
+    "cutout": "Przezroczyste krawędzie papieru"
+  }
+}

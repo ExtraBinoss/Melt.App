@@ -1,0 +1,11 @@
+{
+  "name": "Leuchten",
+  "parameter": {
+    "threshold": "Schwelle für Spitzlichter",
+    "knee": "Weicher Schwellenwert",
+    "intensity": "Leuchtintensität",
+    "radius": "Halo-Radius",
+    "tint": "Leuchtfarbe",
+    "glowOnly": "Nur Leuchten"
+  }
+}

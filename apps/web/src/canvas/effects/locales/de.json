@@ -2,7 +2,7 @@
   "center": "Effektmittelpunkt",
   "radius": "Effektradius",
   "innerRadius": "Geschützter Radius",
-  "feather": "Weicher Übergangsrand",
+  "feather": "Weiche Kante",
   "hint": "Mittelpunkt oder Radius ziehen · Escape zum Abbrechen",
   "centerHelp": "Ziehen, um den Effektmittelpunkt zu verschieben.",
   "radiusHelp": "Ziehen, um die Reichweite des Effekts anzupassen.",

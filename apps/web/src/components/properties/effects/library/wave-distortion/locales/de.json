@@ -1,0 +1,21 @@
+{
+  "name": "Wellenverzerrung",
+  "parameter": {
+    "waveform": "Wellenform",
+    "amplitude": "Amplitude",
+    "frequency": "Perioden pro kürzerer Seite",
+    "angle": "Ausbreitungswinkel",
+    "phase": "Phase",
+    "edge": "Quellränder"
+  },
+  "choice": {
+    "sine": "Sinus",
+    "triangle": "Dreieck",
+    "square": "Rechteck",
+    "sawtooth": "Sägezahn",
+    "transparent": "Transparent",
+    "mirror": "Spiegeln",
+    "repeat": "Wiederholen",
+    "clamp": "Rand fortsetzen"
+  }
+}

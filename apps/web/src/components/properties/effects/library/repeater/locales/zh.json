@@ -1,0 +1,20 @@
+{
+  "name": "重复器",
+  "parameter": {
+    "layout": "布局",
+    "count": "副本数（包含原图）",
+    "columns": "网格列数",
+    "spacingX": "水平间距",
+    "spacingY": "垂直间距",
+    "radius": "圆环半径",
+    "angle": "布局角度",
+    "scaleStep": "每个副本的缩放变化",
+    "rotationStep": "每个副本的旋转",
+    "copyOpacity": "每个副本的不透明度倍数"
+  },
+  "choice": {
+    "linear": "线性",
+    "grid": "网格",
+    "radial": "径向"
+  }
+}

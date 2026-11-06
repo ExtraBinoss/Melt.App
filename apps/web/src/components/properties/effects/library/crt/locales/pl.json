@@ -1,0 +1,40 @@
+{
+  "name": "CRT",
+  "mask": {
+    "aperture": "Kratownica szczelinowa",
+    "shadow": "Maska punktowa",
+    "slot": "Maska szczelinowa"
+  },
+  "parameter": {
+    "scale": "Podziałka luminoforu",
+    "mask": "Maska luminoforu",
+    "maskStrength": "Siła maski",
+    "maskGap": "Odstęp luminoforu",
+    "scanlineStrength": "Intensywność linii skanowania",
+    "scanlinePitch": "Odstęp linii skanowania",
+    "scanlineWidth": "Szerokość wiązki",
+    "scanlinePhase": "Faza linii skanowania",
+    "curvatureX": "Krzywizna pozioma",
+    "curvatureY": "Krzywizna pionowa",
+    "zoom": "Powiększenie ekranu",
+    "convergence": "Rozbieżność kolorów",
+    "glow": "Poświata luminoforu",
+    "glowRadius": "Promień poświaty",
+    "brightness": "Jasność",
+    "contrast": "Kontrast",
+    "saturation": "Nasycenie",
+    "tintColor": "Zabarwienie ekranu",
+    "vignette": "Winietowanie",
+    "roundness": "Narożniki ekranu",
+    "borderSoftness": "Miękkość krawędzi ekranu",
+    "bezelColor": "Kolor ramki",
+    "noise": "Szum sygnału",
+    "jitter": "Drganie linii",
+    "flicker": "Siła migotania",
+    "flickerRate": "Częstotliwość migotania",
+    "rollingBar": "Intensywność przesuwającego się pasa",
+    "rollingSpeed": "Prędkość przesuwającego się pasa",
+    "cutout": "Przezroczyste krawędzie ekranu",
+    "time": "Czas"
+  }
+}

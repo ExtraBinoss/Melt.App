@@ -1,0 +1,21 @@
+{
+  "name": "粉色荧光",
+  "parameter": {
+    "scale": "扫描线间距",
+    "exposure": "曝光",
+    "gamma": "色调伽马",
+    "contrast": "对比度",
+    "glow": "辉光强度",
+    "glowRadius": "辉光范围",
+    "glowThreshold": "辉光阈值",
+    "scanlines": "扫描线强度",
+    "beamWidth": "光束宽度",
+    "grain": "颗粒",
+    "flicker": "闪烁",
+    "speed": "演变速度",
+    "background": "阴影颜色",
+    "phosphor": "荧光体颜色",
+    "highlight": "高光颜色",
+    "time": "时间"
+  }
+}

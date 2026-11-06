@@ -1,0 +1,9 @@
+{
+  "name": "Ombra esterna",
+  "parameter": {
+    "offsetX": "Spostamento orizzontale",
+    "offsetY": "Spostamento verticale",
+    "radius": "Raggio di sfocatura",
+    "shadowColor": "Colore dell'ombra"
+  }
+}

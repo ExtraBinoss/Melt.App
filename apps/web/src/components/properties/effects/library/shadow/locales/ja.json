@@ -1,0 +1,9 @@
+{
+  "name": "ドロップシャドウ",
+  "parameter": {
+    "offsetX": "水平方向のオフセット",
+    "offsetY": "垂直方向のオフセット",
+    "radius": "ぼかしの半径",
+    "shadowColor": "影の色"
+  }
+}

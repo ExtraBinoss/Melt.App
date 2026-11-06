@@ -1,0 +1,50 @@
+{
+  "name": "Kassabon",
+  "fit": {
+    "contain": "Beeldverhouding behouden",
+    "stretch": "Afdrukgebied vullen"
+  },
+  "mode": {
+    "ordered": "Geordende punten",
+    "stochastic": "Willekeurige punten",
+    "threshold": "Drempel"
+  },
+  "edge": {
+    "straight": "Rechte snede",
+    "torn": "Gescheurde rand",
+    "perforated": "Geperforeerde rand"
+  },
+  "parameter": {
+    "scale": "Afstand tussen afdrukpunten",
+    "mode": "Thermisch raster",
+    "exposure": "Belichting",
+    "gamma": "Gamma",
+    "contrast": "Afdrukcontrast",
+    "invert": "Afdruk omkeren",
+    "inkColor": "Afdrukkleur",
+    "paperColor": "Papierkleur",
+    "inkOpacity": "Afdrukdichtheid",
+    "dotSpread": "Puntspreiding",
+    "dotSoftness": "Puntzachtheid",
+    "wear": "Ontbrekende punten",
+    "feedBanding": "Doorvoerbanden",
+    "feedPitch": "Afstand tussen doorvoerbanden",
+    "streaks": "Printkopstrepen",
+    "streakWidth": "Streepbreedte",
+    "marginX": "Horizontale afdrukmarge",
+    "marginY": "Verticale afdrukmarge",
+    "fit": "Beeldpassing",
+    "paperTexture": "Papiertextuur",
+    "fiberSize": "Vezelgrootte",
+    "edge": "Papiersnede",
+    "edgeHeight": "Randdiepte",
+    "edgePitch": "Randafstand",
+    "edgeJitter": "Randonregelmatigheid",
+    "edgeSoftness": "Randzachtheid",
+    "edgeShade": "Randschaduw",
+    "foldStrength": "Vouwschaduw",
+    "foldPosition": "Vouwpositie",
+    "foldWidth": "Vouwbreedte",
+    "cutout": "Transparante papierranden"
+  }
+}

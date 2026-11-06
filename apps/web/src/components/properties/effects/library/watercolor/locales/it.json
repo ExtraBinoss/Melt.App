@@ -1,0 +1,16 @@
+{
+  "name": "Acquerello",
+  "parameter": {
+    "washScale": "Scala della velatura",
+    "simplification": "Semplificazione delle regioni",
+    "edgePreservation": "Conservazione dei bordi",
+    "diffusion": "Diffusione del pigmento",
+    "pigment": "Densità del pigmento",
+    "edgeDarkening": "Accumulo sui bordi",
+    "granulation": "Granulazione del pigmento",
+    "paperGrain": "Grana della carta",
+    "paperScale": "Scala della texture della carta",
+    "paperOpacity": "Velatura della carta",
+    "paperColor": "Colore della carta"
+  }
+}

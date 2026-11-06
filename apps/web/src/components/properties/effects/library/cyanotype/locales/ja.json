@@ -1,0 +1,23 @@
+{
+  "name": "サイアノタイプ",
+  "parameter": {
+    "exposure": "印画の露光",
+    "contrast": "コントラスト",
+    "gamma": "中間調",
+    "density": "青の濃度",
+    "blackPoint": "黒点",
+    "whitePoint": "白点",
+    "invert": "ネガ画像",
+    "inkColor": "青いインク",
+    "paperColor": "紙の色",
+    "wash": "洗い流し",
+    "unevenness": "塗布のむら",
+    "textureScale": "塗布模様の大きさ",
+    "paperGrain": "紙の粒子",
+    "grainScale": "粒子の大きさ",
+    "fibers": "紙の繊維",
+    "fiberScale": "繊維の大きさ",
+    "edgeFade": "縁の色あせ",
+    "edgeWidth": "縁の幅"
+  }
+}

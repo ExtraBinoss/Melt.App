@@ -1,0 +1,23 @@
+{
+  "name": "Cyanotypie",
+  "parameter": {
+    "exposure": "Belichting van de afdruk",
+    "contrast": "Contrast",
+    "gamma": "Middentonen",
+    "density": "Blauwdichtheid",
+    "blackPoint": "Zwartpunt",
+    "whitePoint": "Witpunt",
+    "invert": "Negatiefbeeld",
+    "inkColor": "Blauwe inkt",
+    "paperColor": "Papierkleur",
+    "wash": "Uitwassing",
+    "unevenness": "Ongelijkmatige coating",
+    "textureScale": "Schaal van de coating",
+    "paperGrain": "Papierkorrel",
+    "grainScale": "Korrelgrootte",
+    "fibers": "Papiervezels",
+    "fiberScale": "Vezelgrootte",
+    "edgeFade": "Vervaagde randen",
+    "edgeWidth": "Randbreedte"
+  }
+}

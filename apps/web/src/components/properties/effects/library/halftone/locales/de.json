@@ -1,0 +1,25 @@
+{
+  "name": "Halbtonraster",
+  "parameter": {
+    "pattern": "Muster",
+    "rotation": "Rasterdrehung",
+    "dotSize": "Kreisgröße",
+    "softness": "Randweichheit",
+    "gamma": "Tonwertgamma",
+    "offsetX": "Rasterversatz X",
+    "offsetY": "Rasterversatz Y",
+    "ink": "Punktfarbe",
+    "paper": "Hintergrundfarbe",
+    "backgroundOpacity": "Hintergrunddeckkraft",
+    "sourceColor": "Quellfarben verwenden",
+    "cyanAngle": "Cyan-Rasterwinkel",
+    "magentaAngle": "Magenta-Rasterwinkel",
+    "yellowAngle": "Gelb-Rasterwinkel"
+  },
+  "choice": {
+    "legacy": "Klassischer Druck",
+    "circle-grid": "Kreispunktraster",
+    "round-mosaic": "Rundes Farbmosaik",
+    "color-screen": "Farbkanalraster"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "name": "Aguarela",
+  "parameter": {
+    "washScale": "Escala da aguada",
+    "simplification": "Simplificação de regiões",
+    "edgePreservation": "Preservação das bordas",
+    "diffusion": "Difusão do pigmento",
+    "pigment": "Densidade do pigmento",
+    "edgeDarkening": "Acumulação nas bordas",
+    "granulation": "Granulação do pigmento",
+    "paperGrain": "Grão do papel",
+    "paperScale": "Escala da textura do papel",
+    "paperOpacity": "Aguada do papel",
+    "paperColor": "Cor do papel"
+  }
+}

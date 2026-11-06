@@ -1,0 +1,21 @@
+{
+  "name": "تشويه موجي",
+  "parameter": {
+    "waveform": "شكل الموجة",
+    "amplitude": "السعة",
+    "frequency": "الدورات على الضلع الأقصر",
+    "angle": "زاوية الانتشار",
+    "phase": "الطور",
+    "edge": "حواف المصدر"
+  },
+  "choice": {
+    "sine": "جيبية",
+    "triangle": "مثلثية",
+    "square": "مربعة",
+    "sawtooth": "سن المنشار",
+    "transparent": "شفافة",
+    "mirror": "انعكاس",
+    "repeat": "تكرار",
+    "clamp": "تمديد الحواف"
+  }
+}

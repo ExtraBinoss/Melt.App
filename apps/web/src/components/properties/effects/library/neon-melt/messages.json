@@ -1,0 +1,48 @@
+{
+  "en": {
+    "name": "Neon Melt",
+    "parameter": {
+      "threshold": "Highlight threshold",
+      "knee": "Soft threshold",
+      "intensity": "Glow intensity",
+      "radius": "Halo radius",
+      "tint": "Glow tint",
+      "glowOnly": "Glow only",
+      "palette": "Neon palette",
+      "paletteShift": "Palette offset",
+      "contrast": "Remap contrast",
+      "distortion": "Liquid displacement",
+      "liquidScale": "Liquid wavelength",
+      "direction": "Flow direction",
+      "phase": "Liquid phase"
+    },
+    "choice": {
+      "acid": "Acid",
+      "spectral": "Spectral",
+      "ultraviolet": "Ultraviolet"
+    }
+  },
+  "fr": {
+    "name": "Néon liquide",
+    "parameter": {
+      "threshold": "Seuil des hautes lumières",
+      "knee": "Transition du seuil",
+      "intensity": "Intensité de la lueur",
+      "radius": "Rayon du halo",
+      "tint": "Teinte de la lueur",
+      "glowOnly": "Lueur seule",
+      "palette": "Palette néon",
+      "paletteShift": "Décalage de palette",
+      "contrast": "Contraste du dégradé",
+      "distortion": "Déplacement liquide",
+      "liquidScale": "Longueur des vagues",
+      "direction": "Direction du flux",
+      "phase": "Phase liquide"
+    },
+    "choice": {
+      "acid": "Acide",
+      "spectral": "Spectrale",
+      "ultraviolet": "Ultraviolet"
+    }
+  }
+}

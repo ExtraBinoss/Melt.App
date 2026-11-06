@@ -1,0 +1,23 @@
+{
+  "name": "Profondità di campo",
+  "parameter": {
+    "focusMode": "Modalità di messa a fuoco",
+    "focusX": "Punto di messa a fuoco X",
+    "focusY": "Punto di messa a fuoco Y",
+    "focusDistance": "Distanza di messa a fuoco",
+    "focusRange": "Intervallo di nitidezza",
+    "aperture": "Apertura",
+    "maxBlur": "Sfocatura massima",
+    "blades": "Lamelle del diaframma",
+    "angle": "Orientamento del diaframma",
+    "edgeProtection": "Protezione dei bordi di profondità",
+    "quality": "Qualità del campionamento"
+  },
+  "choice": {
+    "distance": "Distanza dalla fotocamera",
+    "point": "Profondità nativa nel punto",
+    "low": "Bassa (8 campioni)",
+    "medium": "Media (16 campioni)",
+    "high": "Alta (24 campioni)"
+  }
+}

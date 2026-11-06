@@ -1,0 +1,28 @@
+{
+  "name": "撕裂边缘",
+  "parameter": {
+    "technique": "技法",
+    "balance": "色调平衡",
+    "contrast": "对比度",
+    "roughness": "撕裂粗糙度",
+    "textureScale": "纹理大小",
+    "detail": "细纤维",
+    "smoothing": "原图平滑",
+    "tearWidth": "撕裂深度",
+    "edgeWidth": "纸张边缘宽度",
+    "feather": "边缘羽化",
+    "ink": "墨水颜色",
+    "paper": "纸张颜色",
+    "edgeColor": "撕裂边缘颜色",
+    "backgroundOpacity": "纸张不透明度",
+    "sourceColor": "原始颜色",
+    "tearTop": "撕裂顶部",
+    "tearBottom": "撕裂底部",
+    "tearLeft": "撕裂左侧",
+    "tearRight": "撕裂右侧"
+  },
+  "choice": {
+    "graphic": "撕裂图形",
+    "paper": "撕裂纸张轮廓"
+  }
+}

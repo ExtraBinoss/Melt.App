@@ -1,0 +1,23 @@
+{
+  "name": "Scherptediepte",
+  "parameter": {
+    "focusMode": "Scherpstelmodus",
+    "focusX": "Scherpstelpunt X",
+    "focusY": "Scherpstelpunt Y",
+    "focusDistance": "Scherpstelafstand",
+    "focusRange": "Scherptebereik",
+    "aperture": "Diafragma",
+    "maxBlur": "Maximale vervaging",
+    "blades": "Diafragmalamellen",
+    "angle": "Diafragmarichting",
+    "edgeProtection": "Bescherming van diepteranden",
+    "quality": "Bemonsteringskwaliteit"
+  },
+  "choice": {
+    "distance": "Camera-afstand",
+    "point": "Oorspronkelijke diepte op punt",
+    "low": "Laag (8 monsters)",
+    "medium": "Gemiddeld (16 monsters)",
+    "high": "Hoog (24 monsters)"
+  }
+}

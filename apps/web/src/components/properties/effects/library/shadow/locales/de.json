@@ -1,0 +1,9 @@
+{
+  "name": "Schlagschatten",
+  "parameter": {
+    "offsetX": "Horizontaler Versatz",
+    "offsetY": "Vertikaler Versatz",
+    "radius": "Unschärferadius",
+    "shadowColor": "Schattenfarbe"
+  }
+}

@@ -1,5 +1,6 @@
 import { resolveEffectSettings, type Effect } from "@musart/core";
 import type { EffectStage } from "../shared/stages";
+import { progressiveStages } from "./progressive";
 import { blurNode, blurVerticalNode } from "./node";
 import { bilateralNode, boxHorizontalNode, boxVerticalNode, directionalNode } from "./kernels";
 import { lensNode, spinNode, zoomNode } from "./radial";
@@ -23,6 +24,7 @@ const stages: Readonly<Record<string, readonly EffectStage[]>> = Object.freeze({
 /** A bounded set of algorithm-owned graphs, sharing the existing GPU pass/cache owner. */
 export function blurStages(effect: Effect): readonly EffectStage[] {
   const technique = String(resolveEffectSettings(effect).technique);
+  if (technique === "progressive") return progressiveStages(effect);
   if (!Object.hasOwn(stages, technique)) throw new Error("Unknown blur technique.");
   return stages[technique]!;
 }

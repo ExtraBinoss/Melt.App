@@ -1,0 +1,28 @@
+{
+  "name": "Depth Anything V3",
+  "map": "深度图",
+  "prepare": "准备深度…",
+  "regenerate": "重新生成深度…",
+  "hint": "Depth Anything V3 Small · 105 MB，仅需下载一次。下载后将自动生成深度。准备过程通过 WebGPU 在本地运行，在帧之间让出执行时间，并在交互时暂停。播放时使用已保存的深度进行渲染，无需 AI 计算。",
+  "generate": "生成深度",
+  "cancel": "取消",
+  "processing": "正在准备深度",
+  "unsupported": "请选择未锁定的 2D 图像或视频。合成效果无法估算深度。",
+  "parameter": {
+    "strength": "立体感",
+    "angle": "方向",
+    "focus": "固定深度平面",
+    "zoom": "边缘缩放",
+    "view": "显示"
+  },
+  "choice": {
+    "parallax": "视差",
+    "depth": "深度图"
+  },
+  "download": "下载模型",
+  "downloading": "正在下载模型",
+  "completed": "深度已就绪",
+  "close": "关闭",
+  "info": "关于深度准备",
+  "preview": "正在准备视频预览"
+}

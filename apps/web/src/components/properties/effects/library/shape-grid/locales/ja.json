@@ -1,0 +1,27 @@
+{
+  "name": "図形グリッド",
+  "parameter": {
+    "shape": "図形の段階",
+    "cellSize": "セルサイズ",
+    "fill": "図形の塗り",
+    "stroke": "線の幅",
+    "rotation": "グリッドの回転",
+    "contrast": "階調のコントラスト",
+    "colorMode": "カラーモード",
+    "shadowColor": "シャドウの色",
+    "midtoneColor": "中間調の色",
+    "highlightColor": "ハイライトの色",
+    "backgroundColor": "背景色",
+    "backgroundOpacity": "背景の不透明度"
+  },
+  "choice": {
+    "adaptive": "階調に応じた図形",
+    "dots": "ドット",
+    "rings": "リング",
+    "diamonds": "ひし形",
+    "squares": "正方形",
+    "crosses": "十字",
+    "source": "元の色",
+    "palette": "3色パレット"
+  }
+}

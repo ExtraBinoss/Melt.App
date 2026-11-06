@@ -1,0 +1,37 @@
+{
+  "name": "Rauschen",
+  "parameter": {
+    "algorithm": "Algorithmus",
+    "scale": "Zellengröße",
+    "octaves": "Oktaven",
+    "lacunarity": "Frequenzzunahme",
+    "persistence": "Detailstärke",
+    "jitter": "Zellunregelmäßigkeit",
+    "offsetX": "Versatz X",
+    "offsetY": "Versatz Y",
+    "offsetZ": "3D-Schnittebene",
+    "speed": "Entwicklungsgeschwindigkeit",
+    "contrast": "Kontrast",
+    "brightness": "Helligkeit",
+    "gamma": "Gamma",
+    "invert": "Umkehren",
+    "mode": "Rauschen anwenden",
+    "lowColor": "Farbe niedriger Werte",
+    "highColor": "Farbe hoher Werte",
+    "time": "Zeit"
+  },
+  "algorithm": {
+    "perlin": "3D-Perlin",
+    "value": "3D-Werterauschen",
+    "cell": "3D-Zellrauschen",
+    "worley": "3D-Worley",
+    "fbm": "Fraktale brownsche Bewegung",
+    "ridged": "Gratfraktal",
+    "turbulence": "Turbulenz"
+  },
+  "mode": {
+    "replace": "Farbe ersetzen",
+    "add": "Variation hinzufügen",
+    "multiply": "Multiplizieren"
+  }
+}

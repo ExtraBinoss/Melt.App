@@ -1,0 +1,37 @@
+{
+  "name": "噪声",
+  "parameter": {
+    "algorithm": "算法",
+    "scale": "单元大小",
+    "octaves": "倍频层数",
+    "lacunarity": "频率增长率",
+    "persistence": "细节强度",
+    "jitter": "单元不规则度",
+    "offsetX": "X 偏移",
+    "offsetY": "Y 偏移",
+    "offsetZ": "3D 切片",
+    "speed": "演变速度",
+    "contrast": "对比度",
+    "brightness": "亮度",
+    "gamma": "伽马",
+    "invert": "反相",
+    "mode": "噪声应用方式",
+    "lowColor": "低值颜色",
+    "highColor": "高值颜色",
+    "time": "时间"
+  },
+  "algorithm": {
+    "perlin": "3D 柏林噪声",
+    "value": "3D 值噪声",
+    "cell": "3D 单元噪声",
+    "worley": "3D 沃利噪声",
+    "fbm": "分形布朗运动",
+    "ridged": "脊状分形",
+    "turbulence": "湍流"
+  },
+  "mode": {
+    "replace": "替换颜色",
+    "add": "添加变化",
+    "multiply": "正片叠底"
+  }
+}

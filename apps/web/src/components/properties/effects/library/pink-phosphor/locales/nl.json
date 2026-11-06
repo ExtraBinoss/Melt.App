@@ -1,0 +1,21 @@
+{
+  "name": "Roze fosfor",
+  "parameter": {
+    "scale": "Afstand tussen scanlijnen",
+    "exposure": "Belichting",
+    "gamma": "Toongamma",
+    "contrast": "Contrast",
+    "glow": "Gloedsterkte",
+    "glowRadius": "Gloedbereik",
+    "glowThreshold": "Gloeddrempel",
+    "scanlines": "Scanlijnsterkte",
+    "beamWidth": "Bundelbreedte",
+    "grain": "Korrel",
+    "flicker": "Flikkering",
+    "speed": "Evolutiesnelheid",
+    "background": "Schaduwkleur",
+    "phosphor": "Fosforkleur",
+    "highlight": "Hooglichtkleur",
+    "time": "Tijd"
+  }
+}

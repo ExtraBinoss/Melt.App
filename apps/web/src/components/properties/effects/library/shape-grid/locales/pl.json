@@ -1,0 +1,27 @@
+{
+  "name": "Siatka kształtów",
+  "parameter": {
+    "shape": "Skala kształtów",
+    "cellSize": "Rozmiar komórki",
+    "fill": "Wypełnienie kształtów",
+    "stroke": "Grubość obrysu",
+    "rotation": "Obrót siatki",
+    "contrast": "Kontrast tonalny",
+    "colorMode": "Tryb koloru",
+    "shadowColor": "Kolor cieni",
+    "midtoneColor": "Kolor tonów średnich",
+    "highlightColor": "Kolor świateł",
+    "backgroundColor": "Kolor tła",
+    "backgroundOpacity": "Krycie tła"
+  },
+  "choice": {
+    "adaptive": "Adaptacyjna skala tonalna",
+    "dots": "Kropki",
+    "rings": "Pierścienie",
+    "diamonds": "Romby",
+    "squares": "Kwadraty",
+    "crosses": "Krzyże",
+    "source": "Oryginalne kolory",
+    "palette": "Paleta trzech kolorów"
+  }
+}

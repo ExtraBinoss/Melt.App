@@ -1,0 +1,22 @@
+{
+  "name": "섬광",
+  "parameter": {
+    "centerX": "중심 X",
+    "centerY": "중심 Y",
+    "radius": "빛 반경",
+    "softness": "가장자리 부드러움",
+    "falloff": "빛 감쇠",
+    "aspect": "광선 종횡비",
+    "rotation": "광선 회전",
+    "intensity": "빛 강도",
+    "ambient": "주변광",
+    "exposure": "플래시 노출",
+    "highlightCompression": "밝은 영역 압축",
+    "saturation": "채도",
+    "glow": "빛 안개",
+    "grain": "필름 입자",
+    "grainSize": "입자 크기",
+    "lightColor": "빛 색상",
+    "invert": "조명 반전"
+  }
+}

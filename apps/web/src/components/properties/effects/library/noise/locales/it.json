@@ -1,0 +1,37 @@
+{
+  "name": "Rumore",
+  "parameter": {
+    "algorithm": "Algoritmo",
+    "scale": "Dimensione delle celle",
+    "octaves": "Ottave",
+    "lacunarity": "Crescita della frequenza",
+    "persistence": "Intensità dei dettagli",
+    "jitter": "Irregolarità delle celle",
+    "offsetX": "Scostamento X",
+    "offsetY": "Scostamento Y",
+    "offsetZ": "Sezione 3D",
+    "speed": "Velocità di evoluzione",
+    "contrast": "Contrasto",
+    "brightness": "Luminosità",
+    "gamma": "Gamma",
+    "invert": "Inverti",
+    "mode": "Applica rumore",
+    "lowColor": "Colore dei valori bassi",
+    "highColor": "Colore dei valori alti",
+    "time": "Tempo"
+  },
+  "algorithm": {
+    "perlin": "Perlin 3D",
+    "value": "Rumore di valori 3D",
+    "cell": "Celle 3D",
+    "worley": "Worley 3D",
+    "fbm": "Moto browniano frattale",
+    "ridged": "Frattale a creste",
+    "turbulence": "Turbolenza"
+  },
+  "mode": {
+    "replace": "Sostituisci colore",
+    "add": "Aggiungi variazione",
+    "multiply": "Moltiplica"
+  }
+}

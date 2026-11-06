@@ -1,0 +1,221 @@
+[
+  {
+    "type": "edge-detect",
+    "title": "edge-detect: studio-still-life (photo)",
+    "source": "studio-still-life",
+    "scene": "photo",
+    "effect": {
+      "id": "catalog-effect-edge-detect",
+      "type": "edge-detect",
+      "enabled": true,
+      "amount": 1,
+      "scale": 2,
+      "levels": 2,
+      "color": false,
+      "seed": 42
+    },
+    "placement": "layer"
+  },
+  {
+    "type": "window-trails",
+    "title": "window-trails: editorial-portrait (photo)",
+    "source": "editorial-portrait",
+    "scene": "photo",
+    "effect": {
+      "id": "catalog-effect-window-trails",
+      "type": "window-trails",
+      "enabled": true,
+      "amount": 1,
+      "scale": 12,
+      "levels": 2,
+      "color": false,
+      "seed": 42,
+      "time": 2.8,
+      "settings": {
+        "count": 7,
+        "width": 83,
+        "height": 64,
+        "titleHeight": 9,
+        "border": 1,
+        "entranceDelay": 0,
+        "radiusX": 0.26,
+        "radiusY": 0.25,
+        "showSource": false
+      }
+    },
+    "placement": "layer"
+  },
+  {
+    "type": "bevel",
+    "title": "bevel: studio-still-life (photo)",
+    "source": "studio-still-life",
+    "scene": "photo",
+    "effect": {
+      "id": "catalog-effect-bevel",
+      "type": "bevel",
+      "enabled": true,
+      "amount": 1,
+      "scale": 2,
+      "levels": 2,
+      "color": false,
+      "seed": 42,
+      "settings": {
+        "size": 7,
+        "depth": 7,
+        "gloss": 18,
+        "ambient": 0.62
+      }
+    },
+    "placement": "layer"
+  },
+  {
+    "type": "displace",
+    "title": "displace: alpine-lake (photo)",
+    "source": "alpine-lake",
+    "scene": "photo",
+    "effect": {
+      "id": "catalog-effect-displace",
+      "type": "displace",
+      "enabled": true,
+      "amount": 1,
+      "scale": 2,
+      "levels": 2,
+      "color": false,
+      "seed": 42,
+      "time": 0,
+      "inputs": {
+        "map": "catalog-displacement"
+      },
+      "settings": {
+        "strengthX": 28,
+        "strengthY": 17,
+        "dispersion": 0.18
+      }
+    },
+    "placement": "layer"
+  },
+  {
+    "type": "thermal",
+    "title": "thermal: editorial-portrait (photo)",
+    "source": "editorial-portrait",
+    "scene": "photo",
+    "effect": {
+      "id": "catalog-effect-thermal",
+      "type": "thermal",
+      "enabled": true,
+      "amount": 1,
+      "scale": 2,
+      "levels": 2,
+      "color": false,
+      "seed": 42,
+      "time": 0,
+      "settings": {
+        "palette": "rainbow",
+        "gain": 1.1,
+        "edges": 0.25
+      }
+    },
+    "placement": "layer"
+  },
+  {
+    "type": "dither",
+    "title": "dither: editorial-portrait (photo)",
+    "source": "editorial-portrait",
+    "scene": "photo",
+    "effect": {
+      "id": "catalog-effect-dither",
+      "type": "dither",
+      "enabled": true,
+      "amount": 1,
+      "scale": 3,
+      "levels": 4,
+      "color": true,
+      "seed": 42
+    },
+    "placement": "layer"
+  },
+  {
+    "type": "ascii",
+    "title": "ascii: editorial-portrait (photo)",
+    "source": "editorial-portrait",
+    "scene": "photo",
+    "effect": {
+      "id": "catalog-effect-ascii",
+      "type": "ascii",
+      "enabled": true,
+      "amount": 1,
+      "scale": 5,
+      "levels": 10,
+      "color": true,
+      "seed": 42,
+      "settings": {
+        "characters": " .,:;+tfLCG08M@#",
+        "brightness": 0,
+        "contrast": 1.15,
+        "gamma": 1,
+        "palette": "solid",
+        "foreground": "#a8e3c2",
+        "background": "#091611",
+        "gradientEnd": "#8b5cf6",
+        "gradientAngle": 0,
+        "shades": 16,
+        "invert": false,
+        "cellAspect": 0.65,
+        "glyphScale": 1,
+        "weight": 0.5
+      }
+    },
+    "placement": "layer"
+  },
+  {
+    "type": "brightness",
+    "title": "brightness: editorial-portrait (photo)",
+    "source": "editorial-portrait",
+    "scene": "photo",
+    "effect": {
+      "id": "catalog-effect-brightness",
+      "type": "brightness",
+      "enabled": true,
+      "amount": 0.63,
+      "scale": 2,
+      "levels": 2,
+      "color": false,
+      "seed": 42
+    },
+    "placement": "layer"
+  },
+  {
+    "type": "contrast",
+    "title": "contrast: editorial-portrait (photo)",
+    "source": "editorial-portrait",
+    "scene": "photo",
+    "effect": {
+      "id": "catalog-effect-contrast",
+      "type": "contrast",
+      "enabled": true,
+      "amount": 0.78,
+      "scale": 2,
+      "levels": 2,
+      "color": false,
+      "seed": 42
+    },
+    "placement": "layer"
+  },
+  {
+    "type": "grayscale",
+    "title": "grayscale: editorial-portrait (photo)",
+    "source": "editorial-portrait",
+    "scene": "photo",
+    "effect": {
+      "id": "catalog-effect-grayscale",
+      "type": "grayscale",
+      "enabled": true,
+      "amount": 1,
+      "scale": 2,
+      "levels": 2,
+      "color": false,
+      "seed": 42
+    },
+    "placement": "layer"
+  }
+]

@@ -1,0 +1,27 @@
+{
+  "name": "شبكة أشكال",
+  "parameter": {
+    "shape": "تدرج الأشكال",
+    "cellSize": "حجم الخلية",
+    "fill": "تعبئة الأشكال",
+    "stroke": "عرض الحدود",
+    "rotation": "دوران الشبكة",
+    "contrast": "تباين الدرجات اللونية",
+    "colorMode": "نمط الألوان",
+    "shadowColor": "لون الظلال",
+    "midtoneColor": "لون الدرجات المتوسطة",
+    "highlightColor": "لون المناطق الساطعة",
+    "backgroundColor": "لون الخلفية",
+    "backgroundOpacity": "عتامة الخلفية"
+  },
+  "choice": {
+    "adaptive": "تدرج لوني تكيفي",
+    "dots": "نقاط",
+    "rings": "حلقات",
+    "diamonds": "معينات",
+    "squares": "مربعات",
+    "crosses": "صلبان",
+    "source": "الألوان الأصلية",
+    "palette": "لوحة من ثلاثة ألوان"
+  }
+}

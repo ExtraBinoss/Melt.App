@@ -1,0 +1,13 @@
+{
+  "name": "رسم زيتي",
+  "parameter": {
+    "brushScale": "حجم الفرشاة",
+    "elongation": "استطالة الفرشاة",
+    "directionality": "اتجاه الفرشاة الشعاعي",
+    "edgePreservation": "الحفاظ على الحواف",
+    "detail": "التفاصيل الأصلية",
+    "centerX": "مركز الفرشاة X",
+    "centerY": "مركز الفرشاة Y",
+    "angle": "زاوية الفرشاة"
+  }
+}

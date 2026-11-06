@@ -1,0 +1,11 @@
+{
+  "name": "Poświata",
+  "parameter": {
+    "threshold": "Próg świateł",
+    "knee": "Miękki próg",
+    "intensity": "Intensywność poświaty",
+    "radius": "Promień aureoli",
+    "tint": "Odcień poświaty",
+    "glowOnly": "Tylko poświata"
+  }
+}

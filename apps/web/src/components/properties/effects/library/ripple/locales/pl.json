@@ -1,0 +1,22 @@
+{
+  "name": "Żywe fale",
+  "parameter": {
+    "centerX": "Środek X",
+    "centerY": "Środek Y",
+    "innerRadius": "Chroniony promień",
+    "radius": "Zasięg",
+    "feather": "Zmiękczenie krawędzi",
+    "falloff": "Zanikanie z odległością",
+    "amplitude": "Przemieszczenie",
+    "wavelength": "Długość fali",
+    "speed": "Prędkość fali",
+    "phase": "Faza",
+    "direction": "Kierunek",
+    "dispersion": "Rozszczepienie kolorów",
+    "time": "Czas"
+  },
+  "direction": {
+    "outward": "Na zewnątrz",
+    "inward": "Do wewnątrz"
+  }
+}

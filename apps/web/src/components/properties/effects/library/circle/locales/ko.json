@@ -1,0 +1,19 @@
+{
+  "name": "원",
+  "parameter": {
+    "spacing": "셀 간격",
+    "rotation": "망점 각도",
+    "dotSize": "점 크기",
+    "softness": "가장자리 부드러움",
+    "gamma": "명암 감마",
+    "polarity": "점 극성",
+    "foreground": "잉크 색상",
+    "background": "종이 색상",
+    "foregroundOpacity": "잉크 불투명도",
+    "backgroundOpacity": "종이 불투명도"
+  },
+  "polarity": {
+    "shadows": "어두운 영역에 점",
+    "highlights": "밝은 영역에 점"
+  }
+}

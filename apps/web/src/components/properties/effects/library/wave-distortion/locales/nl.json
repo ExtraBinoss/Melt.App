@@ -1,0 +1,21 @@
+{
+  "name": "Golfvervorming",
+  "parameter": {
+    "waveform": "Golfvorm",
+    "amplitude": "Amplitude",
+    "frequency": "Cycli per kortste zijde",
+    "angle": "Voortplantingshoek",
+    "phase": "Fase",
+    "edge": "Bronranden"
+  },
+  "choice": {
+    "sine": "Sinus",
+    "triangle": "Driehoek",
+    "square": "Blokgolf",
+    "sawtooth": "Zaagtand",
+    "transparent": "Transparant",
+    "mirror": "Spiegelen",
+    "repeat": "Herhalen",
+    "clamp": "Randen doortrekken"
+  }
+}

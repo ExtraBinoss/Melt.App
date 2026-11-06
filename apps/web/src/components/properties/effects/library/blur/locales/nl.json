@@ -1,0 +1,35 @@
+{
+  "name": "Vervaging",
+  "parameter": {
+    "technique": "Techniek",
+    "angle": "Richtingshoek",
+    "centerX": "Midden X",
+    "centerY": "Midden Y",
+    "spinAngle": "Draaihoek",
+    "zoomStrength": "Zoomsterkte",
+    "apertureBlades": "Diafragmalamellen",
+    "apertureRotation": "Diafragmarotatie",
+    "rangeSigma": "Kleurtolerantie",
+    "protect": "Midden beschermen",
+    "protectedRadius": "Beschermde straal",
+    "feather": "Zachte beschermingsrand",
+    "gradientShape": "Verloopvorm",
+    "gradientStart": "Begin van verloop",
+    "gradientEnd": "Einde van verloop",
+    "gradientPower": "Progressiecurve",
+    "gradientInvert": "Progressie omkeren"
+  },
+  "choice": {
+    "gaussian": "Gaussisch",
+    "box": "Gemiddelde",
+    "directional": "Gericht",
+    "spin": "Draaiing",
+    "zoom": "Zoom",
+    "lens": "Lens (bokeh)",
+    "bilateral": "Bilateraal",
+    "progressive": "Progressief",
+    "linear": "Lineair",
+    "radial": "Radiaal",
+    "band": "Scherpe strook"
+  }
+}

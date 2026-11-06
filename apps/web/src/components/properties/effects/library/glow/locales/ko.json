@@ -1,0 +1,11 @@
+{
+  "name": "광채",
+  "parameter": {
+    "threshold": "밝은 영역 임계값",
+    "knee": "부드러운 임계값",
+    "intensity": "광채 강도",
+    "radius": "빛무리 반경",
+    "tint": "광채 색조",
+    "glowOnly": "광채만 표시"
+  }
+}

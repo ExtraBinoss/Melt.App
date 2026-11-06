@@ -66,7 +66,9 @@ it("uses distinct bounded algorithm graphs and the preserved original for final 
   for (const technique of BLUR_TECHNIQUES) {
     const effect = createEffect("blur", { settings: { technique, protect: true } });
     const stages = effectStages(effect);
-    expect(stages.length).toBe(technique === "gaussian" || technique === "box" ? 2 : 1);
+    expect(stages.length).toBe(
+      technique === "progressive" ? 4 : technique === "gaussian" || technique === "box" ? 2 : 1,
+    );
     expect(stages.at(-1)!.final).toBe(true);
     expect(keys.has(stages.at(-1)!.key)).toBe(false);
     keys.add(stages.at(-1)!.key);

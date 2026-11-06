@@ -1,0 +1,13 @@
+{
+  "name": "유화",
+  "parameter": {
+    "brushScale": "브러시 크기",
+    "elongation": "브러시 늘이기",
+    "directionality": "방사형 브러시 방향",
+    "edgePreservation": "가장자리 보존",
+    "detail": "원본 세부 묘사",
+    "centerX": "브러시 중심 X",
+    "centerY": "브러시 중심 Y",
+    "angle": "브러시 각도"
+  }
+}

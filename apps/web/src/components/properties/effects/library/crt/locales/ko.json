@@ -1,0 +1,40 @@
+{
+  "name": "CRT",
+  "mask": {
+    "aperture": "애퍼처 그릴",
+    "shadow": "섀도 마스크",
+    "slot": "슬롯 마스크"
+  },
+  "parameter": {
+    "scale": "형광체 피치",
+    "mask": "형광체 마스크",
+    "maskStrength": "마스크 강도",
+    "maskGap": "형광체 간격",
+    "scanlineStrength": "주사선 강도",
+    "scanlinePitch": "주사선 간격",
+    "scanlineWidth": "빔 너비",
+    "scanlinePhase": "주사선 위상",
+    "curvatureX": "가로 곡률",
+    "curvatureY": "세로 곡률",
+    "zoom": "화면 확대",
+    "convergence": "색상 수렴 오차",
+    "glow": "형광체 발광",
+    "glowRadius": "발광 반경",
+    "brightness": "밝기",
+    "contrast": "대비",
+    "saturation": "채도",
+    "tintColor": "화면 색조",
+    "vignette": "비네팅",
+    "roundness": "화면 모서리",
+    "borderSoftness": "화면 가장자리 부드러움",
+    "bezelColor": "베젤 색상",
+    "noise": "신호 잡음",
+    "jitter": "주사선 흔들림",
+    "flicker": "깜박임 강도",
+    "flickerRate": "깜박임 빈도",
+    "rollingBar": "이동 막대 강도",
+    "rollingSpeed": "이동 막대 속도",
+    "cutout": "화면 가장자리 투명화",
+    "time": "시간"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "name": "Ölmalerei",
+  "parameter": {
+    "brushScale": "Pinselgröße",
+    "elongation": "Pinselstreckung",
+    "directionality": "Radiale Pinselrichtung",
+    "edgePreservation": "Kantenerhaltung",
+    "detail": "Originaldetails",
+    "centerX": "Pinselzentrum X",
+    "centerY": "Pinselzentrum Y",
+    "angle": "Pinselwinkel"
+  }
+}

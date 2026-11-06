@@ -1,0 +1,27 @@
+{
+  "actions": "操作",
+  "enabled": "有効",
+  "resetAll": "エフェクトの全パラメーターをリセット",
+  "playLive": "ライブ再生",
+  "pauseLive": "ライブ再生を一時停止",
+  "liveTime": "表示中の位相",
+  "seed": "シード",
+  "falloff": "減衰",
+  "composite": "アルファ合成",
+  "replacement": "エフェクトで置換（既定）",
+  "operation": {
+    "source-over": "ソースを上に合成",
+    "destination-over": "合成先を上に合成",
+    "source-in": "ソースと合成先の内側",
+    "destination-in": "合成先とソースの内側",
+    "source-out": "ソースの合成先外部",
+    "destination-out": "合成先のソース外部",
+    "source-atop": "合成先の範囲にソースを重ねる",
+    "destination-atop": "ソースの範囲に合成先を重ねる",
+    "xor": "重なりを除外",
+    "copy": "ソースのみ",
+    "destination": "合成先のみ",
+    "clear": "クリア",
+    "lighter": "ソースと合成先を加算"
+  }
+}

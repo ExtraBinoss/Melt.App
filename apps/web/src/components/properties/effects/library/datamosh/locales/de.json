@@ -1,0 +1,16 @@
+{
+  "name": "Datamosh · Blockschlieren",
+  "parameter": {
+    "blockSize": "Makroblockgröße",
+    "density": "Betroffene Blöcke",
+    "displacement": "Blockverschiebung",
+    "direction": "Verschiebungsrichtung",
+    "angleVariation": "Richtungsvariation",
+    "coherence": "Zeilenkohärenz",
+    "smear": "Räumliches Verschmieren",
+    "chromaShift": "Farbausbluten",
+    "levels": "Farbstufen",
+    "rate": "Musterrate",
+    "time": "Musterzeit"
+  }
+}

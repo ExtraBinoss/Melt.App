@@ -1,0 +1,21 @@
+{
+  "name": "波形ディストーション",
+  "parameter": {
+    "waveform": "波形",
+    "amplitude": "振幅",
+    "frequency": "短辺あたりの周期数",
+    "angle": "伝播角度",
+    "phase": "位相",
+    "edge": "元画像の端"
+  },
+  "choice": {
+    "sine": "正弦波",
+    "triangle": "三角波",
+    "square": "矩形波",
+    "sawtooth": "のこぎり波",
+    "transparent": "透明",
+    "mirror": "ミラー",
+    "repeat": "繰り返し",
+    "clamp": "端を引き伸ばす"
+  }
+}

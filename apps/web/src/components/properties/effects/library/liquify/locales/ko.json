@@ -1,0 +1,22 @@
+{
+  "name": "유동화",
+  "parameter": {
+    "brushMode": "브러시 모드",
+    "brushRadius": "브러시 반경",
+    "brushStrength": "브러시 강도",
+    "brushHardness": "브러시 경도",
+    "stylusPressure": "펜 압력 사용"
+  },
+  "choice": {
+    "push": "밀기",
+    "pinch": "오목하게",
+    "bloat": "볼록하게",
+    "twirl-cw": "시계 방향 소용돌이",
+    "twirl-ccw": "반시계 방향 소용돌이",
+    "restore": "복원"
+  },
+  "brushHint": "둥근 브러시로 레이어에 그리세요. Escape는 현재 획을 취소하고, 실행 취소는 이전 변형을 복원합니다. 획을 그리는 중이 아닐 때 Escape를 누르면 그리기를 종료합니다.",
+  "clear": "변형 초기화",
+  "capacity": "이 유동화 효과의 브러시 용량이 한도에 도달했습니다. 변형을 실행 취소하거나 초기화하거나, 다른 유동화 효과를 추가하세요.",
+  "spatialHint": "2D 레이어 또는 병합된 컴포지션에 그리세요."
+}

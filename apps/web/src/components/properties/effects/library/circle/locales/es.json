@@ -1,0 +1,19 @@
+{
+  "name": "Círculos",
+  "parameter": {
+    "spacing": "Espaciado de celdas",
+    "rotation": "Ángulo de trama",
+    "dotSize": "Tamaño de punto",
+    "softness": "Suavidad del borde",
+    "gamma": "Gamma tonal",
+    "polarity": "Polaridad de los puntos",
+    "foreground": "Color de tinta",
+    "background": "Color del papel",
+    "foregroundOpacity": "Opacidad de la tinta",
+    "backgroundOpacity": "Opacidad del papel"
+  },
+  "polarity": {
+    "shadows": "Puntos en las sombras",
+    "highlights": "Puntos en las luces altas"
+  }
+}

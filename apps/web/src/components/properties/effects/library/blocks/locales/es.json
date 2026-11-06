@@ -1,0 +1,17 @@
+{
+  "name": "Bloques",
+  "parameter": {
+    "scale": "Espaciado entre tetones",
+    "centerX": "Centro X de la cuadrícula",
+    "centerY": "Centro Y de la cuadrícula",
+    "angle": "Dirección de los bloques",
+    "stagger": "Escalonar filas",
+    "gap": "Separación entre bloques",
+    "relief": "Relieve elevado del plástico",
+    "lightAngle": "Dirección de la luz",
+    "variation": "Variación del color de los bloques",
+    "studRadius": "Radio de los tetones",
+    "studHeight": "Altura de los tetones",
+    "paletteLevels": "Niveles de color (0 = fuente)"
+  }
+}

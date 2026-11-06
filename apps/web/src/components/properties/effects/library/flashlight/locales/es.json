@@ -1,0 +1,22 @@
+{
+  "name": "Destello de luz",
+  "parameter": {
+    "centerX": "Centro X",
+    "centerY": "Centro Y",
+    "radius": "Radio de la luz",
+    "softness": "Suavidad del borde",
+    "falloff": "Atenuación de la luz",
+    "aspect": "Proporción del haz",
+    "rotation": "Rotación del haz",
+    "intensity": "Intensidad de la luz",
+    "ambient": "Luz ambiental",
+    "exposure": "Exposición del flash",
+    "highlightCompression": "Compresión de las luces altas",
+    "saturation": "Saturación",
+    "glow": "Neblina luminosa",
+    "grain": "Grano de película",
+    "grainSize": "Tamaño del grano",
+    "lightColor": "Color de la luz",
+    "invert": "Invertir iluminación"
+  }
+}

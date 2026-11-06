@@ -1,0 +1,27 @@
+{
+  "name": "Griglia di forme",
+  "parameter": {
+    "shape": "Scala di forme",
+    "cellSize": "Dimensione delle celle",
+    "fill": "Riempimento delle forme",
+    "stroke": "Spessore del contorno",
+    "rotation": "Rotazione della griglia",
+    "contrast": "Contrasto tonale",
+    "colorMode": "Modalità colore",
+    "shadowColor": "Colore delle ombre",
+    "midtoneColor": "Colore dei mezzitoni",
+    "highlightColor": "Colore delle alte luci",
+    "backgroundColor": "Colore dello sfondo",
+    "backgroundOpacity": "Opacità dello sfondo"
+  },
+  "choice": {
+    "adaptive": "Scala tonale adattiva",
+    "dots": "Punti",
+    "rings": "Anelli",
+    "diamonds": "Rombi",
+    "squares": "Quadrati",
+    "crosses": "Croci",
+    "source": "Colori originali",
+    "palette": "Tavolozza a tre colori"
+  }
+}

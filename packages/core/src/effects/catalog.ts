@@ -1,3 +1,9 @@
+import { GLOW_DEFINITION } from "./glow/definition";
+import { NEON_MELT_DEFINITION } from "./neon-melt/definition";
+import { REPEATER_DEFINITION } from "./repeater/definition";
+import { WAVE_DISTORTION_DEFINITION } from "./wave-distortion/definition";
+import { SHAPE_GRID_DEFINITION } from "./shape-grid/definition";
+import { WATERCOLOR_DEFINITION } from "./watercolor/definition";
 import { DEPTH_ANYTHING_DEFINITION } from "./depth-anything/definition";
 import { DEPTH_OF_FIELD_DEFINITION } from "./depth-of-field/definition";
 import { TRAIL_DEFINITION } from "./trail/definition";
@@ -54,6 +60,12 @@ import { ASCII_DEFINITION } from "./ascii/definition";
 import { DITHER_DEFINITION } from "./dither/definition";
 /** Portable effect metadata shared by factories, validation and client controls. */
 const BUILTIN_EFFECTS: Readonly<Record<EffectType, EffectDefinition>> = Object.freeze({
+  glow: GLOW_DEFINITION,
+  "neon-melt": NEON_MELT_DEFINITION,
+  repeater: REPEATER_DEFINITION,
+  "wave-distortion": WAVE_DISTORTION_DEFINITION,
+  "shape-grid": SHAPE_GRID_DEFINITION,
+  watercolor: WATERCOLOR_DEFINITION,
   "depth-anything": DEPTH_ANYTHING_DEFINITION,
   "depth-of-field": DEPTH_OF_FIELD_DEFINITION,
   trail: TRAIL_DEFINITION,

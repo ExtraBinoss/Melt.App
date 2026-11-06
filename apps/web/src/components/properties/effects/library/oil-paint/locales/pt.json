@@ -1,0 +1,13 @@
+{
+  "name": "Pintura a óleo",
+  "parameter": {
+    "brushScale": "Escala do pincel",
+    "elongation": "Alongamento do pincel",
+    "directionality": "Direção radial do pincel",
+    "edgePreservation": "Preservação das bordas",
+    "detail": "Detalhe original",
+    "centerX": "Centro do pincel X",
+    "centerY": "Centro do pincel Y",
+    "angle": "Ângulo do pincel"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "name": "Eénbits-dithering",
+  "parameter": {
+    "method": "Methode",
+    "scale": "Celgrootte",
+    "threshold": "Drempelwaarde",
+    "strength": "Dithersterkte",
+    "contrast": "Contrast",
+    "gamma": "Toongamma",
+    "invert": "Omkeren",
+    "foreground": "Inktkleur",
+    "background": "Papierkleur",
+    "sourceColor": "Bronkleuren"
+  },
+  "method": {
+    "threshold": "Vaste drempelwaarde",
+    "bayer2": "Bayer 2×2",
+    "bayer4": "Bayer 4×4",
+    "bayer8": "Bayer 8×8",
+    "interleaved": "Verweven gradiëntruis",
+    "multilevel": "Bayer met meerdere niveaus"
+  }
+}

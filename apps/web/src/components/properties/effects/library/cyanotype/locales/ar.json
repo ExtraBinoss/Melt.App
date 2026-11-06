@@ -1,0 +1,23 @@
+{
+  "name": "طباعة زرقاء",
+  "parameter": {
+    "exposure": "تعريض الطباعة",
+    "contrast": "التباين",
+    "gamma": "الدرجات المتوسطة",
+    "density": "كثافة الأزرق",
+    "blackPoint": "النقطة السوداء",
+    "whitePoint": "النقطة البيضاء",
+    "invert": "صورة سلبية",
+    "inkColor": "حبر أزرق",
+    "paperColor": "لون الورق",
+    "wash": "تلاشي الغسل",
+    "unevenness": "طلاء غير متجانس",
+    "textureScale": "مقياس الطلاء",
+    "paperGrain": "حبيبات الورق",
+    "grainScale": "حجم الحبيبات",
+    "fibers": "ألياف الورق",
+    "fiberScale": "حجم الألياف",
+    "edgeFade": "حواف باهتة",
+    "edgeWidth": "عرض الحافة"
+  }
+}

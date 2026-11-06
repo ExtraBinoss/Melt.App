@@ -1,0 +1,12 @@
+{
+  "title": "Position & area",
+  "position": "Position",
+  "positionHelp": "Drag to position. Arrow keys move; Shift moves farther.",
+  "domainEnabled": "Local area",
+  "domainX": "Position X",
+  "domainY": "Position Y",
+  "domainAngle": "Area direction",
+  "domainRadius": "Radius",
+  "domainAspect": "Aspect",
+  "domainFeather": "Feather"
+}

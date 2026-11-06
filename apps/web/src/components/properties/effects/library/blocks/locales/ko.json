@@ -1,0 +1,17 @@
+{
+  "name": "블록",
+  "parameter": {
+    "scale": "돌기 간격",
+    "centerX": "격자 중심 X",
+    "centerY": "격자 중심 Y",
+    "angle": "블록 방향",
+    "stagger": "행 엇갈리기",
+    "gap": "블록 간격",
+    "relief": "플라스틱 양각",
+    "lightAngle": "빛 방향",
+    "variation": "블록 색상 변화",
+    "studRadius": "돌기 반경",
+    "studHeight": "돌기 높이",
+    "paletteLevels": "색상 단계 수 (0 = 원본)"
+  }
+}

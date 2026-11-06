@@ -1,0 +1,16 @@
+{
+  "name": "Wind",
+  "parameter": {
+    "centerX": "Veldmidden X",
+    "centerY": "Veldmidden Y",
+    "angle": "Windrichting",
+    "length": "Streeplengte",
+    "bandSize": "Bandbreedte",
+    "variation": "Bandvariatie",
+    "gust": "Windvlaagsterkte",
+    "speed": "Windvlaagsnelheid",
+    "phase": "Fase",
+    "sourceMix": "Oorspronkelijk detail",
+    "time": "Tijd"
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "name": "تمويه",
+  "parameter": {
+    "technique": "التقنية",
+    "angle": "زاوية الاتجاه",
+    "centerX": "المركز X",
+    "centerY": "المركز Y",
+    "spinAngle": "زاوية الدوران",
+    "zoomStrength": "شدة التكبير",
+    "apertureBlades": "شفرات فتحة العدسة",
+    "apertureRotation": "دوران فتحة العدسة",
+    "rangeSigma": "تسامح الألوان",
+    "protect": "حماية المركز",
+    "protectedRadius": "نصف قطر الحماية",
+    "feather": "تنعيم حواف الحماية",
+    "gradientShape": "شكل التدرج",
+    "gradientStart": "بداية التدرج",
+    "gradientEnd": "نهاية التدرج",
+    "gradientPower": "منحنى التدرج",
+    "gradientInvert": "عكس التدرج"
+  },
+  "choice": {
+    "gaussian": "غاوسي",
+    "box": "متوسط",
+    "directional": "اتجاهي",
+    "spin": "دوران",
+    "zoom": "تكبير",
+    "lens": "عدسة (بوكيه)",
+    "bilateral": "ثنائي الجانب",
+    "progressive": "تدريجي",
+    "linear": "خطي",
+    "radial": "شعاعي",
+    "band": "شريط حاد"
+  }
+}

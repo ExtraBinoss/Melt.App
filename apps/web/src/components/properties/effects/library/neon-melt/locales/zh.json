@@ -1,0 +1,23 @@
+{
+  "name": "液态霓虹",
+  "parameter": {
+    "threshold": "高光阈值",
+    "knee": "柔和阈值",
+    "intensity": "辉光强度",
+    "radius": "光晕半径",
+    "tint": "辉光色调",
+    "glowOnly": "仅辉光",
+    "palette": "霓虹调色板",
+    "paletteShift": "调色板偏移",
+    "contrast": "重映射对比度",
+    "distortion": "液体位移",
+    "liquidScale": "液体波长",
+    "direction": "流动方向",
+    "phase": "液体相位"
+  },
+  "choice": {
+    "acid": "酸性色",
+    "spectral": "光谱色",
+    "ultraviolet": "紫外色"
+  }
+}

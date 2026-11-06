@@ -1,0 +1,16 @@
+{
+  "name": "Datamosh · Blokvegen",
+  "parameter": {
+    "blockSize": "Macroblokgrootte",
+    "density": "Aangetaste blokken",
+    "displacement": "Blokverschuiving",
+    "direction": "Verschuivingsrichting",
+    "angleVariation": "Richtingsvariatie",
+    "coherence": "Rijcoherentie",
+    "smear": "Ruimtelijke uitsmering",
+    "chromaShift": "Kleuruitvloeiing",
+    "levels": "Kleurniveaus",
+    "rate": "Patroonfrequentie",
+    "time": "Patroontijd"
+  }
+}

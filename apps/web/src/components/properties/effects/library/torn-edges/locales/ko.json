@@ -1,0 +1,28 @@
+{
+  "name": "찢어진 가장자리",
+  "parameter": {
+    "technique": "기법",
+    "balance": "색조 균형",
+    "contrast": "대비",
+    "roughness": "찢김의 거칠기",
+    "textureScale": "텍스처 크기",
+    "detail": "미세 섬유",
+    "smoothing": "원본 부드럽게 하기",
+    "tearWidth": "찢김 깊이",
+    "edgeWidth": "종이 가장자리 너비",
+    "feather": "가장자리 부드러움",
+    "ink": "잉크 색상",
+    "paper": "종이 색상",
+    "edgeColor": "찢어진 가장자리 색상",
+    "backgroundOpacity": "종이 불투명도",
+    "sourceColor": "원본 색상",
+    "tearTop": "위쪽 찢기",
+    "tearBottom": "아래쪽 찢기",
+    "tearLeft": "왼쪽 찢기",
+    "tearRight": "오른쪽 찢기"
+  },
+  "choice": {
+    "graphic": "찢어진 그래픽",
+    "paper": "찢어진 종이 실루엣"
+  }
+}

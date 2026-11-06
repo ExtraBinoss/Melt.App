@@ -1,0 +1,23 @@
+{
+  "name": "Neon liquido",
+  "parameter": {
+    "threshold": "Soglia delle alte luci",
+    "knee": "Soglia morbida",
+    "intensity": "Intensità del bagliore",
+    "radius": "Raggio dell’alone",
+    "tint": "Tinta del bagliore",
+    "glowOnly": "Solo bagliore",
+    "palette": "Tavolozza neon",
+    "paletteShift": "Scostamento della tavolozza",
+    "contrast": "Contrasto della rimappatura",
+    "distortion": "Spostamento liquido",
+    "liquidScale": "Lunghezza d’onda del liquido",
+    "direction": "Direzione del flusso",
+    "phase": "Fase del liquido"
+  },
+  "choice": {
+    "acid": "Acida",
+    "spectral": "Spettrale",
+    "ultraviolet": "Ultravioletta"
+  }
+}

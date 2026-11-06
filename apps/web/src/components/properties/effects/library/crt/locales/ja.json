@@ -1,0 +1,40 @@
+{
+  "name": "CRT",
+  "mask": {
+    "aperture": "アパーチャーグリル",
+    "shadow": "シャドウマスク",
+    "slot": "スロットマスク"
+  },
+  "parameter": {
+    "scale": "蛍光体ピッチ",
+    "mask": "蛍光体マスク",
+    "maskStrength": "マスクの強さ",
+    "maskGap": "蛍光体の間隔",
+    "scanlineStrength": "走査線の強さ",
+    "scanlinePitch": "走査線の間隔",
+    "scanlineWidth": "ビーム幅",
+    "scanlinePhase": "走査線の位相",
+    "curvatureX": "水平方向の湾曲",
+    "curvatureY": "垂直方向の湾曲",
+    "zoom": "画面のズーム",
+    "convergence": "色のコンバージェンスずれ",
+    "glow": "蛍光体の発光",
+    "glowRadius": "発光の半径",
+    "brightness": "明るさ",
+    "contrast": "コントラスト",
+    "saturation": "彩度",
+    "tintColor": "画面の色合い",
+    "vignette": "周辺減光",
+    "roundness": "画面の角",
+    "borderSoftness": "画面端の柔らかさ",
+    "bezelColor": "ベゼルの色",
+    "noise": "信号ノイズ",
+    "jitter": "走査線の揺らぎ",
+    "flicker": "ちらつきの強さ",
+    "flickerRate": "ちらつきの周波数",
+    "rollingBar": "ローリングバーの強さ",
+    "rollingSpeed": "ローリングバーの速度",
+    "cutout": "画面端を透明にする",
+    "time": "時間"
+  }
+}

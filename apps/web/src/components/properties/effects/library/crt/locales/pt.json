@@ -1,0 +1,40 @@
+{
+  "name": "CRT",
+  "mask": {
+    "aperture": "Grelha de abertura",
+    "shadow": "Máscara de sombra",
+    "slot": "Máscara de ranhuras"
+  },
+  "parameter": {
+    "scale": "Passo do fósforo",
+    "mask": "Máscara de fósforo",
+    "maskStrength": "Intensidade da máscara",
+    "maskGap": "Espaçamento do fósforo",
+    "scanlineStrength": "Intensidade das linhas de varrimento",
+    "scanlinePitch": "Espaçamento das linhas de varrimento",
+    "scanlineWidth": "Largura do feixe",
+    "scanlinePhase": "Fase das linhas de varrimento",
+    "curvatureX": "Curvatura horizontal",
+    "curvatureY": "Curvatura vertical",
+    "zoom": "Zoom do ecrã",
+    "convergence": "Desconvergência de cores",
+    "glow": "Brilho do fósforo",
+    "glowRadius": "Raio do brilho",
+    "brightness": "Luminosidade",
+    "contrast": "Contraste",
+    "saturation": "Saturação",
+    "tintColor": "Tonalidade do ecrã",
+    "vignette": "Vinheta",
+    "roundness": "Cantos do ecrã",
+    "borderSoftness": "Suavidade da borda do ecrã",
+    "bezelColor": "Cor da moldura",
+    "noise": "Ruído do sinal",
+    "jitter": "Instabilidade das linhas",
+    "flicker": "Intensidade da cintilação",
+    "flickerRate": "Frequência da cintilação",
+    "rollingBar": "Intensidade da faixa móvel",
+    "rollingSpeed": "Velocidade da faixa móvel",
+    "cutout": "Bordas do ecrã transparentes",
+    "time": "Tempo"
+  }
+}

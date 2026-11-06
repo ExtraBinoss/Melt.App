@@ -1,0 +1,22 @@
+{
+  "name": "動く波紋",
+  "parameter": {
+    "centerX": "中心 X",
+    "centerY": "中心 Y",
+    "innerRadius": "保護する半径",
+    "radius": "到達範囲",
+    "feather": "端のぼかし",
+    "falloff": "距離による減衰",
+    "amplitude": "変位",
+    "wavelength": "波長",
+    "speed": "波の速度",
+    "phase": "位相",
+    "direction": "方向",
+    "dispersion": "色分散",
+    "time": "時間"
+  },
+  "direction": {
+    "outward": "外向き",
+    "inward": "内向き"
+  }
+}

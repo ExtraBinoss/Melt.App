@@ -1,0 +1,23 @@
+{
+  "name": "Cianotipia",
+  "parameter": {
+    "exposure": "Exposición de la copia",
+    "contrast": "Contraste",
+    "gamma": "Tonos medios",
+    "density": "Densidad del azul",
+    "blackPoint": "Punto negro",
+    "whitePoint": "Punto blanco",
+    "invert": "Imagen negativa",
+    "inkColor": "Tinta azul",
+    "paperColor": "Color del papel",
+    "wash": "Deslavado",
+    "unevenness": "Recubrimiento irregular",
+    "textureScale": "Escala del recubrimiento",
+    "paperGrain": "Grano del papel",
+    "grainScale": "Tamaño del grano",
+    "fibers": "Fibras del papel",
+    "fiberScale": "Tamaño de las fibras",
+    "edgeFade": "Bordes desvanecidos",
+    "edgeWidth": "Anchura del borde"
+  }
+}

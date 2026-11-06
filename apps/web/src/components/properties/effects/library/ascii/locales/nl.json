@@ -1,0 +1,28 @@
+{
+  "name": "ASCII",
+  "charactersHint": "Rangschik tekens van licht naar dicht. Spaties tellen mee. Gebruik 1–64 tekens; herhalingen kunnen een tint meer gewicht geven.",
+  "parameter": {
+    "scale": "Tekengrootte",
+    "characters": "Tekens",
+    "brightness": "Helderheid",
+    "contrast": "Contrast",
+    "gamma": "Schaduwdetail",
+    "palette": "Kleurmodus",
+    "foreground": "Inkt / tint",
+    "background": "Achtergrond",
+    "shades": "Toonstappen",
+    "invert": "Dichtheid omkeren",
+    "cellAspect": "Celbreedte",
+    "glyphScale": "Glyfgrootte",
+    "weight": "Inktgewicht",
+    "color": "Bronkleuren",
+    "gradientEnd": "Eindkleur",
+    "gradientAngle": "Verloophoek"
+  },
+  "palette": {
+    "image": "Beeldtinten",
+    "tonal": "Geschaduwde inkt",
+    "solid": "Effen inkt",
+    "gradient": "Verloopinkt"
+  }
+}

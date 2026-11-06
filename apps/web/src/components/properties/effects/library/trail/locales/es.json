@@ -1,0 +1,21 @@
+{
+  "name": "Estela",
+  "parameter": {
+    "mode": "Origen de los ecos",
+    "echoCount": "Número de ecos",
+    "delay": "Tiempo entre ecos",
+    "fade": "Decaimiento de la opacidad de los ecos",
+    "offsetX": "Desplazamiento X por eco",
+    "offsetY": "Desplazamiento Y por eco",
+    "angle": "Dirección del desplazamiento",
+    "centerX": "Centro de expansión X",
+    "centerY": "Centro de expansión Y",
+    "spread": "Cambio de escala por eco",
+    "expandBounds": "Extender más allá de los límites del objeto"
+  },
+  "choice": {
+    "temporal": "Poses / fotogramas de vídeo anteriores",
+    "offset": "Desplazamientos de la imagen actual",
+    "auto": "Automático · adaptar al origen"
+  }
+}

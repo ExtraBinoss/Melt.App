@@ -1,0 +1,16 @@
+{
+  "name": "انحراف لوني",
+  "parameter": {
+    "mode": "وضع الفصل",
+    "centerX": "المركز X",
+    "centerY": "المركز Y",
+    "angle": "اتجاه الفصل",
+    "separation": "فصل القنوات",
+    "radius": "نصف قطر التلاشي",
+    "falloff": "التلاشي مع المسافة"
+  },
+  "choice": {
+    "radial": "شعاعي",
+    "directional": "اتجاهي"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "name": "Néon líquido",
+  "parameter": {
+    "threshold": "Limiar dos realces",
+    "knee": "Limiar suave",
+    "intensity": "Intensidade do brilho",
+    "radius": "Raio do halo",
+    "tint": "Tonalidade do brilho",
+    "glowOnly": "Apenas brilho",
+    "palette": "Paleta néon",
+    "paletteShift": "Deslocamento da paleta",
+    "contrast": "Contraste do remapeamento",
+    "distortion": "Deslocamento líquido",
+    "liquidScale": "Comprimento de onda do líquido",
+    "direction": "Direção do fluxo",
+    "phase": "Fase do líquido"
+  },
+  "choice": {
+    "acid": "Ácida",
+    "spectral": "Espectral",
+    "ultraviolet": "Ultravioleta"
+  }
+}

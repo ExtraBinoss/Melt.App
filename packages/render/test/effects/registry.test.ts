@@ -19,6 +19,11 @@ describe("effect implementation registry", () => {
     expect(Object.isFrozen(EFFECT_NODES)).toBe(true);
     for (const type of Object.keys(EFFECT_NODES) as Array<keyof typeof EFFECT_NODES>) {
       const fixture = nodeFixture(type);
+      if (getEffectDefinition(type).requirements?.depth) {
+        expect(() => EFFECT_NODES[type](fixture)).toThrow("native camera depth port");
+        fixture.dispose();
+        continue;
+      }
       const node = EFFECT_NODES[type](fixture);
       expect(node.isNode).toBe(true);
       if (getEffectDefinition(type).coverage === "preserve") expectSourceAlpha(node, fixture.input);

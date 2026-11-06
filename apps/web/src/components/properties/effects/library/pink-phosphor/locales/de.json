@@ -1,0 +1,21 @@
+{
+  "name": "Rosa Leuchtstoff",
+  "parameter": {
+    "scale": "Abstand der Scanlinien",
+    "exposure": "Belichtung",
+    "gamma": "Tonwertgamma",
+    "contrast": "Kontrast",
+    "glow": "Leuchtstärke",
+    "glowRadius": "Leuchtreichweite",
+    "glowThreshold": "Leuchtschwelle",
+    "scanlines": "Stärke der Scanlinien",
+    "beamWidth": "Strahlbreite",
+    "grain": "Körnung",
+    "flicker": "Flimmern",
+    "speed": "Entwicklungsgeschwindigkeit",
+    "background": "Schattenfarbe",
+    "phosphor": "Leuchtstofffarbe",
+    "highlight": "Lichterfarbe",
+    "time": "Zeit"
+  }
+}

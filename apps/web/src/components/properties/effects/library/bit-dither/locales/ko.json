@@ -1,0 +1,23 @@
+{
+  "name": "1비트 디더",
+  "parameter": {
+    "method": "방식",
+    "scale": "셀 크기",
+    "threshold": "임계값",
+    "strength": "디더 강도",
+    "contrast": "대비",
+    "gamma": "색조 감마",
+    "invert": "반전",
+    "foreground": "잉크 색상",
+    "background": "종이 색상",
+    "sourceColor": "원본 색상"
+  },
+  "method": {
+    "threshold": "고정 임계값",
+    "bayer2": "Bayer 2×2",
+    "bayer4": "Bayer 4×4",
+    "bayer8": "Bayer 8×8",
+    "interleaved": "인터리브 그래디언트 노이즈",
+    "multilevel": "다단계 Bayer"
+  }
+}

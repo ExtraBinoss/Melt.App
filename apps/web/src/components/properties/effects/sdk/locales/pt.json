@@ -1,0 +1,12 @@
+{
+  "title": "Posição e área",
+  "position": "Posição",
+  "positionHelp": "Arraste para posicionar. As setas movem; Shift aumenta o passo.",
+  "domainEnabled": "Área local",
+  "domainX": "Posição X",
+  "domainY": "Posição Y",
+  "domainAngle": "Direção da área",
+  "domainRadius": "Raio",
+  "domainAspect": "Proporção",
+  "domainFeather": "Suavização"
+}

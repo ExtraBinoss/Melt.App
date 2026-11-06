@@ -1,0 +1,18 @@
+{
+  "name": "ターミナル",
+  "parameter": {
+    "progress": "入力の進行度",
+    "columns": "列数",
+    "rows": "行数",
+    "cursor": "カーソル",
+    "cursorColor": "カーソルの色",
+    "blinkRate": "点滅速度",
+    "time": "時間"
+  },
+  "choice": {
+    "none": "なし",
+    "block": "ブロック",
+    "underline": "下線",
+    "line": "行のハイライト"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "name": "Distorsione a onde",
+  "parameter": {
+    "waveform": "Forma d’onda",
+    "amplitude": "Ampiezza",
+    "frequency": "Cicli sul lato più corto",
+    "angle": "Angolo di propagazione",
+    "phase": "Fase",
+    "edge": "Bordi della sorgente"
+  },
+  "choice": {
+    "sine": "Sinusoidale",
+    "triangle": "Triangolare",
+    "square": "Quadra",
+    "sawtooth": "Dente di sega",
+    "transparent": "Trasparente",
+    "mirror": "Specchia",
+    "repeat": "Ripeti",
+    "clamp": "Estendi i bordi"
+  }
+}

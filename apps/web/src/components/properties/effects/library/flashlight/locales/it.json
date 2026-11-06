@@ -1,0 +1,22 @@
+{
+  "name": "Lampo di luce",
+  "parameter": {
+    "centerX": "Centro X",
+    "centerY": "Centro Y",
+    "radius": "Raggio della luce",
+    "softness": "Morbidezza del bordo",
+    "falloff": "Attenuazione della luce",
+    "aspect": "Proporzioni del fascio",
+    "rotation": "Rotazione del fascio",
+    "intensity": "Intensità luminosa",
+    "ambient": "Luce ambientale",
+    "exposure": "Esposizione del flash",
+    "highlightCompression": "Compressione delle alte luci",
+    "saturation": "Saturazione",
+    "glow": "Foschia luminosa",
+    "grain": "Grana della pellicola",
+    "grainSize": "Dimensione della grana",
+    "lightColor": "Colore della luce",
+    "invert": "Inverti illuminazione"
+  }
+}

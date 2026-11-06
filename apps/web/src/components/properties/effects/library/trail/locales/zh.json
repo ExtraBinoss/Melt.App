@@ -1,0 +1,21 @@
+{
+  "name": "拖影",
+  "parameter": {
+    "mode": "回声来源",
+    "echoCount": "回声数量",
+    "delay": "回声时间间隔",
+    "fade": "回声不透明度衰减",
+    "offsetX": "每次回声的 X 偏移",
+    "offsetY": "每次回声的 Y 偏移",
+    "angle": "偏移方向",
+    "centerX": "扩散中心 X",
+    "centerY": "扩散中心 Y",
+    "spread": "每次回声的缩放变化",
+    "expandBounds": "扩展到对象边界之外"
+  },
+  "choice": {
+    "temporal": "先前姿态／视频帧",
+    "offset": "当前图像偏移",
+    "auto": "自动 · 适应来源"
+  }
+}

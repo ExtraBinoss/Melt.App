@@ -1,0 +1,28 @@
+{
+  "name": "ASCII",
+  "charactersHint": "Zeichen von hell nach dicht ordnen. Leerzeichen zählen mit. 1–64 Zeichen verwenden; Wiederholungen gewichten einen Ton stärker.",
+  "parameter": {
+    "scale": "Zeichengröße",
+    "characters": "Zeichen",
+    "brightness": "Helligkeit",
+    "contrast": "Kontrast",
+    "gamma": "Schattendetails",
+    "palette": "Farbmodus",
+    "foreground": "Tinte / Färbung",
+    "background": "Hintergrund",
+    "shades": "Tonwertstufen",
+    "invert": "Dichte umkehren",
+    "cellAspect": "Zellenbreite",
+    "glyphScale": "Glyphengröße",
+    "weight": "Tintenstärke",
+    "color": "Quellfarben",
+    "gradientEnd": "Endfarbe",
+    "gradientAngle": "Verlaufswinkel"
+  },
+  "palette": {
+    "image": "Bildtöne",
+    "tonal": "Schattierte Tinte",
+    "solid": "Einfarbige Tinte",
+    "gradient": "Verlaufstinte"
+  }
+}

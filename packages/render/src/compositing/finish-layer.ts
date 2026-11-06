@@ -90,7 +90,7 @@ export function finishLayerSource(
             Math.min(base.y, historical.y),
         }
       : base;
-    const outset = effectFootprint(effects);
+    const outset = effectFootprint(effects, effectOriginal);
     bounds = trailRenderBounds(
       effects,
       {

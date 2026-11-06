@@ -1,0 +1,23 @@
+{
+  "name": "Risografia",
+  "parameter": {
+    "palette": "Tavolozza degli inchiostri",
+    "inkA": "Primo inchiostro",
+    "inkB": "Secondo inchiostro",
+    "inkC": "Terzo inchiostro",
+    "paperColor": "Colore della carta",
+    "dotSize": "Dimensione dei punti di stampa",
+    "contrast": "Contrasto delle separazioni",
+    "inkDensity": "Densità dell'inchiostro",
+    "misregistration": "Fuori registro degli inchiostri",
+    "grain": "Grana dell'inchiostro",
+    "paperTexture": "Texture della carta",
+    "centerX": "Origine di stampa X",
+    "centerY": "Origine di stampa Y",
+    "angle": "Direzione di stampa"
+  },
+  "choice": {
+    "duotone": "Due inchiostri",
+    "tritone": "Tre inchiostri"
+  }
+}

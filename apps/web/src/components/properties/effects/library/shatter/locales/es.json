@@ -1,0 +1,33 @@
+{
+  "name": "Fragmentación",
+  "pattern": {
+    "impact": "Vidrio impactado",
+    "cellular": "Vidrio celular"
+  },
+  "parameter": {
+    "scale": "Tamaño de las facetas",
+    "pattern": "Patrón de fractura",
+    "centerX": "Impacto X",
+    "centerY": "Impacto Y",
+    "radius": "Radio del impacto",
+    "innerRadius": "Centro protegido",
+    "falloff": "Atenuación del borde",
+    "jitter": "Irregularidad de las fracturas",
+    "spokes": "Grietas radiales",
+    "displacement": "Desplazamiento de las facetas",
+    "rotation": "Rotación de las facetas",
+    "ior": "Índice de refracción",
+    "thickness": "Grosor del vidrio",
+    "dispersion": "Dispersión del color",
+    "tilt": "Inclinación de las facetas",
+    "roughness": "Rugosidad del vidrio",
+    "crackWidth": "Anchura de las grietas",
+    "cracks": "Opacidad de las grietas",
+    "highlights": "Reflejos del vidrio",
+    "tintStrength": "Intensidad del tinte",
+    "tintColor": "Tinte del vidrio",
+    "crackColor": "Color de las grietas",
+    "highlightColor": "Color de los reflejos",
+    "cutout": "Grietas transparentes"
+  }
+}

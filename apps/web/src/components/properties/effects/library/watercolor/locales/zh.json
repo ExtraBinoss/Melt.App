@@ -1,0 +1,16 @@
+{
+  "name": "水彩",
+  "parameter": {
+    "washScale": "渲染尺度",
+    "simplification": "区域简化",
+    "edgePreservation": "边缘保留",
+    "diffusion": "颜料扩散",
+    "pigment": "颜料密度",
+    "edgeDarkening": "边缘积色",
+    "granulation": "颜料颗粒感",
+    "paperGrain": "纸张颗粒",
+    "paperScale": "纸张纹理尺度",
+    "paperOpacity": "纸面淡彩",
+    "paperColor": "纸张颜色"
+  }
+}

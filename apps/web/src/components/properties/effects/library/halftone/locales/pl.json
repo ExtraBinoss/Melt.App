@@ -1,0 +1,25 @@
+{
+  "name": "Półtony",
+  "parameter": {
+    "pattern": "Wzór",
+    "rotation": "Obrót siatki",
+    "dotSize": "Rozmiar kół",
+    "softness": "Miękkość krawędzi",
+    "gamma": "Gamma tonów",
+    "offsetX": "Przesunięcie siatki X",
+    "offsetY": "Przesunięcie siatki Y",
+    "ink": "Kolor punktów",
+    "paper": "Kolor tła",
+    "backgroundOpacity": "Krycie tła",
+    "sourceColor": "Użyj kolorów źródłowych",
+    "cyanAngle": "Kąt rastra cyjanu",
+    "magentaAngle": "Kąt rastra magenty",
+    "yellowAngle": "Kąt rastra żółci"
+  },
+  "choice": {
+    "legacy": "Druk klasyczny",
+    "circle-grid": "Siatka okrągłych punktów",
+    "round-mosaic": "Okrągła mozaika kolorów",
+    "color-screen": "Rastry kanałów kolorów"
+  }
+}

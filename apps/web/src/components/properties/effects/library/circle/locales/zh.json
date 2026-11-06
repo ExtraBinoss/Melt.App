@@ -1,0 +1,19 @@
+{
+  "name": "圆形",
+  "parameter": {
+    "spacing": "单元格间距",
+    "rotation": "网角",
+    "dotSize": "网点大小",
+    "softness": "边缘柔和度",
+    "gamma": "色调伽马",
+    "polarity": "网点极性",
+    "foreground": "油墨颜色",
+    "background": "纸张颜色",
+    "foregroundOpacity": "油墨不透明度",
+    "backgroundOpacity": "纸张不透明度"
+  },
+  "polarity": {
+    "shadows": "暗部网点",
+    "highlights": "高光网点"
+  }
+}

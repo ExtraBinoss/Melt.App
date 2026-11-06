@@ -1,0 +1,27 @@
+{
+  "actions": "Azioni",
+  "enabled": "Attivo",
+  "resetAll": "Ripristina tutti i parametri dell’effetto",
+  "playLive": "Avvia anteprima dal vivo",
+  "pauseLive": "Pausa anteprima dal vivo",
+  "liveTime": "Fase visualizzata",
+  "seed": "Seme casuale",
+  "falloff": "Attenuazione",
+  "composite": "Composizione alfa",
+  "replacement": "Sostituzione con l’effetto (predefinita)",
+  "operation": {
+    "source-over": "Sorgente sopra destinazione",
+    "destination-over": "Destinazione sopra sorgente",
+    "source-in": "Sorgente dentro la destinazione",
+    "destination-in": "Destinazione dentro la sorgente",
+    "source-out": "Sorgente fuori dalla destinazione",
+    "destination-out": "Destinazione fuori dalla sorgente",
+    "source-atop": "Sorgente sull’area della destinazione",
+    "destination-atop": "Destinazione sull’area della sorgente",
+    "xor": "Escludi sovrapposizione",
+    "copy": "Solo sorgente",
+    "destination": "Solo destinazione",
+    "clear": "Azzera",
+    "lighter": "Somma sorgente e destinazione"
+  }
+}

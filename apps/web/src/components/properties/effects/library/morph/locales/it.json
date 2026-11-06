@@ -1,0 +1,11 @@
+{
+  "name": "Trasformazione",
+  "progress": "Avanzamento",
+  "stagger": "Sfalsamento delle lettere",
+  "inflate": "Gonfiamento",
+  "stretch": "Allungamento",
+  "order": "Ordine delle lettere",
+  "forward": "Dalla prima all'ultima",
+  "reverse": "Dall'ultima alla prima",
+  "center": "Dal centro"
+}

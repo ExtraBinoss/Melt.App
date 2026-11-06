@@ -77,6 +77,7 @@ export function MotionSettings({
         onValueChange={setPropertyKey}
       />
       <DriverRangeFields
+        effect={effect}
         property={property}
         value={outputRange}
         disabled={disabled}

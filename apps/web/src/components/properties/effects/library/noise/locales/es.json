@@ -1,0 +1,37 @@
+{
+  "name": "Ruido",
+  "parameter": {
+    "algorithm": "Algoritmo",
+    "scale": "Tamaño de celda",
+    "octaves": "Octavas",
+    "lacunarity": "Crecimiento de frecuencia",
+    "persistence": "Intensidad del detalle",
+    "jitter": "Irregularidad de las celdas",
+    "offsetX": "Desplazamiento X",
+    "offsetY": "Desplazamiento Y",
+    "offsetZ": "Corte 3D",
+    "speed": "Velocidad de evolución",
+    "contrast": "Contraste",
+    "brightness": "Brillo",
+    "gamma": "Gamma",
+    "invert": "Invertir",
+    "mode": "Aplicar ruido",
+    "lowColor": "Color de valores bajos",
+    "highColor": "Color de valores altos",
+    "time": "Tiempo"
+  },
+  "algorithm": {
+    "perlin": "Perlin 3D",
+    "value": "Ruido de valores 3D",
+    "cell": "Celdas 3D",
+    "worley": "Worley 3D",
+    "fbm": "Movimiento browniano fractal",
+    "ridged": "Fractal de crestas",
+    "turbulence": "Turbulencia"
+  },
+  "mode": {
+    "replace": "Reemplazar color",
+    "add": "Añadir variación",
+    "multiply": "Multiplicar"
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "name": "ASCII",
+  "charactersHint": "将字符从稀疏到密集排列，空格也计入。使用 1–64 个字符，重复字符可增加某一色调的权重。",
+  "parameter": {
+    "scale": "字符大小",
+    "characters": "字符",
+    "brightness": "亮度",
+    "contrast": "对比度",
+    "gamma": "暗部细节",
+    "palette": "颜色模式",
+    "foreground": "墨色／色调",
+    "background": "背景",
+    "shades": "色调级数",
+    "invert": "反转密度",
+    "cellAspect": "单元格宽度",
+    "glyphScale": "字形大小",
+    "weight": "墨迹粗细",
+    "color": "源颜色",
+    "gradientEnd": "结束颜色",
+    "gradientAngle": "渐变角度"
+  },
+  "palette": {
+    "image": "图像色调",
+    "tonal": "明暗墨色",
+    "solid": "纯色墨迹",
+    "gradient": "渐变墨色"
+  }
+}

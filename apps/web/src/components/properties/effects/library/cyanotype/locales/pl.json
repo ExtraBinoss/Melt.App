@@ -1,0 +1,23 @@
+{
+  "name": "Cyjanotypia",
+  "parameter": {
+    "exposure": "Ekspozycja odbitki",
+    "contrast": "Kontrast",
+    "gamma": "Półtony",
+    "density": "Gęstość błękitu",
+    "blackPoint": "Punkt czerni",
+    "whitePoint": "Punkt bieli",
+    "invert": "Obraz negatywowy",
+    "inkColor": "Niebieski tusz",
+    "paperColor": "Kolor papieru",
+    "wash": "Wypłukanie",
+    "unevenness": "Nierówna powłoka",
+    "textureScale": "Skala powłoki",
+    "paperGrain": "Ziarnistość papieru",
+    "grainScale": "Rozmiar ziarna",
+    "fibers": "Włókna papieru",
+    "fiberScale": "Rozmiar włókien",
+    "edgeFade": "Wyblakłe krawędzie",
+    "edgeWidth": "Szerokość krawędzi"
+  }
+}

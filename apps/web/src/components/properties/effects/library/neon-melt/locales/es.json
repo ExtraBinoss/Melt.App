@@ -1,0 +1,23 @@
+{
+  "name": "Neón líquido",
+  "parameter": {
+    "threshold": "Umbral de luces altas",
+    "knee": "Umbral suave",
+    "intensity": "Intensidad del resplandor",
+    "radius": "Radio del halo",
+    "tint": "Tinte del resplandor",
+    "glowOnly": "Solo resplandor",
+    "palette": "Paleta de neón",
+    "paletteShift": "Desplazamiento de la paleta",
+    "contrast": "Contraste de reasignación",
+    "distortion": "Desplazamiento líquido",
+    "liquidScale": "Longitud de onda del líquido",
+    "direction": "Dirección del flujo",
+    "phase": "Fase del líquido"
+  },
+  "choice": {
+    "acid": "Ácida",
+    "spectral": "Espectral",
+    "ultraviolet": "Ultravioleta"
+  }
+}

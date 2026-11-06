@@ -1,0 +1,21 @@
+{
+  "name": "Smuga",
+  "parameter": {
+    "mode": "Źródło ech",
+    "echoCount": "Liczba ech",
+    "delay": "Czas między echami",
+    "fade": "Spadek krycia ech",
+    "offsetX": "Przesunięcie X na echo",
+    "offsetY": "Przesunięcie Y na echo",
+    "angle": "Kierunek przesunięcia",
+    "centerX": "Środek rozszerzania X",
+    "centerY": "Środek rozszerzania Y",
+    "spread": "Zmiana skali na echo",
+    "expandBounds": "Rozszerz poza granice obiektu"
+  },
+  "choice": {
+    "temporal": "Poprzednie pozy / klatki wideo",
+    "offset": "Przesunięcia bieżącego obrazu",
+    "auto": "Automatycznie · dopasuj do źródła"
+  }
+}

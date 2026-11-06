@@ -1,22 +1,24 @@
-import type { MotionValue } from "@musart/core";
+import type { Effect, MotionValue } from "@musart/core";
 import { useTranslation } from "react-i18next";
 import { NumberInput } from "../../../shared/NumberInput";
 import { SelectField } from "../../../shared/SelectField";
 import { Input } from "../../../ui/input";
-import type { EffectDriverProperty } from "./authoring";
+import { effectPropertyOptionLabel, type EffectDriverProperty } from "./authoring";
 
 export type DriverRange = readonly [MotionValue, MotionValue];
 /** Authoring values stay local until one validated block transaction is added. */
 export function DriverRangeFields({
+  effect,
   property,
   value,
   disabled,
   onChange,
 }: {
+  effect: Effect;
   property: EffectDriverProperty;
   value: DriverRange;
   disabled: boolean;
-  onChange(value: DriverRange): void;
+  onChange(this: void, value: DriverRange): void;
 }) {
   const { t } = useTranslation("effectMotion");
   return (
@@ -48,7 +50,13 @@ export function DriverRangeFields({
               value={String(value[index])}
               disabled={disabled}
               options={(property.kind === "boolean" ? ["false", "true"] : property.options).map(
-                (item) => ({ value: item, label: property.kind === "boolean" ? t(item) : item }),
+                (item) => ({
+                  value: item,
+                  label:
+                    property.kind === "boolean"
+                      ? t(item)
+                      : t(effectPropertyOptionLabel(effect, property, item), { ns: "translation" }),
+                }),
               )}
               onValueChange={(next) => change(property.kind === "boolean" ? next === "true" : next)}
             />

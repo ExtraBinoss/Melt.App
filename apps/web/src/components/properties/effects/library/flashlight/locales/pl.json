@@ -1,0 +1,22 @@
+{
+  "name": "Błysk światła",
+  "parameter": {
+    "centerX": "Środek X",
+    "centerY": "Środek Y",
+    "radius": "Promień światła",
+    "softness": "Miękkość krawędzi",
+    "falloff": "Zanik światła",
+    "aspect": "Proporcje wiązki",
+    "rotation": "Obrót wiązki",
+    "intensity": "Natężenie światła",
+    "ambient": "Światło otoczenia",
+    "exposure": "Ekspozycja błysku",
+    "highlightCompression": "Kompresja świateł",
+    "saturation": "Nasycenie",
+    "glow": "Świetlna mgiełka",
+    "grain": "Ziarno filmowe",
+    "grainSize": "Rozmiar ziarna",
+    "lightColor": "Kolor światła",
+    "invert": "Odwróć oświetlenie"
+  }
+}

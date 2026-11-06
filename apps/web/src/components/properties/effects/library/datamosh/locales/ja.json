@@ -1,0 +1,16 @@
+{
+  "name": "データモッシュ · ブロックのにじみ",
+  "parameter": {
+    "blockSize": "マクロブロックの大きさ",
+    "density": "影響を受けるブロック",
+    "displacement": "ブロックの変位",
+    "direction": "変位の方向",
+    "angleVariation": "方向の変化",
+    "coherence": "行の一貫性",
+    "smear": "空間的なにじみ",
+    "chromaShift": "色のにじみ",
+    "levels": "色の階調数",
+    "rate": "パターンの変化速度",
+    "time": "パターンの時間"
+  }
+}

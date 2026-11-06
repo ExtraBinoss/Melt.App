@@ -1,0 +1,23 @@
+{
+  "name": "Risografie",
+  "parameter": {
+    "palette": "Tintenpalette",
+    "inkA": "Erste Tinte",
+    "inkB": "Zweite Tinte",
+    "inkC": "Dritte Tinte",
+    "paperColor": "Papierfarbe",
+    "dotSize": "Druckpunktgröße",
+    "contrast": "Farbauszugskontrast",
+    "inkDensity": "Tintendichte",
+    "misregistration": "Passerversatz",
+    "grain": "Tintenkörnung",
+    "paperTexture": "Papierstruktur",
+    "centerX": "Druckursprung X",
+    "centerY": "Druckursprung Y",
+    "angle": "Druckrichtung"
+  },
+  "choice": {
+    "duotone": "Zwei Tinten",
+    "tritone": "Drei Tinten"
+  }
+}

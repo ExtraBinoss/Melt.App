@@ -1,0 +1,11 @@
+{
+  "name": "형태 변환",
+  "progress": "진행률",
+  "stagger": "글자 시간차",
+  "inflate": "부풀리기",
+  "stretch": "늘이기",
+  "order": "글자 순서",
+  "forward": "처음부터 끝까지",
+  "reverse": "끝에서 처음까지",
+  "center": "가운데부터"
+}

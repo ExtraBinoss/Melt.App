@@ -1,0 +1,12 @@
+{
+  "title": "位置与区域",
+  "position": "位置",
+  "positionHelp": "拖动以定位。方向键可移动，按住 Shift 可增大移动步长。",
+  "domainEnabled": "局部区域",
+  "domainX": "X 位置",
+  "domainY": "Y 位置",
+  "domainAngle": "区域方向",
+  "domainRadius": "半径",
+  "domainAspect": "宽高比",
+  "domainFeather": "羽化"
+}

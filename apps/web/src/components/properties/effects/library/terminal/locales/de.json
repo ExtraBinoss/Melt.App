@@ -1,0 +1,18 @@
+{
+  "name": "Terminal",
+  "parameter": {
+    "progress": "Tippfortschritt",
+    "columns": "Spalten",
+    "rows": "Zeilen",
+    "cursor": "Cursor",
+    "cursorColor": "Cursorfarbe",
+    "blinkRate": "Blinkfrequenz",
+    "time": "Zeit"
+  },
+  "choice": {
+    "none": "Keiner",
+    "block": "Block",
+    "underline": "Unterstrich",
+    "line": "Zeilenhervorhebung"
+  }
+}

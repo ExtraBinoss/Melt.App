@@ -1,0 +1,23 @@
+{
+  "name": "景深",
+  "parameter": {
+    "focusMode": "对焦模式",
+    "focusX": "对焦点 X",
+    "focusY": "对焦点 Y",
+    "focusDistance": "对焦距离",
+    "focusRange": "清晰范围",
+    "aperture": "光圈",
+    "maxBlur": "最大模糊",
+    "blades": "光圈叶片",
+    "angle": "光圈方向",
+    "edgeProtection": "深度边缘保护",
+    "quality": "采样质量"
+  },
+  "choice": {
+    "distance": "相机距离",
+    "point": "指定点的原生深度",
+    "low": "低（8 次采样）",
+    "medium": "中（16 次采样）",
+    "high": "高（24 次采样）"
+  }
+}

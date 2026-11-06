@@ -1,7 +1,7 @@
 {
   "center": "效果中心",
   "radius": "效果半径",
-  "innerRadius": "保护区域半径",
+  "innerRadius": "保护半径",
   "feather": "羽化边界",
   "hint": "拖动中心或半径 · 按 Escape 取消",
   "centerHelp": "拖动以移动效果中心。",

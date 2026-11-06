@@ -1,0 +1,23 @@
+{
+  "name": "蓝晒",
+  "parameter": {
+    "exposure": "印相曝光",
+    "contrast": "对比度",
+    "gamma": "中间调",
+    "density": "蓝色浓度",
+    "blackPoint": "黑场",
+    "whitePoint": "白场",
+    "invert": "负片图像",
+    "inkColor": "蓝色墨水",
+    "paperColor": "纸张颜色",
+    "wash": "冲洗褪色",
+    "unevenness": "涂层不均匀度",
+    "textureScale": "涂层纹理大小",
+    "paperGrain": "纸张颗粒",
+    "grainScale": "颗粒大小",
+    "fibers": "纸张纤维",
+    "fiberScale": "纤维大小",
+    "edgeFade": "边缘褪色",
+    "edgeWidth": "边缘宽度"
+  }
+}

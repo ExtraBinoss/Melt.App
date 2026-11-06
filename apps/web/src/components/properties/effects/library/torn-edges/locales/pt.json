@@ -1,0 +1,28 @@
+{
+  "name": "Bordas rasgadas",
+  "parameter": {
+    "technique": "Técnica",
+    "balance": "Equilíbrio tonal",
+    "contrast": "Contraste",
+    "roughness": "Rugosidade do rasgo",
+    "textureScale": "Tamanho da textura",
+    "detail": "Fibras finas",
+    "smoothing": "Suavização da origem",
+    "tearWidth": "Profundidade do rasgo",
+    "edgeWidth": "Largura da borda do papel",
+    "feather": "Suavidade das bordas",
+    "ink": "Cor da tinta",
+    "paper": "Cor do papel",
+    "edgeColor": "Cor da borda rasgada",
+    "backgroundOpacity": "Opacidade do papel",
+    "sourceColor": "Cor original",
+    "tearTop": "Rasgar em cima",
+    "tearBottom": "Rasgar em baixo",
+    "tearLeft": "Rasgar à esquerda",
+    "tearRight": "Rasgar à direita"
+  },
+  "choice": {
+    "graphic": "Gráfico rasgado",
+    "paper": "Silhueta de papel rasgado"
+  }
+}

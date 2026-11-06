@@ -1,0 +1,19 @@
+{
+  "name": "円",
+  "parameter": {
+    "spacing": "セルの間隔",
+    "rotation": "網点角度",
+    "dotSize": "ドットサイズ",
+    "softness": "輪郭の柔らかさ",
+    "gamma": "階調のガンマ",
+    "polarity": "ドットの極性",
+    "foreground": "インクの色",
+    "background": "紙の色",
+    "foregroundOpacity": "インクの不透明度",
+    "backgroundOpacity": "紙の不透明度"
+  },
+  "polarity": {
+    "shadows": "シャドウにドット",
+    "highlights": "ハイライトにドット"
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "name": "Depth Anything V3",
+  "map": "Dieptekaart",
+  "prepare": "Diepte voorbereiden…",
+  "regenerate": "Diepte opnieuw genereren…",
+  "hint": "Depth Anything V3 Small · Eenmalige download van 105 MB. De diepte wordt na de download automatisch gegenereerd. De voorbereiding draait lokaal via WebGPU, geeft tussen frames rekentijd vrij en pauzeert tijdens interacties. Bij het afspelen wordt de opgeslagen diepte zonder AI gerenderd.",
+  "generate": "Diepte genereren",
+  "cancel": "Annuleren",
+  "processing": "Diepte wordt voorbereid",
+  "unsupported": "Selecteer een ontgrendelde 2D-afbeelding of -video. Compositie-effecten kunnen geen diepte schatten.",
+  "parameter": {
+    "strength": "Reliëf",
+    "angle": "Richting",
+    "focus": "Vast dieptevlak",
+    "zoom": "Randzoom",
+    "view": "Weergave"
+  },
+  "choice": {
+    "parallax": "Parallax",
+    "depth": "Dieptekaart"
+  },
+  "download": "Model downloaden",
+  "downloading": "Model wordt gedownload",
+  "completed": "Diepte gereed",
+  "close": "Sluiten",
+  "info": "Over dieptevoorbereiding",
+  "preview": "Videovoorbeeld wordt voorbereid"
+}

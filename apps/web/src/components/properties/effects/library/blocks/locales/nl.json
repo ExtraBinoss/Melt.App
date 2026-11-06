@@ -1,0 +1,17 @@
+{
+  "name": "Bouwstenen",
+  "parameter": {
+    "scale": "Noppenafstand",
+    "centerX": "Rastercentrum X",
+    "centerY": "Rastercentrum Y",
+    "angle": "Steenrichting",
+    "stagger": "Rijen laten verspringen",
+    "gap": "Ruimte tussen stenen",
+    "relief": "Verhoogd kunststofreliëf",
+    "lightAngle": "Lichtrichting",
+    "variation": "Kleurvariatie van stenen",
+    "studRadius": "Noppenstraal",
+    "studHeight": "Noppenhoogte",
+    "paletteLevels": "Kleurniveaus (0 = bron)"
+  }
+}

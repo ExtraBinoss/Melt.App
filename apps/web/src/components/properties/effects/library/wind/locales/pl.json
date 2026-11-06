@@ -1,0 +1,16 @@
+{
+  "name": "Wiatr",
+  "parameter": {
+    "centerX": "Środek pola X",
+    "centerY": "Środek pola Y",
+    "angle": "Kierunek wiatru",
+    "length": "Długość smug",
+    "bandSize": "Szerokość pasm",
+    "variation": "Zmienność pasm",
+    "gust": "Siła podmuchów",
+    "speed": "Prędkość podmuchów",
+    "phase": "Faza",
+    "sourceMix": "Oryginalne szczegóły",
+    "time": "Czas"
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "name": "Kassenbon",
+  "fit": {
+    "contain": "Seitenverhältnis beibehalten",
+    "stretch": "Druckbereich ausfüllen"
+  },
+  "mode": {
+    "ordered": "Geordnete Punkte",
+    "stochastic": "Zufällige Punkte",
+    "threshold": "Schwellenwert"
+  },
+  "edge": {
+    "straight": "Gerader Schnitt",
+    "torn": "Abgerissene Kante",
+    "perforated": "Perforierte Kante"
+  },
+  "parameter": {
+    "scale": "Druckpunktabstand",
+    "mode": "Thermoraster",
+    "exposure": "Belichtung",
+    "gamma": "Gamma",
+    "contrast": "Druckkontrast",
+    "invert": "Druck umkehren",
+    "inkColor": "Druckfarbe",
+    "paperColor": "Papierfarbe",
+    "inkOpacity": "Druckdichte",
+    "dotSpread": "Punktausbreitung",
+    "dotSoftness": "Punktweichheit",
+    "wear": "Fehlende Punkte",
+    "feedBanding": "Vorschubstreifen",
+    "feedPitch": "Abstand der Vorschubstreifen",
+    "streaks": "Druckkopfstreifen",
+    "streakWidth": "Streifenbreite",
+    "marginX": "Horizontaler Druckrand",
+    "marginY": "Vertikaler Druckrand",
+    "fit": "Bildanpassung",
+    "paperTexture": "Papiertextur",
+    "fiberSize": "Fasergröße",
+    "edge": "Papierschnitt",
+    "edgeHeight": "Kantentiefe",
+    "edgePitch": "Kantenabstand",
+    "edgeJitter": "Kantenunregelmäßigkeit",
+    "edgeSoftness": "Kantenweichheit",
+    "edgeShade": "Kantenschattierung",
+    "foldStrength": "Faltschattierung",
+    "foldPosition": "Faltposition",
+    "foldWidth": "Faltbreite",
+    "cutout": "Transparente Papierkanten"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "name": "Blocos",
+  "parameter": {
+    "scale": "Espaçamento dos pinos",
+    "centerX": "Centro X da grelha",
+    "centerY": "Centro Y da grelha",
+    "angle": "Direção dos blocos",
+    "stagger": "Desencontrar filas",
+    "gap": "Espaço entre blocos",
+    "relief": "Relevo elevado do plástico",
+    "lightAngle": "Direção da luz",
+    "variation": "Variação da cor dos blocos",
+    "studRadius": "Raio dos pinos",
+    "studHeight": "Altura dos pinos",
+    "paletteLevels": "Níveis de cor (0 = origem)"
+  }
+}

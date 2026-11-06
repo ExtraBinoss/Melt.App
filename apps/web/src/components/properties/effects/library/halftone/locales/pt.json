@@ -1,0 +1,25 @@
+{
+  "name": "Meio-tom",
+  "parameter": {
+    "pattern": "Padrão",
+    "rotation": "Rotação da grelha",
+    "dotSize": "Tamanho dos círculos",
+    "softness": "Suavidade das bordas",
+    "gamma": "Gama dos tons",
+    "offsetX": "Deslocamento da grelha X",
+    "offsetY": "Deslocamento da grelha Y",
+    "ink": "Cor dos pontos",
+    "paper": "Cor de fundo",
+    "backgroundOpacity": "Opacidade do fundo",
+    "sourceColor": "Usar cores da origem",
+    "cyanAngle": "Ângulo da trama ciano",
+    "magentaAngle": "Ângulo da trama magenta",
+    "yellowAngle": "Ângulo da trama amarela"
+  },
+  "choice": {
+    "legacy": "Impressão clássica",
+    "circle-grid": "Grelha de pontos circulares",
+    "round-mosaic": "Mosaico de cores circular",
+    "color-screen": "Tramas dos canais de cor"
+  }
+}

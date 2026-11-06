@@ -1,0 +1,16 @@
+{
+  "name": "Aquarell",
+  "parameter": {
+    "washScale": "Lasurgröße",
+    "simplification": "Bereichsvereinfachung",
+    "edgePreservation": "Kantenerhaltung",
+    "diffusion": "Pigmentausbreitung",
+    "pigment": "Pigmentdichte",
+    "edgeDarkening": "Pigmentansammlung an Kanten",
+    "granulation": "Pigmentgranulierung",
+    "paperGrain": "Papierkörnung",
+    "paperScale": "Papiertexturgröße",
+    "paperOpacity": "Papierlasur",
+    "paperColor": "Papierfarbe"
+  }
+}

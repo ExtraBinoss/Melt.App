@@ -1,0 +1,22 @@
+{
+  "name": "动态波纹",
+  "parameter": {
+    "centerX": "中心 X",
+    "centerY": "中心 Y",
+    "innerRadius": "受保护半径",
+    "radius": "作用范围",
+    "feather": "边缘羽化",
+    "falloff": "距离衰减",
+    "amplitude": "位移",
+    "wavelength": "波长",
+    "speed": "波速",
+    "phase": "相位",
+    "direction": "方向",
+    "dispersion": "色散",
+    "time": "时间"
+  },
+  "direction": {
+    "outward": "向外",
+    "inward": "向内"
+  }
+}

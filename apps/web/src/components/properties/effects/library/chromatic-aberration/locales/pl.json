@@ -1,0 +1,16 @@
+{
+  "name": "Aberracja chromatyczna",
+  "parameter": {
+    "mode": "Tryb rozdzielenia",
+    "centerX": "Środek X",
+    "centerY": "Środek Y",
+    "angle": "Kierunek rozdzielenia",
+    "separation": "Rozdzielenie kanałów",
+    "radius": "Promień zanikania",
+    "falloff": "Zanikanie z odległością"
+  },
+  "choice": {
+    "radial": "Promienisty",
+    "directional": "Kierunkowy"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "name": "1ビットディザ",
+  "parameter": {
+    "method": "方式",
+    "scale": "セルサイズ",
+    "threshold": "しきい値",
+    "strength": "ディザの強さ",
+    "contrast": "コントラスト",
+    "gamma": "階調のガンマ",
+    "invert": "反転",
+    "foreground": "インクの色",
+    "background": "紙の色",
+    "sourceColor": "元の色"
+  },
+  "method": {
+    "threshold": "固定しきい値",
+    "bayer2": "Bayer 2×2",
+    "bayer4": "Bayer 4×4",
+    "bayer8": "Bayer 8×8",
+    "interleaved": "インターリーブ勾配ノイズ",
+    "multilevel": "多階調Bayer"
+  }
+}

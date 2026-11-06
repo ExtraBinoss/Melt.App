@@ -1,0 +1,12 @@
+{
+  "title": "Position und Bereich",
+  "position": "Position",
+  "positionHelp": "Zum Positionieren ziehen. Pfeiltasten bewegen; Umschalt vergrößert den Schritt.",
+  "domainEnabled": "Lokaler Bereich",
+  "domainX": "Position X",
+  "domainY": "Position Y",
+  "domainAngle": "Bereichsrichtung",
+  "domainRadius": "Radius",
+  "domainAspect": "Seitenverhältnis",
+  "domainFeather": "Weiche Kante"
+}

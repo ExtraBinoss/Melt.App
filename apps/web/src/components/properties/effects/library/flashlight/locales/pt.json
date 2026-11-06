@@ -1,0 +1,22 @@
+{
+  "name": "Clarão de luz",
+  "parameter": {
+    "centerX": "Centro X",
+    "centerY": "Centro Y",
+    "radius": "Raio da luz",
+    "softness": "Suavidade da borda",
+    "falloff": "Atenuação da luz",
+    "aspect": "Proporção do feixe",
+    "rotation": "Rotação do feixe",
+    "intensity": "Intensidade da luz",
+    "ambient": "Luz ambiente",
+    "exposure": "Exposição do flash",
+    "highlightCompression": "Compressão dos realces",
+    "saturation": "Saturação",
+    "glow": "Névoa luminosa",
+    "grain": "Grão de película",
+    "grainSize": "Tamanho do grão",
+    "lightColor": "Cor da luz",
+    "invert": "Inverter iluminação"
+  }
+}

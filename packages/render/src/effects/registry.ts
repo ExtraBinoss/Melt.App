@@ -1,3 +1,9 @@
+import { glowNode } from "./glow/node";
+import { neonMeltNode } from "./neon-melt/node";
+import { repeaterNode } from "./repeater/node";
+import { waveDistortionNode } from "./wave-distortion/node";
+import { shapeGridNode } from "./shape-grid/node";
+import { watercolorNode } from "./watercolor/node";
 import { depthAnythingNode } from "./depth-anything/node";
 import { depthOfFieldNode } from "./depth-of-field/node";
 import { trailNode } from "./trail/node";
@@ -59,6 +65,12 @@ export const EFFECT_NODES: Readonly<
     EffectNodeBuilder
   >
 > = Object.freeze({
+  glow: glowNode,
+  "neon-melt": neonMeltNode,
+  repeater: repeaterNode,
+  "wave-distortion": waveDistortionNode,
+  "shape-grid": shapeGridNode,
+  watercolor: watercolorNode,
   "depth-anything": depthAnythingNode,
   "depth-of-field": depthOfFieldNode,
   trail: trailNode,

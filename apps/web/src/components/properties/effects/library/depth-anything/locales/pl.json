@@ -1,0 +1,28 @@
+{
+  "name": "Depth Anything V3",
+  "map": "Mapa głębi",
+  "prepare": "Przygotuj głębię…",
+  "regenerate": "Wygeneruj głębię ponownie…",
+  "hint": "Depth Anything V3 Small · Jednorazowe pobranie 105 MB. Głębia jest generowana automatycznie po pobraniu. Przygotowanie odbywa się lokalnie przez WebGPU, zwalnia zasoby między klatkami i wstrzymuje się podczas interakcji. Podczas odtwarzania zapisana głębia jest renderowana bez AI.",
+  "generate": "Generuj głębię",
+  "cancel": "Anuluj",
+  "processing": "Przygotowywanie głębi",
+  "unsupported": "Wybierz odblokowany obraz lub film 2D. Efekty kompozycji nie mogą szacować głębi.",
+  "parameter": {
+    "strength": "Relief",
+    "angle": "Kierunek",
+    "focus": "Stała płaszczyzna głębi",
+    "zoom": "Powiększenie krawędzi",
+    "view": "Widok"
+  },
+  "choice": {
+    "parallax": "Paralaksa",
+    "depth": "Mapa głębi"
+  },
+  "download": "Pobierz model",
+  "downloading": "Pobieranie modelu",
+  "completed": "Głębia gotowa",
+  "close": "Zamknij",
+  "info": "O przygotowywaniu głębi",
+  "preview": "Przygotowywanie podglądu wideo"
+}

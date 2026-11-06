@@ -1,0 +1,17 @@
+{
+  "name": "Bausteine",
+  "parameter": {
+    "scale": "Noppenabstand",
+    "centerX": "Rastermitte X",
+    "centerY": "Rastermitte Y",
+    "angle": "Steinrichtung",
+    "stagger": "Reihen versetzen",
+    "gap": "Steinabstand",
+    "relief": "Erhabenes Kunststoffrelief",
+    "lightAngle": "Lichtrichtung",
+    "variation": "Farbvariation der Steine",
+    "studRadius": "Noppenradius",
+    "studHeight": "Noppenhöhe",
+    "paletteLevels": "Farbstufen (0 = Quelle)"
+  }
+}

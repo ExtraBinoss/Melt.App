@@ -1,0 +1,16 @@
+{
+  "name": "바람",
+  "parameter": {
+    "centerX": "필드 중심 X",
+    "centerY": "필드 중심 Y",
+    "angle": "바람 방향",
+    "length": "줄무늬 길이",
+    "bandSize": "띠 너비",
+    "variation": "띠 변화",
+    "gust": "돌풍 강도",
+    "speed": "돌풍 속도",
+    "phase": "위상",
+    "sourceMix": "원본 세부 묘사",
+    "time": "시간"
+  }
+}

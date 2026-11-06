@@ -1,0 +1,11 @@
+{
+  "name": "Metamorfose",
+  "progress": "Progresso",
+  "stagger": "Desfasamento das letras",
+  "inflate": "Inflação",
+  "stretch": "Alongamento",
+  "order": "Ordem das letras",
+  "forward": "Da primeira à última",
+  "reverse": "Da última à primeira",
+  "center": "A partir do centro"
+}

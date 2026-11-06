@@ -1,0 +1,56 @@
+{
+  "en": {
+    "name": "Shape Grid",
+    "parameter": {
+      "shape": "Shape ladder",
+      "cellSize": "Cell size",
+      "fill": "Shape fill",
+      "stroke": "Stroke width",
+      "rotation": "Grid rotation",
+      "contrast": "Tone contrast",
+      "colorMode": "Color mode",
+      "shadowColor": "Shadow color",
+      "midtoneColor": "Midtone color",
+      "highlightColor": "Highlight color",
+      "backgroundColor": "Background color",
+      "backgroundOpacity": "Background opacity"
+    },
+    "choice": {
+      "adaptive": "Adaptive tone ladder",
+      "dots": "Dots",
+      "rings": "Rings",
+      "diamonds": "Diamonds",
+      "squares": "Squares",
+      "crosses": "Crosses",
+      "source": "Original colors",
+      "palette": "Three-color palette"
+    }
+  },
+  "fr": {
+    "name": "Grille de formes",
+    "parameter": {
+      "shape": "Gamme de formes",
+      "cellSize": "Taille des cellules",
+      "fill": "Remplissage des formes",
+      "stroke": "Épaisseur du contour",
+      "rotation": "Rotation de la grille",
+      "contrast": "Contraste des tons",
+      "colorMode": "Mode de couleur",
+      "shadowColor": "Couleur des ombres",
+      "midtoneColor": "Couleur des tons moyens",
+      "highlightColor": "Couleur des hautes lumières",
+      "backgroundColor": "Couleur de fond",
+      "backgroundOpacity": "Opacité du fond"
+    },
+    "choice": {
+      "adaptive": "Gamme adaptée aux tons",
+      "dots": "Points",
+      "rings": "Anneaux",
+      "diamonds": "Losanges",
+      "squares": "Carrés",
+      "crosses": "Croix",
+      "source": "Couleurs d’origine",
+      "palette": "Palette de trois couleurs"
+    }
+  }
+}

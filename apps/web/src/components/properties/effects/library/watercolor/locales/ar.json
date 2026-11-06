@@ -1,0 +1,16 @@
+{
+  "name": "ألوان مائية",
+  "parameter": {
+    "washScale": "مقياس الغسلة اللونية",
+    "simplification": "تبسيط المناطق",
+    "edgePreservation": "الحفاظ على الحواف",
+    "diffusion": "انتشار الصبغة",
+    "pigment": "كثافة الصبغة",
+    "edgeDarkening": "تجمع الصبغة عند الحواف",
+    "granulation": "تحبب الصبغة",
+    "paperGrain": "حبيبات الورق",
+    "paperScale": "مقياس نسيج الورق",
+    "paperOpacity": "الغسلة اللونية للورق",
+    "paperColor": "لون الورق"
+  }
+}

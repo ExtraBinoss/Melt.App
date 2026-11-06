@@ -1,6 +1,6 @@
 # Effect catalog previews
 
-`catalog-622086656cb053dcd32ed9c1.webp` contains 53 static 240 × 180 thumbnails baked with Melt's production Three.js TSL renderer. Classic and Studio load this atlas; browsing never creates an effect renderer or reads source photographs.
+`catalog-9c8918b0b40bb53a4a2e3248.webp` contains 59 static 240 × 180 thumbnails baked with Melt's production Three.js TSL renderer. Classic and Studio load this atlas; browsing never creates an effect renderer or reads source photographs.
 
 Regenerate with the development server running:
 

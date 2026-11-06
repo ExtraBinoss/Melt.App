@@ -1,0 +1,16 @@
+{
+  "name": "Vento",
+  "parameter": {
+    "centerX": "Centro do campo X",
+    "centerY": "Centro do campo Y",
+    "angle": "Direção do vento",
+    "length": "Comprimento dos rastos",
+    "bandSize": "Largura das faixas",
+    "variation": "Variação das faixas",
+    "gust": "Intensidade das rajadas",
+    "speed": "Velocidade das rajadas",
+    "phase": "Fase",
+    "sourceMix": "Detalhe original",
+    "time": "Tempo"
+  }
+}

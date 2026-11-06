@@ -1,0 +1,28 @@
+{
+  "name": "ASCII",
+  "charactersHint": "문자를 옅은 것부터 조밀한 순서로 정렬하세요. 공백도 포함됩니다. 1~64자를 사용하며 문자를 반복하면 특정 명암의 비중을 높일 수 있습니다.",
+  "parameter": {
+    "scale": "문자 크기",
+    "characters": "문자",
+    "brightness": "밝기",
+    "contrast": "대비",
+    "gamma": "어두운 영역 세부 정보",
+    "palette": "색상 모드",
+    "foreground": "잉크 / 색조",
+    "background": "배경",
+    "shades": "명암 단계",
+    "invert": "밀도 반전",
+    "cellAspect": "셀 너비",
+    "glyphScale": "글리프 크기",
+    "weight": "잉크 굵기",
+    "color": "원본 색상",
+    "gradientEnd": "끝 색상",
+    "gradientAngle": "그라데이션 각도"
+  },
+  "palette": {
+    "image": "이미지 명암",
+    "tonal": "음영 잉크",
+    "solid": "단색 잉크",
+    "gradient": "그라데이션 잉크"
+  }
+}

@@ -13,7 +13,12 @@
       "rangeSigma": "Color tolerance",
       "protect": "Protect center",
       "protectedRadius": "Protected radius",
-      "feather": "Protection feather"
+      "feather": "Protection feather",
+      "gradientShape": "Gradient shape",
+      "gradientStart": "Gradient start",
+      "gradientEnd": "Gradient end",
+      "gradientPower": "Progression curve",
+      "gradientInvert": "Invert progression"
     },
     "choice": {
       "gaussian": "Gaussian",
@@ -22,7 +27,11 @@
       "spin": "Spin",
       "zoom": "Zoom",
       "lens": "Lens (Bokeh)",
-      "bilateral": "Bilateral"
+      "bilateral": "Bilateral",
+      "progressive": "Progressive",
+      "linear": "Linear",
+      "radial": "Radial",
+      "band": "Sharp band"
     }
   },
   "fr": {
@@ -39,7 +48,12 @@
       "rangeSigma": "Tolérance des couleurs",
       "protect": "Protéger le centre",
       "protectedRadius": "Rayon protégé",
-      "feather": "Adoucissement de la protection"
+      "feather": "Adoucissement de la protection",
+      "gradientShape": "Forme du dégradé",
+      "gradientStart": "Début du dégradé",
+      "gradientEnd": "Fin du dégradé",
+      "gradientPower": "Courbe de progression",
+      "gradientInvert": "Inverser la progression"
     },
     "choice": {
       "gaussian": "Gaussien",
@@ -48,7 +62,11 @@
       "spin": "Rotation",
       "zoom": "Zoom",
       "lens": "Objectif (bokeh)",
-      "bilateral": "Bilatéral"
+      "bilateral": "Bilatéral",
+      "progressive": "Progressif",
+      "linear": "Linéaire",
+      "radial": "Radial",
+      "band": "Bande nette"
     }
   }
 }

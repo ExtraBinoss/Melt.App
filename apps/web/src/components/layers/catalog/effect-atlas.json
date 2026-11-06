@@ -1,8 +1,15 @@
 {
   "version": 3,
-  "file": "catalog-622086656cb053dcd32ed9c1.webp",
-  "contentHash": "622086656cb053dcd32ed9c134e106690988ce643b1be7cc6e2d56acc0b43593",
+  "file": "catalog-9c8918b0b40bb53a4a2e3248.webp",
+  "contentHash": "9c8918b0b40bb53a4a2e3248dbe5a9810f204e4968ef1715d9557e989e5f4bb3",
   "entries": [
+    "glow",
+    "neon-melt",
+    "repeater",
+    "wave-distortion",
+    "shape-grid",
+    "watercolor",
+    "depth-anything",
     "depth-of-field",
     "trail",
     "risograph",
@@ -21,7 +28,6 @@
     "bevel",
     "displace",
     "thermal",
-    "morph",
     "dither",
     "ascii",
     "brightness",
@@ -108,13 +114,13 @@
   "cellWidth": 240,
   "cellHeight": 180,
   "width": 1920,
-  "height": 1260,
+  "height": 1440,
   "sourceFiles": [
-    "effect-atlas-sources-622086656cb0-1.json",
-    "effect-atlas-sources-622086656cb0-2.json",
-    "effect-atlas-sources-622086656cb0-3.json",
-    "effect-atlas-sources-622086656cb0-4.json",
-    "effect-atlas-sources-622086656cb0-5.json",
-    "effect-atlas-sources-622086656cb0-6.json"
+    "effect-atlas-sources-9c8918b0b40b-1.json",
+    "effect-atlas-sources-9c8918b0b40b-2.json",
+    "effect-atlas-sources-9c8918b0b40b-3.json",
+    "effect-atlas-sources-9c8918b0b40b-4.json",
+    "effect-atlas-sources-9c8918b0b40b-5.json",
+    "effect-atlas-sources-9c8918b0b40b-6.json"
   ]
 }

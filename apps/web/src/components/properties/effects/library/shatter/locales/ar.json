@@ -1,0 +1,33 @@
+{
+  "name": "تحطيم",
+  "pattern": {
+    "impact": "زجاج متشقق بالصدم",
+    "cellular": "زجاج بتشققات خلوية"
+  },
+  "parameter": {
+    "scale": "حجم الأوجه",
+    "pattern": "نمط التصدع",
+    "centerX": "موضع الصدمة X",
+    "centerY": "موضع الصدمة Y",
+    "radius": "نصف قطر الصدمة",
+    "innerRadius": "المركز المحمي",
+    "falloff": "تلاشي الحواف",
+    "jitter": "عدم انتظام التصدعات",
+    "spokes": "شقوق شعاعية",
+    "displacement": "إزاحة الأوجه",
+    "rotation": "دوران الأوجه",
+    "ior": "معامل الانكسار",
+    "thickness": "سمك الزجاج",
+    "dispersion": "تشتت الألوان",
+    "tilt": "ميل الأوجه",
+    "roughness": "خشونة الزجاج",
+    "crackWidth": "عرض الشقوق",
+    "cracks": "عتامة الشقوق",
+    "highlights": "لمعان الزجاج",
+    "tintStrength": "شدة الصبغة",
+    "tintColor": "صبغة الزجاج",
+    "crackColor": "لون الشقوق",
+    "highlightColor": "لون اللمعان",
+    "cutout": "شقوق شفافة"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "actions": "Aktionen",
+  "enabled": "Aktiviert",
+  "resetAll": "Alle Effektparameter zurücksetzen",
+  "playLive": "Live-Vorschau starten",
+  "pauseLive": "Live-Vorschau pausieren",
+  "liveTime": "Angezeigte Phase",
+  "seed": "Zufallsstartwert",
+  "falloff": "Abfall",
+  "composite": "Alpha-Komposition",
+  "replacement": "Effekt ersetzt Quelle (Standard)",
+  "operation": {
+    "source-over": "Quelle über Ziel",
+    "destination-over": "Ziel über Quelle",
+    "source-in": "Quelle innerhalb des Ziels",
+    "destination-in": "Ziel innerhalb der Quelle",
+    "source-out": "Quelle außerhalb des Ziels",
+    "destination-out": "Ziel außerhalb der Quelle",
+    "source-atop": "Quelle auf Ziel begrenzen",
+    "destination-atop": "Ziel auf Quelle begrenzen",
+    "xor": "Überlappung ausschließen",
+    "copy": "Nur Quelle",
+    "destination": "Nur Ziel",
+    "clear": "Zurücksetzen",
+    "lighter": "Quelle und Ziel addieren"
+  }
+}

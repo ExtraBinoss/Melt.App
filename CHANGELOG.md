@@ -4,6 +4,12 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ## [Unreleased]
 
+- Complete effect localization across all twelve supported languages: catalog/search names and descriptions, every SDK parameter and choice, gradients, transitions, source preparation, shared effect/alpha/blend controls, Motion recording/settings and canvas gizmo help. Load native locale bundles instead of falling back to English, and resolve animated choice endpoints through SDK labels while retaining portable values. Add strict per-locale resource, interpolation and runtime lookup regressions.
+
+- Soften held numeric scrub feedback to an 18% primary tint while preserving readable text, smooth fades and a steady appearance across snapping.
+
+- Add SDK-native Glow, Neon Melt, Repeater, Wave Distortion, Shape Grid and Watercolor effects, with generated English/French controls, shared placement, validated edits and Motion targets. Extend Blur with linear, radial and band progressive convolution. Keep filtering on bounded GPU textures, admit transformed repetition footprints, preserve transparent masks and reuse dense bloom prefilters for wide halos. Add focused authoring/history regressions and native WebGPU/WebGL decoded-export checks, including a mixed 50-image workload. See docs/effects/sdk_effects/new-treatments.md.
+
 - Keep numeric scrub labels in the primary color throughout a held gesture, with smooth entry and release fades instead of snap-driven flashes. Put Studio slider reset help on its own tooltip line and translate both hints into all twelve supported languages.
 
 - Replace dotted scrub-label snap underlines with a subtle color cue and solid Studio slider ticks. Add double-click reset to large Studio sliders using each control’s real defaults, with one undoable edit, a replayable shimmer, reduced-motion feedback, and explicit retirement of pending clicks and animations.

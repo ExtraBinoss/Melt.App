@@ -1,0 +1,12 @@
+{
+  "title": "Posición y área",
+  "position": "Posición",
+  "positionHelp": "Arrastra para colocar. Las flechas mueven; Mayús aumenta el paso.",
+  "domainEnabled": "Área local",
+  "domainX": "Posición X",
+  "domainY": "Posición Y",
+  "domainAngle": "Dirección del área",
+  "domainRadius": "Radio",
+  "domainAspect": "Proporción",
+  "domainFeather": "Suavizado"
+}

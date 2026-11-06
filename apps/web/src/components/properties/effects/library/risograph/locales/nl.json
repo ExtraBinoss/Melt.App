@@ -1,0 +1,23 @@
+{
+  "name": "Risografie",
+  "parameter": {
+    "palette": "Inktpalet",
+    "inkA": "Eerste inkt",
+    "inkB": "Tweede inkt",
+    "inkC": "Derde inkt",
+    "paperColor": "Papierkleur",
+    "dotSize": "Grootte van drukpunten",
+    "contrast": "Scheidingscontrast",
+    "inkDensity": "Inktdichtheid",
+    "misregistration": "Registerafwijking van inkt",
+    "grain": "Inktkorrel",
+    "paperTexture": "Papiertextuur",
+    "centerX": "Drukoorsprong X",
+    "centerY": "Drukoorsprong Y",
+    "angle": "Drukrichting"
+  },
+  "choice": {
+    "duotone": "Twee inkten",
+    "tritone": "Drie inkten"
+  }
+}

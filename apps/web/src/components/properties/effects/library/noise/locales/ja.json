@@ -1,0 +1,37 @@
+{
+  "name": "ノイズ",
+  "parameter": {
+    "algorithm": "アルゴリズム",
+    "scale": "セルの大きさ",
+    "octaves": "オクターブ数",
+    "lacunarity": "周波数の増加率",
+    "persistence": "細部の強さ",
+    "jitter": "セルの不規則性",
+    "offsetX": "X方向のオフセット",
+    "offsetY": "Y方向のオフセット",
+    "offsetZ": "3D断面",
+    "speed": "変化の速度",
+    "contrast": "コントラスト",
+    "brightness": "明るさ",
+    "gamma": "ガンマ",
+    "invert": "反転",
+    "mode": "ノイズの適用方法",
+    "lowColor": "低い値の色",
+    "highColor": "高い値の色",
+    "time": "時間"
+  },
+  "algorithm": {
+    "perlin": "3Dパーリン",
+    "value": "3Dバリューノイズ",
+    "cell": "3Dセル",
+    "worley": "3Dウォーリー",
+    "fbm": "フラクタルブラウン運動",
+    "ridged": "尾根状フラクタル",
+    "turbulence": "乱流"
+  },
+  "mode": {
+    "replace": "色を置き換え",
+    "add": "変化を追加",
+    "multiply": "乗算"
+  }
+}

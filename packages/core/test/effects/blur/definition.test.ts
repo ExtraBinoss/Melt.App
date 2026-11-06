@@ -15,6 +15,7 @@ import {
   BLUR_TECHNIQUES,
 } from "../../../src/effects/blur/definition";
 import { isEffectParameterVisible, patchEffectParameter } from "../../../src/effects/parameters";
+import { EFFECT_DOMAIN_PARAMETERS } from "../../../src/effects/sdk/domain";
 import { resolveEffectSettings } from "../../../src/effects/settings";
 
 const parameter = (key: string) => BLUR_DEFINITION.parameters.find((item) => item.key === key)!;
@@ -22,7 +23,10 @@ const parameter = (key: string) => BLUR_DEFINITION.parameters.find((item) => ite
 it("retains old Gaussian defaults and declares one immutable, bounded blur library", () => {
   const effect = createEffect("blur");
   const legacy = { ...effect, settings: undefined };
-  expect(resolveEffectSettings(legacy)).toEqual(BLUR_DEFAULT_SETTINGS);
+  expect(resolveEffectSettings(legacy)).toEqual({
+    ...BLUR_DEFAULT_SETTINGS,
+    ...Object.fromEntries(EFFECT_DOMAIN_PARAMETERS.map((p) => [p.key, p.default])),
+  });
   expect(effect).toMatchObject({ type: "blur", amount: 1, scale: 2 });
   expect(BLUR_DEFINITION.coverage).toBe("expand");
   expect(BLUR_TECHNIQUES).toEqual([
@@ -33,6 +37,7 @@ it("retains old Gaussian defaults and declares one immutable, bounded blur libra
     "zoom",
     "lens",
     "bilateral",
+    "progressive",
   ]);
   expect(Object.isFrozen(BLUR_DEFINITION.defaults.settings)).toBe(true);
   expect(BLUR_DEFINITION.parameters.filter((item) => item.key === "technique")).toHaveLength(1);
@@ -55,7 +60,7 @@ it("exposes technique-owned parameters and opt-in protection fields", () => {
   for (const technique of BLUR_TECHNIQUES) {
     const effect = createEffect("blur", { settings: { technique } });
     for (const [key, techniques] of [
-      ["angle", ["directional"]],
+      ["angle", ["directional", "progressive"]],
       ["spinAngle", ["spin"]],
       ["zoomStrength", ["zoom"]],
       ["apertureBlades", ["lens"]],
@@ -124,5 +129,37 @@ it("round-trips each real technique and atomically rejects invalid settings thro
       }),
     ).toThrow();
     expect(engine.getSnapshot().project).toEqual(before);
+  }
+});
+
+it("exposes progressive stops only for its real convolution technique and validates them", () => {
+  const progressive = createEffect("blur", {
+    settings: { technique: "progressive", gradientStart: 0.8, gradientEnd: 0.2 },
+  });
+  const gaussian = createEffect("blur");
+  for (const key of [
+    "gradientShape",
+    "gradientStart",
+    "gradientEnd",
+    "gradientPower",
+    "gradientInvert",
+  ]) {
+    const field = parameter(key);
+    expect(isEffectParameterVisible(progressive, field)).toBe(true);
+    expect(isEffectParameterVisible(gaussian, field)).toBe(false);
+  }
+  const project = createProject({
+    pages: [createPage({ layers: [createLayer("rectangle", { effects: [progressive] })] })],
+  });
+  expect(() => validateProject(project)).not.toThrow();
+  for (const settings of [
+    { gradientStart: -0.1 },
+    { gradientEnd: 1.1 },
+    { gradientPower: 0 },
+    { gradientShape: "fake" },
+  ]) {
+    const invalid = structuredClone(project);
+    invalid.pages[0]!.layers[0]!.effects[0]!.settings = { technique: "progressive", ...settings };
+    expect(() => validateProject(invalid)).toThrow();
   }
 });

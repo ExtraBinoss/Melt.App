@@ -1,0 +1,23 @@
+{
+  "name": "Dithering jednobitowy",
+  "parameter": {
+    "method": "Metoda",
+    "scale": "Rozmiar komórki",
+    "threshold": "Próg",
+    "strength": "Siła ditheringu",
+    "contrast": "Kontrast",
+    "gamma": "Gamma tonów",
+    "invert": "Odwróć",
+    "foreground": "Kolor tuszu",
+    "background": "Kolor papieru",
+    "sourceColor": "Kolory źródłowe"
+  },
+  "method": {
+    "threshold": "Stały próg",
+    "bayer2": "Bayer 2×2",
+    "bayer4": "Bayer 4×4",
+    "bayer8": "Bayer 8×8",
+    "interleaved": "Przeplatany szum gradientowy",
+    "multilevel": "Wielopoziomowy Bayer"
+  }
+}

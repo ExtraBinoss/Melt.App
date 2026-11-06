@@ -1,0 +1,21 @@
+{
+  "name": "Zniekształcenie falowe",
+  "parameter": {
+    "waveform": "Kształt fali",
+    "amplitude": "Amplituda",
+    "frequency": "Liczba cykli na krótszym boku",
+    "angle": "Kąt rozchodzenia się",
+    "phase": "Faza",
+    "edge": "Krawędzie źródła"
+  },
+  "choice": {
+    "sine": "Sinusoidalna",
+    "triangle": "Trójkątna",
+    "square": "Prostokątna",
+    "sawtooth": "Piłokształtna",
+    "transparent": "Przezroczyste",
+    "mirror": "Odbicie lustrzane",
+    "repeat": "Powtarzanie",
+    "clamp": "Rozciąganie krawędzi"
+  }
+}

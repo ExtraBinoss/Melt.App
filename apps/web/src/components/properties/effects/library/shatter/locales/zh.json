@@ -1,0 +1,33 @@
+{
+  "name": "碎裂",
+  "pattern": {
+    "impact": "冲击碎玻璃",
+    "cellular": "胞状碎玻璃"
+  },
+  "parameter": {
+    "scale": "碎片大小",
+    "pattern": "碎裂图案",
+    "centerX": "冲击位置 X",
+    "centerY": "冲击位置 Y",
+    "radius": "冲击半径",
+    "innerRadius": "受保护的中心",
+    "falloff": "边缘衰减",
+    "jitter": "裂纹不规则度",
+    "spokes": "放射状裂纹",
+    "displacement": "碎片偏移",
+    "rotation": "碎片旋转",
+    "ior": "折射率",
+    "thickness": "玻璃厚度",
+    "dispersion": "色散",
+    "tilt": "碎片倾斜",
+    "roughness": "玻璃粗糙度",
+    "crackWidth": "裂纹宽度",
+    "cracks": "裂纹不透明度",
+    "highlights": "玻璃高光",
+    "tintStrength": "色调强度",
+    "tintColor": "玻璃色调",
+    "crackColor": "裂纹颜色",
+    "highlightColor": "高光颜色",
+    "cutout": "裂纹透明"
+  }
+}

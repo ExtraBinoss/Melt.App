@@ -1,0 +1,44 @@
+{
+  "en": {
+    "name": "Wave Distortion",
+    "parameter": {
+      "waveform": "Waveform",
+      "amplitude": "Amplitude",
+      "frequency": "Cycles per shorter side",
+      "angle": "Propagation angle",
+      "phase": "Phase",
+      "edge": "Source edges"
+    },
+    "choice": {
+      "sine": "Sine",
+      "triangle": "Triangle",
+      "square": "Square",
+      "sawtooth": "Sawtooth",
+      "transparent": "Transparent",
+      "mirror": "Mirror",
+      "repeat": "Repeat",
+      "clamp": "Clamp"
+    }
+  },
+  "fr": {
+    "name": "Distorsion par ondes",
+    "parameter": {
+      "waveform": "Forme d’onde",
+      "amplitude": "Amplitude",
+      "frequency": "Cycles par petit côté",
+      "angle": "Angle de propagation",
+      "phase": "Phase",
+      "edge": "Bords de la source"
+    },
+    "choice": {
+      "sine": "Sinusoïde",
+      "triangle": "Triangle",
+      "square": "Carré",
+      "sawtooth": "Dent de scie",
+      "transparent": "Transparent",
+      "mirror": "Miroir",
+      "repeat": "Répétition",
+      "clamp": "Prolonger"
+    }
+  }
+}

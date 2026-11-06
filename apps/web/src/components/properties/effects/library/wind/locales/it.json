@@ -1,0 +1,16 @@
+{
+  "name": "Vento",
+  "parameter": {
+    "centerX": "Centro del campo X",
+    "centerY": "Centro del campo Y",
+    "angle": "Direzione del vento",
+    "length": "Lunghezza delle scie",
+    "bandSize": "Larghezza delle bande",
+    "variation": "Variazione delle bande",
+    "gust": "Intensità delle raffiche",
+    "speed": "Velocità delle raffiche",
+    "phase": "Fase",
+    "sourceMix": "Dettaglio originale",
+    "time": "Tempo"
+  }
+}

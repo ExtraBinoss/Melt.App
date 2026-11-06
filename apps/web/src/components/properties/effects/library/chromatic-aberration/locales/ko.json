@@ -1,0 +1,16 @@
+{
+  "name": "색수차",
+  "parameter": {
+    "mode": "분리 모드",
+    "centerX": "중심 X",
+    "centerY": "중심 Y",
+    "angle": "분리 방향",
+    "separation": "채널 분리",
+    "radius": "감쇠 반경",
+    "falloff": "거리에 따른 감쇠"
+  },
+  "choice": {
+    "radial": "방사형",
+    "directional": "방향성"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "name": "闪光",
+  "parameter": {
+    "centerX": "中心 X",
+    "centerY": "中心 Y",
+    "radius": "光照半径",
+    "softness": "边缘柔和度",
+    "falloff": "光照衰减",
+    "aspect": "光束宽高比",
+    "rotation": "光束旋转",
+    "intensity": "光照强度",
+    "ambient": "环境光",
+    "exposure": "闪光曝光",
+    "highlightCompression": "高光压缩",
+    "saturation": "饱和度",
+    "glow": "光雾",
+    "grain": "胶片颗粒",
+    "grainSize": "颗粒大小",
+    "lightColor": "光线颜色",
+    "invert": "反转照明"
+  }
+}

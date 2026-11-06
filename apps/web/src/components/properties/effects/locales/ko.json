@@ -1,0 +1,27 @@
+{
+  "actions": "동작",
+  "enabled": "활성화",
+  "resetAll": "모든 효과 매개변수 초기화",
+  "playLive": "실시간 재생",
+  "pauseLive": "실시간 재생 일시 정지",
+  "liveTime": "표시된 위상",
+  "seed": "시드",
+  "falloff": "감쇠",
+  "composite": "알파 합성",
+  "replacement": "효과로 대체(기본값)",
+  "operation": {
+    "source-over": "소스를 위에 합성",
+    "destination-over": "대상을 위에 합성",
+    "source-in": "소스의 대상 내부 영역",
+    "destination-in": "대상의 소스 내부 영역",
+    "source-out": "소스의 대상 외부 영역",
+    "destination-out": "대상의 소스 외부 영역",
+    "source-atop": "대상 영역에 소스 합성",
+    "destination-atop": "소스 영역에 대상 합성",
+    "xor": "겹치는 영역 제외",
+    "copy": "소스만",
+    "destination": "대상만",
+    "clear": "초기화",
+    "lighter": "소스와 대상 더하기"
+  }
+}

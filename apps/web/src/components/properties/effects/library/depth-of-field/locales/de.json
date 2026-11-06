@@ -1,0 +1,23 @@
+{
+  "name": "Schärfentiefe",
+  "parameter": {
+    "focusMode": "Fokusmodus",
+    "focusX": "Fokuspunkt X",
+    "focusY": "Fokuspunkt Y",
+    "focusDistance": "Fokusentfernung",
+    "focusRange": "Schärfebereich",
+    "aperture": "Blende",
+    "maxBlur": "Maximale Unschärfe",
+    "blades": "Blendenlamellen",
+    "angle": "Blendenausrichtung",
+    "edgeProtection": "Schutz der Tiefenkanten",
+    "quality": "Abtastqualität"
+  },
+  "choice": {
+    "distance": "Kameraabstand",
+    "point": "Native Tiefe am Punkt",
+    "low": "Niedrig (8 Abtastungen)",
+    "medium": "Mittel (16 Abtastungen)",
+    "high": "Hoch (24 Abtastungen)"
+  }
+}

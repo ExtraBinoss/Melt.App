@@ -1,0 +1,23 @@
+{
+  "name": "피사계 심도",
+  "parameter": {
+    "focusMode": "초점 모드",
+    "focusX": "초점 위치 X",
+    "focusY": "초점 위치 Y",
+    "focusDistance": "초점 거리",
+    "focusRange": "초점 범위",
+    "aperture": "조리개",
+    "maxBlur": "최대 흐림",
+    "blades": "조리개 날개",
+    "angle": "조리개 방향",
+    "edgeProtection": "깊이 경계 보호",
+    "quality": "샘플링 품질"
+  },
+  "choice": {
+    "distance": "카메라 거리",
+    "point": "지점의 원본 깊이",
+    "low": "낮음(8개 샘플)",
+    "medium": "중간(16개 샘플)",
+    "high": "높음(24개 샘플)"
+  }
+}

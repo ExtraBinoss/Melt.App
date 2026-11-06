@@ -1,0 +1,11 @@
+{
+  "name": "グロー",
+  "parameter": {
+    "threshold": "ハイライトのしきい値",
+    "knee": "ソフトしきい値",
+    "intensity": "グローの強さ",
+    "radius": "光輪の半径",
+    "tint": "グローの色合い",
+    "glowOnly": "グローのみ"
+  }
+}

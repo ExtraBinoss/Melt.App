@@ -1,0 +1,23 @@
+{
+  "name": "تنقيط أحادي البت",
+  "parameter": {
+    "method": "الطريقة",
+    "scale": "حجم الخلية",
+    "threshold": "العتبة",
+    "strength": "شدة التنقيط",
+    "contrast": "التباين",
+    "gamma": "غاما الدرجات اللونية",
+    "invert": "عكس",
+    "foreground": "لون الحبر",
+    "background": "لون الورق",
+    "sourceColor": "ألوان المصدر"
+  },
+  "method": {
+    "threshold": "عتبة ثابتة",
+    "bayer2": "Bayer 2×2",
+    "bayer4": "Bayer 4×4",
+    "bayer8": "Bayer 8×8",
+    "interleaved": "ضجيج تدرج متداخل",
+    "multilevel": "Bayer متعدد المستويات"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "title": "Pozycja i obszar",
+  "position": "Pozycja",
+  "positionHelp": "Przeciągnij, aby ustawić pozycję. Strzałki przesuwają; Shift zwiększa krok.",
+  "domainEnabled": "Obszar lokalny",
+  "domainX": "Pozycja X",
+  "domainY": "Pozycja Y",
+  "domainAngle": "Kierunek obszaru",
+  "domainRadius": "Promień",
+  "domainAspect": "Proporcje",
+  "domainFeather": "Zmiękczenie"
+}

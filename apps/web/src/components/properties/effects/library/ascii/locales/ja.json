@@ -1,0 +1,28 @@
+{
+  "name": "ASCII",
+  "charactersHint": "文字を薄いものから密なものへ並べます。空白も数えます。1～64文字を使用し、同じ文字を繰り返すと特定の階調を強調できます。",
+  "parameter": {
+    "scale": "文字サイズ",
+    "characters": "文字",
+    "brightness": "明るさ",
+    "contrast": "コントラスト",
+    "gamma": "シャドウの詳細",
+    "palette": "カラーモード",
+    "foreground": "インク／色合い",
+    "background": "背景",
+    "shades": "階調数",
+    "invert": "濃度を反転",
+    "cellAspect": "セルの幅",
+    "glyphScale": "グリフのサイズ",
+    "weight": "インクの太さ",
+    "color": "元の色",
+    "gradientEnd": "終了色",
+    "gradientAngle": "グラデーションの角度"
+  },
+  "palette": {
+    "image": "画像の階調",
+    "tonal": "濃淡インク",
+    "solid": "単色インク",
+    "gradient": "グラデーションインク"
+  }
+}

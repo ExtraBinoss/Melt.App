@@ -1,0 +1,35 @@
+{
+  "name": "흐림",
+  "parameter": {
+    "technique": "기법",
+    "angle": "방향 각도",
+    "centerX": "중심 X",
+    "centerY": "중심 Y",
+    "spinAngle": "회전 각도",
+    "zoomStrength": "확대 강도",
+    "apertureBlades": "조리개 날 수",
+    "apertureRotation": "조리개 회전",
+    "rangeSigma": "색상 허용 오차",
+    "protect": "중심 보호",
+    "protectedRadius": "보호 반경",
+    "feather": "보호 경계 부드러움",
+    "gradientShape": "그라데이션 모양",
+    "gradientStart": "그라데이션 시작",
+    "gradientEnd": "그라데이션 끝",
+    "gradientPower": "진행 곡선",
+    "gradientInvert": "진행 반전"
+  },
+  "choice": {
+    "gaussian": "가우시안",
+    "box": "평균",
+    "directional": "방향",
+    "spin": "회전",
+    "zoom": "확대",
+    "lens": "렌즈 (보케)",
+    "bilateral": "양방향",
+    "progressive": "점진적",
+    "linear": "선형",
+    "radial": "방사형",
+    "band": "선명한 띠"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "name": "Bagliore",
+  "parameter": {
+    "threshold": "Soglia delle alte luci",
+    "knee": "Soglia morbida",
+    "intensity": "Intensità del bagliore",
+    "radius": "Raggio dell’alone",
+    "tint": "Tinta del bagliore",
+    "glowOnly": "Solo bagliore"
+  }
+}

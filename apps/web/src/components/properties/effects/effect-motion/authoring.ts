@@ -1,5 +1,6 @@
 import {
   getEffectDefinition,
+  BLEND_CATALOG,
   listMotionProperties,
   listSceneMotionProperties,
   planMotionInitialization,
@@ -335,4 +336,26 @@ export function effectPropertyLabel(effect: Effect, property: EffectDriverProper
     parameter?.labelKey ??
     (property.target.property === "enabled" ? "effectControls:enabled" : property.target.property)
   );
+}
+
+/** Labels stay in SDK metadata; recorded choice values remain portable IDs. */
+export function effectPropertyOptionLabel(
+  effect: Effect,
+  property: EffectDriverProperty,
+  value: string,
+): string {
+  const parameter = getEffectDefinition(effect.type).parameters.find(
+    (item) =>
+      item.key === property.target.property &&
+      (item.scope === "settings") ===
+        (property.target.kind === "effectSetting" ||
+          property.target.kind === "compositionEffectSetting"),
+  );
+  if (parameter?.kind === "select")
+    return parameter.options.find((option) => option.value === value)?.labelKey ?? value;
+  if (property.target.property === "blendMode" && Object.hasOwn(BLEND_CATALOG, value))
+    return BLEND_CATALOG[value as keyof typeof BLEND_CATALOG].nameKey;
+  if (property.target.property === "composite")
+    return value === "default" ? "effectControls:replacement" : `effectControls:operation.${value}`;
+  return value;
 }

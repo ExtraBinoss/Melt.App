@@ -1,0 +1,33 @@
+{
+  "name": "粉砕",
+  "pattern": {
+    "impact": "衝撃によるガラス割れ",
+    "cellular": "セル状のガラス割れ"
+  },
+  "parameter": {
+    "scale": "破片のサイズ",
+    "pattern": "破砕パターン",
+    "centerX": "衝撃位置 X",
+    "centerY": "衝撃位置 Y",
+    "radius": "衝撃の半径",
+    "innerRadius": "保護する中心部",
+    "falloff": "端の減衰",
+    "jitter": "割れ目の不規則さ",
+    "spokes": "放射状のひび",
+    "displacement": "破片のずれ",
+    "rotation": "破片の回転",
+    "ior": "屈折率",
+    "thickness": "ガラスの厚さ",
+    "dispersion": "色分散",
+    "tilt": "破片の傾き",
+    "roughness": "ガラスの粗さ",
+    "crackWidth": "ひびの幅",
+    "cracks": "ひびの不透明度",
+    "highlights": "ガラスのハイライト",
+    "tintStrength": "色合いの強さ",
+    "tintColor": "ガラスの色合い",
+    "crackColor": "ひびの色",
+    "highlightColor": "ハイライトの色",
+    "cutout": "ひびを透明にする"
+  }
+}

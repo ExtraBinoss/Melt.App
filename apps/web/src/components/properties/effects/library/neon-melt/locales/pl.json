@@ -1,0 +1,23 @@
+{
+  "name": "Płynny neon",
+  "parameter": {
+    "threshold": "Próg świateł",
+    "knee": "Miękki próg",
+    "intensity": "Intensywność poświaty",
+    "radius": "Promień aureoli",
+    "tint": "Odcień poświaty",
+    "glowOnly": "Tylko poświata",
+    "palette": "Paleta neonowa",
+    "paletteShift": "Przesunięcie palety",
+    "contrast": "Kontrast mapowania",
+    "distortion": "Płynne przemieszczenie",
+    "liquidScale": "Długość fali cieczy",
+    "direction": "Kierunek przepływu",
+    "phase": "Faza cieczy"
+  },
+  "choice": {
+    "acid": "Kwasowa",
+    "spectral": "Widmowa",
+    "ultraviolet": "Ultrafioletowa"
+  }
+}

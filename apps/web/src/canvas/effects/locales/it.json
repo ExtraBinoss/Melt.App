@@ -2,11 +2,11 @@
   "center": "Centro dell’effetto",
   "radius": "Raggio dell’effetto",
   "innerRadius": "Raggio protetto",
-  "feather": "Bordo di sfumatura",
+  "feather": "Bordo sfumato",
   "hint": "Trascina il centro o il raggio · Esc per annullare",
   "centerHelp": "Trascina per spostare il centro dell’effetto.",
   "radiusHelp": "Trascina per regolare la portata dell’effetto.",
   "innerRadiusHelp": "Trascina per ridimensionare l’area protetta.",
-  "featherHelp": "Trascina per regolare la transizione tra l’area nitida e quella sfocata.",
-  "keyboardHelp": "Frecce: 1 px · Maiusc: 10 px · Esc: annulla."
+  "featherHelp": "Trascina per regolare la transizione tra le aree nitide e sfocate.",
+  "keyboardHelp": "Tasti freccia: 1 px · Maiusc: 10 px · Esc: annulla."
 }

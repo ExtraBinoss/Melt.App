@@ -1,0 +1,50 @@
+{
+  "name": "收据",
+  "fit": {
+    "contain": "保持纵横比",
+    "stretch": "填满打印区域"
+  },
+  "mode": {
+    "ordered": "有序网点",
+    "stochastic": "随机网点",
+    "threshold": "阈值"
+  },
+  "edge": {
+    "straight": "平直切口",
+    "torn": "撕裂边缘",
+    "perforated": "打孔边缘"
+  },
+  "parameter": {
+    "scale": "打印网点间距",
+    "mode": "热敏半色调",
+    "exposure": "曝光",
+    "gamma": "伽马",
+    "contrast": "打印对比度",
+    "invert": "反转打印",
+    "inkColor": "打印颜色",
+    "paperColor": "纸张颜色",
+    "inkOpacity": "打印浓度",
+    "dotSpread": "网点扩散",
+    "dotSoftness": "网点柔和度",
+    "wear": "缺失网点",
+    "feedBanding": "进纸条带",
+    "feedPitch": "进纸条带间距",
+    "streaks": "打印头条痕",
+    "streakWidth": "条痕宽度",
+    "marginX": "水平打印边距",
+    "marginY": "垂直打印边距",
+    "fit": "图像适配",
+    "paperTexture": "纸张纹理",
+    "fiberSize": "纤维大小",
+    "edge": "纸张切口",
+    "edgeHeight": "边缘深度",
+    "edgePitch": "边缘间距",
+    "edgeJitter": "边缘不规则度",
+    "edgeSoftness": "边缘柔和度",
+    "edgeShade": "边缘阴影",
+    "foldStrength": "折痕阴影",
+    "foldPosition": "折痕位置",
+    "foldWidth": "折痕宽度",
+    "cutout": "透明纸张边缘"
+  }
+}

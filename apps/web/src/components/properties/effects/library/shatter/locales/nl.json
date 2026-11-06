@@ -1,0 +1,33 @@
+{
+  "name": "Versplintering",
+  "pattern": {
+    "impact": "Ingeslagen glas",
+    "cellular": "Cellulair glas"
+  },
+  "parameter": {
+    "scale": "Facetgrootte",
+    "pattern": "Breukpatroon",
+    "centerX": "Inslag X",
+    "centerY": "Inslag Y",
+    "radius": "Inslagstraal",
+    "innerRadius": "Beschermd midden",
+    "falloff": "Randafzwakking",
+    "jitter": "Onregelmatigheid van breuken",
+    "spokes": "Radiale barsten",
+    "displacement": "Facetverschuiving",
+    "rotation": "Facetrotatie",
+    "ior": "Brekingsindex",
+    "thickness": "Glasdikte",
+    "dispersion": "Kleurspreiding",
+    "tilt": "Facethelling",
+    "roughness": "Glasruwheid",
+    "crackWidth": "Barstbreedte",
+    "cracks": "Barstdekking",
+    "highlights": "Glasreflecties",
+    "tintStrength": "Tintsterkte",
+    "tintColor": "Glastint",
+    "crackColor": "Barstkleur",
+    "highlightColor": "Reflectiekleur",
+    "cutout": "Transparante barsten"
+  }
+}

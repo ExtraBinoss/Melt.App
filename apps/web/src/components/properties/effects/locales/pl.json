@@ -1,0 +1,27 @@
+{
+  "actions": "Działania",
+  "enabled": "Włączone",
+  "resetAll": "Zresetuj wszystkie parametry efektu",
+  "playLive": "Odtwórz podgląd na żywo",
+  "pauseLive": "Wstrzymaj podgląd na żywo",
+  "liveTime": "Wyświetlana faza",
+  "seed": "Ziarno losowości",
+  "falloff": "Zanikanie",
+  "composite": "Kompozycja alfa",
+  "replacement": "Zastąpienie efektem (domyślnie)",
+  "operation": {
+    "source-over": "Źródło nad celem",
+    "destination-over": "Cel nad źródłem",
+    "source-in": "Źródło wewnątrz celu",
+    "destination-in": "Cel wewnątrz źródła",
+    "source-out": "Źródło poza celem",
+    "destination-out": "Cel poza źródłem",
+    "source-atop": "Źródło na obszarze celu",
+    "destination-atop": "Cel na obszarze źródła",
+    "xor": "Wyklucz część wspólną",
+    "copy": "Tylko źródło",
+    "destination": "Tylko cel",
+    "clear": "Wyczyść",
+    "lighter": "Dodaj źródło i cel"
+  }
+}

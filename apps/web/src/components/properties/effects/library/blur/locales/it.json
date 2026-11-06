@@ -1,0 +1,35 @@
+{
+  "name": "Sfocatura",
+  "parameter": {
+    "technique": "Tecnica",
+    "angle": "Angolo di direzione",
+    "centerX": "Centro X",
+    "centerY": "Centro Y",
+    "spinAngle": "Angolo di rotazione",
+    "zoomStrength": "Intensità dello zoom",
+    "apertureBlades": "Lamelle del diaframma",
+    "apertureRotation": "Rotazione del diaframma",
+    "rangeSigma": "Tolleranza cromatica",
+    "protect": "Proteggi il centro",
+    "protectedRadius": "Raggio protetto",
+    "feather": "Sfumatura della protezione",
+    "gradientShape": "Forma del gradiente",
+    "gradientStart": "Inizio del gradiente",
+    "gradientEnd": "Fine del gradiente",
+    "gradientPower": "Curva di progressione",
+    "gradientInvert": "Inverti progressione"
+  },
+  "choice": {
+    "gaussian": "Gaussiana",
+    "box": "Media",
+    "directional": "Direzionale",
+    "spin": "Rotazione",
+    "zoom": "Zoom",
+    "lens": "Obiettivo (bokeh)",
+    "bilateral": "Bilaterale",
+    "progressive": "Progressiva",
+    "linear": "Lineare",
+    "radial": "Radiale",
+    "band": "Fascia nitida"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "name": "Chromatische Aberration",
+  "parameter": {
+    "mode": "Trennungsmodus",
+    "centerX": "Zentrum X",
+    "centerY": "Zentrum Y",
+    "angle": "Trennungsrichtung",
+    "separation": "Kanaltrennung",
+    "radius": "Abschwächungsradius",
+    "falloff": "Entfernungsabschwächung"
+  },
+  "choice": {
+    "radial": "Radial",
+    "directional": "Gerichtet"
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "name": "Gescheurde randen",
+  "parameter": {
+    "technique": "Techniek",
+    "balance": "Toonbalans",
+    "contrast": "Contrast",
+    "roughness": "Ruwheid van de scheur",
+    "textureScale": "Textuurgrootte",
+    "detail": "Fijne vezels",
+    "smoothing": "Bronverzachting",
+    "tearWidth": "Scheurdiepte",
+    "edgeWidth": "Breedte van de papierrand",
+    "feather": "Randverzachting",
+    "ink": "Inktkleur",
+    "paper": "Papierkleur",
+    "edgeColor": "Kleur van de scheurrand",
+    "backgroundOpacity": "Papierdekking",
+    "sourceColor": "Oorspronkelijke kleur",
+    "tearTop": "Bovenkant scheuren",
+    "tearBottom": "Onderkant scheuren",
+    "tearLeft": "Linkerkant scheuren",
+    "tearRight": "Rechterkant scheuren"
+  },
+  "choice": {
+    "graphic": "Gescheurde afbeelding",
+    "paper": "Silhouet van gescheurd papier"
+  }
+}

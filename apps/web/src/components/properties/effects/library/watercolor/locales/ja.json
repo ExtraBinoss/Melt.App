@@ -1,0 +1,16 @@
+{
+  "name": "水彩",
+  "parameter": {
+    "washScale": "にじみの大きさ",
+    "simplification": "領域の単純化",
+    "edgePreservation": "輪郭の保持",
+    "diffusion": "顔料の拡散",
+    "pigment": "顔料の濃度",
+    "edgeDarkening": "輪郭への顔料の集積",
+    "granulation": "顔料の粒状感",
+    "paperGrain": "紙のきめ",
+    "paperScale": "紙のテクスチャの大きさ",
+    "paperOpacity": "紙の淡彩",
+    "paperColor": "紙の色"
+  }
+}

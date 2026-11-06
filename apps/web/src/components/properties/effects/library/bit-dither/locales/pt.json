@@ -1,0 +1,23 @@
+{
+  "name": "Dithering de um bit",
+  "parameter": {
+    "method": "Método",
+    "scale": "Tamanho da célula",
+    "threshold": "Limiar",
+    "strength": "Intensidade do dithering",
+    "contrast": "Contraste",
+    "gamma": "Gama tonal",
+    "invert": "Inverter",
+    "foreground": "Cor da tinta",
+    "background": "Cor do papel",
+    "sourceColor": "Cores de origem"
+  },
+  "method": {
+    "threshold": "Limiar fixo",
+    "bayer2": "Bayer 2×2",
+    "bayer4": "Bayer 4×4",
+    "bayer8": "Bayer 8×8",
+    "interleaved": "Ruído de gradiente entrelaçado",
+    "multilevel": "Bayer multinível"
+  }
+}

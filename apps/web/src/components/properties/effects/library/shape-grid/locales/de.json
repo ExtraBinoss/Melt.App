@@ -1,0 +1,27 @@
+{
+  "name": "Formenraster",
+  "parameter": {
+    "shape": "Formenabstufung",
+    "cellSize": "Zellengröße",
+    "fill": "Formfüllung",
+    "stroke": "Konturstärke",
+    "rotation": "Rasterdrehung",
+    "contrast": "Tonwertkontrast",
+    "colorMode": "Farbmodus",
+    "shadowColor": "Schattenfarbe",
+    "midtoneColor": "Mittentonfarbe",
+    "highlightColor": "Spitzlichtfarbe",
+    "backgroundColor": "Hintergrundfarbe",
+    "backgroundOpacity": "Hintergrunddeckkraft"
+  },
+  "choice": {
+    "adaptive": "Adaptive Tonwertabstufung",
+    "dots": "Punkte",
+    "rings": "Ringe",
+    "diamonds": "Rauten",
+    "squares": "Quadrate",
+    "crosses": "Kreuze",
+    "source": "Originalfarben",
+    "palette": "Dreifarbige Palette"
+  }
+}

@@ -132,7 +132,7 @@ export function estimatePreviewCost(
     }
     const effects = l.effects.filter(hasEffectTreatment);
     if (effects.length) {
-      const footprint = effectFootprint(effects);
+      const footprint = effectFootprint(effects, { width, height });
       const expanded = footprint.left || footprint.right || footprint.top || footprint.bottom;
       w = rasterExtent(width + footprint.left + footprint.right, density);
       h = rasterExtent(height + footprint.top + footprint.bottom, density);

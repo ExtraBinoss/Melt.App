@@ -1,0 +1,23 @@
+{
+  "name": "Flüssiges Neon",
+  "parameter": {
+    "threshold": "Schwelle für Spitzlichter",
+    "knee": "Weicher Schwellenwert",
+    "intensity": "Leuchtintensität",
+    "radius": "Halo-Radius",
+    "tint": "Leuchtfarbe",
+    "glowOnly": "Nur Leuchten",
+    "palette": "Neonpalette",
+    "paletteShift": "Palettenversatz",
+    "contrast": "Kontrast der Farbzuordnung",
+    "distortion": "Flüssige Verschiebung",
+    "liquidScale": "Flüssigkeitswellenlänge",
+    "direction": "Fließrichtung",
+    "phase": "Flüssigkeitsphase"
+  },
+  "choice": {
+    "acid": "Säurefarben",
+    "spectral": "Spektral",
+    "ultraviolet": "Ultraviolett"
+  }
+}

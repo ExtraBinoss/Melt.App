@@ -1,0 +1,19 @@
+{
+  "name": "دوائر",
+  "parameter": {
+    "spacing": "تباعد الخلايا",
+    "rotation": "زاوية شبكة التنقيط",
+    "dotSize": "حجم النقاط",
+    "softness": "نعومة الحواف",
+    "gamma": "غاما الدرجات اللونية",
+    "polarity": "قطبية النقاط",
+    "foreground": "لون الحبر",
+    "background": "لون الورق",
+    "foregroundOpacity": "عتامة الحبر",
+    "backgroundOpacity": "عتامة الورق"
+  },
+  "polarity": {
+    "shadows": "نقاط في الظلال",
+    "highlights": "نقاط في المناطق الساطعة"
+  }
+}

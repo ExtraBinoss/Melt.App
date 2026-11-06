@@ -1,0 +1,21 @@
+{
+  "name": "Różowy luminofor",
+  "parameter": {
+    "scale": "Odstęp linii skanowania",
+    "exposure": "Ekspozycja",
+    "gamma": "Gamma tonów",
+    "contrast": "Kontrast",
+    "glow": "Siła poświaty",
+    "glowRadius": "Zasięg poświaty",
+    "glowThreshold": "Próg poświaty",
+    "scanlines": "Siła linii skanowania",
+    "beamWidth": "Szerokość wiązki",
+    "grain": "Ziarno",
+    "flicker": "Migotanie",
+    "speed": "Szybkość ewolucji",
+    "background": "Kolor cieni",
+    "phosphor": "Kolor luminoforu",
+    "highlight": "Kolor świateł",
+    "time": "Czas"
+  }
+}

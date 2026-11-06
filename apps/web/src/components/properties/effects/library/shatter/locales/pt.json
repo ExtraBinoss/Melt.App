@@ -1,0 +1,33 @@
+{
+  "name": "Estilhaçamento",
+  "pattern": {
+    "impact": "Vidro com impacto",
+    "cellular": "Vidro celular"
+  },
+  "parameter": {
+    "scale": "Tamanho das facetas",
+    "pattern": "Padrão de fratura",
+    "centerX": "Impacto X",
+    "centerY": "Impacto Y",
+    "radius": "Raio do impacto",
+    "innerRadius": "Centro protegido",
+    "falloff": "Atenuação da borda",
+    "jitter": "Irregularidade das fraturas",
+    "spokes": "Fissuras radiais",
+    "displacement": "Deslocamento das facetas",
+    "rotation": "Rotação das facetas",
+    "ior": "Índice de refração",
+    "thickness": "Espessura do vidro",
+    "dispersion": "Dispersão de cores",
+    "tilt": "Inclinação das facetas",
+    "roughness": "Rugosidade do vidro",
+    "crackWidth": "Largura das fissuras",
+    "cracks": "Opacidade das fissuras",
+    "highlights": "Reflexos do vidro",
+    "tintStrength": "Intensidade da tonalidade",
+    "tintColor": "Tonalidade do vidro",
+    "crackColor": "Cor das fissuras",
+    "highlightColor": "Cor dos reflexos",
+    "cutout": "Fissuras transparentes"
+  }
+}
