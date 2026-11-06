@@ -1,5 +1,5 @@
 import type { Asset, Effect } from "../document/model";
-import { isImageAsset } from "../assets/identity";
+import { isVideoAsset, isImageAsset } from "../assets/identity";
 import { assertRecord, assertText } from "../document/guards";
 import { getEffectDefinition } from "./catalog";
 import { ensure } from "../errors";
@@ -27,9 +27,12 @@ export function validateEffectInputs(
     assertText(id, 256);
     if (assets)
       ensure(
-        Object.hasOwn(assets, id) && isImageAsset(assets[id]!),
+        Object.hasOwn(assets, id) &&
+          (isImageAsset(assets[id]!) ||
+            (definitions.find((input) => input.key === key)?.kind === "media" &&
+              isVideoAsset(assets[id]!))),
         "INVALID_DOCUMENT",
-        "Effect input requires a project image",
+        "Effect input requires compatible project media",
       );
   }
 }

@@ -1,3 +1,4 @@
+import { DepthPreparation } from "../library/depth-anything/DepthPreparation";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { ImagePlus } from "lucide-react";
 import {
@@ -35,6 +36,16 @@ export function EffectImageInputs({
   effect: Effect;
   disabled: boolean;
 }) {
+  if (effect.type === "depth-anything")
+    return (
+      <DepthPreparation
+        key={`${layerId}:${effect.id}`}
+        engine={engine}
+        layerId={layerId}
+        effect={effect}
+        disabled={disabled}
+      />
+    );
   const inputs = getEffectDefinition(effect.type).inputs;
   return inputs?.map((input) => (
     <TextureInput

@@ -1,4 +1,4 @@
-.tool-settings[data-tool="segment"] {
+.tool-settings:is([data-tool="segment"], [data-tool="depth-anything"]) {
   width: min(300px, calc(100dvw - 100px));
   max-width: min(360px, calc(100dvw - 100px));
   max-height: calc(100dvh - 110px);
@@ -64,7 +64,7 @@
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
-.mobile-sheet .tool-settings[data-tool="segment"] {
+.mobile-sheet .tool-settings:is([data-tool="segment"], [data-tool="depth-anything"]) {
   width: 100%;
   max-width: none;
   padding: 0;
@@ -245,4 +245,11 @@
   .background-completion-mark::before {
     display: none;
   }
+}
+
+.tool-settings[data-tool="depth-anything"] .background-target-status {
+  padding-inline-start: 34px;
+}
+.tool-settings[data-tool="depth-anything"] .background-phase .ui-throbber-mark {
+  inset-inline-start: -34px;
 }

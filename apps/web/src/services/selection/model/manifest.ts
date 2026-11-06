@@ -1,7 +1,7 @@
-/** Pinned public SAM 3 tracker export; uses the upstream SAM license. */
-export const MODEL_ID = "onnx-community/sam3-tracker-ONNX";
-export const MODEL_NAME = "SAM 3 Tracker";
-export const MODEL_REVISION = "429305c8a5b3de597243d919a07e4e6bdcd00ef7";
+/** Pinned SAM 2.1 Tiny image predictor; independently downloaded Apache-2.0 weights. */
+export const MODEL_ID = "onnx-community/sam2.1-hiera-tiny-ONNX";
+export const MODEL_NAME = "SAM 2.1 Tiny";
+export const MODEL_REVISION = "814a066640debee5a91e70aa401fb8e17e030503";
 // Preserve existing persistence identities so removal also finds the previous model.
 export const MODEL_CACHE = "transformers-cache";
 export const MODEL_LOCK = "musart.slimsam.model-cache";
@@ -9,16 +9,16 @@ export const ENCODER_FILE = "onnx/vision_encoder_fp16.onnx";
 export const DECODER_FILE = "onnx/prompt_encoder_mask_decoder_fp16.onnx";
 /** Exact pinned Hub blob lengths; excludes shared ONNX Runtime resources. */
 export const MODEL_FILES: Readonly<Record<string, number>> = Object.freeze({
-  [ENCODER_FILE]: 1263005,
-  [`${ENCODER_FILE}_data`]: 934729728,
-  [DECODER_FILE]: 229804,
-  [`${DECODER_FILE}_data`]: 11011072,
+  [ENCODER_FILE]: 314925,
+  [`${ENCODER_FILE}_data`]: 67005504,
+  [DECODER_FILE]: 229799,
+  [`${DECODER_FILE}_data`]: 10454016,
 });
 export const MODEL_HASHES: Readonly<Record<string, string>> = Object.freeze({
-  [ENCODER_FILE]: "f8c52be6de99124bb17f25792054406abc482ce3502166f948d5c5849cd14d02",
-  [`${ENCODER_FILE}_data`]: "4b021a4d3068c9e9153f2f2fcc9e6d280156228671c00ab6c2ddfa737da7f151",
-  [DECODER_FILE]: "43241335a89e96cf3e933d31f0af41f2171e4f0ccba62a7d870fa9a5d7c77cc9",
-  [`${DECODER_FILE}_data`]: "3c89f8f56c140806d65c37ec7b25ac70407d52cbfe6d8d0accbc5fff7ead562d",
+  [ENCODER_FILE]: "7773e79d589dada8e1e630cc7eb18b17b2c5b4faeb1eaab5ebf9df618ecbd50a",
+  [`${ENCODER_FILE}_data`]: "a4dd3759e9b6a476d991fb3493787992e78777e51462695e1bede71ae258103e",
+  [DECODER_FILE]: "00ac7200451f246e8307aa1a1648113f47dc45625738406403a0e6b86c69fc55",
+  [`${DECODER_FILE}_data`]: "027b457a53f5bd76bb401c59555448451d04b4eab6d2f6a6758406b40133ee2c",
 });
 export interface ModelManifest {
   id: string;
@@ -76,6 +76,8 @@ export function modelCachePath(
       model.id,
       ...(model === INTERACTIVE_MODEL
         ? [
+            "onnx-community/sam3-tracker-ONNX",
+            "onnx-community/EdgeTAM-ONNX",
             "diffusionstudio/sam2.1-tiny-video-onnx-fp16",
             "Cr7z676/sam2.1-hiera-tiny-onnx",
             "Xenova/slimsam-77-uniform",

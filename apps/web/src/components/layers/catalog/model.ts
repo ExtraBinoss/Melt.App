@@ -56,6 +56,7 @@ export const EFFECT_FAMILIES: readonly EffectFamily[] = [
 
 /** Presentation-only families; the portable effect/adjustment taxonomy stays authoritative. */
 export const EFFECT_FAMILY = {
+  "depth-anything": "distortion",
   "depth-of-field": "blur",
   trail: "motion",
   risograph: "texture",

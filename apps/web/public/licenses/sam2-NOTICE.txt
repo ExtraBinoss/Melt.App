@@ -1,0 +1,12 @@
+SAM 2.1 Tiny image refinement
+
+Original model: facebook/sam2.1-hiera-tiny
+https://github.com/facebookresearch/sam2
+License: Apache License 2.0 (see sam2-LICENSE.txt).
+
+ONNX export: onnx-community/sam2.1-hiera-tiny-ONNX
+Pinned revision: 814a066640debee5a91e70aa401fb8e17e030503
+https://huggingface.co/onnx-community/sam2.1-hiera-tiny-ONNX
+
+Weights are downloaded independently on explicit refinement. They are not
+bundled with Melt. The inference adapter is independently authored.

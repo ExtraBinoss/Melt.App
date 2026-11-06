@@ -1,6 +1,6 @@
 import { useCallback, useLayoutEffect, useRef, type KeyboardEvent, type RefObject } from "react";
 import { normalizeEffectSearch, type CatalogEntry } from "./model";
-import { CATALOG_PADDING, CATALOG_ROW_HEIGHT } from "./rows";
+import { CATALOG_PADDING, CATALOG_ROW_HEIGHT, CATALOG_SLOT_HEIGHT } from "./rows";
 
 /** Native activation/dismissal stays in Radix; navigation addresses the complete virtual catalog. */
 export function useCatalogNavigation(
@@ -32,7 +32,7 @@ export function useCatalogNavigation(
       if (!entry || !node) return;
       const row = positions.get(entry.type);
       if (row === undefined) return;
-      const top = CATALOG_PADDING + row * CATALOG_ROW_HEIGHT;
+      const top = CATALOG_PADDING + row * CATALOG_SLOT_HEIGHT;
       const current = node.scrollTop,
         height = node.clientHeight || 220;
       const next =

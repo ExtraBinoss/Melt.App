@@ -5,12 +5,16 @@ import type {
 } from "../../../services/selection/object/model";
 /** Decode the chosen thumbnail, then allow one real paint before starting the model worker. */
 export function useTargetPresentation(
-  port: ObjectSelectionPort,
-  state: ObjectSelectionState | null,
+  port: Pick<ObjectSelectionPort, "presented">,
+  state:
+    | (Pick<ObjectSelectionState, "busy" | "automatic" | "layerId" | "thumbnail"> & {
+        preparingSource?: boolean;
+      })
+    | null,
 ) {
   const image = useRef<HTMLImageElement>(null);
   useLayoutEffect(() => {
-    if (!state?.busy || !state.automatic) return;
+    if (!state?.busy || !state.automatic || state.preparingSource) return;
     let disposed = false,
       first = 0,
       second = 0;
@@ -41,6 +45,13 @@ export function useTargetPresentation(
       cancelAnimationFrame(second);
       document.removeEventListener("visibilitychange", visibility);
     };
-  }, [port, state?.busy, state?.automatic, state?.layerId, state?.thumbnail]);
+  }, [
+    port,
+    state?.busy,
+    state?.automatic,
+    state?.layerId,
+    state?.thumbnail,
+    state?.preparingSource,
+  ]);
   return image;
 }

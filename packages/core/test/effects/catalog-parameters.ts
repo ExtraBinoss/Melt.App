@@ -4,6 +4,7 @@ import { BLUR_PARAMETER_KEYS } from "./blur/parameters";
 import { GRADIENT_DEFINITION } from "../../src/effects/gradient/definition";
 import type { EffectType } from "../../src/document/model";
 export const CATALOG_PARAMETERS: Record<EffectType, string[]> = {
+  "depth-anything": ["amount", "strength", "angle", "focus", "zoom", "view"],
   feather: ["amount", "centerX", "centerY", "radius", "softness"],
   terminal: TERMINAL_PARAMETERS,
   liquify: [

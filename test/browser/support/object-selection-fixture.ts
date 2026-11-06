@@ -5,7 +5,11 @@ import type {
   SelectionResponse,
 } from "../../../apps/web/src/services/selection/selection";
 /** Native UI transactions with bounded deterministic ML outputs; never loads model weights. */
-export async function objectSelectionFixture(page: Page, delay = 40) {
+export async function objectSelectionFixture(
+  page: Page,
+  delay = 40,
+  workspace: "classic" | "studio" = "classic",
+) {
   await page.addInitScript(
     ({ delay }) => {
       localStorage.setItem("musart.editor-tutorial.v1", "done");
@@ -119,7 +123,7 @@ export async function objectSelectionFixture(page: Page, delay = 40) {
     },
     { delay },
   );
-  await page.goto("/editor?automation=1");
+  await page.goto(`/editor?automation=1&workspace=${workspace}`);
   await page.waitForFunction(() => Boolean(window.musart));
   const svg =
     '<svg xmlns="http://www.w3.org/2000/svg" width="96" height="64"><path fill="#e03040" d="M0 0h32v64H0z"/><path fill="#30c080" d="M32 0h32v64H32z"/><path fill="#3050e0" d="M64 0h32v64H64z"/></svg>';

@@ -33,7 +33,7 @@ test("inspects declared model bytes without reading binary response bodies", asy
   const read = vi.spyOn(Response.prototype, "arrayBuffer");
   expect(await inspectModelCache(d.storage)).toEqual({
     available: true,
-    bytes: 947233609,
+    bytes: 78004244,
     files: 4,
     supported: true,
   });

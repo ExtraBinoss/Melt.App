@@ -1,8 +1,8 @@
-export const INPUT_SIZE = 1008;
-const mean = [0.5, 0.5, 0.5];
-const deviation = [0.5, 0.5, 0.5];
+export const INPUT_SIZE = 1024;
+const mean = [0.485, 0.456, 0.406];
+const deviation = [0.229, 0.224, 0.225];
 
-/** SAM 3 stretches the source to a square; unlike SAM 1 there is no padding. */
+/** EdgeTAM/SAM 2 stretch to a square with ImageNet normalization and no padding. */
 export async function prepareImage(
   url: string,
   size = INPUT_SIZE,

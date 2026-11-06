@@ -37,6 +37,7 @@ const preview = (
 /** Deliberate art direction for built-ins; an effect author's own declaration takes priority. */
 export const BUILTIN_EFFECT_PREVIEWS: Readonly<Record<EffectType, EffectPreviewDefinition>> =
   Object.freeze({
+    "depth-anything": preview("editorial-portrait"),
     "depth-of-field": preview(
       "studio-still-life",
       {

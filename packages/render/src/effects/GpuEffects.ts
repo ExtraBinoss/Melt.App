@@ -94,7 +94,7 @@ export class GpuEffects {
   private neutral: DataTexture | null = null;
   constructor(
     private readonly renderer: WebGPURenderer,
-    private readonly imageInput?: (assetId: string) => Texture,
+    private readonly imageInput?: (assetId: string, effectId?: string) => Texture,
   ) {}
   private neutralImage(): DataTexture {
     if (!this.neutral) {
@@ -253,7 +253,7 @@ export class GpuEffects {
       if (assetId && bindImages && !this.imageInput)
         throw Error("Effect image resolver is unavailable");
       binding.texture.value =
-        assetId && bindImages ? this.imageInput!(assetId) : this.neutralImage();
+        assetId && bindImages ? this.imageInput!(assetId, effect.id) : this.neutralImage();
       binding.flipY.value = binding.texture.value.isRenderTargetTexture ? 1 : 0;
       binding.enabled.value = assetId ? 1 : 0;
     }

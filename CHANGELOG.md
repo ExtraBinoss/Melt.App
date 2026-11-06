@@ -4,14 +4,24 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ## [Unreleased]
 
+- Replace the 947 MB SAM 3 refinement predictor with pinned SAM 2.1 Tiny FP16 weights (78 MB) after real WebGPU comparison with EdgeTAM. Preserve GPU image embeddings, verified downloads and legacy cache removal; use the correct 1024-square/ImageNet preprocessing. Expose the shared refinement card in Studio and verify automatic point/rectangle inference and secondary-click exclusion without canvas pan or context menus.
+
 - Default Trail to source-aware Auto mode: visible current-source echoes for stationary images/text and exact temporal samples for video or authored Motion. Adapt controls without baking derived settings; extend object echo bounds by default with an undoable opt-out, bounded raster sizes and source-aware cache invalidation.
 
 - Open projects directly in their saved Classic or Studio workspace, keeping the standard named Melt opening surface until the correct chrome and retained canvas are ready; recover from preference and renderer failures without trapping loading.
 - Use the supplied FX-plus and colorimetry SVG artwork at a readable 24 px size in Studio's effects toolbar.
 
+- Render active shared throbbers directly through the native SVG mascot engine, preserving the blink/face/dot lifecycle instead of displaying a raster fallback; group depth-card information beside Cancel and verify sustained animation in a real browser.
+
+- Default Depth Anything V3 to grayscale depth maps for images and videos; open the shared application processing card as soon as the effect is added, download and generate in one job, show a midpoint video thumbnail and the native animated loading mascot, and pace worker GPU inference around editor input. Reuse the initialized model instead of reading its weights twice and use an attributed official project image in the catalog.
+
 - Restore pointer-anchored, searchable Quick Add on blank canvas and artboards in Classic and Studio. Share its typewriter, transform-free blur/fade entrance and store-local Jotai command catalogue with Cmd+K; stop replaying entrances on search/category changes. Reuse the same panel engine for retained Studio property and scene settings, respecting focus and reduced motion.
 - Compact the font picker to 312 px with 64 px row pitch and six mounted rows at the top. Retain usable metadata, prepare it on cancellable pointer intent, remove text scaling and avoid the duplicate initial sample-row commit while preserving real FontFace readiness, preview cancellation and one-step undo.
 - Give camera, environment and light animation cards immediate neutral scene references and real GPU hover previews with first-frame feedback. Compress only thumbnail playback to 1.6 seconds with mirrored loops, preserve authored presets, and align scene animation headings without decorative icons.
+
+- Compact Classic effect catalog category headings while preserving thumbnail row sizes, virtual scrolling and keyboard navigation.
+
+- Add Depth Anything V3 Small preparation for images and videos (up to 60 seconds), with verified on-demand model downloads, cancellable workers, saved depth inputs and a TSL parallax/depth-map effect. Prepared video inputs follow source trims and exact export clocks; generation commits one undoable asset/reference transaction.
 
 - Support native Depth of Field on individual 3D objects and groups, with mapped owner depth and GPU point focus that stays stable outside cropped viewports; expose supported owners in both workspace catalogs.
 - Support temporal Trail on individual layers and groups using exact historical Motion poses, isolated upstream paint, retained native scene context and bounded projective GPU captures.
@@ -19,10 +29,10 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 - Keep document Undo/Redo available after numeric label scrubbing and inside nonmodal parameter popovers; preserve native text editing and modal keyboard ownership, with one commit per completed drag.
 - Restore known project layout preferences across Classic/Studio switches when another client added version 1 fields; preserve extra fields atomically while retaining strict validation of edits and known values.
 - Prevent native renderer focus outlines from framing the Studio canvas when holding Shift, while keeping keyboard focus and control focus indicators.
-- Align Classic 3D selection, hover and the 2D/3D toolbar with prepared glyph bounds; resize visible content without changing text wrapping and rotate around its visible center in one undoable gesture.
-- Share Studio’s measured contextual toolbar growth with Classic, preserving the toolbar shell across object changes and honoring reduced motion.
 - Round numeric Undo/Redo descriptions to at most two decimal places while preserving full document and history precision.
 - Keep rendered 2D and 3D text colors when selecting letters for editing, with the existing selection highlight and caret.
+- Align Classic 3D selection, hover and the 2D/3D toolbar with prepared glyph bounds; resize visible content without changing text wrapping and rotate around its visible center in one undoable gesture.
+- Share Studio’s measured contextual toolbar growth with Classic, preserving the toolbar shell across object changes and honoring reduced motion.
 - Let a simple Classic canvas click select visible foreground artwork over an already-selected background, including native 3D text. Preserve selected-layer drag targeting, additive selection and undo behavior.
 
 - Return text and shape creation tools to Selection after one successful placement by default. Add a device-local Keep creation tool active switch in Editor preferences, translated into every supported language, for repeated insertion until V or Selection is chosen.

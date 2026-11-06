@@ -184,6 +184,7 @@ export async function createRuntime(
             await writes.dispose();
           }
         })();
+        services.depthPreparation?.dispose();
         services.objectSelection?.dispose();
         services.pixelSelection?.dispose();
         await getExportJobs(engine).stop();

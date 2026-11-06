@@ -54,13 +54,16 @@
   position: absolute;
   left: 4px;
   right: 4px;
-  height: 52px;
   min-height: 0;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
+.effect-catalog-virtual [data-slot="dropdown-menu-label"] {
+  height: 26px;
+}
 .effect-catalog-virtual [data-slot="dropdown-menu-item"] {
+  height: 52px;
   padding-block: 5px;
 }
 .effect-catalog [data-slot="dropdown-menu-label"] {

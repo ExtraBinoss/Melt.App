@@ -12,7 +12,7 @@ import type { EffectType } from "@musart/core";
 import { DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel } from "../../ui/dropdown-menu";
 import { useVirtualList } from "../../shared/scroll/use-virtual-list";
 import { EffectThumbnail } from "./EffectThumbnail";
-import { catalogRows, CATALOG_PADDING, CATALOG_ROW_HEIGHT } from "./rows";
+import { catalogRows, CATALOG_PADDING, CATALOG_SLOT_HEIGHT } from "./rows";
 import { useCatalogNavigation } from "./use-catalog-navigation";
 import type { CatalogEntry, EffectFamily } from "./model";
 
@@ -40,7 +40,7 @@ export function CatalogRows({
   const layout = useMemo(() => catalogRows(entries, families), [entries, families]);
   const { first, last, attachViewport, onScroll } = useVirtualList(
     layout.count,
-    CATALOG_ROW_HEIGHT,
+    CATALOG_SLOT_HEIGHT,
     viewport,
     3,
   );
@@ -53,8 +53,8 @@ export function CatalogRows({
     last,
   );
   useImperativeHandle(ref, () => ({ focusFirst: () => focusEntry(0) }), [focusEntry]);
-  const visible = (row: number) => row >= first && row < last;
-  const height = layout.count * CATALOG_ROW_HEIGHT + CATALOG_PADDING * 2;
+  const visible = (row: number, slots = 1) => row + slots > first && row < last;
+  const height = layout.count * CATALOG_SLOT_HEIGHT + CATALOG_PADDING * 2;
   function focus(event: FocusEvent<HTMLDivElement>) {
     const target = (event.target as HTMLElement).closest<HTMLElement>("[data-effect-catalog-item]");
     if (target) setFocused(target.dataset.effectCatalogItem ?? null);
@@ -74,7 +74,7 @@ export function CatalogRows({
         <div className="effect-catalog-virtual" style={{ height }}>
           {layout.groups.map((group) => {
             const items = group.items.filter(
-              (item) => visible(item.row) || item.entry.type === focused,
+              (item) => visible(item.row, 2) || item.entry.type === focused,
             );
             if (!items.length && !visible(group.heading)) return null;
             const label = t(`effectCatalog:family.${group.family}`);
@@ -83,7 +83,7 @@ export function CatalogRows({
                 {visible(group.heading) && (
                   <DropdownMenuLabel
                     style={{
-                      top: CATALOG_PADDING + group.heading * CATALOG_ROW_HEIGHT,
+                      top: CATALOG_PADDING + group.heading * CATALOG_SLOT_HEIGHT,
                     }}
                   >
                     {label}
@@ -93,7 +93,7 @@ export function CatalogRows({
                   <CatalogItem
                     key={item.entry.type}
                     entry={item.entry}
-                    top={CATALOG_PADDING + item.row * CATALOG_ROW_HEIGHT}
+                    top={CATALOG_PADDING + item.row * CATALOG_SLOT_HEIGHT}
                     index={item.index}
                     count={entries.length}
                     onAdd={onAdd}

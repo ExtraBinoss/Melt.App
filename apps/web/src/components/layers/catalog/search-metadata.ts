@@ -4,6 +4,7 @@ import type { EffectType } from "@musart/core";
  * Descriptions live in the catalog locales; selectable techniques are indexed from their definitions.
  */
 export const EFFECT_SEARCH_ALIASES = {
+  "depth-anything": "depth anything v3 da3 ai parallax relief profondeur parallaxe image video",
   "depth-of-field":
     "depth of field dof focus aperture camera native depth profondeur champ mise point ouverture caméra",
   trail: "trail echoes temporal motion history poses traînée échos temporel mouvement historique",

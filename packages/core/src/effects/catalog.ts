@@ -1,3 +1,4 @@
+import { DEPTH_ANYTHING_DEFINITION } from "./depth-anything/definition";
 import { DEPTH_OF_FIELD_DEFINITION } from "./depth-of-field/definition";
 import { TRAIL_DEFINITION } from "./trail/definition";
 import { RISOGRAPH_DEFINITION } from "./risograph/definition";
@@ -53,6 +54,7 @@ import { ASCII_DEFINITION } from "./ascii/definition";
 import { DITHER_DEFINITION } from "./dither/definition";
 /** Portable effect metadata shared by factories, validation and client controls. */
 const BUILTIN_EFFECTS: Readonly<Record<EffectType, EffectDefinition>> = Object.freeze({
+  "depth-anything": DEPTH_ANYTHING_DEFINITION,
   "depth-of-field": DEPTH_OF_FIELD_DEFINITION,
   trail: TRAIL_DEFINITION,
   risograph: RISOGRAPH_DEFINITION,

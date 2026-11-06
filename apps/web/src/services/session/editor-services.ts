@@ -1,3 +1,5 @@
+import { DepthPreparationController } from "../depth/controller";
+import { registerDepthPreparation } from "../depth/service";
 import { confirmExportLeave, ExportLeaveCancelled } from "../export/leave";
 import { remapPortableProject } from "../projects/portable/identity";
 import { portableAssets } from "../projects/portable/assets";
@@ -64,6 +66,7 @@ export function createEditorServices(
   dependencies: ServiceDependencies,
 ): EditorServices {
   const { store, selection, thumbnails } = dependencies;
+  registerDepthPreparation(engine, dependencies);
   const saveCurrent =
     dependencies.saveCurrent ?? ((project: Project) => store.saveCurrent(project));
   const download = dependencies.download ?? downloadBlob;
@@ -452,6 +455,7 @@ export function createEditorServices(
       }
       await objectSelection.point(layerId, x, y, true);
     },
+    depthPreparation: new DepthPreparationController(engine),
     segmentationModel: selection.model,
     backgroundModel: selection.backgroundModel,
     videoBackgroundModel: selection.videoBackgroundModel,

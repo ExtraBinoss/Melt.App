@@ -1,3 +1,4 @@
+import { DepthPreparationOptions } from "./segmentation/DepthPreparationOptions";
 import { useLayoutEffect, useSyncExternalStore } from "react";
 import type { EnginePort } from "@musart/core";
 import { ObjectSelectionOptions } from "./segmentation/ObjectSelectionOptions";
@@ -26,6 +27,23 @@ export function ToolSettings({
     port?.read ?? emptyRead,
     emptyRead,
   );
+  const depth = services.depthPreparation;
+  useLayoutEffect(() => depth?.retainPresentation(), [depth]);
+  const depthState = useSyncExternalStore(
+    depth?.subscribe ?? emptySubscribe,
+    depth?.read ?? emptyRead,
+    emptyRead,
+  );
+  if (depth && depthState)
+    return (
+      <aside
+        className="tool-settings floating-panel"
+        data-tool="depth-anything"
+        aria-label={t("depth-anything")}
+      >
+        <DepthPreparationOptions port={depth} />
+      </aside>
+    );
   if (tool === "wand" && !state?.automatic)
     return (
       <aside className="tool-settings floating-panel" data-tool="wand" aria-label={t("wand")}>

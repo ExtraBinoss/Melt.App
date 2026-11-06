@@ -1,0 +1,58 @@
+{
+  "en": {
+    "name": "Depth Anything V3",
+    "map": "Depth map",
+    "prepare": "Prepare depth…",
+    "regenerate": "Regenerate depth…",
+    "hint": "Depth Anything V3 Small · 105 MB downloaded once. Depth is generated automatically after download. Preparation runs locally on WebGPU, yields between frames and pauses while you interact. Saved depth renders without AI during playback.",
+    "generate": "Generate depth",
+    "cancel": "Cancel",
+    "processing": "Preparing depth",
+    "unsupported": "Select an unlocked 2D image or video. Composition effects cannot estimate depth.",
+    "parameter": {
+      "strength": "Relief",
+      "angle": "Direction",
+      "focus": "Fixed depth plane",
+      "zoom": "Edge zoom",
+      "view": "Display"
+    },
+    "choice": {
+      "parallax": "Parallax",
+      "depth": "Depth map"
+    },
+    "download": "Download model",
+    "downloading": "Downloading model",
+    "completed": "Depth ready",
+    "close": "Close",
+    "info": "About depth preparation",
+    "preview": "Preparing video preview"
+  },
+  "fr": {
+    "name": "Depth Anything V3",
+    "map": "Carte de profondeur",
+    "prepare": "Préparer la profondeur…",
+    "regenerate": "Recalculer la profondeur…",
+    "hint": "Depth Anything V3 Small · 105 Mo téléchargés une seule fois. La profondeur est calculée automatiquement après le téléchargement. La préparation WebGPU reste locale, espace les images et se suspend pendant les interactions. La lecture utilise la profondeur enregistrée, sans IA.",
+    "generate": "Calculer la profondeur",
+    "cancel": "Annuler",
+    "processing": "Préparation de la profondeur",
+    "unsupported": "Sélectionnez une image ou vidéo 2D déverrouillée. Les effets de composition ne peuvent pas estimer la profondeur.",
+    "parameter": {
+      "strength": "Relief",
+      "angle": "Direction",
+      "focus": "Plan de profondeur fixe",
+      "zoom": "Zoom des bords",
+      "view": "Affichage"
+    },
+    "choice": {
+      "parallax": "Parallaxe",
+      "depth": "Carte de profondeur"
+    },
+    "download": "Télécharger le modèle",
+    "downloading": "Téléchargement du modèle",
+    "completed": "Profondeur prête",
+    "close": "Fermer",
+    "info": "À propos de la profondeur",
+    "preview": "Préparation de l’aperçu vidéo"
+  }
+}

@@ -49,7 +49,7 @@ beforeEach(() => {
   }));
 });
 afterEach(() => vi.unstubAllGlobals());
-describe("SAM 3 worker inference", () => {
+describe("SAM 2.1 Tiny worker inference", () => {
   it("feeds multiple inclusion/exclusion points and box corners to the dynamic decoder", async () => {
     const { segmentPrompt } = await import("../../../src/services/selection/sam");
     await segmentPrompt("a", {

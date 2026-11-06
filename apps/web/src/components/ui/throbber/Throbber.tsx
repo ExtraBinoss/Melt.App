@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, useSyncExternalStore, type CSSProperties } from "react";
-import { MeltMark } from "../../../ui/brand/MeltMark";
+import { MeltLogo } from "../../../ui/brand/MeltLogo";
 import type { BrandState } from "../../../ui/brand/dahlia";
 import type { BrandActivity } from "../../../ui/brand/playback";
 import "./throbber.css";
@@ -60,7 +60,7 @@ export function Throbber({
                 <i />
               </span>
             ) : (
-              <MeltMark size={size} state={state} activity={playback} />
+              <MeltLogo size={size} state={state} activity={playback} />
             )}
           </span>
           {label && (

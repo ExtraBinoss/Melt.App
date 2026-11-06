@@ -7,7 +7,10 @@ import type { EffectAuxiliaryInputs, EffectDimensions } from "../effects/shared/
 /** Registers the shared operator's scratch/atlas in the same hard GPU allocation budget. */
 export class EffectResources implements GpuResource {
   private readonly operator: GpuEffects;
-  constructor(renderer: WebGPURenderer, imageInput?: (assetId: string) => Texture) {
+  constructor(
+    renderer: WebGPURenderer,
+    imageInput?: (assetId: string, effectId?: string) => Texture,
+  ) {
     this.operator = new GpuEffects(renderer, imageInput);
   }
   projectedBytes(width: number, height: number, effects: readonly Effect[]): number {

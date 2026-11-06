@@ -171,7 +171,9 @@ export class GpuCompositor {
       this.vectors ??= new VectorSources(this.renderer, this.cache);
       this.color ??= new ColorPipeline(this.renderer);
       if (!this.effects) {
-        this.effects = new EffectResources(this.renderer, (assetId) => this.sources.image(assetId));
+        this.effects = new EffectResources(this.renderer, (assetId, effectId) =>
+          this.sources.effectImage(assetId, effectId),
+        );
         this.cache.set("shared-effects", this.effects);
       }
       if (!this.primitives) {

@@ -1,6 +1,8 @@
 import type { CatalogEntry, EffectFamily } from "./model";
 
 export const CATALOG_ROW_HEIGHT = 52;
+/** Headers use one slot, thumbnail rows two; virtualization keeps integer coordinates. */
+export const CATALOG_SLOT_HEIGHT = CATALOG_ROW_HEIGHT / 2;
 export const CATALOG_PADDING = 4;
 export interface CatalogGroup {
   family: EffectFamily;
@@ -21,7 +23,8 @@ export function catalogRows(entries: readonly CatalogEntry[], families: readonly
       family,
       heading,
       items: items.map((entry) => {
-        const row = count++;
+        const row = count;
+        count += 2;
         const index = ordered.length;
         ordered.push(entry);
         positions.set(entry.type, row);

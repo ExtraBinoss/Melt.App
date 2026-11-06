@@ -83,7 +83,7 @@ export interface EffectDefinition {
   readonly identityAtZero?: boolean;
   readonly inputs?: readonly {
     readonly key: string;
-    readonly kind: "image";
+    readonly kind: "image" | "media";
     readonly labelKey: string;
   }[];
   readonly source?: "geometry";

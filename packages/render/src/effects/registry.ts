@@ -1,3 +1,4 @@
+import { depthAnythingNode } from "./depth-anything/node";
 import { depthOfFieldNode } from "./depth-of-field/node";
 import { trailNode } from "./trail/node";
 import { risographNode } from "./risograph/node";
@@ -58,6 +59,7 @@ export const EFFECT_NODES: Readonly<
     EffectNodeBuilder
   >
 > = Object.freeze({
+  "depth-anything": depthAnythingNode,
   "depth-of-field": depthOfFieldNode,
   trail: trailNode,
   risograph: risographNode,

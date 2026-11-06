@@ -1,3 +1,4 @@
+import { prepareVideoEffectInputs } from "./video-effect-inputs";
 import { hasEffectTreatment } from "../effects/shared/active";
 import {
   effectAssetIds,
@@ -44,6 +45,7 @@ function configure(texture: Texture): Texture {
 export class TextureSources {
   private imageUploads = 0;
   private videos: MediaVideoSources | null = null;
+  private videoEffects = new Map<string, string>();
   private videoMasks = new Map<string, string>();
   get uploads(): number {
     return this.imageUploads + (this.videos?.uploads ?? 0);
@@ -144,16 +146,25 @@ export class TextureSources {
       }
       this.prepared.set(id, entry.texture);
     }
-    if (visible.some((layer) => layer.kind === "video")) {
+    const effectVideo = prepareVideoEffectInputs(visible, assets, options);
+    this.videoEffects = effectVideo.ids;
+    if (effectVideo.layers.some((layer) => layer.kind === "video")) {
       if (!this.renderer) throw Error("Video textures require an initialized Three.js renderer.");
       this.videos ??= new MediaVideoSources(this.renderer, this.cache, this.maxDimension);
     }
-    const video = prepareVideoMasks(visible, assets, options);
+    const video = prepareVideoMasks(effectVideo.layers, assets, effectVideo.options);
     this.videoMasks = video.ids;
     await this.videos?.prepare(page.id, video.layers, assets, video.options);
   }
+  effectImage(assetId: string, effectId?: string): Texture {
+    const id = this.videoEffects.get(JSON.stringify([effectId, assetId]));
+    return this.image(assetId, id);
+  }
   videoStamp(layerId: string): string | null {
-    const own = this.videos?.stamp(layerId) ?? null;
+    const effectStamps = [...this.videoEffects.values()]
+      .filter((id) => JSON.parse(id)[1] === layerId)
+      .map((id) => this.videos?.stamp(id));
+    const own = JSON.stringify([this.videos?.stamp(layerId) ?? null, effectStamps]);
     const mask = this.videoMasks.get(layerId);
     return mask ? JSON.stringify([own, this.videos?.stamp(mask)]) : own;
   }
@@ -170,6 +181,7 @@ export class TextureSources {
   async dispose(): Promise<void> {
     this.prepared.clear();
     this.videoMasks.clear();
+    this.videoEffects.clear();
     await this.videos?.dispose();
   }
   image(assetId: string | null, videoLayerId?: string): Texture {

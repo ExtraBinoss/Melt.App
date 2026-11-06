@@ -21,7 +21,7 @@ export async function loadSam(
   onProgress?: (event: ModelDownloadEvent) => void,
 ): Promise<LoadedSam> {
   const { ort, executionProviders } = await gpuRuntime();
-  // SAM 3 FP16 weights use external data; embeddings stay on GPU between prompts.
+  // FP16 external weights; embeddings stay on GPU between point/rectangle prompts.
   // ORT records several dispatches before submitting. Immediate release destroys
   // temporary buffers still referenced by those commands; lazyRelease retires
   // them after submission without retaining a storage-buffer reuse cache.

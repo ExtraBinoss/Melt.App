@@ -1,3 +1,4 @@
+import depthAnything from "./library/depth-anything/messages.json";
 import depthOfField from "./library/depth-of-field/messages.json";
 import trail from "./library/trail/messages.json";
 import risograph from "./library/risograph/messages.json";
@@ -38,6 +39,7 @@ import receipt from "./library/receipt/messages.json";
 import pinkPhosphor from "./library/pink-phosphor/messages.json";
 /** UI resources stay on the web side; the core catalog only contains stable label keys. */
 export const libraryMessages = {
+  "depth-anything": depthAnything,
   "depth-of-field": depthOfField,
   trail,
   risograph: risograph,

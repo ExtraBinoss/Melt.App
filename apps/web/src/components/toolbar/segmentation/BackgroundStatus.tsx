@@ -1,3 +1,4 @@
+import type { BrandState } from "../../../ui/brand/dahlia";
 import { Check } from "lucide-react";
 import { Throbber } from "../../ui/throbber/Throbber";
 
@@ -8,12 +9,16 @@ export function BackgroundStatus({
   label,
   completedLabel,
   step,
+  state = "working",
+  size = 20,
 }: {
   busy: boolean;
   completed: boolean;
   label: string;
   completedLabel: string;
   step: string;
+  state?: BrandState;
+  size?: number;
 }) {
   return (
     <div className="background-phase">
@@ -21,9 +26,9 @@ export function BackgroundStatus({
         <Throbber
           active={busy}
           delayMs={0}
-          size={20}
+          size={size}
           variant="shimmer"
-          state="working"
+          state={state}
           label={label}
         />
         {completed && !busy && (

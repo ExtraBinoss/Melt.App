@@ -1,3 +1,4 @@
+import type { DepthPreparationController } from "../services/depth/controller";
 import type { LocalModelPort } from "../services/selection/model/contract";
 import type { ObjectSelectionPort } from "../services/selection/object/model";
 import type { ProjectTiming } from "../services/performance/project-timing";
@@ -131,6 +132,7 @@ export interface EditorServices {
   ): Promise<import("../services/export/model").CompositionExportResult>;
   projectPreferences?: import("../services/projects/preferences/model").ProjectPreferencesPort;
   mediaResolverFor?(this: void, projectId: string): import("@musart/render").MediaSourceResolver;
+  depthPreparation?: DepthPreparationController;
   segmentationModel?: LocalModelPort;
   backgroundModel?: LocalModelPort;
   videoBackgroundModel?: LocalModelPort;

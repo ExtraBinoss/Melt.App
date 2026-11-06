@@ -17,6 +17,7 @@ import { createViewportActions } from "../../canvas/session/viewport-actions";
 import { StudioGuides } from "./framing/StudioGuides";
 import { StudioEffects } from "./effects/StudioEffects";
 import { IconButton } from "../../components/shared/IconButton";
+import { ToolSettings } from "../../components/toolbar/ToolSettings";
 import "./messages";
 import "./studio-chrome.css";
 
@@ -109,6 +110,7 @@ export const StudioChrome = memo(function StudioChrome({
         )}
       </div>
       <StudioCompositions engine={engine} services={services} run={run} />
+      <ToolSettings engine={engine} services={services} onTask={onTask} />
       <MaterialControl engine={engine} run={run} />
       <StudioObjectBar engine={engine} run={run} />
       <EnvironmentControl engine={engine} run={run} />
