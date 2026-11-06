@@ -4,6 +4,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ## [Unreleased]
 
+- Keep Studio's object color and palette buttons aligned in one compact row without increasing the contextual toolbar height.
+
 - Add designer selection through source transparency and empty vector areas, an explicit behind-selection gesture and a contextual layer picker while retaining stable drag targets.
 - Add personal effect presets and ordered treatments with named saving, restoration distinct from factory defaults, independent applied copies and undoable application.
 - Add named palette libraries, explicit document color links and a shortcut beside color pickers, with locked-swatch variations, preview/cancel and undoable global edits.
