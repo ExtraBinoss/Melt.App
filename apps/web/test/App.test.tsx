@@ -196,7 +196,7 @@ test("surfaces renderer and service errors and routes local image selection usin
   d.mount(<App engine={d.engine} services={d.services} />);
   await screen.findByTestId("canvas");
   fireEvent.click(screen.getByText("Canvas error"));
-  expect(screen.getByRole("alert")).toHaveTextContent("Renderer unavailable");
+  expect(await screen.findByRole("alert")).toHaveTextContent("Renderer unavailable");
   fireEvent.click(screen.getByRole("button", { name: "Fermer la notification" }));
   fireEvent.click(screen.getByText("Image point"));
   expect(d.services.selectImagePoint).not.toHaveBeenCalled();
@@ -251,7 +251,7 @@ test("pauses failed Motion playback without changing the document or preventing 
   expect(transport.read().playing).toBe(true);
   fireEvent.click(screen.getByText("Canvas error"));
   expect(transport.read()).toMatchObject({ playing: false, time: { value: 1, rate: 2 } });
-  expect(screen.getByRole("alert")).toHaveTextContent("Renderer unavailable");
+  expect(await screen.findByRole("alert")).toHaveTextContent("Renderer unavailable");
   for (let i = 0; i < 4; i++) fireEvent.click(screen.getByText("Canvas error"));
   expect(screen.getAllByRole("alert")).toHaveLength(1);
   expect(d.engine.getSnapshot()).toBe(before);

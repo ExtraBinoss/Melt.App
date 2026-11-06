@@ -2,5 +2,8 @@
   "close": "إغلاق الإشعار",
   "copy": "نسخ الرسالة والتشخيص",
   "details": "التفاصيل التقنية",
-  "objectAdded": "تمت إضافة {{name}}"
+  "objectAdded": "تمت إضافة {{name}}",
+  "confirmed": "تم التأكيد",
+  "viewRecentered": "تم توسيط العرض",
+  "notifications": "الإشعارات"
 }

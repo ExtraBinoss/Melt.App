@@ -2,5 +2,8 @@
   "close": "Chiudi notifica",
   "copy": "Copia messaggio e diagnostica",
   "details": "Dettagli tecnici",
-  "objectAdded": "{{name}} aggiunto"
+  "objectAdded": "{{name}} aggiunto",
+  "confirmed": "Confermato",
+  "viewRecentered": "Vista centrata",
+  "notifications": "Notifiche"
 }

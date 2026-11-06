@@ -1,0 +1,43 @@
+.editor-feedback-stack [data-sonner-toaster] {
+  width: min(360px, calc(100vw - 24px));
+  font-family: inherit;
+  pointer-events: auto;
+  z-index: 90;
+}
+.editor-feedback-stack [data-sonner-toaster][data-y-position="bottom"] {
+  bottom: var(--notice-bottom, 100px);
+  right: var(--notice-right, 18px);
+  left: auto;
+}
+.editor-feedback-stack [data-sonner-toaster][data-y-position="top"] {
+  top: var(--notice-top, 18px);
+  left: var(--notice-center, 50%);
+  right: auto;
+  transform: translateX(-50%);
+}
+.editor-feedback-stack [data-sonner-toast] {
+  width: 100%;
+}
+.editor-feedback-stack :is(.editor-notice, .history-notice) {
+  width: 100%;
+  box-sizing: border-box;
+}
+.editor-feedback-stack .history-notice {
+  min-height: 52px;
+  height: auto;
+  padding-block: 12px;
+  border-radius: var(--radius-lg);
+}
+.editor-feedback-stack .history-notice > span {
+  white-space: normal;
+}
+.editor-feedback-stack [data-sonner-toast][data-removed="true"] {
+  pointer-events: none;
+}
+
+.editor-feedback-stack .notice-content {
+  flex: 1;
+}
+.editor-feedback-stack .editor-notice:not(.error-notice) > svg {
+  color: var(--success);
+}

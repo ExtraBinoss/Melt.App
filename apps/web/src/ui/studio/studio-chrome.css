@@ -173,8 +173,45 @@
   overflow: hidden;
 }
 .studio-compositions-content .studio-panel-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
   padding: 12px 14px;
   margin: 0;
+}
+.studio-compositions-content .studio-panel-title > .icon-button {
+  flex-shrink: 0;
+}
+
+/* Feedback stays on the button: no scale, layout movement or React hover state. */
+.workspace-mode-root[data-workspace-mode="studio"]
+  :is(.studio-compositions .studio-dock-heading, .editor-canvas .canvas-timeline-toggle) {
+  transition-property: background-color, border-color, color, box-shadow;
+  transition-duration: 120ms;
+}
+.workspace-mode-root[data-workspace-mode="studio"]
+  :is(.studio-compositions .studio-dock-heading, .editor-canvas .canvas-timeline-toggle):is(
+    :hover,
+    :focus-visible
+  ) {
+  background: color-mix(in srgb, var(--foreground) 18%, var(--card));
+  color: var(--foreground);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--foreground) 35%, transparent);
+}
+.workspace-mode-root[data-workspace-mode="studio"]
+  :is(
+    .studio-compositions .studio-dock-heading,
+    .editor-canvas .canvas-timeline-toggle
+  ):focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 3px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .workspace-mode-root[data-workspace-mode="studio"]
+    :is(.studio-compositions .studio-dock-heading, .editor-canvas .canvas-timeline-toggle) {
+    transition-duration: 0s;
+  }
 }
 .studio-compositions-content .pages-tabs {
   position: static;

@@ -129,6 +129,7 @@ test("Studio effect editors keep shared scroll surfaces and native dismissal, me
   await expect(panel).toHaveCount(0);
   await expect(trigger).toBeFocused();
   await page.evaluate(() => window.musart!.select(["sphere"]));
+  await page.getByRole("button", { name: "Compositions", exact: true }).click();
   await page.getByRole("button", { name: "Advanced controls", exact: true }).click();
   const advanced = page.locator(".studio-advanced-popover");
   await scrollToBottom(page, advanced.locator(".inspector-scroll"));

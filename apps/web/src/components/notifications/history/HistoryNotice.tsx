@@ -83,9 +83,22 @@ export function HistoryNotice({ engine }: { engine: EnginePort }) {
     </div>
   );
 }
-function HistoryCard({ notice, onClose }: { notice: HistoryNoticeValue; onClose: () => void }) {
+export function HistoryCard({
+  notice,
+  onClose,
+  paused = false,
+  animated = true,
+  active = true,
+}: {
+  notice: HistoryNoticeValue;
+  onClose: () => void;
+  paused?: boolean;
+  animated?: boolean;
+  active?: boolean;
+}) {
   const { t } = useTranslation("historyNotice"),
-    present = useIsPresent(),
+    retained = useIsPresent(),
+    present = retained && active,
     reduced = useReducedMotion();
   const [timer] = useState(() => createNoticeTimer(onClose));
   useLayoutEffect(() => {
@@ -97,6 +110,9 @@ function HistoryCard({ notice, onClose }: { notice: HistoryNoticeValue; onClose:
     return () => timer.clear();
   }, [notice.id, present, timer]);
   useLayoutEffect(() => () => timer.dispose(), [timer]);
+  useLayoutEffect(() => {
+    timer.pause("stack", paused);
+  }, [timer, paused]);
   const description = formatHistoryDescription(
       notice.description,
       notice.direction,
@@ -114,7 +130,7 @@ function HistoryCard({ notice, onClose }: { notice: HistoryNoticeValue; onClose:
       data-history-direction={notice.direction}
       inert={!present || undefined}
       aria-hidden={!present || undefined}
-      initial={reduced ? false : { opacity: 0, y: -6, scale: 0.94 }}
+      initial={reduced || !animated ? false : { opacity: 0, y: -6, scale: 0.94 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, y: reduced ? 0 : -6, scale: reduced ? 1 : 0.96 }}
       transition={{ duration: reduced ? 0 : 0.16 }}

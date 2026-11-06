@@ -1,4 +1,5 @@
-import { useId } from "react";
+import { useEffect, useId, useMemo, useRef } from "react";
+import { atom, useAtom } from "jotai";
 import type { ReactNode } from "react";
 import { IconButton } from "../../../components/shared/IconButton";
 import { Popover, PopoverContent, PopoverTrigger } from "../../../components/ui/popover";
@@ -9,16 +10,36 @@ export function StudioDock({
   icon,
   className,
   children,
+  headerAction,
+  openRequest,
 }: {
   title: string;
   icon: ReactNode;
   className: string;
   children: ReactNode;
+  headerAction?: ReactNode;
+  openRequest?: object | null;
 }) {
   const id = useId();
+  const openAtom = useMemo(() => atom(false), []);
+  const [open, setOpen] = useAtom(openAtom);
+  const requested = useRef(false);
+  useEffect(() => {
+    if (openRequest) {
+      requested.current = true;
+      setOpen(true);
+    }
+  }, [openRequest, setOpen]);
   return (
     <section className={`studio-dock ${className}`} data-canvas-control>
-      <Popover modal={false}>
+      <Popover
+        modal={false}
+        open={open}
+        onOpenChange={(value) => {
+          requested.current = false;
+          setOpen(value);
+        }}
+      >
         <PopoverTrigger asChild>
           <IconButton
             label={title}
@@ -39,9 +60,17 @@ export function StudioDock({
           role="region"
           aria-label={title}
           initialFocus="content"
+          onOpenAutoFocus={(event) => {
+            // A requested child editor owns focus; the enclosing dock must not steal it.
+            if (requested.current) event.preventDefault();
+            requested.current = false;
+          }}
           data-canvas-control
         >
-          <div className="studio-panel-title">{title}</div>
+          <div className="studio-panel-title">
+            <span>{title}</span>
+            {headerAction}
+          </div>
           {children}
         </PopoverContent>
       </Popover>

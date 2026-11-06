@@ -71,6 +71,7 @@ test("Studio properties, Motion switches, right pan and spatial snapping retain 
   await page.evaluate(() => window.musart!.select(["studio-title"]));
 
   const bodyStyle = await page.locator("body").getAttribute("style");
+  await page.getByRole("button", { name: "Compositions", exact: true }).click();
   const properties = page.getByRole("button", { name: "Advanced controls", exact: true });
   await properties.click();
   const editor = page.locator(".studio-advanced-body .inspector");
@@ -87,6 +88,7 @@ test("Studio properties, Motion switches, right pan and spatial snapping retain 
   ).toBe(true);
   await page.keyboard.press("Escape");
   expect(await page.locator("body").getAttribute("style")).toBe(bodyStyle);
+  await page.keyboard.press("Escape");
   await page.locator(".canvas-timeline-toggle").click();
   await expect(page.locator(".motion-timeline-dock")).not.toHaveAttribute("data-motion-animating");
   const panel = await page.locator(".motion-timeline").elementHandle();

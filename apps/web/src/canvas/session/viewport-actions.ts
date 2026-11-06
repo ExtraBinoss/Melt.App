@@ -1,4 +1,7 @@
 import type { EnginePort } from "@musart/core";
+import i18n from "i18next";
+import { publishEditorNotice } from "../../components/notifications/source";
+import "../../components/notifications/messages";
 
 export type ViewportAction = "fit" | "reset" | "recenter" | "zoomIn" | "zoomOut";
 export interface ViewportFocus {
@@ -37,6 +40,12 @@ export function createViewportActions(engine: EnginePort): ViewportActions {
     run: (action) => {
       const active = [...listeners];
       for (const listener of active) listener(action);
+      if (active.length && (action === "recenter" || action === "reset"))
+        publishEditorNotice(engine, {
+          title: i18n.t("notices:confirmed"),
+          message: i18n.t("notices:viewRecentered"),
+          error: false,
+        });
       return active.length > 0;
     },
     subscribe: (listener) => {

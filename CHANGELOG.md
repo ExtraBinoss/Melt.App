@@ -4,6 +4,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ## [Unreleased]
 
+- Stack up to five editor and undo/redo notices with the genuine shadcn/Sonner component, expand on hover or keyboard focus, retain independent paused reading timers and diagnostics, and position the stack above Studio scene controls. Keep its Jotai subscriptions isolated from App/canvas. Confirm recenter actions through this shared Studio/Classic stack with a title and description in all twelve languages. Move Studio advanced settings into Compositions, preserving direct light-animation navigation, and strengthen Motion/Compositions hover and keyboard focus feedback without moving text or controls.
+
 - Add SDK-native Wax, Melt and Emboss with complete controls, choices, catalog descriptions and search labels in all twelve supported languages. Wax adds a soft translucent coating and source-aware highlights; Melt pulls source colors and transparent silhouettes into deterministic directional drips with conservative bounds; Emboss offers raised, recessed, pillow and outline profiles from luminance or alpha. Reuse generated controls, placement, Motion, validated edits and history. Keep generated choice fields focused after validated edits. Add focused authoring and native WebGPU/WebGL export regressions.
 
 - Synchronize effect position-pad X/Y fields in real time through imperative Jotai subscriptions without React commits during dragging; retain one undoable position commit and cancellation restoration for layer and composition effects.

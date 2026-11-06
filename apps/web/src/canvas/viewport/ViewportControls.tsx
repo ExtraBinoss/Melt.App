@@ -3,7 +3,6 @@ import { useMemo } from "react";
 import type { EnginePort } from "@musart/core";
 import { useAtom, useAtomValue } from "jotai";
 import { zoomControlsAtom } from "../../state/viewport/preferences";
-import { HistoryNotice } from "../../components/notifications/history/HistoryNotice";
 import { timelineOpenAtom } from "../../state/motion/timeline-state";
 import "../../components/motion/messages";
 import { useTranslation } from "react-i18next";
@@ -35,7 +34,6 @@ export function ViewportControls({
   const bindings = useKeybindings();
   return (
     <>
-      {engine && <HistoryNotice engine={engine} />}
       {showZoom && (
         <div className="canvas-controls floating-panel" data-canvas-control>
           <IconButton
@@ -87,7 +85,7 @@ export function ViewportControls({
 function EngineTimelineToggle({ engine }: { engine: EnginePort }) {
   const { t } = useTranslation();
   const studio = useWorkspaceMode() === "studio";
-  const select = useMemo(createArtboardModeProjection, []);
+  const select = useMemo(() => createArtboardModeProjection(), []);
   const modes = useEngineValue(engine, select);
   const page = modes.pages.find((item) => item.id === modes.pageId)!;
   const [timelineOpen, setTimelineOpen] = useAtom(timelineOpenAtom);

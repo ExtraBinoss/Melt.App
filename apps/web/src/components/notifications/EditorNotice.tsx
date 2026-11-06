@@ -17,6 +17,7 @@ import "./notices.css";
 import "./placement.css";
 
 export interface EditorNoticeValue {
+  title?: string;
   message: string;
   error: boolean;
   details?: string;
@@ -61,9 +62,22 @@ export function EditorNotice({
     document.body,
   );
 }
-function NoticeCard({ notice, onClose }: { notice: EditorNoticeValue; onClose: () => void }) {
+export function NoticeCard({
+  notice,
+  onClose,
+  paused = false,
+  animated = true,
+  active = true,
+}: {
+  notice: EditorNoticeValue;
+  onClose: () => void;
+  paused?: boolean;
+  animated?: boolean;
+  active?: boolean;
+}) {
   const { t } = useTranslation("notices");
-  const present = useIsPresent(),
+  const retained = useIsPresent(),
+    present = retained && active,
     reduced = useReducedMotion();
   const [timer] = useState(() => createNoticeTimer(onClose));
   useLayoutEffect(() => {
@@ -73,16 +87,18 @@ function NoticeCard({ notice, onClose }: { notice: EditorNoticeValue; onClose: (
     if (present) timer.restart(notice.error ? ERROR_NOTICE_MS : SUCCESS_NOTICE_MS);
     else timer.clear();
     return () => timer.clear();
-  }, [notice.message, notice.error, notice.details, present, timer]);
+  }, [notice.title, notice.message, notice.error, notice.details, present, timer]);
   useLayoutEffect(() => () => timer.dispose(), [timer]);
+  useLayoutEffect(() => {
+    timer.pause("stack", paused);
+  }, [timer, paused]);
   const copying = useCallback((active: boolean) => timer.pause("copy", active), [timer]);
   const dismiss = () => {
     timer.clear();
     onClose();
   };
-  const copyText = notice.details
-    ? `${notice.message}\n\n${t("details")}:\n${notice.details}`
-    : notice.message;
+  const message = notice.title ? `${notice.title}\n${notice.message}` : notice.message;
+  const copyText = notice.details ? `${message}\n\n${t("details")}:\n${notice.details}` : message;
   return (
     <motion.div
       className={`editor-notice notice-card floating-panel ${notice.error ? "error-notice" : ""}`}
@@ -90,7 +106,7 @@ function NoticeCard({ notice, onClose }: { notice: EditorNoticeValue; onClose: (
       aria-atomic="true"
       inert={!present || undefined}
       aria-hidden={!present || undefined}
-      initial={reduced ? false : { opacity: 0, y: 8 }}
+      initial={reduced || !animated ? false : { opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: reduced ? 0 : 8 }}
       transition={{ duration: reduced ? 0 : 0.14 }}
@@ -112,6 +128,7 @@ function NoticeCard({ notice, onClose }: { notice: EditorNoticeValue; onClose: (
         <CheckCircle2 size={18} aria-hidden />
       )}
       <div className="notice-content">
+        {notice.title && <strong className="notice-title">{notice.title}</strong>}
         <p>{notice.message}</p>
         {notice.details && (
           <details>

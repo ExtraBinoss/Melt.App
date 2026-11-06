@@ -28,6 +28,13 @@
   margin: 0;
   white-space: pre-wrap;
 }
+.notice-title {
+  display: block;
+  font-weight: 600;
+}
+.notice-title + p {
+  color: var(--muted-foreground);
+}
 .notice-content details {
   margin-top: 8px;
   font-size: 11px;

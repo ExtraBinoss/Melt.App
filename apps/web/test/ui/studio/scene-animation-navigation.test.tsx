@@ -4,6 +4,7 @@ import { createSpatialScene, SCENE_MOTION_ANIMATION_PRESETS } from "@musart/core
 import { animationPresentation } from "../../../src/components/motion/animations/presentation";
 import { StudioPropertyPopover } from "../../../src/ui/studio/controls/StudioPropertyPopover";
 import { useSceneAnimationNavigation } from "../../../src/ui/studio/panels/use-scene-animation-navigation";
+import { StudioCompositions } from "../../../src/ui/studio/panels/StudioCompositions";
 import { setup } from "../../support/ui";
 
 it("opens the retained Advanced popover for light Edit requests and respects dismissal", async () => {
@@ -41,4 +42,40 @@ it("opens the retained Advanced popover for light Edit requests and respects dis
   expect(screen.queryByRole("button", { name: "Light controls" })).toBeNull();
   act(() => presentation.requestEditor(animationId));
   await waitFor(() => expect(screen.getByRole("button", { name: "Light controls" })).toBeVisible());
+});
+
+it("opens the Compositions parent for a light request and does not replay consumed requests", async () => {
+  const d = setup({ reducedMotion: true });
+  const spatial = createSpatialScene();
+  d.engine.execute({ type: "updatePage", patch: { spatial } });
+  d.engine.execute({ type: "setCompositionMode", mode: "motion" });
+  d.engine.execute({
+    type: "addMotionAnimation",
+    owner: {
+      kind: "light",
+      compositionId: d.engine.getSnapshot().pageId,
+      lightId: spatial.lights[0]!.id,
+    },
+    preset: SCENE_MOTION_ANIMATION_PRESETS.find((preset) => preset.id === "scene-light-pulse")!,
+    start: { value: 0, rate: 1 },
+  });
+  d.mount(<StudioCompositions engine={d.engine} services={d.services} run={d.run} />);
+  const presentation = animationPresentation(d.engine);
+  const animationId = d.engine.getSnapshot().project.pages[0]!.motion!.sceneAnimations![0]!.id;
+  expect(screen.queryByRole("button", { name: "Réglages avancés" })).toBeNull();
+  act(() => presentation.requestEditor(animationId));
+  await waitFor(() => expect(document.querySelector(".studio-advanced-popover")).toBeVisible());
+  await waitFor(() => expect(presentation.readEditorRequest()).toBeNull());
+  const light = document.querySelector('[data-scene-animations="light"] .animation-detail-channel');
+  await waitFor(() => expect(light).toBeVisible());
+  fireEvent.keyDown(document.activeElement!, { key: "Escape" });
+  await waitFor(() => expect(light).not.toBeVisible());
+  fireEvent.keyDown(document.activeElement!, { key: "Escape" });
+  await waitFor(() => expect(document.querySelector(".studio-advanced-popover")).not.toBeVisible());
+  fireEvent.keyDown(document.activeElement!, { key: "Escape" });
+  fireEvent.click(screen.getByRole("button", { name: /^Compositions$/ }));
+  await waitFor(() =>
+    expect(screen.getByRole("button", { name: "Réglages avancés" })).toBeVisible(),
+  );
+  expect(document.querySelector(".studio-advanced-popover")).toBeNull();
 });

@@ -35,7 +35,11 @@ editable and are retained in the project.
   effects/color adjustments and view controls. Top tooltips open below their buttons;
   bottom tooltips open above. Export retains the primary theme accent.
 - The closed composition control opens the existing pages and layer components,
-  including visibility, locks, nested effects and ordering.
+  including visibility, locks, nested effects and ordering. Its header contains
+  **Advanced controls** for scene and object properties; this button no longer stays
+  in the permanent top toolbar. Light-animation editing opens these controls directly.
+- Recenter confirms the action through the shared [notification stack](notifications.md),
+  which holds up to five cards and stays above the scene buttons.
 - Selecting text reveals an outlined text input, font, font size, depth and bevel
   directly in the centered object bar. Models and primitives expose proportional
   size and X/Y rotation. Position, axis scales and Z rotation are available in the

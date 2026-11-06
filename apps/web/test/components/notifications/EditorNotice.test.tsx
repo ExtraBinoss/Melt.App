@@ -163,3 +163,24 @@ test("duplicate notices and a changing onClose preserve expiry; null/unmount can
   expect(latest).toHaveBeenCalledOnce();
   view.unmount();
 });
+
+test("success acknowledgments present a title and description and copy both", async () => {
+  const write = vi.fn(async (_text: string) => {});
+  Object.defineProperty(navigator, "clipboard", {
+    configurable: true,
+    value: { writeText: write },
+  });
+  const d = setup();
+  const view = d.mount(
+    <EditorNotice
+      notice={{ title: "Validé", message: "Vue recentrée", error: false }}
+      onClose={vi.fn()}
+    />,
+  );
+  expect(screen.getByRole("status")).toHaveTextContent("ValidéVue recentrée");
+  expect(screen.getByText("Validé").tagName).toBe("STRONG");
+  fireEvent.click(screen.getByRole("button", { name: "Copier le message et le diagnostic" }));
+  await act(async () => {});
+  expect(write).toHaveBeenCalledWith("Validé\nVue recentrée");
+  view.unmount();
+});

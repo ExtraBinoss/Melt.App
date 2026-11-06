@@ -2,5 +2,8 @@
   "close": "알림 닫기",
   "copy": "메시지 및 진단 복사",
   "details": "기술 세부 정보",
-  "objectAdded": "{{name}} 추가됨"
+  "objectAdded": "{{name}} 추가됨",
+  "confirmed": "완료",
+  "viewRecentered": "보기를 중앙으로 이동했습니다",
+  "notifications": "알림"
 }

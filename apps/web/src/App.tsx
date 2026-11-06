@@ -4,7 +4,7 @@ import { useProjectTitle } from "./components/workspace/use-project-title";
 import { dashboardHref, isPlainPrimaryClick, dialogLinkKeyDown } from "./ui/navigation/activation";
 import { ExportLeaveGuard } from "./components/export/ExportLeaveGuard";
 import { guardExportNavigation, ExportLeaveCancelled } from "./services/export/leave";
-import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { lazy, Suspense, useCallback, useMemo, useRef, useState } from "react";
 import { atom, useStore } from "jotai";
 import { EditorDialogVisibility } from "./components/workspace/EditorDialogVisibility";
 import { useRenderMetrics } from "./state/session/render-metrics";
@@ -19,7 +19,7 @@ import {
   useEngine,
   useTheme,
 } from "./state/session/editor";
-import { subscribeEditorNotices } from "./components/notifications/source";
+import { publishEditorNotice } from "./components/notifications/source";
 import { useShortcuts } from "./state/session/shortcuts";
 import { formatUiError } from "./state/i18n/errors/format";
 import "./state/i18n";
@@ -48,7 +48,8 @@ import { CanvasArea } from "./components/viewport/CanvasArea";
 import { ProjectDialog, type ProjectDialogProps } from "./components/projects/ProjectDialog";
 import { TransitionRequestHost } from "./components/motion/transitions/TransitionRequestHost";
 import { MotionImportConfirmation } from "./components/motion-import/ConfirmationDialog";
-import { EditorNotice, type EditorNoticeValue } from "./components/notifications/EditorNotice";
+import type { EditorNoticeValue } from "./components/notifications/EditorNotice";
+import { EditorFeedbackStack } from "./components/notifications/EditorFeedbackStack";
 import { errorDiagnostics } from "./components/notifications/diagnostics";
 import { ProjectPill } from "./components/projects/ProjectPill";
 import {
@@ -105,8 +106,10 @@ export function App({ engine, services, welcome = false, routing }: AppProps) {
   };
   const [dialogs] = useState(() => atom({ exportOpen: false, timelapseOpen: false }));
   const motionTransport = useMemo(() => createMotionTransport(engine), [engine]);
-  const [notice, setNotice] = useState<EditorNoticeValue | null>(null);
-  useEffect(() => subscribeEditorNotices(engine, setNotice), [engine]);
+  const setNotice = useCallback(
+    (value: EditorNoticeValue) => publishEditorNotice(engine, value),
+    [engine],
+  );
   const [processing, setProcessing] = useState<"wand" | "segment" | null>(null);
   const selectionPending = useRef(false);
   const input = useRef<HTMLInputElement>(null);
@@ -115,15 +118,10 @@ export function App({ engine, services, welcome = false, routing }: AppProps) {
     (message: string, details?: string) => {
       // A failed frame cannot be repaired by requesting more frames from the same source.
       motionTransport.pause();
-      setNotice((current) =>
-        current?.error && current.message === message && current.details === details
-          ? current
-          : { message, error: true, ...(details ? { details } : {}) },
-      );
+      setNotice({ message, error: true, ...(details ? { details } : {}) });
     },
-    [motionTransport],
+    [motionTransport, setNotice],
   );
-  const dismissNotice = useCallback(() => setNotice(null), []);
   const onTask = useCallback(
     async (task: () => void | Promise<void>, success?: string): Promise<boolean> => {
       try {
@@ -138,7 +136,7 @@ export function App({ engine, services, welcome = false, routing }: AppProps) {
         return false;
       }
     },
-    [],
+    [setNotice],
   );
   const run = useCallback(
     (action: () => void) => {
@@ -424,7 +422,7 @@ export function App({ engine, services, welcome = false, routing }: AppProps) {
                   hidden={choosingProject || !!projectMenu}
                   onProjectCreated={routing ? (id) => routing.navigate("editor", id) : undefined}
                 />
-                <EditorNotice engine={engine} notice={notice} onClose={dismissNotice} />
+                <EditorFeedbackStack engine={engine} />
                 {projectMenu && (
                   <ProjectMenu
                     engine={engine}

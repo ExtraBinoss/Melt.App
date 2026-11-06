@@ -2,5 +2,8 @@
   "close": "Dismiss notification",
   "copy": "Copy message and diagnostics",
   "details": "Technical details",
-  "objectAdded": "{{name}} added"
+  "objectAdded": "{{name}} added",
+  "confirmed": "Confirmed",
+  "viewRecentered": "View recentered",
+  "notifications": "Notifications"
 }

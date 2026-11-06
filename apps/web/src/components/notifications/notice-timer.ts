@@ -1,4 +1,4 @@
-type PauseReason = "hover" | "focus" | "copy";
+type PauseReason = "hover" | "focus" | "copy" | "stack";
 
 /** One timeout, no animation loop. Remaining reading time is retained across independent pauses. */
 export function createNoticeTimer(onExpire: () => void) {

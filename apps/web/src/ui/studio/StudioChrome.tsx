@@ -1,17 +1,14 @@
 import { memo, useCallback, type ReactNode } from "react";
-import { Crosshair, Download, ImagePlus, PanelRight } from "lucide-react";
+import { Crosshair, Download, ImagePlus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import type { EnginePort } from "@musart/core";
 import type { EditorServices } from "../../state/contracts";
 import type { TaskRunner } from "../../components/projects/ProjectDialog";
 import { TextTool } from "../../components/text/TextTool";
-import { StudioPropertyPopover } from "./controls/StudioPropertyPopover";
 import { ObjectLibrary } from "../../components/spatial/objects/ObjectLibrary";
 import { StudioCompositions } from "./panels/StudioCompositions";
 import { MaterialControl } from "../../components/spatial/MaterialControl";
 import { EnvironmentControl } from "../../components/spatial/EnvironmentControl";
-import { StudioAdvanced } from "./panels/StudioAdvanced";
-import { useSceneAnimationNavigation } from "./panels/use-scene-animation-navigation";
 import { StudioObjectBar } from "./panels/StudioObjectBar";
 import { createViewportActions } from "../../canvas/session/viewport-actions";
 import { StudioGuides } from "./framing/StudioGuides";
@@ -48,7 +45,6 @@ export const StudioChrome = memo(function StudioChrome({
   const { t } = useTranslation("studioChrome");
   const { t: common } = useTranslation();
   const viewport = createViewportActions(engine);
-  const advancedRequest = useSceneAnimationNavigation(engine);
   const run = useCallback(
     (task: () => void) => {
       void onTask(task);
@@ -80,23 +76,6 @@ export const StudioChrome = memo(function StudioChrome({
       </nav>
       <div className="studio-actions" data-canvas-control>
         <StudioEffects engine={engine} services={services} run={run} />
-        <StudioPropertyPopover
-          openRequest={advancedRequest}
-          trigger={
-            <IconButton label={t("advanced")} tooltipSide="bottom" className="studio-surface">
-              <PanelRight size={17} />
-            </IconButton>
-          }
-          side="bottom"
-          align="end"
-          collisionPadding={12}
-          className="studio-advanced-popover"
-          data-canvas-control
-          aria-label={t("advanced")}
-          initialFocus="content"
-        >
-          <StudioAdvanced engine={engine} run={run} />
-        </StudioPropertyPopover>
         {exportControl ?? (
           <IconButton
             label={t("export")}

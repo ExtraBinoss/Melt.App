@@ -2,5 +2,8 @@
   "close": "Melding sluiten",
   "copy": "Bericht en diagnostiek kopiëren",
   "details": "Technische details",
-  "objectAdded": "{{name}} toegevoegd"
+  "objectAdded": "{{name}} toegevoegd",
+  "confirmed": "Bevestigd",
+  "viewRecentered": "Weergave gecentreerd",
+  "notifications": "Meldingen"
 }
