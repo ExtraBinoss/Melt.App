@@ -1,4 +1,10 @@
-import { invertMatrix, type Composition, type Layer, type SpatialGeometry } from "@musart/core";
+import {
+  invertMatrix,
+  type Bounds,
+  type Composition,
+  type Layer,
+  type SpatialGeometry,
+} from "@musart/core";
 import { Matrix3, Matrix4, Mesh, type Camera, type Object3D } from "three/webgpu";
 
 /** Source-local projected layout pixels to authored pixels on a native front face.
@@ -10,6 +16,7 @@ export function spatialEffectProjection(
   content: Object3D,
   camera: Camera,
   geometry: SpatialGeometry,
+  transport?: Bounds,
 ): readonly number[] | undefined {
   if (
     (layer.kind !== "text" && layer.kind !== "vector") ||
@@ -72,5 +79,19 @@ export function spatialEffectProjection(
     Math.hypot(m[2]!, m[5]!, m[8]!);
   if (Math.abs(pixels.determinant()) <= Number.EPSILON * 32 * magnitude) return;
   const result = pixels.invert().elements;
-  return result.every(Number.isFinite) ? result : undefined;
+  if (!result.every(Number.isFinite)) return;
+  if (transport) {
+    // A volume still has visible sides when its front face is viewed edge-on.
+    // If that raster crosses the inverse plane's horizon, no finite authored
+    // rectangle can hold it. Keep effects on the complete native raster instead
+    // of downsampling an effectively infinite intermediate and losing coverage.
+    let sign = 0;
+    for (const x of [transport.x, transport.x + transport.width])
+      for (const y of [transport.y, transport.y + transport.height]) {
+        const w = result[2]! * x + result[5]! * y + result[8]!;
+        if (Math.abs(w) <= 0.000001 || (sign && Math.sign(w) !== sign)) return;
+        sign = Math.sign(w);
+      }
+  }
+  return result;
 }

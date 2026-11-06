@@ -231,6 +231,7 @@ export class CompositionScene implements GpuResource {
         resource.content,
         this.camera,
         geometry,
+        bounds,
       );
       if (effectProjection) this.effectProjections.set(layer.id, effectProjection);
       const transport = transportProjection(page, layer, bounds, geometry);

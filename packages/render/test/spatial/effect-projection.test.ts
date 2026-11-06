@@ -9,6 +9,7 @@ import {
   transformPoint,
 } from "@musart/core";
 import {
+  BoxGeometry,
   BufferGeometry,
   Group,
   Matrix3,
@@ -176,6 +177,56 @@ test("unsupported, empty, edge-on and behind-camera faces have no effect project
     }
     camera.projectionMatrix = new Matrix4().set(0, 0, 0, NaN, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1);
     expect(spatialEffectProjection(page, layer, content, camera, geometry)).toBeUndefined();
+  } finally {
+    native.dispose();
+    material.dispose();
+  }
+});
+
+test("visible extrusion sides crossing the face horizon retain raster-space effects", () => {
+  const settings = createSpatialScene();
+  settings.camera.yaw = 83;
+  settings.camera.pitch = 0;
+  const source = createLayer("vector", {
+    id: "shape",
+    x: 150,
+    y: 150,
+    width: 300,
+    height: 300,
+    spatial: {
+      ...createSpatialLayer("extrude"),
+      x: 0.28,
+      y: 0.89,
+      z: 0.3,
+      scaleX: 1.8,
+      scaleY: 1.8,
+      scaleZ: 1.8,
+      rotationY: -7,
+    },
+  });
+  const native = new BoxGeometry(2, 2, 0.38);
+  const material = new MeshBasicMaterial();
+  const content = new Mesh(native, material);
+  const root = new Group();
+  root.matrixAutoUpdate = false;
+  root.add(content);
+  try {
+    for (const rotationY of [-10, -7, 0, 87, 90]) {
+      const layer = { ...source, spatial: { ...source.spatial!, rotationY } };
+      const page = createPage({ width: 600, height: 600, spatial: settings, layers: [layer] });
+      const geometry = new SpatialGeometry(page);
+      root.matrix.fromArray(geometry.worldMatrix(layer.id));
+      root.updateMatrixWorld(true);
+      const camera = createSpatialCamera(settings.camera, 1);
+      updateCompositionCamera(camera, page, WebGPUCoordinateSystem);
+      const transport = projectedTransport(page, layer, root, camera, geometry);
+      expect(transport.width * transport.height).toBeGreaterThan(10000);
+      const projection = spatialEffectProjection(page, layer, content, camera, geometry);
+      expect(projection).toBeDefined();
+      const result = spatialEffectProjection(page, layer, content, camera, geometry, transport);
+      if (rotationY < 0) expect(result).toBeUndefined();
+      else expect(result).toEqual(projection);
+    }
   } finally {
     native.dispose();
     material.dispose();

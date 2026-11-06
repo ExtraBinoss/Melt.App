@@ -4,6 +4,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ## [Unreleased]
 
+- Keep extruded 3D text/vector layers visible with Chromatic Aberration and other effects near edge-on rotations. Detect when the native raster crosses the authored face’s inverse projection horizon and evaluate effects, depth and history in native raster coordinates, avoiding effectively infinite intermediate surfaces and lost coverage in Classic, Studio and exports.
+
 - Fix native 3D objects disappearing under camera/object rotation in reflected layer frames in Classic and Studio. Preserve native raster winding through reflected source crops and restore their orientation in the GPU output pass, retaining correct lighting, depth, shadows and the WebGL fallback.
 
 - Replace the 947 MB SAM 3 refinement predictor with pinned SAM 2.1 Tiny FP16 weights (78 MB) after real WebGPU comparison with EdgeTAM. Preserve GPU image embeddings, verified downloads and legacy cache removal; use the correct 1024-square/ImageNet preprocessing. Expose the shared refinement card in Studio and verify automatic point/rectangle inference and secondary-click exclusion without canvas pan or context menus.
