@@ -1,6 +1,16 @@
 import { expect, test } from "@playwright/test";
 import { createLayer, createPage, createProject } from "@musart/core";
 
+interface GuideEntrance {
+  kind: string;
+  name: string;
+  transform: string;
+  duration: number;
+  delay: number;
+  fromFilter: string;
+  fromOpacity: number;
+}
+
 for (const reduced of [false, true]) {
   test(`Studio Show guides shares the palette entrance and keeps text stable (reduced=${reduced})`, async ({
     page,
@@ -32,7 +42,7 @@ for (const reduced of [false, true]) {
       document.documentElement.dataset.guideEntrances = "[]";
       document.addEventListener("animationstart", (event) => {
         if (!(event.target instanceof HTMLElement)) return;
-        const kind = event.target.matches("[data-studio-guide-controls]")
+        const kind = event.target.matches("[data-studio-guide-controls] [data-blur-reveal]")
           ? "controls"
           : event.target.matches("[data-studio-capture]")
             ? "canvas"
@@ -40,15 +50,26 @@ for (const reduced of [false, true]) {
               ? "panel"
               : null;
         if (!kind) return;
-        const entries = JSON.parse(document.documentElement.dataset.guideEntrances!) as {
-          kind: string;
-          name: string;
-          transform: string;
-        }[];
+        const entries = JSON.parse(
+          document.documentElement.dataset.guideEntrances!,
+        ) as GuideEntrance[];
+        const animation = event.target
+          .getAnimations()
+          .find(
+            (animation) =>
+              animation instanceof CSSAnimation && animation.animationName === event.animationName,
+          );
+        const effect = animation?.effect;
+        const timing = effect?.getTiming(),
+          first = effect instanceof KeyframeEffect ? effect.getKeyframes()[0] : undefined;
         entries.push({
           kind,
           name: event.animationName,
           transform: getComputedStyle(event.target).transform,
+          duration: Number(timing?.duration ?? 0),
+          delay: timing?.delay ?? 0,
+          fromFilter: String(first?.filter ?? "none"),
+          fromOpacity: Number(first?.opacity ?? 0),
         });
         document.documentElement.dataset.guideEntrances = JSON.stringify(entries);
       });
@@ -68,12 +89,7 @@ for (const reduced of [false, true]) {
     expect(await page.evaluate(() => window.musart!.snapshot().revision)).toBe(before + 1);
     const read = () =>
       page.evaluate(
-        () =>
-          JSON.parse(document.documentElement.dataset.guideEntrances!) as {
-            kind: string;
-            name: string;
-            transform: string;
-          }[],
+        () => JSON.parse(document.documentElement.dataset.guideEntrances!) as GuideEntrance[],
       );
     if (reduced) {
       await expect(controls).toHaveCSS("animation-name", "none");
@@ -86,11 +102,20 @@ for (const reduced of [false, true]) {
           expect.arrayContaining([
             "panel:palette-panel-fade",
             "controls:musart-blur-fade",
-            "canvas:palette-panel-fade",
+            "canvas:musart-blur-fade",
           ]),
         );
       expect((await read()).every((entry) => entry.transform === "none")).toBe(true);
-      await expect(controls).toHaveCSS("filter", "none");
+      await expect(popup.locator(".blur-reveal:not([data-blur-complete])")).toHaveCount(0);
+      const sequence = (await read()).filter((entry) => entry.kind === "controls");
+      expect(sequence.length).toBeGreaterThanOrEqual(12);
+      expect(
+        sequence.every(
+          (entry) =>
+            entry.duration === 280 && entry.fromFilter === "blur(6px)" && entry.fromOpacity === 0.2,
+        ),
+      ).toBe(true);
+      expect(new Set(sequence.map((entry) => entry.delay)).size).toBeGreaterThanOrEqual(10);
     }
     const count = (await read()).filter((entry) => entry.kind === "controls").length;
     await popup.locator('[data-preset-id="tiktok-video"]').click();
@@ -104,7 +129,7 @@ for (const reduced of [false, true]) {
     if (!reduced)
       await expect
         .poll(async () => (await read()).filter((entry) => entry.kind === "controls").length)
-        .toBe(count + 1);
+        .toBe(count * 2);
     await expect(page.locator("body")).not.toHaveAttribute("data-scroll-locked");
     await expect(page.locator("body")).not.toHaveCSS("pointer-events", "none");
     await page.keyboard.press("Escape");

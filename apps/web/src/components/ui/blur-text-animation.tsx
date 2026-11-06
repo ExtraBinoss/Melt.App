@@ -32,6 +32,7 @@ export interface BlurRevealProps extends Omit<ComponentProps<"span">, "ref"> {
   delayMs?: number;
   initialDelayMs?: number;
   blur?: number;
+  fromOpacity?: number;
   scale?: number;
   reduced?: boolean;
   /** Stable typography for palettes; other entrances may retain their small lift. */
@@ -48,6 +49,7 @@ export function BlurReveal({
   delayMs,
   initialDelayMs = 0,
   blur = 3,
+  fromOpacity = 0,
   scale = 1,
   reduced = false,
   motion = "lift",
@@ -65,6 +67,7 @@ export function BlurReveal({
         bound(delayMs, Math.min(rank * 4, 48), 0, 10000) + bound(initialDelayMs, 0, 0, 10000),
       ),
       blur: bound(blur, 3, 0, 24),
+      fromOpacity: bound(fromOpacity, 0, 0, 1),
       scale: bound(scale, 1, 0.5, 1.25),
       motion,
     };
@@ -133,6 +136,7 @@ export function BlurReveal({
           "--blur-reveal-duration": `${timing.duration}ms`,
           "--blur-reveal-delay": `${timing.delay}ms`,
           "--blur-reveal-amount": `${timing.blur}px`,
+          "--blur-reveal-from-opacity": timing.fromOpacity,
           "--blur-reveal-scale": timing.scale,
         } as CSSProperties
       }

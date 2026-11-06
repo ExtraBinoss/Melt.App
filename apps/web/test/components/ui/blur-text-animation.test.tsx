@@ -2,7 +2,10 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { Profiler } from "react";
 import { expect, test, vi } from "vitest";
 import { Popover, PopoverTrigger, PopoverContent } from "../../../src/components/ui/popover";
-import { PaletteReveal } from "../../../src/components/shared/motion/PaletteReveal";
+import {
+  PaletteReveal,
+  PaletteRevealGroup,
+} from "../../../src/components/shared/motion/PaletteReveal";
 import BlurTextAnimation, {
   BlurReveal,
   Component,
@@ -31,6 +34,30 @@ test("palette headings, settings and rows share a stable blur/fade cadence witho
   event("animationend");
   expect(row.style.willChange).toBe("");
   expect(row).toHaveAttribute("data-blur-complete");
+});
+test("settings resolve a visible blur in a bounded sequence without animation-frame commits", () => {
+  const commits = vi.fn();
+  const view = render(
+    <Profiler id="sequence" onRender={commits}>
+      <PaletteRevealGroup profile="controls">
+        <PaletteReveal order={1}>First card</PaletteReveal>
+        <PaletteReveal order={13}>Last setting</PaletteReveal>
+      </PaletteRevealGroup>
+    </Profiler>,
+  );
+  const first = screen.getByText("First card"),
+    last = screen.getByText("Last setting");
+  expect(first.style.getPropertyValue("--blur-reveal-amount")).toBe("6px");
+  expect(first.style.getPropertyValue("--blur-reveal-from-opacity")).toBe("0.2");
+  expect(first.style.getPropertyValue("--blur-reveal-duration")).toBe("280ms");
+  expect(first.style.getPropertyValue("--blur-reveal-delay")).toBe("18ms");
+  expect(last.style.getPropertyValue("--blur-reveal-delay")).toBe("234ms");
+  const before = commits.mock.calls.length;
+  animation(first, "animationstart");
+  animation(first, "animationend");
+  expect(commits).toHaveBeenCalledTimes(before);
+  expect(first.style.willChange).toBe("");
+  view.unmount();
 });
 test("keeps the supplied API aliases, exact whitespace and surrounding typography without demo content", () => {
   expect(Component).toBe(BlurTextAnimation);

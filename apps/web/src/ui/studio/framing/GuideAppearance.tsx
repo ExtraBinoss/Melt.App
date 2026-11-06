@@ -1,3 +1,4 @@
+import { PaletteReveal } from "../../../components/shared/motion/PaletteReveal";
 import { useTranslation } from "react-i18next";
 import { NumberInput } from "../../../components/shared/NumberInput";
 import { SelectField } from "../../../components/shared/SelectField";
@@ -12,32 +13,36 @@ export function GuideAppearance({
   onPreview,
   onCancel,
   identity,
+  reveal = false,
 }: {
   value: StudioGuideAppearance;
   onChange: (value: StudioGuideAppearance) => void;
   onPreview: (value: StudioGuideAppearance) => void;
   onCancel: () => void;
   identity?: object;
+  reveal?: boolean;
 }) {
   const { t } = useTranslation("studioFraming");
   return (
     <div className="studio-guide-appearance">
-      <div className="studio-guide-setting">
-        <span>{t("safeArea")}</span>
-        <SelectField
-          identity={identity}
-          label={t("safeArea")}
-          value={value.safeArea}
-          options={[
-            { value: "format", label: t("formatSafeArea") },
-            { value: "custom", label: t("customMargin") },
-            { value: "none", label: t("none") },
-          ]}
-          onValueChange={(safeArea) =>
-            onChange({ ...value, safeArea: safeArea as StudioGuideAppearance["safeArea"] })
-          }
-        />
-      </div>
+      <PaletteReveal asChild enabled={reveal} order={11}>
+        <div className="studio-guide-setting">
+          <span>{t("safeArea")}</span>
+          <SelectField
+            identity={identity}
+            label={t("safeArea")}
+            value={value.safeArea}
+            options={[
+              { value: "format", label: t("formatSafeArea") },
+              { value: "custom", label: t("customMargin") },
+              { value: "none", label: t("none") },
+            ]}
+            onValueChange={(safeArea) =>
+              onChange({ ...value, safeArea: safeArea as StudioGuideAppearance["safeArea"] })
+            }
+          />
+        </div>
+      </PaletteReveal>
       {value.safeArea === "custom" && (
         <NumberInput
           identity={identity}
@@ -52,40 +57,44 @@ export function GuideAppearance({
           onCommit={(margin) => onChange({ ...value, margin })}
         />
       )}
-      <div className="studio-guide-setting">
-        <span>{t("guideColor")}</span>
-        <SelectField
-          identity={identity}
-          label={t("guideColor")}
-          value={value.color}
-          options={(Object.keys(STUDIO_GUIDE_COLORS) as (keyof typeof STUDIO_GUIDE_COLORS)[]).map(
-            (color) => ({
-              value: color,
-              label: (
-                <span className="studio-guide-color-option">
-                  <i style={{ backgroundColor: STUDIO_GUIDE_COLORS[color] }} />
-                  {t(color)}
-                </span>
-              ),
-            }),
-          )}
-          onPreview={(color) =>
-            onPreview({ ...value, color: color as StudioGuideAppearance["color"] })
-          }
-          onPreviewCancel={onCancel}
-          onValueChange={(color) =>
-            onChange({ ...value, color: color as StudioGuideAppearance["color"] })
-          }
-        />
-      </div>
-      <label className="studio-guide-setting">
-        <span>{t("centerLines")}</span>
-        <Switch
-          aria-label={t("centerLines")}
-          checked={value.center}
-          onCheckedChange={(center) => onChange({ ...value, center })}
-        />
-      </label>
+      <PaletteReveal asChild enabled={reveal} order={12}>
+        <div className="studio-guide-setting">
+          <span>{t("guideColor")}</span>
+          <SelectField
+            identity={identity}
+            label={t("guideColor")}
+            value={value.color}
+            options={(Object.keys(STUDIO_GUIDE_COLORS) as (keyof typeof STUDIO_GUIDE_COLORS)[]).map(
+              (color) => ({
+                value: color,
+                label: (
+                  <span className="studio-guide-color-option">
+                    <i style={{ backgroundColor: STUDIO_GUIDE_COLORS[color] }} />
+                    {t(color)}
+                  </span>
+                ),
+              }),
+            )}
+            onPreview={(color) =>
+              onPreview({ ...value, color: color as StudioGuideAppearance["color"] })
+            }
+            onPreviewCancel={onCancel}
+            onValueChange={(color) =>
+              onChange({ ...value, color: color as StudioGuideAppearance["color"] })
+            }
+          />
+        </div>
+      </PaletteReveal>
+      <PaletteReveal asChild enabled={reveal} order={13}>
+        <label className="studio-guide-setting">
+          <span>{t("centerLines")}</span>
+          <Switch
+            aria-label={t("centerLines")}
+            checked={value.center}
+            onCheckedChange={(center) => onChange({ ...value, center })}
+          />
+        </label>
+      </PaletteReveal>
     </div>
   );
 }

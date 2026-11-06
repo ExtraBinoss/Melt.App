@@ -5,7 +5,7 @@ import { useWorkspaceMode } from "../workspace-mode";
 import type { SpatialCanvasProps } from "../../../canvas/spatial/CanvasSpatialEditing";
 import { getStudioViewport } from "./viewport";
 import { DEFAULT_STUDIO_GUIDES, STUDIO_GUIDE_COLORS, studioSafeInsets } from "./guide-settings";
-import "../../../components/shared/motion/palette-panel.css";
+import "../../../components/ui/blur-text-animation.css";
 import "./backdrop.css";
 import "./framing.css";
 

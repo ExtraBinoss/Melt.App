@@ -1,6 +1,6 @@
 @keyframes musart-blur-reveal {
   from {
-    opacity: 0;
+    opacity: var(--blur-reveal-from-opacity, 0);
     filter: blur(var(--blur-reveal-amount, 3px));
     transform: translate3d(0, 3px, 0) scale(var(--blur-reveal-scale, 1));
   }
@@ -16,7 +16,7 @@
 }
 @keyframes musart-blur-fade {
   from {
-    opacity: 0;
+    opacity: var(--blur-reveal-from-opacity, 0);
     filter: blur(var(--blur-reveal-amount, 3px));
   }
   to {

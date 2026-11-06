@@ -66,8 +66,12 @@ timing and rendering checks independently of unit coverage following
 
 The capture popover and settings revealed by Show guides reuse `PalettePanel` and
 `PaletteReveal`, the Cmd+K blur/fade engine. Text never scales or translates during
-the reveal. Changing formats, colors or margins retains the mounted controls and
+the reveal. The settings profile starts at 20% opacity and 6 px blur, resolves over
+280 ms, and staggers cards followed by dimensions and appearance fields in 18 ms
+steps capped at 234 ms. Offscreen format cards share the last visible card's delay.
+Cmd+K retains its original faster palette profile. Canvas guides resolve from 4 px
+blur over 280 ms through the same keyframes. Changing formats, colors or margins retains the mounted controls and
 does not restart their opening animation. The canvas capture frame uses the same
-shared opacity keyframes; camera projection and guide geometry remain imperative.
+shared blur/fade keyframes; camera projection and guide geometry remain imperative.
 Reduced motion skips both entrances. These presentation animations do not create
 document commands, modify exported artwork or animate layout dimensions.

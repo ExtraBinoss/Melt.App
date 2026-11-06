@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useReducedMotion } from "motion/react";
 import { PalettePanel } from "../../../components/shared/motion/PalettePanel";
-import { PaletteReveal } from "../../../components/shared/motion/PaletteReveal";
+import { PaletteReveal, PaletteRevealGroup } from "../../../components/shared/motion/PaletteReveal";
 import type { CaptureGuides, EnginePort } from "@musart/core";
 import { Scan } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -64,21 +64,22 @@ export function StudioGuides({ engine }: { engine: EnginePort }) {
         data-canvas-control
       >
         <PalettePanel reduced={reduced} waitForPlacement>
-          <PaletteReveal asChild reduced={reduced}>
-            <label className="studio-capture-heading">
-              <strong>{t("showGuide")}</strong>
-              <Switch
-                size="sm"
-                aria-label={t("showGuide")}
-                checked={value.visible}
-                onCheckedChange={(visible) => edit.commit({ ...value, visible })}
-              />
-            </label>
-          </PaletteReveal>
-          {value.visible && (
-            <PaletteReveal asChild reduced={reduced} order={1}>
+          <PaletteRevealGroup profile="controls">
+            <PaletteReveal asChild reduced={reduced}>
+              <label className="studio-capture-heading">
+                <strong>{t("showGuide")}</strong>
+                <Switch
+                  size="sm"
+                  aria-label={t("showGuide")}
+                  checked={value.visible}
+                  onCheckedChange={(visible) => edit.commit({ ...value, visible })}
+                />
+              </label>
+            </PaletteReveal>
+            {value.visible && (
               <div className="studio-capture-controls" data-studio-guide-controls>
                 <FramePresetPicker
+                  reveal
                   value={value}
                   bounds={bounds}
                   identity={page}
@@ -87,6 +88,7 @@ export function StudioGuides({ engine }: { engine: EnginePort }) {
                   onCancel={edit.cancel}
                 />
                 <GuideAppearance
+                  reveal
                   value={value}
                   identity={page}
                   onChange={(next) => edit.commit({ ...value, ...next })}
@@ -94,8 +96,8 @@ export function StudioGuides({ engine }: { engine: EnginePort }) {
                   onCancel={edit.cancel}
                 />
               </div>
-            </PaletteReveal>
-          )}
+            )}
+          </PaletteRevealGroup>
         </PalettePanel>
       </PopoverContent>
     </Popover>
