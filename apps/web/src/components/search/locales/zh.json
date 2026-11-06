@@ -182,7 +182,10 @@
     "shape-grid": "使用几何形状网格和可编辑调色板重建图像色调。",
     "watercolor": "将图像细节简化为淡彩色块，并添加纸张颗粒和加深的边缘。",
     "depth-anything": "从 2D 图像或视频在本地生成相对深度图，并可选择添加视差效果。",
-    "time-warp-scan": "用于已保存项目的旧版扫描线时间扭曲。"
+    "time-warp-scan": "用于已保存项目的旧版扫描线时间扭曲。",
+    "wax": "柔和半透明的蜡质涂层，平滑原图浮雕并添加定向表面高光。",
+    "melt": "根据色调将原始颜色与轮廓拉伸为定向的液体滴流。",
+    "emboss": "根据亮度或透明度生成凸起、凹陷、圆润或轮廓浮雕，使用原始颜色或纯色材质呈现光影。"
   },
   "commandLabels": {
     "togglePlayback": "播放 / 暂停",
@@ -303,7 +306,10 @@
     "shape-grid": "形状网格",
     "watercolor": "水彩",
     "repeater": "重复器",
-    "wave-distortion": "波浪扭曲"
+    "wave-distortion": "波浪扭曲",
+    "wax": "蜡质",
+    "melt": "熔化",
+    "emboss": "浮雕"
   },
   "language": "语言"
 }

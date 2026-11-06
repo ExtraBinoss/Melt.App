@@ -37,6 +37,9 @@ const preview = (
 /** Deliberate art direction for built-ins; an effect author's own declaration takes priority. */
 export const BUILTIN_EFFECT_PREVIEWS: Readonly<Record<EffectType, EffectPreviewDefinition>> =
   Object.freeze({
+    wax: preview("studio-still-life"),
+    melt: preview("editorial-portrait"),
+    emboss: preview("studio-still-life"),
     glow: preview("neon-city"),
     "neon-melt": preview("neon-city"),
     repeater: preview("studio-still-life"),

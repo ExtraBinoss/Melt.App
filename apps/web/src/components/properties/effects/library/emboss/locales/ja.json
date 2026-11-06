@@ -1,0 +1,29 @@
+{
+  "name": "エンボス",
+  "parameter": {
+    "amount": "適用量",
+    "mode": "レリーフの種類",
+    "height": "高さの入力",
+    "material": "表面素材",
+    "materialColor": "素材の色",
+    "size": "レリーフの大きさ",
+    "softness": "柔らかさ",
+    "depth": "深さ",
+    "azimuth": "光の方向",
+    "altitude": "光の高さ",
+    "ambient": "環境光",
+    "highlight": "ハイライトの強さ",
+    "shadow": "影の強さ",
+    "gloss": "光沢"
+  },
+  "choice": {
+    "raised": "浮き彫り",
+    "recessed": "凹み彫り",
+    "pillow": "丸みのある浮き彫り",
+    "outline": "輪郭の隆起",
+    "luminance": "輝度",
+    "alpha": "アルファの輪郭",
+    "source": "元の色",
+    "neutral": "単色素材"
+  }
+}

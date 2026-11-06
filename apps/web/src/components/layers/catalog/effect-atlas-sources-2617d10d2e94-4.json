@@ -1,5 +1,56 @@
 [
   {
+    "type": "brightness",
+    "title": "brightness: editorial-portrait (photo)",
+    "source": "editorial-portrait",
+    "scene": "photo",
+    "effect": {
+      "id": "catalog-effect-brightness",
+      "type": "brightness",
+      "enabled": true,
+      "amount": 0.63,
+      "scale": 2,
+      "levels": 2,
+      "color": false,
+      "seed": 42
+    },
+    "placement": "layer"
+  },
+  {
+    "type": "contrast",
+    "title": "contrast: editorial-portrait (photo)",
+    "source": "editorial-portrait",
+    "scene": "photo",
+    "effect": {
+      "id": "catalog-effect-contrast",
+      "type": "contrast",
+      "enabled": true,
+      "amount": 0.78,
+      "scale": 2,
+      "levels": 2,
+      "color": false,
+      "seed": 42
+    },
+    "placement": "layer"
+  },
+  {
+    "type": "grayscale",
+    "title": "grayscale: editorial-portrait (photo)",
+    "source": "editorial-portrait",
+    "scene": "photo",
+    "effect": {
+      "id": "catalog-effect-grayscale",
+      "type": "grayscale",
+      "enabled": true,
+      "amount": 1,
+      "scale": 2,
+      "levels": 2,
+      "color": false,
+      "seed": 42
+    },
+    "placement": "layer"
+  },
+  {
     "type": "blur",
     "title": "blur: neon-city (photo)",
     "source": "neon-city",
@@ -136,57 +187,6 @@
       "type": "temperature",
       "enabled": true,
       "amount": 0.88,
-      "scale": 2,
-      "levels": 2,
-      "color": false,
-      "seed": 42
-    },
-    "placement": "layer"
-  },
-  {
-    "type": "tint",
-    "title": "tint: editorial-portrait (photo)",
-    "source": "editorial-portrait",
-    "scene": "photo",
-    "effect": {
-      "id": "catalog-effect-tint",
-      "type": "tint",
-      "enabled": true,
-      "amount": 0.82,
-      "scale": 2,
-      "levels": 2,
-      "color": false,
-      "seed": 42
-    },
-    "placement": "layer"
-  },
-  {
-    "type": "gamma",
-    "title": "gamma: studio-still-life (photo)",
-    "source": "studio-still-life",
-    "scene": "photo",
-    "effect": {
-      "id": "catalog-effect-gamma",
-      "type": "gamma",
-      "enabled": true,
-      "amount": 0.73,
-      "scale": 2,
-      "levels": 2,
-      "color": false,
-      "seed": 42
-    },
-    "placement": "layer"
-  },
-  {
-    "type": "invert",
-    "title": "invert: neon-city (photo)",
-    "source": "neon-city",
-    "scene": "photo",
-    "effect": {
-      "id": "catalog-effect-invert",
-      "type": "invert",
-      "enabled": true,
-      "amount": 1,
       "scale": 2,
       "levels": 2,
       "color": false,

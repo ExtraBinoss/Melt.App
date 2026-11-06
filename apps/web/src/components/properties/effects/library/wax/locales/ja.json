@@ -1,0 +1,16 @@
+{
+  "name": "ワックス",
+  "parameter": {
+    "blur": "平滑化半径",
+    "relief": "凹凸",
+    "translucence": "半透明感",
+    "gloss": "光沢",
+    "glow": "表面の輝き",
+    "brightness": "明るさ",
+    "aberration": "色の分散",
+    "tint": "色づけの強さ",
+    "waxColor": "ワックスの色",
+    "lightAngle": "光の方向",
+    "lightElevation": "光の仰角"
+  }
+}

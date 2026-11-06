@@ -1,0 +1,18 @@
+{
+  "name": "녹이기",
+  "parameter": {
+    "distance": "늘이기 거리",
+    "angle": "늘이기 방향",
+    "liquidity": "유동성",
+    "dripScale": "물방울 너비",
+    "toneInfluence": "색조 영향",
+    "tone": "늘일 색조",
+    "phase": "위상",
+    "amount": "강도",
+    "seed": "시드"
+  },
+  "choice": {
+    "highlights": "밝은 영역",
+    "shadows": "어두운 영역"
+  }
+}

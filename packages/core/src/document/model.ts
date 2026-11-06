@@ -33,6 +33,9 @@ export type LayerKind = "rectangle" | "ellipse" | "text" | "image" | "video" | "
 import type { LiquifyDab } from "../effects/liquify/strokes";
 
 export type EffectType =
+  | "wax"
+  | "melt"
+  | "emboss"
   | "glow"
   | "neon-melt"
   | "repeater"

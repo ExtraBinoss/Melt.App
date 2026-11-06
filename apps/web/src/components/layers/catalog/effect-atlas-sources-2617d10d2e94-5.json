@@ -1,5 +1,56 @@
 [
   {
+    "type": "tint",
+    "title": "tint: editorial-portrait (photo)",
+    "source": "editorial-portrait",
+    "scene": "photo",
+    "effect": {
+      "id": "catalog-effect-tint",
+      "type": "tint",
+      "enabled": true,
+      "amount": 0.82,
+      "scale": 2,
+      "levels": 2,
+      "color": false,
+      "seed": 42
+    },
+    "placement": "layer"
+  },
+  {
+    "type": "gamma",
+    "title": "gamma: studio-still-life (photo)",
+    "source": "studio-still-life",
+    "scene": "photo",
+    "effect": {
+      "id": "catalog-effect-gamma",
+      "type": "gamma",
+      "enabled": true,
+      "amount": 0.73,
+      "scale": 2,
+      "levels": 2,
+      "color": false,
+      "seed": 42
+    },
+    "placement": "layer"
+  },
+  {
+    "type": "invert",
+    "title": "invert: neon-city (photo)",
+    "source": "neon-city",
+    "scene": "photo",
+    "effect": {
+      "id": "catalog-effect-invert",
+      "type": "invert",
+      "enabled": true,
+      "amount": 1,
+      "scale": 2,
+      "levels": 2,
+      "color": false,
+      "seed": 42
+    },
+    "placement": "layer"
+  },
+  {
     "type": "sepia",
     "title": "sepia: editorial-portrait (photo)",
     "source": "editorial-portrait",
@@ -180,116 +231,6 @@
         "softness": 0.25,
         "shadow": 0.35,
         "phase": 0
-      }
-    },
-    "placement": "layer"
-  },
-  {
-    "type": "ripple",
-    "title": "ripple: alpine-lake (photo)",
-    "source": "alpine-lake",
-    "scene": "photo",
-    "effect": {
-      "id": "catalog-effect-ripple",
-      "type": "ripple",
-      "enabled": true,
-      "amount": 1,
-      "scale": 1,
-      "levels": 2,
-      "color": false,
-      "seed": 42,
-      "time": 0.9,
-      "settings": {
-        "centerX": 0.5,
-        "centerY": 0.5,
-        "innerRadius": 0,
-        "radius": 150,
-        "feather": 20,
-        "falloff": 1,
-        "amplitude": 10,
-        "wavelength": 29,
-        "speed": 48,
-        "phase": 0,
-        "direction": "outward",
-        "dispersion": 0.2
-      }
-    },
-    "placement": "layer"
-  },
-  {
-    "type": "shatter",
-    "title": "shatter: studio-still-life (photo)",
-    "source": "studio-still-life",
-    "scene": "photo",
-    "effect": {
-      "id": "catalog-effect-shatter",
-      "type": "shatter",
-      "enabled": true,
-      "amount": 1,
-      "scale": 45,
-      "levels": 2,
-      "color": false,
-      "seed": 42,
-      "settings": {
-        "pattern": "impact",
-        "centerX": 0.5,
-        "centerY": 0.5,
-        "radius": 0.95,
-        "innerRadius": 0,
-        "falloff": 1,
-        "jitter": 0.6,
-        "spokes": 12,
-        "displacement": 10,
-        "rotation": 4,
-        "ior": 1.52,
-        "thickness": 24,
-        "dispersion": 0.35,
-        "tilt": 0.5,
-        "roughness": 0.08,
-        "crackWidth": 1.5,
-        "cracks": 0.9,
-        "highlights": 1.25,
-        "tintStrength": 0.1,
-        "tintColor": "#dcefff",
-        "crackColor": "#10141a",
-        "highlightColor": "#cbe5f7",
-        "cutout": false
-      }
-    },
-    "placement": "layer"
-  },
-  {
-    "type": "noise",
-    "title": "noise: neon-city (photo)",
-    "source": "neon-city",
-    "scene": "photo",
-    "effect": {
-      "id": "catalog-effect-noise",
-      "type": "noise",
-      "enabled": true,
-      "amount": 0.45,
-      "scale": 36,
-      "levels": 2,
-      "color": true,
-      "seed": 42,
-      "time": 0,
-      "settings": {
-        "algorithm": "ridged",
-        "octaves": 4,
-        "lacunarity": 2,
-        "persistence": 0.5,
-        "jitter": 1,
-        "offsetX": 0,
-        "offsetY": 0,
-        "offsetZ": 0,
-        "speed": 0.25,
-        "contrast": 1.65,
-        "brightness": 0,
-        "gamma": 1,
-        "invert": false,
-        "mode": "replace",
-        "lowColor": "#000000",
-        "highColor": "#ffffff"
       }
     },
     "placement": "layer"

@@ -66,7 +66,10 @@
     "shape-grid": "Ricostruisci i toni dell’immagine con una griglia di forme geometriche e palette modificabili.",
     "watercolor": "Semplifica i dettagli in velature di pigmento con grana della carta e bordi scuriti.",
     "depth-anything": "Genera localmente una mappa di profondità relativa da un’immagine o un video 2D e aggiungi una parallasse facoltativa.",
-    "feather": "Sfumatura ellittica della trasparenza con centro, raggio e morbidezza modificabili."
+    "feather": "Sfumatura ellittica della trasparenza con centro, raggio e morbidezza modificabili.",
+    "wax": "Rivestimento di cera traslucida con rilievo levigato e riflessi direzionali sulla superficie.",
+    "melt": "Trascina colori e sagome in colature liquide direzionali ponderate per tono.",
+    "emboss": "Ombreggia luminanza o alfa come rilievo sporgente, incavato, arrotondato o di contorno, con colori originali o materiale neutro."
   },
   "family": {
     "tone": "Luce e tonalità",

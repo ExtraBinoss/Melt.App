@@ -1,0 +1,60 @@
+{
+  "en": {
+    "name": "Emboss",
+    "parameter": {
+      "amount": "Amount",
+      "mode": "Relief type",
+      "height": "Height source",
+      "material": "Surface material",
+      "materialColor": "Material color",
+      "size": "Relief size",
+      "softness": "Softness",
+      "depth": "Depth",
+      "azimuth": "Light direction",
+      "altitude": "Light elevation",
+      "ambient": "Ambient light",
+      "highlight": "Highlight strength",
+      "shadow": "Shadow strength",
+      "gloss": "Gloss"
+    },
+    "choice": {
+      "raised": "Raised",
+      "recessed": "Recessed",
+      "pillow": "Pillow",
+      "outline": "Outline ridge",
+      "luminance": "Luminance",
+      "alpha": "Alpha silhouette",
+      "source": "Source colors",
+      "neutral": "Neutral material"
+    }
+  },
+  "fr": {
+    "name": "Gaufrage",
+    "parameter": {
+      "amount": "Intensité",
+      "mode": "Type de relief",
+      "height": "Source de hauteur",
+      "material": "Matériau de surface",
+      "materialColor": "Couleur du matériau",
+      "size": "Taille du relief",
+      "softness": "Douceur",
+      "depth": "Profondeur",
+      "azimuth": "Direction de la lumière",
+      "altitude": "Élévation de la lumière",
+      "ambient": "Lumière ambiante",
+      "highlight": "Intensité des reflets",
+      "shadow": "Intensité des ombres",
+      "gloss": "Brillance"
+    },
+    "choice": {
+      "raised": "En relief",
+      "recessed": "En creux",
+      "pillow": "Coussin",
+      "outline": "Bourrelet de contour",
+      "luminance": "Luminance",
+      "alpha": "Silhouette alpha",
+      "source": "Couleurs de la source",
+      "neutral": "Matériau neutre"
+    }
+  }
+}

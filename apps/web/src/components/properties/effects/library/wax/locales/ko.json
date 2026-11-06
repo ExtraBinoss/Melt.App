@@ -1,0 +1,16 @@
+{
+  "name": "왁스",
+  "parameter": {
+    "blur": "매끄러움 반경",
+    "relief": "요철",
+    "translucence": "반투명도",
+    "gloss": "광택",
+    "glow": "표면 발광",
+    "brightness": "밝기",
+    "aberration": "색 분산",
+    "tint": "색조 강도",
+    "waxColor": "왁스 색상",
+    "lightAngle": "조명 방향",
+    "lightElevation": "조명 고도"
+  }
+}

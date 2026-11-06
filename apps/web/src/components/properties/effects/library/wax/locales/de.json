@@ -1,0 +1,16 @@
+{
+  "name": "Wachs",
+  "parameter": {
+    "blur": "Glättungsradius",
+    "relief": "Relief",
+    "translucence": "Lichtdurchlässigkeit",
+    "gloss": "Glanz",
+    "glow": "Oberflächenleuchten",
+    "brightness": "Helligkeit",
+    "aberration": "Farbspreizung",
+    "tint": "Tönungsstärke",
+    "waxColor": "Wachsfarbe",
+    "lightAngle": "Lichtrichtung",
+    "lightElevation": "Lichthöhe"
+  }
+}

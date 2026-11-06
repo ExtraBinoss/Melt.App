@@ -1,0 +1,16 @@
+{
+  "name": "蜡质",
+  "parameter": {
+    "blur": "平滑半径",
+    "relief": "浮雕强度",
+    "translucence": "半透明感",
+    "gloss": "光泽",
+    "glow": "表面辉光",
+    "brightness": "亮度",
+    "aberration": "色散",
+    "tint": "染色强度",
+    "waxColor": "蜡的颜色",
+    "lightAngle": "光照方向",
+    "lightElevation": "光照仰角"
+  }
+}

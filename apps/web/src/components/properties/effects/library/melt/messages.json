@@ -1,0 +1,38 @@
+{
+  "en": {
+    "name": "Melt",
+    "parameter": {
+      "distance": "Pull distance",
+      "angle": "Pull direction",
+      "liquidity": "Liquidity",
+      "dripScale": "Drip width",
+      "toneInfluence": "Tone influence",
+      "tone": "Pull tones",
+      "phase": "Phase",
+      "amount": "Amount",
+      "seed": "Seed"
+    },
+    "choice": {
+      "highlights": "Highlights",
+      "shadows": "Shadows"
+    }
+  },
+  "fr": {
+    "name": "Fonte",
+    "parameter": {
+      "distance": "Distance d’étirement",
+      "angle": "Direction d’étirement",
+      "liquidity": "Fluidité",
+      "dripScale": "Largeur des coulures",
+      "toneInfluence": "Influence des tons",
+      "tone": "Tons étirés",
+      "phase": "Phase",
+      "amount": "Intensité",
+      "seed": "Graine"
+    },
+    "choice": {
+      "highlights": "Hautes lumières",
+      "shadows": "Ombres"
+    }
+  }
+}

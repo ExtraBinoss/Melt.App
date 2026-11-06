@@ -447,7 +447,7 @@ const ParameterField = memo(function ParameterField({
             <label className="effect-select-field">
               <span>{label}</span>
               <SelectField
-                identity={effect}
+                identity={`${effect.id}:${effect.type}:${parameter.key}`}
                 label={label}
                 value={String(live)}
                 disabled={disabled}

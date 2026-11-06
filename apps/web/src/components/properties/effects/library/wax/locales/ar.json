@@ -1,0 +1,16 @@
+{
+  "name": "شمع",
+  "parameter": {
+    "blur": "نصف قطر التنعيم",
+    "relief": "التضاريس",
+    "translucence": "شبه الشفافية",
+    "gloss": "اللمعان",
+    "glow": "توهج السطح",
+    "brightness": "السطوع",
+    "aberration": "التشتت اللوني",
+    "tint": "قوة الصبغة",
+    "waxColor": "لون الشمع",
+    "lightAngle": "اتجاه الضوء",
+    "lightElevation": "ارتفاع الضوء"
+  }
+}

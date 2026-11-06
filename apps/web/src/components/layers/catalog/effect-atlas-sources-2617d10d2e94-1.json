@@ -1,5 +1,56 @@
 [
   {
+    "type": "wax",
+    "title": "wax: studio-still-life (photo)",
+    "source": "studio-still-life",
+    "scene": "photo",
+    "effect": {
+      "id": "catalog-effect-wax",
+      "type": "wax",
+      "enabled": true,
+      "amount": 1,
+      "scale": 2,
+      "levels": 2,
+      "color": false,
+      "seed": 42
+    },
+    "placement": "layer"
+  },
+  {
+    "type": "melt",
+    "title": "melt: editorial-portrait (photo)",
+    "source": "editorial-portrait",
+    "scene": "photo",
+    "effect": {
+      "id": "catalog-effect-melt",
+      "type": "melt",
+      "enabled": true,
+      "amount": 1,
+      "scale": 2,
+      "levels": 2,
+      "color": false,
+      "seed": 42
+    },
+    "placement": "layer"
+  },
+  {
+    "type": "emboss",
+    "title": "emboss: studio-still-life (photo)",
+    "source": "studio-still-life",
+    "scene": "photo",
+    "effect": {
+      "id": "catalog-effect-emboss",
+      "type": "emboss",
+      "enabled": true,
+      "amount": 1,
+      "scale": 2,
+      "levels": 2,
+      "color": false,
+      "seed": 42
+    },
+    "placement": "layer"
+  },
+  {
     "type": "glow",
     "title": "glow: neon-city (photo)",
     "source": "neon-city",
@@ -132,71 +183,6 @@
     "effect": {
       "id": "catalog-effect-depth-anything",
       "type": "depth-anything",
-      "enabled": true,
-      "amount": 1,
-      "scale": 2,
-      "levels": 2,
-      "color": false,
-      "seed": 42
-    },
-    "placement": "layer"
-  },
-  {
-    "type": "depth-of-field",
-    "title": "depth-of-field: studio-still-life (depth)",
-    "source": "studio-still-life",
-    "scene": "depth",
-    "effect": {
-      "id": "catalog-effect-depth-of-field",
-      "type": "depth-of-field",
-      "enabled": true,
-      "amount": 1,
-      "scale": 2,
-      "levels": 2,
-      "color": false,
-      "seed": 42,
-      "settings": {
-        "focusDistance": 4.5,
-        "focusRange": 0.06,
-        "aperture": 0.8,
-        "maxBlur": 12,
-        "edgeProtection": 0.75
-      }
-    },
-    "placement": "composition"
-  },
-  {
-    "type": "trail",
-    "title": "trail: editorial-portrait (temporal)",
-    "source": "editorial-portrait",
-    "scene": "temporal",
-    "effect": {
-      "id": "catalog-effect-trail",
-      "type": "trail",
-      "enabled": true,
-      "amount": 1,
-      "scale": 2,
-      "levels": 2,
-      "color": false,
-      "seed": 42,
-      "settings": {
-        "mode": "temporal",
-        "echoCount": 4,
-        "delay": 0.13,
-        "fade": 0.75
-      }
-    },
-    "placement": "composition",
-    "sampleTime": 0.9
-  },
-  {
-    "type": "risograph",
-    "title": "risograph: editorial-portrait (photo)",
-    "source": "editorial-portrait",
-    "scene": "photo",
-    "effect": {
-      "id": "catalog-effect-risograph",
-      "type": "risograph",
       "enabled": true,
       "amount": 1,
       "scale": 2,

@@ -1,3 +1,4 @@
+import { meltFootprint } from "../melt/footprint";
 import { repeaterFootprint } from "../repeater/footprint";
 import { waveDistortionFootprint } from "../wave-distortion/footprint";
 import { glowFootprint } from "../glow/footprint";
@@ -23,6 +24,7 @@ type FootprintBuilder = (
   input: Outset,
 ) => Outset;
 const footprints: Partial<Record<EffectType, FootprintBuilder>> = {
+  melt: meltFootprint,
   repeater: (effect, dimensions, input) => {
     if (!dimensions) throw new Error("Repeater footprint requires authored owner dimensions.");
     return repeaterFootprint(effect, dimensions, input);

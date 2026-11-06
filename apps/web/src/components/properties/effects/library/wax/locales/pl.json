@@ -1,0 +1,16 @@
+{
+  "name": "Wosk",
+  "parameter": {
+    "blur": "Promień wygładzania",
+    "relief": "Wypukłość",
+    "translucence": "Półprzezroczystość",
+    "gloss": "Połysk",
+    "glow": "Poświata powierzchni",
+    "brightness": "Jasność",
+    "aberration": "Rozszczepienie barw",
+    "tint": "Siła zabarwienia",
+    "waxColor": "Kolor wosku",
+    "lightAngle": "Kierunek światła",
+    "lightElevation": "Wysokość światła"
+  }
+}

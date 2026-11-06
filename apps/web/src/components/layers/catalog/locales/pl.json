@@ -66,7 +66,10 @@
     "shape-grid": "Odtwarzaj tony obrazu za pomocą siatki kształtów geometrycznych i edytowalnych palet.",
     "watercolor": "Upraszczaj szczegóły do rozmytych plam pigmentu z ziarnem papieru i przyciemnionymi krawędziami.",
     "depth-anything": "Generuj lokalnie mapę względnej głębi z obrazu lub filmu 2D i opcjonalnie dodawaj paralaksę.",
-    "feather": "Miękka eliptyczna przezroczystość z edytowalnym środkiem, promieniem i miękkością."
+    "feather": "Miękka eliptyczna przezroczystość z edytowalnym środkiem, promieniem i miękkością.",
+    "wax": "Miękka, półprzezroczysta powłoka woskowa z wygładzonym reliefem i kierunkowymi refleksami.",
+    "melt": "Rozciąga kolory i sylwetki w kierunkowe płynne zacieki zależne od tonów.",
+    "emboss": "Cieniuje luminancję lub alfę jako wypukły, wklęsły, poduszkowy lub konturowy relief w kolorach źródła albo neutralnego materiału."
   },
   "family": {
     "tone": "Światło i tony",

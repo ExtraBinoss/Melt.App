@@ -66,7 +66,10 @@
     "shape-grid": "Bildtonwerte mit einem Raster aus geometrischen Formen und bearbeitbaren Paletten rekonstruieren.",
     "watercolor": "Bilddetails zu Pigmentlasuren mit Papierkörnung und dunkleren Rändern vereinfachen.",
     "depth-anything": "Aus einem 2D-Bild oder -Video lokal eine relative Tiefenkarte erzeugen und optional Parallaxe hinzufügen.",
-    "feather": "Weicher elliptischer Transparenzverlauf mit anpassbarer Mitte, Radius und Weichheit."
+    "feather": "Weicher elliptischer Transparenzverlauf mit anpassbarer Mitte, Radius und Weichheit.",
+    "wax": "Weiche, durchscheinende Wachsschicht mit geglättetem Relief und gerichteten Oberflächenreflexen.",
+    "melt": "Zieht Quellfarben und Silhouetten in gerichtete, tonwertabhängige Flüssigkeitstropfen.",
+    "emboss": "Schattiert Helligkeit oder Alpha als erhabenes, vertieftes, rundes Kissen- oder Konturrelief mit Quellfarben oder neutralem Material."
   },
   "family": {
     "tone": "Licht und Tonwerte",

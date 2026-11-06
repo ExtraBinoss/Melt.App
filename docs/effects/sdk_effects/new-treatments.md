@@ -6,6 +6,40 @@ property registry. There is no separate effect editor, renderer or animation clo
 Existing portable IDs, including `blur`, `trail`, `ripple` and `ink-bleed`, retain
 their meaning.
 
+## Wax, Melt and Emboss
+
+`wax` smooths premultiplied source color and height with a bounded 25-sample
+Gaussian stencil. A source-aware normal drives directional highlights, wrapped
+light and tinted translucence. Blur radius, relief, gloss, broad surface glow,
+brightness and chromatic edge spread are editable. Original per-pixel alpha is
+preserved exactly. This is a screen-space wax coating, not physical subsurface
+scattering. The material reference is [Madphase Wax](https://help.madphase.app/reference/effects/material/damage/surface/wax/);
+the implementation is Melt's own treatment.
+
+`melt` pulls source color and transparent silhouettes along an authored direction.
+Smooth seeded lanes vary the pull; a short premultiplied gather softens tails.
+Distance and lane size use document pixels. Liquidity, highlight/shadow weighting,
+seed and an explicit periodic phase are ordinary SDK controls. Phase is seek-safe
+and does not depend on previously rendered frames. Distance bounds admit one-sided
+displacement before the renderer allocates textures; the existing cache budget
+still applies. Missing source coverage is transparent. This is a deterministic
+viscous warp, not gravity-based fluid simulation. Its directional reference is
+[Madphase Smear/Melt](https://help.madphase.app/reference/effects/distortion/warp/distortion/smear/).
+Neon Melt keeps its separate recoloring and bloom treatment.
+
+`emboss` shades luminance or alpha as raised, recessed, pillow or outline relief.
+The profiles respectively use linear height, reversed height with cavity shading,
+a circular cap and a paired-edge ridge. Source colors or a neutral colored material,
+size, softness, depth, light direction/elevation and highlight/shadow controls are
+editable. A fixed 25-sample height stencil plus the original source preserves exact
+alpha. This does not extrude geometry. Existing Bevel retains its portable behavior.
+
+All three effects use generated SDK controls, shared application areas, Motion
+targets and ordinary validated transactions in all twelve locales. Native witnesses
+live in `test/browser/wax-melt-emboss.spec.ts` and `material-locales.spec.ts`;
+captures and decoded-export metrics are written to ignored
+`artifacts/material-treatments/`.
+
 ## Glow and Neon Melt
 
 `glow` extracts visible highlights using a soft luminance threshold. Dense Gaussian
@@ -128,3 +162,25 @@ label while retaining the same portable option ID.
 lookups for every registered effect. English fallback cannot satisfy a missing
 locale entry. The native effect-locale witness checks German, Japanese and Arabic
 controls, endpoint menus, search, focus restoration, nonmodal overlays and RTL.
+
+## Wax, Melt and Emboss verification — 2026-11-06
+
+- 104 focused authoring, renderer graph, bounds, history, generated-control, SDK
+  and localization tests passed across eleven files after the concurrent designer
+  integration. Seven additional catalog/resource checks passed. Production-source
+  and new-witness TypeScript passed.
+- Decoded PNG exports passed on WebGPU and Three's WebGL fallback in headless
+  Chromium 156.0.8078.4 on Linux with the repository Vulkan/SwiftShader flags.
+  Checks cover amount-zero identity, partial opacity, parameter and application-area
+  changes, masks, layer/group/composition scopes, stack order, exact preserved alpha
+  for Wax/Emboss, all four relief modes, directed Melt silhouette expansion and
+  deterministic random-access phase replay.
+- The 50-image mixed material workload used one original upload and 6,357,028
+  accounted cache bytes against a 67,108,864-byte limit; actual GPU, WebGL and Canvas
+  production pixel-read counters remained zero. This is a correctness/resource
+  check, not a hardware latency benchmark.
+- Native German, Japanese and Arabic controls, Motion endpoint menus, local search,
+  selection focus, nonmodal overlays and narrow RTL layout passed. Strict direct
+  bundle checks cover all twelve languages without fallback.
+- All 62 active raster effect previews were baked from the native SDK graphs, with
+  zero production pixel reads.

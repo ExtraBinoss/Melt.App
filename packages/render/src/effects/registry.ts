@@ -1,3 +1,6 @@
+import { waxNode } from "./wax/node";
+import { meltNode } from "./melt/node";
+import { embossNode } from "./emboss/node";
 import { glowNode } from "./glow/node";
 import { neonMeltNode } from "./neon-melt/node";
 import { repeaterNode } from "./repeater/node";
@@ -65,6 +68,9 @@ export const EFFECT_NODES: Readonly<
     EffectNodeBuilder
   >
 > = Object.freeze({
+  wax: waxNode,
+  melt: meltNode,
+  emboss: embossNode,
   glow: glowNode,
   "neon-melt": neonMeltNode,
   repeater: repeaterNode,

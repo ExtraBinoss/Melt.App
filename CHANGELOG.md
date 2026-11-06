@@ -4,6 +4,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ## [Unreleased]
 
+- Add SDK-native Wax, Melt and Emboss with complete controls, choices, catalog descriptions and search labels in all twelve supported languages. Wax adds a soft translucent coating and source-aware highlights; Melt pulls source colors and transparent silhouettes into deterministic directional drips with conservative bounds; Emboss offers raised, recessed, pillow and outline profiles from luminance or alpha. Reuse generated controls, placement, Motion, validated edits and history. Keep generated choice fields focused after validated edits. Add focused authoring and native WebGPU/WebGL export regressions.
+
 - Synchronize effect position-pad X/Y fields in real time through imperative Jotai subscriptions without React commits during dragging; retain one undoable position commit and cancellation restoration for layer and composition effects.
 - Keep preset names stable during IndexedDB reads and switches; replace treatment-library loading text with the shared delayed brand throbber and suppress the initial empty-list flash.
 

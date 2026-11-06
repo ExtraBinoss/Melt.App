@@ -1,0 +1,29 @@
+{
+  "name": "Relevo",
+  "parameter": {
+    "amount": "Intensidade",
+    "mode": "Tipo de relevo",
+    "height": "Fonte da altura",
+    "material": "Material da superfície",
+    "materialColor": "Cor do material",
+    "size": "Tamanho do relevo",
+    "softness": "Suavidade",
+    "depth": "Profundidade",
+    "azimuth": "Direção da luz",
+    "altitude": "Elevação da luz",
+    "ambient": "Luz ambiente",
+    "highlight": "Intensidade dos realces",
+    "shadow": "Intensidade das sombras",
+    "gloss": "Brilho"
+  },
+  "choice": {
+    "raised": "Elevado",
+    "recessed": "Rebaixado",
+    "pillow": "Almofadado",
+    "outline": "Borda em relevo",
+    "luminance": "Luminância",
+    "alpha": "Silhueta alfa",
+    "source": "Cores originais",
+    "neutral": "Material neutro"
+  }
+}

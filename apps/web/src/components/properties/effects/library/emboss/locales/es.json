@@ -1,0 +1,29 @@
+{
+  "name": "Relieve",
+  "parameter": {
+    "amount": "Intensidad",
+    "mode": "Tipo de relieve",
+    "height": "Fuente de altura",
+    "material": "Material de superficie",
+    "materialColor": "Color del material",
+    "size": "Tamaño del relieve",
+    "softness": "Suavidad",
+    "depth": "Profundidad",
+    "azimuth": "Dirección de la luz",
+    "altitude": "Elevación de la luz",
+    "ambient": "Luz ambiental",
+    "highlight": "Intensidad de brillos",
+    "shadow": "Intensidad de sombras",
+    "gloss": "Brillo"
+  },
+  "choice": {
+    "raised": "Elevado",
+    "recessed": "Hundido",
+    "pillow": "Almohadillado",
+    "outline": "Borde en relieve",
+    "luminance": "Luminancia",
+    "alpha": "Silueta alfa",
+    "source": "Colores originales",
+    "neutral": "Material neutro"
+  }
+}

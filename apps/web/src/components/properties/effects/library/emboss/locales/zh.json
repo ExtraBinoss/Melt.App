@@ -1,0 +1,29 @@
+{
+  "name": "浮雕",
+  "parameter": {
+    "amount": "强度",
+    "mode": "浮雕类型",
+    "height": "高度来源",
+    "material": "表面材质",
+    "materialColor": "材质颜色",
+    "size": "浮雕大小",
+    "softness": "柔和度",
+    "depth": "深度",
+    "azimuth": "光照方向",
+    "altitude": "光照仰角",
+    "ambient": "环境光",
+    "highlight": "高光强度",
+    "shadow": "阴影强度",
+    "gloss": "光泽"
+  },
+  "choice": {
+    "raised": "凸起",
+    "recessed": "凹陷",
+    "pillow": "圆润浮雕",
+    "outline": "轮廓凸边",
+    "luminance": "亮度",
+    "alpha": "透明度轮廓",
+    "source": "原始颜色",
+    "neutral": "纯色材质"
+  }
+}

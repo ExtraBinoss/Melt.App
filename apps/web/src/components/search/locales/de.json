@@ -182,7 +182,10 @@
     "shape-grid": "Bildtonwerte mit einem Raster aus geometrischen Formen und bearbeitbaren Paletten rekonstruieren.",
     "watercolor": "Bilddetails zu Pigmentlasuren mit Papierkörnung und dunkleren Rändern vereinfachen.",
     "depth-anything": "Aus einem 2D-Bild oder -Video lokal eine relative Tiefenkarte erzeugen und optional Parallaxe hinzufügen.",
-    "time-warp-scan": "Ältere zeitliche Verzerrung durch Abtastzeilen für gespeicherte Projekte."
+    "time-warp-scan": "Ältere zeitliche Verzerrung durch Abtastzeilen für gespeicherte Projekte.",
+    "wax": "Weiche, durchscheinende Wachsschicht mit geglättetem Relief und gerichteten Oberflächenreflexen.",
+    "melt": "Zieht Quellfarben und Silhouetten in gerichtete, tonwertabhängige Flüssigkeitstropfen.",
+    "emboss": "Schattiert Helligkeit oder Alpha als erhabenes, vertieftes, rundes Kissen- oder Konturrelief mit Quellfarben oder neutralem Material."
   },
   "commandLabels": {
     "togglePlayback": "Wiedergabe / Pause",
@@ -303,7 +306,10 @@
     "shape-grid": "Formenraster",
     "watercolor": "Aquarell",
     "repeater": "Wiederholer",
-    "wave-distortion": "Wellenverzerrung"
+    "wave-distortion": "Wellenverzerrung",
+    "wax": "Wachs",
+    "melt": "Schmelzen",
+    "emboss": "Prägung"
   },
   "language": "Sprache"
 }

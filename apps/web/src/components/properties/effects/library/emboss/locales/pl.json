@@ -1,0 +1,29 @@
+{
+  "name": "Wytłoczenie",
+  "parameter": {
+    "amount": "Intensywność",
+    "mode": "Rodzaj reliefu",
+    "height": "Źródło wysokości",
+    "material": "Materiał powierzchni",
+    "materialColor": "Kolor materiału",
+    "size": "Rozmiar reliefu",
+    "softness": "Miękkość",
+    "depth": "Głębokość",
+    "azimuth": "Kierunek światła",
+    "altitude": "Wysokość światła",
+    "ambient": "Światło otoczenia",
+    "highlight": "Siła rozświetleń",
+    "shadow": "Siła cieni",
+    "gloss": "Połysk"
+  },
+  "choice": {
+    "raised": "Wypukły",
+    "recessed": "Wklęsły",
+    "pillow": "Poduszkowy",
+    "outline": "Wypukły kontur",
+    "luminance": "Luminancja",
+    "alpha": "Sylwetka alfa",
+    "source": "Kolory źródła",
+    "neutral": "Materiał neutralny"
+  }
+}

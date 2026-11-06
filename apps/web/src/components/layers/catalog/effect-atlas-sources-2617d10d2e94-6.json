@@ -1,5 +1,115 @@
 [
   {
+    "type": "ripple",
+    "title": "ripple: alpine-lake (photo)",
+    "source": "alpine-lake",
+    "scene": "photo",
+    "effect": {
+      "id": "catalog-effect-ripple",
+      "type": "ripple",
+      "enabled": true,
+      "amount": 1,
+      "scale": 1,
+      "levels": 2,
+      "color": false,
+      "seed": 42,
+      "time": 0.9,
+      "settings": {
+        "centerX": 0.5,
+        "centerY": 0.5,
+        "innerRadius": 0,
+        "radius": 150,
+        "feather": 20,
+        "falloff": 1,
+        "amplitude": 10,
+        "wavelength": 29,
+        "speed": 48,
+        "phase": 0,
+        "direction": "outward",
+        "dispersion": 0.2
+      }
+    },
+    "placement": "layer"
+  },
+  {
+    "type": "shatter",
+    "title": "shatter: studio-still-life (photo)",
+    "source": "studio-still-life",
+    "scene": "photo",
+    "effect": {
+      "id": "catalog-effect-shatter",
+      "type": "shatter",
+      "enabled": true,
+      "amount": 1,
+      "scale": 45,
+      "levels": 2,
+      "color": false,
+      "seed": 42,
+      "settings": {
+        "pattern": "impact",
+        "centerX": 0.5,
+        "centerY": 0.5,
+        "radius": 0.95,
+        "innerRadius": 0,
+        "falloff": 1,
+        "jitter": 0.6,
+        "spokes": 12,
+        "displacement": 10,
+        "rotation": 4,
+        "ior": 1.52,
+        "thickness": 24,
+        "dispersion": 0.35,
+        "tilt": 0.5,
+        "roughness": 0.08,
+        "crackWidth": 1.5,
+        "cracks": 0.9,
+        "highlights": 1.25,
+        "tintStrength": 0.1,
+        "tintColor": "#dcefff",
+        "crackColor": "#10141a",
+        "highlightColor": "#cbe5f7",
+        "cutout": false
+      }
+    },
+    "placement": "layer"
+  },
+  {
+    "type": "noise",
+    "title": "noise: neon-city (photo)",
+    "source": "neon-city",
+    "scene": "photo",
+    "effect": {
+      "id": "catalog-effect-noise",
+      "type": "noise",
+      "enabled": true,
+      "amount": 0.45,
+      "scale": 36,
+      "levels": 2,
+      "color": true,
+      "seed": 42,
+      "time": 0,
+      "settings": {
+        "algorithm": "ridged",
+        "octaves": 4,
+        "lacunarity": 2,
+        "persistence": 0.5,
+        "jitter": 1,
+        "offsetX": 0,
+        "offsetY": 0,
+        "offsetZ": 0,
+        "speed": 0.25,
+        "contrast": 1.65,
+        "brightness": 0,
+        "gamma": 1,
+        "invert": false,
+        "mode": "replace",
+        "lowColor": "#000000",
+        "highColor": "#ffffff"
+      }
+    },
+    "placement": "layer"
+  },
+  {
     "type": "flashlight",
     "title": "flashlight: studio-still-life (photo)",
     "source": "studio-still-life",
@@ -251,65 +361,6 @@
         "foldPosition": 0.62,
         "foldWidth": 5,
         "cutout": false
-      }
-    },
-    "placement": "layer"
-  },
-  {
-    "type": "pink-phosphor",
-    "title": "pink-phosphor: editorial-portrait (photo)",
-    "source": "editorial-portrait",
-    "scene": "photo",
-    "effect": {
-      "id": "catalog-effect-pink-phosphor",
-      "type": "pink-phosphor",
-      "enabled": true,
-      "amount": 1,
-      "scale": 2,
-      "levels": 2,
-      "color": false,
-      "seed": 42,
-      "time": 0,
-      "settings": {
-        "exposure": 0,
-        "gamma": 1,
-        "contrast": 1,
-        "glow": 0.48,
-        "glowRadius": 2,
-        "glowThreshold": 0.55,
-        "scanlines": 0.3,
-        "beamWidth": 0.65,
-        "grain": 0.04,
-        "flicker": 0.03,
-        "speed": 1,
-        "background": "#100416",
-        "phosphor": "#ff4fa9",
-        "highlight": "#fff0fa"
-      }
-    },
-    "placement": "layer"
-  },
-  {
-    "type": "transition",
-    "title": "transition: alpine-lake (photo)",
-    "source": "alpine-lake",
-    "scene": "photo",
-    "effect": {
-      "id": "catalog-effect-transition",
-      "type": "transition",
-      "enabled": true,
-      "amount": 1,
-      "scale": 2,
-      "levels": 2,
-      "color": false,
-      "seed": 42,
-      "settings": {
-        "style": "diagonal-wipe",
-        "progress": 0.64,
-        "softness": 0.02,
-        "strength": 1,
-        "detail": 8,
-        "direction": "left"
       }
     },
     "placement": "layer"

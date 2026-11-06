@@ -4,6 +4,9 @@ import type { EffectType } from "@musart/core";
  * Descriptions live in the catalog locales; selectable techniques are indexed from their definitions.
  */
 export const EFFECT_SEARCH_ALIASES = {
+  wax: "wax cire coating translucent relief matière bougie",
+  melt: "melt melting smear drip liquid fonte coulure fondu visqueux",
+  emboss: "emboss deboss outboss raised recessed pillow relief gaufrage creux gravure",
   glow: "glow bloom light halo lueur lumière",
   "neon-melt": "acid glow neon melt liquid psychedelic néon liquide",
   repeater: "cloner clone repeater repeat grid radial répétition copies grille",

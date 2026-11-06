@@ -1,0 +1,29 @@
+{
+  "name": "Prägung",
+  "parameter": {
+    "amount": "Stärke",
+    "mode": "Relieftyp",
+    "height": "Höhenquelle",
+    "material": "Oberflächenmaterial",
+    "materialColor": "Materialfarbe",
+    "size": "Reliefgröße",
+    "softness": "Weichheit",
+    "depth": "Tiefe",
+    "azimuth": "Lichtrichtung",
+    "altitude": "Lichthöhe",
+    "ambient": "Umgebungslicht",
+    "highlight": "Glanzlichtstärke",
+    "shadow": "Schattenstärke",
+    "gloss": "Glanz"
+  },
+  "choice": {
+    "raised": "Erhaben",
+    "recessed": "Vertieft",
+    "pillow": "Kissenrelief",
+    "outline": "Konturwulst",
+    "luminance": "Helligkeit",
+    "alpha": "Alpha-Silhouette",
+    "source": "Quellfarben",
+    "neutral": "Neutrales Material"
+  }
+}

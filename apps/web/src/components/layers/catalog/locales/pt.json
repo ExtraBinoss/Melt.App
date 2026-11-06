@@ -66,7 +66,10 @@
     "shape-grid": "Reconstrói os tons da imagem com uma grelha de formas geométricas e paletas editáveis.",
     "watercolor": "Simplifica os detalhes em aguadas de pigmento com grão de papel e contornos escurecidos.",
     "depth-anything": "Gera localmente um mapa de profundidade relativa a partir de uma imagem ou vídeo 2D e adiciona paralaxe opcional.",
-    "feather": "Transparência elíptica suave com centro, raio e suavidade editáveis."
+    "feather": "Transparência elíptica suave com centro, raio e suavidade editáveis.",
+    "wax": "Revestimento de cera translúcida com relevo suavizado e reflexos direcionais na superfície.",
+    "melt": "Arrasta cores e silhuetas para escorridos líquidos direcionais ponderados pelo tom.",
+    "emboss": "Sombreia a luminância ou o alfa como relevo elevado, rebaixado, almofadado ou de contorno, com cores originais ou material neutro."
   },
   "family": {
     "tone": "Luz e tonalidade",

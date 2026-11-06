@@ -1,0 +1,16 @@
+{
+  "name": "Cera",
+  "parameter": {
+    "blur": "Raio de suavização",
+    "relief": "Relevo",
+    "translucence": "Translucidez",
+    "gloss": "Brilho especular",
+    "glow": "Luminescência da superfície",
+    "brightness": "Luminosidade",
+    "aberration": "Dispersão cromática",
+    "tint": "Intensidade da tonalidade",
+    "waxColor": "Cor da cera",
+    "lightAngle": "Direção da luz",
+    "lightElevation": "Elevação da luz"
+  }
+}

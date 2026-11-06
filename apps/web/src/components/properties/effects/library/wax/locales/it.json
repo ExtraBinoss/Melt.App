@@ -1,0 +1,16 @@
+{
+  "name": "Cera",
+  "parameter": {
+    "blur": "Raggio di levigatura",
+    "relief": "Rilievo",
+    "translucence": "Traslucenza",
+    "gloss": "Lucentezza",
+    "glow": "Bagliore superficiale",
+    "brightness": "Luminosità",
+    "aberration": "Dispersione cromatica",
+    "tint": "Intensità della tinta",
+    "waxColor": "Colore della cera",
+    "lightAngle": "Direzione della luce",
+    "lightElevation": "Elevazione della luce"
+  }
+}

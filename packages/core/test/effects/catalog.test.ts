@@ -7,6 +7,9 @@ import { createEffect, createLayer } from "../../src/document/factories";
 describe("portable effect definitions", () => {
   it("describes every supported effect once, with the existing deterministic defaults", () => {
     expect(Object.keys(EFFECT_CATALOG)).toEqual([
+      "wax",
+      "melt",
+      "emboss",
       "glow",
       "neon-melt",
       "repeater",
@@ -95,6 +98,7 @@ describe("portable effect definitions", () => {
       expect(getEffectDefinition(definition.type)).toBe(definition);
       expect(definition.coverage).toBe(
         [
+          "melt",
           "glow",
           "neon-melt",
           "repeater",
@@ -130,6 +134,9 @@ describe("portable effect definitions", () => {
       );
       expect(definition.category).toBe(
         [
+          "wax",
+          "melt",
+          "emboss",
           "glow",
           "neon-melt",
           "repeater",

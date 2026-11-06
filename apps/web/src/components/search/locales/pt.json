@@ -182,7 +182,10 @@
     "shape-grid": "Reconstrói os tons da imagem com uma grelha de formas geométricas e paletas editáveis.",
     "watercolor": "Simplifica os detalhes em aguadas de pigmento com grão de papel e contornos escurecidos.",
     "depth-anything": "Gera localmente um mapa de profundidade relativa a partir de uma imagem ou vídeo 2D e adiciona paralaxe opcional.",
-    "time-warp-scan": "Distorção temporal antiga por linhas de varrimento para projetos guardados."
+    "time-warp-scan": "Distorção temporal antiga por linhas de varrimento para projetos guardados.",
+    "wax": "Revestimento de cera translúcida com relevo suavizado e reflexos direcionais na superfície.",
+    "melt": "Arrasta cores e silhuetas para escorridos líquidos direcionais ponderados pelo tom.",
+    "emboss": "Sombreia a luminância ou o alfa como relevo elevado, rebaixado, almofadado ou de contorno, com cores originais ou material neutro."
   },
   "commandLabels": {
     "togglePlayback": "Reproduzir / pausar",
@@ -303,7 +306,10 @@
     "shape-grid": "Grelha de formas",
     "watercolor": "Aguarela",
     "repeater": "Repetidor",
-    "wave-distortion": "Distorção por ondas"
+    "wave-distortion": "Distorção por ondas",
+    "wax": "Cera",
+    "melt": "Derreter",
+    "emboss": "Relevo"
   },
   "resultCount_many": "{{count}} resultados",
   "language": "Idioma"

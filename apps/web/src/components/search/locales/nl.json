@@ -182,7 +182,10 @@
     "shape-grid": "Bouw beeldtonen opnieuw op met een raster van geometrische vormen en bewerkbare paletten.",
     "watercolor": "Vereenvoudig beelddetails tot pigmentwassingen met papierkorrel en donkere randen.",
     "depth-anything": "Genereer lokaal een relatieve dieptekaart uit een 2D-afbeelding of -video en voeg desgewenst parallax toe.",
-    "time-warp-scan": "Oudere tijdvervorming met scanlijnen voor opgeslagen projecten."
+    "time-warp-scan": "Oudere tijdvervorming met scanlijnen voor opgeslagen projecten.",
+    "wax": "Zachte doorschijnende waslaag met glad reliëf en gerichte lichtreflecties op het oppervlak.",
+    "melt": "Trekt bronkleuren en silhouetten in gerichte vloeibare druppels op basis van toonwaarden.",
+    "emboss": "Geeft helderheid of alfa schaduw als verhoogd, verzonken, afgerond kussen- of contourreliëf, met bronkleuren of neutraal materiaal."
   },
   "commandLabels": {
     "togglePlayback": "Afspelen / pauzeren",
@@ -303,7 +306,10 @@
     "shape-grid": "Vormenraster",
     "watercolor": "Aquarel",
     "repeater": "Herhaler",
-    "wave-distortion": "Golfvervorming"
+    "wave-distortion": "Golfvervorming",
+    "wax": "Was",
+    "melt": "Smelten",
+    "emboss": "Reliëf"
   },
   "language": "Taal"
 }

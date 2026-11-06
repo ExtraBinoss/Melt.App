@@ -81,11 +81,18 @@ test("search matches localized names, durable IDs and families, with accent-inse
   ]);
   expect(filterEffectCatalog(entries, "ombre", "all").map((entry) => entry.type)).toEqual([
     "circle",
+    "melt",
     "shadow",
   ]);
   expect(filterEffectCatalog(entries, "pink-phosphor", "all").map((entry) => entry.type)).toEqual([
     "pink-phosphor",
   ]);
+  for (const [query, type] of [
+    ["cire", "wax"],
+    ["fonte", "melt"],
+    ["gaufrage", "emboss"],
+  ])
+    expect(filterEffectCatalog(entries, query, "all").map((entry) => entry.type)).toContain(type);
   expect(
     filterEffectCatalog(entries, "retro ecrans", "all").every((entry) => entry.family === "retro"),
   ).toBe(true);

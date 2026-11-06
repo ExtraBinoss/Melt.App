@@ -1,8 +1,11 @@
 {
   "version": 3,
-  "file": "catalog-9c8918b0b40bb53a4a2e3248.webp",
-  "contentHash": "9c8918b0b40bb53a4a2e3248dbe5a9810f204e4968ef1715d9557e989e5f4bb3",
+  "file": "catalog-2617d10d2e9477ac8d4b7bee.webp",
+  "contentHash": "2617d10d2e9477ac8d4b7beec90bb50d40b5a00671b6e8ad133161c6e1c7cb71",
   "entries": [
+    "wax",
+    "melt",
+    "emboss",
     "glow",
     "neon-melt",
     "repeater",
@@ -116,11 +119,12 @@
   "width": 1920,
   "height": 1440,
   "sourceFiles": [
-    "effect-atlas-sources-9c8918b0b40b-1.json",
-    "effect-atlas-sources-9c8918b0b40b-2.json",
-    "effect-atlas-sources-9c8918b0b40b-3.json",
-    "effect-atlas-sources-9c8918b0b40b-4.json",
-    "effect-atlas-sources-9c8918b0b40b-5.json",
-    "effect-atlas-sources-9c8918b0b40b-6.json"
+    "effect-atlas-sources-2617d10d2e94-1.json",
+    "effect-atlas-sources-2617d10d2e94-2.json",
+    "effect-atlas-sources-2617d10d2e94-3.json",
+    "effect-atlas-sources-2617d10d2e94-4.json",
+    "effect-atlas-sources-2617d10d2e94-5.json",
+    "effect-atlas-sources-2617d10d2e94-6.json",
+    "effect-atlas-sources-2617d10d2e94-7.json"
   ]
 }

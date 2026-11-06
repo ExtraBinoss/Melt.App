@@ -182,7 +182,10 @@
     "shape-grid": "Reconstruct image tones with a grid of geometric shapes and editable palettes.",
     "watercolor": "Simplify image detail into pigment washes with paper grain and darkened edges.",
     "depth-anything": "Generate a relative depth map locally from a 2D image or video and optionally add parallax.",
-    "time-warp-scan": "Legacy scanline time distortion for saved projects."
+    "time-warp-scan": "Legacy scanline time distortion for saved projects.",
+    "wax": "Soft translucent wax coating with smoothed source relief and directional surface highlights.",
+    "melt": "Pull source colors and silhouettes into directional, tone-weighted liquid drips.",
+    "emboss": "Shade luminance or alpha as raised, recessed, rounded pillow or outline relief, using source colors or a neutral material."
   },
   "commandLabels": {
     "togglePlayback": "Play / pause Motion",
@@ -303,7 +306,10 @@
     "watercolor": "Watercolor",
     "time-warp-scan": "Time warp scan",
     "feather": "Feather",
-    "depth-anything": "Depth Anything V3"
+    "depth-anything": "Depth Anything V3",
+    "wax": "Wax",
+    "melt": "Melt",
+    "emboss": "Emboss"
   },
   "language": "Language"
 }

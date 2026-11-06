@@ -1,0 +1,18 @@
+{
+  "name": "溶解",
+  "parameter": {
+    "distance": "引き伸ばし距離",
+    "angle": "引き伸ばし方向",
+    "liquidity": "流動性",
+    "dripScale": "滴の幅",
+    "toneInfluence": "色調の影響",
+    "tone": "引き伸ばす色調",
+    "phase": "位相",
+    "amount": "適用量",
+    "seed": "シード"
+  },
+  "choice": {
+    "highlights": "ハイライト",
+    "shadows": "シャドウ"
+  }
+}

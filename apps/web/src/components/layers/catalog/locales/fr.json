@@ -66,7 +66,10 @@
     "shape-grid": "Reconstruire les tons de l’image avec une trame de formes géométriques et des palettes éditables.",
     "watercolor": "Simplifier les détails en lavis de pigments avec du grain de papier et des contours assombris.",
     "depth-anything": "Générer localement une carte de profondeur relative depuis une image ou vidéo 2D et ajouter une parallaxe facultative.",
-    "feather": "Atténuation elliptique de la transparence avec centre, rayon et douceur modifiables."
+    "feather": "Atténuation elliptique de la transparence avec centre, rayon et douceur modifiables.",
+    "wax": "Revêtement de cire translucide avec relief lissé et reflets de surface directionnels.",
+    "melt": "Étire les couleurs et les silhouettes en coulures liquides directionnelles selon les tons.",
+    "emboss": "Transforme la luminance ou l’alpha en relief saillant, creux, arrondi ou de contour, avec les couleurs de la source ou un matériau neutre."
   },
   "family": {
     "tone": "Lumière et tonalité",

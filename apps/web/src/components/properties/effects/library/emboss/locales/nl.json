@@ -1,0 +1,29 @@
+{
+  "name": "Reliëf",
+  "parameter": {
+    "amount": "Sterkte",
+    "mode": "Reliëftype",
+    "height": "Hoogtebron",
+    "material": "Oppervlaktemateriaal",
+    "materialColor": "Materiaalkleur",
+    "size": "Reliëfgrootte",
+    "softness": "Zachtheid",
+    "depth": "Diepte",
+    "azimuth": "Lichtrichting",
+    "altitude": "Lichthoogte",
+    "ambient": "Omgevingslicht",
+    "highlight": "Sterkte van hooglichten",
+    "shadow": "Schaduwsterkte",
+    "gloss": "Glans"
+  },
+  "choice": {
+    "raised": "Verhoogd",
+    "recessed": "Verzonken",
+    "pillow": "Kussenreliëf",
+    "outline": "Contourrand",
+    "luminance": "Helderheid",
+    "alpha": "Alfasilhouet",
+    "source": "Bronkleuren",
+    "neutral": "Neutraal materiaal"
+  }
+}

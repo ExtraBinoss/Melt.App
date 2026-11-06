@@ -1,0 +1,29 @@
+{
+  "name": "Rilievo",
+  "parameter": {
+    "amount": "Intensità",
+    "mode": "Tipo di rilievo",
+    "height": "Sorgente altezza",
+    "material": "Materiale della superficie",
+    "materialColor": "Colore del materiale",
+    "size": "Dimensione del rilievo",
+    "softness": "Morbidezza",
+    "depth": "Profondità",
+    "azimuth": "Direzione della luce",
+    "altitude": "Elevazione della luce",
+    "ambient": "Luce ambiente",
+    "highlight": "Intensità dei riflessi",
+    "shadow": "Intensità delle ombre",
+    "gloss": "Lucentezza"
+  },
+  "choice": {
+    "raised": "Sporgente",
+    "recessed": "Incavato",
+    "pillow": "Arrotondato",
+    "outline": "Bordo in rilievo",
+    "luminance": "Luminanza",
+    "alpha": "Sagoma alfa",
+    "source": "Colori originali",
+    "neutral": "Materiale neutro"
+  }
+}

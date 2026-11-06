@@ -1,0 +1,29 @@
+{
+  "name": "نقش بارز",
+  "parameter": {
+    "amount": "الشدة",
+    "mode": "نوع النقش",
+    "height": "مصدر الارتفاع",
+    "material": "خامة السطح",
+    "materialColor": "لون الخامة",
+    "size": "حجم النقش",
+    "softness": "النعومة",
+    "depth": "العمق",
+    "azimuth": "اتجاه الضوء",
+    "altitude": "ارتفاع الضوء",
+    "ambient": "الإضاءة المحيطة",
+    "highlight": "شدة اللمعان",
+    "shadow": "شدة الظلال",
+    "gloss": "البريق"
+  },
+  "choice": {
+    "raised": "بارز",
+    "recessed": "غائر",
+    "pillow": "مستدير",
+    "outline": "حافة بارزة",
+    "luminance": "النصوع",
+    "alpha": "حدود الشفافية",
+    "source": "ألوان المصدر",
+    "neutral": "خامة محايدة"
+  }
+}

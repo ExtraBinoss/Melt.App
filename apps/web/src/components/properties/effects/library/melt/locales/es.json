@@ -1,0 +1,18 @@
+{
+  "name": "Derretir",
+  "parameter": {
+    "distance": "Distancia de arrastre",
+    "angle": "Dirección de arrastre",
+    "liquidity": "Fluidez",
+    "dripScale": "Ancho de los goteos",
+    "toneInfluence": "Influencia tonal",
+    "tone": "Tonos arrastrados",
+    "phase": "Fase",
+    "amount": "Intensidad",
+    "seed": "Semilla"
+  },
+  "choice": {
+    "highlights": "Luces",
+    "shadows": "Sombras"
+  }
+}

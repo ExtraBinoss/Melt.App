@@ -1,0 +1,29 @@
+{
+  "name": "엠보스",
+  "parameter": {
+    "amount": "강도",
+    "mode": "부조 유형",
+    "height": "높이 소스",
+    "material": "표면 재질",
+    "materialColor": "재질 색상",
+    "size": "부조 크기",
+    "softness": "부드러움",
+    "depth": "깊이",
+    "azimuth": "빛 방향",
+    "altitude": "빛 높이",
+    "ambient": "주변광",
+    "highlight": "하이라이트 강도",
+    "shadow": "그림자 강도",
+    "gloss": "광택"
+  },
+  "choice": {
+    "raised": "양각",
+    "recessed": "음각",
+    "pillow": "쿠션 부조",
+    "outline": "윤곽 테두리",
+    "luminance": "휘도",
+    "alpha": "알파 실루엣",
+    "source": "원본 색상",
+    "neutral": "단색 재질"
+  }
+}

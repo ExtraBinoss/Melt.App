@@ -1,0 +1,18 @@
+{
+  "name": "Derreter",
+  "parameter": {
+    "distance": "Distância de arrasto",
+    "angle": "Direção de arrasto",
+    "liquidity": "Fluidez",
+    "dripScale": "Largura dos escorridos",
+    "toneInfluence": "Influência tonal",
+    "tone": "Tons arrastados",
+    "phase": "Fase",
+    "amount": "Intensidade",
+    "seed": "Semente"
+  },
+  "choice": {
+    "highlights": "Realces",
+    "shadows": "Sombras"
+  }
+}

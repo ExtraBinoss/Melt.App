@@ -1,0 +1,18 @@
+{
+  "name": "انصهار",
+  "parameter": {
+    "distance": "مسافة السحب",
+    "angle": "اتجاه السحب",
+    "liquidity": "السيولة",
+    "dripScale": "عرض القطرات",
+    "toneInfluence": "تأثير الدرجات اللونية",
+    "tone": "الدرجات المسحوبة",
+    "phase": "الطور",
+    "amount": "الشدة",
+    "seed": "البذرة"
+  },
+  "choice": {
+    "highlights": "الإضاءات",
+    "shadows": "الظلال"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "name": "Was",
+  "parameter": {
+    "blur": "Straal voor vervaging",
+    "relief": "Reliëf",
+    "translucence": "Doorschijnendheid",
+    "gloss": "Glans",
+    "glow": "Oppervlaktegloed",
+    "brightness": "Helderheid",
+    "aberration": "Kleurspreiding",
+    "tint": "Tintsterkte",
+    "waxColor": "Waskleur",
+    "lightAngle": "Lichtrichting",
+    "lightElevation": "Lichthoogte"
+  }
+}

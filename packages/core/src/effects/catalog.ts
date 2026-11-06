@@ -1,3 +1,6 @@
+import { WAX_DEFINITION } from "./wax/definition";
+import { MELT_DEFINITION } from "./melt/definition";
+import { EMBOSS_DEFINITION } from "./emboss/definition";
 import { GLOW_DEFINITION } from "./glow/definition";
 import { NEON_MELT_DEFINITION } from "./neon-melt/definition";
 import { REPEATER_DEFINITION } from "./repeater/definition";
@@ -60,6 +63,9 @@ import { ASCII_DEFINITION } from "./ascii/definition";
 import { DITHER_DEFINITION } from "./dither/definition";
 /** Portable effect metadata shared by factories, validation and client controls. */
 const BUILTIN_EFFECTS: Readonly<Record<EffectType, EffectDefinition>> = Object.freeze({
+  wax: WAX_DEFINITION,
+  melt: MELT_DEFINITION,
+  emboss: EMBOSS_DEFINITION,
   glow: GLOW_DEFINITION,
   "neon-melt": NEON_MELT_DEFINITION,
   repeater: REPEATER_DEFINITION,

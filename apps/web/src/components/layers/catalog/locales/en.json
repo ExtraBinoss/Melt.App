@@ -66,7 +66,10 @@
     "shape-grid": "Reconstruct image tones with a grid of geometric shapes and editable palettes.",
     "watercolor": "Simplify image detail into pigment washes with paper grain and darkened edges.",
     "depth-anything": "Generate a relative depth map locally from a 2D image or video and optionally add parallax.",
-    "feather": "Soft elliptical alpha falloff with editable center, radius and softness."
+    "feather": "Soft elliptical alpha falloff with editable center, radius and softness.",
+    "wax": "Soft translucent wax coating with smoothed source relief and directional surface highlights.",
+    "melt": "Pull source colors and silhouettes into directional, tone-weighted liquid drips.",
+    "emboss": "Shade luminance or alpha as raised, recessed, rounded pillow or outline relief, using source colors or a neutral material."
   },
   "family": {
     "tone": "Light & tone",

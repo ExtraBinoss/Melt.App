@@ -1,0 +1,34 @@
+{
+  "en": {
+    "name": "Wax",
+    "parameter": {
+      "blur": "Smoothing radius",
+      "relief": "Relief",
+      "translucence": "Translucence",
+      "gloss": "Gloss",
+      "glow": "Surface glow",
+      "brightness": "Brightness",
+      "aberration": "Chromatic spread",
+      "tint": "Tint strength",
+      "waxColor": "Wax color",
+      "lightAngle": "Light direction",
+      "lightElevation": "Light elevation"
+    }
+  },
+  "fr": {
+    "name": "Cire",
+    "parameter": {
+      "blur": "Rayon de lissage",
+      "relief": "Relief",
+      "translucence": "Translucidité",
+      "gloss": "Brillance",
+      "glow": "Lueur de surface",
+      "brightness": "Luminosité",
+      "aberration": "Dispersion chromatique",
+      "tint": "Intensité de la teinte",
+      "waxColor": "Couleur de la cire",
+      "lightAngle": "Direction de la lumière",
+      "lightElevation": "Élévation de la lumière"
+    }
+  }
+}

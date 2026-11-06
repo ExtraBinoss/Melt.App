@@ -8,6 +8,7 @@ import {
   createProject,
   EditorEngine,
   getEffectDefinition,
+  type EffectType,
 } from "../../../packages/core/src/index";
 import { EffectParameters } from "../../../apps/web/src/components/properties/effects/EffectParameters";
 import {
@@ -19,16 +20,20 @@ import { StudioEffectCatalog } from "../../../apps/web/src/ui/studio/effects/Stu
 import { TooltipProvider } from "../../../apps/web/src/components/ui/tooltip";
 import { WorkspaceTheme } from "../../../apps/web/src/ui/brand/WorkspaceTheme";
 import { useTranslation } from "react-i18next";
-import { changeLanguage } from "../../../apps/web/src/state/i18n";
+import { changeLanguage, i18n } from "../../../apps/web/src/state/i18n";
 import type { Locale } from "../../../apps/web/src/state/i18n/locales";
 import "../../../apps/web/src/components/properties/effects/library-messages";
 import "../../../apps/web/src/components/properties/effects/effect-motion/messages";
 import "../../../apps/web/src/styles/global.css";
 
-export async function mountEffectLocales(language: Locale) {
+export async function mountEffectLocales(
+  language: Locale,
+  type: EffectType = "wave-distortion",
+  propertyKey = "waveform",
+) {
   await changeLanguage(language);
   document.documentElement.classList.add("dark");
-  const layer = createLayer("rectangle", { effects: [createEffect("wave-distortion")] });
+  const layer = createLayer("rectangle", { effects: [createEffect(type)] });
   const engine = new EditorEngine(createProject({ pages: [createPage({ layers: [layer] })] }));
   const host = document.body.appendChild(document.createElement("main"));
   host.style.cssText = "padding:16px;max-width:380px;background:var(--background);min-height:100vh";
@@ -36,21 +41,35 @@ export async function mountEffectLocales(language: Locale) {
     <Provider>
       <WorkspaceTheme value="studio">
         <TooltipProvider>
-          <Witness engine={engine} />
+          <Witness engine={engine} propertyKey={propertyKey} />
         </TooltipProvider>
       </WorkspaceTheme>
     </Provider>,
   );
+  const definition = getEffectDefinition(type);
+  const parameter = definition.parameters.find((parameter) => parameter.key === propertyKey)!;
+  return {
+    name: i18n.t(definition.nameKey),
+    parameter: i18n.t(parameter.labelKey),
+    choices:
+      parameter.kind === "select" ? parameter.options.map((option) => i18n.t(option.labelKey)) : [],
+    from: i18n.t("effectMotion:from"),
+    search: i18n.t("effectCatalog:search"),
+  };
 }
-function Witness({ engine }: { engine: EditorEngine }) {
+function Witness({ engine, propertyKey }: { engine: EditorEngine; propertyKey: string }) {
   const { t } = useTranslation();
   const snapshot = useSyncExternalStore(engine.subscribe, engine.getSnapshot, engine.getSnapshot);
   const layer = snapshot.project.pages[0]!.layers[0]!,
     effect = layer.effects[0]!;
   const property = effectMotionProperties(engine, effect).find(
-    (p) => p.target.property === "waveform",
+    (p) => p.target.property === propertyKey,
   )!;
-  const [range, setRange] = useState<DriverRange>(["sine", "triangle"]);
+  const [range, setRange] = useState<DriverRange>(
+    property.kind === "choice"
+      ? [property.options[0]!, property.options[1] ?? property.options[0]!]
+      : [property.value, property.value],
+  );
   return (
     <>
       <section aria-label={t("effects")}>

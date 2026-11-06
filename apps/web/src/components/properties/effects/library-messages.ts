@@ -1,3 +1,6 @@
+import { messages as wax } from "./library/wax/messages";
+import { messages as melt } from "./library/melt/messages";
+import { messages as emboss } from "./library/emboss/messages";
 import { messages as glowNodeMessages } from "./library/glow/messages";
 import { messages as neonMeltNodeMessages } from "./library/neon-melt/messages";
 import { messages as repeaterNodeMessages } from "./library/repeater/messages";
@@ -45,6 +48,9 @@ import { messages as receipt } from "./library/receipt/messages";
 import { messages as pinkPhosphor } from "./library/pink-phosphor/messages";
 /** UI resources stay on the web side; the core catalog only contains stable label keys. */
 export const libraryMessages = {
+  wax,
+  melt,
+  emboss,
   glow: glowNodeMessages,
   "neon-melt": neonMeltNodeMessages,
   repeater: repeaterNodeMessages,

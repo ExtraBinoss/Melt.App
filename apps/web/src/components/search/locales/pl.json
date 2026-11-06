@@ -182,7 +182,10 @@
     "shape-grid": "Odtwarzaj tony obrazu za pomocą siatki kształtów geometrycznych i edytowalnych palet.",
     "watercolor": "Upraszczaj szczegóły do rozmytych plam pigmentu z ziarnem papieru i przyciemnionymi krawędziami.",
     "depth-anything": "Generuj lokalnie mapę względnej głębi z obrazu lub filmu 2D i opcjonalnie dodawaj paralaksę.",
-    "time-warp-scan": "Starsze zniekształcenie czasu liniami skanowania dla zapisanych projektów."
+    "time-warp-scan": "Starsze zniekształcenie czasu liniami skanowania dla zapisanych projektów.",
+    "wax": "Miękka, półprzezroczysta powłoka woskowa z wygładzonym reliefem i kierunkowymi refleksami.",
+    "melt": "Rozciąga kolory i sylwetki w kierunkowe płynne zacieki zależne od tonów.",
+    "emboss": "Cieniuje luminancję lub alfę jako wypukły, wklęsły, poduszkowy lub konturowy relief w kolorach źródła albo neutralnego materiału."
   },
   "commandLabels": {
     "togglePlayback": "Odtwórz / wstrzymaj",
@@ -303,7 +306,10 @@
     "shape-grid": "Siatka kształtów",
     "watercolor": "Akwarela",
     "repeater": "Powielacz",
-    "wave-distortion": "Zniekształcenie falowe"
+    "wave-distortion": "Zniekształcenie falowe",
+    "wax": "Wosk",
+    "melt": "Topnienie",
+    "emboss": "Wytłoczenie"
   },
   "resultCount_few": "{{count}} wyniki",
   "resultCount_many": "{{count}} wyników",
