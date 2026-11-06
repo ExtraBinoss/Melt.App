@@ -36,14 +36,11 @@ export function PaletteSwatches({
               aria-label={`${color.name} ${color.value}`}
               title={color.value}
               disabled={busy}
-              onClick={() => onUse(color, false)}
+              onClick={() => onUse(color, canLink)}
             />
           </ContextMenuTrigger>
           <ContextMenuContent>
             <ContextMenuItem onSelect={() => onUse(color, false)}>{t("local")}</ContextMenuItem>
-            <ContextMenuItem disabled={!canLink} onSelect={() => onUse(color, true)}>
-              {t("link")}
-            </ContextMenuItem>
             <ContextMenuItem onSelect={onEdit}>{t("edit")}</ContextMenuItem>
           </ContextMenuContent>
         </ContextMenu>

@@ -113,35 +113,57 @@ test("compact palettes preserve named saves, native menus, locked variations and
   ).toContainText("Company");
   await expect(popover.getByRole("textbox")).toHaveCount(0);
   expect((await popover.boundingBox())!.height).toBeLessThan(240);
+  await page.mouse.move(1000, 100);
+  await expect(popover.getByRole("button", { name: "Palette actions", exact: true })).toHaveCSS(
+    "opacity",
+    "1",
+  );
   await popover
     .locator(".palette-library-list")
     .getByRole("button", { name: "1 #e26d3f", exact: true })
-    .click({ button: "right" });
-  await page.getByRole("menuitem", { name: "Link as document color", exact: true }).click();
+    .click();
   await expect
     .poll(() => page.evaluate(() => window.musart!.snapshot().project.colors?.length))
     .toBe(1);
-  await popover.locator(".palette-detected .palette-swatch").first().click({ button: "right" });
-  await page.getByRole("menuitem", { name: "Link as document color", exact: true }).click();
+  const linkedId = await page.evaluate(() => window.musart!.snapshot().project.colors![0]!.id);
+  await popover.locator(".palette-detected .palette-swatch").first().click();
   await expect
     .poll(() => page.evaluate(() => window.musart!.snapshot().project.colors?.length))
-    .toBe(2);
-  const linkedIds = await page.evaluate(() =>
-    window.musart!.snapshot().project.colors!.map(({ id }) => id),
-  );
-  expect(linkedIds[1]).toMatch(/^[0-9a-f]{8}-[0-9a-f-]{27}$/);
-  expect(linkedIds[1]).not.toBe(linkedIds[0]);
-  // Palette variation follows explicit saved-swatch identities, never equal literals.
+    .toBe(1);
+  expect(
+    await page.evaluate(
+      () => window.musart!.snapshot().project.pages[0]!.layers[0]!.colorLinks?.fill,
+    ),
+  ).toBe(linkedId);
+  // Copy-only remains an optional secondary action; choosing the swatch links again.
   await popover
     .locator(".palette-library-list")
     .getByRole("button", { name: "1 #e26d3f", exact: true })
     .click({ button: "right" });
-  await page.getByRole("menuitem", { name: "Link as document color", exact: true }).click();
+  await expect(
+    page.getByRole("menuitem", { name: "Link as document color", exact: true }),
+  ).toHaveCount(0);
+  await page.getByRole("menuitem", { name: "Use locally", exact: true }).click();
+  // A different local literal detaches; selecting the palette restores its identity.
+  await popover
+    .locator(".palette-library-list")
+    .getByRole("button", { name: "2 #264653", exact: true })
+    .click({ button: "right" });
+  await page.getByRole("menuitem", { name: "Use locally", exact: true }).click();
+  expect(
+    await page.evaluate(
+      () => window.musart!.snapshot().project.pages[0]!.layers[0]!.colorLinks?.fill,
+    ),
+  ).toBeUndefined();
+  await popover
+    .locator(".palette-library-list")
+    .getByRole("button", { name: "1 #e26d3f", exact: true })
+    .click();
   await expect
     .poll(() =>
       page.evaluate(() => window.musart!.snapshot().project.pages[0]!.layers[0]!.colorLinks?.fill),
     )
-    .toBe(linkedIds[0]);
+    .toBe(linkedId);
   expect(await page.locator("body").getAttribute("style")).toBe(body);
   const before = await page.evaluate(() => window.musart!.snapshot());
   await menu(page, popover, "Edit palette");
@@ -457,8 +479,7 @@ test("Studio palette links and generations replace gradient paint with solid ink
   await popover
     .locator(".palette-detected")
     .getByRole("button", { name: /#ff0000/ })
-    .click({ button: "right" });
-  await page.getByRole("menuitem", { name: "Link as document color", exact: true }).click();
+    .click();
   await expect
     .poll(() =>
       page.evaluate(() => {

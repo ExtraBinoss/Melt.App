@@ -2,7 +2,7 @@
 
 The `feat/designer-ux` branch groups three independent designer workflows: selecting
 artwork through overlap, reusable effect presets/treatments, and named color
-palettes with explicit document links. The normal Three.js/TSL renderer and
+palettes with automatic swatch links. The normal Three.js/TSL renderer and
 validated engine command/history paths remain authoritative.
 
 ## Local preview
@@ -54,7 +54,8 @@ picker. **All** shows saved palette rows in a list capped at 180 pixels before
 scrolling; the selector can filter a saved palette. Automatically detected document
 colors remain below a divider. Add opens a separate editor with an empty suggested name,
 shared swatch picker and native pipette where supported. Secondary actions and
-explicit linked document colors are in the menu.
+document color editing is in the always-visible actions menu. Selecting a swatch
+automatically links it; reusing a detected color shares the same document ink.
 Named palettes can be reused across projects; explicit document colors and links
 travel inside a project. Choosing a saved swatch locally and linking a property
 to a document color are distinct actions. A linked global edit updates all bound

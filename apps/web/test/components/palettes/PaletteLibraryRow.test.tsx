@@ -55,7 +55,7 @@ test("reads only intersecting rows and keeps swatch identity and row selection",
   await act(async () => observers[0]!.show());
   expect(readPalette).toHaveBeenCalledExactlyOnceWith("brand");
   fireEvent.click(screen.getByRole("button", { name: "Ink #264653", exact: true }));
-  expect(onUse).toHaveBeenCalledWith(palette.colors[0], false);
+  expect(onUse).toHaveBeenCalledWith(palette.colors[0], true);
   fireEvent.click(screen.getByRole("button", { name: "Brand", exact: true }));
   expect(onActivate).toHaveBeenCalledWith(palette);
   expect(observers[0]!.disconnect).toHaveBeenCalled();

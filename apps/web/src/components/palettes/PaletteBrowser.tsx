@@ -10,7 +10,7 @@ import { Throbber } from "../ui/throbber/Throbber";
 import { PalettePicker } from "./PalettePicker";
 import { usePaletteEngine } from "./PaletteProvider";
 import { DocumentColors } from "./DocumentColors";
-import { paletteVariation } from "../../services/palettes/binding";
+import { paletteApplication } from "../../services/palettes/application";
 import { usePaletteVariation } from "./use-palette-variation";
 import { PaletteEditor } from "./PaletteEditor";
 import { useDocumentPalette } from "./use-document-palette";
@@ -172,23 +172,7 @@ export function PaletteBrowser({
       cancelVariation();
       beforeApply();
       if (link && engine && targets.length) {
-        const colorId = detected ? crypto.randomUUID() : color.id;
-        const paintCommands =
-          paletteVariation(
-            engine.getSnapshot(),
-            [{ ...color, id: colorId }],
-            targets.filter(
-              (target) => !target.effectId && ["fill", "background"].includes(target.property),
-            ),
-          ).commands ?? [];
-        engine.transaction([
-          ...paintCommands,
-          {
-            type: "setDocumentColors",
-            colors: [{ id: colorId, name: color.name, value: color.value }],
-          },
-          { type: "linkDocumentColor", targets, colorId },
-        ]);
+        engine.transaction(paletteApplication(engine.getSnapshot(), color, targets, detected));
       } else onUse(color.value);
       setError("");
     } catch (reason) {
@@ -314,7 +298,7 @@ export function PaletteBrowser({
             <IconButton label={t("cancel")} onClick={() => setMode("pick")}>
               <ArrowLeft size={16} />
             </IconButton>
-            <span>{t("linkedColors")}</span>
+            <span>{t("document")}</span>
           </div>
           <DocumentColors
             engine={engine}

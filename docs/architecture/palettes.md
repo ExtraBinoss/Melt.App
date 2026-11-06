@@ -13,15 +13,17 @@ A portable project may own `colors`; composition, layer and effect `colorLinks`
 address their definitions explicitly. Renderers continue to consume ordinary
 literal background, fill, stroke and effect setting values. Linking and global
 updates use validated commands; one global update propagates every explicit use
-in a single transaction and undo entry. Equal local colors never become linked
-implicitly. Detaching or deleting a definition preserves its current appearance.
+in a single transaction and undo entry. Choosing a saved swatch creates or reuses its document color automatically.
+Choosing a detected color reuses an existing document color with the same
+normalized value, or creates a durable identity. Other equal local paints do not
+become linked until the user chooses that swatch. Detaching or deleting a definition preserves its current appearance.
 Literal edits detach only their changed fields. Undo, reload and duplication
 retain links. Clipboard paste imports globals as remapped dependencies across
 projects without overwriting destination definitions or matching by color value.
 
 The palette button sits beside color controls and opens its own compact nonmodal popover.
 The initial picker contains only a palette selector, swatches, add and contextual
-help. The selector defaults to **All** and filters only saved palettes. Named
+help, with its actions menu always visible. The selector defaults to **All** and filters only saved palettes. Named
 palette rows occupy at most 180 pixels before scrolling; only intersecting rows
 read their bounded payloads. The detected document palette remains below a divider,
 independently of the saved-palette filter. The outer popover remains bounded. Detection uses authored colors and bounded original-image worker
@@ -32,7 +34,7 @@ The add action opens the editor; secondary library and explicit linked-color
 management live in a menu. Color swatches open the shared native color control;
 invalid hex drafts show inline errors and block Save, Dice and Apply.
 It supplies named palette creation, explicit update, duplicate, import/export,
-local swatches and optional document links. Editing a saved library entry never
+local-only copies and automatic document links when choosing a swatch. Editing a saved library entry never
 silently modifies projects. Document globals show usage counts and explicit
 commands to update all uses or detach the current target.
 

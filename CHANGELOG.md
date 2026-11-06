@@ -4,6 +4,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ## [Unreleased]
 
+- Keep palette actions visible and automatically link colors when choosing swatches; reuse document color identities for repeated detected colors and retain an optional local-only copy action.
+
 - Streamline effect preset headers with one save action, in-selector modification status, icon-only naming forms and a divider above compositing controls. Preview local IndexedDB presets on hover without document/history writes, including their transient image inputs.
 - List saved palettes under an All filter in a 180-pixel scroll area, with detected document colors below a divider and lazy visible-row payload reads.
 - Preview palette generations on the addressed paint even without global links; apply solid colors over gradients and original model/vector colors with one undo, preserving explicit document links.

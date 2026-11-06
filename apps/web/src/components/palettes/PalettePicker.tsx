@@ -110,7 +110,7 @@ export function PalettePicker({
             {onDocument && (
               <>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onSelect={onDocument}>{t("linkedColors")}</DropdownMenuItem>
+                <DropdownMenuItem onSelect={onDocument}>{t("document")}</DropdownMenuItem>
               </>
             )}
             <DropdownMenuSeparator />

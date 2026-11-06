@@ -39,13 +39,6 @@
   color: var(--muted-foreground);
   padding-left: 6px;
 }
-.palette-more {
-  opacity: 0;
-}
-.palette-browser:hover .palette-more,
-.palette-browser:focus-within .palette-more {
-  opacity: 1;
-}
 .palette-picker-swatches {
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
