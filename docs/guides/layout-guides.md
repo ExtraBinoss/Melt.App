@@ -61,3 +61,13 @@ shared settings interface. These test definitions do not establish a passing nat
 result or a timing claim; retain outcomes from the frozen build's actual run. Run native
 timing and rendering checks independently of unit coverage following
 [the shared performance protocol](../performance/protocol.md).
+
+## Studio capture entrance
+
+The capture popover and settings revealed by Show guides reuse `PalettePanel` and
+`PaletteReveal`, the Cmd+K blur/fade engine. Text never scales or translates during
+the reveal. Changing formats, colors or margins retains the mounted controls and
+does not restart their opening animation. The canvas capture frame uses the same
+shared opacity keyframes; camera projection and guide geometry remain imperative.
+Reduced motion skips both entrances. These presentation animations do not create
+document commands, modify exported artwork or animate layout dimensions.

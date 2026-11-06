@@ -4,6 +4,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ## [Unreleased]
 
+- Reuse the Cmd+K palette entrance for Studio capture-guide controls: reveal the popover and newly enabled settings with transform-free blur/fade, fade canvas guides through the shared opacity animation, and respect reduced motion without changing guide geometry, undo or export behavior.
+
 - Keep the inspector color-space selector readable: reserve space for its selected label and give its local menu enough width for sRGB, Display P3 and CMYK labels while retaining viewport bounds, keyboard focus and nonmodal behavior.
 
 - Document the paid cloud product direction, provider-neutral persistence, storage-funded project allowances, shared authenticated MCP/headless access, creative resources, collaboration transports and history/cost optimization in docs/paid_plan/.

@@ -1,4 +1,7 @@
 import { useState } from "react";
+import { useReducedMotion } from "motion/react";
+import { PalettePanel } from "../../../components/shared/motion/PalettePanel";
+import { PaletteReveal } from "../../../components/shared/motion/PaletteReveal";
 import type { CaptureGuides, EnginePort } from "@musart/core";
 import { Scan } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -17,6 +20,7 @@ import "./messages";
 export function StudioGuides({ engine }: { engine: EnginePort }) {
   const { t } = useTranslation("studioFraming");
   const [open, setOpen] = useState(false);
+  const reduced = !!useReducedMotion();
   const stored = useProjectPreference("studioCapture");
   const page = useEngineValue(engine, (snapshot) =>
     snapshot.project.pages.find((item) => item.id === snapshot.pageId)!,
@@ -52,40 +56,47 @@ export function StudioGuides({ engine }: { engine: EnginePort }) {
         </IconButton>
       </PopoverTrigger>
       <PopoverContent
+        asChild
         className="studio-capture-popover"
         side="bottom"
         align="center"
         collisionPadding={12}
         data-canvas-control
       >
-        <label className="studio-capture-heading">
-          <strong>{t("showGuide")}</strong>
-          <Switch
-            size="sm"
-            aria-label={t("showGuide")}
-            checked={value.visible}
-            onCheckedChange={(visible) => edit.commit({ ...value, visible })}
-          />
-        </label>
-        {value.visible && (
-          <>
-            <FramePresetPicker
-              value={value}
-              bounds={bounds}
-              identity={page}
-              onChange={(next) => edit.commit({ ...value, ...next })}
-              onPreview={(next) => edit.preview({ ...value, ...next })}
-              onCancel={edit.cancel}
-            />
-            <GuideAppearance
-              value={value}
-              identity={page}
-              onChange={(next) => edit.commit({ ...value, ...next })}
-              onPreview={(next) => edit.preview({ ...value, ...next })}
-              onCancel={edit.cancel}
-            />
-          </>
-        )}
+        <PalettePanel reduced={reduced} waitForPlacement>
+          <PaletteReveal asChild reduced={reduced}>
+            <label className="studio-capture-heading">
+              <strong>{t("showGuide")}</strong>
+              <Switch
+                size="sm"
+                aria-label={t("showGuide")}
+                checked={value.visible}
+                onCheckedChange={(visible) => edit.commit({ ...value, visible })}
+              />
+            </label>
+          </PaletteReveal>
+          {value.visible && (
+            <PaletteReveal asChild reduced={reduced} order={1}>
+              <div className="studio-capture-controls" data-studio-guide-controls>
+                <FramePresetPicker
+                  value={value}
+                  bounds={bounds}
+                  identity={page}
+                  onChange={(next) => edit.commit({ ...value, ...next })}
+                  onPreview={(next) => edit.preview({ ...value, ...next })}
+                  onCancel={edit.cancel}
+                />
+                <GuideAppearance
+                  value={value}
+                  identity={page}
+                  onChange={(next) => edit.commit({ ...value, ...next })}
+                  onPreview={(next) => edit.preview({ ...value, ...next })}
+                  onCancel={edit.cancel}
+                />
+              </div>
+            </PaletteReveal>
+          )}
+        </PalettePanel>
       </PopoverContent>
     </Popover>
   );
