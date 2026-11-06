@@ -4,6 +4,8 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ## [Unreleased]
 
+- Replace dotted scrub-label snap underlines with a subtle color cue and solid Studio slider ticks. Add double-click reset to large Studio sliders using each control’s real defaults, with one undoable edit, a replayable shimmer, reduced-motion feedback, and explicit retirement of pending clicks and animations.
+
 - Hide empty export Advanced accordions and keep Video export available for Static compositions. Offer a configurable still-video duration (two seconds by default), render the frozen base design without enabling retained Motion or audio, and reuse its preview frame. Preserve native encoder limits, selection/framing, progress, cancellation and stale-snapshot checks.
 
 - Make Studio Show guides visibly resolve from blur with staggered format cards and setting rows, instead of fading the entire form as one block. Add a bounded settings profile to the shared palette reveal engine, preserve the existing Cmd+K cadence, and give canvas guides a matching blur entrance. Keep text stationary, avoid animation-frame React updates, release compositing hints and honor reduced motion.

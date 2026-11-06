@@ -54,10 +54,16 @@ editable and are retained in the project.
   direction pad, distance and focal-angle controls edit the composition camera.
 - Slider drags remain relative outside their tracks. Shift uses increments of five
   or ten useful units according to speed (scaled to the parameter range); slow
-  movement refines ordinary input. Dashed markers indicate snapping. Help uses
+  movement refines ordinary input. Quiet color cues and solid ticks indicate snapping. Help uses
   shared tooltips instead of browser titles.
 - Sliders preview imperatively, commit once on release and restore on cancellation,
-  owner changes or unmount. Neutral surfaces use the shared theme without glows.
+  owner changes or unmount. Double-click a large slider to restore its domain default
+  (including the selected material preset's values). A brief clipped shimmer confirms
+  the reset; reduced motion uses a steady tint. Click-only commits wait up to 500 ms
+  for native double-click recognition, with immediate preview and focus-handoff
+  commit; drags and keyboard steps still commit immediately. A reset cancels those
+  click drafts and creates at most one undo entry. Neutral surfaces use the shared
+  theme without persistent glows.
 - Recenter restores the immersive view. Vertical wheel input, Ctrl/Cmd+wheel and
   touch pinch zoom the shared Studio camera. Native orbit follows the pointer
   directly and carries bounded elapsed-time momentum after release, with one

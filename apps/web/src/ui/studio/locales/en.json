@@ -17,5 +17,6 @@
   "rotation": "Rotation",
   "linkScale": "Link scale axes",
   "unlinkScale": "Unlink scale axes",
+  "sliderResetHint": "Double-click to reset",
   "preciseHint": "Steps 5 / 10 · Slow drag: precision"
 }

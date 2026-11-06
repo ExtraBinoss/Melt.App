@@ -67,6 +67,7 @@ export function StudioObjectTransform({
             invalidation={motionTimeChanges(engine)}
             label={label}
             value={spatial[key]}
+            resetValue={0}
             min={Math.min(rotation ? -180 : -10, spatial[key])}
             max={Math.max(rotation ? 180 : 10, spatial[key])}
             step={rotation ? 1 : 0.01}

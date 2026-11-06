@@ -193,6 +193,7 @@ export function StudioBackgroundPaint({
               <StudioSlider
                 label={g("radialradius")}
                 value={(gradient.radius ?? 0.5) * 100}
+                resetValue={50}
                 min={1}
                 max={200}
                 step={1}

@@ -1,8 +1,22 @@
-import type { ComponentProps, PointerEvent } from "react";
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import type { ComponentProps, PointerEvent, ReactNode } from "react";
+import { act, fireEvent, render as renderBase, screen } from "@testing-library/react";
 import { expect, test, vi } from "vitest";
 import { Slider } from "../../../src/components/ui/slider";
 import { StudioSlider } from "../../../src/ui/studio/controls/StudioSlider";
+
+import { I18nextProvider } from "react-i18next";
+import { TooltipProvider } from "../../../src/components/ui/tooltip";
+import { i18n } from "../../../src/state/i18n";
+
+function render(ui: ReactNode) {
+  return renderBase(ui, {
+    wrapper: ({ children }) => (
+      <I18nextProvider i18n={i18n}>
+        <TooltipProvider>{children}</TooltipProvider>
+      </I18nextProvider>
+    ),
+  });
+}
 
 const observed = vi.hoisted(() => ({ slider: vi.fn() }));
 vi.mock("../../../src/components/ui/slider", async (original) => {
@@ -18,8 +32,28 @@ vi.mock("../../../src/components/ui/slider", async (original) => {
 function callbacks() {
   return observed.slider.mock.calls.at(-1)![0] as ComponentProps<typeof Slider>;
 }
-function start() {
-  act(() => callbacks().onPointerDownCapture?.({ button: 0 } as PointerEvent<HTMLSpanElement>));
+function start(drag = false) {
+  const root = screen.getByRole("slider").closest('[data-slot="slider"]')!;
+  act(() =>
+    callbacks().onPointerDownCapture?.({
+      button: 0,
+      currentTarget: root,
+      pointerId: 1,
+      clientX: 0,
+      timeStamp: 1,
+      shiftKey: false,
+    } as PointerEvent<HTMLSpanElement>),
+  );
+  if (drag)
+    act(() =>
+      callbacks().onPointerMoveCapture?.({
+        pointerId: 1,
+        clientX: 8,
+        timeStamp: 17,
+        shiftKey: false,
+        preventDefault: vi.fn(),
+      } as unknown as PointerEvent<HTMLSpanElement>),
+    );
 }
 function props() {
   return {
@@ -57,7 +91,8 @@ test("genuine Radix keyboard edits commit once and update only the slider leaf",
 test("many preview samples become one release commit; Escape rejects late release", () => {
   const p = props();
   render(<StudioSlider {...p} />);
-  start();
+  start(true);
+  p.onPreview.mockClear();
   for (const value of [0.6, 0.7, 0.8]) act(() => callbacks().onValueChange?.([value]));
   expect(p.onCommit).not.toHaveBeenCalled();
   expect(screen.getByRole("slider")).toHaveAttribute("aria-valuenow", "0.8");
@@ -136,4 +171,69 @@ test("time invalidation cancels a held gesture and rejects all later samples unt
   expect(screen.getByRole("slider")).toHaveAttribute("aria-valuenow", "0.5");
   view.unmount();
   expect(unsubscribe).toHaveBeenCalledOnce();
+});
+
+test("double-click cancels the two click previews, resets once and retires its shimmer", () => {
+  vi.useFakeTimers();
+  const p = { ...props(), resetValue: 0.25 };
+  const view = render(<StudioSlider {...p} />);
+  try {
+    for (const value of [0.8, 0.9]) {
+      start();
+      act(() => {
+        callbacks().onValueChange?.([value]);
+        callbacks().onValueCommit?.([value]);
+      });
+      expect(p.onCommit).not.toHaveBeenCalled();
+      act(() => {
+        vi.advanceTimersByTime(100);
+      });
+    }
+    const root = screen.getByRole("slider").closest(".studio-slider")!;
+    fireEvent.doubleClick(root);
+    expect(p.onCancel).toHaveBeenCalledOnce();
+    expect(p.onCommit).toHaveBeenCalledExactlyOnceWith(0.25);
+    expect(root.querySelector("[data-resetting]")).not.toBeNull();
+    act(() => {
+      vi.advanceTimersByTime(560);
+    });
+    expect(root.querySelector("[data-resetting]")).toBeNull();
+    expect(p.onCommit).toHaveBeenCalledOnce();
+  } finally {
+    view.unmount();
+    vi.useRealTimers();
+  }
+});
+
+test("pending single clicks commit on focus handoff, while replaced owners and disabled resets stay inert", () => {
+  vi.useFakeTimers();
+  const p = { ...props(), resetValue: 2 };
+  const view = render(<StudioSlider {...p} />);
+  try {
+    start();
+    act(() => {
+      callbacks().onValueChange?.([0.8]);
+      callbacks().onValueCommit?.([0.8]);
+    });
+    fireEvent.blur(screen.getByRole("slider"));
+    expect(p.onCommit).toHaveBeenCalledExactlyOnceWith(0.8);
+    p.onCommit.mockClear();
+    start();
+    act(() => {
+      callbacks().onValueChange?.([0.7]);
+      callbacks().onValueCommit?.([0.7]);
+    });
+    view.rerender(<StudioSlider {...p} identity={{}} disabled />);
+    act(() => {
+      vi.runAllTimers();
+    });
+    fireEvent.doubleClick(screen.getByRole("slider").closest(".studio-slider")!);
+    expect(p.onCommit).not.toHaveBeenCalled();
+    view.rerender(<StudioSlider {...p} identity={{}} />);
+    fireEvent.doubleClick(screen.getByRole("slider").closest(".studio-slider")!);
+    expect(p.onCommit).toHaveBeenCalledExactlyOnceWith(1);
+  } finally {
+    view.unmount();
+    vi.useRealTimers();
+  }
 });

@@ -17,7 +17,13 @@ function restartAnimation(animation: Animation): void {
 }
 
 /** Callers own disabled/reduced-motion admission; this owns only the shared visual pulse. */
-export function useResetFeedback(ref: RefObject<HTMLElement | null>): () => void {
+export function useResetFeedback(
+  ref: RefObject<HTMLElement | null>,
+  {
+    animationName = RESET_ANIMATION,
+    duration = 360,
+  }: { animationName?: string; duration?: number } = {},
+): () => void {
   const active = useRef<Pulse | null>(null),
     alive = useRef(false);
   useLayoutEffect(() => {
@@ -37,14 +43,13 @@ export function useResetFeedback(ref: RefObject<HTMLElement | null>): () => void
     node.setAttribute("data-resetting", "");
     const animation =
       node
-        .getAnimations?.()
+        .getAnimations?.({ subtree: true })
         .find(
-          (candidate) =>
-            "animationName" in candidate && candidate.animationName === RESET_ANIMATION,
+          (candidate) => "animationName" in candidate && candidate.animationName === animationName,
         ) ?? (previous?.node === node ? previous.animation : undefined);
     if (previous?.node === node && previous.animation && previous.animation !== animation)
       previous.animation.cancel();
-    // Retain the owned CSSAnimation through its finished 320–360 ms cleanup window too:
+    // Retain the owned CSSAnimation through its finished cleanup window too:
     // browsers may omit a finished, non-filling CSS animation from getAnimations().
     if (animation) restartAnimation(animation);
     const pulse: Pulse = { node, animation };
@@ -53,6 +58,6 @@ export function useResetFeedback(ref: RefObject<HTMLElement | null>): () => void
       if (active.current !== pulse) return;
       clearPulse(pulse);
       active.current = null;
-    }, 360);
-  }, [ref]);
+    }, duration);
+  }, [ref, animationName, duration]);
 }

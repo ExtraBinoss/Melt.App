@@ -2,7 +2,13 @@ import { memo, useLayoutEffect, useMemo } from "react";
 import { AnimatePresence, useIsPresent } from "motion/react";
 import { Settings2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { SPATIAL_NUMBERS, type EnginePort, type Layer, type SessionSnapshot } from "@musart/core";
+import {
+  createSpatialLayer,
+  SPATIAL_NUMBERS,
+  type EnginePort,
+  type Layer,
+  type SessionSnapshot,
+} from "@musart/core";
 import { useDocumentSnapshot } from "../../../state/session/use-document-snapshot";
 import { motionTimeChanges } from "../../../state/session/motion-edit";
 import { layerSelection } from "../../../components/layers/menu/selection";
@@ -192,6 +198,7 @@ function StudioObjectControls({
                     invalidation={motionTimeChanges(engine)}
                     label={spatialText(key)}
                     value={spatial[key]}
+                    resetValue={createSpatialLayer(spatial.source)[key]}
                     min={key === "depth" ? 0.001 : 0}
                     max={key === "depth" ? 5 : 0.3}
                     step={0.01}
@@ -218,6 +225,7 @@ function StudioObjectControls({
                 invalidation={motionTimeChanges(engine)}
                 label={spatialText("scale")}
                 value={Math.abs(layer.spatial.scaleX)}
+                resetValue={1}
                 min={minimum}
                 max={maximum}
                 step={0.01}
@@ -284,6 +292,7 @@ function StudioObjectControls({
                 invalidation={motionTimeChanges(engine)}
                 label={common("fontSize")}
                 value={layer.fontSize}
+                resetValue={64}
                 min={4}
                 max={600}
                 step={1}
@@ -356,6 +365,7 @@ function StudioObjectControls({
                       invalidation={motionTimeChanges(engine)}
                       label={spatialText(key)}
                       value={source[key]}
+                      resetValue={createSpatialLayer(source.source)[key]}
                       min={SPATIAL_NUMBERS[key][0]}
                       max={SPATIAL_NUMBERS[key][1]}
                       step={1}

@@ -135,3 +135,28 @@ test("rebinds a replacement CSS animation and changes no React state", () => {
   expect(second.cancel).toHaveBeenCalledOnce();
   expect(vi.getTimerCount()).toBe(0);
 });
+
+test("a named Studio shimmer replays independently and owns its longer cleanup window", () => {
+  const ordinary = animation(),
+    shimmer = animation("studio-reset-shimmer");
+  const { node } = nodeWith(ordinary, shimmer),
+    ref = createRef<HTMLElement>();
+  ref.current = node;
+  const view = renderHook(() =>
+    useResetFeedback(ref, { animationName: "studio-reset-shimmer", duration: 560 }),
+  );
+  view.result.current();
+  expect(shimmer.play).toHaveBeenCalledOnce();
+  expect(ordinary.play).not.toHaveBeenCalled();
+  vi.advanceTimersByTime(500);
+  expect(node).toHaveAttribute("data-resetting");
+  view.result.current();
+  expect(shimmer.play).toHaveBeenCalledTimes(2);
+  vi.advanceTimersByTime(559);
+  expect(node).toHaveAttribute("data-resetting");
+  view.unmount();
+  expect(node).not.toHaveAttribute("data-resetting");
+  expect(shimmer.cancel).toHaveBeenCalledOnce();
+  expect(ordinary.cancel).not.toHaveBeenCalled();
+  expect(vi.getTimerCount()).toBe(0);
+});

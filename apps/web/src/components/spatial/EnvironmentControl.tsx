@@ -2,6 +2,7 @@ import { memo, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   createSpatialScene,
+  DEFAULT_SPATIAL_SCENE,
   SPATIAL_ENVIRONMENTS,
   SPATIAL_ENVIRONMENT_PRESETS,
   type EnginePort,
@@ -128,6 +129,7 @@ export const EnvironmentControl = memo(function EnvironmentControl({
                 invalidation={motionTimeChanges(engine)}
                 label={spatialText(key)}
                 value={camera[key]}
+                resetValue={DEFAULT_SPATIAL_SCENE.camera[key]}
                 min={key === "distance" ? 0.2 : 5}
                 max={key === "distance" ? 100 : 120}
                 step={key === "distance" ? 0.1 : 1}
@@ -170,6 +172,7 @@ export const EnvironmentControl = memo(function EnvironmentControl({
                   invalidation={motionTimeChanges(engine)}
                   label={t(key)}
                   value={environment[key]}
+                  resetValue={DEFAULT_SPATIAL_SCENE.environment[key]}
                   min={key === "rotation" ? -180 : 0}
                   max={key === "rotation" ? 180 : 10}
                   step={key === "rotation" ? 1 : 0.1}

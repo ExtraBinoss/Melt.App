@@ -40,6 +40,7 @@ export async function mount() {
               max={100}
               step={1}
               value={value}
+              resetValue={10}
               identity="owner"
               onPreview={(value) => events.previews.push(value)}
               onCommit={(value) => {

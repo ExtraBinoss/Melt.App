@@ -104,3 +104,83 @@ test("gradient direction survives repeated type switches and swatches inherit St
   }
   await expect(page.locator(".color-swatch").first()).toHaveCSS("border-top-left-radius", "8px");
 });
+
+test("scrubbing a Studio label has no dotted underline and keeps its field geometry", async ({
+  page,
+}) => {
+  await mountControls(page);
+  const scrub = page.getByRole("button", { name: "Adjust Intensity" });
+  const field = page.locator(".number-field").filter({ has: scrub });
+  const before = (await field.boundingBox())!;
+  const box = (await scrub.boundingBox())!;
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+  await page.keyboard.down("Shift");
+  await page.mouse.down();
+  await page.mouse.move(box.x + box.width / 2 + 20, box.y + box.height / 2, { steps: 5 });
+  await expect(field).toHaveAttribute("data-snapped", "");
+  await expect(scrub).not.toHaveCSS("border-bottom-style", "dashed");
+  await expect(scrub).not.toHaveCSS("border-bottom-style", "dotted");
+  const after = (await field.boundingBox())!;
+  expect(after.height).toBe(before.height);
+  expect(after.y).toBe(before.y);
+  await page.mouse.up();
+  await page.keyboard.up("Shift");
+  await expect(field).not.toHaveAttribute("data-snapped");
+});
+
+test("native double-click resets a large slider once, replays its shimmer and honors reduced motion", async ({
+  page,
+}) => {
+  await mountControls(page);
+  const slider = page.getByRole("slider", { name: "Test value" });
+  const root = page.locator(".studio-slider").first();
+  const feedback = root.locator(".studio-slider-reset-feedback");
+  await slider.focus();
+  await page.keyboard.press("ArrowRight");
+  await expect(slider).toHaveAttribute("aria-valuenow", "11");
+  const box = (await root.boundingBox())!;
+  const point = { x: box.x + box.width * 0.8, y: box.y + box.height / 2 };
+  await page.mouse.dblclick(point.x, point.y, { delay: 100 });
+  await expect(slider).toHaveAttribute("aria-valuenow", "10");
+  await expect(feedback).toHaveAttribute("data-resetting", "");
+  expect(
+    await feedback.evaluate((node) =>
+      node
+        .getAnimations({ subtree: true })
+        .some(
+          (animation) =>
+            "animationName" in animation && animation.animationName === "studio-reset-shimmer",
+        ),
+    ),
+  ).toBe(true);
+  await feedback.evaluate((node) => {
+    const animation = node
+      .getAnimations({ subtree: true })
+      .find(
+        (animation) =>
+          "animationName" in animation && animation.animationName === "studio-reset-shimmer",
+      );
+    animation?.pause();
+    if (animation) animation.currentTime = 260;
+  });
+  await root.screenshot({ path: "artifacts/studio/reset-shimmer.png" });
+  await expect(feedback).not.toHaveAttribute("data-resetting");
+  await page.mouse.dblclick(point.x, point.y, { delay: 100 });
+  await expect(feedback).toHaveAttribute("data-resetting", "");
+  await expect(feedback).not.toHaveAttribute("data-resetting");
+  const events = () =>
+    page.evaluate(
+      () => (window as unknown as { __controls: { commits: number[] } }).__controls.commits,
+    );
+  expect(await events()).toEqual([11, 10]);
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await slider.focus();
+  await page.keyboard.press("ArrowRight");
+  await page.mouse.dblclick(point.x, point.y, { delay: 100 });
+  await expect(slider).toHaveAttribute("aria-valuenow", "10");
+  expect(await feedback.evaluate((node) => getComputedStyle(node, "::after").animationName)).toBe(
+    "none",
+  );
+  await expect(feedback).not.toHaveAttribute("data-resetting");
+  expect(await events()).toEqual([11, 10, 11, 10]);
+});

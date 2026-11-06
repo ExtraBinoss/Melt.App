@@ -151,6 +151,7 @@ export const MaterialControl = memo(function MaterialControl({
                   invalidation={motionTimeChanges(engine)}
                   label={spatialText(key)}
                   value={spatial.material[key]}
+                  resetValue={spatialMaterial(spatial.material.preset).settings[key]}
                   min={0}
                   max={key === "emissiveIntensity" ? 5 : 1}
                   disabled={!selection.editable}

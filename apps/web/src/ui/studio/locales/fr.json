@@ -17,5 +17,6 @@
   "rotation": "Rotation",
   "linkScale": "Lier les axes de l’échelle",
   "unlinkScale": "Délier les axes de l’échelle",
+  "sliderResetHint": "Double-cliquez pour réinitialiser",
   "preciseHint": "Crans 5 / 10 · Geste lent : précision"
 }

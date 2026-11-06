@@ -111,5 +111,6 @@
 }
 
 .number-field[data-snapped] .number-scrub {
-  border-bottom: 1px dashed var(--muted-foreground);
+  background: color-mix(in srgb, var(--primary) 12%, var(--accent));
+  color: var(--foreground);
 }

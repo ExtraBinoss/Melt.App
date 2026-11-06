@@ -5,7 +5,7 @@
   position: absolute;
   bottom: -3px;
   height: 12px;
-  border-left: 1px dashed var(--muted-foreground);
+  border-left: 1px solid var(--muted-foreground);
   pointer-events: none;
   transform: translateX(-50%);
 }

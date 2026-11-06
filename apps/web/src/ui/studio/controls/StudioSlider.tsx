@@ -2,6 +2,7 @@ import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import { Slider } from "../../../components/ui/slider";
 import { useTranslation } from "react-i18next";
 import { ControlHint } from "../../../components/shared/ControlHint";
+import { useResetFeedback } from "../../../components/shared/use-reset-feedback";
 import { Kbd } from "../../../components/ui/kbd";
 import {
   gestureGain,
@@ -15,6 +16,7 @@ import "../messages";
 export interface StudioSliderProps {
   label: string;
   value: number;
+  resetValue?: number | (() => number);
   min: number;
   max: number;
   step?: number;
@@ -32,13 +34,31 @@ export interface StudioSliderProps {
 export function StudioSlider(props: StudioSliderProps) {
   const { label, value, min, max, step = 0.01, unit = "", identity, disabled } = props;
   const id = useId();
+  const feedback = useRef<HTMLSpanElement>(null);
+  const resetFeedback = useResetFeedback(feedback, {
+    animationName: "studio-reset-shimmer",
+    duration: 560,
+  });
+  const pending = useRef<{
+    timer: ReturnType<typeof setTimeout>;
+    identity: unknown;
+    value: number;
+  } | null>(null);
+  function clearPending() {
+    if (!pending.current) return false;
+    clearTimeout(pending.current.timer);
+    pending.current = null;
+    return true;
+  }
   const { t } = useTranslation("studioChrome");
   const pointer = useRef<{
     pointerId: number;
     x: number;
+    startX: number;
     time: number;
     width: number;
     shift: boolean;
+    moved: boolean;
     value: number;
   } | null>(null);
   const [presentation, setPresentation] = useState({
@@ -60,7 +80,8 @@ export function StudioSlider(props: StudioSliderProps) {
   useLayoutEffect(() => {
     session.current = { active: false, cancelled: false };
     return () => {
-      if (session.current.active) callbacks.current.onCancel();
+      const waiting = clearPending();
+      if (session.current.active || waiting) callbacks.current.onCancel();
       session.current.active = false;
       session.current.cancelled = true;
       pointer.current = null;
@@ -69,7 +90,8 @@ export function StudioSlider(props: StudioSliderProps) {
   useEffect(
     () =>
       props.invalidation?.subscribe(() => {
-        if (!session.current.active) return;
+        const waiting = clearPending();
+        if (!session.current.active && !waiting) return;
         callbacks.current.onCancel();
         session.current = { active: false, cancelled: true };
         pointer.current = null;
@@ -80,20 +102,54 @@ export function StudioSlider(props: StudioSliderProps) {
   function begin() {
     if (disabled || !Object.is(callbacks.current.identity, identity) || session.current.active)
       return;
+    clearPending();
     session.current = { active: true, cancelled: false };
     lastPreview.current = undefined;
     callbacks.current.onStart?.();
   }
   function cancel() {
-    if (session.current.active) callbacks.current.onCancel();
+    const waiting = clearPending();
+    if (session.current.active || waiting) callbacks.current.onCancel();
     session.current = { active: false, cancelled: true };
     setDraft(null);
     pointer.current = null;
   }
+  function flushPending() {
+    const held = pending.current;
+    if (!held) return;
+    clearPending();
+    if (!callbacks.current.disabled && Object.is(callbacks.current.identity, held.identity))
+      callbacks.current.onCommit(held.value);
+    else callbacks.current.onCancel();
+    setDraft(null);
+  }
+  function reset() {
+    if (disabled || !Object.is(callbacks.current.identity, identity)) return;
+    const source = callbacks.current.resetValue ?? 0;
+    const raw = typeof source === "function" ? source() : source;
+    if (!Number.isFinite(raw)) return;
+    cancel();
+    const next = Math.max(min, Math.min(max, Number((Math.round(raw / step) * step).toFixed(6))));
+    if (next !== callbacks.current.value) {
+      callbacks.current.onStart?.();
+      callbacks.current.onPreview(next);
+      callbacks.current.onCommit(next);
+    }
+    resetFeedback();
+  }
   const shown = Object.is(presentation.identity, identity) ? (presentation.draft ?? value) : value;
   const digits = step >= 1 ? 0 : step >= 0.1 ? 1 : 2;
   return (
-    <div className="studio-slider" data-canvas-control>
+    <div
+      className="studio-slider"
+      data-canvas-control
+      onDoubleClickCapture={(event) => {
+        if (event.button !== 0) return;
+        event.preventDefault();
+        event.stopPropagation();
+        reset();
+      }}
+    >
       <div className="studio-slider-heading">
         <label id={id}>{label}</label>
         <output aria-hidden="true">
@@ -105,7 +161,9 @@ export function StudioSlider(props: StudioSliderProps) {
         content={
           <>
             <Kbd>⇧</Kbd>
-            <span>{t("preciseHint")}</span>
+            <span>
+              {t("preciseHint")} · {t("sliderResetHint")}
+            </span>
           </>
         }
       >
@@ -131,9 +189,11 @@ export function StudioSlider(props: StudioSliderProps) {
               pointer.current = {
                 pointerId: event.pointerId,
                 x: event.clientX,
+                startX: event.clientX,
                 time: event.timeStamp,
                 width,
                 shift: event.shiftKey,
+                moved: false,
                 value: shown,
               };
             }}
@@ -149,6 +209,7 @@ export function StudioSlider(props: StudioSliderProps) {
                 return;
               event.preventDefault();
               const delta = event.clientX - active.x;
+              if (Math.abs(event.clientX - active.startX) >= 3) active.moved = true;
               const elapsed = event.timeStamp - active.time;
               const speed = elapsed > 0 ? Math.abs(delta) / elapsed : 1;
               active.value = Math.max(
@@ -194,7 +255,10 @@ export function StudioSlider(props: StudioSliderProps) {
               });
             }}
             onBlur={(event) => {
-              if (!event.currentTarget.contains(event.relatedTarget)) cancel();
+              if (!event.currentTarget.contains(event.relatedTarget)) {
+                flushPending();
+                cancel();
+              }
             }}
             onKeyDownCapture={(event) => {
               if (event.key === "Escape") {
@@ -261,17 +325,26 @@ export function StudioSlider(props: StudioSliderProps) {
                 !Object.is(callbacks.current.identity, identity)
               )
                 return;
-              if (pointer.current) next = lastPreview.current ?? shown;
+              const held = pointer.current;
+              if (held) next = lastPreview.current ?? shown;
               pointer.current = null;
               // Radix can commit a keyboard step before its value-change callback.
               if (lastPreview.current !== next) callbacks.current.onPreview(next);
               session.current.active = false;
-              callbacks.current.onCommit(next);
-              setDraft(null);
+              if (held && !held.moved) {
+                // Keep a click's preview immediate, but admit the native double-click
+                // before publishing history. A drag and keyboard steps still commit immediately.
+                clearPending();
+                pending.current = { identity, value: next, timer: setTimeout(flushPending, 500) };
+              } else {
+                callbacks.current.onCommit(next);
+                setDraft(null);
+              }
             }}
           />
         </div>
       </ControlHint>
+      <span ref={feedback} className="studio-slider-reset-feedback" aria-hidden="true" />
       {presentation.snap !== null && (
         <span
           className="studio-slider-snap"
