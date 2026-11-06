@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useRef } from "react";
 import { useStore } from "jotai";
-import type { EnginePort, PaletteSwatch, SessionSnapshot } from "@musart/core";
+import type { ColorTarget, EnginePort, PaletteSwatch, SessionSnapshot } from "@musart/core";
 import { paletteVariation } from "../../services/palettes/binding";
 import { previewAtom } from "../../state/session/editor";
 import type { PreviewValue } from "../../state/session/preview-source";
@@ -16,16 +16,18 @@ export function usePaletteVariation(
   engine: EnginePort | undefined,
   callbacks: Callbacks,
   invalidated: () => void,
+  targets: readonly ColorTarget[] = [],
 ) {
   const store = useStore(),
-    latest = useRef({ callbacks, invalidated });
+    latest = useRef({ callbacks, invalidated, targets });
   const session = useRef<{
     base?: SessionSnapshot;
     owned: PreviewValue | null;
     local: boolean;
+    targets: readonly ColorTarget[];
   } | null>(null);
   useLayoutEffect(() => {
-    latest.current = { callbacks, invalidated };
+    latest.current = { callbacks, invalidated, targets };
   });
   const cancel = useCallback(() => {
     const current = session.current;
@@ -57,10 +59,15 @@ export function usePaletteVariation(
   function preview(colors: PaletteSwatch[]) {
     if (!session.current) {
       latest.current.callbacks.beforeApply();
-      session.current = { base: engine?.getSnapshot(), owned: null, local: false };
+      session.current = {
+        base: engine?.getSnapshot(),
+        owned: null,
+        local: false,
+        targets: latest.current.targets,
+      };
     }
     const current = session.current;
-    const variation = current.base && paletteVariation(current.base, colors);
+    const variation = current.base && paletteVariation(current.base, colors, current.targets);
     if (variation?.preview) {
       current.owned = { target: "page", patch: variation.preview };
       store.set(previewAtom, current.owned);
@@ -81,11 +88,16 @@ export function usePaletteVariation(
       cancel();
       throw Error("Palette preview is stale.");
     }
-    const variation = base && paletteVariation(base, colors);
+    const variation = base && paletteVariation(base, colors, session.current?.targets);
     cancel();
     latest.current.callbacks.beforeApply();
-    if (variation?.globals.length && engine)
-      engine.execute({ type: "setDocumentColors", colors: variation.globals });
+    if (variation && engine && (variation.globals.length || variation.commands?.length))
+      engine.transaction([
+        ...(variation.globals.length
+          ? [{ type: "setDocumentColors" as const, colors: variation.globals }]
+          : []),
+        ...(variation.commands ?? []),
+      ]);
     else latest.current.callbacks.onUse(colors[0]!.value);
   }
   return { preview, apply, cancel };

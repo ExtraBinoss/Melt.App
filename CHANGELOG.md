@@ -4,6 +4,9 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 
 ## [Unreleased]
 
+- List saved palettes under an All filter in a 180-pixel scroll area, with detected document colors below a divider and lazy visible-row payload reads.
+- Preview palette generations on the addressed paint even without global links; apply solid colors over gradients and original model/vector colors with one undo, preserving explicit document links.
+
 - Simplify the palette popover to named swatches and an add action; move secondary controls into menus and reuse shared switches, color pickers, native eyedropper sampling and inline hex validation.
 - Detect document colors from authored paints and bounded original-image sampling; add animated naming suggestions and per-generation undo/redo inside the popover, retaining document history after Apply.
 - Keep palette tooltips above their controls, add concise contextual help and prevent gradient color-row hover controls from overlapping.

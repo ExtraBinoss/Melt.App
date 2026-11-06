@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { ColorTarget, PaletteSwatch, SavedPalette } from "@musart/core";
 import { validateSavedPalette } from "@musart/core";
 import { useTranslation } from "react-i18next";
@@ -10,10 +10,12 @@ import { Throbber } from "../ui/throbber/Throbber";
 import { PalettePicker } from "./PalettePicker";
 import { usePaletteEngine } from "./PaletteProvider";
 import { DocumentColors } from "./DocumentColors";
+import { paletteVariation } from "../../services/palettes/binding";
 import { usePaletteVariation } from "./use-palette-variation";
 import { PaletteEditor } from "./PaletteEditor";
 import { useDocumentPalette } from "./use-document-palette";
 const DOCUMENT_PALETTE_ID = "document:detected";
+const ALL_PALETTES_ID = "library:all";
 export function PaletteBrowser({
   value,
   targets,
@@ -32,7 +34,7 @@ export function PaletteBrowser({
   const { t } = useTranslation("palettes"),
     engine = usePaletteEngine();
   const detected = useDocumentPalette(engine, value);
-  const [viewingDocument, setViewingDocument] = useState(true);
+  const [filterId, setFilterId] = useState(ALL_PALETTES_ID);
   const documentPalette: SavedPalette = {
     id: DOCUMENT_PALETTE_ID,
     name: t("documentDetected"),
@@ -49,10 +51,15 @@ export function PaletteBrowser({
   const connection = useRef<PaletteLibrary | null>(null),
     lifetime = useRef({ epoch: 0, request: 0 });
   const [preview, setPreview] = useState<PaletteSwatch[] | null>(null);
-  const variation = usePaletteVariation(engine, { beforeApply, onUse, onPreview, onCancel }, () => {
-    setPreview(null);
-    setError(t("changed"));
-  });
+  const variation = usePaletteVariation(
+    engine,
+    { beforeApply, onUse, onPreview, onCancel },
+    () => {
+      setPreview(null);
+      setError(t("changed"));
+    },
+    targets,
+  );
   function cancelVariation() {
     variation.cancel();
     setPreview(null);
@@ -109,19 +116,29 @@ export function PaletteBrowser({
       if (current()) setBusy(false);
     }
   }
+  const readPalette = useCallback(async (id: string) => {
+    const library = connection.current,
+      token = lifetime.current.epoch;
+    if (!library) throw Error("Palette library is closed.");
+    const record = await library.get(id);
+    if (connection.current !== library || lifetime.current.epoch !== token)
+      throw Error("Palette library is closed.");
+    return record;
+  }, []);
+  function activate(record: PaletteRecord) {
+    cancelVariation();
+    setSelected(record);
+    setDraft(record);
+  }
   function load(id: string) {
-    if (id === DOCUMENT_PALETTE_ID) {
+    setFilterId(id);
+    if (id === ALL_PALETTES_ID) {
       cancelVariation();
-      setViewingDocument(true);
       return;
     }
     void perform(async (library, current) => {
       const record = await library.get(id);
-      if (current()) {
-        setSelected(record);
-        setDraft(record);
-        setViewingDocument(false);
-      }
+      if (current()) activate(record);
     });
   }
   async function reload(library: PaletteLibrary, current: () => boolean, after = cursors.at(-1)) {
@@ -144,19 +161,28 @@ export function PaletteBrowser({
       if (current()) {
         setSelected(record);
         setDraft(record);
-        setViewingDocument(false);
+        setFilterId(record.id);
         setMode("pick");
       }
       await reload(library, current);
     });
   }
-  function use(color: PaletteSwatch, link: boolean) {
+  function use(color: PaletteSwatch, link: boolean, detected: boolean) {
     try {
       cancelVariation();
       beforeApply();
       if (link && engine && targets.length) {
-        const colorId = viewingDocument ? crypto.randomUUID() : color.id;
+        const colorId = detected ? crypto.randomUUID() : color.id;
+        const paintCommands =
+          paletteVariation(
+            engine.getSnapshot(),
+            [{ ...color, id: colorId }],
+            targets.filter(
+              (target) => !target.effectId && ["fill", "background"].includes(target.property),
+            ),
+          ).commands ?? [];
         engine.transaction([
+          ...paintCommands,
           {
             type: "setDocumentColors",
             colors: [{ id: colorId, name: color.name, value: color.value }],
@@ -219,16 +245,15 @@ export function PaletteBrowser({
     setDraft({
       id: crypto.randomUUID(),
       name: "",
-      colors: (detected.colors.length
-        ? detected.colors
-        : [{ id: "current", name: "1", value }]
-      ).map((color, index) => ({ ...color, id: crypto.randomUUID(), name: `${index + 1}` })),
+      colors: [
+        { id: "current", name: "1", value },
+        ...detected.colors.filter((color) => color.value.toLowerCase() !== value.toLowerCase()),
+      ].map((color, index) => ({ ...color, id: crypto.randomUUID(), name: `${index + 1}` })),
     });
   }
   function closeEditor() {
     cancelVariation();
     setDraft(selected);
-    setViewingDocument(!selected);
     setMode("pick");
   }
   return (
@@ -236,18 +261,19 @@ export function PaletteBrowser({
       {mode === "pick" && (
         <PalettePicker
           items={items}
-          selectedId={viewingDocument ? DOCUMENT_PALETTE_ID : selected?.id}
-          palette={viewingDocument ? documentPalette : draft}
+          filterId={filterId}
+          selected={selected}
           detected={documentPalette}
-          personal={!viewingDocument && !!selected}
+          readPalette={readPalette}
+          onActivate={activate}
           busy={busy}
           canLink={Boolean(engine && targets.length)}
           onLoad={load}
           onNew={createPalette}
           onUse={use}
-          onEdit={() => {
-            if (viewingDocument) createPalette();
-            else setMode("edit");
+          onEdit={(record) => {
+            if (record) activate(record);
+            setMode("edit");
           }}
           onDuplicate={() => draft && save({ ...draft, name: `${draft.name} 2` }, true)}
           onDelete={() => {
@@ -257,7 +283,7 @@ export function PaletteBrowser({
                 if (current()) {
                   setSelected(null);
                   setDraft(null);
-                  setViewingDocument(true);
+                  setFilterId(ALL_PALETTES_ID);
                 }
                 await reload(library, current);
               });
@@ -323,6 +349,7 @@ export function PaletteBrowser({
             if (current()) {
               setSelected(record);
               setDraft(record);
+              setFilterId(record.id);
               setMode("pick");
             }
             await reload(library, current);
@@ -338,6 +365,7 @@ export function PaletteBrowser({
               onClick={() => {
                 const next = cursors.slice(0, -1);
                 setCursors(next);
+                setFilterId(ALL_PALETTES_ID);
                 void perform((library, current) => reload(library, current, next.at(-1)));
               }}
             >
@@ -351,6 +379,7 @@ export function PaletteBrowser({
               onClick={() => {
                 const after = items.at(-1)!.id;
                 setCursors([...cursors, after]);
+                setFilterId(ALL_PALETTES_ID);
                 void perform((library, current) => reload(library, current, after));
               }}
             >

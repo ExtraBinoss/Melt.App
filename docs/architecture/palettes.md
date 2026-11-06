@@ -21,8 +21,10 @@ projects without overwriting destination definitions or matching by color value.
 
 The palette button sits beside color controls and opens its own compact nonmodal popover.
 The initial picker contains only a palette selector, swatches, add and contextual
-help. It defaults to a detected document palette; personal palettes remain in the
-same selector. Detection uses authored colors and bounded original-image worker
+help. The selector defaults to **All** and filters only saved palettes. Named
+palette rows occupy at most 180 pixels before scrolling; only intersecting rows
+read their bounded payloads. The detected document palette remains below a divider,
+independently of the saved-palette filter. The outer popover remains bounded. Detection uses authored colors and bounded original-image worker
 sampling, never compositor readbacks (see the detection service README for the
 source-footprint approximation and resource bounds). Empty palette names use
 imperative, reduced-motion-aware example placeholders, not prefilled company names.
@@ -40,6 +42,10 @@ existing imperative presentation source; they do not write keys or document
 history. Apply creates one document commit; Cancel, dismissal, changed selection,
 changed document and unmount restore the canonical artwork. Saving a variation
 is an explicit save-as action and never silently replaces its brand palette.
+An explicit paint target also previews the first swatch when no saved identity
+matches a document color. Solid paint replaces that target's gradient or original
+model/vector colors; unrelated paints retain their modes. The commands and global
+updates apply together as one transaction.
 Every generation enters a bounded 50-step local history with undo/redo buttons and
 Ctrl/Cmd+Z, Shift+Z or Ctrl+Y. Branching retires forward generations; text fields
 retain native text undo. Exhausted local history falls back to document history,

@@ -1,17 +1,12 @@
 import { Info, MoreHorizontal, Plus } from "lucide-react";
 import type { PaletteSwatch, SavedPalette } from "@musart/core";
 import { useTranslation } from "react-i18next";
-import type { PaletteSummary } from "../../services/palettes/library";
+import type { PaletteRecord, PaletteSummary } from "../../services/palettes/library";
 import { SelectField } from "../shared/SelectField";
 import { ControlHint } from "../shared/ControlHint";
 import { IconButton } from "../shared/IconButton";
 import { Button } from "../ui/button";
-import {
-  ContextMenu,
-  ContextMenuTrigger,
-  ContextMenuContent,
-  ContextMenuItem,
-} from "../ui/context-menu";
+import { PaletteLibraryRow, PaletteSwatches } from "./PaletteLibraryRow";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -22,10 +17,11 @@ import {
 
 export function PalettePicker({
   items,
-  selectedId,
-  palette,
+  filterId,
+  selected,
   detected,
-  personal,
+  readPalette,
+  onActivate,
   busy,
   canLink,
   onLoad,
@@ -39,16 +35,17 @@ export function PalettePicker({
   onDocument,
 }: {
   items: PaletteSummary[];
-  selectedId?: string;
-  palette: SavedPalette | null;
+  filterId: string;
+  selected: PaletteRecord | null;
   detected: SavedPalette;
-  personal: boolean;
+  readPalette: (id: string) => Promise<PaletteRecord>;
+  onActivate: (record: PaletteRecord) => void;
   busy: boolean;
   canLink: boolean;
   onLoad: (id: string) => void;
   onNew: () => void;
-  onUse: (color: PaletteSwatch, link: boolean) => void;
-  onEdit: () => void;
+  onUse: (color: PaletteSwatch, link: boolean, detected: boolean) => void;
+  onEdit: (record?: PaletteRecord) => void;
   onDuplicate: () => void;
   onDelete: () => void;
   onImport: () => void;
@@ -56,24 +53,25 @@ export function PalettePicker({
   onDocument?: () => void;
 }) {
   const { t } = useTranslation("palettes");
+  const available =
+    selected && filterId === selected.id && !items.some(({ id }) => id === selected.id)
+      ? [...items, { id: selected.id, name: selected.name, revision: selected.revision }]
+      : items;
+  const visible =
+    filterId === "library:all" ? available : available.filter(({ id }) => id === filterId);
   return (
     <>
       <div className="palette-picker-heading">
-        {items.length || detected.colors.length ? (
-          <SelectField
-            label={t("library")}
-            value={selectedId ?? ""}
-            selectedLabel={palette?.name}
-            disabled={busy}
-            options={[
-              { value: detected.id, label: detected.name },
-              ...items.map(({ id, name }) => ({ value: id, label: name })),
-            ]}
-            onValueChange={onLoad}
-          />
-        ) : (
-          <span className="palette-picker-placeholder">{t("shortcut")}</span>
-        )}
+        <SelectField
+          label={t("library")}
+          value={filterId}
+          disabled={busy}
+          options={[
+            { value: "library:all", label: t("all") },
+            ...available.map(({ id, name }) => ({ value: id, label: name })),
+          ]}
+          onValueChange={onLoad}
+        />
         <IconButton label={t("new")} tooltipSide="top" disabled={busy} onClick={onNew}>
           <Plus size={16} />
         </IconButton>
@@ -99,14 +97,14 @@ export function PalettePicker({
             </IconButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem disabled={!palette} onSelect={onEdit}>
+            <DropdownMenuItem disabled={!selected} onSelect={() => onEdit()}>
               {t("edit")}
             </DropdownMenuItem>
-            <DropdownMenuItem disabled={!personal} onSelect={onDuplicate}>
+            <DropdownMenuItem disabled={!selected} onSelect={onDuplicate}>
               {t("duplicate")}
             </DropdownMenuItem>
             <DropdownMenuItem onSelect={onImport}>{t("import")}</DropdownMenuItem>
-            <DropdownMenuItem disabled={!personal} onSelect={onExport}>
+            <DropdownMenuItem disabled={!selected} onSelect={onExport}>
               {t("export")}
             </DropdownMenuItem>
             {onDocument && (
@@ -116,36 +114,38 @@ export function PalettePicker({
               </>
             )}
             <DropdownMenuSeparator />
-            <DropdownMenuItem disabled={!personal} variant="destructive" onSelect={onDelete}>
+            <DropdownMenuItem disabled={!selected} variant="destructive" onSelect={onDelete}>
               {t("remove")}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <div className="palette-picker-swatches">
-        {palette?.colors.map((color) => (
-          <ContextMenu key={color.id}>
-            <ContextMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                className="palette-swatch"
-                style={{ background: color.value }}
-                aria-label={`${color.name} ${color.value}`}
-                title={color.value}
-                disabled={busy}
-                onClick={() => onUse(color, false)}
-              />
-            </ContextMenuTrigger>
-            <ContextMenuContent>
-              <ContextMenuItem onSelect={() => onUse(color, false)}>{t("local")}</ContextMenuItem>
-              <ContextMenuItem disabled={!canLink} onSelect={() => onUse(color, true)}>
-                {t("link")}
-              </ContextMenuItem>
-              <ContextMenuItem onSelect={onEdit}>{t("edit")}</ContextMenuItem>
-            </ContextMenuContent>
-          </ContextMenu>
+      <div className="palette-library-list" aria-label={t("library")}>
+        {visible.map((summary) => (
+          <PaletteLibraryRow
+            key={summary.id}
+            summary={summary}
+            selected={selected?.id === summary.id}
+            busy={busy}
+            canLink={canLink}
+            readPalette={readPalette}
+            onActivate={onActivate}
+            onUse={(color, link) => onUse(color, link, false)}
+            onEdit={onEdit}
+          />
         ))}
       </div>
+      <div role="separator" className="palette-document-divider" />
+      <section className="palette-detected" aria-label={detected.name}>
+        <span className="palette-section-name">{detected.name}</span>
+        <PaletteSwatches
+          colors={detected.colors}
+          busy={busy}
+          canLink={canLink}
+          onUse={(color, link) => onUse(color, link, true)}
+          onEdit={onNew}
+        />
+      </section>
     </>
   );
 }

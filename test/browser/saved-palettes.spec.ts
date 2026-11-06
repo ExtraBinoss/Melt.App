@@ -63,13 +63,15 @@ test("compact palettes preserve named saves, native menus, locked variations and
   await expect(popover).toBeVisible();
   await expect(
     popover.getByRole("combobox", { name: "Saved palettes", exact: true }),
-  ).toContainText("From document");
+  ).toContainText("All");
+  await expect(popover.getByRole("region", { name: "Document", exact: true })).toBeVisible();
+  await expect(popover.locator(".palette-document-divider")).toHaveAttribute("role", "separator");
   await popover.getByRole("button", { name: "About palettes", exact: true }).hover();
   const help = page.getByRole("tooltip").filter({ hasText: "Choose a saved palette" });
   await expect(help).toBeVisible();
   await expect(help).toHaveAttribute("data-side", "top");
   expect((await popover.boundingBox())!.width).toBeLessThanOrEqual(280);
-  expect((await popover.boundingBox())!.height).toBeLessThan(130);
+  expect((await popover.boundingBox())!.height).toBeLessThan(150);
   await expect(popover.getByRole("textbox")).toHaveCount(0);
   await expect(popover.locator("p")).toHaveCount(0);
   await expect(popover.getByRole("button", { name: "New palette", exact: true })).toBeVisible();
@@ -110,12 +112,36 @@ test("compact palettes preserve named saves, native menus, locked variations and
     popover.getByRole("combobox", { name: "Saved palettes", exact: true }),
   ).toContainText("Company");
   await expect(popover.getByRole("textbox")).toHaveCount(0);
-  expect((await popover.boundingBox())!.height).toBeLessThan(160);
-  await popover.getByRole("button", { name: "1 #e26d3f", exact: true }).click({ button: "right" });
+  expect((await popover.boundingBox())!.height).toBeLessThan(240);
+  await popover
+    .locator(".palette-library-list")
+    .getByRole("button", { name: "1 #e26d3f", exact: true })
+    .click({ button: "right" });
   await page.getByRole("menuitem", { name: "Link as document color", exact: true }).click();
   await expect
     .poll(() => page.evaluate(() => window.musart!.snapshot().project.colors?.length))
     .toBe(1);
+  await popover.locator(".palette-detected .palette-swatch").first().click({ button: "right" });
+  await page.getByRole("menuitem", { name: "Link as document color", exact: true }).click();
+  await expect
+    .poll(() => page.evaluate(() => window.musart!.snapshot().project.colors?.length))
+    .toBe(2);
+  const linkedIds = await page.evaluate(() =>
+    window.musart!.snapshot().project.colors!.map(({ id }) => id),
+  );
+  expect(linkedIds[1]).toMatch(/^[0-9a-f]{8}-[0-9a-f-]{27}$/);
+  expect(linkedIds[1]).not.toBe(linkedIds[0]);
+  // Palette variation follows explicit saved-swatch identities, never equal literals.
+  await popover
+    .locator(".palette-library-list")
+    .getByRole("button", { name: "1 #e26d3f", exact: true })
+    .click({ button: "right" });
+  await page.getByRole("menuitem", { name: "Link as document color", exact: true }).click();
+  await expect
+    .poll(() =>
+      page.evaluate(() => window.musart!.snapshot().project.pages[0]!.layers[0]!.colorLinks?.fill),
+    )
+    .toBe(linkedIds[0]);
   expect(await page.locator("body").getAttribute("style")).toBe(body);
   const before = await page.evaluate(() => window.musart!.snapshot());
   await menu(page, popover, "Edit palette");
@@ -222,7 +248,7 @@ test("Studio color and palette triggers stay on one row and open a compact nativ
   await shortcut.click();
   const popover = page.locator("[data-palette-popover]");
   await expect(popover).toBeVisible();
-  expect((await popover.boundingBox())!.height).toBeLessThan(130);
+  expect((await popover.boundingBox())!.height).toBeLessThan(150);
   const bounds = (await popover.boundingBox())!;
   expect(bounds.y + bounds.height).toBeLessThan(group.y);
   await expect(popover.getByRole("textbox")).toHaveCount(0);
@@ -288,9 +314,192 @@ test("document palette detects original image colors without sampling compositor
   const popover = page.locator("[data-palette-popover]");
   await expect(
     popover.getByRole("combobox", { name: "Saved palettes", exact: true }),
-  ).toContainText("From document");
+  ).toContainText("All");
   await expect(popover.getByRole("button", { name: /#ff4400/ })).toBeVisible();
   await expect(popover.getByRole("button", { name: /#264653/ })).toBeVisible();
   await expect(popover.getByRole("button", { name: /#00ff00/ })).toHaveCount(0);
   await expect(popover.getByRole("alert")).toHaveCount(0);
+});
+
+test("All lists saved palettes lazily in a bounded scroll area above document colors", async ({
+  page,
+}) => {
+  test.setTimeout(60000);
+  await open(page);
+  await page.evaluate(async () => {
+    const database = await new Promise<IDBDatabase>((resolve, reject) => {
+      const request = indexedDB.open("musart-palettes", 2);
+      request.onupgradeneeded = () => {
+        for (const name of ["palettes", "metadata", "retired"])
+          request.result.createObjectStore(name, { keyPath: "id" });
+      };
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+    await new Promise<void>((resolve, reject) => {
+      const transaction = database.transaction(["palettes", "metadata"], "readwrite");
+      for (let index = 0; index < 60; index++) {
+        const id = `palette-${String(index).padStart(2, "0")}`;
+        const summary = { id, name: `Saved ${index}`, revision: `revision-${index}` };
+        transaction.objectStore("metadata").put(summary);
+        transaction.objectStore("palettes").put({
+          ...summary,
+          colors: [{ id: `color-${index}`, name: "Ink", value: "#264653" }],
+        });
+      }
+      transaction.oncomplete = () => resolve();
+      transaction.onerror = () => reject(transaction.error);
+    });
+    database.close();
+    const observed = window as unknown as { palettePayloadReads: string[] };
+    observed.palettePayloadReads = [];
+    const original = IDBObjectStore.prototype.get;
+    IDBObjectStore.prototype.get = function (key) {
+      if (this.name === "palettes")
+        observed.palettePayloadReads.push(typeof key === "string" ? key : "<non-string>");
+      return original.call(this, key);
+    };
+  });
+  await page.locator(".inspector .color-control .palette-shortcut").first().click();
+  const popover = page.locator("[data-palette-popover]");
+  const selector = popover.getByRole("combobox", { name: "Saved palettes", exact: true });
+  const list = popover.locator(".palette-library-list");
+  const documentColors = popover.getByRole("region", { name: "Document", exact: true });
+  await expect(selector).toContainText("All");
+  await expect(list.locator(".palette-library-row")).toHaveCount(50);
+  await expect(
+    list.getByRole("button", { name: "Ink #264653", exact: true }).first(),
+  ).toBeVisible();
+  const reads = () =>
+    page.evaluate(
+      () => (window as unknown as { palettePayloadReads: string[] }).palettePayloadReads,
+    );
+  expect((await reads()).length).toBeLessThanOrEqual(4);
+  const bounds = (await list.boundingBox())!;
+  expect(bounds.height).toBeLessThanOrEqual(180);
+  expect(await list.evaluate((element) => element.scrollHeight > element.clientHeight)).toBe(true);
+  await expect(documentColors).toBeVisible();
+  expect((await documentColors.boundingBox())!.y).toBeGreaterThan(bounds.y + bounds.height);
+  expect((await popover.boundingBox())!.height).toBeLessThanOrEqual(420);
+  await list.evaluate((element) => {
+    element.scrollTop = element.scrollHeight;
+  });
+  await expect(list.getByRole("button", { name: "Saved 49", exact: true })).toBeEnabled();
+  expect((await reads()).length).toBeLessThanOrEqual(8);
+  await selector.click();
+  await expect(page.getByRole("option", { name: "Document", exact: true })).toHaveCount(0);
+  await page.getByRole("option", { name: "Saved 4", exact: true }).click();
+  await expect(list.locator(".palette-library-row")).toHaveCount(1);
+  await expect(list.getByRole("button", { name: "Saved 4", exact: true })).toBeVisible();
+  await expect(documentColors).toBeVisible();
+  await selector.click();
+  await page.getByRole("option", { name: "All", exact: true }).click();
+  await popover.getByRole("button", { name: "Next palettes", exact: true }).click();
+  await expect(list.locator(".palette-library-row")).toHaveCount(10);
+  await expect(list.getByRole("button", { name: "Saved 50", exact: true })).toBeVisible();
+});
+
+test("unlinked palette generations preview their addressed color and apply with one undo", async ({
+  page,
+}) => {
+  test.setTimeout(60000);
+  await open(page);
+  const before = await page.evaluate(() => window.musart!.snapshot());
+  await page.locator(".inspector .color-control .palette-shortcut").first().click();
+  const popover = page.locator("[data-palette-popover]");
+  await popover.getByRole("button", { name: "New palette", exact: true }).click();
+  const editor = popover.locator(".palette-editor"),
+    canvas = page.locator(".editor-gpu-scene canvas"),
+    baseline = await canvas.screenshot();
+  await editor.getByRole("button", { name: "Generate harmonious variation", exact: true }).click();
+  await expect.poll(async () => Buffer.compare(await canvas.screenshot(), baseline)).not.toBe(0);
+  expect(await page.evaluate(() => window.musart!.snapshot().revision)).toBe(before.revision);
+  await editor.getByRole("button", { name: "Apply", exact: true }).click();
+  await expect
+    .poll(() => page.evaluate(() => window.musart!.snapshot().revision))
+    .toBe(before.revision + 1);
+  expect(
+    await page.evaluate(() => window.musart!.snapshot().project.pages[0]!.layers[0]!.fill),
+  ).not.toBe("#e26d3f");
+  await editor.getByRole("button", { name: "Undo", exact: true }).click();
+  await expect
+    .poll(() => page.evaluate(() => window.musart!.snapshot().project))
+    .toEqual(before.project);
+});
+
+test("Studio palette links and generations replace gradient paint with solid ink and undo restores it", async ({
+  page,
+}) => {
+  test.setTimeout(90000);
+  await open(page, true);
+  await page.evaluate(() => {
+    const layer = window.musart!.snapshot().project.pages[0]!.layers[0]!;
+    window.musart!.execute({
+      type: "updateLayers",
+      ids: [layer.id],
+      patch: {
+        spatial: { ...layer.spatial!, useModelMaterials: true },
+        fillGradient: {
+          kind: "linear",
+          angle: 0,
+          stops: [
+            { offset: 0, color: "#ff0000" },
+            { offset: 1, color: "#0000ff" },
+          ],
+        },
+      },
+    });
+  });
+  const before = await page.evaluate(() => window.musart!.snapshot());
+  const shortcut = page.locator(".studio-object-paint .palette-shortcut");
+  await shortcut.click();
+  const popover = page.locator("[data-palette-popover]");
+  await popover
+    .locator(".palette-detected")
+    .getByRole("button", { name: /#ff0000/ })
+    .click({ button: "right" });
+  await page.getByRole("menuitem", { name: "Link as document color", exact: true }).click();
+  await expect
+    .poll(() =>
+      page.evaluate(() => {
+        const snapshot = window.musart!.snapshot(),
+          layer = snapshot.project.pages[0]!.layers[0]!;
+        return {
+          gradient: !!layer.fillGradient,
+          model: layer.spatial!.useModelMaterials,
+          fill: layer.fill,
+          linked: layer.colorLinks?.fill === snapshot.project.colors?.[0]?.id,
+          revision: snapshot.revision,
+        };
+      }),
+    )
+    .toEqual({
+      gradient: false,
+      model: false,
+      fill: "#ff0000",
+      linked: true,
+      revision: before.revision + 1,
+    });
+  await page.keyboard.press("Escape");
+  await page.keyboard.press("ControlOrMeta+z");
+  await expect
+    .poll(() => page.evaluate(() => window.musart!.snapshot().project))
+    .toEqual(before.project);
+  await shortcut.click();
+  await popover.getByRole("button", { name: "New palette", exact: true }).click();
+  const editor = popover.locator(".palette-editor"),
+    canvas = page.locator(".editor-gpu-scene canvas");
+  const baseline = await canvas.screenshot();
+  const revision = await page.evaluate(() => window.musart!.snapshot().revision);
+  await editor.getByRole("button", { name: "Generate harmonious variation", exact: true }).click();
+  await expect.poll(async () => Buffer.compare(await canvas.screenshot(), baseline)).not.toBe(0);
+  expect(await page.evaluate(() => window.musart!.snapshot().revision)).toBe(revision);
+  await editor.getByRole("button", { name: "Apply", exact: true }).click();
+  const changed = await page.evaluate(() => window.musart!.snapshot().project.pages[0]!.layers[0]!);
+  expect(changed.fillGradient).toBeUndefined();
+  expect(changed.spatial!.useModelMaterials).toBe(false);
+  await editor.getByRole("button", { name: "Undo", exact: true }).click();
+  await expect
+    .poll(() => page.evaluate(() => window.musart!.snapshot().project))
+    .toEqual(before.project);
 });

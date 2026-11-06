@@ -42,7 +42,7 @@
   "edit": "Modifier la palette",
   "infoLabel": "À propos des palettes",
   "info": "Choisis une palette enregistrée ou les couleurs détectées dans ce document. + crée une palette.",
-  "documentDetected": "Du document",
+  "documentDetected": "Document",
   "linkedColors": "Couleurs liées",
   "historyUndo": "Annuler",
   "historyRedo": "Rétablir",
@@ -62,5 +62,6 @@
     "Collection d’affiches",
     "Café du quartier",
     "Lancement produit"
-  ]
+  ],
+  "all": "Tout"
 }

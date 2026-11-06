@@ -42,7 +42,7 @@
   "edit": "Edit palette",
   "infoLabel": "About palettes",
   "info": "Choose a saved palette or colors detected in this document. + creates a palette.",
-  "documentDetected": "From document",
+  "documentDetected": "Document",
   "linkedColors": "Linked colors",
   "historyUndo": "Undo",
   "historyRedo": "Redo",
@@ -62,5 +62,6 @@
     "Poster collection",
     "Coffee shop",
     "Product launch"
-  ]
+  ],
+  "all": "All"
 }

@@ -81,8 +81,8 @@ export function StudioObjectPaint({
               target={{ kind: "layer", layerId: layer.id, property: "fill" }}
               value={layer.fill}
               disabled={disabled}
-              onPreview={(fill) => paint({ fill })}
-              onCommit={(fill) => commit(materialPaint({ fill }))}
+              onPreview={(fill) => paint({ fill, fillGradient: undefined })}
+              onCommit={(fill) => commit(materialPaint({ fill, fillGradient: undefined }))}
               onCancel={restore}
             />
           )}
@@ -94,8 +94,8 @@ export function StudioObjectPaint({
         disabled={disabled}
         targets={[{ pageId: engine.getSnapshot().pageId, layerId: layer.id, property: "fill" }]}
         beforeApply={restore}
-        onUse={(fill) => commit(materialPaint({ fill }))}
-        onPreview={(fill) => paint({ fill })}
+        onUse={(fill) => commit(materialPaint({ fill, fillGradient: undefined }))}
+        onPreview={(fill) => paint({ fill, fillGradient: undefined })}
         onCancel={restore}
       />
     </>
