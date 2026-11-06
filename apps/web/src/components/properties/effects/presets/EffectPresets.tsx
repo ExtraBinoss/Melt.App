@@ -75,7 +75,7 @@ export function EffectPresets({
   const [source, setSource] = useState({ id: effect.id, reference, items });
   if (source.id !== effect.id || source.reference !== reference || source.items !== items) {
     setSource({ id: effect.id, reference, items });
-    setSaved(null);
+    if (source.id !== effect.id || source.reference !== reference) setSaved(null);
     setLoaded(!reference || !engine);
     if (source.id !== effect.id || source.reference !== reference) {
       setRename(false);
@@ -158,8 +158,8 @@ export function EffectPresets({
     saved && !effectMatchesTreatment(effect, saved.treatment, engine?.getSnapshot().project.assets);
   const selectedName = saved?.name ?? effect.preset?.name ?? t("custom");
   const selectedLabel =
-    reference && (unavailable || !loaded || modified)
-      ? t(unavailable ? "unavailableLabel" : !loaded ? "loadingLabel" : "modifiedLabel", {
+    reference && (unavailable || modified)
+      ? t(unavailable ? "unavailableLabel" : "modifiedLabel", {
           name: selectedName,
         })
       : selectedName;

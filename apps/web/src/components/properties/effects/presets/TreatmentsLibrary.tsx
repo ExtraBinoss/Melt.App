@@ -3,6 +3,7 @@ import { captureEffectTreatment, type EnginePort } from "@musart/core";
 import { useTranslation } from "react-i18next";
 import { Button } from "../../../ui/button";
 import { Input } from "../../../ui/input";
+import { Throbber } from "../../../ui/throbber/Throbber";
 import { applyTreatment, type TreatmentTarget } from "../../../../services/effect-presets/apply";
 import type { TreatmentHeader } from "../../../../services/effect-presets/store";
 import { useEffectLibrary } from "./use-library";
@@ -171,7 +172,11 @@ export function TreatmentsLibrary({ engine, target, disabled }: TreatmentContext
       {!library.busy && !library.items.some((item) => item.kind === "stack") && (
         <p className="muted-description">{t("empty")}</p>
       )}
-      {(busy || library.busy) && <small>{t("loading")}</small>}
+      {(busy || library.busy) && (
+        <div role="status" aria-label={t("loading")}>
+          <Throbber size={18} decorative />
+        </div>
+      )}
       {library.before && (
         <Button
           size="sm"

@@ -6,7 +6,7 @@ export function useEffectLibrary(enabled = true) {
   const [items, setItems] = useState<TreatmentHeader[]>([]);
   const [before, setBefore] = useState<[number, string] | null>(null);
   const [error, setError] = useState("");
-  const [busy, setBusy] = useState(false);
+  const [busy, setBusy] = useState(enabled);
   const getStore = useCallback(() => (store.current ??= new EffectPresetStore()), []);
   const refresh = useCallback(
     async (after?: [number, string]) => {

@@ -25,6 +25,5 @@
   "stale": "La cible a changé. Réessayez.",
   "reload": "Recharger la bibliothèque",
   "modifiedLabel": "{{name}} · Modifié",
-  "unavailableLabel": "{{name}} · Indisponible",
-  "loadingLabel": "{{name}} · Chargement…"
+  "unavailableLabel": "{{name}} · Indisponible"
 }

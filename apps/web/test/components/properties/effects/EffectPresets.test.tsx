@@ -1,10 +1,12 @@
 import { expect, test, vi } from "vitest";
-import { fireEvent, screen, waitFor, within } from "@testing-library/react";
+import { act, fireEvent, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { captureEffectTreatment, createEffect } from "@musart/core";
 import { EffectParameters } from "../../../../src/components/properties/effects/EffectParameters";
 import { EffectPresetStore } from "../../../../src/services/effect-presets/store";
 import { setup } from "../../../support/ui";
+import { EffectPresets } from "../../../../src/components/properties/effects/presets/EffectPresets";
+import type { SavedTreatment } from "../../../../src/services/effect-presets/store";
 
 test("preset header precedes owner controls and keeps stack saving inside its actions menu", async () => {
   const user = userEvent.setup(),
@@ -34,6 +36,54 @@ test("preset header precedes owner controls and keeps stack saving inside its ac
   expect(within(form).getByRole("button", { name: "Annuler" })).toHaveTextContent("");
   fireEvent.keyDown(screen.getByRole("textbox", { name: "Nom du traitement" }), { key: "Escape" });
   expect(screen.queryByRole("textbox", { name: "Nom du traitement" })).toBeNull();
+});
+
+test("keeps the applied preset name while local reads are pending and rejects an old read after switching", async () => {
+  const d = setup();
+  vi.spyOn(EffectPresetStore.prototype, "list").mockResolvedValue({ items: [], before: null });
+  let finishFirst!: (record: SavedTreatment | null) => void;
+  let finishSecond!: (record: SavedTreatment | null) => void;
+  const get = vi
+    .spyOn(EffectPresetStore.prototype, "get")
+    .mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          finishFirst = resolve;
+        }),
+    )
+    .mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          finishSecond = resolve;
+        }),
+    );
+  const original = createEffect("grain", { id: "grain" });
+  const props = { engine: d.engine, disabled: false, onChange: vi.fn(), onReset: vi.fn() };
+  const view = d.mount(
+    <EffectPresets {...props} effect={{ ...original, preset: { id: "first", name: "Paper" } }} />,
+  );
+  const selector = screen.getByRole("combobox", { name: "Préréglage enregistré" });
+  expect(selector).toHaveTextContent("Paper");
+  expect(selector).not.toHaveTextContent(/Chargement|Loading/);
+  // Initial metadata listing can restart the same lazy read; finish that owner first.
+  await act(async () => {});
+  const secondGet = vi.fn(
+    () =>
+      new Promise<SavedTreatment | null>((resolve) => {
+        finishSecond = resolve;
+      }),
+  );
+  get.mockImplementation(secondGet);
+  view.rerender(
+    <EffectPresets {...props} effect={{ ...original, preset: { id: "second", name: "Ink" } }} />,
+  );
+  expect(selector).toHaveTextContent("Ink");
+  expect(selector).not.toHaveTextContent(/Chargement|Loading|Paper/);
+  await act(async () => finishFirst(null));
+  expect(selector).toHaveTextContent("Ink");
+  expect(selector).not.toHaveTextContent("indisponible");
+  await act(async () => finishSecond(null));
+  expect(selector).toHaveTextContent("Ink · Indisponible");
 });
 
 test("modified status stays inside the selector and save/rename use icon confirmations", async () => {

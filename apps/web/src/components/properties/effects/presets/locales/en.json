@@ -25,6 +25,5 @@
   "stale": "The editing target changed. Try again.",
   "reload": "Reload library",
   "modifiedLabel": "{{name}} · Modified",
-  "unavailableLabel": "{{name}} · Unavailable",
-  "loadingLabel": "{{name}} · Loading…"
+  "unavailableLabel": "{{name}} · Unavailable"
 }

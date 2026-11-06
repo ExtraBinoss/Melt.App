@@ -5,6 +5,7 @@ All notable changes are recorded here in English. Melt uses a synchronized [Sema
 ## [Unreleased]
 
 - Synchronize effect position-pad X/Y fields in real time through imperative Jotai subscriptions without React commits during dragging; retain one undoable position commit and cancellation restoration for layer and composition effects.
+- Keep preset names stable during IndexedDB reads and switches; replace treatment-library loading text with the shared delayed brand throbber and suppress the initial empty-list flash.
 
 - Remove the separate linked-color panel and menu action; palette swatches continue to manage document links automatically.
 

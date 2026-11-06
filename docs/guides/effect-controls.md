@@ -45,6 +45,10 @@ defaults and removes the preset reference. The actions menu also updates,
 renames or deletes the saved entry. Updating the library never changes other
 applied copies. A missing entry is explicitly shown as unavailable while the
 document keeps its applied values.
+The applied name remains visible during local IndexedDB reads and preset switches;
+loading never replaces it. The treatment browser uses the shared delayed brand
+throbber instead of a visible loading sentence, and avoids flashing an empty list
+while its first metadata read is pending.
 
 **Save effect stack** lives in the preset actions menu and captures the owner's
 complete ordered stack, including
